@@ -18,4 +18,10 @@ public class MainMenu : Node2D
 //  {
 //      
 //  }
+
+	private void _on_Button_pressed()
+	{
+		GD.Print("Load button pressed");
+		GetTree().ChangeScene("res://C7Game.tscn");    
+	}
 }
