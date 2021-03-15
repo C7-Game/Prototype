@@ -8,7 +8,7 @@ public class Game : Node2D
 	// Declare member variables here. Examples:
 	// private int a = 2;
 	// private string b = "text";
-	public string Civ3Path = "D:/Civilization III";
+	public string Civ3Path = Util.GetCiv3Path();
 	
 	int[,] Map;
 	Hashtable Terrmask = new Hashtable();

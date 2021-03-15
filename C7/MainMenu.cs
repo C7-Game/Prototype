@@ -8,7 +8,7 @@ public class MainMenu : Node2D
 	// private int a = 2;
 	// private string b = "text";
 	
-	public string Civ3Path = "D:/Civilization III";
+	public string Civ3Path = Util.GetCiv3Path();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
