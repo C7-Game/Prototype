@@ -1,0 +1,22 @@
+# Identify text-based files and standardize to Unix (lf) line endings
+
+# C# files
+*.cs text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+
+# Godot files
+*.tscn text eol=lf
+*.godot text eol=lf
+*.tres text eol=lf
+*.import text eol=lf
+*.gd text eol=lf
+*.shader text eol=lf
+
+# Other
+*.md text eol=lf
+*.ps1 text eol=lf
+
+.gitignore text eol=lf
+.gitattributes text eol=lf
+LICENSE text eol=lf
