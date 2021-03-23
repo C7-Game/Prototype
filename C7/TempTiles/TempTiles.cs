@@ -25,4 +25,10 @@ public class TempTiles : Node2D
         // NOTE: I think this quits the current node or scene and not necessarily the whole program if this is a child node?
         GetTree().Quit();
     }
+
+    public void _on_FileDialog_file_selected(string path)
+    {
+        GD.Print("File selected! " + path);
+        // DoSomething();
+    }
 }

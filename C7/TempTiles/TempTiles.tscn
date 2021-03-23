@@ -34,3 +34,4 @@ current_dir = "/Users/jim/code/src/godot/Prototype/C7"
 current_path = "/Users/jim/code/src/godot/Prototype/C7/"
 [connection signal="pressed" from="OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
 [connection signal="pressed" from="QuitButton" to="." method="_on_QuitButton_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]
