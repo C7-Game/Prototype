@@ -3,14 +3,14 @@ using System;
 
 public class TempTiles : Node2D
 {
-    public string SavePath = Util.GetCiv3Path() + @"/Conquests/Saves";
     private FileDialog Dialog;
 
     public override void _Ready()
     {
         GD.Print("TempTiles script started!");
+        // Create reference to child node so we can change its settings from here
         Dialog = GetNode<FileDialog>("FileDialog");
-        Dialog.CurrentDir = SavePath;
+        Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves";
     }
 
     public void _on_OpenFileButton_pressed()
