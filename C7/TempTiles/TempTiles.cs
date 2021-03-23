@@ -18,4 +18,11 @@ public class TempTiles : Node2D
         GD.Print("Open button pressed!");
         Dialog.Popup_();
     }
+
+    public void _on_QuitButton_pressed()
+    {
+        GD.Print("Quit button pressed!");
+        // NOTE: I think this quits the current node or scene and not necessarily the whole program if this is a child node?
+        GetTree().Quit();
+    }
 }

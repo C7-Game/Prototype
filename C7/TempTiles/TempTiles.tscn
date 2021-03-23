@@ -13,6 +13,16 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="QuitButton" type="Button" parent="."]
+margin_left = 8.0
+margin_top = 308.0
+margin_right = 604.0
+margin_bottom = 562.0
+text = "Quit"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="FileDialog" type="FileDialog" parent="."]
 margin_right = 416.0
 margin_bottom = 184.0
@@ -23,3 +33,4 @@ access = 2
 current_dir = "/Users/jim/code/src/godot/Prototype/C7"
 current_path = "/Users/jim/code/src/godot/Prototype/C7/"
 [connection signal="pressed" from="OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
+[connection signal="pressed" from="QuitButton" to="." method="_on_QuitButton_pressed"]
