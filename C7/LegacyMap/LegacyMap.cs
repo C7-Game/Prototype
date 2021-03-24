@@ -27,7 +27,7 @@ public class LegacyMap : Node2D
             get { return 0; }
         }
     }
-    private System.Collections.Generic.IEnumerable<ILegacyTile> LegacyTiles;
+    public System.Collections.Generic.IEnumerable<ILegacyTile> LegacyTiles;
     public override void _Ready()
     {
         System.Collections.Generic.List<TempHackTile> foo = new System.Collections.Generic.List<TempHackTile>();
@@ -39,11 +39,15 @@ public class LegacyMap : Node2D
     {
         GD.Print("Temp() started");
         int TileCount = 0;
+        int WaterCount = 0;
         foreach (ILegacyTile tile in LegacyTiles)
         {
-            GD.Print(tile.X, tile.Y, tile.IsLand);
+            // GD.Print(tile.X, tile.Y, tile.IsLand);
             TileCount++;
+            if(!tile.IsLand) { WaterCount++; }
         }
         GD.Print("Total tiles: " + TileCount);
+        GD.Print("Water tiles: " + WaterCount);
+        GD.Print("% Water: " + 100.0 * WaterCount / TileCount);
     }
 }

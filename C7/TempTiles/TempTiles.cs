@@ -13,6 +13,7 @@ public class TempTiles : Node2D
         public int X { get; set; }
         public int Y { get; set; }
     }
+    private LegacyMap MapUI;
     public override void _Ready()
     {
         GD.Print("TempTiles script started!");
@@ -21,6 +22,9 @@ public class TempTiles : Node2D
         Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves/Auto";
 
         LegacyMapReader = new ReadCivData.QueryCiv3Sav.Civ3File();
+        // Load LegacyMap scene (?) and attach to tree
+        MapUI = new LegacyMap();
+        this.AddChild(MapUI);
     }
 
     public void _on_OpenFileButton_pressed()
@@ -41,6 +45,8 @@ public class TempTiles : Node2D
         GD.Print("File selected! " + path);
         LegacyMapReader.Load(path);
         CreateTileSet();
+        MapUI.LegacyTiles = Tiles;
+        MapUI.Temp();
     }
     private void CreateTileSet()
     {
@@ -53,15 +59,18 @@ public class TempTiles : Node2D
         GD.Print(WorldWidth + " x " + WorldHeight); 
 
         Offset = LegacyMapReader.SectionOffset("TILE", 1);
-        for (int y=0; y < WorldHeight; y+=2)
+        for (int y=0; y < WorldHeight; y++)
         {
             for (int x=y%2; x < WorldWidth; x+=2)
             {
                 TempTile ThisTile = new TempTile();
                 ThisTile.X = x;
                 ThisTile.Y = y;
-                ThisTile.IsLand = true;
+                // If low nybble of terrain byte is < 11, tile is land
+                ThisTile.IsLand = (LegacyMapReader.ReadByte(Offset+53) & 0x0F) < 11;
                 Tiles.Add(ThisTile);
+                // 212 bytes per tile in Conquests SAV
+                Offset += 212;
             }
         }
     }
