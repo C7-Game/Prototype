@@ -1,10 +1,18 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public class TempTiles : Node2D
 {
     private FileDialog Dialog;
     private ReadCivData.QueryCiv3Sav.Civ3File LegacyMapReader;
+    private List<TempTile> Tiles;
+    public class TempTile: LegacyMap.ILegacyTile
+    {
+        public bool IsLand { get; private set; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
+    }
     public override void _Ready()
     {
         GD.Print("TempTiles script started!");
@@ -32,5 +40,16 @@ public class TempTiles : Node2D
     {
         GD.Print("File selected! " + path);
         LegacyMapReader.Load(path);
+        CreateTileSet();
+    }
+    private void CreateTileSet()
+    {
+        GD.Print("CreateTileSet()");
+        Tiles = new List<TempTile>();
+        int Offset = LegacyMapReader.SectionOffset("WRLD", 2) + 8;
+        int WorldHeight = LegacyMapReader.ReadInt32(Offset);
+        int WorldWidth = LegacyMapReader.ReadInt32(Offset + 5*4);
+        GD.Print("World Size:");
+        GD.Print(WorldWidth + " x " + WorldHeight); 
     }
 }

@@ -14,7 +14,8 @@ public class LegacyMap : Node2D
     }
     private class TempHackTile: ILegacyTile
     {
-        public bool IsLand{
+        public bool IsLand
+        {
             get { return true; }
         }
         public int X
