@@ -28,26 +28,21 @@ public class LegacyMap : Node2D
         }
     }
     public System.Collections.Generic.IEnumerable<ILegacyTile> LegacyTiles;
+    private DynamicFont MapFont;
     public override void _Ready()
     {
-        System.Collections.Generic.List<TempHackTile> foo = new System.Collections.Generic.List<TempHackTile>();
-        foo.Add(new TempHackTile());
-        LegacyTiles = foo;
-        Temp();
+        string FontPath = Util.GetCiv3Path() + @"/LSANS.TTF";
+        MapFont = new DynamicFont();
+        MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
+        LegacyTiles = new System.Collections.Generic.List<TempHackTile>();
     }
-    public void Temp()
+    public override void _Draw()
     {
-        GD.Print("Temp() started");
-        int TileCount = 0;
-        int WaterCount = 0;
+        base._Draw();
+        MapFont.Size = 10;
         foreach (ILegacyTile tile in LegacyTiles)
         {
-            // GD.Print(tile.X, tile.Y, tile.IsLand);
-            TileCount++;
-            if(!tile.IsLand) { WaterCount++; }
+            DrawString(MapFont, new Vector2(tile.X * 10, tile.Y * 5), tile.IsLand ? "O" : "", new Color(1,1,1,1));
         }
-        GD.Print("Total tiles: " + TileCount);
-        GD.Print("Water tiles: " + WaterCount);
-        GD.Print("% Water: " + 100.0 * WaterCount / TileCount);
     }
 }
