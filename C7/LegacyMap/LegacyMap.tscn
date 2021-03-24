@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://LegacyMap.cs" type="Script" id=1]
+[ext_resource path="res://LegacyMap/LegacyMap.cs" type="Script" id=1]
 
 [node name="LegacyMap" type="Node2D"]
 script = ExtResource( 1 )
