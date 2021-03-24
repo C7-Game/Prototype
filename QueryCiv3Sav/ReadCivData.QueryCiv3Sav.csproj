@@ -3,5 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Blast\Blast.csproj" />
+  </ItemGroup>
 
 </Project>

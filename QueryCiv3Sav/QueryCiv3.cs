@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-// using Blast;
+using Blast;
 
 namespace ReadCivData.QueryCiv3Sav {
     public class Civ3Section {
@@ -25,14 +25,10 @@ namespace ReadCivData.QueryCiv3Sav {
             Console.WriteLine(ascii.GetString(this.FileData, 0, 4));
         }
         protected internal void Decompress() {
-            // Decompression disabled for now
-            throw new ApplicationException("Decompression not yet implemented");
-            /*
             MemoryStream DecompressedStream = new MemoryStream();
             BlastDecoder Decompressor = new BlastDecoder(new MemoryStream(this.FileData, writable: false), DecompressedStream);
             Decompressor.Decompress();
             this.FileData = DecompressedStream.ToArray();
-            */
         }
         protected internal void PopulateSections() {
             int Count = 0;
