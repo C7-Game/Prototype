@@ -4,13 +4,15 @@ using System;
 public class TempTiles : Node2D
 {
     private FileDialog Dialog;
-
+    private ReadCivData.QueryCiv3Sav.Civ3File LegacyMapReader;
     public override void _Ready()
     {
         GD.Print("TempTiles script started!");
         // Create reference to child node so we can change its settings from here
         Dialog = GetNode<FileDialog>("FileDialog");
         Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves/Auto";
+
+        LegacyMapReader = new ReadCivData.QueryCiv3Sav.Civ3File();
     }
 
     public void _on_OpenFileButton_pressed()
@@ -29,6 +31,6 @@ public class TempTiles : Node2D
     public void _on_FileDialog_file_selected(string path)
     {
         GD.Print("File selected! " + path);
-        // DoSomething();
+        LegacyMapReader.Load(path);
     }
 }
