@@ -10,7 +10,7 @@ public class TempTiles : Node2D
         GD.Print("TempTiles script started!");
         // Create reference to child node so we can change its settings from here
         Dialog = GetNode<FileDialog>("FileDialog");
-        Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves";
+        Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves/Auto";
     }
 
     public void _on_OpenFileButton_pressed()
