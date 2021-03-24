@@ -19,11 +19,6 @@ namespace QueryCiv3 {
             // TODO: Check for CIV3 or BIC header?
             this.PopulateSections();
         }
-        // For dev validation only
-        public void PrintFirstFourBytes() {
-            System.Text.ASCIIEncoding ascii = new System.Text.ASCIIEncoding();
-            Console.WriteLine(ascii.GetString(this.FileData, 0, 4));
-        }
         protected internal void Decompress() {
             MemoryStream DecompressedStream = new MemoryStream();
             BlastDecoder Decompressor = new BlastDecoder(new MemoryStream(this.FileData, writable: false), DecompressedStream);
@@ -50,7 +45,6 @@ namespace QueryCiv3 {
                     Section.Offset = Offset;
                     Section.Name = ascii.GetString(this.FileData, Offset, 4);
                     SectionList.Add(Section);
-                    // Console.WriteLine(Section.Name + " " + Section.Offset);
                 }
             }
             // TODO: Filter junk and dirty data from array (e.g. stray CITYs, non-headers, and such)
@@ -66,8 +60,7 @@ namespace QueryCiv3 {
                     }
                 }
             }
-            // TODO: Add name and nth to message
-            throw new ArgumentException("Unable to find section");
+            throw new ArgumentException("Unable to find section " + name + ", " + nth);
         }
         // TODO: Force little endian conversion on big endian systems
         //  although anticipated Intel and ARM targets are little endian, so maybe not important

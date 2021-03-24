@@ -50,6 +50,9 @@ This reads the unit INI file and loads a Flic[] property so that all of a unit's
 
 ## Build
 
+\* Note: These build instructions are for a shared dotnet library.
+For C7 game, just use Godot Mono to build the C7 project.
+
 - Uses dotnet core 3.1 cli
 - CD to this folder and `dotnet build`
 - Files will be in obj/Debug/

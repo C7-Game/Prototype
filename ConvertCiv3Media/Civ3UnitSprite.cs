@@ -77,15 +77,12 @@ namespace ConvertCiv3Media
             string[] foo = unitPath.Split(new char[]{'/','\\'});
             foo[foo.Length-2] = "Palettes";
             foo[foo.Length-1] = String.Format("ntp{0:D02}.pcx", unitColor);
-            // Console.WriteLine(String.Join("/", foo));
             Pcx UnitPal = new Pcx(String.Join("/", foo));
 
             // TODO: Fix this total hack
             string[] bar = unitPath.Split(new char[]{'/','\\'});
             foreach (UnitAction actn in Enum.GetValues(typeof(UnitAction))) {
                 if (UnitIniData["Animations"][actn.ToString()] != "" && UnitIniData["Animations"][actn.ToString()] != null) {
-                    // Console.WriteLine(UnitIniData["Animations"][actn.ToString()] != "");
-                    // Console.WriteLine(actn.ToString() + @" '" + UnitIniData["Animations"][actn.ToString()] + @"'");
                     bar[bar.Length-1] = UnitIniData["Animations"][actn.ToString()];
                     Flic UnitFlic = new Flic(String.Join("/", bar));
 
