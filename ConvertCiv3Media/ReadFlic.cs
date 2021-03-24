@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace ReadCivData.ConvertCiv3Media
+namespace ConvertCiv3Media
 {
     // Under construction
     // Not intended to be a generalized/universal Flic reader

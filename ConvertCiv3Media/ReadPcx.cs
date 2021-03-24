@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace ReadCivData.ConvertCiv3Media
+namespace ConvertCiv3Media
 {
     public class Pcx {
 

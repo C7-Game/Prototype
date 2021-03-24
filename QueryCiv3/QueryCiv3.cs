@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using Blast;
 
-namespace ReadCivData.QueryCiv3Sav {
+namespace QueryCiv3 {
     public class Civ3Section {
         public string Name;
         public int Offset;

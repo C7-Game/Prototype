@@ -1,6 +1,6 @@
 using Godot;
 using System;
-using ReadCivData.ConvertCiv3Media;
+using ConvertCiv3Media;
 
 public class MainMenu : Node2D
 {

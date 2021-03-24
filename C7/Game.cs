@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Collections;
-using ReadCivData.ConvertCiv3Media;
+using ConvertCiv3Media;
 
 public class Game : Node2D
 {

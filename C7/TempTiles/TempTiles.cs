@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class TempTiles : Node2D
 {
     private FileDialog Dialog;
-    private ReadCivData.QueryCiv3Sav.Civ3File LegacyMapReader;
+    private QueryCiv3.Civ3File LegacyMapReader;
     private List<TempTile> Tiles;
     public class TempTile: LegacyMap.ILegacyTile
     {
@@ -20,7 +20,7 @@ public class TempTiles : Node2D
         Dialog = GetNode<FileDialog>("FileDialog");
         Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves";
 
-        LegacyMapReader = new ReadCivData.QueryCiv3Sav.Civ3File();
+        LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
         MapUI = new LegacyMap();
         this.AddChild(MapUI);

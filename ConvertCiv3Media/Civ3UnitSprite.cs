@@ -3,7 +3,7 @@ using System.IO;
 using IniParser;
 using IniParser.Model;
 
-namespace ReadCivData.ConvertCiv3Media
+namespace ConvertCiv3Media
 {
     // Under construction
     

@@ -3,9 +3,9 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConvertCiv3Media\ReadCivData.ConvertCiv3Media.csproj" />
+    <ProjectReference Include="..\ConvertCiv3Media\ConvertCiv3Media.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QueryCiv3Sav\ReadCivData.QueryCiv3Sav.csproj" />
+    <ProjectReference Include="..\QueryCiv3\QueryCiv3.csproj" />
   </ItemGroup>
 </Project>
