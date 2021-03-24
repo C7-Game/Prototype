@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <PackageId>BlastDecompressor</PackageId>
+    <Title>Blast Decompressor</Title>
+    <Description>A port of the PkWare Blast compression algorithm based on the C implementation
+    by Mark Adler.</Description>
+    <PackageVersion>0.1-pre</PackageVersion>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+</Project>

@@ -5,4 +5,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ConvertCiv3Media\ReadCivData.ConvertCiv3Media.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QueryCiv3Sav\ReadCivData.QueryCiv3Sav.csproj" />
+  </ItemGroup>
 </Project>
