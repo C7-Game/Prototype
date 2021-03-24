@@ -9,9 +9,9 @@ public class TempTiles : Node2D
     private List<TempTile> Tiles;
     public class TempTile: LegacyMap.ILegacyTile
     {
-        public bool IsLand { get; private set; }
-        public int X { get; private set; }
-        public int Y { get; private set; }
+        public bool IsLand { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
     }
     public override void _Ready()
     {
@@ -51,5 +51,18 @@ public class TempTiles : Node2D
         int WorldWidth = LegacyMapReader.ReadInt32(Offset + 5*4);
         GD.Print("World Size:");
         GD.Print(WorldWidth + " x " + WorldHeight); 
+
+        Offset = LegacyMapReader.SectionOffset("TILE", 1);
+        for (int y=0; y < WorldHeight; y+=2)
+        {
+            for (int x=y%2; x < WorldWidth; x+=2)
+            {
+                TempTile ThisTile = new TempTile();
+                ThisTile.X = x;
+                ThisTile.Y = y;
+                ThisTile.IsLand = true;
+                Tiles.Add(ThisTile);
+            }
+        }
     }
 }
