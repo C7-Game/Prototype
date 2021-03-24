@@ -11,4 +11,4 @@ BIQ data will also need to be read and probably exposed here.
 - Provide sane size for file open dialog
 - Provide sane size and/or spacing for action buttons
 - Perhaps experiment with resonsive layout for menu
-- Read a file
+- Render proper graphics
