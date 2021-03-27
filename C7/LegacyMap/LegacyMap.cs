@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 
 public class LegacyMap : Node2D
@@ -8,8 +9,10 @@ public class LegacyMap : Node2D
     {
         // temp hack for prototyping land/water only map
         bool IsLand {get;}
-        int X {get;}
-        int Y {get;}
+        int LegacyBaseTerrainID { get; }
+        int LegacyOverlayTerrainID { get; }
+        int LegacyX {get;}
+        int LegacyY {get;}
         
     }
     public IEnumerable<ILegacyTile> LegacyTiles;
@@ -28,7 +31,7 @@ public class LegacyMap : Node2D
         {
             foreach (ILegacyTile tile in LegacyTiles)
             {
-                DrawString(MapFont, new Vector2(tile.X * 10, tile.Y * 5), tile.IsLand ? "O" : "", new Color(1,1,1,1));
+                DrawString(MapFont, new Vector2(tile.LegacyX * 10, tile.LegacyY * 5), tile.IsLand ? "O" : "", new Color(1,1,1,1));
             }
         }
     }

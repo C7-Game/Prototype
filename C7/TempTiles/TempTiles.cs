@@ -7,11 +7,13 @@ public class TempTiles : Node2D
     private FileDialog Dialog;
     private QueryCiv3.Civ3File LegacyMapReader;
     private List<TempTile> Tiles;
-    public class TempTile: LegacyMap.ILegacyTile
+    private class TempTile: LegacyMap.ILegacyTile
     {
         public bool IsLand { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int LegacyBaseTerrainID { get; set; }
+        public int LegacyOverlayTerrainID { get; set; }
+        public int LegacyX { get; set; }
+        public int LegacyY { get; set; }
     }
     private LegacyMap MapUI;
     public override void _Ready()
@@ -57,10 +59,15 @@ public class TempTiles : Node2D
             for (int x=y%2; x < WorldWidth; x+=2)
             {
                 TempTile ThisTile = new TempTile();
-                ThisTile.X = x;
-                ThisTile.Y = y;
+                ThisTile.LegacyX = x;
+                ThisTile.LegacyY = y;
+
+                int TerrainByte = LegacyMapReader.ReadByte(Offset+53);
+                ThisTile.LegacyBaseTerrainID = TerrainByte & 0x0F;
+                ThisTile.LegacyOverlayTerrainID = TerrainByte >> 4;
                 // If low nybble of terrain byte is < 11, tile is land
-                ThisTile.IsLand = (LegacyMapReader.ReadByte(Offset+53) & 0x0F) < 11;
+                ThisTile.IsLand = ThisTile.LegacyBaseTerrainID < 11;
+
                 Tiles.Add(ThisTile);
                 // 212 bytes per tile in Conquests SAV
                 Offset += 212;
