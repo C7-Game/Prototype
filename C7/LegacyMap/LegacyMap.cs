@@ -56,7 +56,7 @@ public class LegacyMap : Node2D
         }
 		for (int y = 0; y < myheight; y++) {
 			for (int x = y % 2; x < mywidth; x+=2) {
-				TM.SetCellv(new Vector2(x + 1, y), Map[x,y]);
+				TM.SetCellv(new Vector2(x, y), Map[x,y]);
 			}
 		}
         // TM.Scale = new Vector2((float)0.2, (float)0.2);
@@ -89,7 +89,7 @@ public class LegacyMap : Node2D
 				TS.TileSetTexture(id, Txtr);
 				TS.TileSetRegion(id, new Rect2(x, y, 128, 64));
 				GD.Print((x / 128) * (PcxTxtr.Height / 64) + (y / 64));
-				TileIDLookup[fileID, (x / 128) * (PcxTxtr.Height / 64) + (y / 64)] = id;
+				TileIDLookup[fileID, (x / 128) + (y / 64) * (PcxTxtr.Width / 128)] = id;
 			}
 		}
 		}
