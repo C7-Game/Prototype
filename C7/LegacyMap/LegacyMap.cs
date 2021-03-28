@@ -37,7 +37,7 @@ public class LegacyMap : Node2D
 		TileSet TS = new TileSet();
 		TM.TileSet = TS;
 
-		Pcx PcxTxtr = new Pcx(Util.GetCiv3Path() + "/Art/Terrain/xpgc.pcx");
+		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
         // Quick hack to map graphic coordinate system to default BIQ terrain ID
         Terrmask = new Hashtable();

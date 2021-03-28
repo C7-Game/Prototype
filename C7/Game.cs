@@ -8,7 +8,7 @@ public class Game : Node2D
 	// Declare member variables here. Examples:
 	// private int a = 2;
 	// private string b = "text";
-	public string Civ3Path = Util.GetCiv3Path();
+	// public string Civ3Path = Util.GetCiv3Path();
 	
 	int[,] Map;
 	Hashtable Terrmask = new Hashtable();
@@ -35,7 +35,7 @@ public class Game : Node2D
 		TileSet TS = new TileSet();
 		TM.TileSet = TS;
 
-		Pcx PcxTxtr = new Pcx(Civ3Path + "/Art/Terrain/xpgc.pcx");
+		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
 
 		int id = TS.GetLastUnusedTileId();

@@ -8,7 +8,7 @@ public class MainMenu : Node2D
 	// private int a = 2;
 	// private string b = "text";
 	
-	public string Civ3Path = Util.GetCiv3Path();
+	// public string Civ3Path = Util.GetCiv3Path();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -19,7 +19,7 @@ public class MainMenu : Node2D
 	
 	private void DisplayTitleScreen()
 	{	
-		Pcx PcxTxtr = new Pcx(Civ3Path + "/Art/title.pcx");
+		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/title.pcx"));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
 		
 		TextureRect texture = new TextureRect();

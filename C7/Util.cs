@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 public class Util
 {
@@ -20,5 +21,26 @@ public class Util
     {
         // Assuming 64-bit platform, get vanilla Civ3 install folder from registry
         return (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", defaultPath);
+    }
+    static public string Civ3MediaPath(string relPath, string relModPath = "")
+    // Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
+    // Assumes Conquests/Complete
+    // TODO: Add mod path parameter and check mod folder first
+    {
+        string Civ3Root = GetCiv3Path();
+        string [] TryPaths = new string [] {
+            relModPath,
+            "Conquests",
+            "civ3PTW",
+            ""
+        };
+        for(int i = 0; i < TryPaths.Length; i++)
+        {
+            // If relModPath not set, skip that check
+            if(i == 0 && relModPath == "") { continue; }
+            string pathCandidate = Civ3Root + "/" + TryPaths[i] + "/" + relPath;
+            if(File.Exists(pathCandidate)) { return pathCandidate; }
+        }
+        throw new ApplicationException("Media path not found: " + relPath);
     }
 }
