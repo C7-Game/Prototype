@@ -115,13 +115,13 @@ public class TempTiles : Node2D
     {
         Tiles = new List<TempTile>();
         int Offset = LegacyMapReader.SectionOffset("WRLD", 2) + 8;
-        int WorldHeight = LegacyMapReader.ReadInt32(Offset);
-        int WorldWidth = LegacyMapReader.ReadInt32(Offset + 5*4);
+        MapUI.MapHeight = LegacyMapReader.ReadInt32(Offset);
+        MapUI.MapWidth = LegacyMapReader.ReadInt32(Offset + 5*4);
 
         Offset = LegacyMapReader.SectionOffset("TILE", 1);
-        for (int y=0; y < WorldHeight; y++)
+        for (int y=0; y < MapUI.MapHeight; y++)
         {
-            for (int x=y%2; x < WorldWidth; x+=2)
+            for (int x=y%2; x < MapUI.MapWidth; x+=2)
             {
                 TempTile ThisTile = new TempTile();
                 ThisTile.LegacyX = x;

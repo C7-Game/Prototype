@@ -19,6 +19,9 @@ public class LegacyMap : Node2D
     TileMap TM;
 	TileSet TS;
 	private int[,] TileIDLookup;
+	// NOTE: The following two must be set externally before displaying map
+	public int MapWidth;
+	public int MapHeight;
     public override void _Ready()
     {
 		//
@@ -40,9 +43,7 @@ public class LegacyMap : Node2D
         TS.CreateTile(id);
         id++;
 
-        // TODO: Don't hard-code size
-		int mywidth = 100, myheight = 100;
-		Map = new int[mywidth,myheight];
+		Map = new int[MapWidth,MapHeight];
 
 		// Populate map values
         if(LegacyTiles != null)
@@ -54,8 +55,8 @@ public class LegacyMap : Node2D
                 Map[tile.LegacyX,tile.LegacyY] = TileIDLookup[tile.LegacyFileID,tile.LegacyImageID];
             }
         }
-		for (int y = 0; y < myheight; y++) {
-			for (int x = y % 2; x < mywidth; x+=2) {
+		for (int y = 0; y < MapHeight; y++) {
+			for (int x = y % 2; x < MapWidth; x+=2) {
 				TM.SetCellv(new Vector2(x, y), Map[x,y]);
 			}
 		}
