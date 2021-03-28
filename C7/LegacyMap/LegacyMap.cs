@@ -69,19 +69,10 @@ public class LegacyMap : Node2D
 				// order right, bottom, left, top; 0 is plains, 1 grass, 2 coast
                 // Temp hack: assuming 4-bit terrain IDs, bit-rotating them into one integer key
                 // TODO: Make the key an Array of IEquatable of some sort, most likely int or GUID
-                GD.Print((y / 64) % 3);
-                GD.Print((y / 64) / 3 % 3);
-                GD.Print((x / 128) / 3 % 3);
-                GD.Print((x / 128) % 3);
-                GD.Print("---- " + id);
-                GD.Print((int)TerrID[((y / 64) % 3)] << 12 +
-					(int)TerrID[((y / 64) / 3 % 3)] << 8 +
-					(int)TerrID[((x / 128) / 3 % 3)] << 4 +
-					(int)TerrID[((x / 128) % 3)]);
 				Terrmask.Add(
-					(int)TerrID[((y / 64) % 3)] << 12 +
-					(int)TerrID[((y / 64) / 3 % 3)] << 8 +
-					(int)TerrID[((x / 128) / 3 % 3)] << 4 +
+					((int)TerrID[((y / 64) % 3)] << 12) +
+					((int)TerrID[((y / 64) / 3 % 3)] << 8) +
+					((int)TerrID[((x / 128) / 3 % 3)] << 4) +
 					(int)TerrID[((x / 128) % 3)]
 					, id);
 			}
@@ -105,9 +96,9 @@ public class LegacyMap : Node2D
 				int Top = y == 0 ? (Map[(x+1) % mywidth,y]) : (Map[x,y-1]);
 				int Bottom = y == myheight - 1 ? (Map[(x+1) % mywidth,y]) : (Map[x,y+1]);
 				int foo = 
-					(Map[(x+1) % mywidth,y]) << 12 +
-					Bottom << 8 +
-					(Map[Mathf.Abs((x-1) % mywidth),y]) << 4 +
+					((Map[(x+1) % mywidth,y]) << 12) +
+					(Bottom << 8) +
+					((Map[Mathf.Abs((x-1) % mywidth),y]) << 4) +
 					Top
 				;
 				try {
