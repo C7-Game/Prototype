@@ -64,11 +64,23 @@ public class LegacyMap : Node2D
 	}
 	private void LoadTileSet(int fileID)
 	{
+		Hashtable FileNameLookup = new Hashtable
+		{
+			{ 0, "Art/Terrain/xtgc.pcx" },
+			{ 1, "Art/Terrain/xpgc.pcx" },
+			{ 2, "Art/Terrain/xdgc.pcx" },
+			{ 3, "Art/Terrain/xdpc.pcx" },
+			{ 4, "Art/Terrain/xdgp.pcx" },
+			{ 5, "Art/Terrain/xggc.pcx" },
+			{ 6, "Art/Terrain/wCSO.pcx" },
+			{ 7, "Art/Terrain/wSSS.pcx" },
+			{ 8, "Art/Terrain/wOOO.pcx" },
+		};
 		int id = TS.GetLastUnusedTileId();
 		// temp if
-		if(fileID == 1)
+		if(FileNameLookup[fileID] != null)
 		{
-		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
+		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath(FileNameLookup[fileID].ToString()));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
 
 		for (int y = 0; y < PcxTxtr.Height; y += 64) {
