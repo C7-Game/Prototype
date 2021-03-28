@@ -57,7 +57,6 @@ public class TempTiles : Node2D
 
     public void _on_OffsetButton_pressed()
     {
-        GD.Print("Offset button!");
         TileOffset++;
         OffsetButton.Text = "Offset " + TileOffset.ToString();
         CreateTileSet();
@@ -65,7 +64,6 @@ public class TempTiles : Node2D
     }
     public void _on_OffsetMinusButton_pressed()
     {
-        GD.Print("Offset Minus button!");
         TileOffset--;
         OffsetButton.Text = "Offset " + TileOffset.ToString();
         CreateTileSet();
@@ -120,6 +118,7 @@ public class TempTiles : Node2D
         {
             foreach (TempTile tile in Tiles)
             {
+                // TODO: This is writing under the map and buttons for some reason
                 DrawString(MapFont, new Vector2(tile.LegacyX * 128 + 64, tile.LegacyY * 64 + 32) * ScaleFactor, tile.DebugByte.ToString(), new Color(1,1,1,1));
             }
         }

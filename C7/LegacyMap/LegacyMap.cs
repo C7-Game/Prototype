@@ -17,6 +17,8 @@ public class LegacyMap : Node2D
     public IEnumerable<ILegacyTile> LegacyTiles;
 	int[,] Map;
     TileMap TM;
+	TileSet TS;
+	private int[,] TileIDLookup;
     public override void _Ready()
     {
 		//
@@ -27,38 +29,16 @@ public class LegacyMap : Node2D
 		TM = new TileMap();
 		TM.CellSize = new Vector2(64,32);
 		// TM.CenteredTextures = true;
-		TileSet TS = new TileSet();
+		TS = new TileSet();
 		TM.TileSet = TS;
 
-		/* Will adapt this to file/index soon
-		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
-		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
-		*/
-        // Quick hack to map graphic coordinate system to default BIQ terrain ID
+		TileIDLookup = new int[9,81];
 
 		int id = TS.GetLastUnusedTileId();
         // Make blank default tile
         // TODO: Make red tile or similar
         TS.CreateTile(id);
         id++;
-		/*
-		for (int y = 0; y < PcxTxtr.Height; y += 64) {
-			for (int x = 0; x < PcxTxtr.Width; x+= 128, id++) {
-				TS.CreateTile(id);
-				TS.TileSetTexture(id, Txtr);
-				TS.TileSetRegion(id, new Rect2(x, y, 128, 64));
-				// order right, bottom, left, top; 0 is plains, 1 grass, 2 coast
-                // Temp hack: assuming 4-bit terrain IDs, bit-rotating them into one integer key
-                // TODO: Make the key an Array of IEquatable of some sort, most likely int or GUID
-				Terrmask.Add(
-					((int)TerrID[((y / 64) % 3)] << 12) +
-					((int)TerrID[((y / 64) / 3 % 3)] << 8) +
-					((int)TerrID[((x / 128) / 3 % 3)] << 4) +
-					(int)TerrID[((x / 128) % 3)]
-					, id);
-			}
-		}
-		*/
 
         // TODO: Don't hard-code size
 		int mywidth = 100, myheight = 100;
@@ -69,10 +49,37 @@ public class LegacyMap : Node2D
         {
             foreach (ILegacyTile tile in LegacyTiles)
             {
-                Map[tile.LegacyX,tile.LegacyY] = tile.LegacyImageID;
+				// If tile media file not loaded yet
+				if(TileIDLookup[tile.LegacyFileID,1] == 0) { LoadTileSet(tile.LegacyFileID); }
+                Map[tile.LegacyX,tile.LegacyY] = TileIDLookup[tile.LegacyFileID,tile.LegacyImageID];
             }
         }
+		for (int y = 0; y < myheight; y++) {
+			for (int x = y % 2; x < mywidth; x+=2) {
+				TM.SetCellv(new Vector2(x + 1, y), Map[x,y]);
+			}
+		}
         // TM.Scale = new Vector2((float)0.2, (float)0.2);
 		AddChild(TM);
+	}
+	private void LoadTileSet(int fileID)
+	{
+		int id = TS.GetLastUnusedTileId();
+		// temp if
+		if(fileID == 1)
+		{
+		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
+		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
+
+		for (int y = 0; y < PcxTxtr.Height; y += 64) {
+			for (int x = 0; x < PcxTxtr.Width; x+= 128, id++) {
+				TS.CreateTile(id);
+				TS.TileSetTexture(id, Txtr);
+				TS.TileSetRegion(id, new Rect2(x, y, 128, 64));
+				GD.Print((x / 128) * (PcxTxtr.Height / 64) + (y / 64));
+				TileIDLookup[fileID, (x / 128) * (PcxTxtr.Height / 64) + (y / 64)] = id;
+			}
+		}
+		}
 	}
 }
