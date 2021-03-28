@@ -20,7 +20,8 @@ public class LegacyMap : Node2D
     public IEnumerable<ILegacyTile> LegacyTiles;
     private DynamicFont MapFont;
 	int[,] Map;
-	Hashtable Terrmask = new Hashtable();
+	Hashtable Terrmask;
+    TileMap TM;
     public override void _Ready()
     {
         string FontPath = Util.GetCiv3Path() + @"/LSANS.TTF";
@@ -28,8 +29,9 @@ public class LegacyMap : Node2D
         MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
     }
 	public void TerrainAsTileMap() {
+        if (TM != null) { RemoveChild(TM); }
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
-		TileMap TM = new TileMap();
+		TM = new TileMap();
 		TM.CellSize = new Vector2(64,32);
 		// TM.CenteredTextures = true;
 		TileSet TS = new TileSet();
@@ -38,15 +40,13 @@ public class LegacyMap : Node2D
 		Pcx PcxTxtr = new Pcx(Util.GetCiv3Path() + "/Art/Terrain/xpgc.pcx");
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
         // Quick hack to map graphic coordinate system to default BIQ terrain ID
+        Terrmask = new Hashtable();
         Hashtable TerrID = new Hashtable
         {
             { 0, 1 },
             { 1, 2 },
             { 2, 11 },
         };
-        GD.Print(TerrID[0]);
-        GD.Print(TerrID[1]);
-        GD.Print(TerrID[2]);
 
 		int id = TS.GetLastUnusedTileId();
         // Make blank default tile
