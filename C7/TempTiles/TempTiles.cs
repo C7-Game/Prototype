@@ -7,15 +7,20 @@ public class TempTiles : Node2D
     private FileDialog Dialog;
     private QueryCiv3.Civ3File LegacyMapReader;
     private List<TempTile> Tiles;
-    private class TempTile: OldLegacyMap.ILegacyTile
+    private class TempTile: LegacyMap.ILegacyTile
     {
-        public bool IsLand { get; set; }
+        /*
         public int LegacyBaseTerrainID { get; set; }
         public int LegacyOverlayTerrainID { get; set; }
+        */
         public int LegacyX { get; set; }
         public int LegacyY { get; set; }
+        public int LegacyFileID { get; set; }
+        public int LegacyImageID { get; set; }
     }
-    private OldLegacyMap MapUI;
+    private LegacyMap MapUI;
+    private int Offset = 0;
+    private Button OffsetButton;
     public override void _Ready()
     {
         // Create reference to child node so we can change its settings from here
@@ -23,9 +28,11 @@ public class TempTiles : Node2D
         Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves";
         Dialog.Resizable = true;
 
+        OffsetButton = GetNode<Button>("OffsetButton");
+
         LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
-        MapUI = new OldLegacyMap();
+        MapUI = new LegacyMap();
         this.AddChild(MapUI);
     }
 
@@ -38,6 +45,19 @@ public class TempTiles : Node2D
     {
         // NOTE: I think this quits the current node or scene and not necessarily the whole program if this is a child node?
         GetTree().Quit();
+    }
+
+    public void _on_OffsetButton_pressed()
+    {
+        GD.Print("Offset button!");
+        Offset++;
+        OffsetButton.Text = "Offset " + Offset.ToString();
+    }
+    public void _on_OffsetMinusButton_pressed()
+    {
+        GD.Print("Offset Minus button!");
+        Offset--;
+        OffsetButton.Text = "Offset " + Offset.ToString();
     }
 
     public void _on_FileDialog_file_selected(string path)
@@ -63,11 +83,13 @@ public class TempTiles : Node2D
                 ThisTile.LegacyX = x;
                 ThisTile.LegacyY = y;
 
+                /*
                 int TerrainByte = LegacyMapReader.ReadByte(Offset+53);
                 ThisTile.LegacyBaseTerrainID = TerrainByte & 0x0F;
                 ThisTile.LegacyOverlayTerrainID = TerrainByte >> 4;
-                // If low nybble of terrain byte is < 11, tile is land
-                ThisTile.IsLand = ThisTile.LegacyBaseTerrainID < 11;
+                */
+                ThisTile.LegacyFileID = LegacyMapReader.ReadByte(Offset+11);
+                ThisTile.LegacyImageID = LegacyMapReader.ReadByte(Offset+10);
 
                 Tiles.Add(ThisTile);
                 // 212 bytes per tile in Conquests SAV

@@ -32,6 +32,28 @@ mode = 0
 access = 2
 current_dir = "/Users/jim/code/src/godot/Prototype/C7"
 current_path = "/Users/jim/code/src/godot/Prototype/C7/"
+
+[node name="OffsetButton" type="Button" parent="."]
+margin_left = 696.0
+margin_top = 8.0
+margin_right = 1170.0
+margin_bottom = 294.0
+text = "Offset"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="OffsetMinusButton" type="Button" parent="."]
+margin_left = 694.0
+margin_top = 322.0
+margin_right = 1168.0
+margin_bottom = 608.0
+text = "Offset Minus"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
 [connection signal="pressed" from="QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]
+[connection signal="pressed" from="OffsetButton" to="." method="_on_OffsetButton_pressed"]
+[connection signal="pressed" from="OffsetMinusButton" to="." method="_on_OffsetMinusButton_pressed"]
