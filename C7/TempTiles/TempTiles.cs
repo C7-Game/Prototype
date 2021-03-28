@@ -17,12 +17,20 @@ public class TempTiles : Node2D
         public int LegacyY { get; set; }
         public int LegacyFileID { get; set; }
         public int LegacyImageID { get; set; }
+        public int DebugByte;
     }
     private LegacyMap MapUI;
-    private int Offset = 0;
+    private int TileOffset = 0;
     private Button OffsetButton;
+    private DynamicFont MapFont;
+    private float ScaleFactor = (float)0.2;
+
     public override void _Ready()
     {
+        string FontPath = Util.GetCiv3Path() + @"/LSANS.TTF";
+        MapFont = new DynamicFont();
+        MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
+
         // Create reference to child node so we can change its settings from here
         Dialog = GetNode<FileDialog>("FileDialog");
         Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves";
@@ -50,14 +58,18 @@ public class TempTiles : Node2D
     public void _on_OffsetButton_pressed()
     {
         GD.Print("Offset button!");
-        Offset++;
-        OffsetButton.Text = "Offset " + Offset.ToString();
+        TileOffset++;
+        OffsetButton.Text = "Offset " + TileOffset.ToString();
+        CreateTileSet();
+        Update();
     }
     public void _on_OffsetMinusButton_pressed()
     {
         GD.Print("Offset Minus button!");
-        Offset--;
-        OffsetButton.Text = "Offset " + Offset.ToString();
+        TileOffset--;
+        OffsetButton.Text = "Offset " + TileOffset.ToString();
+        CreateTileSet();
+        Update();
     }
 
     public void _on_FileDialog_file_selected(string path)
@@ -66,6 +78,8 @@ public class TempTiles : Node2D
         CreateTileSet();
         MapUI.LegacyTiles = Tiles;
         MapUI.TerrainAsTileMap();
+        MapUI.Scale = new Vector2(1,1) * ScaleFactor;
+        Update();
     }
     private void CreateTileSet()
     {
@@ -88,12 +102,25 @@ public class TempTiles : Node2D
                 ThisTile.LegacyBaseTerrainID = TerrainByte & 0x0F;
                 ThisTile.LegacyOverlayTerrainID = TerrainByte >> 4;
                 */
-                ThisTile.LegacyFileID = LegacyMapReader.ReadByte(Offset+11);
-                ThisTile.LegacyImageID = LegacyMapReader.ReadByte(Offset+10);
+                ThisTile.DebugByte = LegacyMapReader.ReadByte(Offset+TileOffset);
+                ThisTile.LegacyFileID = LegacyMapReader.ReadByte(Offset+17);
+                ThisTile.LegacyImageID = LegacyMapReader.ReadByte(Offset+16);
 
                 Tiles.Add(ThisTile);
                 // 212 bytes per tile in Conquests SAV
                 Offset += 212;
+            }
+        }
+    }
+    public override void _Draw()
+    {
+        base._Draw();
+        MapFont.Size = 10;
+        if(Tiles != null)
+        {
+            foreach (TempTile tile in Tiles)
+            {
+                DrawString(MapFont, new Vector2(tile.LegacyX * 128 + 64, tile.LegacyY * 64 + 32) * ScaleFactor, tile.DebugByte.ToString(), new Color(1,1,1,1));
             }
         }
     }

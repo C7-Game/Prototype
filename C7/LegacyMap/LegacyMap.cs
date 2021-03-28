@@ -13,17 +13,13 @@ public class LegacyMap : Node2D
         int LegacyImageID { get; }
         int LegacyX {get;}
         int LegacyY {get;}
-        
-    }
+	}
     public IEnumerable<ILegacyTile> LegacyTiles;
-    private DynamicFont MapFont;
 	int[,] Map;
     TileMap TM;
     public override void _Ready()
     {
-        string FontPath = Util.GetCiv3Path() + @"/LSANS.TTF";
-        MapFont = new DynamicFont();
-        MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
+		//
     }
 	public void TerrainAsTileMap() {
         if (TM != null) { RemoveChild(TM); }
@@ -76,20 +72,7 @@ public class LegacyMap : Node2D
                 Map[tile.LegacyX,tile.LegacyY] = tile.LegacyImageID;
             }
         }
-        TM.Scale = new Vector2((float)0.2, (float)0.2);
+        // TM.Scale = new Vector2((float)0.2, (float)0.2);
 		AddChild(TM);
-		// For drawing text
-		Update();
 	}
-    public override void _Draw()
-    {
-        base._Draw();
-        MapFont.Size = 10;
-        if(LegacyTiles != null)
-        {
-            foreach (ILegacyTile tile in LegacyTiles)
-            {
-                DrawString(MapFont, new Vector2(tile.LegacyX * 128 + 64, tile.LegacyY * 64 + 32) * (float)0.2, tile.LegacyFileID.ToString(), new Color(1,1,1,1));
-            }
-        }
-    }}
+}
