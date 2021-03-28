@@ -9,6 +9,7 @@ public class ViewPcxFlc : Node2D
         // Create reference to child node so we can change its settings from here
         Dialog = GetNode<FileDialog>("FileDialog");
         Dialog.CurrentDir = Util.GetCiv3Path();
+        Dialog.Resizable = true;
     }
 
     public void _on_OpenFileButton_pressed()
@@ -24,16 +25,17 @@ public class ViewPcxFlc : Node2D
 
     public void _on_FileDialog_file_selected(string path)
     {
-        GD.Print("Hi");
         if (ViewImage != null)
         {
             RemoveChild(ViewImage);
-            // TODO: Remove old ViewImage (since Godot is C++, don't think just removing ref will suffice)
+            // TODO: Delete old ViewImage (since Godot is C++, don't think just removing ref will suffice)
         }
         Pcx PcxTexture = new Pcx(path);
         Sprite PcxImage = new Sprite();
         PcxImage.Texture = PCXToGodot.getImageTextureFromPCX(PcxTexture);
-        PcxImage.Position = new Vector2(200, 100);
+        // Sprite are positioned by center, so get size and offset to alighn to top-left of window
+        Vector2 SpriteSize = PcxImage.GetRect().Size;
+        PcxImage.Position = new Vector2(SpriteSize.x / 2, SpriteSize.y / 2);
         ViewImage = PcxImage;
         AddChild(ViewImage);
         Update();

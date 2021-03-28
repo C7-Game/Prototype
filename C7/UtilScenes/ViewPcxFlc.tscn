@@ -24,8 +24,8 @@ __meta__ = {
 }
 
 [node name="FileDialog" type="FileDialog" parent="."]
-margin_right = 416.0
-margin_bottom = 184.0
+margin_right = 588.0
+margin_bottom = 746.0
 rect_min_size = Vector2( 400, 140 )
 window_title = "Open a File"
 mode = 0

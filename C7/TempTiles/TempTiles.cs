@@ -21,6 +21,7 @@ public class TempTiles : Node2D
         // Create reference to child node so we can change its settings from here
         Dialog = GetNode<FileDialog>("FileDialog");
         Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves";
+        Dialog.Resizable = true;
 
         LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
