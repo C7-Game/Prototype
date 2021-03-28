@@ -4,6 +4,32 @@ using System.Collections.Generic;
 
 public class TempTiles : Node2D
 {
+    private class TextLayerClass : Node2D
+    {
+        public List<TempTile> Tiles;
+
+        private DynamicFont MapFont;
+        public override void _Ready()
+        {
+            string FontPath = Util.GetCiv3Path() + @"/LSANS.TTF";
+            MapFont = new DynamicFont();
+            MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
+
+        }
+        public override void _Draw()
+        {
+            base._Draw();
+            MapFont.Size = 32;
+            if(Tiles != null)
+            {
+                foreach (TempTile tile in Tiles)
+                {
+                    // TODO: This is writing under the map and buttons for some reason
+                    DrawString(MapFont, new Vector2(tile.LegacyX * 64 + 32, tile.LegacyY * 32 + 80), tile.DebugByte.ToString(), new Color(0,0,0,1));
+                }
+            }
+        }
+    }
     private FileDialog Dialog;
     private QueryCiv3.Civ3File LegacyMapReader;
     private List<TempTile> Tiles;
@@ -24,6 +50,8 @@ public class TempTiles : Node2D
     private Button OffsetButton;
     private DynamicFont MapFont;
     private float ScaleFactor = (float)0.25;
+    private TextLayerClass DebugTextLayer;
+    private float MapAlpha = (float)1;
 
     public override void _Ready()
     {
@@ -41,7 +69,11 @@ public class TempTiles : Node2D
         LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
         MapUI = new LegacyMap();
+        MapUI.Modulate = new Color(1,1,1,MapAlpha);
         this.AddChild(MapUI);
+        DebugTextLayer = new TextLayerClass();
+        DebugTextLayer.Scale = new Vector2(1, 1) * ScaleFactor;
+        this.AddChild(DebugTextLayer);
     }
 
     public void _on_OpenFileButton_pressed()
@@ -109,18 +141,8 @@ public class TempTiles : Node2D
                 Offset += 212;
             }
         }
-    }
-    public override void _Draw()
-    {
-        base._Draw();
-        MapFont.Size = 10;
-        if(Tiles != null)
-        {
-            foreach (TempTile tile in Tiles)
-            {
-                // TODO: This is writing under the map and buttons for some reason
-                DrawString(MapFont, new Vector2(tile.LegacyX * 64 + 32, tile.LegacyY * 32 + 16) * ScaleFactor, tile.DebugByte.ToString(), new Color(1,1,1,1));
-            }
-        }
+        DebugTextLayer.Visible = TileOffset != 0;
+        DebugTextLayer.Tiles = Tiles;
+        DebugTextLayer.Update();
     }
 }
