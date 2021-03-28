@@ -113,6 +113,8 @@ public class TempTiles : Node2D
     }
     private void CreateTileSet()
     {
+        // TODO: Pull mod path from embedded BIC if present
+        MapUI.ModRelPath = "";
         Tiles = new List<TempTile>();
         int Offset = LegacyMapReader.SectionOffset("WRLD", 2) + 8;
         MapUI.MapHeight = LegacyMapReader.ReadInt32(Offset);

@@ -22,6 +22,8 @@ public class LegacyMap : Node2D
 	// NOTE: The following two must be set externally before displaying map
 	public int MapWidth;
 	public int MapHeight;
+	// If a mod is in effect, set this, otherwise set to "" or "Conquests"
+	public string ModRelPath = "";
     public override void _Ready()
     {
 		//
@@ -81,7 +83,7 @@ public class LegacyMap : Node2D
 		// temp if
 		if(FileNameLookup[fileID] != null)
 		{
-		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath(FileNameLookup[fileID].ToString()));
+		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath(FileNameLookup[fileID].ToString(), ModRelPath));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
 
 		for (int y = 0; y < PcxTxtr.Height; y += 64) {
