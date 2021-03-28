@@ -61,6 +61,10 @@ public class LegacyMap : Node2D
         GD.Print(TerrID[2]);
 
 		int id = TS.GetLastUnusedTileId();
+        // Make blank default tile
+        // TODO: Make red tile or similar
+        TS.CreateTile(id);
+        id++;
 		for (int y = 0; y < PcxTxtr.Height; y += 64) {
 			for (int x = 0; x < PcxTxtr.Width; x+= 128, id++) {
 				TS.CreateTile(id);
@@ -116,6 +120,7 @@ public class LegacyMap : Node2D
 				// } catch {}
 			}
 		}
+        TM.Scale = new Vector2((float)0.2, (float)0.2);
 		AddChild(TM);
 	}
 }
