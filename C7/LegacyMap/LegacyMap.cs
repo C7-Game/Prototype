@@ -27,18 +27,6 @@ public class LegacyMap : Node2D
         MapFont = new DynamicFont();
         MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
     }
-    public override void _Draw()
-    {
-        base._Draw();
-        MapFont.Size = 10;
-        if(LegacyTiles != null)
-        {
-            foreach (ILegacyTile tile in LegacyTiles)
-            {
-                DrawString(MapFont, new Vector2(tile.LegacyX * 10, tile.LegacyY * 5), tile.IsLand ? "O" : "", new Color(1,1,1,1));
-            }
-        }
-    }
 	public void TerrainAsTileMap() {
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
 		TileMap TM = new TileMap();

@@ -45,7 +45,6 @@ public class TempTiles : Node2D
         CreateTileSet();
         MapUI.LegacyTiles = Tiles;
         MapUI.TerrainAsTileMap();
-        MapUI.Update();
     }
     private void CreateTileSet()
     {
