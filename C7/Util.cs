@@ -25,8 +25,7 @@ public class Util
     static public string Civ3MediaPath(string relPath, string relModPath = "")
     // Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
     // Assumes Conquests/Complete
-    // TODO: Add mod path parameter and check mod folder first
-    {
+     {
         string Civ3Root = GetCiv3Path();
         string [] TryPaths = new string [] {
             relModPath,
