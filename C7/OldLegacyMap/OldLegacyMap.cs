@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using ConvertCiv3Media;
 
-public class LegacyMap : Node2D
+public class OldLegacyMap : Node2D
 {
     public interface ILegacyTile
     // Tiles need to provide this info to LegacyMap

@@ -7,7 +7,7 @@ public class TempTiles : Node2D
     private FileDialog Dialog;
     private QueryCiv3.Civ3File LegacyMapReader;
     private List<TempTile> Tiles;
-    private class TempTile: LegacyMap.ILegacyTile
+    private class TempTile: OldLegacyMap.ILegacyTile
     {
         public bool IsLand { get; set; }
         public int LegacyBaseTerrainID { get; set; }
@@ -15,7 +15,7 @@ public class TempTiles : Node2D
         public int LegacyX { get; set; }
         public int LegacyY { get; set; }
     }
-    private LegacyMap MapUI;
+    private OldLegacyMap MapUI;
     public override void _Ready()
     {
         // Create reference to child node so we can change its settings from here
@@ -25,7 +25,7 @@ public class TempTiles : Node2D
 
         LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
-        MapUI = new LegacyMap();
+        MapUI = new OldLegacyMap();
         this.AddChild(MapUI);
     }
 
