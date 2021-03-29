@@ -91,7 +91,6 @@ public class LegacyMap : Node2D
 				TS.CreateTile(id);
 				TS.TileSetTexture(id, Txtr);
 				TS.TileSetRegion(id, new Rect2(x, y, 128, 64));
-				GD.Print((x / 128) * (PcxTxtr.Height / 64) + (y / 64));
 				TileIDLookup[fileID, (x / 128) + (y / 64) * (PcxTxtr.Width / 128)] = id;
 			}
 		}
