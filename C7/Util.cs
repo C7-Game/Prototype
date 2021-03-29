@@ -1,12 +1,29 @@
 using System;
-using System.IO;
+using Godot;
 
 public class Util
 {
+    public class Civ3FileDialog : FileDialog
+    // Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
+    // While instantiated it will return to the last-accessed folder when reopened
+    {
+        public string RelPath= "";
+        public override void _Ready()
+        {
+            Mode = ModeEnum.OpenFile;
+            Access = AccessEnum.Filesystem;
+            CurrentDir = Util.GetCiv3Path() + "/" + RelPath;
+            Resizable = true;
+            MarginRight = 550;
+            MarginBottom = 750;
+            base._Ready();
+        }
+        
+    }
     static public string GetCiv3Path()
     {
         // Use CIV3_HOME env var if present
-        string path = Environment.GetEnvironmentVariable("CIV3_HOME");
+        string path = System.Environment.GetEnvironmentVariable("CIV3_HOME");
         if (path != null) return path;
 
         // Look up in Windows registry if present
@@ -38,7 +55,7 @@ public class Util
             // If relModPath not set, skip that check
             if(i == 0 && relModPath == "") { continue; }
             string pathCandidate = Civ3Root + "/" + TryPaths[i] + "/" + relPath;
-            if(File.Exists(pathCandidate)) { return pathCandidate; }
+            if(System.IO.File.Exists(pathCandidate)) { return pathCandidate; }
         }
         throw new ApplicationException("Media path not found: " + relPath);
     }

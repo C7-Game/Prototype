@@ -2,14 +2,13 @@ using Godot;
 using ConvertCiv3Media;
 public class ViewPcxFlc : Node2D
 {
-    private FileDialog Dialog;
+    private Util.Civ3FileDialog Dialog;
     private Node2D ViewImage;
     public override void _Ready()
     {
-        // Create reference to child node so we can change its settings from here
-        Dialog = GetNode<FileDialog>("FileDialog");
-        Dialog.CurrentDir = Util.GetCiv3Path();
-        Dialog.Resizable = true;
+        Dialog = new Util.Civ3FileDialog();
+        Dialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
+        AddChild(Dialog);
     }
 
     public void _on_OpenFileButton_pressed()

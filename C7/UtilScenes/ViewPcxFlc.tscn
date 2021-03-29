@@ -22,16 +22,5 @@ text = "Quit"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[node name="FileDialog" type="FileDialog" parent="."]
-margin_right = 588.0
-margin_bottom = 746.0
-rect_min_size = Vector2( 400, 140 )
-window_title = "Open a File"
-mode = 0
-access = 2
-current_dir = "/Users/jim/code/src/godot/Prototype/C7"
-current_path = "/Users/jim/code/src/godot/Prototype/C7/"
 [connection signal="pressed" from="OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
 [connection signal="pressed" from="QuitButton" to="." method="_on_QuitButton_pressed"]
-[connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]

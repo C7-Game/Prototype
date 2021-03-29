@@ -30,7 +30,7 @@ public class TempTiles : Node2D
             }
         }
     }
-    private FileDialog Dialog;
+    private Util.Civ3FileDialog Dialog;
     private QueryCiv3.Civ3File LegacyMapReader;
     private List<TempTile> Tiles;
     private class TempTile: LegacyMap.ILegacyTile
@@ -59,10 +59,10 @@ public class TempTiles : Node2D
         MapFont = new DynamicFont();
         MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
 
-        // Create reference to child node so we can change its settings from here
-        Dialog = GetNode<FileDialog>("FileDialog");
-        Dialog.CurrentDir = Util.GetCiv3Path() + @"/Conquests/Saves";
-        Dialog.Resizable = true;
+        Dialog = new Util.Civ3FileDialog();
+        Dialog.RelPath = @"Conquests/Saves";
+        Dialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
+        AddChild(Dialog);
 
         OffsetButton = GetNode<Button>("OffsetButton");
 
