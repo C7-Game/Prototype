@@ -35,10 +35,8 @@ public class TempTiles : Node2D
     private List<TempTile> Tiles;
     private class TempTile: LegacyMap.ILegacyTile
     {
-        /*
         public int LegacyBaseTerrainID { get; set; }
         public int LegacyOverlayTerrainID { get; set; }
-        */
         public int LegacyX { get; set; }
         public int LegacyY { get; set; }
         public int LegacyFileID { get; set; }
@@ -72,13 +70,6 @@ public class TempTiles : Node2D
         DebugTextLayer = new TextLayerClass();
         DebugTextLayer.Scale = new Vector2(1, 1) * ScaleFactor;
         this.AddChild(DebugTextLayer);
-
-        // Removing and re-adding ToolBar so it draws on top of map
-        Control foo = GetNode<Control>("ToolBar");
-        RemoveChild(foo);
-        AddChild(foo);
-
-        // OffsetButton = GetNode<Button>("OffsetButton");
     }
 
     public void _on_OpenFileButton_pressed()
@@ -127,11 +118,9 @@ public class TempTiles : Node2D
                 ThisTile.LegacyX = x;
                 ThisTile.LegacyY = y;
 
-                /*
                 int TerrainByte = LegacyMapReader.ReadByte(Offset+53);
                 ThisTile.LegacyBaseTerrainID = TerrainByte & 0x0F;
                 ThisTile.LegacyOverlayTerrainID = TerrainByte >> 4;
-                */
                 ThisTile.DebugByte = LegacyMapReader.ReadByte(Offset+TileOffset);
                 ThisTile.LegacyFileID = LegacyMapReader.ReadByte(Offset+17);
                 ThisTile.LegacyImageID = LegacyMapReader.ReadByte(Offset+16);
