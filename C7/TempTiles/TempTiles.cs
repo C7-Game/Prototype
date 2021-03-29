@@ -64,8 +64,6 @@ public class TempTiles : Node2D
         Dialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
         AddChild(Dialog);
 
-        OffsetButton = GetNode<Button>("OffsetButton");
-
         LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
         MapUI = new LegacyMap();
@@ -74,6 +72,13 @@ public class TempTiles : Node2D
         DebugTextLayer = new TextLayerClass();
         DebugTextLayer.Scale = new Vector2(1, 1) * ScaleFactor;
         this.AddChild(DebugTextLayer);
+
+        // Removing and re-adding ToolBar so it draws on top of map
+        Control foo = GetNode<Control>("ToolBar");
+        RemoveChild(foo);
+        AddChild(foo);
+
+        // OffsetButton = GetNode<Button>("OffsetButton");
     }
 
     public void _on_OpenFileButton_pressed()
@@ -87,17 +92,10 @@ public class TempTiles : Node2D
         GetTree().Quit();
     }
 
-    public void _on_OffsetButton_pressed()
+    public void _on_SpinBox_value_changed(float value)
     {
-        TileOffset++;
-        OffsetButton.Text = "Offset " + TileOffset.ToString();
-        CreateTileSet();
-        Update();
-    }
-    public void _on_OffsetMinusButton_pressed()
-    {
-        TileOffset--;
-        OffsetButton.Text = "Offset " + TileOffset.ToString();
+        TileOffset = (int)value;
+        // TODO: check if file loaded before running this
         CreateTileSet();
         Update();
     }
