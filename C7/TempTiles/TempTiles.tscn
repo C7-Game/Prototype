@@ -1,11 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://TempTiles/TempTiles.cs" type="Script" id=1]
-[ext_resource path="res://Fonts/NotoSans-Regular.ttf" type="DynamicFontData" id=2]
-
-[sub_resource type="DynamicFont" id=1]
-size = 24
-font_data = ExtResource( 2 )
+[ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
 
 [node name="TempTiles" type="Node2D"]
 script = ExtResource( 1 )
@@ -41,7 +37,7 @@ size_flags_horizontal = 3
 [node name="OpenFileButton" type="Button" parent="ToolBar/MarginContainer/HBoxContainer"]
 margin_right = 75.0
 margin_bottom = 40.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = ExtResource( 2 )
 text = "Open"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -57,7 +53,7 @@ margin_left = 87.0
 margin_top = 3.0
 margin_right = 240.0
 margin_bottom = 37.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = ExtResource( 2 )
 text = "Debug Offset"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -80,7 +76,7 @@ size_flags_horizontal = 3
 margin_left = 571.0
 margin_right = 632.0
 margin_bottom = 40.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = ExtResource( 2 )
 text = "Quit"
 __meta__ = {
 "_edit_use_anchors_": false
