@@ -46,10 +46,35 @@ margin_left = 79.0
 margin_right = 83.0
 margin_bottom = 40.0
 
-[node name="Label" type="Label" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+[node name="LeftButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_left = 87.0
+margin_right = 143.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Left"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RightButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 147.0
+margin_right = 219.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Right"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSeparator3" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 223.0
+margin_right = 227.0
+margin_bottom = 40.0
+
+[node name="Label" type="Label" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 231.0
 margin_top = 3.0
-margin_right = 240.0
+margin_right = 384.0
 margin_bottom = 37.0
 custom_fonts/font = ExtResource( 2 )
 text = "Debug Offset"
@@ -58,14 +83,14 @@ __meta__ = {
 }
 
 [node name="SpinBox" type="SpinBox" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 244.0
-margin_right = 318.0
+margin_left = 388.0
+margin_right = 462.0
 margin_bottom = 40.0
 max_value = 212.0
 rounded = true
 
 [node name="VSeparator2" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 322.0
+margin_left = 466.0
 margin_right = 919.0
 margin_bottom = 40.0
 size_flags_horizontal = 3
@@ -79,6 +104,14 @@ text = "Quit"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="KinematicBody2D" type="KinematicBody2D" parent="."]
+position = Vector2( 512, 300 )
+
+[node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
+current = true
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
 [connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/SpinBox" to="." method="_on_SpinBox_value_changed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]

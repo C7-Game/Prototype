@@ -90,7 +90,16 @@ public class TempTiles : Node2D
         CreateTileSet();
         Update();
     }
-
+    public void _on_RightButton_pressed()
+    {
+        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
+        foo.Position = new Vector2(foo.Position.x + 128, foo.Position.y);
+    }
+    public void _on_LeftButton_pressed()
+    {
+        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
+        foo.Position = new Vector2(foo.Position.x - 128, foo.Position.y);
+    }
     public void _on_FileDialog_file_selected(string path)
     {
         LegacyMapReader.Load(path);
