@@ -11,15 +11,12 @@ public class TempTiles : Node2D
         private DynamicFont MapFont;
         public override void _Ready()
         {
-            string FontPath = Util.GetCiv3Path() + @"/LSANS.TTF";
-            MapFont = new DynamicFont();
-            MapFont.FontData = ResourceLoader.Load(FontPath) as DynamicFontData;
+            MapFont = ResourceLoader.Load<DynamicFont>("res://Fonts/NSansFont24Pt.tres");
 
         }
         public override void _Draw()
         {
             base._Draw();
-            MapFont.Size = 32;
             if(Tiles != null)
             {
                 foreach (TempTile tile in Tiles)
@@ -68,7 +65,6 @@ public class TempTiles : Node2D
         MapUI.Modulate = new Color(1,1,1,MapAlpha);
         this.AddChild(MapUI);
         DebugTextLayer = new TextLayerClass();
-        DebugTextLayer.Scale = new Vector2(1, 1) * ScaleFactor;
         this.AddChild(DebugTextLayer);
     }
 
@@ -90,6 +86,11 @@ public class TempTiles : Node2D
         CreateTileSet();
         Update();
     }
+    public void _on_Zoom_value_changed(float value)
+    {
+        Vector2 NewScale = new Vector2(value, value);
+        Scale = NewScale;
+    }
     public void _on_RightButton_pressed()
     {
         KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -100,13 +101,22 @@ public class TempTiles : Node2D
         KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
         foo.Position = new Vector2(foo.Position.x - 128, foo.Position.y);
     }
+    public void _on_UpButton_pressed()
+    {
+        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
+        foo.Position = new Vector2(foo.Position.x, foo.Position.y - 64);
+    }
+    public void _on_DownButton_pressed()
+    {
+        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
+        foo.Position = new Vector2(foo.Position.x, foo.Position.y + 64);
+    }
     public void _on_FileDialog_file_selected(string path)
     {
         LegacyMapReader.Load(path);
         CreateTileSet();
         MapUI.LegacyTiles = Tiles;
         MapUI.TerrainAsTileMap();
-        MapUI.Scale = new Vector2(1,1) * ScaleFactor;
         Update();
     }
     private void CreateTileSet()

@@ -66,15 +66,54 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VSeparator3" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+[node name="UpButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_left = 223.0
-margin_right = 227.0
+margin_right = 268.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Up"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DownButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 272.0
+margin_right = 351.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Down"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSeparator3" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 355.0
+margin_right = 359.0
 margin_bottom = 40.0
 
+[node name="Zoom" type="HSlider" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 363.0
+margin_right = 517.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 1.0
+
+[node name="VSeparator4" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 521.0
+margin_right = 525.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="Label" type="Label" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 231.0
+margin_left = 529.0
 margin_top = 3.0
-margin_right = 384.0
+margin_right = 682.0
 margin_bottom = 37.0
 custom_fonts/font = ExtResource( 2 )
 text = "Debug Offset"
@@ -83,14 +122,14 @@ __meta__ = {
 }
 
 [node name="SpinBox" type="SpinBox" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 388.0
-margin_right = 462.0
+margin_left = 686.0
+margin_right = 760.0
 margin_bottom = 40.0
 max_value = 212.0
 rounded = true
 
 [node name="VSeparator2" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 466.0
+margin_left = 764.0
 margin_right = 919.0
 margin_bottom = 40.0
 size_flags_horizontal = 3
@@ -113,5 +152,8 @@ current = true
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UpButton" to="." method="_on_UpButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
+[connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom" to="." method="_on_Zoom_value_changed"]
 [connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/SpinBox" to="." method="_on_SpinBox_value_changed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
