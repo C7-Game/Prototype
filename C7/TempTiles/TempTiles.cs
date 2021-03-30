@@ -135,6 +135,16 @@ public class TempTiles : Node2D
                     MoveCamera = false;
                 }
             }
+            else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelUp)
+            {
+                GetTree().SetInputAsHandled();
+                GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value += (float)0.1;
+            }
+            else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelDown)
+            {
+                GetTree().SetInputAsHandled();
+                GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value -= (float)0.1;
+            }
         }
         else if(@event is InputEventMouseMotion eventMouseMotion)
         {
