@@ -42,11 +42,11 @@ public class TempTiles : Node2D
     }
     private LegacyMap MapUI;
     private int TileOffset = 0;
-    private Button OffsetButton;
     private DynamicFont MapFont;
-    private float ScaleFactor = (float)0.25;
     private TextLayerClass DebugTextLayer;
-    private float MapAlpha = (float)1;
+    private bool MoveCamera;
+    private Vector2 OldPosition;
+    private KinematicBody2D Player;
 
     public override void _Ready()
     {
@@ -57,15 +57,16 @@ public class TempTiles : Node2D
         Dialog = new Util.Civ3FileDialog();
         Dialog.RelPath = @"Conquests/Saves";
         Dialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
-        AddChild(Dialog);
+        GetNode<Control>("CanvasLayer/ToolBar").AddChild(Dialog);
 
         LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
         MapUI = new LegacyMap();
-        MapUI.Modulate = new Color(1,1,1,MapAlpha);
         this.AddChild(MapUI);
         DebugTextLayer = new TextLayerClass();
         this.AddChild(DebugTextLayer);
+
+        Player = GetNode<KinematicBody2D>("KinematicBody2D");
     }
 
     public void _on_OpenFileButton_pressed()
@@ -93,23 +94,19 @@ public class TempTiles : Node2D
     }
     public void _on_RightButton_pressed()
     {
-        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
-        foo.Position = new Vector2(foo.Position.x + 128, foo.Position.y);
+        Player.Position = new Vector2(Player.Position.x + 128, Player.Position.y);
     }
     public void _on_LeftButton_pressed()
     {
-        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
-        foo.Position = new Vector2(foo.Position.x - 128, foo.Position.y);
+        Player.Position = new Vector2(Player.Position.x - 128, Player.Position.y);
     }
     public void _on_UpButton_pressed()
     {
-        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
-        foo.Position = new Vector2(foo.Position.x, foo.Position.y - 64);
+        Player.Position = new Vector2(Player.Position.x, Player.Position.y - 64);
     }
     public void _on_DownButton_pressed()
     {
-        KinematicBody2D foo = GetNode<KinematicBody2D>("KinematicBody2D");
-        foo.Position = new Vector2(foo.Position.x, foo.Position.y + 64);
+        Player.Position = new Vector2(Player.Position.x, Player.Position.y + 64);
     }
     public void _on_FileDialog_file_selected(string path)
     {
@@ -118,6 +115,36 @@ public class TempTiles : Node2D
         MapUI.LegacyTiles = Tiles;
         MapUI.TerrainAsTileMap();
         Update();
+    }
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        // Scrolls map by repositioning "Player" when clicking & dragging mouse
+        // Control node must not be in the way and/or have mouse pass enabled
+        if(@event is InputEventMouseButton eventMouseButton)
+        {
+            if(eventMouseButton.ButtonIndex == (int)ButtonList.Left)
+            {
+                GetTree().SetInputAsHandled();
+                if(eventMouseButton.IsPressed())
+                {
+                    OldPosition = eventMouseButton.Position;
+                    MoveCamera = true;
+                }
+                else
+                {
+                    MoveCamera = false;
+                }
+            }
+        }
+        else if(@event is InputEventMouseMotion eventMouseMotion)
+        {
+            if(MoveCamera)
+            {
+                GetTree().SetInputAsHandled();
+                Player.Position += (OldPosition - eventMouseMotion.Position) / Scale;
+                OldPosition = eventMouseMotion.Position;
+            }
+        }
     }
     private void CreateTileSet()
     {
