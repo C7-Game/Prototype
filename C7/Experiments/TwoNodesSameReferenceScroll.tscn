@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Experiments/TwoNodesSameReferenceScroll.cs" type="Script" id=1]
+[ext_resource path="res://icon.png" type="Texture" id=2]
+
+[node name="TwoNodesSameReferenceScroll" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="OriginalNode" type="Node2D" parent="."]
+
+[node name="icon" type="Sprite" parent="OriginalNode"]
+position = Vector2( 160, 160 )
+texture = ExtResource( 2 )
