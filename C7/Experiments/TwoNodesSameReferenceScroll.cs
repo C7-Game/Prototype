@@ -12,13 +12,17 @@ public class TwoNodesSameReferenceScroll : Node2D
         // I believe all the childern will be references and not duplicated
         CopyNode = OriginalNode.Duplicate() as Node2D;
         AddChild(CopyNode);
-        CopyNode.Position = new Vector2(ImageWidth, CopyNode.Position.y);
+        CopyNode.Position = new Vector2(ImageWidth * 2, CopyNode.Position.y);
+        OriginalNode.Position = new Vector2(ImageWidth, OriginalNode.Position.y);
+
+        // Rotate the original icon; if the CopyNode shows the same rotation then it's the same object
+        GetNode<Sprite>("OriginalNode/icon").RotationDegrees = 90;
     }
     public override void _Draw()
     {
         DrawRect(
             new Rect2(
-                new Vector2(0, 0),
+                new Vector2(ImageWidth, 0),
                 new Vector2(ImageWidth, ImageWidth)
             ),
             new Color(1, 0, 0, 1),
@@ -35,10 +39,10 @@ public class TwoNodesSameReferenceScroll : Node2D
  public override void _Process(float delta)
  {
      OriginalNode.Position += new Vector2(-1, 0);
-     if(OriginalNode.Position.x < -ImageWidth)
-        OriginalNode.Position = new Vector2(ImageWidth, 0);
+     if(OriginalNode.Position.x < 0)
+        OriginalNode.Position = new Vector2(ImageWidth * 2, 0);
      CopyNode.Position += new Vector2(-1, 0);
-     if(CopyNode.Position.x < -ImageWidth)
-        CopyNode.Position = new Vector2(ImageWidth, 0);
+     if(CopyNode.Position.x < 0)
+        CopyNode.Position = new Vector2(ImageWidth * 2, 0);
  }
 }
