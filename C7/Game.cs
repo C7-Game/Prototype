@@ -5,13 +5,15 @@ using ConvertCiv3Media;
 
 public class Game : Node2D
 {
-	// Declare member variables here. Examples:
-	// private int a = 2;
-	// private string b = "text";
-	// public string Civ3Path = Util.GetCiv3Path();
+	enum GameState {
+		PreGame,
+		PlayerTurn,
+		ComputerTurn
+	}
 	
 	int[,] Map;
 	Hashtable Terrmask = new Hashtable();
+	GameState CurrentState = GameState.PreGame;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -21,11 +23,20 @@ public class Game : Node2D
 		this.TerrainAsTileMap();
 	}
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+	public override void _Process(float delta)
+	{
+		switch (CurrentState)
+		{
+			case GameState.PreGame:
+				GD.Print("Game starting");
+				OnPlayerStartTurn();
+				break;
+			case GameState.PlayerTurn:
+				break;
+			case GameState.ComputerTurn:
+				break;
+		}
+	}
 
 	public void TerrainAsTileMap() {
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
@@ -90,5 +101,38 @@ public class Game : Node2D
 			}
 		}
 		AddChild(TM);
+	}
+
+	private void OnPlayerStartTurn()
+	{
+		GD.Print("Starting player turn");
+		// enable turn button
+		CurrentState = GameState.PlayerTurn;
+	}
+
+	private void OnPlayerEndTurn()
+	{
+		if (CurrentState == GameState.PlayerTurn)
+		{
+			GD.Print("Ending player turn");
+			// disable turn button
+			OnComputerStartTurn();
+		}
+	}
+
+	private void OnComputerStartTurn()
+	{
+		GD.Print("Starting computer turn");
+		// start timer to call OnComputerEndTurn()
+		CurrentState = GameState.ComputerTurn;
+	}
+
+	private void OnComputerEndTurn()
+	{
+		if (CurrentState == GameState.ComputerTurn)
+		{
+			GD.Print("Ending computer turn");
+			OnPlayerStartTurn();
+		}
 	}
 }
