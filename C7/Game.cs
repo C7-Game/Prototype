@@ -146,8 +146,13 @@ public class Game : Node2D
 	{
 		GD.Print("Starting computer turn");
 		CurrentState = GameState.ComputerTurn;
-		// start timer to call OnComputerEndTurn()
+		ComputerSimulateTurn();
 		GD.Print("Thinking...");
+	}
+
+	public async void ComputerSimulateTurn()
+	{
+		await ToSignal(GetTree().CreateTimer(2), "timeout");
 		OnComputerEndTurn();
 	}
 
