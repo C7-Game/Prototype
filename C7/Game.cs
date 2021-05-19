@@ -14,6 +14,7 @@ public class Game : Node2D
 	int[,] Map;
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
+	Button EndTurnButton;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -21,6 +22,7 @@ public class Game : Node2D
 		GD.Print("Now in game!");
 		
 		this.TerrainAsTileMap();
+		this.CreateUI();
 	}
 
 	public override void _Process(float delta)
@@ -103,10 +105,30 @@ public class Game : Node2D
 		AddChild(TM);
 	}
 
+	private void CreateUI()
+	{
+		EndTurnButton = new Button();
+		EndTurnButton.Text = "End Turn";
+		AddChild(EndTurnButton);
+		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
+	}
+
+	private void _onEndTurnButtonPressed()
+	{
+		if (CurrentState == GameState.PlayerTurn)
+		{
+			OnPlayerEndTurn();
+		}
+		else
+		{
+			GD.Print("It's not your turn!");
+		}
+	}
+
 	private void OnPlayerStartTurn()
 	{
 		GD.Print("Starting player turn");
-		// enable turn button
+		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
 	}
 
@@ -115,7 +137,7 @@ public class Game : Node2D
 		if (CurrentState == GameState.PlayerTurn)
 		{
 			GD.Print("Ending player turn");
-			// disable turn button
+			EndTurnButton.Disabled = true;
 			OnComputerStartTurn();
 		}
 	}
@@ -123,8 +145,10 @@ public class Game : Node2D
 	private void OnComputerStartTurn()
 	{
 		GD.Print("Starting computer turn");
-		// start timer to call OnComputerEndTurn()
 		CurrentState = GameState.ComputerTurn;
+		// start timer to call OnComputerEndTurn()
+		GD.Print("Thinking...");
+		OnComputerEndTurn();
 	}
 
 	private void OnComputerEndTurn()
