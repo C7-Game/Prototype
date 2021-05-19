@@ -5,6 +5,7 @@ using ConvertCiv3Media;
 
 public class Game : Node2D
 {
+	[Signal] public delegate void TurnStarted();
 	enum GameState {
 		PreGame,
 		PlayerTurn,
@@ -23,6 +24,8 @@ public class Game : Node2D
 		
 		this.TerrainAsTileMap();
 		this.CreateUI();
+		TurnCounterComponent turnCntCpnt = new TurnCounterComponent();
+		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
 	}
 
 	public override void _Process(float delta)
@@ -128,6 +131,7 @@ public class Game : Node2D
 	private void OnPlayerStartTurn()
 	{
 		GD.Print("Starting player turn");
+		EmitSignal(nameof(TurnStarted));
 		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
 	}
