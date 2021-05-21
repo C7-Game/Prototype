@@ -20,12 +20,10 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		GD.Print("Now in game!");
-		
 		this.TerrainAsTileMap();
 		this.CreateUI();
-		TurnCounterComponent turnCntCpnt = new TurnCounterComponent();
-		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
+		ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+		GD.Print("Now in game!");
 	}
 
 	public override void _Process(float delta)
@@ -33,14 +31,21 @@ public class Game : Node2D
 		switch (CurrentState)
 		{
 			case GameState.PreGame:
-				GD.Print("Game starting");
-				OnPlayerStartTurn();
+				StartGame();
 				break;
 			case GameState.PlayerTurn:
 				break;
 			case GameState.ComputerTurn:
 				break;
 		}
+	}
+
+	private void StartGame()
+	{
+		GD.Print("Game starting");
+		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
+		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
+		OnPlayerStartTurn();
 	}
 
 	public void TerrainAsTileMap() {

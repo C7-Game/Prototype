@@ -1,5 +1,5 @@
 using Godot;
-public class TurnCounterComponent : Node
+public class TurnCounterComponent : GameComponent
 {
     int _turnCount = 0;
 
