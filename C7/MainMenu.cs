@@ -84,7 +84,7 @@ public class MainMenu : Node2D
 		exit.Text = "Exit";
 		exit.SetPosition(new Vector2(860, 475));
 		AddChild(exit);
-		exit.Connect("pressed", this, "_on_Button_pressed");
+		exit.Connect("pressed", this, "_on_Exit_pressed");
 		
 	}
 
@@ -98,5 +98,10 @@ public class MainMenu : Node2D
 	{
 		GD.Print("Load button pressed");
 		GetTree().ChangeScene("res://C7Game.tscn");    
+	}
+	
+	public void _on_Exit_pressed()
+	{
+		GetTree().Quit();
 	}
 }
