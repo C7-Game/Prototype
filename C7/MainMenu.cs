@@ -6,6 +6,7 @@ public class MainMenu : Node2D
 	readonly int BUTTON_LABEL_OFFSET = 4;
 	
 	StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
+	StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 	ImageTexture InactiveButton;
 	ImageTexture HoverButton;
 
@@ -25,6 +26,7 @@ public class MainMenu : Node2D
 		HoverButton = PCXToGodot.getImageTextureFromPCX(ButtonsTxtr, 22, 1, 20, 20);
 		
 		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
+		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 
 		AddButton("New Game", 160, "_on_Button_pressed");
 		AddButton("Quick Start", 195, "_on_Button_pressed");
@@ -50,28 +52,29 @@ public class MainMenu : Node2D
 
 	private void AddButton(string label, int verticalPosition, string actionName)
 	{
-		TextureButton startButton = new TextureButton();
-		startButton.TextureNormal = InactiveButton;
-		startButton.TextureHover = HoverButton;
-		startButton.SetPosition(new Vector2(835, verticalPosition));
-		AddChild(startButton);
-		startButton.Connect("pressed", this, actionName);
+		TextureButton newButton = new TextureButton();
+		newButton.TextureNormal = InactiveButton;
+		newButton.TextureHover = HoverButton;
+		newButton.SetPosition(new Vector2(835, verticalPosition));
+		AddChild(newButton);
+		newButton.Connect("pressed", this, actionName);
 				
-		Button start = new Button();
-		start.Text = label;
-		start.AddColorOverride("font_color", new Color(0, 0, 0));
-		start.AddStyleboxOverride("normal", TransparentBackgroundStyle);
-		start.AddStyleboxOverride("hover", TransparentBackgroundStyle);
-		start.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
-		AddChild(start);
-		start.Connect("pressed", this, actionName);
-	}
+		Button newButtonLabel = new Button();
+		newButtonLabel.Text = label;
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+		newButtonLabel.AddColorOverride("font_color", new Color(0, 0, 0));
+		//Only the Exit and part of the Credits button are getting the right color.  The rest are black.  Not sure why.
+		newButtonLabel.AddColorOverride("font_color_hover", new Color(181.0f/255, 90.0f/255, 0, 255));
+		//N.B. there are also font_color_pressed and font_color_disabled.
+
+		newButtonLabel.AddStyleboxOverride("normal", TransparentBackgroundStyle);
+		newButtonLabel.AddStyleboxOverride("hover", TransparentBackgroundHoverStyle);
+		newButtonLabel.AddStyleboxOverride("pressed", TransparentBackgroundHoverStyle);
+
+		newButtonLabel.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
+		AddChild(newButtonLabel);
+		newButtonLabel.Connect("pressed", this, actionName);
+	}
 
 	public void _on_Button_pressed()
 	{
