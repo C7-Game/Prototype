@@ -36,7 +36,7 @@ public class MainMenu : Node2D
 		AddButton("Hall of Fame", 335, "_on_Button_pressed");
 		AddButton("Preferences", 370, "_on_Button_pressed");
 		AddButton("Audio Preferences", 405, "_on_Button_pressed");
-		AddButton("Credits", 440, "_on_Button_pressed");
+		AddButton("Credits", 440, "showCredits");
 		AddButton("Exit", 475, "_on_Exit_pressed");
 	}
 
@@ -80,6 +80,12 @@ public class MainMenu : Node2D
 	{
 		GD.Print("Load button pressed");
 		GetTree().ChangeScene("res://C7Game.tscn");    
+	}
+	
+	public void showCredits()
+	{
+		GD.Print("Credits button pressed");
+		GetTree().ChangeScene("res://Credits.tscn");    
 	}
 	
 	public void _on_Exit_pressed()
