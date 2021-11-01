@@ -121,7 +121,9 @@ public class Game : Node2D
 		AddChild(EndTurnButton);
 		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
 
-		ImageTexture menuTexture = Util.LoadTextureFromPCX("Art/interface/menuButtons.pcx", 0, 1, 35, 28);
+		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtons.pcx"));
+		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
+		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 28);
 		TextureButton menuButton = new TextureButton();
 		menuButton.TextureNormal = menuTexture;
 		menuButton.SetPosition(new Vector2(21, 12));
