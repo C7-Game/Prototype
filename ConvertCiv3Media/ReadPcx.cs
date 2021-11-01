@@ -7,7 +7,7 @@ namespace ConvertCiv3Media
     public class Pcx {
 
         public byte[,] Palette = new byte[256,3];
-        public byte[] Image = new byte[]{};
+        public byte[] ColorIndices = new byte[]{};
         public int Width = 0;
         public int Height = 0;
 
@@ -73,7 +73,7 @@ namespace ConvertCiv3Media
                     LineIdx++;
                 }
             }
-            this.Image = ListImage.ToArray();
+            this.ColorIndices = ListImage.ToArray();
         }
     }
 }
