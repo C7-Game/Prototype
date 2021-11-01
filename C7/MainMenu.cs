@@ -21,9 +21,8 @@ public class MainMenu : Node2D
 	{	
 		SetMainMenuBackground();
 		
-		Pcx ButtonsTxtr = new Pcx(Util.Civ3MediaPath("Art/buttonsFINAL.pcx"));
-		InactiveButton = PCXToGodot.getImageTextureFromPCX(ButtonsTxtr, 1, 1, 20, 20);
-		HoverButton = PCXToGodot.getImageTextureFromPCX(ButtonsTxtr, 22, 1, 20, 20);
+		InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
+		HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
 		
 		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
 		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
@@ -42,8 +41,7 @@ public class MainMenu : Node2D
 
 	private void SetMainMenuBackground()
 	{
-		Pcx TitleScreenPCX = new Pcx(Util.Civ3MediaPath("Art/title.pcx"));
-		ImageTexture TitleScreenTexture = PCXToGodot.getImageTextureFromPCX(TitleScreenPCX);
+		ImageTexture TitleScreenTexture = Util.LoadTextureFromPCX("Art/title.pcx");
 		
 		TextureRect MainMenuBackground = new TextureRect();
 		MainMenuBackground.Texture = TitleScreenTexture;

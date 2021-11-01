@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using ConvertCiv3Media;
 
 public class Util
 {
@@ -58,5 +59,21 @@ public class Util
             if(System.IO.File.Exists(pathCandidate)) { return pathCandidate; }
         }
         throw new ApplicationException("Media path not found: " + relPath);
+    }
+
+    //Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
+    static public ImageTexture LoadTextureFromPCX(string relPath)
+    {
+		Pcx TitleScreenPCX = new Pcx(Util.Civ3MediaPath(relPath));
+		return PCXToGodot.getImageTextureFromPCX(TitleScreenPCX);
+    }
+    
+    
+    //Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
+    //file, and it'll load it up and return you what you need.
+    static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height)
+    {
+		Pcx TitleScreenPCX = new Pcx(Util.Civ3MediaPath(relPath));
+		return PCXToGodot.getImageTextureFromPCX(TitleScreenPCX, leftStart, topStart, width, height);
     }
 }

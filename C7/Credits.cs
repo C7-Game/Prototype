@@ -13,8 +13,8 @@ public class Credits : Node2D
 
 	private void ShowCredits()
 	{
-		Pcx CreditsBackgroundPCX = new Pcx(Util.Civ3MediaPath("Art/Credits/credits_background.pcx"));
-		ImageTexture CreditsTexture = PCXToGodot.getImageTextureFromPCX(CreditsBackgroundPCX);
+		ImageTexture CreditsTexture = Util.LoadTextureFromPCX("Art/Credits/credits_background.pcx");
+		ImageTexture GoBackTexture = Util.LoadTextureFromPCX("Art/exitBox-backgroundStates.pcx", 0, 0, 72, 48);
 		
 		TextureRect CreditsBackground = new TextureRect();
 		CreditsBackground.Texture = CreditsTexture;
@@ -26,10 +26,7 @@ public class Credits : Node2D
 		creditsLabel.Text = "Project Ringleader: WildWeazel";
 		creditsLabel.SetPosition(new Vector2(360, 120));
 		AddChild(creditsLabel);
-
-		Pcx GoBackPCX = new Pcx(Util.Civ3MediaPath("Art/exitBox-backgroundStates.pcx"));
-		ImageTexture GoBackTexture = PCXToGodot.getImageTextureFromPCX(GoBackPCX, 0, 0, 72, 48);
-
+		
 		TextureButton GoBackButton = new TextureButton();
 		GoBackButton.TextureNormal = GoBackTexture;
 		GoBackButton.SetPosition(new Vector2(952, 720));
