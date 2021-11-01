@@ -117,8 +117,27 @@ public class Game : Node2D
 	{
 		EndTurnButton = new Button();
 		EndTurnButton.Text = "End Turn";
+		EndTurnButton.SetPosition(new Vector2(250, 10));
 		AddChild(EndTurnButton);
 		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
+
+		ImageTexture menuTexture = Util.LoadTextureFromPCX("Art/interface/menuButtons.pcx", 0, 1, 35, 28);
+		TextureButton menuButton = new TextureButton();
+		menuButton.TextureNormal = menuTexture;
+		menuButton.SetPosition(new Vector2(21, 12));
+		AddChild(menuButton);
+		
+		ImageTexture civilopediaTexture = Util.LoadTextureFromPCX("Art/interface/menuButtons.pcx", 36, 1, 35, 28);
+		TextureButton civilopediaButton = new TextureButton();
+		civilopediaButton.TextureNormal = civilopediaTexture;
+		civilopediaButton.SetPosition(new Vector2(57, 12));
+		AddChild(civilopediaButton);
+		
+		ImageTexture advisorsTexture = Util.LoadTextureFromPCX("Art/interface/menuButtons.pcx", 73, 1, 33, 28);
+		TextureButton advisorsButton = new TextureButton();
+		advisorsButton.TextureNormal = advisorsTexture;
+		advisorsButton.SetPosition(new Vector2(94, 12));
+		AddChild(advisorsButton);
 	}
 
 	private void _onEndTurnButtonPressed()
