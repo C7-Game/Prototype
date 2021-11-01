@@ -1,18 +1,13 @@
 using Godot;
-using System;
 using ConvertCiv3Media;
 
 public class MainMenu : Node2D
 {
-	// Declare member variables here. Examples:
-	// private int a = 2;
-	// private string b = "text";
-	
-	// public string Civ3Path = Util.GetCiv3Path();
-
+	readonly int BUTTON_LABEL_OFFSET = 4;
 	
 	StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
 	ImageTexture InactiveButton;
+	ImageTexture HoverButton;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -27,6 +22,7 @@ public class MainMenu : Node2D
 		
 		Pcx ButtonsTxtr = new Pcx(Util.Civ3MediaPath("Art/buttonsFINAL.pcx"));
 		InactiveButton = PCXToGodot.getImageTextureFromPCX(ButtonsTxtr, 1, 1, 20, 20);
+		HoverButton = PCXToGodot.getImageTextureFromPCX(ButtonsTxtr, 22, 1, 20, 20);
 		
 		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
 
@@ -56,6 +52,7 @@ public class MainMenu : Node2D
 	{
 		TextureButton startButton = new TextureButton();
 		startButton.TextureNormal = InactiveButton;
+		startButton.TextureHover = HoverButton;
 		startButton.SetPosition(new Vector2(835, verticalPosition));
 		AddChild(startButton);
 		startButton.Connect("pressed", this, actionName);
@@ -64,7 +61,8 @@ public class MainMenu : Node2D
 		start.Text = label;
 		start.AddColorOverride("font_color", new Color(0, 0, 0));
 		start.AddStyleboxOverride("normal", TransparentBackgroundStyle);
-		start.SetPosition(new Vector2(860, verticalPosition));
+		start.AddStyleboxOverride("hover", TransparentBackgroundStyle);
+		start.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
 		AddChild(start);
 		start.Connect("pressed", this, actionName);
 	}
