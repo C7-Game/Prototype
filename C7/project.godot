@@ -19,6 +19,10 @@ config/name="C7"
 run/main_scene="res://MainMenu.tscn"
 config/icon="res://icon.png"
 
+[display]
+
+window/size/height=768
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"
