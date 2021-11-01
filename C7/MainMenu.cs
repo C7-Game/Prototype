@@ -10,6 +10,10 @@ public class MainMenu : Node2D
 	
 	// public string Civ3Path = Util.GetCiv3Path();
 
+	
+	StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
+	ImageTexture InactiveButton;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -19,73 +23,50 @@ public class MainMenu : Node2D
 	
 	private void DisplayTitleScreen()
 	{	
-		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/title.pcx"));
-		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
+		SetMainMenuBackground();
 		
-		TextureRect texture = new TextureRect();
-		texture.Texture = Txtr;
-		AddChild(texture);
- 
-		Button newButton = new Button();
-		newButton.Text = "New Game";
-		newButton.SetPosition(new Vector2(860, 160));
-		AddChild(newButton);
-		newButton.Connect("pressed", this, "_on_Button_pressed");
+		Pcx ButtonsTxtr = new Pcx(Util.Civ3MediaPath("Art/buttonsFINAL.pcx"));
+		InactiveButton = PCXToGodot.getImageTextureFromPCX(ButtonsTxtr, 1, 1, 20, 20);
 		
-		Button quickStart = new Button();
-		quickStart.Text = "Quick Start";
-		quickStart.SetPosition(new Vector2(860, 195));
-		AddChild(quickStart);
-		quickStart.Connect("pressed", this, "_on_Button_pressed");
+		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
+
+		AddButton("New Game", 160, "_on_Button_pressed");
+		AddButton("Quick Start", 195, "_on_Button_pressed");
+		AddButton("Tutorial", 230, "_on_Button_pressed");
+		AddButton("Load Game", 265, "_on_Button_pressed");
+		AddButton("Load Scenario", 300, "_on_Button_pressed");
+		AddButton("Hall of Fame", 335, "_on_Button_pressed");
+		AddButton("Preferences", 370, "_on_Button_pressed");
+		AddButton("Audio Preferences", 405, "_on_Button_pressed");
+		AddButton("Credits", 440, "_on_Button_pressed");
+		AddButton("Exit", 475, "_on_Exit_pressed");
+	}
+
+	private void SetMainMenuBackground()
+	{
+		Pcx TitleScreenPCX = new Pcx(Util.Civ3MediaPath("Art/title.pcx"));
+		ImageTexture TitleScreenTexture = PCXToGodot.getImageTextureFromPCX(TitleScreenPCX);
 		
-		Button tutorial = new Button();
-		tutorial.Text = "Tutorial";
-		tutorial.SetPosition(new Vector2(860, 230));
-		AddChild(tutorial);
-		tutorial.Connect("pressed", this, "_on_Button_pressed");
-		
-		Button loadGame = new Button();
-		loadGame.Text = "Load Game";
-		loadGame.SetPosition(new Vector2(860, 265));
-		AddChild(loadGame);
-		loadGame.Connect("pressed", this, "_on_Button_pressed");
-		
-		Button loadScenario = new Button();
-		loadScenario.Text = "Load Scenario";
-		loadScenario.SetPosition(new Vector2(860, 300));
-		AddChild(loadScenario);
-		loadScenario.Connect("pressed", this, "_on_Button_pressed");
-		
-		Button hallOfFame = new Button();
-		hallOfFame.Text = "Hall of Fame";
-		hallOfFame.SetPosition(new Vector2(860, 335));
-		AddChild(hallOfFame);
-		hallOfFame.Connect("pressed", this, "_on_Button_pressed");
-		
-		Button preferences = new Button();
-		preferences.Text = "Preferences";
-		preferences.SetPosition(new Vector2(860, 370));
-		AddChild(preferences);
-		preferences.Connect("pressed", this, "_on_Button_pressed");
-		
-		Button audioPreferences = new Button();
-		audioPreferences.Text = "Audio Preferences";
-		audioPreferences.SetPosition(new Vector2(860, 405));
-		AddChild(audioPreferences);
-		audioPreferences.Connect("pressed", this, "_on_Button_pressed");
-		
-		Button credits = new Button();
-		credits.Text = "Credits";
-		credits.SetPosition(new Vector2(860, 440));
-		AddChild(credits);
-		credits.Connect("pressed", this, "_on_Button_pressed");
-		
-		Button exit = new Button();
-		exit.Text = "Exit";
-		exit.SetPosition(new Vector2(860, 475));
-		AddChild(exit);
-		exit.Connect("pressed", this, "_on_Exit_pressed");
-		
+		TextureRect MainMenuBackground = new TextureRect();
+		MainMenuBackground.Texture = TitleScreenTexture;
+		AddChild(MainMenuBackground);
+	}
+
+	private void AddButton(string label, int verticalPosition, string actionName)
+	{
+		TextureButton startButton = new TextureButton();
+		startButton.TextureNormal = InactiveButton;
+		startButton.SetPosition(new Vector2(835, verticalPosition));
+		AddChild(startButton);
+		startButton.Connect("pressed", this, actionName);
+				
+		Button start = new Button();
+		start.Text = label;
+		start.AddColorOverride("font_color", new Color(0, 0, 0));
+		start.AddStyleboxOverride("normal", TransparentBackgroundStyle);
+		start.SetPosition(new Vector2(860, verticalPosition));
+		AddChild(start);
+		start.Connect("pressed", this, actionName);
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -14,6 +14,14 @@ public class PCXToGodot : Godot.Object
 		Txtr.CreateFromImage(ImgTxtr, 0);
 		return Txtr;
 	}
+
+	public static ImageTexture getImageTextureFromPCX(Pcx pcx, int leftStart, int topStart, int width, int height) {
+		Image Image = ByteArrayToImage(pcx.Image, pcx.Palette, pcx.Width, pcx.Height);
+		Image = Image.GetRect(new Rect2(leftStart, topStart, width, height));
+		ImageTexture Txtr = new ImageTexture();
+		Txtr.CreateFromImage(Image, 0);
+		return Txtr;
+	}
 	
 	private static Image ByteArrayToImage(byte[] ba, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
 		Image OutImage = new Image();
