@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://TempTiles/TempTiles.cs" type="Script" id=1]
+[ext_resource path="res://UtilScenes/TempTiles.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
 
 [node name="TempTiles" type="Node2D"]
