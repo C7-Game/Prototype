@@ -16,10 +16,12 @@ public class Game : Node2D
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
+	Timer endTurnBlinkingTimer;
 
 	
 	TextureButton nextTurnButton = new TextureButton();
 	ImageTexture nextTurnOnTexture;
+	ImageTexture nextTurnOffTexture;
 	ImageTexture nextTurnBlinkTexture;
 
 	// Called when the node enters the scene tree for the first time.
@@ -138,7 +140,7 @@ public class Game : Node2D
 
 		Pcx nextTurnColor = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states color.pcx"));
 		Pcx nextTurnAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states alpha.pcx"));
-		ImageTexture nextTurnOffTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 0, 0, 47, 28);
+		nextTurnOffTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 0, 0, 47, 28);
 		nextTurnOnTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 47, 0, 47, 28);
 		nextTurnBlinkTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 94, 0, 47, 28);
 
@@ -153,19 +155,19 @@ public class Game : Node2D
 	{
 		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtons.pcx"));
 		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
-		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 28);
+		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 29);
 		TextureButton menuButton = new TextureButton();
 		menuButton.TextureNormal = menuTexture;
 		menuButton.SetPosition(new Vector2(21, 12));
 		AddChild(menuButton);
 		
-		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 28);
+		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 29);
 		TextureButton civilopediaButton = new TextureButton();
 		civilopediaButton.TextureNormal = civilopediaTexture;
 		civilopediaButton.SetPosition(new Vector2(57, 12));
 		AddChild(civilopediaButton);
 		
-		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 28);
+		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
 		TextureButton advisorsButton = new TextureButton();
 		advisorsButton.TextureNormal = advisorsTexture;
 		advisorsButton.SetPosition(new Vector2(94, 12));
@@ -191,32 +193,27 @@ public class Game : Node2D
 		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
 
-		// Create a timer node
-		var timer = new Timer();
-		// Set timer interval
-		timer.WaitTime = 1.0f;
-		// Set it as repeat
-		timer.OneShot = false;
-		// Connect its timeout signal to the function you want to repeat
-		timer.Connect("timeout", this, "toggleEndTurnButton");
-		//timer.connect("timeout", self, "repeat_me")
-		// Add to the tree as child of the current node
-		AddChild(timer);
-		timer.Start();
-
-		GD.Print("Timer ought to be set");
+		//Set a timer so the end turn button starts blinking after awhile.
+		//Obviously once we have more game mechanics, it won't happen automatically
+		//after 5 seconds.
+		endTurnBlinkingTimer = new Timer();
+		endTurnBlinkingTimer.WaitTime = 5.0f;
+		endTurnBlinkingTimer.OneShot = true;
+		endTurnBlinkingTimer.Connect("timeout", this, "toggleEndTurnButton");
+		AddChild(endTurnBlinkingTimer);
+		endTurnBlinkingTimer.Start();
 	}
 
 	private void toggleEndTurnButton() {
-		GD.Print("Toggling end button");
 		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
-			GD.Print("Turning on blink texture");
 			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
 		}
 		else {
-			GD.Print("Turning on regular 'on' texture");
 			nextTurnButton.TextureNormal = nextTurnOnTexture;
 		}
+		endTurnBlinkingTimer.OneShot = false;
+		endTurnBlinkingTimer.WaitTime = 0.6f;
+		endTurnBlinkingTimer.Start();
 	}
 
 	private void OnPlayerEndTurn()
@@ -224,6 +221,8 @@ public class Game : Node2D
 		if (CurrentState == GameState.PlayerTurn)
 		{
 			GD.Print("Ending player turn");
+			endTurnBlinkingTimer.Stop();
+			nextTurnButton.TextureNormal = nextTurnOffTexture;
 			EndTurnButton.Disabled = true;
 			OnComputerStartTurn();
 		}
