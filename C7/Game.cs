@@ -36,7 +36,7 @@ public class Game : Node2D
 			ComponentManager.Instance.AddComponent(new TurnCounterComponent());
 		}
 		catch {
-			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter(0);
+			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
 		}
 		GD.Print("Now in game!");
 	}
