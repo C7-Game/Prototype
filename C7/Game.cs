@@ -18,6 +18,7 @@ public class Game : Node2D
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
+	Control Toolbar;
 	Timer endTurnAlertTimer;
 	private bool MoveCamera;
 	private Vector2 OldPosition;
@@ -28,6 +29,7 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		this.TerrainAsTileMap();
 		this.CreateUI();
@@ -148,7 +150,8 @@ public class Game : Node2D
 		EndTurnButton = new Button();
 		EndTurnButton.Text = "End Turn";
 		EndTurnButton.SetPosition(new Vector2(250, 10));
-		AddChild(EndTurnButton);
+		Toolbar.AddChild(EndTurnButton);
+		Toolbar.MoveChild(EndTurnButton, 0);
 		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
 
 		AddTopLeftButtons();
@@ -162,20 +165,23 @@ public class Game : Node2D
 		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 29);
 		TextureButton menuButton = new TextureButton();
 		menuButton.TextureNormal = menuTexture;
-		menuButton.SetPosition(new Vector2(21, 12));
-		AddChild(menuButton);
-		
+		// menuButton.SetPosition(new Vector2(21, 12));
+		Toolbar.AddChild(menuButton);
+		Toolbar.MoveChild(menuButton, 0);
+
 		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 29);
 		TextureButton civilopediaButton = new TextureButton();
 		civilopediaButton.TextureNormal = civilopediaTexture;
-		civilopediaButton.SetPosition(new Vector2(57, 12));
-		AddChild(civilopediaButton);
+		// civilopediaButton.SetPosition(new Vector2(57, 12));
+		Toolbar.AddChild(civilopediaButton);
+		Toolbar.MoveChild(civilopediaButton, 1);
 		
 		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
 		TextureButton advisorsButton = new TextureButton();
 		advisorsButton.TextureNormal = advisorsTexture;
-		advisorsButton.SetPosition(new Vector2(94, 12));
-		AddChild(advisorsButton);
+		// advisorsButton.SetPosition(new Vector2(94, 12));
+		Toolbar.AddChild(advisorsButton);
+		Toolbar.MoveChild(advisorsButton, 2);
 	}
 
 	private void AddLowerRightBox()
