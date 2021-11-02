@@ -59,7 +59,6 @@ public class TempTiles : Node2D
         Dialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
         GetNode<Control>("CanvasLayer/ToolBar").AddChild(Dialog);
 
-        LegacyMapReader = new QueryCiv3.Civ3File();
         // Load LegacyMap scene (?) and attach to tree
         MapUI = new LegacyMap();
         this.AddChild(MapUI);
@@ -110,7 +109,7 @@ public class TempTiles : Node2D
     }
     public void _on_FileDialog_file_selected(string path)
     {
-        LegacyMapReader.Load(path);
+        LegacyMapReader = new QueryCiv3.Civ3File(QueryCiv3.Util.ReadFile(path));
         CreateTileSet();
         MapUI.LegacyTiles = Tiles;
         MapUI.TerrainAsTileMap();
