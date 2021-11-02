@@ -64,8 +64,8 @@ public class Util
     //Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
     static public ImageTexture LoadTextureFromPCX(string relPath)
     {
-		Pcx TitleScreenPCX = new Pcx(Util.Civ3MediaPath(relPath));
-		return PCXToGodot.getImageTextureFromPCX(TitleScreenPCX);
+		Pcx NewPCX = new Pcx(Util.Civ3MediaPath(relPath));
+		return PCXToGodot.getImageTextureFromPCX(NewPCX);
     }
     
     
@@ -73,7 +73,7 @@ public class Util
     //file, and it'll load it up and return you what you need.
     static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height)
     {
-		Pcx TitleScreenPCX = new Pcx(Util.Civ3MediaPath(relPath));
-		return PCXToGodot.getImageTextureFromPCX(TitleScreenPCX, leftStart, topStart, width, height);
+		Pcx NewPCX = new Pcx(Util.Civ3MediaPath(relPath));
+		return PCXToGodot.getImageTextureFromPCX(NewPCX, leftStart, topStart, width, height);
     }
 }

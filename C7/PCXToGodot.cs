@@ -71,14 +71,12 @@ public class PCXToGodot : Godot.Object
 			//Going to have to figure that one out.  For now, make sure it doesn't blow up.
 			if (i < alphaPcx.ColorIndices.Length) {
 				alpha = alphaPcx.Palette[alphaPcx.ColorIndices[i], 0];
-			}	
-			// byte alpha = 255;
+			}
 			OutImage.SetPixel(i % imagePcx.Width, i / imagePcx.Width, Color.Color8(red, green, blue, alpha));
 		}
 		OutImage.Unlock();
 
-		//TODO: I'm not 100% sure why it was cutting off the bottom pixel without the +1, but it was.  Need to verify.
-		Image CroppedImage = OutImage.GetRect(new Rect2(leftStart, topStart, croppedWidth + 1, croppedHeight + 1));
+		Image CroppedImage = OutImage.GetRect(new Rect2(leftStart, topStart, croppedWidth, croppedHeight));
 		ImageTexture Txtr = new ImageTexture();
 		Txtr.CreateFromImage(CroppedImage, 0);
 		return Txtr;
