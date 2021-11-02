@@ -6,6 +6,8 @@ using ConvertCiv3Media;
 public class Game : Node2D
 {
 	[Signal] public delegate void TurnStarted();
+	[Signal] public delegate void TurnEnded();
+
 	enum GameState {
 		PreGame,
 		PlayerTurn,
@@ -16,16 +18,12 @@ public class Game : Node2D
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
-	Timer endTurnBlinkingTimer;
-    private bool MoveCamera;
-    private Vector2 OldPosition;
-    private KinematicBody2D Player;
-
+	Timer endTurnAlertTimer;
+	private bool MoveCamera;
+	private Vector2 OldPosition;
+	private KinematicBody2D Player;
 	
-	TextureButton nextTurnButton = new TextureButton();
-	ImageTexture nextTurnOnTexture;
-	ImageTexture nextTurnOffTexture;
-	ImageTexture nextTurnBlinkTexture;
+	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -61,6 +59,7 @@ public class Game : Node2D
 		GD.Print("Game starting");
 		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
 		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
+		Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
 		OnPlayerStartTurn();
 	}
 
@@ -166,78 +165,9 @@ public class Game : Node2D
 
 	private void AddLowerRightBox()
 	{
-		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
-		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
-		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
-		TextureRect boxRightRectangle = new TextureRect();
-		boxRightRectangle.Texture = boxRight;
-		boxRightRectangle.SetPosition(new Vector2(OS.WindowSize.x - (boxRightColor.Width + 5), OS.WindowSize.y - (boxRightColor.Height + 1)));
-		AddChild(boxRightRectangle);
-
-		Pcx nextTurnColor = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states color.pcx"));
-		Pcx nextTurnAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states alpha.pcx"));
-		nextTurnOffTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 0, 0, 47, 28);
-		nextTurnOnTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 47, 0, 47, 28);
-		nextTurnBlinkTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 94, 0, 47, 28);
-
-		nextTurnButton.TextureNormal = nextTurnOffTexture;
-		nextTurnButton.TextureHover = nextTurnOnTexture;
-		nextTurnButton.SetPosition(new Vector2(OS.WindowSize.x - (boxRightColor.Width + 5), OS.WindowSize.y - (boxRightColor.Height + 1)));
-		AddChild(nextTurnButton);
-		nextTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
-
-
-		//Labels and whatnot in this text box
-		Label lblUnitSelected = new Label();
-		lblUnitSelected.Text = "Settler";
-		lblUnitSelected.AddColorOverride("font_color", new Color(0, 0, 0));
-		lblUnitSelected.Align = Label.AlignEnum.Right;
-		lblUnitSelected.SetPosition(new Vector2(0, 20));
-		lblUnitSelected.AnchorRight = 1.0f;
-		lblUnitSelected.MarginRight = -35;
-		boxRightRectangle.AddChild(lblUnitSelected);
-		
-		Label attackDefenseMovement = new Label();
-		attackDefenseMovement.Text = "0.0. 1/1";
-		attackDefenseMovement.AddColorOverride("font_color", new Color(0, 0, 0));
-		attackDefenseMovement.Align = Label.AlignEnum.Right;
-		attackDefenseMovement.SetPosition(new Vector2(0, 35));
-		attackDefenseMovement.AnchorRight = 1.0f;
-		attackDefenseMovement.MarginRight = -35;
-		boxRightRectangle.AddChild(attackDefenseMovement);
-		
-		Label terrainType = new Label();
-		terrainType.Text = "Grassland";
-		terrainType.AddColorOverride("font_color", new Color(0, 0, 0));
-		terrainType.Align = Label.AlignEnum.Right;
-		terrainType.SetPosition(new Vector2(0, 50));
-		terrainType.AnchorRight = 1.0f;
-		terrainType.MarginRight = -35;
-		boxRightRectangle.AddChild(terrainType);
-		
-		//For the centered labels, we anchor them center, with equal weight on each side.
-		//Then, when they are visible, we add a left margin that's negative and equal to half
-		//their width.
-		//Seems like there probably is an easier way, but I haven't found it yet.
-		Label civAndGovt = new Label();
-		civAndGovt.Text = "Rome - Despotism (5.5.0)";
-		civAndGovt.AddColorOverride("font_color", new Color(0, 0, 0));
-		civAndGovt.Align = Label.AlignEnum.Center;
-		civAndGovt.SetPosition(new Vector2(0, 90));
-		civAndGovt.AnchorLeft = 0.5f;
-		civAndGovt.AnchorRight = 0.5f;
-		boxRightRectangle.AddChild(civAndGovt);
-		civAndGovt.MarginLeft = -1 * (civAndGovt.RectSize.x/2.0f);
-
-		Label yearAndGold = new Label();
-		yearAndGold.Text = "4000 BC  10 Gold (+0 per turn)";
-		yearAndGold.AddColorOverride("font_color", new Color(0, 0, 0));
-		yearAndGold.Align = Label.AlignEnum.Center;
-		yearAndGold.SetPosition(new Vector2(0, 105));
-		yearAndGold.AnchorLeft = 0.5f;
-		yearAndGold.AnchorRight = 0.5f;
-		boxRightRectangle.AddChild(yearAndGold);
-		yearAndGold.MarginLeft = -1 * (yearAndGold.RectSize.x/2.0f);
+		//294 x 137 are the dimensions of the right info box.
+		LowerRightInfoBox.Position = (new Vector2(OS.WindowSize.x - (294 + 5), OS.WindowSize.y - (137 + 1)));
+		AddChild(LowerRightInfoBox);
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -262,24 +192,12 @@ public class Game : Node2D
 		//Set a timer so the end turn button starts blinking after awhile.
 		//Obviously once we have more game mechanics, it won't happen automatically
 		//after 5 seconds.
-		endTurnBlinkingTimer = new Timer();
-		endTurnBlinkingTimer.WaitTime = 5.0f;
-		endTurnBlinkingTimer.OneShot = true;
-		endTurnBlinkingTimer.Connect("timeout", this, "toggleEndTurnButton");
-		AddChild(endTurnBlinkingTimer);
-		endTurnBlinkingTimer.Start();
-	}
-
-	private void toggleEndTurnButton() {
-		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
-			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
-		}
-		else {
-			nextTurnButton.TextureNormal = nextTurnOnTexture;
-		}
-		endTurnBlinkingTimer.OneShot = false;
-		endTurnBlinkingTimer.WaitTime = 0.6f;
-		endTurnBlinkingTimer.Start();
+		endTurnAlertTimer = new Timer();
+		endTurnAlertTimer.WaitTime = 5.0f;
+		endTurnAlertTimer.OneShot = true;
+		endTurnAlertTimer.Connect("timeout", LowerRightInfoBox, "toggleEndTurnButton");
+		AddChild(endTurnAlertTimer);
+		endTurnAlertTimer.Start();
 	}
 
 	private void OnPlayerEndTurn()
@@ -287,8 +205,7 @@ public class Game : Node2D
 		if (CurrentState == GameState.PlayerTurn)
 		{
 			GD.Print("Ending player turn");
-			endTurnBlinkingTimer.Stop();
-			nextTurnButton.TextureNormal = nextTurnOffTexture;
+			LowerRightInfoBox.StopToggling();
 			EndTurnButton.Disabled = true;
 			OnComputerStartTurn();
 		}
@@ -317,73 +234,73 @@ public class Game : Node2D
 		}
 	}
 
-    public void _on_QuitButton_pressed()
-    {
-        // NOTE: I think this quits the current node or scene and not necessarily the whole program if this is a child node?
-        GetTree().Quit();
-    }
+	public void _on_QuitButton_pressed()
+	{
+		// NOTE: I think this quits the current node or scene and not necessarily the whole program if this is a child node?
+		GetTree().Quit();
+	}
 
-    public void _on_Zoom_value_changed(float value)
-    {
-        Vector2 NewScale = new Vector2(value, value);
-        Scale = NewScale;
-    }
-    public void _on_RightButton_pressed()
-    {
-        Player.Position = new Vector2(Player.Position.x + 128, Player.Position.y);
-    }
-    public void _on_LeftButton_pressed()
-    {
-        Player.Position = new Vector2(Player.Position.x - 128, Player.Position.y);
-    }
-    public void _on_UpButton_pressed()
-    {
-        Player.Position = new Vector2(Player.Position.x, Player.Position.y - 64);
-    }
-    public void _on_DownButton_pressed()
-    {
-        Player.Position = new Vector2(Player.Position.x, Player.Position.y + 64);
-    }
+	public void _on_Zoom_value_changed(float value)
+	{
+		Vector2 NewScale = new Vector2(value, value);
+		Scale = NewScale;
+	}
+	public void _on_RightButton_pressed()
+	{
+		Player.Position = new Vector2(Player.Position.x + 128, Player.Position.y);
+	}
+	public void _on_LeftButton_pressed()
+	{
+		Player.Position = new Vector2(Player.Position.x - 128, Player.Position.y);
+	}
+	public void _on_UpButton_pressed()
+	{
+		Player.Position = new Vector2(Player.Position.x, Player.Position.y - 64);
+	}
+	public void _on_DownButton_pressed()
+	{
+		Player.Position = new Vector2(Player.Position.x, Player.Position.y + 64);
+	}
 
-    public override void _UnhandledInput(InputEvent @event)
-    {
-        // Scrolls map by repositioning "Player" when clicking & dragging mouse
-        // Control node must not be in the way and/or have mouse pass enabled
-        if(@event is InputEventMouseButton eventMouseButton)
-        {
-            if(eventMouseButton.ButtonIndex == (int)ButtonList.Left)
-            {
-                GetTree().SetInputAsHandled();
-                if(eventMouseButton.IsPressed())
-                {
-                    OldPosition = eventMouseButton.Position;
-                    MoveCamera = true;
-                }
-                else
-                {
-                    MoveCamera = false;
-                }
-            }
-            else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelUp)
-            {
-                GetTree().SetInputAsHandled();
-                GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value += (float)0.1;
-            }
-            else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelDown)
-            {
-                GetTree().SetInputAsHandled();
-                GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value -= (float)0.1;
-            }
-        }
-        else if(@event is InputEventMouseMotion eventMouseMotion)
-        {
-            if(MoveCamera)
-            {
-                GetTree().SetInputAsHandled();
-                Player.Position += (OldPosition - eventMouseMotion.Position) / Scale;
-                OldPosition = eventMouseMotion.Position;
-            }
-        }
-    }
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		// Scrolls map by repositioning "Player" when clicking & dragging mouse
+		// Control node must not be in the way and/or have mouse pass enabled
+		if(@event is InputEventMouseButton eventMouseButton)
+		{
+			if(eventMouseButton.ButtonIndex == (int)ButtonList.Left)
+			{
+				GetTree().SetInputAsHandled();
+				if(eventMouseButton.IsPressed())
+				{
+					OldPosition = eventMouseButton.Position;
+					MoveCamera = true;
+				}
+				else
+				{
+					MoveCamera = false;
+				}
+			}
+			else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelUp)
+			{
+				GetTree().SetInputAsHandled();
+				GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value += (float)0.1;
+			}
+			else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelDown)
+			{
+				GetTree().SetInputAsHandled();
+				GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value -= (float)0.1;
+			}
+		}
+		else if(@event is InputEventMouseMotion eventMouseMotion)
+		{
+			if(MoveCamera)
+			{
+				GetTree().SetInputAsHandled();
+				Player.Position += (OldPosition - eventMouseMotion.Position) / Scale;
+				OldPosition = eventMouseMotion.Position;
+			}
+		}
+	}
 
 }
