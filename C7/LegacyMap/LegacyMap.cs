@@ -6,17 +6,17 @@ using ConvertCiv3Media;
 
 public class LegacyMap : Node2D
 {
-    public interface ILegacyTile
-    // Tiles need to provide this info to LegacyMap
-    {
-        int LegacyFileID { get; }
-        int LegacyImageID { get; }
-        int LegacyX {get;}
-        int LegacyY {get;}
+	public interface ILegacyTile
+	// Tiles need to provide this info to LegacyMap
+	{
+		int LegacyFileID { get; }
+		int LegacyImageID { get; }
+		int LegacyX {get;}
+		int LegacyY {get;}
 	}
-    public IEnumerable<ILegacyTile> LegacyTiles;
+	public IEnumerable<ILegacyTile> LegacyTiles;
 	int[,] Map;
-    TileMap TM;
+	TileMap TM;
 	TileSet TS;
 	private int[,] TileIDLookup;
 	// NOTE: The following two must be set externally before displaying map
@@ -24,12 +24,12 @@ public class LegacyMap : Node2D
 	public int MapHeight;
 	// If a mod is in effect, set this, otherwise set to "" or "Conquests"
 	public string ModRelPath = "";
-    public override void _Ready()
-    {
+	public override void _Ready()
+	{
 		//
-    }
+	}
 	public void TerrainAsTileMap() {
-        if (TM != null) { RemoveChild(TM); }
+		if (TM != null) { RemoveChild(TM); }
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
 		TM = new TileMap();
 		TM.CellSize = new Vector2(64,32);
@@ -40,29 +40,29 @@ public class LegacyMap : Node2D
 		TileIDLookup = new int[9,81];
 
 		int id = TS.GetLastUnusedTileId();
-        // Make blank default tile
-        // TODO: Make red tile or similar
-        TS.CreateTile(id);
-        id++;
+		// Make blank default tile
+		// TODO: Make red tile or similar
+		TS.CreateTile(id);
+		id++;
 
 		Map = new int[MapWidth,MapHeight];
 
 		// Populate map values
-        if(LegacyTiles != null)
-        {
-            foreach (ILegacyTile tile in LegacyTiles)
-            {
+		if(LegacyTiles != null)
+		{
+			foreach (ILegacyTile tile in LegacyTiles)
+			{
 				// If tile media file not loaded yet
 				if(TileIDLookup[tile.LegacyFileID,1] == 0) { LoadTileSet(tile.LegacyFileID); }
-                Map[tile.LegacyX,tile.LegacyY] = TileIDLookup[tile.LegacyFileID,tile.LegacyImageID];
-            }
-        }
+				Map[tile.LegacyX,tile.LegacyY] = TileIDLookup[tile.LegacyFileID,tile.LegacyImageID];
+			}
+		}
 		for (int y = 0; y < MapHeight; y++) {
 			for (int x = y % 2; x < MapWidth; x+=2) {
 				TM.SetCellv(new Vector2(x, y), Map[x,y]);
 			}
 		}
-        // TM.Scale = new Vector2((float)0.2, (float)0.2);
+		// TM.Scale = new Vector2((float)0.2, (float)0.2);
 		AddChild(TM);
 	}
 	private void LoadTileSet(int fileID)
