@@ -17,6 +17,11 @@ public class Game : Node2D
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
 
+	
+	TextureButton nextTurnButton = new TextureButton();
+	ImageTexture nextTurnOnTexture;
+	ImageTexture nextTurnBlinkTexture;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -121,6 +126,31 @@ public class Game : Node2D
 		AddChild(EndTurnButton);
 		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
 
+		AddTopLeftButtons();
+
+		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
+		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
+		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
+		TextureRect boxRightRectangle = new TextureRect();
+		boxRightRectangle.Texture = boxRight;
+		boxRightRectangle.SetPosition(new Vector2(OS.WindowSize.x - (boxRightColor.Width + 5), OS.WindowSize.y - (boxRightColor.Height + 1)));
+		AddChild(boxRightRectangle);
+
+		Pcx nextTurnColor = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states color.pcx"));
+		Pcx nextTurnAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states alpha.pcx"));
+		ImageTexture nextTurnOffTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 0, 0, 47, 28);
+		nextTurnOnTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 47, 0, 47, 28);
+		nextTurnBlinkTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 94, 0, 47, 28);
+
+		nextTurnButton.TextureNormal = nextTurnOffTexture;
+		nextTurnButton.TextureHover = nextTurnOnTexture;
+		nextTurnButton.SetPosition(new Vector2(OS.WindowSize.x - (boxRightColor.Width + 5), OS.WindowSize.y - (boxRightColor.Height + 1)));
+		AddChild(nextTurnButton);
+
+	}
+
+	private void AddTopLeftButtons()
+	{
 		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtons.pcx"));
 		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
 		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 28);
@@ -140,14 +170,6 @@ public class Game : Node2D
 		advisorsButton.TextureNormal = advisorsTexture;
 		advisorsButton.SetPosition(new Vector2(94, 12));
 		AddChild(advisorsButton);
-
-		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
-		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
-		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
-		TextureRect boxRightRectangle = new TextureRect();
-		boxRightRectangle.Texture = boxRight;
-		boxRightRectangle.SetPosition(new Vector2(OS.WindowSize.x - (boxRightColor.Width + 5), OS.WindowSize.y - (boxRightColor.Height + 1)));
-		AddChild(boxRightRectangle);
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -168,6 +190,33 @@ public class Game : Node2D
 		EmitSignal(nameof(TurnStarted));
 		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
+
+		// Create a timer node
+		var timer = new Timer();
+		// Set timer interval
+		timer.WaitTime = 1.0f;
+		// Set it as repeat
+		timer.OneShot = false;
+		// Connect its timeout signal to the function you want to repeat
+		timer.Connect("timeout", this, "toggleEndTurnButton");
+		//timer.connect("timeout", self, "repeat_me")
+		// Add to the tree as child of the current node
+		AddChild(timer);
+		timer.Start();
+
+		GD.Print("Timer ought to be set");
+	}
+
+	private void toggleEndTurnButton() {
+		GD.Print("Toggling end button");
+		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
+			GD.Print("Turning on blink texture");
+			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
+		}
+		else {
+			GD.Print("Turning on regular 'on' texture");
+			nextTurnButton.TextureNormal = nextTurnOnTexture;
+		}
 	}
 
 	private void OnPlayerEndTurn()
