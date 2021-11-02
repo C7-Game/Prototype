@@ -1,6 +1,160 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
+[ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
 
 [node name="C7Game" type="Node2D"]
 script = ExtResource( 1 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ToolBar" type="Control" parent="CanvasLayer"]
+anchor_right = 1.0
+mouse_filter = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/ToolBar"]
+anchor_right = 1.0
+margin_bottom = 80.0
+custom_constants/margin_right = 20
+custom_constants/margin_top = 20
+custom_constants/margin_left = 20
+custom_constants/margin_bottom = 20
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ToolBar/MarginContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 1004.0
+margin_bottom = 60.0
+
+[node name="OpenFileButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_right = 75.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Open"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSeparator" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 79.0
+margin_right = 83.0
+margin_bottom = 40.0
+
+[node name="LeftButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 87.0
+margin_right = 143.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Left"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RightButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 147.0
+margin_right = 219.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Right"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="UpButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 223.0
+margin_right = 268.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Up"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="DownButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 272.0
+margin_right = 351.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Down"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSeparator3" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 355.0
+margin_right = 359.0
+margin_bottom = 40.0
+
+[node name="Zoom" type="HSlider" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 363.0
+margin_right = 517.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+min_value = 0.1
+max_value = 2.0
+step = 0.1
+value = 1.0
+
+[node name="VSeparator4" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 521.0
+margin_right = 525.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 529.0
+margin_top = 3.0
+margin_right = 682.0
+margin_bottom = 37.0
+custom_fonts/font = ExtResource( 2 )
+text = "Debug Offset"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SpinBox" type="SpinBox" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 686.0
+margin_right = 760.0
+margin_bottom = 40.0
+max_value = 212.0
+rounded = true
+
+[node name="VSeparator2" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 764.0
+margin_right = 919.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+
+[node name="QuitButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 923.0
+margin_right = 984.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 2 )
+text = "Quit"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="KinematicBody2D" type="KinematicBody2D" parent="."]
+position = Vector2( 512, 300 )
+
+[node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
+current = true
+
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UpButton" to="." method="_on_UpButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
+[connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom" to="." method="_on_Zoom_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/SpinBox" to="." method="_on_SpinBox_value_changed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
