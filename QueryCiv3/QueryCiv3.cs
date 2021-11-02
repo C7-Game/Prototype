@@ -15,7 +15,10 @@ namespace QueryCiv3
         public int Civ3StringEncoding = 1252;
         protected internal byte[] FileData;
         protected internal Civ3Section[] Sections;
-        public bool HasCustomBic {get; protected set;}
+        public bool HasCustomBic
+        {
+            get => (uint)this.ReadInt32(12 + this.SectionOffset("VER#", 1)) != (uint)0xcdcdcdcd;
+        }
         public bool IsGameFile {get; protected set;}
         public Civ3File(byte[] fileBytes)
         {
@@ -23,8 +26,6 @@ namespace QueryCiv3
             this.FileData = fileBytes;
             // TODO: Check for CIV3 or BIC header?
             Sections = PopulateSections(FileData);
-            int BicOffset = SectionOffset("VER#", 1);
-            HasCustomBic = (uint)ReadInt32(BicOffset+8) != (uint)0xcdcdcdcd;
             byte[] Civ3Bytes = new byte[]{0x43, 0x49, 0x56, 0x33};
             IsGameFile = true;
             for(int i=0; i < 4; i++)
