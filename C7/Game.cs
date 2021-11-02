@@ -31,7 +31,13 @@ public class Game : Node2D
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		this.TerrainAsTileMap();
 		this.CreateUI();
-		ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+		// If later recreating scene, the component may already exist, hence try/catch
+		try{
+			ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+		}
+		catch {
+			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter(0);
+		}
 		GD.Print("Now in game!");
 	}
 
@@ -246,11 +252,10 @@ public class Game : Node2D
 	public void _on_QuitButton_pressed()
 	{
 		// This apparently exits the whole program
-		GetTree().Quit();
+		// GetTree().Quit();
 
 		// ChangeScene deletes the current scene and frees its memory, so this is quitting to main menu
-		// But this is currently causing an error when reentering the scene because TurnCounterComponent has already been added
-		// GetTree().ChangeScene("res://MainMenu.tscn");    
+		GetTree().ChangeScene("res://MainMenu.tscn");    
 	}
 
 	public void _on_Zoom_value_changed(float value)
