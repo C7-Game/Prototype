@@ -124,8 +124,8 @@ public class LowerRightInfoBox : TextureRect
 
 	private void turnEnded() {
 		GD.Print("Emitting the turn end signal");
-		//TODO: This signal is not picked up for some reason.
-		EmitSignal(nameof(Game.TurnEnded));
+		// TODO: I'm pretty sure I'm doing this wrong, but it's working - Jim
+		GetParent().GetParent().GetParent().EmitSignal(nameof(Game.TurnEnded));
 		
 	}
 
