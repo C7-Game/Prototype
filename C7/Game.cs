@@ -140,6 +140,14 @@ public class Game : Node2D
 		advisorsButton.TextureNormal = advisorsTexture;
 		advisorsButton.SetPosition(new Vector2(94, 12));
 		AddChild(advisorsButton);
+
+		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
+		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
+		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
+		TextureRect boxRightRectangle = new TextureRect();
+		boxRightRectangle.Texture = boxRight;
+		boxRightRectangle.SetPosition(new Vector2(OS.WindowSize.x - (boxRightColor.Width + 5), OS.WindowSize.y - (boxRightColor.Height + 1)));
+		AddChild(boxRightRectangle);
 	}
 
 	private void _onEndTurnButtonPressed()
