@@ -149,6 +149,7 @@ position = Vector2( 512, 300 )
 
 [node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
 current = true
+
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
