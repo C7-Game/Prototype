@@ -2,7 +2,7 @@ using Godot;
 using System;
 using ConvertCiv3Media;
 
-public class LowerRightInfoBox : Node2D
+public class LowerRightInfoBox : TextureRect
 {
 
 	TextureButton nextTurnButton = new TextureButton();
