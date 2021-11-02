@@ -18,3 +18,4 @@ Mock city and unit data may be included, too, as their info will be needed to dr
 
 BIQ data will also need to be read and probably exposed here.
 
+This has been moved to UtilScenes as the debug offest will show the offset's value on the map tiles.
