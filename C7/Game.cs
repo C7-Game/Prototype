@@ -180,9 +180,10 @@ public class Game : Node2D
 
 	private void AddLowerRightBox()
 	{
+		CanvasItem GameStatus = GetNode<CanvasItem>("CanvasLayer/GameStatus");
 		//294 x 137 are the dimensions of the right info box.
 		LowerRightInfoBox.Position = (new Vector2(OS.WindowSize.x - (294 + 5), OS.WindowSize.y - (137 + 1)));
-		AddChild(LowerRightInfoBox);
+		GameStatus.AddChild(LowerRightInfoBox);
 	}
 
 	private void _onEndTurnButtonPressed()
