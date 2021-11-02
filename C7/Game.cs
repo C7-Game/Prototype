@@ -17,6 +17,9 @@ public class Game : Node2D
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
 	Timer endTurnBlinkingTimer;
+    private bool MoveCamera;
+    private Vector2 OldPosition;
+    private KinematicBody2D Player;
 
 	
 	TextureButton nextTurnButton = new TextureButton();
@@ -27,6 +30,7 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		this.TerrainAsTileMap();
 		this.CreateUI();
 		ComponentManager.Instance.AddComponent(new TurnCounterComponent());
@@ -254,4 +258,74 @@ public class Game : Node2D
 			OnPlayerStartTurn();
 		}
 	}
+
+    public void _on_QuitButton_pressed()
+    {
+        // NOTE: I think this quits the current node or scene and not necessarily the whole program if this is a child node?
+        GetTree().Quit();
+    }
+
+    public void _on_Zoom_value_changed(float value)
+    {
+        Vector2 NewScale = new Vector2(value, value);
+        Scale = NewScale;
+    }
+    public void _on_RightButton_pressed()
+    {
+        Player.Position = new Vector2(Player.Position.x + 128, Player.Position.y);
+    }
+    public void _on_LeftButton_pressed()
+    {
+        Player.Position = new Vector2(Player.Position.x - 128, Player.Position.y);
+    }
+    public void _on_UpButton_pressed()
+    {
+        Player.Position = new Vector2(Player.Position.x, Player.Position.y - 64);
+    }
+    public void _on_DownButton_pressed()
+    {
+        Player.Position = new Vector2(Player.Position.x, Player.Position.y + 64);
+    }
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        // Scrolls map by repositioning "Player" when clicking & dragging mouse
+        // Control node must not be in the way and/or have mouse pass enabled
+        if(@event is InputEventMouseButton eventMouseButton)
+        {
+            if(eventMouseButton.ButtonIndex == (int)ButtonList.Left)
+            {
+                GetTree().SetInputAsHandled();
+                if(eventMouseButton.IsPressed())
+                {
+                    OldPosition = eventMouseButton.Position;
+                    MoveCamera = true;
+                }
+                else
+                {
+                    MoveCamera = false;
+                }
+            }
+            else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelUp)
+            {
+                GetTree().SetInputAsHandled();
+                GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value += (float)0.1;
+            }
+            else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelDown)
+            {
+                GetTree().SetInputAsHandled();
+                GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value -= (float)0.1;
+            }
+        }
+        else if(@event is InputEventMouseMotion eventMouseMotion)
+        {
+            if(MoveCamera)
+            {
+                GetTree().SetInputAsHandled();
+                Player.Position += (OldPosition - eventMouseMotion.Position) / Scale;
+                OldPosition = eventMouseMotion.Position;
+            }
+        }
+    }
+
 }

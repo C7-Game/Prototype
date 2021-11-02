@@ -32,23 +32,23 @@ margin_top = 20.0
 margin_right = 1004.0
 margin_bottom = 60.0
 
-[node name="OpenFileButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_right = 75.0
+[node name="UiBarEndTurnButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_right = 114.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
-text = "Open"
+text = "End Turn"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="VSeparator" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 79.0
-margin_right = 83.0
+margin_left = 118.0
+margin_right = 122.0
 margin_bottom = 40.0
 
 [node name="LeftButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 87.0
-margin_right = 143.0
+margin_left = 126.0
+margin_right = 182.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Left"
@@ -57,8 +57,8 @@ __meta__ = {
 }
 
 [node name="RightButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 147.0
-margin_right = 219.0
+margin_left = 186.0
+margin_right = 258.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Right"
@@ -67,8 +67,8 @@ __meta__ = {
 }
 
 [node name="UpButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 223.0
-margin_right = 268.0
+margin_left = 262.0
+margin_right = 307.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Up"
@@ -77,8 +77,8 @@ __meta__ = {
 }
 
 [node name="DownButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 272.0
-margin_right = 351.0
+margin_left = 311.0
+margin_right = 390.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Down"
@@ -87,13 +87,13 @@ __meta__ = {
 }
 
 [node name="VSeparator3" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 355.0
-margin_right = 359.0
+margin_left = 394.0
+margin_right = 398.0
 margin_bottom = 40.0
 
 [node name="Zoom" type="HSlider" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 363.0
-margin_right = 517.0
+margin_left = 402.0
+margin_right = 911.0
 margin_bottom = 40.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
@@ -103,36 +103,12 @@ step = 0.1
 value = 1.0
 
 [node name="VSeparator4" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 521.0
-margin_right = 525.0
-margin_bottom = 40.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 529.0
-margin_top = 3.0
-margin_right = 682.0
-margin_bottom = 37.0
-custom_fonts/font = ExtResource( 2 )
-text = "Debug Offset"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="SpinBox" type="SpinBox" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 686.0
-margin_right = 760.0
-margin_bottom = 40.0
-max_value = 212.0
-rounded = true
-
-[node name="VSeparator2" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 764.0
+margin_left = 915.0
 margin_right = 919.0
 margin_bottom = 40.0
-size_flags_horizontal = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="QuitButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_left = 923.0
@@ -150,11 +126,10 @@ position = Vector2( 512, 300 )
 [node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
 current = true
 
-[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/OpenFileButton" to="." method="_on_OpenFileButton_pressed"]
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UpButton" to="." method="_on_UpButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
 [connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom" to="." method="_on_Zoom_value_changed"]
-[connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/SpinBox" to="." method="_on_SpinBox_value_changed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
