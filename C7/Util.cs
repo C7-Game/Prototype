@@ -47,6 +47,10 @@ public class Util
         string Civ3Root = GetCiv3Path();
         string [] TryPaths = new string [] {
             relModPath,
+            // Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
+            //  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
+            // NOTE: May need another replace for case-sensitive filesystmes (Mac/Linux)
+            relModPath.Replace(@"\Civ3PTW\Scenarios\", @"\civ3PTW\Extras\"),
             "Conquests",
             "civ3PTW",
             ""

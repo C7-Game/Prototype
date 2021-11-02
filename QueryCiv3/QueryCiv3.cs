@@ -98,7 +98,7 @@ namespace QueryCiv3
                 }
             }
             // TODO: Add name and nth to message
-            throw new ArgumentException("Unable to find section");
+            throw new ArgumentException($"Unable to find section '{name}' nth {nth}");
         }
         // TODO: Force little endian conversion on big endian systems
         //  although anticipated Intel and ARM targets are little endian, so maybe not important
