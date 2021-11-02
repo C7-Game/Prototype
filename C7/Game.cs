@@ -49,6 +49,11 @@ public class Game : Node2D
 			case GameState.ComputerTurn:
 				break;
 		}
+		if (Input.IsKeyPressed(16777217))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
+		{
+			GD.Print("User pressed escape");
+			//TODO: Display the "Oh No! Do you really want to quit?" menu
+		}
 	}
 
 	private void StartGame()
