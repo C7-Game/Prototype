@@ -9,6 +9,6 @@
     by Mark Adler.</Description>
     <PackageVersion>0.1-pre</PackageVersion>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
   </PropertyGroup>
 </Project>
