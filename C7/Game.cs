@@ -47,10 +47,19 @@ public class Game : Node2D
 			case GameState.ComputerTurn:
 				break;
 		}
+		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
+		//without a manual cast to int.
+		//https://github.com/godotengine/godot/issues/16388
 		if (Input.IsKeyPressed(16777217))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
 		{
 			GD.Print("User pressed escape");
 			//TODO: Display the "Oh No! Do you really want to quit?" menu
+		}
+		else if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+			GD.Print("User requested domestic advisor");
+			DomesticAdvisor advisor = new DomesticAdvisor();
+			//TODO: Center on > 1024x768 res.
+			AddChild(advisor);
 		}
 	}
 
