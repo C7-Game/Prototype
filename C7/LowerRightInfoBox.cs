@@ -2,7 +2,7 @@ using Godot;
 using System;
 using ConvertCiv3Media;
 
-public class LowerRightInfoBox : Node2D
+public class LowerRightInfoBox : TextureRect
 {
 
 	TextureButton nextTurnButton = new TextureButton();
@@ -124,8 +124,8 @@ public class LowerRightInfoBox : Node2D
 
 	private void turnEnded() {
 		GD.Print("Emitting the turn end signal");
-		//TODO: This signal is not picked up for some reason.
-		EmitSignal(nameof(Game.TurnEnded));
+		// TODO: I'm pretty sure I'm doing this wrong, but it's working - Jim
+		GetParent().GetParent().GetParent().EmitSignal(nameof(Game.TurnEnded));
 		
 	}
 

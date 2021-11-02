@@ -31,7 +31,13 @@ public class Game : Node2D
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		this.TerrainAsTileMap();
 		this.CreateUI();
-		ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+		// If later recreating scene, the component may already exist, hence try/catch
+		try{
+			ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+		}
+		catch {
+			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
+		}
 		GD.Print("Now in game!");
 	}
 
@@ -174,9 +180,12 @@ public class Game : Node2D
 
 	private void AddLowerRightBox()
 	{
+		MarginContainer GameStatus = GetNode<MarginContainer>("CanvasLayer/GameStatus");
 		//294 x 137 are the dimensions of the right info box.
-		LowerRightInfoBox.Position = (new Vector2(OS.WindowSize.x - (294 + 5), OS.WindowSize.y - (137 + 1)));
-		AddChild(LowerRightInfoBox);
+		// LowerRightInfoBox.Position = (new Vector2(OS.WindowSize.x - (294 + 5), OS.WindowSize.y - (137 + 1)));
+		GameStatus.MarginLeft = -(294 + 5);
+		GameStatus.MarginTop = -(137 + 1);
+		GameStatus.AddChild(LowerRightInfoBox);
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -246,11 +255,10 @@ public class Game : Node2D
 	public void _on_QuitButton_pressed()
 	{
 		// This apparently exits the whole program
-		GetTree().Quit();
+		// GetTree().Quit();
 
 		// ChangeScene deletes the current scene and frees its memory, so this is quitting to main menu
-		// But this is currently causing an error when reentering the scene because TurnCounterComponent has already been added
-		// GetTree().ChangeScene("res://MainMenu.tscn");    
+		GetTree().ChangeScene("res://MainMenu.tscn");    
 	}
 
 	public void _on_Zoom_value_changed(float value)

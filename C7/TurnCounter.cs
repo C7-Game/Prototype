@@ -8,4 +8,8 @@ public class TurnCounterComponent : GameComponent
 		_turnCount++;
 		GD.Print(string.Format("Turn {0}", _turnCount));
 	}
+	public void SetTurnCounter(int count = 0)
+	{
+		_turnCount = count;
+	}
 }
