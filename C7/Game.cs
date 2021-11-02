@@ -129,13 +129,13 @@ public class Game : Node2D
 		menuButton.SetPosition(new Vector2(21, 12));
 		AddChild(menuButton);
 		
-		ImageTexture civilopediaTexture = Util.LoadTextureFromPCX("Art/interface/menuButtons.pcx", 36, 1, 35, 28);
+		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 28);
 		TextureButton civilopediaButton = new TextureButton();
 		civilopediaButton.TextureNormal = civilopediaTexture;
 		civilopediaButton.SetPosition(new Vector2(57, 12));
 		AddChild(civilopediaButton);
 		
-		ImageTexture advisorsTexture = Util.LoadTextureFromPCX("Art/interface/menuButtons.pcx", 73, 1, 33, 28);
+		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 28);
 		TextureButton advisorsButton = new TextureButton();
 		advisorsButton.TextureNormal = advisorsTexture;
 		advisorsButton.SetPosition(new Vector2(94, 12));

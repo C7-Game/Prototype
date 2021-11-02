@@ -73,7 +73,8 @@ public class PCXToGodot : Godot.Object
 		}
 		OutImage.Unlock();
 
-		Image CroppedImage = OutImage.GetRect(new Rect2(leftStart, topStart, croppedWidth, croppedHeight));
+		//TODO: I'm not 100% sure why it was cutting off the bottom pixel without the +1, but it was.  Need to verify.
+		Image CroppedImage = OutImage.GetRect(new Rect2(leftStart, topStart, croppedWidth + 1, croppedHeight + 1));
 		ImageTexture Txtr = new ImageTexture();
 		Txtr.CreateFromImage(CroppedImage, 0);
 		return Txtr;
