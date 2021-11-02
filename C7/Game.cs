@@ -245,8 +245,12 @@ public class Game : Node2D
 
 	public void _on_QuitButton_pressed()
 	{
-		// NOTE: I think this quits the current node or scene and not necessarily the whole program if this is a child node?
+		// This apparently exits the whole program
 		GetTree().Quit();
+
+		// ChangeScene deletes the current scene and frees its memory, so this is quitting to main menu
+		// But this is currently causing an error when reentering the scene because TurnCounterComponent has already been added
+		// GetTree().ChangeScene("res://MainMenu.tscn");    
 	}
 
 	public void _on_Zoom_value_changed(float value)
