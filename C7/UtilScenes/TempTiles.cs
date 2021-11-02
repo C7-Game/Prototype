@@ -157,8 +157,19 @@ public class TempTiles : Node2D
     }
     private void CreateTileSet()
     {
-        // TODO: Pull mod path from embedded BIC if present
-        MapUI.ModRelPath = "";
+        // Pull mod path from embedded BIC if present
+        if (LegacyMapReader.HasCustomBic)
+        {
+            QueryCiv3.Civ3File customBic = new QueryCiv3.Civ3File(LegacyMapReader.CustomBic);
+            int offset = LegacyMapReader.SectionOffset("BIC ", 1) + 8;
+            // Unsure of length of this string field, but 256 appears about right
+            string mRelPath = @"Conquests\" + LegacyMapReader.GetString(offset, 256);
+            MapUI.ModRelPath = mRelPath;
+        }
+        else 
+        {
+            MapUI.ModRelPath = "";
+        }
         Tiles = new List<TempTile>();
         int Offset = LegacyMapReader.SectionOffset("WRLD", 2) + 8;
         MapUI.MapHeight = LegacyMapReader.ReadInt32(Offset);
