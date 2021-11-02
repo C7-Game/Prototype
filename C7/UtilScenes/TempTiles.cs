@@ -157,26 +157,18 @@ public class TempTiles : Node2D
     }
     private void CreateTileSet()
     {
-        GD.Print("hi");
-        // TODO: Pull mod path from embedded BIC if present
+        // Pull mod path from embedded BIC if present
         if (LegacyMapReader.HasCustomBic)
         {
             QueryCiv3.Civ3File customBic = new QueryCiv3.Civ3File(LegacyMapReader.CustomBic);
-
-            // MapUI.ModRelPath = "";
-            GD.Print("HasCustomBic");
             int offset = LegacyMapReader.SectionOffset("BIC ", 1) + 8;
-            // Unsure of length of this string field...or of starting offset
+            // Unsure of length of this string field, but 256 appears about right
             string mRelPath = @"Conquests\" + LegacyMapReader.GetString(offset, 256);
-            GD.Print(mRelPath);
             MapUI.ModRelPath = mRelPath;
         }
         else 
         {
-            GD.Print("no custom Bic");
             MapUI.ModRelPath = "";
-            // MapUI.ModRelPath = @"civ3PTW/Scenarios/Sn00pys Terrain";
-            // MapUI.ModRelPath = @"civ3PTW/Scenarios/Warpstorm Watercolor Terrain";
         }
         Tiles = new List<TempTile>();
         int Offset = LegacyMapReader.SectionOffset("WRLD", 2) + 8;
