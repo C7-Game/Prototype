@@ -57,6 +57,7 @@ public class Game : Node2D
 	{
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
+		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
 		this.TerrainAsTileMap();
 		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
@@ -108,10 +109,9 @@ public class Game : Node2D
 
 	public void RefillMapView()
 	{
-		// TODO: Should use window size here but then need to resize the MapView when window size changes
 		// The Offset of 2 is to provide a margin
-		int mapViewWidth  = 2 + (int)(OS.GetScreenSize().x / MapView.CellSize.x);
-		int mapViewHeight = 2 + (int)(OS.GetScreenSize().y / MapView.CellSize.y);
+		int mapViewWidth  = 2 + (int)(OS.WindowSize.x / MapView.CellSize.x);
+		int mapViewHeight = 2 + (int)(OS.WindowSize.y / MapView.CellSize.y);
 
 		MapView.Clear();
 
@@ -309,6 +309,11 @@ public class Game : Node2D
 	{
 		Vector2 NewScale = new Vector2(value, value);
 		MapView.Scale = NewScale;
+	}
+
+	public void _OnViewportSizeChanged()
+	{
+		RefillMapView();
 	}
 
 	public void MoveCamera(Vector2 offset)
