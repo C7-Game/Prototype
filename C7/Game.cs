@@ -13,8 +13,16 @@ public class Game : Node2D
 		PlayerTurn,
 		ComputerTurn
 	}
-	
+
+	public static readonly Vector2 tileSize = new Vector2(64, 32); // TODO: These should be integer values
+
+	int mapWidth = 14, mapHeight = 18;
 	int[,] Map;
+
+	int cameraPixelX = 0, cameraPixelY = 0;
+	int cameraTileX = 0, cameraTileY = 0;
+	private TileMap MapView;
+
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
@@ -24,6 +32,18 @@ public class Game : Node2D
 	private KinematicBody2D Player;
 	
 	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
+
+	public int wrapTileX(int x)
+	{
+		int tr = x % mapWidth;
+		return (tr >= 0) ? tr : tr + mapWidth;
+	}
+
+	public int wrapTileY(int y)
+	{
+		int tr = y % mapHeight;
+		return (tr >= 0) ? tr : tr + mapHeight;
+	}
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -78,13 +98,31 @@ public class Game : Node2D
 		OnPlayerStartTurn();
 	}
 
+	public void refillMapView()
+	{
+		// TODO: Should use window size here but then need to resize the MapView when window size changes
+		// The Offset of 4 is to provide a margin
+		int mapViewWidth  = 4 + (int)(OS.GetScreenSize().x / MapView.CellSize.x);
+		int mapViewHeight = 4 + (int)(OS.GetScreenSize().y / MapView.CellSize.y);
+
+		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
+		for (int y = 0; y < mapViewHeight; y++) {
+			for (int x = 1 - (y%2); x < mapViewWidth; x+=2) {
+				// TM.SetCellv(new Vector2(x + (y % 2), y), (new Random()).Next() % TS.GetTilesIds().Count);
+				// try {
+				MapView.SetCellv(new Vector2(x, y), Map[wrapTileX(cameraTileX+x), wrapTileY(cameraTileY+y)]);
+				// } catch {}
+			}
+		}
+	}
+
 	public void TerrainAsTileMap() {
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
-		TileMap TM = new TileMap();
-		TM.CellSize = new Vector2(64,32);
+		MapView = new TileMap();
+		MapView.CellSize = tileSize;
 		// TM.CenteredTextures = true;
 		TileSet TS = new TileSet();
-		TM.TileSet = TS;
+		MapView.TileSet = TS;
 
 		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
@@ -105,24 +143,23 @@ public class Game : Node2D
 			}
 		}
 
-		int mywidth = 14, myheight = 18;
-		Map = new int[mywidth,myheight];
+		Map = new int[mapWidth,mapHeight];
 		// Populate map values, 0 out terrain mask
-		for (int y = 0; y < myheight; y++) {
-			for (int x = 0; x < mywidth; x++) {
+		for (int y = 0; y < mapHeight; y++) {
+			for (int x = 0; x < mapWidth; x++) {
 				// If x & y are both even or odd, terrain value; if mismatched, terrain mask init to 0
 				Map[x,y] = x%2 - y%2 == 0 ? (new Random()).Next(0,3) : 0;
 			}
 		}
 		// Loop to lookup tile ids based on terrain mask
-		for (int y = 0; y < myheight; y++) {
-			for (int x = (1 - (y % 2)); x < mywidth; x+=2) {
-				int Top = y == 0 ? (Map[(x+1) % mywidth,y]) : (Map[x,y-1]);
-				int Bottom = y == myheight - 1 ? (Map[(x+1) % mywidth,y]) : (Map[x,y+1]);
+		for (int y = 0; y < mapHeight; y++) {
+			for (int x = (1 - (y % 2)); x < mapWidth; x+=2) {
+				int Top = y == 0 ? (Map[(x+1) % mapWidth,y]) : (Map[x,y-1]);
+				int Bottom = y == mapHeight - 1 ? (Map[(x+1) % mapWidth,y]) : (Map[x,y+1]);
 				string foo = 
-					(Map[(x+1) % mywidth,y]).ToString("D3") +
+					(Map[(x+1) % mapWidth,y]).ToString("D3") +
 					Bottom.ToString("D3") +
-					(Map[Mathf.Abs((x-1) % mywidth),y]).ToString("D3") +
+					(Map[Mathf.Abs((x-1) % mapWidth),y]).ToString("D3") +
 					Top.ToString("D3")
 				;
 				try {
@@ -131,16 +168,8 @@ public class Game : Node2D
 				} catch { GD.Print(x + "," + y + " " + foo); }
 			}
 		}
-		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
-		for (int y = 0; y < myheight; y++) {
-			for (int x = 1 - (y%2); x < mywidth; x+=2) {
-				// TM.SetCellv(new Vector2(x + (y % 2), y), (new Random()).Next() % TS.GetTilesIds().Count);
-				// try {
-				TM.SetCellv(new Vector2(x, y), Map[x,y]);
-				// } catch {}
-			}
-		}
-		AddChild(TM);
+		refillMapView();
+		AddChild(MapView);
 	}
 
 	private void CreateUI()
@@ -266,21 +295,44 @@ public class Game : Node2D
 		Vector2 NewScale = new Vector2(value, value);
 		Scale = NewScale;
 	}
+
+	public void moveCamera(Vector2 offset)
+	{
+		cameraPixelX += (int)offset.x;
+		cameraPixelY += (int)offset.y;
+
+		int tileDoubleX = 2 * (int)tileSize.x;
+		int tileDoubleY = 2 * (int)tileSize.y;
+
+		// Renormalize X
+		int tilesX = cameraPixelX / tileDoubleX;
+		cameraPixelX -= tilesX * tileDoubleX;
+		cameraTileX += 2 * tilesX;
+
+		// Same for Y
+		int tilesY = cameraPixelY / tileDoubleY;
+		cameraPixelY -= tilesY * tileDoubleY;
+		cameraTileY += 2 * tilesY;
+
+		MapView.GlobalPosition = new Vector2(-cameraPixelX, -cameraPixelY);
+		refillMapView();
+	}
+
 	public void _on_RightButton_pressed()
 	{
-		Player.Position = new Vector2(Player.Position.x + 128, Player.Position.y);
+		moveCamera(new Vector2(128, 0));
 	}
 	public void _on_LeftButton_pressed()
 	{
-		Player.Position = new Vector2(Player.Position.x - 128, Player.Position.y);
+		moveCamera(new Vector2(-128, 0));
 	}
 	public void _on_UpButton_pressed()
 	{
-		Player.Position = new Vector2(Player.Position.x, Player.Position.y - 64);
+		moveCamera(new Vector2(0, -64));
 	}
 	public void _on_DownButton_pressed()
 	{
-		Player.Position = new Vector2(Player.Position.x, Player.Position.y + 64);
+		moveCamera(new Vector2(0, 64));
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -318,7 +370,7 @@ public class Game : Node2D
 			if(MoveCamera)
 			{
 				GetTree().SetInputAsHandled();
-				Player.Position += (OldPosition - eventMouseMotion.Position) / Scale;
+				moveCamera((OldPosition - eventMouseMotion.Position) / Scale);
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
