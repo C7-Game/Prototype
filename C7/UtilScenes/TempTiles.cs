@@ -28,7 +28,7 @@ public class TempTiles : Node2D
         }
     }
     private Util.Civ3FileDialog Dialog;
-    private QueryCiv3.Civ3File LegacyMapReader;
+    private QueryCiv3.SavData LegacyMapReader;
     private List<TempTile> Tiles;
     private class TempTile: LegacyMap.ILegacyTile
     {
@@ -109,7 +109,8 @@ public class TempTiles : Node2D
     }
     public void _on_FileDialog_file_selected(string path)
     {
-        LegacyMapReader = new QueryCiv3.Civ3File(QueryCiv3.Util.ReadFile(path));
+        byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(Util.GetCiv3Path() + @"/Conquests/conquests.biq");
+        LegacyMapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(path), defaultBicBytes);
         CreateTileSet();
         MapUI.LegacyTiles = Tiles;
         MapUI.TerrainAsTileMap();
@@ -158,12 +159,12 @@ public class TempTiles : Node2D
     private void CreateTileSet()
     {
         // Pull mod path from embedded BIC if present
-        if (LegacyMapReader.HasCustomBic)
+        if (LegacyMapReader.Sav.HasCustomBic)
         {
-            QueryCiv3.Civ3File customBic = new QueryCiv3.Civ3File(LegacyMapReader.CustomBic);
-            int offset = LegacyMapReader.SectionOffset("BIC ", 1) + 8;
+            QueryCiv3.Civ3File customBic = new QueryCiv3.Civ3File(LegacyMapReader.Sav.CustomBic);
+            int offset = LegacyMapReader.Sav.SectionOffset("BIC ", 1) + 8;
             // Unsure of length of this string field, but 256 appears about right
-            string mRelPath = @"Conquests\" + LegacyMapReader.GetString(offset, 256);
+            string mRelPath = @"Conquests\" + LegacyMapReader.Sav.GetString(offset, 256);
             MapUI.ModRelPath = mRelPath;
         }
         else 
@@ -171,30 +172,22 @@ public class TempTiles : Node2D
             MapUI.ModRelPath = "";
         }
         Tiles = new List<TempTile>();
-        int Offset = LegacyMapReader.SectionOffset("WRLD", 2) + 8;
-        MapUI.MapHeight = LegacyMapReader.ReadInt32(Offset);
-        MapUI.MapWidth = LegacyMapReader.ReadInt32(Offset + 5*4);
+        MapUI.MapHeight = LegacyMapReader.Wrld.Height;
+        MapUI.MapWidth = LegacyMapReader.Wrld.Width;
 
-        Offset = LegacyMapReader.SectionOffset("TILE", 1);
-        for (int y=0; y < MapUI.MapHeight; y++)
+        QueryCiv3.MapTile[] mapTiles = LegacyMapReader.Tile;
+        for (int i=0; i < mapTiles.Length; i++)
         {
-            for (int x=y%2; x < MapUI.MapWidth; x+=2)
-            {
                 TempTile ThisTile = new TempTile();
-                ThisTile.LegacyX = x;
-                ThisTile.LegacyY = y;
+                ThisTile.LegacyY = i / (MapUI.MapWidth / 2);
+                ThisTile.LegacyX = (ThisTile.LegacyY % 2) + (2 * (i % (MapUI.MapWidth / 2)));
 
-                int TerrainByte = LegacyMapReader.ReadByte(Offset+53);
-                ThisTile.LegacyBaseTerrainID = TerrainByte & 0x0F;
-                ThisTile.LegacyOverlayTerrainID = TerrainByte >> 4;
-                ThisTile.DebugByte = LegacyMapReader.ReadByte(Offset+TileOffset);
-                ThisTile.LegacyFileID = LegacyMapReader.ReadByte(Offset+17);
-                ThisTile.LegacyImageID = LegacyMapReader.ReadByte(Offset+16);
-
+                ThisTile.LegacyBaseTerrainID = mapTiles[i].BaseTerrain;
+                ThisTile.LegacyOverlayTerrainID = mapTiles[i].OverlayTerrain;
+                ThisTile.DebugByte = LegacyMapReader.Sav.ReadByte(mapTiles[i].Offset+TileOffset);
+                ThisTile.LegacyFileID = mapTiles[i].BaseTerrainFileID;
+                ThisTile.LegacyImageID = mapTiles[i].BaseTerrainImageID;
                 Tiles.Add(ThisTile);
-                // 212 bytes per tile in Conquests SAV
-                Offset += 212;
-            }
         }
         DebugTextLayer.Visible = TileOffset != 0;
         DebugTextLayer.Tiles = Tiles;
