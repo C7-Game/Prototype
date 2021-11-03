@@ -32,6 +32,7 @@ public class Game : Node2D
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		this.TerrainAsTileMap();
+		Scale = new Vector2((float)0.3, (float)0.3);
 		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
@@ -109,58 +110,20 @@ public class Game : Node2D
 
 		int mywidth = 80, myheight = 80;
 		Map = new int[mywidth,myheight];
-		for (int y=0; y<myheight; y++)
-		{
-			for (int x=0; x<mywidth; x++) Map[x,y] = -1;
-		}
-		// seed land
-		Map[mywidth/4,myheight/3] = 0;
-		Map[mywidth/4,2*myheight/3] = 1;
-		Map[3*mywidth/4,myheight/3] = 1;
-		Map[3*mywidth/4,2*myheight/3] = 0;
-		for (bool changed=true; changed;)
-		{
-			changed = false;
-			for (int y=1; y<myheight-1; y++)
-			{
-				for (int x=1; x<mywidth-1; x++)
-				{
-					if ((Map[x,y] & 0xfffe) == 0)
-					{
-						for (int i=-1; i < 2; i++) for(int j=-1; j<2; j++)
-						{
-							int x2 = x + i;
-							int y2 = y + j;
-							if (((i | j) != 0) || (Map[x2,y2] == -1))
-							{
-								changed = true;
-								if (new Random().Next(10) < 1)
-								{
-									Map[x2,y2] = 2;
-									continue;
-								}
-								Map[x2,y2] = new Random().Next(10) < 2 ? 1 - Map[x,y] : Map[x,y];
-							}
-						}
-					}
-				}
-				if (y > 70) changed = false;	// temp stopper
-			}
-		}
-		for (int y=0; y<myheight; y++)
-		{
-			for (int x=0; x<mywidth; x++) if (Map[x,y] == -1) Map[x,y] = 2;
-		}
-		/*
-		// Populate map values, 0 out terrain mask
+		OpenSimplexNoise noise = new OpenSimplexNoise();
+		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
+		// Populate map values
 		for (int y = 0; y < myheight; y++) {
 			for (int x = 0; x < mywidth; x++) {
-				// If x & y are both even or odd, terrain value; if mismatched, terrain mask init to 0
-				Map[x,y] = x%2 - y%2 == 0 ? (new Random()).Next(0,3) : 0;
+				// Multiplying x & y for noise coordinate sampling
+				float foo = noise.GetNoise2d(x*2,y*2);
+				Map[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
 			}
 		}
-		*/
 		// Loop to lookup tile ids based on terrain mask
+		//  NOTE: This layout is full width, but the tiles are every-other coordinate
+		//    What I've done is generated "terrain ID" all over and am deriving an
+		//    image ID on the tile placement spots based on surrounding terrain values
 		for (int y = 0; y < myheight; y++) {
 			for (int x = (1 - (y % 2)); x < mywidth; x+=2) {
 				int Top = y == 0 ? (Map[(x+1) % mywidth,y]) : (Map[x,y-1]);
