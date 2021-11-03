@@ -107,8 +107,51 @@ public class Game : Node2D
 			}
 		}
 
-		int mywidth = 14, myheight = 18;
+		int mywidth = 80, myheight = 80;
 		Map = new int[mywidth,myheight];
+		for (int y=0; y<myheight; y++)
+		{
+			for (int x=0; x<mywidth; x++) Map[x,y] = -1;
+		}
+		// seed land
+		Map[mywidth/4,myheight/3] = 0;
+		Map[mywidth/4,2*myheight/3] = 1;
+		Map[3*mywidth/4,myheight/3] = 1;
+		Map[3*mywidth/4,2*myheight/3] = 0;
+		for (bool changed=true; changed;)
+		{
+			changed = false;
+			for (int y=1; y<myheight-1; y++)
+			{
+				for (int x=1; x<mywidth-1; x++)
+				{
+					if ((Map[x,y] & 0xfffe) == 0)
+					{
+						for (int i=-1; i < 2; i++) for(int j=-1; j<2; j++)
+						{
+							int x2 = x + i;
+							int y2 = y + j;
+							if (((i | j) != 0) || (Map[x2,y2] == -1))
+							{
+								changed = true;
+								if (new Random().Next(10) < 1)
+								{
+									Map[x2,y2] = 2;
+									continue;
+								}
+								Map[x2,y2] = new Random().Next(10) < 2 ? 1 - Map[x,y] : Map[x,y];
+							}
+						}
+					}
+				}
+				if (y > 70) changed = false;	// temp stopper
+			}
+		}
+		for (int y=0; y<myheight; y++)
+		{
+			for (int x=0; x<mywidth; x++) if (Map[x,y] == -1) Map[x,y] = 2;
+		}
+		/*
 		// Populate map values, 0 out terrain mask
 		for (int y = 0; y < myheight; y++) {
 			for (int x = 0; x < mywidth; x++) {
@@ -116,6 +159,7 @@ public class Game : Node2D
 				Map[x,y] = x%2 - y%2 == 0 ? (new Random()).Next(0,3) : 0;
 			}
 		}
+		*/
 		// Loop to lookup tile ids based on terrain mask
 		for (int y = 0; y < myheight; y++) {
 			for (int x = (1 - (y % 2)); x < mywidth; x+=2) {
