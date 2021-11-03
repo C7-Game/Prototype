@@ -172,14 +172,11 @@ public class TempTiles : Node2D
             MapUI.ModRelPath = "";
         }
         Tiles = new List<TempTile>();
-        // int Offset = LegacyMapReader.Sav.SectionOffset("WRLD", 2) + 8;
         MapUI.MapHeight = LegacyMapReader.Wrld.Height;
         MapUI.MapWidth = LegacyMapReader.Wrld.Width;
 
-        // Offset = LegacyMapReader.Sav.SectionOffset("TILE", 1);
         QueryCiv3.MapTile[] mapTiles = LegacyMapReader.Tile;
         for (int i=0; i < mapTiles.Length; i++)
-        // for (int i=0; i < MapUI.MapWidth * 2; i++)
         {
                 TempTile ThisTile = new TempTile();
                 ThisTile.LegacyY = i / (MapUI.MapWidth / 2);
@@ -192,28 +189,6 @@ public class TempTiles : Node2D
                 ThisTile.LegacyImageID = mapTiles[i].BaseTerrainImageID;
                 Tiles.Add(ThisTile);
         }
-        /*
-        for (int y=0; y < MapUI.MapHeight; y++)
-        {
-            for (int x=y%2; x < MapUI.MapWidth; x+=2)
-            {
-                TempTile ThisTile = new TempTile();
-                ThisTile.LegacyX = x;
-                ThisTile.LegacyY = y;
-
-                int TerrainByte = LegacyMapReader.Sav.ReadByte(Offset+53);
-                ThisTile.LegacyBaseTerrainID =  TerrainByte & 0x0F;
-                ThisTile.LegacyOverlayTerrainID = TerrainByte >> 4;
-                ThisTile.DebugByte = LegacyMapReader.Sav.ReadByte(Offset+TileOffset);
-                ThisTile.LegacyFileID = LegacyMapReader.Sav.ReadByte(Offset+17);
-                ThisTile.LegacyImageID = LegacyMapReader.Sav.ReadByte(Offset+16);
-
-                Tiles.Add(ThisTile);
-                // 212 bytes per tile in Conquests SAV
-                Offset += 212;
-            }
-        }
-        */
         DebugTextLayer.Visible = TileOffset != 0;
         DebugTextLayer.Tiles = Tiles;
         DebugTextLayer.Update();
