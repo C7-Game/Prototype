@@ -299,7 +299,7 @@ public class Game : Node2D
 	public void _on_Zoom_value_changed(float value)
 	{
 		Vector2 NewScale = new Vector2(value, value);
-		Scale = NewScale;
+		MapView.Scale = NewScale;
 	}
 
 	public void moveCamera(Vector2 offset)
@@ -307,8 +307,8 @@ public class Game : Node2D
 		cameraPixelX += (int)offset.x;
 		cameraPixelY += (int)offset.y;
 
-		int tileDoubleX = 2 * (int)tileSize.x;
-		int tileDoubleY = 2 * (int)tileSize.y;
+		int tileDoubleX = 2 * (int)(MapView.Scale.x * tileSize.x);
+		int tileDoubleY = 2 * (int)(MapView.Scale.y * tileSize.y);
 
 		// Renormalize X
 		int tilesX = cameraPixelX / tileDoubleX;
