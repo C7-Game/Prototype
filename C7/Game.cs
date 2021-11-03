@@ -109,16 +109,19 @@ public class Game : Node2D
 	public void RefillMapView()
 	{
 		// TODO: Should use window size here but then need to resize the MapView when window size changes
-		// The Offset of 4 is to provide a margin
-		int mapViewWidth  = 4 + (int)(OS.GetScreenSize().x / MapView.CellSize.x);
-		int mapViewHeight = 4 + (int)(OS.GetScreenSize().y / MapView.CellSize.y);
+		// The Offset of 2 is to provide a margin
+		int mapViewWidth  = 2 + (int)(OS.GetScreenSize().x / MapView.CellSize.x);
+		int mapViewHeight = 2 + (int)(OS.GetScreenSize().y / MapView.CellSize.y);
+
+		MapView.Clear();
 
 		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
-		for (int y = 0; y < mapViewHeight; y++) {
-			for (int x = 1 - (y%2); x < mapViewWidth; x+=2) {
+		// loops start at -3 and -6 to provide a margin on the left and top, respectively
+		for (int y = -6; y < mapViewHeight; y++) {
+			for (int x = -3 - (y%2); x < mapViewWidth; x+=2) {
 				// TM.SetCellv(new Vector2(x + (y % 2), y), (new Random()).Next() % TS.GetTilesIds().Count);
 				// try {
-				MapView.SetCellv(new Vector2(x, y), Map[WrapTileX(cameraTileX+x), WrapTileY(cameraTileY+y)]);
+				MapView.SetCell(x, y, Map[WrapTileX(cameraTileX+x), WrapTileY(cameraTileY+y)]);
 				// } catch {}
 			}
 		}
