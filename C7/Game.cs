@@ -18,6 +18,7 @@ public class Game : Node2D
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
+	Control Toolbar;
 	Timer endTurnAlertTimer;
 	private bool MoveCamera;
 	private Vector2 OldPosition;
@@ -28,8 +29,10 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		this.TerrainAsTileMap();
+		Scale = new Vector2((float)0.3, (float)0.3);
 		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
@@ -105,16 +108,22 @@ public class Game : Node2D
 			}
 		}
 
-		int mywidth = 14, myheight = 18;
+		int mywidth = 80, myheight = 80;
 		Map = new int[mywidth,myheight];
-		// Populate map values, 0 out terrain mask
+		OpenSimplexNoise noise = new OpenSimplexNoise();
+		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
+		// Populate map values
 		for (int y = 0; y < myheight; y++) {
 			for (int x = 0; x < mywidth; x++) {
-				// If x & y are both even or odd, terrain value; if mismatched, terrain mask init to 0
-				Map[x,y] = x%2 - y%2 == 0 ? (new Random()).Next(0,3) : 0;
+				// Multiplying x & y for noise coordinate sampling
+				float foo = noise.GetNoise2d(x*2,y*2);
+				Map[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
 			}
 		}
 		// Loop to lookup tile ids based on terrain mask
+		//  NOTE: This layout is full width, but the tiles are every-other coordinate
+		//    What I've done is generated "terrain ID" all over and am deriving an
+		//    image ID on the tile placement spots based on surrounding terrain values
 		for (int y = 0; y < myheight; y++) {
 			for (int x = (1 - (y % 2)); x < mywidth; x+=2) {
 				int Top = y == 0 ? (Map[(x+1) % mywidth,y]) : (Map[x,y-1]);
@@ -148,7 +157,8 @@ public class Game : Node2D
 		EndTurnButton = new Button();
 		EndTurnButton.Text = "End Turn";
 		EndTurnButton.SetPosition(new Vector2(250, 10));
-		AddChild(EndTurnButton);
+		Toolbar.AddChild(EndTurnButton);
+		Toolbar.MoveChild(EndTurnButton, 0);
 		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
 
 		AddTopLeftButtons();
@@ -162,20 +172,23 @@ public class Game : Node2D
 		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 29);
 		TextureButton menuButton = new TextureButton();
 		menuButton.TextureNormal = menuTexture;
-		menuButton.SetPosition(new Vector2(21, 12));
-		AddChild(menuButton);
-		
+		// menuButton.SetPosition(new Vector2(21, 12));
+		Toolbar.AddChild(menuButton);
+		Toolbar.MoveChild(menuButton, 0);
+
 		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 29);
 		TextureButton civilopediaButton = new TextureButton();
 		civilopediaButton.TextureNormal = civilopediaTexture;
-		civilopediaButton.SetPosition(new Vector2(57, 12));
-		AddChild(civilopediaButton);
+		// civilopediaButton.SetPosition(new Vector2(57, 12));
+		Toolbar.AddChild(civilopediaButton);
+		Toolbar.MoveChild(civilopediaButton, 1);
 		
 		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
 		TextureButton advisorsButton = new TextureButton();
 		advisorsButton.TextureNormal = advisorsTexture;
-		advisorsButton.SetPosition(new Vector2(94, 12));
-		AddChild(advisorsButton);
+		// advisorsButton.SetPosition(new Vector2(94, 12));
+		Toolbar.AddChild(advisorsButton);
+		Toolbar.MoveChild(advisorsButton, 2);
 	}
 
 	private void AddLowerRightBox()

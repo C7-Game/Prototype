@@ -96,11 +96,9 @@ public class LowerRightInfoBox : TextureRect
 
 	private void toggleEndTurnButton() {
 		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
-			GD.Print("Setting texture to blink (blue) texture");
 			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
 		}
 		else {
-			GD.Print("Setting texture to on (orange) texture");
 			nextTurnButton.TextureNormal = nextTurnOnTexture;
 		}
 		

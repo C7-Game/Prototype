@@ -62,7 +62,7 @@ namespace QueryCiv3
     public class MapTile
     {
         protected SavData Data;
-        protected int Offset;
+        public int Offset {get; protected set;}
         public MapTile(SavData data, int offset)
         {
             Data = data;
@@ -74,6 +74,8 @@ namespace QueryCiv3
         public int Terrain { get => Data.Sav.ReadByte(Offset+53); }
         public int BaseTerrain { get => Terrain & 0x0f; }
         public int OverlayTerrain { get => (Terrain & 0xf0) >> 4; }
+        public int BaseTerrainFileID { get => Data.Sav.ReadByte(Offset+17); }
+        public int BaseTerrainImageID { get => Data.Sav.ReadByte(Offset+16); }
     }
     public class ContItem
     {
