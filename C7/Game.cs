@@ -28,19 +28,19 @@ public class Game : Node2D
 	Button EndTurnButton;
 	Control Toolbar;
 	Timer endTurnAlertTimer;
-	private bool MoveCamera;
+	private bool IsMovingCamera;
 	private Vector2 OldPosition;
 	private KinematicBody2D Player;
 	
 	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
 
-	public int wrapTileX(int x)
+	public int WrapTileX(int x)
 	{
 		int tr = x % mapWidth;
 		return (tr >= 0) ? tr : tr + mapWidth;
 	}
 
-	public int wrapTileY(int y)
+	public int WrapTileY(int y)
 	{
 		int tr = y % mapHeight;
 		return (tr >= 0) ? tr : tr + mapHeight;
@@ -100,7 +100,7 @@ public class Game : Node2D
 		OnPlayerStartTurn();
 	}
 
-	public void refillMapView()
+	public void RefillMapView()
 	{
 		// TODO: Should use window size here but then need to resize the MapView when window size changes
 		// The Offset of 4 is to provide a margin
@@ -112,7 +112,7 @@ public class Game : Node2D
 			for (int x = 1 - (y%2); x < mapViewWidth; x+=2) {
 				// TM.SetCellv(new Vector2(x + (y % 2), y), (new Random()).Next() % TS.GetTilesIds().Count);
 				// try {
-				MapView.SetCellv(new Vector2(x, y), Map[wrapTileX(cameraTileX+x), wrapTileY(cameraTileY+y)]);
+				MapView.SetCellv(new Vector2(x, y), Map[WrapTileX(cameraTileX+x), WrapTileY(cameraTileY+y)]);
 				// } catch {}
 			}
 		}
@@ -170,7 +170,7 @@ public class Game : Node2D
 				} catch { GD.Print(x + "," + y + " " + foo); }
 			}
 		}
-		refillMapView();
+		RefillMapView();
 		AddChild(MapView);
 	}
 
@@ -302,7 +302,7 @@ public class Game : Node2D
 		MapView.Scale = NewScale;
 	}
 
-	public void moveCamera(Vector2 offset)
+	public void MoveCamera(Vector2 offset)
 	{
 		cameraPixelX += (int)offset.x;
 		cameraPixelY += (int)offset.y;
@@ -321,24 +321,24 @@ public class Game : Node2D
 		cameraTileY += 2 * tilesY;
 
 		MapView.GlobalPosition = new Vector2(-cameraPixelX, -cameraPixelY);
-		refillMapView();
+		RefillMapView();
 	}
 
 	public void _on_RightButton_pressed()
 	{
-		moveCamera(new Vector2(128, 0));
+		MoveCamera(new Vector2(128, 0));
 	}
 	public void _on_LeftButton_pressed()
 	{
-		moveCamera(new Vector2(-128, 0));
+		MoveCamera(new Vector2(-128, 0));
 	}
 	public void _on_UpButton_pressed()
 	{
-		moveCamera(new Vector2(0, -64));
+		MoveCamera(new Vector2(0, -64));
 	}
 	public void _on_DownButton_pressed()
 	{
-		moveCamera(new Vector2(0, 64));
+		MoveCamera(new Vector2(0, 64));
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -353,11 +353,11 @@ public class Game : Node2D
 				if(eventMouseButton.IsPressed())
 				{
 					OldPosition = eventMouseButton.Position;
-					MoveCamera = true;
+					IsMovingCamera = true;
 				}
 				else
 				{
-					MoveCamera = false;
+					IsMovingCamera = false;
 				}
 			}
 			else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelUp)
@@ -373,10 +373,10 @@ public class Game : Node2D
 		}
 		else if(@event is InputEventMouseMotion eventMouseMotion)
 		{
-			if(MoveCamera)
+			if(IsMovingCamera)
 			{
 				GetTree().SetInputAsHandled();
-				moveCamera((OldPosition - eventMouseMotion.Position) / Scale);
+				MoveCamera((OldPosition - eventMouseMotion.Position) / Scale);
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
