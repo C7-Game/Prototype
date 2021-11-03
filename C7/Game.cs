@@ -19,8 +19,14 @@ public class Game : Node2D
 	int mapWidth = 14, mapHeight = 18;
 	int[,] Map;
 
-	int cameraPixelX = 0, cameraPixelY = 0;
+	// cameraTileX/Y store the upper left tile coords currently being viewed. cameraPixelX/Y store the pixel offset within that tile NOT the total
+	// offset from the origin.
+	// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire screen. For
+	// small movements, the MapView itself is moved (amount is in cameraPixelX/Y) but once the movement equals an entire grid cell (2 times the
+	// tile width or height) the map is snapped back toward the origin by that amount and to compensate it changes what tiles are drawn
+	// (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around wrapped edges.
 	int cameraTileX = 0, cameraTileY = 0;
+	int cameraPixelX = 0, cameraPixelY = 0;
 	private TileMap MapView;
 
 	Hashtable Terrmask = new Hashtable();
@@ -310,7 +316,7 @@ public class Game : Node2D
 		int tileDoubleX = 2 * (int)(MapView.Scale.x * tileSize.x);
 		int tileDoubleY = 2 * (int)(MapView.Scale.y * tileSize.y);
 
-		// Renormalize X
+		// If the X-direction pixel movement has covered a double-tile, snap the map backwards and change what tiles are drawn.
 		int tilesX = cameraPixelX / tileDoubleX;
 		cameraPixelX -= tilesX * tileDoubleX;
 		cameraTileX += 2 * tilesX;
