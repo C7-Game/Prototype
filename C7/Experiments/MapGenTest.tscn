@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Experiments/MapGenTest.cs" type="Script" id=2]
+
+[node name="MapGenTest" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+anchor_right = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Regenerate" type="Button" parent="CanvasLayer/Control/HBoxContainer"]
+margin_right = 145.0
+margin_bottom = 40.0
+custom_fonts/font = ExtResource( 1 )
+text = "Regenerate"
+
+[connection signal="pressed" from="CanvasLayer/Control/HBoxContainer/Regenerate" to="." method="_on_Regenerate_pressed"]
