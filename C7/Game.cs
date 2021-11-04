@@ -171,26 +171,17 @@ public class Game : Node2D
 		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtons.pcx"));
 		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
 		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 29);
-		TextureButton menuButton = new TextureButton();
+		
+		TextureButton menuButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/MenuButton");
 		menuButton.TextureNormal = menuTexture;
-		// menuButton.SetPosition(new Vector2(21, 12));
-		Toolbar.AddChild(menuButton);
-		Toolbar.MoveChild(menuButton, 0);
-
 		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 29);
-		TextureButton civilopediaButton = new TextureButton();
+		TextureButton civilopediaButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/CivilopediaButton");
 		civilopediaButton.TextureNormal = civilopediaTexture;
-		// civilopediaButton.SetPosition(new Vector2(57, 12));
-		Toolbar.AddChild(civilopediaButton);
-		Toolbar.MoveChild(civilopediaButton, 1);
 		
 		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
-		TextureButton advisorsButton = new TextureButton();
+		TextureButton advisorsButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton");
 		advisorsButton.TextureNormal = advisorsTexture;
 		advisorsButton.Connect("pressed", this, "ShowDomesticAdvisor");
-		// advisorsButton.SetPosition(new Vector2(94, 12));
-		Toolbar.AddChild(advisorsButton);
-		Toolbar.MoveChild(advisorsButton, 2);
 	}
 
 	private void AddLowerRightBox()

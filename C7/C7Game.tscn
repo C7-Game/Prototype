@@ -43,8 +43,22 @@ margin_top = 20.0
 margin_right = 1004.0
 margin_bottom = 60.0
 
+[node name="MenuButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_bottom = 40.0
+
+[node name="CivilopediaButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 4.0
+margin_right = 4.0
+margin_bottom = 40.0
+
+[node name="AdvisorButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
+margin_left = 8.0
+margin_right = 8.0
+margin_bottom = 40.0
+
 [node name="UiBarEndTurnButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_right = 114.0
+margin_left = 12.0
+margin_right = 126.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "End Turn"
@@ -53,13 +67,13 @@ __meta__ = {
 }
 
 [node name="VSeparator" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 118.0
-margin_right = 122.0
+margin_left = 130.0
+margin_right = 134.0
 margin_bottom = 40.0
 
 [node name="LeftButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 126.0
-margin_right = 182.0
+margin_left = 138.0
+margin_right = 194.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Left"
@@ -68,8 +82,8 @@ __meta__ = {
 }
 
 [node name="RightButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 186.0
-margin_right = 258.0
+margin_left = 198.0
+margin_right = 270.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Right"
@@ -78,8 +92,8 @@ __meta__ = {
 }
 
 [node name="UpButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 262.0
-margin_right = 307.0
+margin_left = 274.0
+margin_right = 319.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Up"
@@ -88,8 +102,8 @@ __meta__ = {
 }
 
 [node name="DownButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 311.0
-margin_right = 390.0
+margin_left = 323.0
+margin_right = 402.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Down"
@@ -98,12 +112,12 @@ __meta__ = {
 }
 
 [node name="VSeparator3" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 394.0
-margin_right = 398.0
+margin_left = 406.0
+margin_right = 410.0
 margin_bottom = 40.0
 
 [node name="Zoom" type="HSlider" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 402.0
+margin_left = 414.0
 margin_right = 911.0
 margin_bottom = 40.0
 size_flags_horizontal = 3
