@@ -255,10 +255,8 @@ public class Game : Node2D
 
 	private void ShowDomesticAdvisor()
 	{
-		GD.Print("User requested domestic advisor via F1");
-
 		CenterContainer Advisors = GetNode<CenterContainer>("CanvasLayer/Advisor");
-		Advisors.EmitSignal("hide");
+		Advisors.EmitSignal("ShowSpecificAdvisor", "F1");
 	}
 
 	private void _onEndTurnButtonPressed()
