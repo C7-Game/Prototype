@@ -65,6 +65,7 @@ public class Game : Node2D
 		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
 		this.TerrainAsTileMap();
 		MapView.Scale = new Vector2((float)0.3, (float)0.3);
+		RefillMapView(); // Reset view after setting scale
 		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
