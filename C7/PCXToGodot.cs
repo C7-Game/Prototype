@@ -55,9 +55,6 @@ public class PCXToGodot : Godot.Object
 		Image OutImage = new Image();
 		OutImage.Create(croppedWidth, croppedHeight, false, Image.Format.Rgba8);
 		OutImage.Lock();
-		GD.Print(string.Format("imagePcx dimensions: {0}, {1}", imagePcx.Width, imagePcx.Height));
-		GD.Print(string.Format("alphaPcx dimensions: {0}, {1}", alphaPcx.Width, alphaPcx.Height));
-		GD.Print(string.Format("Alpha palette size: {0}", alphaPcx.Palette.Length));
 		for (int y = topStart; y < topStart + croppedHeight; y++)
 		{
 			for (int x = leftStart; x < leftStart + croppedWidth; x++)

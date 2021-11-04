@@ -10,7 +10,9 @@ public class AdvisorButton : TextureButton
 		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
 		ImageTexture texture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
 		ImageTexture textureHover = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 61, 35, 29, 60);
-		this.TextureNormal = texture;	
+		ImageTexture texturePressed = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 121, 35, 29, 120);
+		this.TextureNormal = texture;
 		this.TextureHover = textureHover;
+		this.TexturePressed = texturePressed;
 	}
 }
