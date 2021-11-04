@@ -7,7 +7,7 @@ public class Game : Node2D
 {
 	[Signal] public delegate void TurnStarted();
 	[Signal] public delegate void TurnEnded();
-	[Signal] public delegate void HideAdvisor();
+	[Signal] public delegate void ShowSpecificAdvisor();
 
 	enum GameState {
 		PreGame,
@@ -29,8 +29,6 @@ public class Game : Node2D
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
 	Control Toolbar;
-	
-	CenterContainer AdvisorContainer;
 	Timer endTurnAlertTimer;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
@@ -98,7 +96,7 @@ public class Game : Node2D
 			//TODO: Display the "Oh No! Do you really want to quit?" menu
 		}
 		else if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-			ShowDomesticAdvisor();
+			EmitSignal("ShowSpecificAdvisor", "F1");
 		}
 	}
 
@@ -108,7 +106,6 @@ public class Game : Node2D
 		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
 		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
 		Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
-		Connect(nameof(HideAdvisor), this, nameof(OnHideAdvisor));
 		OnPlayerStartTurn();
 	}
 
@@ -254,12 +251,6 @@ public class Game : Node2D
 		GameStatus.AddChild(LowerRightInfoBox);
 	}
 
-	private void ShowDomesticAdvisor()
-	{
-		CenterContainer Advisors = GetNode<CenterContainer>("CanvasLayer/Advisor");
-		Advisors.EmitSignal("ShowSpecificAdvisor", "F1");
-	}
-
 	private void _onEndTurnButtonPressed()
 	{
 		if (CurrentState == GameState.PlayerTurn)
@@ -288,11 +279,6 @@ public class Game : Node2D
 		endTurnAlertTimer.Connect("timeout", LowerRightInfoBox, "toggleEndTurnButton");
 		AddChild(endTurnAlertTimer);
 		endTurnAlertTimer.Start();
-	}
-
-	private void OnHideAdvisor()
-	{
-		AdvisorContainer.Hide();
 	}
 
 	private void OnPlayerEndTurn()

@@ -164,6 +164,7 @@ __meta__ = {
 anchor_mode = 0
 current = true
 
+[connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
@@ -172,5 +173,4 @@ current = true
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
 [connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom" to="." method="_on_Zoom_value_changed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
-[connection signal="ShowSpecificAdvisor" from="CanvasLayer/Advisor" to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="hide" from="CanvasLayer/Advisor" to="CanvasLayer/Advisor" method="_on_Advisor_hide"]
