@@ -7,6 +7,7 @@ public class Game : Node2D
 {
 	[Signal] public delegate void TurnStarted();
 	[Signal] public delegate void TurnEnded();
+	[Signal] public delegate void HideAdvisor();
 
 	enum GameState {
 		PreGame,
@@ -19,6 +20,8 @@ public class Game : Node2D
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
 	Control Toolbar;
+	
+	CenterContainer AdvisorContainer;
 	Timer endTurnAlertTimer;
 	private bool MoveCamera;
 	private Vector2 OldPosition;
@@ -66,9 +69,16 @@ public class Game : Node2D
 		}
 		else if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
 			GD.Print("User requested domestic advisor");
-			DomesticAdvisor advisor = new DomesticAdvisor();
-			//TODO: Center on > 1024x768 res.
-			AddChild(advisor);
+			if (AdvisorContainer == null) {
+				GD.Print("Creating and showing advisor");
+				AdvisorContainer = GetNode<CenterContainer>("CanvasLayer/Advisor");
+				DomesticAdvisor advisor = new DomesticAdvisor();
+				AdvisorContainer.AddChild(advisor);
+			}
+			else {
+				GD.Print("Showing advisor");
+				AdvisorContainer.Show();
+			}
 		}
 	}
 
@@ -78,6 +88,7 @@ public class Game : Node2D
 		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
 		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
 		Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
+		Connect(nameof(HideAdvisor), this, nameof(OnHideAdvisor));
 		OnPlayerStartTurn();
 	}
 
@@ -229,6 +240,11 @@ public class Game : Node2D
 		endTurnAlertTimer.Connect("timeout", LowerRightInfoBox, "toggleEndTurnButton");
 		AddChild(endTurnAlertTimer);
 		endTurnAlertTimer.Start();
+	}
+
+	private void OnHideAdvisor()
+	{
+		AdvisorContainer.Hide();
 	}
 
 	private void OnPlayerEndTurn()
