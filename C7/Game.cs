@@ -68,25 +68,7 @@ public class Game : Node2D
 			//TODO: Display the "Oh No! Do you really want to quit?" menu
 		}
 		else if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-			GD.Print("User requested domestic advisor");
-			if (AdvisorContainer == null) {
-				GD.Print("Creating and showing advisor");
-				AdvisorContainer = GetNode<CenterContainer>("CanvasLayer/Advisor");
-				DomesticAdvisor advisor = new DomesticAdvisor();
-				AdvisorContainer.AddChild(advisor);
-
-				//Center the advisor container.  Following directions at https://docs.godotengine.org/en/stable/tutorials/gui/size_and_anchors.html?highlight=anchor
-				//Also taking advantage of it being 1024x768, as the directions didn't really work.  This is not 100% ideal (would be great for a general-purpose solution to work),
-				//but does work with the current graphics independent of resolution.
-				AdvisorContainer.MarginLeft = -512;
-				AdvisorContainer.MarginRight = -512;
-				AdvisorContainer.MarginTop = -384;
-				AdvisorContainer.MarginBottom = 384;
-			}
-			else {
-				GD.Print("Showing advisor");
-				AdvisorContainer.Show();
-			}
+			ShowDomesticAdvisor();
 		}
 	}
 
@@ -205,6 +187,7 @@ public class Game : Node2D
 		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
 		TextureButton advisorsButton = new TextureButton();
 		advisorsButton.TextureNormal = advisorsTexture;
+		advisorsButton.Connect("pressed", this, "ShowDomesticAdvisor");
 		// advisorsButton.SetPosition(new Vector2(94, 12));
 		Toolbar.AddChild(advisorsButton);
 		Toolbar.MoveChild(advisorsButton, 2);
@@ -218,6 +201,29 @@ public class Game : Node2D
 		GameStatus.MarginLeft = -(294 + 5);
 		GameStatus.MarginTop = -(137 + 1);
 		GameStatus.AddChild(LowerRightInfoBox);
+	}
+
+	private void ShowDomesticAdvisor()
+	{
+		GD.Print("User requested domestic advisor");
+		if (AdvisorContainer == null) {
+			GD.Print("Creating and showing advisor");
+			AdvisorContainer = GetNode<CenterContainer>("CanvasLayer/Advisor");
+			DomesticAdvisor advisor = new DomesticAdvisor();
+			AdvisorContainer.AddChild(advisor);
+
+			//Center the advisor container.  Following directions at https://docs.godotengine.org/en/stable/tutorials/gui/size_and_anchors.html?highlight=anchor
+			//Also taking advantage of it being 1024x768, as the directions didn't really work.  This is not 100% ideal (would be great for a general-purpose solution to work),
+			//but does work with the current graphics independent of resolution.
+			AdvisorContainer.MarginLeft = -512;
+			AdvisorContainer.MarginRight = -512;
+			AdvisorContainer.MarginTop = -384;
+			AdvisorContainer.MarginBottom = 384;
+		}
+		else {
+			GD.Print("Showing advisor");
+			AdvisorContainer.Show();
+		}
 	}
 
 	private void _onEndTurnButtonPressed()
