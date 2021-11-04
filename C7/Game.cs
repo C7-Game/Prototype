@@ -16,18 +16,12 @@ public class Game : Node2D
 
 	public static readonly Vector2 tileSize = new Vector2(64, 32); // TODO: These should be integer values
 
-	bool mapWrapHorizontally = false, mapWrapVertically = false;
+	bool mapWrapHorizontally = true, mapWrapVertically = true;
 	int mapWidth = 14, mapHeight = 18;
 	int[,] Map;
 
-	// cameraTileX/Y store the upper left tile coords currently being viewed. cameraPixelX/Y store the pixel offset within that tile NOT the total
-	// offset from the origin.
-	// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire screen. For
-	// small movements, the MapView itself is moved (amount is in cameraPixelX/Y) but once the movement equals an entire grid cell (2 times the
-	// tile width or height) the map is snapped back toward the origin by that amount and to compensate it changes what tiles are drawn
-	// (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around wrapped edges.
-	int cameraTileX = 0, cameraTileY = 0;
-	int cameraPixelX = 0, cameraPixelY = 0;
+	// cameraLocation stores the upper left pixel coordinates on the map of the area currently being viewed.
+	Vector2 cameraLocation = new Vector2(0, 0);
 	private TileMap MapView;
 
 	Hashtable Terrmask = new Hashtable();
@@ -117,11 +111,31 @@ public class Game : Node2D
 
 	public void RefillMapView()
 	{
+		MapView.Clear();
+
+		// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire
+		// screen. For small movements, the MapView itself is moved (amount is in cameraResidueX/Y) but once the movement equals an entire
+		// grid cell (2 times the tile width or height) the map is snapped back toward the origin by that amount and to compensate it changes
+		// what tiles are drawn (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around
+		// wrapped edges.
+
+		int tileFullX = 2 * (int)(MapView.Scale.x * tileSize.x);
+		int cameraPixelX = (int)cameraLocation.x;
+		int fullTilesX = cameraPixelX / tileFullX;
+		int cameraTileX = 2 * fullTilesX;
+		int cameraResidueX = cameraPixelX - fullTilesX * tileFullX;
+
+		int tileFullY = 2 * (int)(MapView.Scale.y * tileSize.y);
+		int cameraPixelY = (int)cameraLocation.y;
+		int fullTilesY = cameraPixelY / tileFullY;
+		int cameraTileY = 2 * fullTilesY;
+		int cameraResidueY = cameraPixelY - fullTilesY * tileFullY;
+
+		MapView.GlobalPosition = new Vector2(-cameraResidueX, -cameraResidueY);
+
 		// The Offset of 2 is to provide a margin
 		int mapViewWidth  = 2 + (int)(OS.WindowSize.x / MapView.CellSize.x);
 		int mapViewHeight = 2 + (int)(OS.WindowSize.y / MapView.CellSize.y);
-
-		MapView.Clear();
 
 		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
 		// loops start at -3 and -6 to provide a margin on the left and top, respectively
@@ -129,7 +143,7 @@ public class Game : Node2D
 			for (int dx = -3 - (dy%2); dx < mapViewWidth; dx+=2) {
 				int x = cameraTileX + dx, y = cameraTileY + dy;
 				if (IsInRange(x, y)) {
-					MapView.SetCell(x, y, Map[WrapTileX(x), WrapTileY(y)]);
+					MapView.SetCell(dx, dy, Map[WrapTileX(x), WrapTileY(y)]);
 				}
 			}
 		}
@@ -326,47 +340,7 @@ public class Game : Node2D
 
 	public void MoveCamera(Vector2 offset)
 	{
-		cameraPixelX += (int)offset.x;
-		cameraPixelY += (int)offset.y;
-
-		int tileDoubleX = 2 * (int)(MapView.Scale.x * tileSize.x);
-		int tileDoubleY = 2 * (int)(MapView.Scale.y * tileSize.y);
-
-		// If the X-direction pixel movement has covered a double-tile, snap the map backwards and change what tiles are drawn.
-		int tilesX = cameraPixelX / tileDoubleX;
-		cameraPixelX -= tilesX * tileDoubleX;
-		cameraTileX += 2 * tilesX;
-		if (!mapWrapHorizontally)
-		{
-			if ((cameraTileX < 0) || ((cameraTileX <= 0) && (cameraPixelX > 0)))
-			{
-				cameraTileX = 0;
-				cameraPixelX = 0;
-			}
-			else if (cameraTileX >= mapWidth)
-			{
-				cameraTileX = mapWidth - 1;
-			}
-		}
-
-		// Same for Y
-		int tilesY = cameraPixelY / tileDoubleY;
-		cameraPixelY -= tilesY * tileDoubleY;
-		cameraTileY += 2 * tilesY;
-		if (!mapWrapVertically)
-		{
-			if ((cameraTileY < 0) || (cameraTileY <= 0) && (cameraPixelY > 0))
-			{
-				cameraTileY = 0;
-				cameraPixelY = 0;
-			}
-			else if (cameraTileY >= mapHeight)
-			{
-				cameraTileY = mapHeight - 1;
-			}
-		}
-
-		MapView.GlobalPosition = new Vector2(-cameraPixelX, -cameraPixelY);
+		cameraLocation += offset;
 		RefillMapView();
 	}
 
