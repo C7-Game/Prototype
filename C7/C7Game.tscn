@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
+[ext_resource path="res://Advisors.cs" type="Script" id=3]
 
 [node name="C7Game" type="Node2D"]
 script = ExtResource( 1 )
@@ -152,6 +153,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -162,6 +164,7 @@ __meta__ = {
 anchor_mode = 0
 current = true
 
+[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
@@ -169,4 +172,4 @@ current = true
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
 [connection signal="value_changed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom" to="." method="_on_Zoom_value_changed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
-[connection signal="modal_closed" from="CanvasLayer/Advisor" to="." method="OnHideAdvisor"]
+[connection signal="hide" from="CanvasLayer/Advisor" to="CanvasLayer/Advisor" method="_on_Advisor_hide"]
