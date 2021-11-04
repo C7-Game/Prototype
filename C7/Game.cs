@@ -16,7 +16,7 @@ public class Game : Node2D
 
 	public static readonly Vector2 tileSize = new Vector2(64, 32); // TODO: These should be integer values
 
-	bool mapWrapHorizontally = true, mapWrapVertically = true;
+	bool mapWrapHorizontally = false, mapWrapVertically = false;
 	int mapWidth = 14, mapHeight = 18;
 	int[,] Map;
 
@@ -119,23 +119,23 @@ public class Game : Node2D
 		// what tiles are drawn (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around
 		// wrapped edges.
 
-		int tileFullX = 2 * (int)(MapView.Scale.x * tileSize.x);
-		int cameraPixelX = (int)cameraLocation.x;
-		int fullTilesX = cameraPixelX / tileFullX;
-		int cameraTileX = 2 * fullTilesX;
-		int cameraResidueX = cameraPixelX - fullTilesX * tileFullX;
+		Vector2 tileFullSize = 2 * MapView.Scale * tileSize;
 
-		int tileFullY = 2 * (int)(MapView.Scale.y * tileSize.y);
+		int cameraPixelX = (int)cameraLocation.x;
+		int fullTilesX = cameraPixelX / (int)tileFullSize.x;
+		int cameraTileX = 2 * fullTilesX;
+		int cameraResidueX = cameraPixelX - fullTilesX * (int)tileFullSize.x;
+
 		int cameraPixelY = (int)cameraLocation.y;
-		int fullTilesY = cameraPixelY / tileFullY;
+		int fullTilesY = cameraPixelY / (int)tileFullSize.y;
 		int cameraTileY = 2 * fullTilesY;
-		int cameraResidueY = cameraPixelY - fullTilesY * tileFullY;
+		int cameraResidueY = cameraPixelY - fullTilesY * (int)tileFullSize.y;
 
 		MapView.GlobalPosition = new Vector2(-cameraResidueX, -cameraResidueY);
 
 		// The Offset of 2 is to provide a margin
-		int mapViewWidth  = 2 + (int)(OS.WindowSize.x / MapView.CellSize.x);
-		int mapViewHeight = 2 + (int)(OS.WindowSize.y / MapView.CellSize.y);
+		int mapViewWidth  = 2 + (int)(OS.WindowSize.x / (MapView.Scale.x * MapView.CellSize.x));
+		int mapViewHeight = 2 + (int)(OS.WindowSize.y / (MapView.Scale.y * MapView.CellSize.y));
 
 		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
 		// loops start at -3 and -6 to provide a margin on the left and top, respectively
@@ -331,6 +331,7 @@ public class Game : Node2D
 	{
 		Vector2 NewScale = new Vector2(value, value);
 		MapView.Scale = NewScale;
+		RefillMapView();
 	}
 
 	public void _OnViewportSizeChanged()
