@@ -16,6 +16,7 @@ public class Game : Node2D
 
 	public static readonly Vector2 tileSize = new Vector2(64, 32); // TODO: These should be integer values
 
+	bool mapWrapHorizontally = false, mapWrapVertically = false;
 	int mapWidth = 14, mapHeight = 18;
 	int[,] Map;
 
@@ -39,6 +40,13 @@ public class Game : Node2D
 	private KinematicBody2D Player;
 	
 	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
+
+	public bool IsInRange(int x, int y)
+	{
+		bool xInRange = mapWrapHorizontally || ((x >= 0) && (x < mapWidth));
+		bool yInRange = mapWrapVertically   || ((y >= 0) && (y < mapHeight));
+		return xInRange && yInRange;
+	}
 
 	public int WrapTileX(int x)
 	{
@@ -117,12 +125,12 @@ public class Game : Node2D
 
 		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
 		// loops start at -3 and -6 to provide a margin on the left and top, respectively
-		for (int y = -6; y < mapViewHeight; y++) {
-			for (int x = -3 - (y%2); x < mapViewWidth; x+=2) {
-				// TM.SetCellv(new Vector2(x + (y % 2), y), (new Random()).Next() % TS.GetTilesIds().Count);
-				// try {
-				MapView.SetCell(x, y, Map[WrapTileX(cameraTileX+x), WrapTileY(cameraTileY+y)]);
-				// } catch {}
+		for (int dy = -6; dy < mapViewHeight; dy++) {
+			for (int dx = -3 - (dy%2); dx < mapViewWidth; dx+=2) {
+				int x = cameraTileX + dx, y = cameraTileY + dy;
+				if (IsInRange(x, y)) {
+					MapView.SetCell(x, y, Map[WrapTileX(x), WrapTileY(y)]);
+				}
 			}
 		}
 	}
@@ -328,11 +336,35 @@ public class Game : Node2D
 		int tilesX = cameraPixelX / tileDoubleX;
 		cameraPixelX -= tilesX * tileDoubleX;
 		cameraTileX += 2 * tilesX;
+		if (!mapWrapHorizontally)
+		{
+			if ((cameraTileX < 0) || ((cameraTileX <= 0) && (cameraPixelX > 0)))
+			{
+				cameraTileX = 0;
+				cameraPixelX = 0;
+			}
+			else if (cameraTileX >= mapWidth)
+			{
+				cameraTileX = mapWidth - 1;
+			}
+		}
 
 		// Same for Y
 		int tilesY = cameraPixelY / tileDoubleY;
 		cameraPixelY -= tilesY * tileDoubleY;
 		cameraTileY += 2 * tilesY;
+		if (!mapWrapVertically)
+		{
+			if ((cameraTileY < 0) || (cameraTileY <= 0) && (cameraPixelY > 0))
+			{
+				cameraTileY = 0;
+				cameraPixelY = 0;
+			}
+			else if (cameraTileY >= mapHeight)
+			{
+				cameraTileY = mapHeight - 1;
+			}
+		}
 
 		MapView.GlobalPosition = new Vector2(-cameraPixelX, -cameraPixelY);
 		RefillMapView();
