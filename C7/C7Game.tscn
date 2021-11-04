@@ -132,9 +132,9 @@ __meta__ = {
 }
 
 [node name="KinematicBody2D" type="KinematicBody2D" parent="."]
-position = Vector2( 2500, 1300 )
 
 [node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
+anchor_mode = 0
 current = true
 
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]

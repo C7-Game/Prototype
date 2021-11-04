@@ -61,7 +61,7 @@ public class Game : Node2D
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
 		this.TerrainAsTileMap();
-		Scale = new Vector2((float)0.3, (float)0.3);
+		MapView.Scale = new Vector2((float)0.3, (float)0.3);
 		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
