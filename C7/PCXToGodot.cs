@@ -51,34 +51,32 @@ public class PCXToGodot : Godot.Object
 
 	//Combines two PCXs, one used for the alpha, to produce a final output image.
 	//Some files, such as Art/interface/menuButtons.pcx and Art/interface/menuButtonsAlpha.pcx, use this method.
-	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
+	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight, int alphaRowOffset = 0) {
 		Image OutImage = new Image();
-		OutImage.Create(imagePcx.Width, imagePcx.Height, false, Image.Format.Rgba8);
+		OutImage.Create(croppedWidth, croppedHeight, false, Image.Format.Rgba8);
 		OutImage.Lock();
 		GD.Print(string.Format("imagePcx dimensions: {0}, {1}", imagePcx.Width, imagePcx.Height));
 		GD.Print(string.Format("alphaPcx dimensions: {0}, {1}", alphaPcx.Width, alphaPcx.Height));
 		GD.Print(string.Format("Alpha palette size: {0}", alphaPcx.Palette.Length));
-		for (int i = 0; i < imagePcx.Width * imagePcx.Height; i++)
+		for (int y = topStart; y < topStart + croppedHeight; y++)
 		{
-			byte red = imagePcx.Palette[imagePcx.ColorIndices[i], 0];
-			byte green = imagePcx.Palette[imagePcx.ColorIndices[i], 1];
-			byte blue = imagePcx.Palette[imagePcx.ColorIndices[i], 2];
-			//Assumption based on menuButtonsAlpha.pcx: The palette in the alpha PCX always has the same red, green, and blue values (i.e. is grayscale).
-			//Examining it with breakpoints in my Java code, it appears it starts at 255, 255, 255, and goes down one at a time.  But this code
-			//doesn't assume that, it only assumes the grayscale aspect.  In theory, this should work for any transparency, 0 to 255.
-			byte alpha = 255;
-			//TODO: Of course, the alpha image may be smaller than the non-alpha one, with implicit repeating across the non-alpha.
-			//Going to have to figure that one out.  For now, make sure it doesn't blow up.
-			if (i < alphaPcx.ColorIndices.Length) {
-				alpha = alphaPcx.Palette[alphaPcx.ColorIndices[i], 0];
+			for (int x = leftStart; x < leftStart + croppedWidth; x++)
+			{
+				int currentPixel = y * imagePcx.Width + x;
+				byte red = imagePcx.Palette[imagePcx.ColorIndexAt(x, y), 0];
+				byte green = imagePcx.Palette[imagePcx.ColorIndexAt(x, y), 1];
+				byte blue = imagePcx.Palette[imagePcx.ColorIndexAt(x, y), 2];
+				//Assumption based on menuButtonsAlpha.pcx: The palette in the alpha PCX always has the same red, green, and blue values (i.e. is grayscale).
+				//Examining it with breakpoints in my Java code, it appears it starts at 255, 255, 255, and goes down one at a time.  But this code
+				//doesn't assume that, it only assumes the grayscale aspect.  In theory, this should work for any transparency, 0 to 255.
+				byte alpha = alphaPcx.Palette[alphaPcx.ColorIndexAt(x, y - alphaRowOffset), 0];
+				OutImage.SetPixel(x - leftStart, y - topStart, Color.Color8(red, green, blue, alpha));
 			}
-			OutImage.SetPixel(i % imagePcx.Width, i / imagePcx.Width, Color.Color8(red, green, blue, alpha));
 		}
 		OutImage.Unlock();
 
-		Image CroppedImage = OutImage.GetRect(new Rect2(leftStart, topStart, croppedWidth, croppedHeight));
 		ImageTexture Txtr = new ImageTexture();
-		Txtr.CreateFromImage(CroppedImage, 0);
+		Txtr.CreateFromImage(OutImage, 0);
 		return Txtr;
 
 

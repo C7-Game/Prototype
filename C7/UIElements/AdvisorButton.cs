@@ -8,7 +8,9 @@ public class AdvisorButton : TextureButton
 	{
 		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtons.pcx"));
 		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
-		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
-		this.TextureNormal = menuTexture;		
+		ImageTexture texture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
+		ImageTexture textureHover = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 61, 35, 29, 60);
+		this.TextureNormal = texture;	
+		this.TextureHover = textureHover;
 	}
 }
