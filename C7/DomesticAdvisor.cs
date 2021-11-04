@@ -55,6 +55,6 @@ public class DomesticAdvisor : Node2D
 
 	private void ReturnToMenu()
 	{
-		GetParent().GetParent().GetParent().EmitSignal("HideAdvisor");
+		GetParent().EmitSignal("modal_closed");
 	}
 }
