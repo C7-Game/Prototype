@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
 [ext_resource path="res://Advisors.cs" type="Script" id=3]
+[ext_resource path="res://UIElements/MenuButton.cs" type="Script" id=4]
+[ext_resource path="res://UIElements/CivilopediaButton.cs" type="Script" id=5]
+[ext_resource path="res://UIElements/AdvisorButton.cs" type="Script" id=6]
 
 [node name="C7Game" type="Node2D"]
 script = ExtResource( 1 )
@@ -46,16 +49,19 @@ margin_bottom = 60.0
 
 [node name="MenuButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_bottom = 40.0
+script = ExtResource( 4 )
 
 [node name="CivilopediaButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_left = 4.0
 margin_right = 4.0
 margin_bottom = 40.0
+script = ExtResource( 5 )
 
 [node name="AdvisorButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_left = 8.0
 margin_right = 8.0
 margin_bottom = 40.0
+script = ExtResource( 6 )
 
 [node name="UiBarEndTurnButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_left = 12.0

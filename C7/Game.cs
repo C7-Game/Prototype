@@ -220,27 +220,8 @@ public class Game : Node2D
 		Toolbar.MoveChild(EndTurnButton, 0);
 		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
 
-		AddTopLeftButtons();
 		AddLowerRightBox();
 	}
-
-	private void AddTopLeftButtons()
-	{
-		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtons.pcx"));
-		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
-		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 29);
-		
-		TextureButton menuButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/MenuButton");
-		menuButton.TextureNormal = menuTexture;
-		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 29);
-		TextureButton civilopediaButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/CivilopediaButton");
-		civilopediaButton.TextureNormal = civilopediaTexture;
-		
-		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
-		TextureButton advisorsButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton");
-		advisorsButton.TextureNormal = advisorsTexture;
-	}
-
 	private void AddLowerRightBox()
 	{
 		MarginContainer GameStatus = GetNode<MarginContainer>("CanvasLayer/GameStatus");
