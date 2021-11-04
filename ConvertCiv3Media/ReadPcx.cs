@@ -16,6 +16,13 @@ namespace ConvertCiv3Media
         public Pcx(string path) {
             this.Load(path);
         }
+
+        public byte ColorIndexAt(int x, int y)
+        {
+            int pixel = y * Width + x;
+            return ColorIndices[pixel];
+        }
+
         // not a generalized pcx reader
         // assumes 8-bit image with 256-color 8-bit rgb palette
         public void Load(string path) {
