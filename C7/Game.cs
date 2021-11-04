@@ -7,6 +7,7 @@ public class Game : Node2D
 {
 	[Signal] public delegate void TurnStarted();
 	[Signal] public delegate void TurnEnded();
+	[Signal] public delegate void HideAdvisor();
 
 	enum GameState {
 		PreGame,
@@ -28,6 +29,8 @@ public class Game : Node2D
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
 	Control Toolbar;
+	
+	CenterContainer AdvisorContainer;
 	Timer endTurnAlertTimer;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
@@ -94,10 +97,7 @@ public class Game : Node2D
 			//TODO: Display the "Oh No! Do you really want to quit?" menu
 		}
 		else if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-			GD.Print("User requested domestic advisor");
-			DomesticAdvisor advisor = new DomesticAdvisor();
-			//TODO: Center on > 1024x768 res.
-			AddChild(advisor);
+			ShowDomesticAdvisor();
 		}
 	}
 
@@ -107,6 +107,7 @@ public class Game : Node2D
 		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
 		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
 		Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
+		Connect(nameof(HideAdvisor), this, nameof(OnHideAdvisor));
 		OnPlayerStartTurn();
 	}
 
@@ -230,25 +231,17 @@ public class Game : Node2D
 		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtons.pcx"));
 		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/menuButtonsAlpha.pcx"));
 		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 29);
-		TextureButton menuButton = new TextureButton();
+		
+		TextureButton menuButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/MenuButton");
 		menuButton.TextureNormal = menuTexture;
-		// menuButton.SetPosition(new Vector2(21, 12));
-		Toolbar.AddChild(menuButton);
-		Toolbar.MoveChild(menuButton, 0);
-
 		ImageTexture civilopediaTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 36, 1, 35, 29);
-		TextureButton civilopediaButton = new TextureButton();
+		TextureButton civilopediaButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/CivilopediaButton");
 		civilopediaButton.TextureNormal = civilopediaTexture;
-		// civilopediaButton.SetPosition(new Vector2(57, 12));
-		Toolbar.AddChild(civilopediaButton);
-		Toolbar.MoveChild(civilopediaButton, 1);
 		
 		ImageTexture advisorsTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 73, 1, 35, 29);
-		TextureButton advisorsButton = new TextureButton();
+		TextureButton advisorsButton = GetNode<TextureButton>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton");
 		advisorsButton.TextureNormal = advisorsTexture;
-		// advisorsButton.SetPosition(new Vector2(94, 12));
-		Toolbar.AddChild(advisorsButton);
-		Toolbar.MoveChild(advisorsButton, 2);
+		advisorsButton.Connect("pressed", this, "ShowDomesticAdvisor");
 	}
 
 	private void AddLowerRightBox()
@@ -259,6 +252,29 @@ public class Game : Node2D
 		GameStatus.MarginLeft = -(294 + 5);
 		GameStatus.MarginTop = -(137 + 1);
 		GameStatus.AddChild(LowerRightInfoBox);
+	}
+
+	private void ShowDomesticAdvisor()
+	{
+		GD.Print("User requested domestic advisor");
+		if (AdvisorContainer == null) {
+			GD.Print("Creating and showing advisor");
+			AdvisorContainer = GetNode<CenterContainer>("CanvasLayer/Advisor");
+			DomesticAdvisor advisor = new DomesticAdvisor();
+			AdvisorContainer.AddChild(advisor);
+
+			//Center the advisor container.  Following directions at https://docs.godotengine.org/en/stable/tutorials/gui/size_and_anchors.html?highlight=anchor
+			//Also taking advantage of it being 1024x768, as the directions didn't really work.  This is not 100% ideal (would be great for a general-purpose solution to work),
+			//but does work with the current graphics independent of resolution.
+			AdvisorContainer.MarginLeft = -512;
+			AdvisorContainer.MarginRight = -512;
+			AdvisorContainer.MarginTop = -384;
+			AdvisorContainer.MarginBottom = 384;
+		}
+		else {
+			GD.Print("Showing advisor");
+			AdvisorContainer.Show();
+		}
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -289,6 +305,11 @@ public class Game : Node2D
 		endTurnAlertTimer.Connect("timeout", LowerRightInfoBox, "toggleEndTurnButton");
 		AddChild(endTurnAlertTimer);
 		endTurnAlertTimer.Start();
+	}
+
+	private void OnHideAdvisor()
+	{
+		AdvisorContainer.Hide();
 	}
 
 	private void OnPlayerEndTurn()
