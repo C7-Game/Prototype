@@ -213,6 +213,7 @@ current = true
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/GameStatus" method="OnTurnStarted"]
+[connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/GameStatus" to="." method="OnPlayerEndTurn"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]

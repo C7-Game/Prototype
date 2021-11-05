@@ -244,8 +244,9 @@ public class Game : Node2D
 		CurrentState = GameState.PlayerTurn;
 
 		//Set the selected unit in the lower right, via an event
+		//We can't send the whole map unit via signals (probably because it can't be serialized?),
+		//so I'm sending the name for now, as a temporary workaround.
 		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
-		GD.Print("The engine says the selected unit is a " + SelectedUnit.unitType.name);
 		EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
 	}
 

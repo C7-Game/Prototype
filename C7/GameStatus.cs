@@ -8,6 +8,8 @@ public class GameStatus : MarginContainer
 	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
 	Timer endTurnAlertTimer;
 
+	[Signal] public delegate void BlinkyEndTurnButtonPressed();
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -18,8 +20,7 @@ public class GameStatus : MarginContainer
 	
 	public void OnNewUnitSelected(string mapUnit)
 	{
-		GD.Print("The event arrived!");
-		GD.Print("The answer is " + mapUnit);
+		GD.Print("The newly selected unit is " + mapUnit);
 	}
 	
 	private void OnTurnEnded()
