@@ -178,16 +178,20 @@ public class Game : Node2D
 					, id);
 			}
 		}
-
+		double[,] tempNoiseField =C7GameData.GameMap.tempMapGenPrototyping(2 * mapWidth, mapHeight, true, true);
 		Map = new int[mapWidth,mapHeight];
-		OpenSimplexNoise noise = new OpenSimplexNoise();
-		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
+		// OpenSimplexNoise noise = new OpenSimplexNoise();
+		// noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
 		// Populate map values
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = 0; x < mapWidth; x++) {
 				// Multiplying x & y for noise coordinate sampling
-				float foo = noise.GetNoise2d(x*2,y*2);
-				Map[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
+				// float foo = noise.GetNoise2d(x*2,y*2);
+				// Map[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
+				// Trying the external noise library; remove tempNoiseField references and
+				//   uncomment OpenSimplexNoise, noise, and foo related lines
+				// The external library seems to return from -0.5 to 0.5 whereas Godot's does -1 to 1
+				Map[x,y] = tempNoiseField[x*2,y] * 2 < 0.1 ? 2 : tempNoiseField[x*2,y] * 2 < 0.4? 1 : 0;
 			}
 		}
 		// Loop to lookup tile ids based on terrain mask

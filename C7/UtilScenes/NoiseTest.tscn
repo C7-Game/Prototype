@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://UtilScenes/NoiseTest.cs" type="Script" id=1]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+Width = 1024
+Height = 768
+Persistence = 0.5
+Octaves = 3
