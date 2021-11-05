@@ -72,29 +72,18 @@ namespace C7GameData
             for (int x=0; x < width; x++)
             {
                 double theta = ((double)x / (double)width) * (System.Math.PI * 2);
-                // System.Console.WriteLine(theta.ToString("F8"));
-                // double cosTheta = System.Math.Cos(theta);
-                // double sinTheta = System.Math.Sin(theta);
                 double oX = originOffset + (scale * x);
                 double cX = originOffset + (scale * radius * System.Math.Sin(theta));
                 double cY = originOffset + (scale * radius * System.Math.Cos(theta));
-                System.Console.WriteLine((cX/scale).ToString("F8"));
-                System.Console.WriteLine((cY/scale).ToString("F8"));
-                System.Console.WriteLine("");
                 for (int y=0; y < height; y++)
                 {
                     double oY = originOffset + (scale * y);
                     if (!(wrapX || wrapY))
                     {
-                        // noiseField[x,y] = noise.Evaluate(originOffset + (scale * x), originOffset + (scale * y));
                         noiseField[x,y] = noise.Evaluate(oX, oY);
                     }
                     else
                     {
-                        // double cX = ((oX * cosTheta) - (oY * sinTheta));
-                        // double cY = ((oX * sinTheta) + (oY * cosTheta));
-                        // double cX = ((x * cosTheta) - (y * sinTheta));
-                        // double cY = ((x * sinTheta) + (y * cosTheta));
                         if (wrapX && wrapY)
                         {
                             throw new System.ApplicationException("Wrapping both axes not yet implemented");
@@ -103,7 +92,6 @@ namespace C7GameData
                         if (wrapY)
                         {
                             throw new System.ApplicationException("Wrapping Y axis not yet implemented");
-                            // noiseField[x,y] = noise.Evaluate(cX, cY, oY);
                         }
                         if (wrapX)
                         {
@@ -115,10 +103,6 @@ namespace C7GameData
                                 double c = oY + offset;
                                 noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
                             }
-                            // test makes circle as expected at scale 1
-                            // but not in the position I expect...hmm
-                            // noiseField[(int)(cX*40)+(width/2),(int)(cY*40)+(height/2)] = 1;
-
                         }
                     }
                 }

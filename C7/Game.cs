@@ -19,7 +19,7 @@ public class Game : Node2D
 	public static readonly Vector2 tileSize = new Vector2(64, 32); // TODO: These should be integer values
 
 	bool mapWrapHorizontally = false, mapWrapVertically = false;
-	int mapWidth = 80, mapHeight = 80;
+	int mapWidth = 100, mapHeight = 100;
 	int[,] Map;
 
 	// cameraLocation stores the upper left pixel coordinates on the map of the area currently being viewed.
