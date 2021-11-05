@@ -330,8 +330,8 @@ public class Game : Node2D
 		Vector2 oldScale = MapView.Scale;
 		if (v2NewScale != oldScale) {
 			MapView.Scale = v2NewScale;
-			cameraLocation = (v2NewScale / oldScale) * (cameraLocation + center) - center;
-			RefillMapView();
+			SetCameraLocation ((v2NewScale / oldScale) * (cameraLocation + center) - center);
+			// RefillMapView(); // Don't have to call this because it's already called when the camera location is changed
 		}
 	}
 
@@ -352,7 +352,53 @@ public class Game : Node2D
 
 	public void MoveCamera(Vector2 offset)
 	{
-		cameraLocation += offset;
+		SetCameraLocation(cameraLocation + offset);
+	}
+
+	public void SetCameraLocation(Vector2 location)
+	{
+		cameraLocation = location;
+
+		// Prevent the camera from moving beyond an unwrapped edge of the map. One complication here is that the viewport might actually be
+		// larger than the map (if we're zoomed far out) so in that case we must apply the constraint the other way around, i.e. constrain the
+		// map to the viewport rather than the viewport to the map.
+		// TODO: Not quite perfect. When you zoom out you can still move the map a bit off the right/bottom edges.
+		Vector2 viewportSize = GetViewport().Size;
+		Vector2 mapPixelSize = MapView.Scale * (new Vector2(tileSize.x * (mapWidth + 1), tileSize.y * (mapHeight + 1)));
+		if (! mapWrapHorizontally) {
+			float leftLim, rightLim; {
+				if (mapPixelSize.x >= viewportSize.x) {
+					leftLim = 0;
+					rightLim = mapPixelSize.x - viewportSize.x;
+				} else {
+					leftLim = mapPixelSize.x - viewportSize.x;
+					rightLim = 0;
+				}
+			}
+			if (cameraLocation.x < leftLim)
+				cameraLocation.x = leftLim;
+			else if (cameraLocation.x > rightLim)
+				cameraLocation.x = rightLim;
+		}
+		if (! mapWrapVertically) {
+			// These margins allow the player to move the camera that far off those map edges so that the UI controls don't cover up the
+			// map. TODO: These values should be read from the sizes of the UI elements instead of hardcoded.
+			float topMargin = 70, bottomMargin = 140;
+			float topLim, bottomLim; {
+				if (mapPixelSize.y >= viewportSize.y) {
+					topLim = -topMargin;
+					bottomLim = mapPixelSize.y - viewportSize.y + bottomMargin;
+				} else {
+					topLim = mapPixelSize.y - viewportSize.y;
+					bottomLim = 0;
+				}
+			}
+			if (cameraLocation.y < topLim)
+				cameraLocation.y = topLim;
+			else if (cameraLocation.y > bottomLim)
+				cameraLocation.y = bottomLim;
+		}
+
 		RefillMapView();
 	}
 
