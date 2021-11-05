@@ -57,14 +57,17 @@ namespace C7GameData
         // Actual fake-isometric map will have different shape, but for noise we'll go straight 2d matrix
         // NOTE: Apparently this OpenSimplex implementation doesn't do octaves, including persistance or lacunarity
         //  Might be able to implement them, use https://www.youtube.com/watch?v=MRNFcywkUSA&list=PLFt_AvWsXl0eBW2EiBtl_sxmDtSgZBxB3&index=4 as reference
+        // TODO: Parameterize octaves, persistence, scale/period; compare this generator to Godot's
+        // NOTE: Godot's OpenSimplexNoise returns -1 to 1; this one seems to be from 0 to 1 like most Simplex/Perlin implementations
         public static double[,] tempMapGenPrototyping(int width, int height, bool wrapX = true, bool wrapY = false)
         {
-            int octaves = 3;
+            // TODO: I think my octaves implementation is broken; specifically it needs normalizing I think as additional octaves drive more extreme values
+            int octaves = 1;
             double persistence = 0.5;
             // The public domain OpenSiplex implementation always
             //   seems to be 0 at 0,0, so let's offset from it.
-            double originOffset = 10;
-            double scale = 0.06;
+            double originOffset = 1000;
+            double scale = 0.03;
             double xRadius = (double)width / (System.Math.PI * 2);
             double yRadius = (double)height / (System.Math.PI * 2);
             OpenSimplexNoise noise = new OpenSimplexNoise();
@@ -72,67 +75,72 @@ namespace C7GameData
 
             for (int x=0; x < width; x++)
             {
-                double theta = ((double)x / (double)width) * (System.Math.PI * 2);
                 double oX = originOffset + (scale * x);
+                // Set up cX,cY to make one circle as a function of x
+                double theta = ((double)x / (double)width) * (System.Math.PI * 2);
                 double cX = originOffset + (scale * xRadius * System.Math.Sin(theta));
                 double cY = originOffset + (scale * xRadius * System.Math.Cos(theta));
                 for (int y=0; y < height; y++)
                 {
                     double oY = originOffset + (scale * y);
+                    // Set up ycX,ycY to make one circle as a function of y
                     double yTheta = ((double)y / (double)height) * (System.Math.PI * 2);
                     double ycX = originOffset + (scale * yRadius * System.Math.Sin(yTheta));
                     double ycY = originOffset + (scale * yRadius * System.Math.Cos(yTheta));
+
+                    // No wrapping, just yoink values at scaled coordinates
                     if (!(wrapX || wrapY))
                     {
-                        noiseField[x,y] = noise.Evaluate(oX, oY);
+                        // noiseField[x,y] = noise.Evaluate(oX, oY);
+                        for (int i=0;i<octaves;i++)
+                        {
+                            double offset = i * 1.5 * System.Math.Max(width, height) * scale;
+                            noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(oX + offset, oY + offset);
+                        }
+                        continue;
                     }
-                    else
+                    // Bi-axis wrapping requires two extra dimensions and circling through each
+                    if (wrapX && wrapY)
                     {
-                        if (wrapX && wrapY)
+                        for (int i=0;i<octaves;i++)
                         {
-                            for (int i=0;i<octaves;i++)
-                            {
-                                double offset = i * 1.5 * System.Math.Max(width, height) * scale;
-                                double a = cX + offset;
-                                double b = cY + offset;
-                                double c = ycX + offset;
-                                double d = ycY + offset;
-                                noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c, d);
-                            }
-                            continue;
+                            double offset = i * 1.5 * System.Math.Max(width, height) * scale;
+                            double a = cX + offset;
+                            double b = cY + offset;
+                            double c = ycX + offset;
+                            double d = ycY + offset;
+                            noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c, d);
                         }
-                        if (wrapY)
+                        // Skip the below tests, go to next loop iteration
+                        continue;
+                    }
+                    // Y wrapping as Y increments it instead traces a circle in a third dimension to match up its ends
+                    if (wrapY)
+                    {
+                        for (int i=0;i<octaves;i++)
                         {
-                            for (int i=0;i<octaves;i++)
-                            {
-                                double offset = i * 1.5 * System.Math.Max(width, height) * scale;
-                                double a = ycX + offset;
-                                double b = ycY + offset;
-                                double c = oX + offset;
-                                noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
-                            }
+                            double offset = i * 1.5 * System.Math.Max(width, height) * scale;
+                            double a = ycX + offset;
+                            double b = ycY + offset;
+                            double c = oX + offset;
+                            noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
                         }
-                        if (wrapX)
+                        continue;
+                    }
+                    // Similar to Y wrapping
+                    if (wrapX)
+                    {
+                        for (int i=0;i<octaves;i++)
                         {
-                            for (int i=0;i<octaves;i++)
-                            {
-                                double offset = i * 1.5 * System.Math.Max(width, height) * scale;
-                                double a = cX + offset;
-                                double b = cY + offset;
-                                double c = oY + offset;
-                                noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
-                            }
+                            double offset = i * 1.5 * System.Math.Max(width, height) * scale;
+                            double a = cX + offset;
+                            double b = cY + offset;
+                            double c = oY + offset;
+                            noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
                         }
                     }
                 }
             }
-            // temporarily shifting noiseField to make it easier to visually spot good/bad wrapping
-            double[,] testWrap = new double[width, height];
-            for(int x=0;x<width;x++)
-              for(int y=0;y<height;y++)
-                testWrap[x,y] = noiseField[((int)(0.9*width + x)%width), ((int)(0.9*height + y)%height)];
-
-            return testWrap;
             return noiseField;
         }
     }

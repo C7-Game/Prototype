@@ -17,9 +17,15 @@ public class NoiseTest : Node2D
     int Octaves;
     public override void _Ready()
     {
-        GD.Print(Width, Height);
+        double sum = 0, min = 0, max = 0;
+        int count = 0;
+        int countGtOne = 0;
+        int countLtNOne = 0;
+
         Position = new Vector2((Width/(float)2), Height/(float)2);
         double[,] tempNoiseField = C7GameData.GameMap.tempMapGenPrototyping(Width, Height, wrapX, wrapY);
+        min = tempNoiseField[0,0];
+        max = min;
 
         Image img = new Image();
         img.Create(Width, Height, false, Image.Format.L8);
@@ -27,9 +33,16 @@ public class NoiseTest : Node2D
         for (int x=0;x<Width;x++)
             for (int y=0;y<Height;y++)
             {
-                float foo = 1 + ((float)tempNoiseField[x,y] / 2);
-                foo = (float)tempNoiseField[x,y];
-                img.SetPixel(x,y,new Color(foo, foo, foo, 1));    
+                // The public domain OpenSimplex code seems to return between -0.5 and 0.5 with one octave
+                float foo = (float)(tempNoiseField[x,y]) + (float)0.5;
+                img.SetPixel(x,y,new Color(foo, foo, foo, 1));
+                sum += foo;
+                count++;
+                if (foo>max) max = foo;
+                if (foo<min) min = foo;
+                if (foo>1) countGtOne++;
+                if (foo<-1) countLtNOne++;
+
             }
         img.Unlock();
 
@@ -39,5 +52,10 @@ public class NoiseTest : Node2D
         noiseSprite.Texture = txt;
 
         txt.CreateFromImage(img);
+        GD.Print(sum/count);
+        GD.Print(max);
+        GD.Print(min);
+        GD.Print(countGtOne/(double)count);
+        GD.Print(countLtNOne/(double)count);
     }
 }

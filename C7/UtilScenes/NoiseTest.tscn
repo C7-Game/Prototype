@@ -6,6 +6,5 @@
 script = ExtResource( 1 )
 Width = 1024
 Height = 768
-wrapX = true
 Persistence = 0.5
 Octaves = 3
