@@ -57,23 +57,39 @@ namespace C7GameData
         // Actual fake-isometric map will have different shape, but for noise we'll go straight 2d matrix
         // NOTE: Apparently this OpenSimplex implementation doesn't do octaves, including persistance or lacunarity
         //  Might be able to implement them, use https://www.youtube.com/watch?v=MRNFcywkUSA&list=PLFt_AvWsXl0eBW2EiBtl_sxmDtSgZBxB3&index=4 as reference
-        public static double[,] tempMapGenPrototyping(int width=8, int height=8, bool wrapX = true, bool wrapY = false)
+        public static double[,] tempMapGenPrototyping(int width, int height, bool wrapX = true, bool wrapY = false)
         {
             // The public domain OpenSiplex implementation always
             //   seems to be 0 at 0,0, so let's offset from it.
             double originOffset = 10;
-            double multiplier = 0.06;
+            double multiplier = 0.07;
+            double theta = 0.0;
+            double incTheta = 1 / (width * System.Math.PI);
             OpenSimplexNoise noise = new OpenSimplexNoise();
             double[,] noiseField = new double[width, height];
 
             for (int x=0; x < width; x++)
             {
-                for (int y=0; y < height; y++ )
+                for (int y=0; y < height; y++, theta += incTheta)
                 {
-                    noiseField[x,y] = noise.Evaluate(originOffset + (multiplier * x), originOffset + (multiplier * y));
-                    System.Console.WriteLine(noiseField[x,y].ToString() + " ");
+                    if (wrapX || wrapY == false)
+                    {
+                        noiseField[x,y] = noise.Evaluate(originOffset + (multiplier * x), originOffset + (multiplier * y));
+                    }
+                    else
+                    {
+                        double cosTheta = System.Math.Cos(theta);
+                        double sinTheta = System.Math.Sin(theta);
+                        double cX = multiplier * x * cosTheta - y * sinTheta;
+                        double cY = multiplier * x * sinTheta + y * cosTheta;
+                        if (wrapX && wrapY) throw new System.ApplicationException("Wrapping both axes not yet implemented");
+                        if (wrapY) throw new System.ApplicationException("Wrapping both axes not yet implemented");
+                        if (wrapX)
+                        {
+                            noiseField[x,y] = noise.Evaluate(cX, cY, multiplier * y);
+                        }
+                    }
                 }
-                System.Console.WriteLine("");
             }
             return noiseField;
         }
