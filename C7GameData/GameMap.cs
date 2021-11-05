@@ -65,7 +65,8 @@ namespace C7GameData
             //   seems to be 0 at 0,0, so let's offset from it.
             double originOffset = 0;
             double scale = 0.06;
-            double radius = (double)width / (System.Math.PI * 2);
+            double xRadius = (double)width / (System.Math.PI * 2);
+            double yRadius = (double)height / (System.Math.PI * 2);
             OpenSimplexNoise noise = new OpenSimplexNoise();
             double[,] noiseField = new double[width, height];
 
@@ -73,11 +74,14 @@ namespace C7GameData
             {
                 double theta = ((double)x / (double)width) * (System.Math.PI * 2);
                 double oX = originOffset + (scale * x);
-                double cX = originOffset + (scale * radius * System.Math.Sin(theta));
-                double cY = originOffset + (scale * radius * System.Math.Cos(theta));
+                double cX = originOffset + (scale * xRadius * System.Math.Sin(theta));
+                double cY = originOffset + (scale * xRadius * System.Math.Cos(theta));
                 for (int y=0; y < height; y++)
                 {
                     double oY = originOffset + (scale * y);
+                    double yTheta = ((double)y / (double)height) * (System.Math.PI * 2);
+                    double ycX = originOffset + (scale * yRadius * System.Math.Sin(yTheta));
+                    double ycY = originOffset + (scale * yRadius * System.Math.Cos(yTheta));
                     if (!(wrapX || wrapY))
                     {
                         noiseField[x,y] = noise.Evaluate(oX, oY);
@@ -91,7 +95,14 @@ namespace C7GameData
                         }
                         if (wrapY)
                         {
-                            throw new System.ApplicationException("Wrapping Y axis not yet implemented");
+                            for (int i=0;i<octaves;i++)
+                            {
+                                double offset = i * 1.5 * System.Math.Max(width, height) * scale;
+                                double a = ycX + offset;
+                                double b = ycY + offset;
+                                double c = oX + offset;
+                                noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
+                            }
                         }
                         if (wrapX)
                         {
@@ -107,6 +118,7 @@ namespace C7GameData
                     }
                 }
             }
+            // temporarily shifting noiseField to make it easier to visually spot good/bad wrapping
             double[,] testWrap = new double[width, height];
             for(int x=0;x<width;x++)
               for(int y=0;y<height;y++)
