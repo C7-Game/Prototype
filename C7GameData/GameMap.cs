@@ -63,8 +63,9 @@ namespace C7GameData
             double persistence = 0.5;
             // The public domain OpenSiplex implementation always
             //   seems to be 0 at 0,0, so let's offset from it.
-            double originOffset = 10;
-            double scale = 0.5;
+            double originOffset = 0;
+            double scale = 0.06;
+            double radius = (double)width / (System.Math.PI * 2);
             OpenSimplexNoise noise = new OpenSimplexNoise();
             double[,] noiseField = new double[width, height];
 
@@ -75,10 +76,10 @@ namespace C7GameData
                 // double cosTheta = System.Math.Cos(theta);
                 // double sinTheta = System.Math.Sin(theta);
                 double oX = originOffset + (scale * x);
-                double cX = originOffset + (scale * System.Math.Sin(theta));
-                double cY = originOffset + (scale * System.Math.Cos(theta));
-                System.Console.WriteLine(cX.ToString("F8"));
-                System.Console.WriteLine(cY.ToString("F8"));
+                double cX = originOffset + (scale * radius * System.Math.Sin(theta));
+                double cY = originOffset + (scale * radius * System.Math.Cos(theta));
+                System.Console.WriteLine((cX/scale).ToString("F8"));
+                System.Console.WriteLine((cY/scale).ToString("F8"));
                 System.Console.WriteLine("");
                 for (int y=0; y < height; y++)
                 {
@@ -114,6 +115,10 @@ namespace C7GameData
                                 double c = oY + offset;
                                 noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
                             }
+                            // test makes circle as expected at scale 1
+                            // but not in the position I expect...hmm
+                            // noiseField[(int)(cX*40)+(width/2),(int)(cY*40)+(height/2)] = 1;
+
                         }
                     }
                 }
