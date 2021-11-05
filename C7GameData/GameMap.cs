@@ -22,6 +22,7 @@ namespace C7GameData
          **/
         public static GameMap generateDummyGameMap()
         {
+            tempMapGenPrototyping();
             TerrainType grassland = new TerrainType();
             grassland.name = "Grassland";
             grassland.baseFoodProduction = 2;
@@ -53,6 +54,13 @@ namespace C7GameData
             }
             return dummyMap;
         }
-
+        public static void tempMapGenPrototyping()
+        {
+            OpenSimplexNoise noise = new OpenSimplexNoise(5248754);
+            System.Console.WriteLine(noise.Evaluate(0,0));
+            System.Console.WriteLine(noise.Evaluate(0,1));
+            System.Console.WriteLine(noise.Evaluate(1,0));
+            System.Console.WriteLine(noise.Evaluate(1,1));
+        }
     }
 }
