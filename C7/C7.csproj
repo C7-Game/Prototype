@@ -8,4 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\QueryCiv3\QueryCiv3.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\C7Engine\C7Engine.csproj" />
+  </ItemGroup>
 </Project>

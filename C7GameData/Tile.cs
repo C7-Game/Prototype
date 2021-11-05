@@ -1,10 +1,11 @@
 namespace C7GameData
 {
+    using System.Collections.Generic;
     public class Tile
     {
-        int xCoordinate;
-        int yCoordinate;
-        TerrainType terrainType;
+        public int xCoordinate;
+        public int yCoordinate;
+        public TerrainType terrainType;
 
         //One thing to decide is do we want to have a tile have a list of units on it,
         //or a unit have reference to the tile it is on, or both?
@@ -12,6 +13,11 @@ namespace C7GameData
         //of memory for pointers), but I'm inclined to go with both since it makes it easy and
         //efficient to perform calculations, whether you need to know which unit on a tile
         //has the best defense, or which tile a unit is on when viewing the Military Advisor.
-        Array<MapUnit> unitsOnTile;
+        public List<MapUnit> unitsOnTile;
+
+        public Tile()
+        {
+            unitsOnTile = new List<MapUnit>();
+        }
     }
 }

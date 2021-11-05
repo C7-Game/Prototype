@@ -6,10 +6,13 @@ namespace C7GameData
      **/
     public class UnitPrototype
     {
-        string name;
-        int attack;
-        int defense;
-        int movement;
+        public string name {get; set;}
+        public int attack {get; set;}
+        public int defense {get; set;}
+        public int movement {get; set;}
+
+        public bool canFoundCity {get; set;}
+        public bool canBuildRoads {get; set;}  //eventually there will be real worker tasks, for now let's just have one basic one.
 
         //probably some things like graphics and whether it's a helicopter someday
     }

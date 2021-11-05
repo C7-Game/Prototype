@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections;
 using ConvertCiv3Media;
+using C7Engine;
 
 public class Game : Node2D
 {
@@ -72,6 +73,9 @@ public class Game : Node2D
 		catch {
 			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
 		}
+		
+		CreateGame.createGame();
+		
 		GD.Print("Now in game!");
 	}
 
