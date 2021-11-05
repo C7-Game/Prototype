@@ -63,7 +63,7 @@ namespace C7GameData
             double persistence = 0.5;
             // The public domain OpenSiplex implementation always
             //   seems to be 0 at 0,0, so let's offset from it.
-            double originOffset = 0;
+            double originOffset = 10;
             double scale = 0.06;
             double xRadius = (double)width / (System.Math.PI * 2);
             double yRadius = (double)height / (System.Math.PI * 2);
@@ -90,7 +90,15 @@ namespace C7GameData
                     {
                         if (wrapX && wrapY)
                         {
-                            throw new System.ApplicationException("Wrapping both axes not yet implemented");
+                            for (int i=0;i<octaves;i++)
+                            {
+                                double offset = i * 1.5 * System.Math.Max(width, height) * scale;
+                                double a = cX + offset;
+                                double b = cY + offset;
+                                double c = ycX + offset;
+                                double d = ycY + offset;
+                                noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c, d);
+                            }
                             continue;
                         }
                         if (wrapY)
