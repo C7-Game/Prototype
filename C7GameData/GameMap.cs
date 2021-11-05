@@ -59,6 +59,8 @@ namespace C7GameData
         //  Might be able to implement them, use https://www.youtube.com/watch?v=MRNFcywkUSA&list=PLFt_AvWsXl0eBW2EiBtl_sxmDtSgZBxB3&index=4 as reference
         public static double[,] tempMapGenPrototyping(int width, int height, bool wrapX = true, bool wrapY = false)
         {
+            int octaves = 3;
+            double persistence = 0.5;
             // The public domain OpenSiplex implementation always
             //   seems to be 0 at 0,0, so let's offset from it.
             double originOffset = 10;
@@ -104,7 +106,14 @@ namespace C7GameData
                         }
                         if (wrapX)
                         {
-                            noiseField[x,y] = noise.Evaluate(cX, cY, oY);
+                            for (int i=0;i<octaves;i++)
+                            {
+                                double offset = i * 1.5 * System.Math.Max(width, height) * scale;
+                                double a = cX + offset;
+                                double b = cY + offset;
+                                double c = oY + offset;
+                                noiseField[x,y] += (octaves - i) * persistence * noise.Evaluate(a, b, c);
+                            }
                         }
                     }
                 }
