@@ -62,31 +62,44 @@ namespace C7GameData
             // The public domain OpenSiplex implementation always
             //   seems to be 0 at 0,0, so let's offset from it.
             double originOffset = 10;
-            double multiplier = 0.07;
-            double theta = 0.0;
+            double multiplier = 1;
             double incTheta = 1 / (width * System.Math.PI);
             OpenSimplexNoise noise = new OpenSimplexNoise();
             double[,] noiseField = new double[width, height];
 
             for (int x=0; x < width; x++)
             {
-                for (int y=0; y < height; y++, theta += incTheta)
+                for (int y=0; y < height; y++)
                 {
-                    if (wrapX || wrapY == false)
+                    double oX = originOffset + (multiplier * x);
+                    double oY = originOffset + (multiplier * y);
+                    if (!(wrapX || wrapY))
                     {
-                        noiseField[x,y] = noise.Evaluate(originOffset + (multiplier * x), originOffset + (multiplier * y));
+                        // noiseField[x,y] = noise.Evaluate(originOffset + (multiplier * x), originOffset + (multiplier * y));
+                        noiseField[x,y] = noise.Evaluate(oX, oY);
                     }
                     else
                     {
+                        double theta = x * incTheta;
                         double cosTheta = System.Math.Cos(theta);
                         double sinTheta = System.Math.Sin(theta);
-                        double cX = multiplier * x * cosTheta - y * sinTheta;
-                        double cY = multiplier * x * sinTheta + y * cosTheta;
-                        if (wrapX && wrapY) throw new System.ApplicationException("Wrapping both axes not yet implemented");
-                        if (wrapY) throw new System.ApplicationException("Wrapping both axes not yet implemented");
+                        double cX = ((oX * cosTheta) - (oY * sinTheta));
+                        double cY = ((oX * sinTheta) + (oY * cosTheta));
+                        // double cX = ((x * cosTheta) - (y * sinTheta));
+                        // double cY = ((x * sinTheta) + (y * cosTheta));
+                        if (wrapX && wrapY)
+                        {
+                            throw new System.ApplicationException("Wrapping both axes not yet implemented");
+                        }
+                        if (wrapY)
+                        {
+                            throw new System.ApplicationException("Wrapping Y axis not yet implemented");
+                            // noiseField[x,y] = noise.Evaluate(cX, cY, oY);
+                        }
                         if (wrapX)
                         {
-                            noiseField[x,y] = noise.Evaluate(cX, cY, multiplier * y);
+                            noiseField[x,y] = noise.Evaluate(cX, cY, oX);
+                            // noiseField[x,y] = noise.Evaluate(x, y, x);
                         }
                     }
                 }
