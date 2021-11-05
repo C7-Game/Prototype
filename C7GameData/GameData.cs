@@ -65,6 +65,10 @@ namespace C7GameData
             mapWorker.location = map.tiles[168];
             mapUnits.Add(mapWorker);
 
+            mapSettler.movementPointsRemaining = 1;
+            mapWarrior.movementPointsRemaining = 1;
+            mapWorker.movementPointsRemaining = 1;
+
             //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
         }
     }

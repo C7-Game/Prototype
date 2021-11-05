@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://UIElements/MenuButton.cs" type="Script" id=4]
 [ext_resource path="res://UIElements/CivilopediaButton.cs" type="Script" id=5]
 [ext_resource path="res://UIElements/AdvisorButton.cs" type="Script" id=6]
+[ext_resource path="res://GameStatus.cs" type="Script" id=7]
 [ext_resource path="res://UIElements/RenameButton.cs" type="Script" id=8]
 [ext_resource path="res://UIElements/AutomateButton.cs" type="Script" id=9]
 [ext_resource path="res://UIElements/UnitButtons.cs" type="Script" id=12]
@@ -22,6 +23,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -40.0
 margin_top = -40.0
+script = ExtResource( 7 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -207,6 +209,7 @@ alignment = 1
 anchor_mode = 0
 current = true
 
+[connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/GameStatus" method="OnNewUnitSelected"]
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]

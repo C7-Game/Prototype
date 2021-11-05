@@ -3,13 +3,15 @@ using System;
 using System.Collections;
 using ConvertCiv3Media;
 using C7Engine;
+using C7GameData;
 
 public class Game : Node2D
 {
 	[Signal] public delegate void TurnStarted();
 	[Signal] public delegate void TurnEnded();
 	[Signal] public delegate void ShowSpecificAdvisor();
-
+	[Signal] public delegate void NewAutoselectedUnit();
+	
 	enum GameState {
 		PreGame,
 		PlayerTurn,
@@ -254,6 +256,11 @@ public class Game : Node2D
 		EmitSignal(nameof(TurnStarted));
 		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
+
+		//Set the selected unit in the lower right, via an event
+		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
+		GD.Print("The engine says the selected unit is a " + SelectedUnit.unitType.name);
+		EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
 
 		//Set a timer so the end turn button starts blinking after awhile.
 		//Obviously once we have more game mechanics, it won't happen automatically
