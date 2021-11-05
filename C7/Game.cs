@@ -133,12 +133,12 @@ public class Game : Node2D
 
 		MapView.GlobalPosition = new Vector2(-cameraResidueX, -cameraResidueY);
 
-		// The Offset of 2 is to provide a margin
-		int mapViewWidth  = 2 + (int)(OS.WindowSize.x / (MapView.Scale.x * MapView.CellSize.x));
-		int mapViewHeight = 2 + (int)(OS.WindowSize.y / (MapView.Scale.y * MapView.CellSize.y));
+		// The offset of 4 is to ensure the bottom and right edges of the screen are covered
+		int mapViewWidth  = 4 + (int)(OS.WindowSize.x / (MapView.Scale.x * MapView.CellSize.x));
+		int mapViewHeight = 4 + (int)(OS.WindowSize.y / (MapView.Scale.y * MapView.CellSize.y));
 
 		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
-		// loops start at -3 and -6 to provide a margin on the left and top, respectively
+		// loops start at -3 and -6 to ensure the left and top (respectively) edges of the screen are covered
 		for (int dy = -6; dy < mapViewHeight; dy++) {
 			for (int dx = -3 - (dy%2); dx < mapViewWidth; dx+=2) {
 				int x = cameraTileX + dx, y = cameraTileY + dy;
