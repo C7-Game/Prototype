@@ -62,34 +62,40 @@ namespace C7GameData
             // The public domain OpenSiplex implementation always
             //   seems to be 0 at 0,0, so let's offset from it.
             double originOffset = 10;
-            double multiplier = 1;
-            double incTheta = 1 / (width * System.Math.PI);
+            double scale = 0.5;
             OpenSimplexNoise noise = new OpenSimplexNoise();
             double[,] noiseField = new double[width, height];
 
             for (int x=0; x < width; x++)
             {
+                double theta = ((double)x / (double)width) * (System.Math.PI * 2);
+                // System.Console.WriteLine(theta.ToString("F8"));
+                // double cosTheta = System.Math.Cos(theta);
+                // double sinTheta = System.Math.Sin(theta);
+                double oX = originOffset + (scale * x);
+                double cX = originOffset + (scale * System.Math.Sin(theta));
+                double cY = originOffset + (scale * System.Math.Cos(theta));
+                System.Console.WriteLine(cX.ToString("F8"));
+                System.Console.WriteLine(cY.ToString("F8"));
+                System.Console.WriteLine("");
                 for (int y=0; y < height; y++)
                 {
-                    double oX = originOffset + (multiplier * x);
-                    double oY = originOffset + (multiplier * y);
+                    double oY = originOffset + (scale * y);
                     if (!(wrapX || wrapY))
                     {
-                        // noiseField[x,y] = noise.Evaluate(originOffset + (multiplier * x), originOffset + (multiplier * y));
+                        // noiseField[x,y] = noise.Evaluate(originOffset + (scale * x), originOffset + (scale * y));
                         noiseField[x,y] = noise.Evaluate(oX, oY);
                     }
                     else
                     {
-                        double theta = x * incTheta;
-                        double cosTheta = System.Math.Cos(theta);
-                        double sinTheta = System.Math.Sin(theta);
-                        double cX = ((oX * cosTheta) - (oY * sinTheta));
-                        double cY = ((oX * sinTheta) + (oY * cosTheta));
+                        // double cX = ((oX * cosTheta) - (oY * sinTheta));
+                        // double cY = ((oX * sinTheta) + (oY * cosTheta));
                         // double cX = ((x * cosTheta) - (y * sinTheta));
                         // double cY = ((x * sinTheta) + (y * cosTheta));
                         if (wrapX && wrapY)
                         {
                             throw new System.ApplicationException("Wrapping both axes not yet implemented");
+                            continue;
                         }
                         if (wrapY)
                         {
@@ -98,12 +104,17 @@ namespace C7GameData
                         }
                         if (wrapX)
                         {
-                            noiseField[x,y] = noise.Evaluate(cX, cY, oX);
-                            // noiseField[x,y] = noise.Evaluate(x, y, x);
+                            noiseField[x,y] = noise.Evaluate(cX, cY, oY);
                         }
                     }
                 }
             }
+            double[,] testWrap = new double[width, height];
+            for(int x=0;x<width;x++)
+              for(int y=0;y<height;y++)
+                testWrap[x,y] = noiseField[((int)(0.9*width + x)%width), ((int)(0.9*height + y)%height)];
+
+            return testWrap;
             return noiseField;
         }
     }
