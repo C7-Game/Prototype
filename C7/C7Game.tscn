@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://UIElements/AutomateButton.cs" type="Script" id=9]
 [ext_resource path="res://UIElements/GoToButton.cs" type="Script" id=10]
 [ext_resource path="res://UIElements/FortifyButton.cs" type="Script" id=11]
+[ext_resource path="res://UIElements/UnitButtons.cs" type="Script" id=12]
 
 [node name="C7Game" type="Node2D"]
 script = ExtResource( 1 )
@@ -176,46 +177,40 @@ anchor_right = 0.5
 anchor_bottom = 1.0
 margin_top = -112.0
 size_flags_vertical = 0
+custom_constants/separation = 0
+script = ExtResource( 12 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
-margin_right = 8.0
+[node name="AdvancedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
 size_flags_vertical = 0
-
-[node name="RenameButton" type="TextureButton" parent="CanvasLayer/UnitButtons/HBoxContainer"]
-script = ExtResource( 8 )
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
-anchor_top = 1.0
-anchor_bottom = 1.0
-margin_top = 4.0
-margin_right = 8.0
-margin_bottom = 4.0
-size_flags_vertical = 0
-
-[node name="AutomateButton" type="TextureButton" parent="CanvasLayer/UnitButtons/HBoxContainer2"]
-script = ExtResource( 9 )
-
-[node name="MainUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
-margin_top = 8.0
-margin_right = 8.0
-margin_bottom = 8.0
-size_flags_vertical = 0
+custom_constants/separation = 0
 alignment = 1
 
-[node name="WaitButton" type="TextureButton" parent="CanvasLayer/UnitButtons/MainUnitControls"]
+[node name="RenameButton" type="TextureButton" parent="CanvasLayer/UnitButtons/AdvancedUnitControls"]
+script = ExtResource( 8 )
+
+[node name="SpecializedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
+size_flags_vertical = 0
+custom_constants/separation = 0
+alignment = 1
+
+[node name="AutomateButton" type="TextureButton" parent="CanvasLayer/UnitButtons/SpecializedUnitControls"]
+script = ExtResource( 9 )
+
+[node name="PrimaryUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
+size_flags_vertical = 0
+custom_constants/separation = 0
+alignment = 1
+
+[node name="WaitButton" type="TextureButton" parent="CanvasLayer/UnitButtons/PrimaryUnitControls"]
 script = ExtResource( 7 )
 
-[node name="FortifyButton" type="TextureButton" parent="CanvasLayer/UnitButtons/MainUnitControls"]
-margin_left = 4.0
-margin_right = 4.0
+[node name="FortifyButton" type="TextureButton" parent="CanvasLayer/UnitButtons/PrimaryUnitControls"]
 script = ExtResource( 11 )
 
-[node name="GoToButton" type="TextureButton" parent="CanvasLayer/UnitButtons/MainUnitControls"]
-margin_left = 8.0
-margin_right = 8.0
+[node name="GoToButton" type="TextureButton" parent="CanvasLayer/UnitButtons/PrimaryUnitControls"]
 script = ExtResource( 10 )
 
 [node name="KinematicBody2D" type="KinematicBody2D" parent="."]
