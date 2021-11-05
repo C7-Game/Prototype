@@ -307,14 +307,43 @@ public class Game : Node2D
 
 	public void _on_Zoom_value_changed(float value)
 	{
-		Vector2 NewScale = new Vector2(value, value);
-		MapView.Scale = NewScale;
-		RefillMapView();
+		// Zoom centered on the middle of the window
+		SetCameraZoom(value, OS.WindowSize / 2);
 	}
 
 	public void _OnViewportSizeChanged()
 	{
 		RefillMapView();
+	}
+
+	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
+	// same after the zoom level is changed, and if center is screenSize/2, the tile in the center of the window won't change.
+	// This function does not adjust the zoom slider, so to keep the slider in sync with the actual zoom level, use AdjustZoomSlider. This
+	// function must be separate, though, so that we can change the zoom level inside that callback without entering an infinite loop.
+	private void SetCameraZoom(float newScale, Vector2 center)
+	{
+		Vector2 v2NewScale = new Vector2(newScale, newScale);
+		Vector2 oldScale = MapView.Scale;
+		if (v2NewScale != oldScale) {
+			MapView.Scale = v2NewScale;
+			cameraLocation = (v2NewScale / oldScale) * (cameraLocation + center) - center;
+			RefillMapView();
+		}
+	}
+
+	public void AdjustZoomSlider(int numSteps, Vector2 zoomCenter)
+	{
+		HSlider slider = GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom");
+		double newScale = slider.Value + slider.Step * (double)numSteps;
+		if (newScale < slider.MinValue)
+			newScale = slider.MinValue;
+		else if (newScale > slider.MaxValue)
+			newScale = slider.MaxValue;
+
+		// Note we must set the camera zoom before setting the new slider value since setting the value will trigger the callback which will
+		// adjust the zoom around a center we don't want.
+		SetCameraZoom((float)newScale, zoomCenter);
+		slider.Value = newScale;
 	}
 
 	public void MoveCamera(Vector2 offset)
@@ -362,12 +391,12 @@ public class Game : Node2D
 			else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelUp)
 			{
 				GetTree().SetInputAsHandled();
-				GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value += (float)0.1;
+				AdjustZoomSlider(1, GetViewport().GetMousePosition());
 			}
 			else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelDown)
 			{
 				GetTree().SetInputAsHandled();
-				GetNode<HSlider>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer/Zoom").Value -= (float)0.1;
+				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
 			}
 		}
 		else if(@event is InputEventMouseMotion eventMouseMotion)
