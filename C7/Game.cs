@@ -32,13 +32,10 @@ public class Game : Node2D
 	GameState CurrentState = GameState.PreGame;
 	Button EndTurnButton;
 	Control Toolbar;
-	Timer endTurnAlertTimer;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
 	private KinematicBody2D Player;
 	
-	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
-
 	public bool IsInRange(int x, int y)
 	{
 		bool xInRange = mapWrapHorizontally || ((x >= 0) && (x < mapWidth));
@@ -111,7 +108,7 @@ public class Game : Node2D
 		GD.Print("Game starting");
 		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
 		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
-		Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
+		// Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
 		OnPlayerStartTurn();
 	}
 
@@ -225,17 +222,6 @@ public class Game : Node2D
 		Toolbar.AddChild(EndTurnButton);
 		Toolbar.MoveChild(EndTurnButton, 0);
 		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
-
-		AddLowerRightBox();
-	}
-	private void AddLowerRightBox()
-	{
-		MarginContainer GameStatus = GetNode<MarginContainer>("CanvasLayer/GameStatus");
-		//294 x 137 are the dimensions of the right info box.
-		// LowerRightInfoBox.Position = (new Vector2(OS.WindowSize.x - (294 + 5), OS.WindowSize.y - (137 + 1)));
-		GameStatus.MarginLeft = -(294 + 5);
-		GameStatus.MarginTop = -(137 + 1);
-		GameStatus.AddChild(LowerRightInfoBox);
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -261,16 +247,6 @@ public class Game : Node2D
 		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
 		GD.Print("The engine says the selected unit is a " + SelectedUnit.unitType.name);
 		EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
-
-		//Set a timer so the end turn button starts blinking after awhile.
-		//Obviously once we have more game mechanics, it won't happen automatically
-		//after 5 seconds.
-		endTurnAlertTimer = new Timer();
-		endTurnAlertTimer.WaitTime = 5.0f;
-		endTurnAlertTimer.OneShot = true;
-		endTurnAlertTimer.Connect("timeout", LowerRightInfoBox, "toggleEndTurnButton");
-		AddChild(endTurnAlertTimer);
-		endTurnAlertTimer.Start();
 	}
 
 	private void OnPlayerEndTurn()
@@ -278,8 +254,8 @@ public class Game : Node2D
 		if (CurrentState == GameState.PlayerTurn)
 		{
 			GD.Print("Ending player turn");
-			LowerRightInfoBox.StopToggling();
 			EndTurnButton.Disabled = true;
+			EmitSignal(nameof(TurnEnded));
 			OnComputerStartTurn();
 		}
 	}
