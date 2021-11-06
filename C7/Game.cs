@@ -448,4 +448,8 @@ public class Game : Node2D
 		}
 	}
 
+	private void UnitButtonPressed(string buttonName)
+	{
+		GD.Print("The " + buttonName + " button was pressed");
+	}
 }
