@@ -93,14 +93,16 @@ public class MapView : Node2D {
 
 		GlobalPosition = new Vector2(-cameraResidueX, -cameraResidueY);
 
+		// Normally we want to use the viewport size here but GetViewport() returns null when this function gets called for the first time
+		// during new game setup so in that case use the window size.
+		Vector2 screenSize = (GetViewport() != null) ? GetViewport().Size : OS.WindowSize;
 		// The offset of 4 is to ensure the bottom and right edges of the screen are covered
-		int mapViewWidth  = 4 + (int)(OS.WindowSize.x / (Scale.x * tileSize.x));
-		int mapViewHeight = 4 + (int)(OS.WindowSize.y / (Scale.y * tileSize.y));
+		Vector2 mapViewSize = new Vector2(4, 4) + screenSize / (Scale * tileSize);
 
 		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
 		// loops start at -3 and -6 to ensure the left and top (respectively) edges of the screen are covered
-		for (int dy = -6; dy < mapViewHeight; dy++) {
-			for (int dx = -3 - (dy%2); dx < mapViewWidth; dx+=2) {
+		for (int dy = -6; dy < mapViewSize.y; dy++) {
+			for (int dx = -3 - (dy%2); dx < mapViewSize.x; dx+=2) {
 				int x = cameraTileX + dx, y = cameraTileY + dy;
 				if (isInBounds(x, y)) {
 					terrainView.SetCell(dx, dy, terrain[wrapTileX(x), wrapTileY(y)]);
