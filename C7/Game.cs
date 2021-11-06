@@ -38,9 +38,7 @@ public class Game : Node2D
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
 		this.TerrainAsTileMap();
-		mapView.setCameraZoom((float)0.3, new Vector2(0, 0));
-		// MapView.Scale = new Vector2((float)0.3, (float)0.3);
-		// RefillMapView(); // Reset view after setting scale
+		mapView.cameraZoom = (float)0.3;
 		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
@@ -234,8 +232,7 @@ public class Game : Node2D
 
 	public void _on_Zoom_value_changed(float value)
 	{
-		// Zoom centered on the middle of the window
-		mapView.setCameraZoom(value, GetViewport().Size / 2);
+		mapView.setCameraZoomFromMiddle(value);
 	}
 
 	public void _OnViewportSizeChanged()
@@ -260,19 +257,19 @@ public class Game : Node2D
 
 	public void _on_RightButton_pressed()
 	{
-		mapView.moveCamera(new Vector2(128, 0));
+		mapView.cameraLocation += new Vector2(128, 0);
 	}
 	public void _on_LeftButton_pressed()
 	{
-		mapView.moveCamera(new Vector2(-128, 0));
+		mapView.cameraLocation += new Vector2(-128, 0);
 	}
 	public void _on_UpButton_pressed()
 	{
-		mapView.moveCamera(new Vector2(0, -64));
+		mapView.cameraLocation += new Vector2(0, -64);
 	}
 	public void _on_DownButton_pressed()
 	{
-		mapView.moveCamera(new Vector2(0, 64));
+		mapView.cameraLocation += new Vector2(0, 64);
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -310,7 +307,7 @@ public class Game : Node2D
 			if(IsMovingCamera)
 			{
 				GetTree().SetInputAsHandled();
-				mapView.moveCamera((OldPosition - eventMouseMotion.Position) / Scale);
+				mapView.cameraLocation += OldPosition - eventMouseMotion.Position;
 				OldPosition = eventMouseMotion.Position;
 			}
 		}

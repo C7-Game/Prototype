@@ -2,16 +2,29 @@ using System.Collections;
 using Godot;
 using ConvertCiv3Media;
 
-public class MapView : Node2D
-{
+public class MapView : Node2D {
 	public static readonly Vector2 tileSize = new Vector2(64, 32);
 
-	// TODO: Getters and setters (where appropriate) for these.
-	private int[,] terrain;
-	private int mapWidth, mapHeight;
-	private bool wrapHorizontally, wrapVertically;
-	private Vector2 cameraLocation = new Vector2(0, 0);
+	public int mapWidth  { get; private set; }
+	public int mapHeight { get; private set; }
+	public bool wrapHorizontally { get; private set; }
+	public bool wrapVertically   { get; private set; }
 
+	private Vector2 internalCameraLocation = new Vector2(0, 0);
+	public Vector2 cameraLocation {
+		get {
+			return internalCameraLocation;
+		}
+		set {
+			setCameraLocation(value);
+		}
+	}
+	public float cameraZoom {
+		get { return Scale.x; } // x and y are the same
+		set { setCameraZoomFromMiddle(value); }
+	}
+
+	private int[,] terrain;
 	private TileMap terrainView;
 	private TileSet terrainSet;
 
@@ -111,6 +124,12 @@ public class MapView : Node2D
 		}
 	}
 
+	// Zooms in or out centered on the middle of the screen
+	public void setCameraZoomFromMiddle(float newScale)
+	{
+		setCameraZoom(newScale, GetViewport().Size / 2);
+	}
+
 	public void moveCamera(Vector2 offset)
 	{
 		setCameraLocation(cameraLocation + offset);
@@ -118,16 +137,15 @@ public class MapView : Node2D
 
 	public void setCameraLocation(Vector2 location)
 	{
-		cameraLocation = location;
-
 		// Prevent the camera from moving beyond an unwrapped edge of the map. One complication here is that the viewport might actually be
 		// larger than the map (if we're zoomed far out) so in that case we must apply the constraint the other way around, i.e. constrain the
 		// map to the viewport rather than the viewport to the map.
 		// TODO: Not quite perfect. When you zoom out you can still move the map a bit off the right/bottom edges.
 		Vector2 viewportSize = GetViewport().Size;
 		Vector2 mapPixelSize = Scale * (new Vector2(tileSize.x * (mapWidth + 1), tileSize.y * (mapHeight + 1)));
-		if (! wrapHorizontally) {
-			float leftLim, rightLim; {
+		if (!wrapHorizontally) {
+			float leftLim, rightLim;
+			{
 				if (mapPixelSize.x >= viewportSize.x) {
 					leftLim = 0;
 					rightLim = mapPixelSize.x - viewportSize.x;
@@ -136,16 +154,17 @@ public class MapView : Node2D
 					rightLim = 0;
 				}
 			}
-			if (cameraLocation.x < leftLim)
-				cameraLocation.x = leftLim;
-			else if (cameraLocation.x > rightLim)
-				cameraLocation.x = rightLim;
+			if (location.x < leftLim)
+				location.x = leftLim;
+			else if (location.x > rightLim)
+				location.x = rightLim;
 		}
-		if (! wrapVertically) {
+		if (!wrapVertically) {
 			// These margins allow the player to move the camera that far off those map edges so that the UI controls don't cover up the
 			// map. TODO: These values should be read from the sizes of the UI elements instead of hardcoded.
 			float topMargin = 70, bottomMargin = 140;
-			float topLim, bottomLim; {
+			float topLim, bottomLim;
+			{
 				if (mapPixelSize.y >= viewportSize.y) {
 					topLim = -topMargin;
 					bottomLim = mapPixelSize.y - viewportSize.y + bottomMargin;
@@ -154,14 +173,14 @@ public class MapView : Node2D
 					bottomLim = 0;
 				}
 			}
-			if (cameraLocation.y < topLim)
-				cameraLocation.y = topLim;
-			else if (cameraLocation.y > bottomLim)
-				cameraLocation.y = bottomLim;
+			if (location.y < topLim)
+				location.y = topLim;
+			else if (location.y > bottomLim)
+				location.y = bottomLim;
 		}
 
+		internalCameraLocation = location;
 		resetVisibleTiles();
 	}
-
 
 }
