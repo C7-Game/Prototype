@@ -18,15 +18,10 @@ public class Game : Node2D
 		ComputerTurn
 	}
 
-	public static readonly Vector2 tileSize = new Vector2(64, 32); // TODO: These should be integer values
 
-	bool mapWrapHorizontally = false, mapWrapVertically = false;
-	int mapWidth = 80, mapHeight = 80;
 	int[,] Map;
 
-	// cameraLocation stores the upper left pixel coordinates on the map of the area currently being viewed.
-	Vector2 cameraLocation = new Vector2(0, 0);
-	private TileMap MapView;
+	private MapView mapView;
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
@@ -36,25 +31,6 @@ public class Game : Node2D
 	private Vector2 OldPosition;
 	private KinematicBody2D Player;
 	
-	public bool IsInRange(int x, int y)
-	{
-		bool xInRange = mapWrapHorizontally || ((x >= 0) && (x < mapWidth));
-		bool yInRange = mapWrapVertically   || ((y >= 0) && (y < mapHeight));
-		return xInRange && yInRange;
-	}
-
-	public int WrapTileX(int x)
-	{
-		int tr = x % mapWidth;
-		return (tr >= 0) ? tr : tr + mapWidth;
-	}
-
-	public int WrapTileY(int y)
-	{
-		int tr = y % mapHeight;
-		return (tr >= 0) ? tr : tr + mapHeight;
-	}
-
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -62,8 +38,7 @@ public class Game : Node2D
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
 		this.TerrainAsTileMap();
-		MapView.Scale = new Vector2((float)0.3, (float)0.3);
-		RefillMapView(); // Reset view after setting scale
+		mapView.cameraZoom = (float)0.3;
 		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
@@ -112,53 +87,10 @@ public class Game : Node2D
 		OnPlayerStartTurn();
 	}
 
-	public void RefillMapView()
-	{
-		MapView.Clear();
-
-		// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire
-		// screen. For small movements, the MapView itself is moved (amount is in cameraResidueX/Y) but once the movement equals an entire
-		// grid cell (2 times the tile width or height) the map is snapped back toward the origin by that amount and to compensate it changes
-		// what tiles are drawn (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around
-		// wrapped edges.
-
-		Vector2 tileFullSize = 2 * MapView.Scale * tileSize;
-
-		int cameraPixelX = (int)cameraLocation.x;
-		int fullTilesX = cameraPixelX / (int)tileFullSize.x;
-		int cameraTileX = 2 * fullTilesX;
-		int cameraResidueX = cameraPixelX - fullTilesX * (int)tileFullSize.x;
-
-		int cameraPixelY = (int)cameraLocation.y;
-		int fullTilesY = cameraPixelY / (int)tileFullSize.y;
-		int cameraTileY = 2 * fullTilesY;
-		int cameraResidueY = cameraPixelY - fullTilesY * (int)tileFullSize.y;
-
-		MapView.GlobalPosition = new Vector2(-cameraResidueX, -cameraResidueY);
-
-		// The offset of 4 is to ensure the bottom and right edges of the screen are covered
-		int mapViewWidth  = 4 + (int)(OS.WindowSize.x / (MapView.Scale.x * MapView.CellSize.x));
-		int mapViewHeight = 4 + (int)(OS.WindowSize.y / (MapView.Scale.y * MapView.CellSize.y));
-
-		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
-		// loops start at -3 and -6 to ensure the left and top (respectively) edges of the screen are covered
-		for (int dy = -6; dy < mapViewHeight; dy++) {
-			for (int dx = -3 - (dy%2); dx < mapViewWidth; dx+=2) {
-				int x = cameraTileX + dx, y = cameraTileY + dy;
-				if (IsInRange(x, y)) {
-					MapView.SetCell(dx, dy, Map[WrapTileX(x), WrapTileY(y)]);
-				}
-			}
-		}
-	}
-
 	public void TerrainAsTileMap() {
-		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
-		MapView = new TileMap();
-		MapView.CellSize = tileSize;
-		// TM.CenteredTextures = true;
+		int mapWidth = 80, mapHeight = 80;
+
 		TileSet TS = new TileSet();
-		MapView.TileSet = TS;
 
 		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
@@ -214,8 +146,9 @@ public class Game : Node2D
 				} catch { GD.Print(x + "," + y + " " + foo); }
 			}
 		}
-		RefillMapView();
-		AddChild(MapView);
+
+		mapView = new MapView(Map, TS, false, false);
+		AddChild(mapView);
 	}
 
 	private void CreateUI()
@@ -299,28 +232,12 @@ public class Game : Node2D
 
 	public void _on_Zoom_value_changed(float value)
 	{
-		// Zoom centered on the middle of the window
-		SetCameraZoom(value, OS.WindowSize / 2);
+		mapView.setCameraZoomFromMiddle(value);
 	}
 
 	public void _OnViewportSizeChanged()
 	{
-		RefillMapView();
-	}
-
-	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
-	// same after the zoom level is changed, and if center is screenSize/2, the tile in the center of the window won't change.
-	// This function does not adjust the zoom slider, so to keep the slider in sync with the actual zoom level, use AdjustZoomSlider. This
-	// function must be separate, though, so that we can change the zoom level inside that callback without entering an infinite loop.
-	private void SetCameraZoom(float newScale, Vector2 center)
-	{
-		Vector2 v2NewScale = new Vector2(newScale, newScale);
-		Vector2 oldScale = MapView.Scale;
-		if (v2NewScale != oldScale) {
-			MapView.Scale = v2NewScale;
-			SetCameraLocation ((v2NewScale / oldScale) * (cameraLocation + center) - center);
-			// RefillMapView(); // Don't have to call this because it's already called when the camera location is changed
-		}
+		mapView.resetVisibleTiles();
 	}
 
 	public void AdjustZoomSlider(int numSteps, Vector2 zoomCenter)
@@ -334,77 +251,25 @@ public class Game : Node2D
 
 		// Note we must set the camera zoom before setting the new slider value since setting the value will trigger the callback which will
 		// adjust the zoom around a center we don't want.
-		SetCameraZoom((float)newScale, zoomCenter);
+		mapView.setCameraZoom((float)newScale, zoomCenter);
 		slider.Value = newScale;
-	}
-
-	public void MoveCamera(Vector2 offset)
-	{
-		SetCameraLocation(cameraLocation + offset);
-	}
-
-	public void SetCameraLocation(Vector2 location)
-	{
-		cameraLocation = location;
-
-		// Prevent the camera from moving beyond an unwrapped edge of the map. One complication here is that the viewport might actually be
-		// larger than the map (if we're zoomed far out) so in that case we must apply the constraint the other way around, i.e. constrain the
-		// map to the viewport rather than the viewport to the map.
-		// TODO: Not quite perfect. When you zoom out you can still move the map a bit off the right/bottom edges.
-		Vector2 viewportSize = GetViewport().Size;
-		Vector2 mapPixelSize = MapView.Scale * (new Vector2(tileSize.x * (mapWidth + 1), tileSize.y * (mapHeight + 1)));
-		if (! mapWrapHorizontally) {
-			float leftLim, rightLim; {
-				if (mapPixelSize.x >= viewportSize.x) {
-					leftLim = 0;
-					rightLim = mapPixelSize.x - viewportSize.x;
-				} else {
-					leftLim = mapPixelSize.x - viewportSize.x;
-					rightLim = 0;
-				}
-			}
-			if (cameraLocation.x < leftLim)
-				cameraLocation.x = leftLim;
-			else if (cameraLocation.x > rightLim)
-				cameraLocation.x = rightLim;
-		}
-		if (! mapWrapVertically) {
-			// These margins allow the player to move the camera that far off those map edges so that the UI controls don't cover up the
-			// map. TODO: These values should be read from the sizes of the UI elements instead of hardcoded.
-			float topMargin = 70, bottomMargin = 140;
-			float topLim, bottomLim; {
-				if (mapPixelSize.y >= viewportSize.y) {
-					topLim = -topMargin;
-					bottomLim = mapPixelSize.y - viewportSize.y + bottomMargin;
-				} else {
-					topLim = mapPixelSize.y - viewportSize.y;
-					bottomLim = 0;
-				}
-			}
-			if (cameraLocation.y < topLim)
-				cameraLocation.y = topLim;
-			else if (cameraLocation.y > bottomLim)
-				cameraLocation.y = bottomLim;
-		}
-
-		RefillMapView();
 	}
 
 	public void _on_RightButton_pressed()
 	{
-		MoveCamera(new Vector2(128, 0));
+		mapView.cameraLocation += new Vector2(128, 0);
 	}
 	public void _on_LeftButton_pressed()
 	{
-		MoveCamera(new Vector2(-128, 0));
+		mapView.cameraLocation += new Vector2(-128, 0);
 	}
 	public void _on_UpButton_pressed()
 	{
-		MoveCamera(new Vector2(0, -64));
+		mapView.cameraLocation += new Vector2(0, -64);
 	}
 	public void _on_DownButton_pressed()
 	{
-		MoveCamera(new Vector2(0, 64));
+		mapView.cameraLocation += new Vector2(0, 64);
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -442,10 +307,14 @@ public class Game : Node2D
 			if(IsMovingCamera)
 			{
 				GetTree().SetInputAsHandled();
-				MoveCamera((OldPosition - eventMouseMotion.Position) / Scale);
+				mapView.cameraLocation += OldPosition - eventMouseMotion.Position;
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
 	}
 
+	private void UnitButtonPressed(string buttonName)
+	{
+		GD.Print("The " + buttonName + " button was pressed");
+	}
 }
