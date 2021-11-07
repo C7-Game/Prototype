@@ -16,8 +16,7 @@ namespace C7Engine
                     return unit;
                 }
             }
-            //We probably shouldn't return null and tempt fate
-            return null;
+            return MapUnit.NONE;
         }
 
         public static void fortifyUnit(string guid)

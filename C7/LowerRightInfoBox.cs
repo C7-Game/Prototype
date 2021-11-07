@@ -9,6 +9,8 @@ public class LowerRightInfoBox : TextureRect
 	ImageTexture nextTurnOnTexture;
 	ImageTexture nextTurnOffTexture;
 	ImageTexture nextTurnBlinkTexture;
+
+	Label lblUnitSelected = new Label();
 	
 	Timer blinkingTimer = new Timer();
 	Boolean timerStarted = false;	//This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
@@ -42,7 +44,6 @@ public class LowerRightInfoBox : TextureRect
 
 
 		//Labels and whatnot in this text box
-		Label lblUnitSelected = new Label();
 		lblUnitSelected.Text = "Settler";
 		lblUnitSelected.AddColorOverride("font_color", new Color(0, 0, 0));
 		lblUnitSelected.Align = Label.AlignEnum.Right;
@@ -94,13 +95,10 @@ public class LowerRightInfoBox : TextureRect
 		yearAndGold.MarginLeft = -1 * (yearAndGold.RectSize.x/2.0f);
 	}
 
-	private void toggleEndTurnButton() {
-		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
-			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
-		}
-		else {
-			nextTurnButton.TextureNormal = nextTurnOnTexture;
-		}
+	public void SetEndOfTurnStatus() {
+		lblUnitSelected.Text = "ENTER or SPACEBAR for next turn";
+
+		toggleEndTurnButton();
 		
 		if (!timerStarted) {
 			blinkingTimer.OneShot = false;
@@ -111,6 +109,18 @@ public class LowerRightInfoBox : TextureRect
 			GD.Print("Started a timer for blinking");
 
 			timerStarted = true;
+		}
+	}
+
+	private void toggleEndTurnButton()
+	{
+		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
+			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
+			lblUnitSelected.Visible = true;
+		}
+		else {
+			nextTurnButton.TextureNormal = nextTurnOnTexture;
+			lblUnitSelected.Visible = false;
 		}
 	}
 

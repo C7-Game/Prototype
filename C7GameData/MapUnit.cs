@@ -18,5 +18,7 @@ namespace C7GameData
         {
             guid = Guid.NewGuid().ToString();
         }
+
+        public static MapUnit NONE = new MapUnit();
     }
 }

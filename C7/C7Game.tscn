@@ -210,6 +210,7 @@ anchor_mode = 0
 current = true
 
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/GameStatus" method="OnNewUnitSelected"]
+[connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/GameStatus" method="OnNoMoreAutoselectableUnits"]
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/GameStatus" method="OnTurnStarted"]

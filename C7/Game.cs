@@ -11,6 +11,7 @@ public class Game : Node2D
 	[Signal] public delegate void TurnEnded();
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
+	[Signal] public delegate void NoMoreAutoselectableUnits();
 	
 	enum GameState {
 		PreGame,
@@ -322,8 +323,14 @@ public class Game : Node2D
 		//We can't send the whole map unit via signals (probably because it can't be serialized?),
 		//so I'm sending the name for now, as a temporary workaround.
 		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
-		this.CurrentlySelectedUnit = SelectedUnit;
-		EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
+
+		if (SelectedUnit == MapUnit.NONE) {
+			EmitSignal(nameof(NoMoreAutoselectableUnits));
+		}
+		else {
+			this.CurrentlySelectedUnit = SelectedUnit;
+			EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
+		}
 	}
 
 	private void UnitButtonPressed(string buttonName)
