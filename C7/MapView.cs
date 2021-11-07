@@ -52,21 +52,34 @@ public class MapView : Node2D {
 
 	public bool isInBounds(int x, int y)
 	{
-		bool xInBounds = wrapHorizontally || ((x >= 0) && (x < mapWidth));
-		bool yInBounds = wrapVertically   || ((y >= 0) && (y < mapHeight));
+		bool xInBounds; {
+			if (wrapHorizontally)
+				xInBounds = true;
+			else if (y%2 == 0)
+				xInBounds = (x >= 0) && (x <= mapWidth - 2);
+			else
+				xInBounds = (x >= 1) && (x <= mapWidth - 1);
+		}
+		bool yInBounds = wrapVertically || ((y >= 0) && (y < mapHeight));
 		return xInBounds && yInBounds;
 	}
 
 	public int wrapTileX(int x)
 	{
-		int tr = x % mapWidth;
-		return (tr >= 0) ? tr : tr + mapWidth;
+		if (wrapHorizontally) {
+			int tr = x % mapWidth;
+			return (tr >= 0) ? tr : tr + mapWidth;
+		} else
+			return x;
 	}
 
 	public int wrapTileY(int y)
 	{
-		int tr = y % mapHeight;
-		return (tr >= 0) ? tr : tr + mapHeight;
+		if (wrapVertically) {
+			int tr = y % mapHeight;
+			return (tr >= 0) ? tr : tr + mapHeight;
+		} else
+			return y;
 	}
 
 	public void resetVisibleTiles()
@@ -96,19 +109,16 @@ public class MapView : Node2D {
 		// Normally we want to use the viewport size here but GetViewport() returns null when this function gets called for the first time
 		// during new game setup so in that case use the window size.
 		Vector2 screenSize = (GetViewport() != null) ? GetViewport().Size : OS.WindowSize;
-		// The offset of 4 is to ensure the bottom and right edges of the screen are covered
-		Vector2 mapViewSize = new Vector2(4, 4) + screenSize / (Scale * tileSize);
+		// The offset of 2 is to ensure the bottom and right edges of the screen are covered
+		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / (Scale * tileSize);
 
-		// loop to place tiles, each of which contains 1/4 of 4 'real' map locations
-		// loops start at -3 and -6 to ensure the left and top (respectively) edges of the screen are covered
-		for (int dy = -6; dy < mapViewSize.y; dy++) {
-			for (int dx = -3 - (dy%2); dx < mapViewSize.x; dx+=2) {
+		for (int dy = -2; dy < mapViewSize.y; dy++)
+			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
 				int x = cameraTileX + dx, y = cameraTileY + dy;
 				if (isInBounds(x, y)) {
 					terrainView.SetCell(dx, dy, terrain[wrapTileX(x), wrapTileY(y)]);
 				}
 			}
-		}
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
@@ -183,6 +193,13 @@ public class MapView : Node2D {
 
 		internalCameraLocation = location;
 		resetVisibleTiles();
+	}
+
+	public void tileAt(Vector2 screenLocation, out int tileX, out int tileY)
+	{
+		Vector2 mapLoc = terrainView.WorldToMap(terrainView.ToLocal(cameraLocation + screenLocation));
+		tileX = (int)mapLoc.x;
+		tileY = (int)mapLoc.y;
 	}
 
 }

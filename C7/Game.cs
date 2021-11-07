@@ -131,7 +131,7 @@ public class Game : Node2D
 		//    What I've done is generated "terrain ID" all over and am deriving an
 		//    image ID on the tile placement spots based on surrounding terrain values
 		for (int y = 0; y < mapHeight; y++) {
-			for (int x = (1 - (y % 2)); x < mapWidth; x+=2) {
+			for (int x = y%2; x < mapWidth; x+=2) {
 				int Top = y == 0 ? (Map[(x+1) % mapWidth,y]) : (Map[x,y-1]);
 				int Bottom = y == mapHeight - 1 ? (Map[(x+1) % mapWidth,y]) : (Map[x,y+1]);
 				string foo = 
@@ -300,6 +300,17 @@ public class Game : Node2D
 			{
 				GetTree().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
+			}
+			else if (eventMouseButton.ButtonIndex == (int)ButtonList.Right)
+			{
+				int x, y;
+				mapView.tileAt(eventMouseButton.Position, out x, out y);
+				if (mapView.isInBounds(x, y)) {
+					GD.Print("setting terrain sprite at (" + x.ToString() + ", " + y.ToString() + ") to 0");
+					Map[x, y] = 0;
+					mapView.resetVisibleTiles();
+				} else
+					GD.Print("(" + x.ToString() + ", " + y.ToString() + ") is out of bounds");
 			}
 		}
 		else if(@event is InputEventMouseMotion eventMouseMotion)
