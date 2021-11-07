@@ -329,7 +329,8 @@ public class Game : Node2D
 		}
 		else {
 			this.CurrentlySelectedUnit = SelectedUnit;
-			EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
+			ParameterWrapper wrappedUnit = new ParameterWrapper(SelectedUnit);
+			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
 		}
 	}
 

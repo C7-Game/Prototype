@@ -18,9 +18,11 @@ public class GameStatus : MarginContainer
 		AddChild(LowerRightInfoBox);
 	}
 	
-	public void OnNewUnitSelected(string mapUnit)
+	public void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
-		GD.Print("The newly selected unit is " + mapUnit);
+		MapUnit NewUnit = wrappedMapUnit.GetValue<MapUnit>();
+		GD.Print("The newly selected unit's name is: " + NewUnit.unitType.name);
+		LowerRightInfoBox.UpdateUnitInfo(NewUnit);
 	}
 	
 	private void OnTurnEnded()

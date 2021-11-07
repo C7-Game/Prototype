@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using ConvertCiv3Media;
+using C7GameData;
 
 public class LowerRightInfoBox : TextureRect
 {
@@ -136,6 +137,12 @@ public class LowerRightInfoBox : TextureRect
 		GD.Print("Emitting the blinky button pressed signal");
 		GetParent().EmitSignal("BlinkyEndTurnButtonPressed");
 		
+	}
+
+	public void UpdateUnitInfo(MapUnit NewUnit)
+	{
+		lblUnitSelected.Text = NewUnit.unitType.name;
+		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.unitType.movement + "/" + NewUnit.unitType.movement;
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
