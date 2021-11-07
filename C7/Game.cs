@@ -123,7 +123,7 @@ public class Game : Node2D
 				// Trying the external noise library; remove tempNoiseField references and
 				//   uncomment OpenSimplexNoise, noise, and foo related lines
 				// The external library seems to return from -0.5 to 0.5 whereas Godot's does -1 to 1
-				Map[x,y] = tempNoiseField[x*2,y] * 2 < 0.1 ? 2 : tempNoiseField[x*2,y] * 2 < 0.4? 1 : 0;
+				Map[x,y] = tempNoiseField[x*2+(y%2),y] * 2 < 0.1 ? 2 : tempNoiseField[x*2,y] * 2 < 0.4? 1 : 0;
 			}
 		}
 		// Loop to lookup tile ids based on terrain mask
