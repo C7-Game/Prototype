@@ -3,6 +3,7 @@
 .import/
 export.cfg
 export_presets.cfg
+mono_crash.*.json
 
 # Mono-specific ignores
 .mono/
