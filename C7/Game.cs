@@ -25,6 +25,7 @@ public class Game : Node2D
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
+	MapUnit CurrentlySelectedUnit = null;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
 	Button EndTurnButton;
 	Control Toolbar;
 	private bool IsMovingCamera;
@@ -68,7 +69,7 @@ public class Game : Node2D
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
 		//without a manual cast to int.
 		//https://github.com/godotengine/godot/issues/16388
-		if (Input.IsKeyPressed(16777217))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
+		if (Input.IsKeyPressed((int)Godot.KeyList.Escape))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
 		{
 			GD.Print("User pressed escape");
 			//TODO: Display the "Oh No! Do you really want to quit?" menu
@@ -175,11 +176,7 @@ public class Game : Node2D
 		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
 
-		//Set the selected unit in the lower right, via an event
-		//We can't send the whole map unit via signals (probably because it can't be serialized?),
-		//so I'm sending the name for now, as a temporary workaround.
-		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
-		EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
+		GetNextAutoselectedUnit();
 	}
 
 	private void OnPlayerEndTurn()
@@ -319,8 +316,23 @@ public class Game : Node2D
 		}
 	}
 
+	private void GetNextAutoselectedUnit()
+	{
+		//Set the selected unit in the lower right, via an event
+		//We can't send the whole map unit via signals (probably because it can't be serialized?),
+		//so I'm sending the name for now, as a temporary workaround.
+		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
+		this.CurrentlySelectedUnit = SelectedUnit;
+		EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
+	}
+
 	private void UnitButtonPressed(string buttonName)
 	{
 		GD.Print("The " + buttonName + " button was pressed");
+		if (buttonName.Equals("hold"))
+		{
+			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
+			GetNextAutoselectedUnit();
+		}
 	}
 }
