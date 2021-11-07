@@ -50,18 +50,19 @@ public class MapView : Node2D {
 		AddChild(terrainView);
 	}
 
-	public bool isInBounds(int x, int y)
+	public bool isTileAt(int x, int y)
 	{
+		bool evenRow = y%2 == 0;
 		bool xInBounds; {
 			if (wrapHorizontally)
 				xInBounds = true;
-			else if (y%2 == 0)
+			else if (evenRow)
 				xInBounds = (x >= 0) && (x <= mapWidth - 2);
 			else
 				xInBounds = (x >= 1) && (x <= mapWidth - 1);
 		}
 		bool yInBounds = wrapVertically || ((y >= 0) && (y < mapHeight));
-		return xInBounds && yInBounds;
+		return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 == 1));
 	}
 
 	public int wrapTileX(int x)
@@ -115,7 +116,7 @@ public class MapView : Node2D {
 		for (int dy = -2; dy < mapViewSize.y; dy++)
 			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
 				int x = cameraTileX + dx, y = cameraTileY + dy;
-				if (isInBounds(x, y)) {
+				if (isTileAt(x, y)) {
 					terrainView.SetCell(dx, dy, terrain[wrapTileX(x), wrapTileY(y)]);
 				}
 			}

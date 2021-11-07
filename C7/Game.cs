@@ -305,12 +305,12 @@ public class Game : Node2D
 			{
 				int x, y;
 				mapView.tileAt(eventMouseButton.Position, out x, out y);
-				if (mapView.isInBounds(x, y)) {
+				if (mapView.isTileAt(x, y)) {
 					GD.Print("setting terrain sprite at (" + x.ToString() + ", " + y.ToString() + ") to 0");
 					Map[x, y] = 0;
 					mapView.resetVisibleTiles();
 				} else
-					GD.Print("(" + x.ToString() + ", " + y.ToString() + ") is out of bounds");
+					GD.Print("No tile at (" + x.ToString() + ", " + y.ToString() + ")");
 			}
 		}
 		else if(@event is InputEventMouseMotion eventMouseMotion)
