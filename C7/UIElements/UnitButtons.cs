@@ -52,4 +52,9 @@ public class UnitButtons : VBoxContainer
 		//pressed is the one they are looking for.  But it seems like an acceptable trade-off on the surface.
 		EmitSignal("UnitButtonPressed", "hold");
 	}
+	
+	private void OnNoMoreAutoselectableUnits()
+	{
+		this.Visible = false;
+	}
 }

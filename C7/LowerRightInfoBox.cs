@@ -11,6 +11,8 @@ public class LowerRightInfoBox : TextureRect
 	ImageTexture nextTurnBlinkTexture;
 
 	Label lblUnitSelected = new Label();
+	Label attackDefenseMovement = new Label();
+	Label terrainType = new Label();
 	
 	Timer blinkingTimer = new Timer();
 	Boolean timerStarted = false;	//This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
@@ -52,7 +54,6 @@ public class LowerRightInfoBox : TextureRect
 		lblUnitSelected.MarginRight = -35;
 		boxRightRectangle.AddChild(lblUnitSelected);
 		
-		Label attackDefenseMovement = new Label();
 		attackDefenseMovement.Text = "0.0. 1/1";
 		attackDefenseMovement.AddColorOverride("font_color", new Color(0, 0, 0));
 		attackDefenseMovement.Align = Label.AlignEnum.Right;
@@ -61,7 +62,6 @@ public class LowerRightInfoBox : TextureRect
 		attackDefenseMovement.MarginRight = -35;
 		boxRightRectangle.AddChild(attackDefenseMovement);
 		
-		Label terrainType = new Label();
 		terrainType.Text = "Grassland";
 		terrainType.AddColorOverride("font_color", new Color(0, 0, 0));
 		terrainType.Align = Label.AlignEnum.Right;
@@ -97,6 +97,8 @@ public class LowerRightInfoBox : TextureRect
 
 	public void SetEndOfTurnStatus() {
 		lblUnitSelected.Text = "ENTER or SPACEBAR for next turn";
+		attackDefenseMovement.Visible = false;
+		terrainType.Visible = false;
 
 		toggleEndTurnButton();
 		
