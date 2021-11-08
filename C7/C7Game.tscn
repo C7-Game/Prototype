@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
@@ -10,6 +10,45 @@
 [ext_resource path="res://UIElements/UnitButtons/RenameButton.cs" type="Script" id=8]
 [ext_resource path="res://UIElements/UnitButtons/AutomateButton.cs" type="Script" id=9]
 [ext_resource path="res://UIElements/UnitButtons/UnitButtons.cs" type="Script" id=12]
+
+[sub_resource type="Animation" id=2]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:rect_position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 1024, 80 ) ]
+}
+tracks/1/type = "bezier"
+tracks/1/path = NodePath(".:margin_left")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"points": PoolRealArray( 0, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0 )
+}
+
+[sub_resource type="Animation" id=1]
+resource_name = "SlideOutAnimation"
+length = 0.5
+tracks/0/type = "bezier"
+tracks/0/path = NodePath(".:margin_left")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"points": PoolRealArray( 0, -0.25, 0, 0.25, 0, 83, -0.25, 0, 0.25, 0 ),
+"times": PoolRealArray( 0, 0.5 )
+}
 
 [node name="C7Game" type="Node2D"]
 script = ExtResource( 1 )
@@ -32,16 +71,15 @@ __meta__ = {
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -200.0
 margin_top = 80.0
 margin_bottom = -200.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Button" type="Button" parent="CanvasLayer/SlideOutBar"]
-margin_left = 78.79
-margin_right = 111.79
+[node name="SlideToggle" type="Button" parent="CanvasLayer/SlideOutBar"]
+margin_left = -124.27
+margin_right = -91.27
 margin_bottom = 20.0
 toggle_mode = true
 text = "<->"
@@ -124,6 +162,8 @@ __meta__ = {
 }
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer/SlideOutBar"]
+anims/RESET = SubResource( 2 )
+anims/SlideOutAnimation = SubResource( 1 )
 
 [node name="ToolBar" type="Control" parent="CanvasLayer"]
 anchor_right = 1.0
@@ -171,24 +211,6 @@ margin_right = 126.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "End Turn"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="VSeparator" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 130.0
-margin_right = 134.0
-margin_bottom = 40.0
-
-[node name="VSeparator3" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 138.0
-margin_right = 142.0
-margin_bottom = 40.0
-
-[node name="VSeparator4" type="VSeparator" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-margin_left = 146.0
-margin_right = 150.0
-margin_bottom = 40.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -253,6 +275,7 @@ current = true
 [connection signal="TurnEnded" from="." to="CanvasLayer/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/GameStatus" method="OnTurnStarted"]
 [connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/GameStatus" to="." method="OnPlayerEndTurn"]
+[connection signal="toggled" from="CanvasLayer/SlideOutBar/SlideToggle" to="." method="_on_SlideToggle_toggled"]
 [connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]

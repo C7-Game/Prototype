@@ -49,7 +49,10 @@ public class Game : Node2D
 		}
 		
 		CreateGame.createGame();
-		
+
+		// Hide slideout bar on startup		
+		_on_SlideToggle_toggled(false);
+
 		GD.Print("Now in game!");
 	}
 
@@ -360,6 +363,17 @@ public class Game : Node2D
 		{
 			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
 			GetNextAutoselectedUnit();
+		}
+	}
+	private void _on_SlideToggle_toggled(bool buttonPressed)
+	{
+		if (buttonPressed)
+		{
+			GetNode<AnimationPlayer>("CanvasLayer/SlideOutBar/AnimationPlayer").PlayBackwards("SlideOutAnimation");
+		}
+		else
+		{
+			GetNode<AnimationPlayer>("CanvasLayer/SlideOutBar/AnimationPlayer").Play("SlideOutAnimation");
 		}
 	}
 }

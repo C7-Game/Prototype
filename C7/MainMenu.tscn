@@ -7,14 +7,6 @@ z_index = 1
 z_as_relative = false
 script = ExtResource( 1 )
 
-[node name="LoadButton" type="Button" parent="."]
-margin_right = 611.0
-margin_bottom = 134.0
-text = "Load Game"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="Background" type="TextureRect" parent="."]
 margin_left = -3.0
 margin_top = -4.0
@@ -24,5 +16,3 @@ rect_clip_content = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
-
-[connection signal="pressed" from="LoadButton" to="." method="_on_Button_pressed"]
