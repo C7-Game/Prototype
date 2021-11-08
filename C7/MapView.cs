@@ -1,10 +1,9 @@
-using System.Collections;
 using Godot;
-using ConvertCiv3Media;
 
 public class MapView : Node2D {
-	// TODO: Rename this to cell size, tile pack size, or something. The tiles sprites are twice this size.
-	public static readonly Vector2 tileSize = new Vector2(64, 32);
+	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
+	// staggered and half overlap).
+	public static readonly Vector2 cellSize = new Vector2(64, 32);
 
 	public int mapWidth  { get; private set; }
 	public int mapHeight { get; private set; }
@@ -23,6 +22,32 @@ public class MapView : Node2D {
 	public float cameraZoom {
 		get { return Scale.x; } // x and y are the same
 		set { setCameraZoomFromMiddle(value); }
+	}
+
+	// Normally the camera location is stored in pixels in map coords, the cameraLocationInCells property gives the camera location in grid
+	// cells. cellX/Y is the whole number of cells and residueX/Y is the pixel location inside the cell.
+	public struct CameraLocationInCells {
+		public int cellsX, cellsY;
+		public int residueX, residueY;
+	}
+	public CameraLocationInCells cameraLocationInCells {
+		get {
+			var tr = new CameraLocationInCells();
+
+			Vector2 tileSize = 2 * Scale * cellSize;
+
+			int cameraPixelX = (int)cameraLocation.x;
+			int tilesX = cameraPixelX / (int)tileSize.x;
+			tr.cellsX = 2 * tilesX;
+			tr.residueX = cameraPixelX - tilesX * (int)tileSize.x;
+
+			int cameraPixelY = (int)cameraLocation.y;
+			int tilesY = cameraPixelY / (int)tileSize.y;
+			tr.cellsY = 2 * tilesY;
+			tr.residueY = cameraPixelY - tilesY * (int)tileSize.y;
+
+			return tr;
+		}
 	}
 
 	private int[,] terrain;
@@ -44,7 +69,7 @@ public class MapView : Node2D {
 	public void initTerrainLayer() {
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
 		terrainView = new TileMap();
-		terrainView.CellSize = tileSize;
+		terrainView.CellSize = cellSize;
 		// terrainView.CenteredTextures = true;
 		terrainView.TileSet = terrainSet;
 		resetVisibleTiles();
@@ -88,35 +113,26 @@ public class MapView : Node2D {
 	{
 		terrainView.Clear();
 
+		// TODO: Update this comment and move it somewhere more appropriate
 		// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire
 		// screen. For small movements, the MapView itself is moved (amount is in cameraResidueX/Y) but once the movement equals an entire
 		// grid cell (2 times the tile width or height) the map is snapped back toward the origin by that amount and to compensate it changes
 		// what tiles are drawn (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around
 		// wrapped edges.
 
-		Vector2 tileFullSize = 2 * Scale * tileSize;
+		var cLIC = cameraLocationInCells;
 
-		int cameraPixelX = (int)cameraLocation.x;
-		int fullTilesX = cameraPixelX / (int)tileFullSize.x;
-		int cameraTileX = 2 * fullTilesX;
-		int cameraResidueX = cameraPixelX - fullTilesX * (int)tileFullSize.x;
-
-		int cameraPixelY = (int)cameraLocation.y;
-		int fullTilesY = cameraPixelY / (int)tileFullSize.y;
-		int cameraTileY = 2 * fullTilesY;
-		int cameraResidueY = cameraPixelY - fullTilesY * (int)tileFullSize.y;
-
-		Position = new Vector2(-cameraResidueX, -cameraResidueY);
+		Position = new Vector2(-cLIC.residueX, -cLIC.residueY);
 
 		// Normally we want to use the viewport size here but GetViewport() returns null when this function gets called for the first time
 		// during new game setup so in that case use the window size.
 		Vector2 screenSize = (GetViewport() != null) ? GetViewport().Size : OS.WindowSize;
 		// The offset of 2 is to ensure the bottom and right edges of the screen are covered
-		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / (Scale * tileSize);
+		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / (Scale * cellSize);
 
 		for (int dy = -2; dy < mapViewSize.y; dy++)
 			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
-				int x = cameraTileX + dx, y = cameraTileY + dy;
+				int x = cLIC.cellsX + dx, y = cLIC.cellsY + dy;
 				if (isTileAt(x, y)) {
 					terrainView.SetCell(dx, dy, terrain[wrapTileX(x), wrapTileY(y)]);
 				}
@@ -134,7 +150,7 @@ public class MapView : Node2D {
 		if (v2NewScale != oldScale) {
 			Scale = v2NewScale;
 			setCameraLocation ((v2NewScale / oldScale) * (cameraLocation + center) - center);
-			// RefillMapView(); // Don't have to call this because it's already called when the camera location is changed
+			// resetVisibleTiles(); // Don't have to call this because it's already called when the camera location is changed
 		}
 	}
 
@@ -156,7 +172,7 @@ public class MapView : Node2D {
 		// map to the viewport rather than the viewport to the map.
 		// TODO: Not quite perfect. When you zoom out you can still move the map a bit off the right/bottom edges.
 		Vector2 viewportSize = GetViewport().Size;
-		Vector2 mapPixelSize = Scale * (new Vector2(tileSize.x * (mapWidth + 1), tileSize.y * (mapHeight + 1)));
+		Vector2 mapPixelSize = Scale * (new Vector2(cellSize.x * (mapWidth + 1), cellSize.y * (mapHeight + 1)));
 		if (!wrapHorizontally) {
 			float leftLim, rightLim;
 			{
@@ -197,30 +213,25 @@ public class MapView : Node2D {
 		resetVisibleTiles();
 	}
 
-	// Returns the location of the center of tile (x, y) on the screen. Works even if (x, y) is off screen or out of bounds.
-	public Vector2 screenLocationOfTile(int x, int y)
+	// Returns the location of tile (x, y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the
+	// upper left. Works even if (x, y) is off screen or out of bounds.
+	public Vector2 screenLocationOfTile(int x, int y, bool center = true)
 	{
-		// TODO: This stuff that's common to this func and resetVisibleTiles should be factored out into a helper function
-		Vector2 tileFullSize = 2 * Scale * tileSize;
-		int cameraPixelX = (int)cameraLocation.x;
-		int fullTilesX = cameraPixelX / (int)tileFullSize.x;
-		int cameraTileX = 2 * fullTilesX;
-		int cameraPixelY = (int)cameraLocation.y;
-		int fullTilesY = cameraPixelY / (int)tileFullSize.y;
-		int cameraTileY = 2 * fullTilesY;
+		var cLIC = cameraLocationInCells;
 
-		// cameraTileX/Y is what gets drawn at (0, 0) in MapView's local coordinates. Add one to x & y to get the tile center b/c in Civ 3 the
-		// tile at (x, y) is a diamond centered on (x+1, y+1).
-		return Position + new Vector2(x + 1 - cameraTileX, y + 1 - cameraTileY) * Scale * tileSize;
+		// Add one to x & y to get the tile center b/c in Civ 3 the tile at (x, y) is a diamond centered on (x+1, y+1).
+		Vector2 centeringOffset = center ? new Vector2(1, 1) : new Vector2(0, 0);
+
+		// cameraTileX/Y is what gets drawn at (0, 0) in MapView's local coordinates.
+		return Position + (centeringOffset + new Vector2(x - cLIC.cellsX, y - cLIC.cellsY)) * Scale * cellSize;
 	}
 
 	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
 	public bool tileOnScreenAt(Vector2 screenLocation, out int tileX, out int tileY)
 	{
-		// Add (1, 1) to get the tile upper left location instead of center. TODO: This calculation could be made a lot more efficient by
-		// inlining screenLocationOfTile since right now it undoes several things that function does. Though this way it's more clear how the
-		// algorithm works.
-		Vector2 mapLoc = (screenLocation - screenLocationOfTile(0, 0)) / (Scale * tileSize) + new Vector2(1, 1);
+		// TODO: This calculation could be made a lot more efficient by inlining screenLocationOfTile since right now it undoes several things
+		// that function does. Though this way it's more clear how the algorithm works.
+		Vector2 mapLoc = (screenLocation - screenLocationOfTile(0, 0, false)) / (Scale * cellSize);
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
 		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
