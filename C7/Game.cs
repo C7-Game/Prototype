@@ -339,7 +339,12 @@ public class Game : Node2D
 					this.OnPlayerEndTurn();
 				}
 				else {
-					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
+					//Spacebar is the shortcut for the "hold" action.  Right now, this is how
+					//we map the keyboard shortcut to it.
+					//I think we should probably have a handler at the end that says, 'if none of
+					//our non-unit key handlers fired, run against a map to see if a unit one should'.
+					//But let's wait until we have at least two before deciding what the pattern should be.
+					this.UnitButtonPressed("hold");
 				}
 			}
 		}
@@ -357,6 +362,11 @@ public class Game : Node2D
 		}
 	}
 
+	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
+	///the keyboard shortcuts should wind up here.
+	///Eventually, we should quite possibly put this somewhere other than Game.cs, or at
+	///least the logic should be somewhere else.  I want to see how it looks with a couple
+	///more things going on before figuring out what the 'right' thing is, though.
 	private void UnitButtonPressed(string buttonName)
 	{
 		GD.Print("The " + buttonName + " button was pressed");
