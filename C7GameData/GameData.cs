@@ -32,7 +32,7 @@ namespace C7GameData
             settler.name = "Settler";
             settler.attack = 0;
             settler.defense = 0;
-            settler.movement = 0;
+            settler.movement = 1;
             settler.canFoundCity = true;
 
             UnitPrototype warrior = new UnitPrototype();

@@ -57,4 +57,9 @@ public class UnitButtons : VBoxContainer
 	{
 		this.Visible = false;
 	}
+	
+	private void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
+	{
+		this.Visible = true;
+	}
 }

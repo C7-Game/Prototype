@@ -195,6 +195,9 @@ public class Game : Node2D
 	{
 		GD.Print("Starting computer turn");
 		CurrentState = GameState.ComputerTurn;
+		//Actual backend processing
+		TurnHandling.EndTurn();
+		//Simulating processing so the turn doesn't end too quickly
 		ComputerSimulateTurn();
 		GD.Print("Thinking...");
 	}

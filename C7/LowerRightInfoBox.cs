@@ -141,6 +141,9 @@ public class LowerRightInfoBox : TextureRect
 
 	public void UpdateUnitInfo(MapUnit NewUnit)
 	{
+		lblUnitSelected.Visible = true;
+		attackDefenseMovement.Visible = true;
+		terrainType.Visible = true;
 		lblUnitSelected.Text = NewUnit.unitType.name;
 		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.unitType.movement + "/" + NewUnit.unitType.movement;
 	}
