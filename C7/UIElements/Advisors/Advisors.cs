@@ -55,4 +55,21 @@ public class Advisors : CenterContainer
 			this.Show();
 		}
 	}
+	
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (this.Visible) {
+			if (@event is InputEventKey eventKey)
+			{
+				if (eventKey.Pressed)
+				{
+					if (eventKey.Scancode == (int)Godot.KeyList.Space || eventKey.Scancode == (int)Godot.KeyList.Enter)
+					{
+						GD.Print("Advisor received a space/enter event; stopping propagation.");
+						GetTree().SetInputAsHandled();
+					}
+				}
+			}
+		}
+	}
 }
