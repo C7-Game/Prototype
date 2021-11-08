@@ -11,6 +11,7 @@ public class Game : Node2D
 	[Signal] public delegate void TurnEnded();
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
+	[Signal] public delegate void NoMoreAutoselectableUnits();
 	
 	enum GameState {
 		PreGame,
@@ -25,6 +26,7 @@ public class Game : Node2D
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
+	MapUnit CurrentlySelectedUnit = null;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
 	Button EndTurnButton;
 	Control Toolbar;
 	private bool IsMovingCamera;
@@ -68,7 +70,7 @@ public class Game : Node2D
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
 		//without a manual cast to int.
 		//https://github.com/godotengine/godot/issues/16388
-		if (Input.IsKeyPressed(16777217))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
+		if (Input.IsKeyPressed((int)Godot.KeyList.Escape))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
 		{
 			GD.Print("User pressed escape");
 			//TODO: Display the "Oh No! Do you really want to quit?" menu
@@ -110,20 +112,16 @@ public class Game : Node2D
 					, id);
 			}
 		}
-		double[,] tempNoiseField =C7GameData.GameMap.tempMapGenPrototyping(2 * mapWidth, mapHeight, true, true);
+
 		Map = new int[mapWidth,mapHeight];
-		// OpenSimplexNoise noise = new OpenSimplexNoise();
-		// noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
+		Godot.OpenSimplexNoise noise = new Godot.OpenSimplexNoise();
+		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
 		// Populate map values
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = 0; x < mapWidth; x++) {
 				// Multiplying x & y for noise coordinate sampling
-				// float foo = noise.GetNoise2d(x*2,y*2);
-				// Map[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
-				// Trying the external noise library; remove tempNoiseField references and
-				//   uncomment OpenSimplexNoise, noise, and foo related lines
-				// The external library seems to return from -0.5 to 0.5 whereas Godot's does -1 to 1
-				Map[x,y] = tempNoiseField[x*2,y] * 2 < 0.1 ? 2 : tempNoiseField[x*2,y] * 2 < 0.4? 1 : 0;
+				float foo = noise.GetNoise2d(x*2,y*2);
+				Map[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
 			}
 		}
 		// Loop to lookup tile ids based on terrain mask
@@ -141,7 +139,6 @@ public class Game : Node2D
 					Top.ToString("D3")
 				;
 				try {
-				// Map[x,y] = (int)Terrmask["001001001001"];
 				Map[x,y] = (int)Terrmask[foo];
 				} catch { GD.Print(x + "," + y + " " + foo); }
 			}
@@ -180,11 +177,7 @@ public class Game : Node2D
 		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
 
-		//Set the selected unit in the lower right, via an event
-		//We can't send the whole map unit via signals (probably because it can't be serialized?),
-		//so I'm sending the name for now, as a temporary workaround.
-		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
-		EmitSignal(nameof(NewAutoselectedUnit), SelectedUnit.unitType.name);
+		GetNextAutoselectedUnit();
 	}
 
 	private void OnPlayerEndTurn()
@@ -323,8 +316,30 @@ public class Game : Node2D
 		}
 	}
 
+	private void GetNextAutoselectedUnit()
+	{
+		//Set the selected unit in the lower right, via an event
+		//We can't send the whole map unit via signals (probably because it can't be serialized?),
+		//so I'm sending the name for now, as a temporary workaround.
+		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
+
+		if (SelectedUnit == MapUnit.NONE) {
+			EmitSignal(nameof(NoMoreAutoselectableUnits));
+		}
+		else {
+			this.CurrentlySelectedUnit = SelectedUnit;
+			ParameterWrapper wrappedUnit = new ParameterWrapper(SelectedUnit);
+			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
+		}
+	}
+
 	private void UnitButtonPressed(string buttonName)
 	{
 		GD.Print("The " + buttonName + " button was pressed");
+		if (buttonName.Equals("hold"))
+		{
+			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
+			GetNextAutoselectedUnit();
+		}
 	}
 }

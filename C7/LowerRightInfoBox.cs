@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using ConvertCiv3Media;
+using C7GameData;
 
 public class LowerRightInfoBox : TextureRect
 {
@@ -9,6 +10,10 @@ public class LowerRightInfoBox : TextureRect
 	ImageTexture nextTurnOnTexture;
 	ImageTexture nextTurnOffTexture;
 	ImageTexture nextTurnBlinkTexture;
+
+	Label lblUnitSelected = new Label();
+	Label attackDefenseMovement = new Label();
+	Label terrainType = new Label();
 	
 	Timer blinkingTimer = new Timer();
 	Boolean timerStarted = false;	//This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
@@ -42,7 +47,6 @@ public class LowerRightInfoBox : TextureRect
 
 
 		//Labels and whatnot in this text box
-		Label lblUnitSelected = new Label();
 		lblUnitSelected.Text = "Settler";
 		lblUnitSelected.AddColorOverride("font_color", new Color(0, 0, 0));
 		lblUnitSelected.Align = Label.AlignEnum.Right;
@@ -51,7 +55,6 @@ public class LowerRightInfoBox : TextureRect
 		lblUnitSelected.MarginRight = -35;
 		boxRightRectangle.AddChild(lblUnitSelected);
 		
-		Label attackDefenseMovement = new Label();
 		attackDefenseMovement.Text = "0.0. 1/1";
 		attackDefenseMovement.AddColorOverride("font_color", new Color(0, 0, 0));
 		attackDefenseMovement.Align = Label.AlignEnum.Right;
@@ -60,7 +63,6 @@ public class LowerRightInfoBox : TextureRect
 		attackDefenseMovement.MarginRight = -35;
 		boxRightRectangle.AddChild(attackDefenseMovement);
 		
-		Label terrainType = new Label();
 		terrainType.Text = "Grassland";
 		terrainType.AddColorOverride("font_color", new Color(0, 0, 0));
 		terrainType.Align = Label.AlignEnum.Right;
@@ -94,13 +96,12 @@ public class LowerRightInfoBox : TextureRect
 		yearAndGold.MarginLeft = -1 * (yearAndGold.RectSize.x/2.0f);
 	}
 
-	private void toggleEndTurnButton() {
-		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
-			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
-		}
-		else {
-			nextTurnButton.TextureNormal = nextTurnOnTexture;
-		}
+	public void SetEndOfTurnStatus() {
+		lblUnitSelected.Text = "ENTER or SPACEBAR for next turn";
+		attackDefenseMovement.Visible = false;
+		terrainType.Visible = false;
+
+		toggleEndTurnButton();
 		
 		if (!timerStarted) {
 			blinkingTimer.OneShot = false;
@@ -114,6 +115,18 @@ public class LowerRightInfoBox : TextureRect
 		}
 	}
 
+	private void toggleEndTurnButton()
+	{
+		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
+			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
+			lblUnitSelected.Visible = true;
+		}
+		else {
+			nextTurnButton.TextureNormal = nextTurnOnTexture;
+			lblUnitSelected.Visible = false;
+		}
+	}
+
 	public void StopToggling() {
 		nextTurnButton.TextureNormal = nextTurnOffTexture;
 		blinkingTimer.Stop();
@@ -124,6 +137,12 @@ public class LowerRightInfoBox : TextureRect
 		GD.Print("Emitting the blinky button pressed signal");
 		GetParent().EmitSignal("BlinkyEndTurnButtonPressed");
 		
+	}
+
+	public void UpdateUnitInfo(MapUnit NewUnit)
+	{
+		lblUnitSelected.Text = NewUnit.unitType.name;
+		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.unitType.movement + "/" + NewUnit.unitType.movement;
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.

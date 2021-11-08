@@ -18,9 +18,11 @@ public class GameStatus : MarginContainer
 		AddChild(LowerRightInfoBox);
 	}
 	
-	public void OnNewUnitSelected(string mapUnit)
+	public void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
-		GD.Print("The newly selected unit is " + mapUnit);
+		MapUnit NewUnit = wrappedMapUnit.GetValue<MapUnit>();
+		GD.Print("The newly selected unit's name is: " + NewUnit.unitType.name);
+		LowerRightInfoBox.UpdateUnitInfo(NewUnit);
 	}
 	
 	private void OnTurnEnded()
@@ -30,15 +32,11 @@ public class GameStatus : MarginContainer
 	
 	private void OnTurnStarted()
 	{		
-		//Set a timer so the end turn button starts blinking after awhile.
-		//Obviously once we have more game mechanics, it won't happen automatically
-		//after 5 seconds.
-		endTurnAlertTimer = new Timer();
-		endTurnAlertTimer.WaitTime = 5.0f;
-		endTurnAlertTimer.OneShot = true;
-		endTurnAlertTimer.Connect("timeout", LowerRightInfoBox, "toggleEndTurnButton");
-		AddChild(endTurnAlertTimer);
-		endTurnAlertTimer.Start();
+		//TODO: Remove this signal handler, probably
+	}
+	
+	private void OnNoMoreAutoselectableUnits()
+	{
+		LowerRightInfoBox.SetEndOfTurnStatus();
 	}
 }
-

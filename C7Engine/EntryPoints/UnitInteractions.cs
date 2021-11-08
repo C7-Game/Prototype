@@ -1,6 +1,7 @@
 namespace C7Engine
 {
     using C7GameData;
+    using System;
     public class UnitInteractions
     {
         public static MapUnit getNextSelectedUnit()
@@ -15,8 +16,7 @@ namespace C7Engine
                     return unit;
                 }
             }
-            //We probably shouldn't return null and tempt fate
-            return null;
+            return MapUnit.NONE;
         }
 
         public static void fortifyUnit(string guid)
@@ -73,9 +73,12 @@ namespace C7Engine
             {
                 if (unit.guid == guid)
                 {
+                    Console.WriteLine("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; settings its movement to zero");
                     unit.movementPointsRemaining = 0;
+                    return;
                 }
             }
+            Console.WriteLine("Failed to find a matching unit with guid " + guid);
         }
     }
 }
