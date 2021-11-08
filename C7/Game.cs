@@ -339,18 +339,16 @@ public class Game : Node2D
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
 		{
+			// UI slider has the min/max zoom settings for now
 			VSlider slider = GetNode<VSlider>("CanvasLayer/SlideOutBar/VBoxContainer/Zoom");
-			double newScale = Scale.x * magnifyGesture.Factor;
+			double newScale = mapView.Scale.x * magnifyGesture.Factor;
 			if (newScale < slider.MinValue)
 				newScale = slider.MinValue;
 			else if (newScale > slider.MaxValue)
 				newScale = slider.MaxValue;
 			mapView.setCameraZoom((float)newScale, magnifyGesture.Position);
+			// Update the UI slider
 			slider.Value = newScale;
-
-			GD.Print(Scale, " ", newScale);
-
-			// GD.Print("Zoom!", magnifyGesture.Factor, magnifyGesture.Position);
 		}
 
 	}
