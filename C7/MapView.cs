@@ -3,6 +3,7 @@ using Godot;
 using ConvertCiv3Media;
 
 public class MapView : Node2D {
+	// TODO: Rename this to cell size, tile pack size, or something. The tiles sprites are twice this size.
 	public static readonly Vector2 tileSize = new Vector2(64, 32);
 
 	public int mapWidth  { get; private set; }
@@ -62,7 +63,7 @@ public class MapView : Node2D {
 				xInBounds = (x >= 1) && (x <= mapWidth - 1);
 		}
 		bool yInBounds = wrapVertically || ((y >= 0) && (y < mapHeight));
-		return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 == 1));
+		return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
 	}
 
 	public int wrapTileX(int x)
@@ -105,7 +106,7 @@ public class MapView : Node2D {
 		int cameraTileY = 2 * fullTilesY;
 		int cameraResidueY = cameraPixelY - fullTilesY * (int)tileFullSize.y;
 
-		GlobalPosition = new Vector2(-cameraResidueX, -cameraResidueY);
+		Position = new Vector2(-cameraResidueX, -cameraResidueY);
 
 		// Normally we want to use the viewport size here but GetViewport() returns null when this function gets called for the first time
 		// during new game setup so in that case use the window size.
@@ -196,11 +197,56 @@ public class MapView : Node2D {
 		resetVisibleTiles();
 	}
 
-	public void tileAt(Vector2 screenLocation, out int tileX, out int tileY)
+	// Returns the location of the center of tile (x, y) on the screen. Works even if (x, y) is off screen or out of bounds.
+	public Vector2 screenLocationOfTile(int x, int y)
 	{
-		Vector2 mapLoc = terrainView.WorldToMap(terrainView.ToLocal(cameraLocation + screenLocation));
-		tileX = (int)mapLoc.x;
-		tileY = (int)mapLoc.y;
+		// TODO: This stuff that's common to this func and resetVisibleTiles should be factored out into a helper function
+		Vector2 tileFullSize = 2 * Scale * tileSize;
+		int cameraPixelX = (int)cameraLocation.x;
+		int fullTilesX = cameraPixelX / (int)tileFullSize.x;
+		int cameraTileX = 2 * fullTilesX;
+		int cameraPixelY = (int)cameraLocation.y;
+		int fullTilesY = cameraPixelY / (int)tileFullSize.y;
+		int cameraTileY = 2 * fullTilesY;
+
+		// cameraTileX/Y is what gets drawn at (0, 0) in MapView's local coordinates. Add one to x & y to get the tile center b/c in Civ 3 the
+		// tile at (x, y) is a diamond centered on (x+1, y+1).
+		return Position + new Vector2(x + 1 - cameraTileX, y + 1 - cameraTileY) * Scale * tileSize;
+	}
+
+	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
+	public bool tileOnScreenAt(Vector2 screenLocation, out int tileX, out int tileY)
+	{
+		// Add (1, 1) to get the tile upper left location instead of center. TODO: This calculation could be made a lot more efficient by
+		// inlining screenLocationOfTile since right now it undoes several things that function does. Though this way it's more clear how the
+		// algorithm works.
+		Vector2 mapLoc = (screenLocation - screenLocationOfTile(0, 0)) / (Scale * tileSize) + new Vector2(1, 1);
+		Vector2 intMapLoc = mapLoc.Floor();
+		Vector2 fracMapLoc = mapLoc - intMapLoc;
+		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
+		bool evenColumn = x%2 == 0, evenRow = y%2 == 0;
+		if (evenColumn ^ evenRow) {
+			if (fracMapLoc.y > fracMapLoc.x)
+				x -= 1;
+			else
+				y -= 1;
+		} else {
+			if (fracMapLoc.y < 1 - fracMapLoc.x) {
+				x -= 1;
+				y -= 1;
+			}
+		}
+		x = wrapTileX(x);
+		y = wrapTileY(y);
+		if (isTileAt(x, y)) {
+			tileX = x;
+			tileY = y;
+			return true;
+		} else {
+			tileX = -1;
+			tileY = -1;
+			return false;
+		}
 	}
 
 }

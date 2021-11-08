@@ -301,16 +301,15 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
 			}
-			else if (eventMouseButton.ButtonIndex == (int)ButtonList.Right)
+			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (! eventMouseButton.IsPressed()))
 			{
 				int x, y;
-				mapView.tileAt(eventMouseButton.Position, out x, out y);
-				if (mapView.isTileAt(x, y)) {
-					GD.Print("setting terrain sprite at (" + x.ToString() + ", " + y.ToString() + ") to 0");
+				if (mapView.tileOnScreenAt(eventMouseButton.Position, out x, out y)) {
+					GD.Print("Setting terrain sprite at (" + x.ToString() + ", " + y.ToString() + ") to 0");
 					Map[x, y] = 0;
 					mapView.resetVisibleTiles();
 				} else
-					GD.Print("No tile at (" + x.ToString() + ", " + y.ToString() + ")");
+					GD.Print("Didn't click on any tile");
 			}
 		}
 		else if(@event is InputEventMouseMotion eventMouseMotion)
