@@ -129,6 +129,8 @@ public class LowerRightInfoBox : TextureRect
 
 	public void StopToggling() {
 		nextTurnButton.TextureNormal = nextTurnOffTexture;
+		lblUnitSelected.Text = "Please wait...";
+		lblUnitSelected.Visible = true;
 		blinkingTimer.Stop();
 		timerStarted = false;
 	}

@@ -26,7 +26,7 @@ public class Game : Node2D
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
-	MapUnit CurrentlySelectedUnit = null;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
+	MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
 	Button EndTurnButton;
 	Control Toolbar;
 	private bool IsMovingCamera;
@@ -317,21 +317,42 @@ public class Game : Node2D
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
+		else if (@event is InputEventKey eventKey)
+		{
+			if (eventKey.Pressed && eventKey.Scancode == (int)Godot.KeyList.Enter)
+			{
+				GD.Print("Enter pressed");
+				if (CurrentlySelectedUnit == MapUnit.NONE)
+				{
+					GD.Print("Turn ending");
+					this.OnPlayerEndTurn();
+				}
+				else {
+					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
+				}
+			}
+			else if (eventKey.Pressed && eventKey.Scancode == (int)Godot.KeyList.Space)
+			{
+				GD.Print("Space pressed");
+				if (CurrentlySelectedUnit == MapUnit.NONE)
+				{
+					this.OnPlayerEndTurn();
+				}
+				else {
+					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
+				}
+			}
+		}
 	}
 
 	private void GetNextAutoselectedUnit()
 	{
-		//Set the selected unit in the lower right, via an event
-		//We can't send the whole map unit via signals (probably because it can't be serialized?),
-		//so I'm sending the name for now, as a temporary workaround.
-		MapUnit SelectedUnit = UnitInteractions.getNextSelectedUnit();
-
-		if (SelectedUnit == MapUnit.NONE) {
+		this.CurrentlySelectedUnit = UnitInteractions.getNextSelectedUnit();
+		if (CurrentlySelectedUnit == MapUnit.NONE) {
 			EmitSignal(nameof(NoMoreAutoselectableUnits));
 		}
 		else {
-			this.CurrentlySelectedUnit = SelectedUnit;
-			ParameterWrapper wrappedUnit = new ParameterWrapper(SelectedUnit);
+			ParameterWrapper wrappedUnit = new ParameterWrapper(CurrentlySelectedUnit);
 			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
 		}
 	}
