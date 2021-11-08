@@ -27,7 +27,6 @@ public class Game : Node2D
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
 	MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
-	Button EndTurnButton;
 	Control Toolbar;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
@@ -41,7 +40,6 @@ public class Game : Node2D
 		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
 		this.TerrainAsTileMap();
 		mapView.cameraZoom = (float)0.3;
-		this.CreateUI();
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
 			ComponentManager.Instance.AddComponent(new TurnCounterComponent());
@@ -148,16 +146,6 @@ public class Game : Node2D
 		AddChild(mapView);
 	}
 
-	private void CreateUI()
-	{
-		EndTurnButton = new Button();
-		EndTurnButton.Text = "End Turn";
-		EndTurnButton.SetPosition(new Vector2(250, 10));
-		Toolbar.AddChild(EndTurnButton);
-		Toolbar.MoveChild(EndTurnButton, 0);
-		EndTurnButton.Connect("pressed", this, "_onEndTurnButtonPressed");
-	}
-
 	private void _onEndTurnButtonPressed()
 	{
 		if (CurrentState == GameState.PlayerTurn)
@@ -174,7 +162,6 @@ public class Game : Node2D
 	{
 		GD.Print("Starting player turn");
 		EmitSignal(nameof(TurnStarted));
-		EndTurnButton.Disabled = false;
 		CurrentState = GameState.PlayerTurn;
 
 		GetNextAutoselectedUnit();
@@ -185,7 +172,6 @@ public class Game : Node2D
 		if (CurrentState == GameState.PlayerTurn)
 		{
 			GD.Print("Ending player turn");
-			EndTurnButton.Disabled = true;
 			EmitSignal(nameof(TurnEnded));
 			OnComputerStartTurn();
 		}
