@@ -1,5 +1,6 @@
 using Godot;
 using ConvertCiv3Media;
+using System;
 
 public class MainMenu : Node2D
 {
@@ -9,6 +10,7 @@ public class MainMenu : Node2D
 	StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 	ImageTexture InactiveButton;
 	ImageTexture HoverButton;
+	TextureRect MainMenuBackground;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -19,31 +21,36 @@ public class MainMenu : Node2D
 	
 	private void DisplayTitleScreen()
 	{	
-		SetMainMenuBackground();
-		
-		InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
-		HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
-		
-		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
-		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
+		try {
+			SetMainMenuBackground();
+			
+			InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
+			HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
+			
+			TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
+			TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 
-		AddButton("New Game", 160, "_on_Button_pressed");
-		AddButton("Quick Start", 195, "_on_Button_pressed");
-		AddButton("Tutorial", 230, "_on_Button_pressed");
-		AddButton("Load Game", 265, "_on_Button_pressed");
-		AddButton("Load Scenario", 300, "_on_Button_pressed");
-		AddButton("Hall of Fame", 335, "_on_Button_pressed");
-		AddButton("Preferences", 370, "_on_Button_pressed");
-		AddButton("Audio Preferences", 405, "_on_Button_pressed");
-		AddButton("Credits", 440, "showCredits");
-		AddButton("Exit", 475, "_on_Exit_pressed");
+			AddButton("New Game", 160, "_on_Button_pressed");
+			AddButton("Quick Start", 195, "_on_Button_pressed");
+			AddButton("Tutorial", 230, "_on_Button_pressed");
+			AddButton("Load Game", 265, "_on_Button_pressed");
+			AddButton("Load Scenario", 300, "_on_Button_pressed");
+			AddButton("Hall of Fame", 335, "_on_Button_pressed");
+			AddButton("Preferences", 370, "_on_Button_pressed");
+			AddButton("Audio Preferences", 405, "_on_Button_pressed");
+			AddButton("Credits", 440, "showCredits");
+			AddButton("Exit", 475, "_on_Exit_pressed");
+		}
+		catch(Exception ex)
+		{
+			GD.Print("Could not set up the main menu");
+		}
 	}
 
 	private void SetMainMenuBackground()
 	{
 		ImageTexture TitleScreenTexture = Util.LoadTextureFromPCX("Art/title.pcx");
-		
-		TextureRect MainMenuBackground = new TextureRect();
+		MainMenuBackground = GetNode<TextureRect>("CanvasLayer/CenterContainer/MainMenuBackground");
 		MainMenuBackground.Texture = TitleScreenTexture;
 		AddChild(MainMenuBackground);
 	}
@@ -54,7 +61,7 @@ public class MainMenu : Node2D
 		newButton.TextureNormal = InactiveButton;
 		newButton.TextureHover = HoverButton;
 		newButton.SetPosition(new Vector2(835, verticalPosition));
-		AddChild(newButton);
+		MainMenuBackground.AddChild(newButton);
 		newButton.Connect("pressed", this, actionName);
 				
 		Button newButtonLabel = new Button();
@@ -70,7 +77,7 @@ public class MainMenu : Node2D
 		newButtonLabel.AddStyleboxOverride("pressed", TransparentBackgroundHoverStyle);
 
 		newButtonLabel.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
-		AddChild(newButtonLabel);
+		MainMenuBackground.AddChild(newButtonLabel);
 		newButtonLabel.Connect("pressed", this, actionName);
 	}
 

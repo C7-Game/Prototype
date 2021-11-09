@@ -33,9 +33,31 @@ margin_bottom = 54.0
 custom_fonts/font = ExtResource( 2 )
 text = "Civfanatics Creation &
 Customization Community's
-Civ3 Conquests Clone"
+Civ3 Conquests Clone
+Unable to load default graphics
+On Windows, these should be auto-detected from
+the Registry if Civ3 is installed.
+On Mac and Linux, set the environment variable
+CIV3_HOME to the Civ install location.
+Then restart C7."
 align = 1
 valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MainMenuBackground" type="TextureRect" parent="CanvasLayer/CenterContainer"]
+margin_left = 512.0
+margin_top = 384.0
+margin_right = 512.0
+margin_bottom = 384.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
