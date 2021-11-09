@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Godot;
+using ConvertCiv3Media;
 
 public class MapView : Node2D {
 	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
@@ -54,9 +56,16 @@ public class MapView : Node2D {
 		}
 	}
 
+	public struct VisibleTile {
+		public int virtTileX, virtTileY; // (x, y) coords of the tile. These are "virtual", i.e. unwrapped, coordinates.
+		public int viewX, viewY; // coordinates of the cell where the tile is be drawn, for use by tiled (not loose) layers
+	}
+
 	private int[,] terrain;
 	private TileMap terrainView;
 	private TileSet terrainSet;
+
+	private UnitView unitView;
 
 	public MapView(int[,] terrain, TileSet terrainSet, bool wrapHorizontally, bool wrapVertically)
 	{
@@ -68,9 +77,14 @@ public class MapView : Node2D {
 		this.wrapVertically = wrapVertically;
 
 		initTerrainLayer();
+
+		// Init unit layer
+		unitView = new UnitView(this);
+		AddChild(unitView);
 	}
 
-	public void initTerrainLayer() {
+	public void initTerrainLayer()
+	{
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
 		terrainView = new TileMap();
 		terrainView.CellSize = cellSize;
@@ -113,6 +127,25 @@ public class MapView : Node2D {
 			return y;
 	}
 
+	public IEnumerable<VisibleTile> visibleTiles()
+	{
+		var cLIC = cameraLocationInCells;
+		Vector2 screenSize = (GetViewport() != null) ? GetViewport().Size : OS.WindowSize;
+		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / scaledCellSize;
+		for (int dy = -2; dy < mapViewSize.y; dy++)
+			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
+				int x = cLIC.cellsX + dx, y = cLIC.cellsY + dy;
+				if (isTileAt(x, y)) {
+					VisibleTile tileInView = new VisibleTile();
+					tileInView.virtTileX = x;
+					tileInView.virtTileY = y;
+					tileInView.viewX = dx;
+					tileInView.viewY = dy;
+					yield return tileInView;
+				}
+			}
+	}
+
 	public void resetVisibleTiles()
 	{
 		terrainView.Clear();
@@ -126,21 +159,15 @@ public class MapView : Node2D {
 
 		var cLIC = cameraLocationInCells;
 
+		// Update layer positions
 		terrainView.Position = new Vector2(-cLIC.residueX, -cLIC.residueY);
+		if (unitView != null)
+			unitView.Position = -cameraLocation;
 
-		// Normally we want to use the viewport size here but GetViewport() returns null when this function gets called for the first time
-		// during new game setup so in that case use the window size.
-		Vector2 screenSize = (GetViewport() != null) ? GetViewport().Size : OS.WindowSize;
-		// The offset of 2 is to ensure the bottom and right edges of the screen are covered
-		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / scaledCellSize;
+		foreach (var vT in visibleTiles())
+			terrainView.SetCell(vT.viewX, vT.viewY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
 
-		for (int dy = -2; dy < mapViewSize.y; dy++)
-			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
-				int x = cLIC.cellsX + dx, y = cLIC.cellsY + dy;
-				if (isTileAt(x, y)) {
-					terrainView.SetCell(dx, dy, terrain[wrapTileX(x), wrapTileY(y)]);
-				}
-			}
+		unitView?.Update(); // trigger redraw
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
@@ -154,6 +181,7 @@ public class MapView : Node2D {
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
 			terrainView.Scale = v2NewZoom;
+			unitView.Scale = v2NewZoom;
 			setCameraLocation ((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
 			// resetVisibleTiles(); // Don't have to call this because it's already called when the camera location is changed
 		}
@@ -265,4 +293,34 @@ public class MapView : Node2D {
 		}
 	}
 
+}
+
+public class UnitView : Node2D {
+	private MapView mapView;
+
+	private ImageTexture unitIcons;
+
+	public UnitView(MapView mapView)
+	{
+		this.mapView = mapView;
+
+		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));
+		unitIcons = PCXToGodot.getImageTextureFromPCX(iconPCX);
+	}
+
+	public override void _Draw()
+	{
+		base._Draw();
+
+		foreach (var vT in mapView.visibleTiles()) {
+			int x = mapView.wrapTileX(vT.virtTileX);
+			int y = mapView.wrapTileY(vT.virtTileY);
+			if ((x == 5) && (y == 5)) {
+				Rect2 screenRect = new Rect2(MapView.cellSize * new Vector2(x + 1, y + 1) - new Vector2(16, 32), new Vector2(32, 32));
+				Rect2 settlerRect = new Rect2(new Vector2(1, 1), new Vector2(32, 32));
+				DrawTextureRectRegion(unitIcons, screenRect, settlerRect);
+			}
+		}
+
+	}
 }
