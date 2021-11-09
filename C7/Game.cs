@@ -307,9 +307,9 @@ public class Game : Node2D
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
-		else if (@event is InputEventKey eventKey)
+		else if (@event is InputEventKey eventKey && eventKey.Pressed)
 		{
-			if (eventKey.Pressed && eventKey.Scancode == (int)Godot.KeyList.Enter)
+			if (eventKey.Scancode == (int)Godot.KeyList.Enter)
 			{
 				GD.Print("Enter pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
@@ -321,7 +321,7 @@ public class Game : Node2D
 					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
 				}
 			}
-			else if (eventKey.Pressed && eventKey.Scancode == (int)Godot.KeyList.Space)
+			else if (eventKey.Scancode == (int)Godot.KeyList.Space)
 			{
 				GD.Print("Space pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
@@ -335,6 +335,22 @@ public class Game : Node2D
 					//our non-unit key handlers fired, run against a map to see if a unit one should'.
 					//But let's wait until we have at least two before deciding what the pattern should be.
 					this.UnitButtonPressed("hold");
+				}
+			}
+			else if (eventKey.Scancode == (int)Godot.KeyList.W)
+			{
+				GD.Print("W pressed");
+				if (CurrentlySelectedUnit != MapUnit.NONE)
+				{
+					this.UnitButtonPressed("wait");
+				}
+			}
+			else if (eventKey.Scancode == (int)Godot.KeyList.F)
+			{
+				GD.Print("F pressed");
+				if (CurrentlySelectedUnit != MapUnit.NONE)
+				{
+					this.UnitButtonPressed("fortify");
 				}
 			}
 		}

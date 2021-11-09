@@ -62,13 +62,13 @@ public class Advisors : CenterContainer
 		if (this.Visible) {
 			if (@event is InputEventKey eventKey)
 			{
+				//As I've added more shortcuts, I've realized checking all of them here could be irksome.
+				//For now, I'm thinking it would make more sense to process or allow through the ones that should go through,
+				//as most of the global ones should *not* go through here.
 				if (eventKey.Pressed)
 				{
-					if (eventKey.Scancode == (int)Godot.KeyList.Space || eventKey.Scancode == (int)Godot.KeyList.Enter)
-					{
-						GD.Print("Advisor received a space/enter event; stopping propagation.");
-						GetTree().SetInputAsHandled();
-					}
+					GD.Print("Advisor received a key press; stopping propagation.");
+					GetTree().SetInputAsHandled();
 				}
 			}
 		}
