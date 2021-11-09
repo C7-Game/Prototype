@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class DomesticAdvisor : Node2D
+public class DomesticAdvisor : TextureRect
 {
 	// Declare member variables here. Examples:
 	// private int a = 2;
@@ -15,10 +15,7 @@ public class DomesticAdvisor : Node2D
 
 	private void CreateUI() {
 		ImageTexture DomesticBackground = Util.LoadTextureFromPCX("Art/Advisors/domestic.pcx");
-
-		TextureRect BackgroundRectangle = new TextureRect();
-		BackgroundRectangle.Texture = DomesticBackground;
-		AddChild(BackgroundRectangle);
+		this.Texture = DomesticBackground;
 
 		//TODO: Age-based background.  Only use Ancient for now.
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupDOMESTIC.pcx", 1, 40, 149, 110);

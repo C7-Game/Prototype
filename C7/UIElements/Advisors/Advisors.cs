@@ -15,10 +15,6 @@ public class Advisors : CenterContainer
 		//Center the advisor container.  Following directions at https://docs.godotengine.org/en/stable/tutorials/gui/size_and_anchors.html?highlight=anchor
 		//Also taking advantage of it being 1024x768, as the directions didn't really work.  This is not 100% ideal (would be great for a general-purpose solution to work),
 		//but does work with the current graphics independent of resolution.
-		this.MarginLeft = -512;
-		this.MarginRight = -512;
-		this.MarginTop = -384;
-		this.MarginBottom = 384;
 		this.Hide();
 	}
 
