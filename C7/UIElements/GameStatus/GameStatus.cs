@@ -30,9 +30,10 @@ public class GameStatus : MarginContainer
 		LowerRightInfoBox.StopToggling();
 	}
 	
-	private void OnTurnStarted()
+	private void OnTurnStarted(int turnNumber)
 	{		
-		//TODO: Remove this signal handler, probably
+		//Oh hai, we do need this handler here!
+		LowerRightInfoBox.SetTurn(turnNumber);
 	}
 	
 	private void OnNoMoreAutoselectableUnits()

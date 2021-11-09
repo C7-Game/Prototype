@@ -164,7 +164,8 @@ public class Game : Node2D
 	private void OnPlayerStartTurn()
 	{
 		GD.Print("Starting player turn");
-		EmitSignal(nameof(TurnStarted));
+		int turnNumber = TurnHandling.GetTurnNumber();
+		EmitSignal(nameof(TurnStarted), turnNumber);
 		CurrentState = GameState.PlayerTurn;
 
 		GetNextAutoselectedUnit();

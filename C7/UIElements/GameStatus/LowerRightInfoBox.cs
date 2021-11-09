@@ -14,6 +14,7 @@ public class LowerRightInfoBox : TextureRect
 	Label lblUnitSelected = new Label();
 	Label attackDefenseMovement = new Label();
 	Label terrainType = new Label();
+	Label yearAndGold = new Label();
 	
 	Timer blinkingTimer = new Timer();
 	Boolean timerStarted = false;	//This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
@@ -85,8 +86,7 @@ public class LowerRightInfoBox : TextureRect
 		boxRightRectangle.AddChild(civAndGovt);
 		civAndGovt.MarginLeft = -1 * (civAndGovt.RectSize.x/2.0f);
 
-		Label yearAndGold = new Label();
-		yearAndGold.Text = "4000 BC  10 Gold (+0 per turn)";
+		yearAndGold.Text = "Turn 0  10 Gold (+0 per turn)";
 		yearAndGold.AddColorOverride("font_color", new Color(0, 0, 0));
 		yearAndGold.Align = Label.AlignEnum.Center;
 		yearAndGold.SetPosition(new Vector2(0, 105));
@@ -148,6 +148,13 @@ public class LowerRightInfoBox : TextureRect
 		terrainType.Visible = true;
 		lblUnitSelected.Text = NewUnit.unitType.name;
 		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.unitType.movement + "/" + NewUnit.unitType.movement;
+	}
+
+	///This is going to evolve a lot over time.  Probably this info box will need to keep some local state.
+	///But for now it'll show the changing turn number, providing some interactivity
+	public void SetTurn(int turnNumber)
+	{
+		yearAndGold.Text = "Turn " + turnNumber + "  10 Gold (+0 per turn)";
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.

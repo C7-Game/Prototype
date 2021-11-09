@@ -16,5 +16,11 @@ namespace C7Engine
             UnitInteractions.ClearWaitQueue();
             gameData.turn++;
         }
+
+        ///Eventually we'll have a game year or month or whatever, but for now this provides feedback on our progression
+        public static int GetTurnNumber()
+        {
+            return EngineStorage.gameData.turn;
+        }
     }
 }
