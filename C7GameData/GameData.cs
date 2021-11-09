@@ -33,6 +33,7 @@ namespace C7GameData
             settler.attack = 0;
             settler.defense = 0;
             settler.movement = 1;
+            settler.iconIndex = 0;
             settler.canFoundCity = true;
 
             UnitPrototype warrior = new UnitPrototype();
@@ -40,12 +41,14 @@ namespace C7GameData
             warrior.attack = 1;
             warrior.defense = 1;
             warrior.movement = 1;
+            warrior.iconIndex = 6;
 
             UnitPrototype worker = new UnitPrototype();
             worker.name = "Worker";
             worker.attack = 0;
             worker.defense = 0;
             worker.movement = 1;
+            worker.iconIndex = 1;
             worker.canBuildRoads = true;
 
             MapUnit mapSettler = new MapUnit();
@@ -57,12 +60,12 @@ namespace C7GameData
 
             MapUnit mapWarrior = new MapUnit();
             mapWarrior.unitType = warrior;
-            mapWarrior.location = map.tiles[168];
+            mapWarrior.location = map.tiles[169];
             mapUnits.Add(mapWarrior);
 
             MapUnit mapWorker = new MapUnit();
             mapWorker.unitType = worker;
-            mapWorker.location = map.tiles[168];
+            mapWorker.location = map.tiles[170];
             mapUnits.Add(mapWorker);
 
             mapSettler.movementPointsRemaining = 1;

@@ -320,14 +320,17 @@ public class UnitView : Node2D {
 	{
 		base._Draw();
 
+		int unitIconsWidth = (unitIcons.GetWidth() - 1) / 33;
 		foreach (var vT in mapView.visibleTiles()) {
 			int x = mapView.wrapTileX(vT.virtTileX);
 			int y = mapView.wrapTileY(vT.virtTileY);
 			foreach (var unit in C7Engine.EngineStorage.gameData.mapUnits)
 				if ((x == unit.location.xCoordinate) && (y == unit.location.yCoordinate)) {
+					int iconIndex = unit.unitType.iconIndex;
+					Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
+					Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
 					Rect2 screenRect = new Rect2(MapView.cellSize * new Vector2(x + 1, y + 1) - new Vector2(16, 32), new Vector2(32, 32));
-					Rect2 settlerRect = new Rect2(new Vector2(1, 1), new Vector2(32, 32));
-					DrawTextureRectRegion(unitIcons, screenRect, settlerRect);
+					DrawTextureRectRegion(unitIcons, screenRect, unitRect);
 				}
 		}
 
