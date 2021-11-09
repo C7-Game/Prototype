@@ -12,6 +12,8 @@ public class MapView : Node2D {
 		get { return cellSize * new Vector2(cameraZoom, cameraZoom); }
 	}
 
+	public Game game;
+
 	public int mapWidth  { get; private set; }
 	public int mapHeight { get; private set; }
 	public bool wrapHorizontally { get; private set; }
@@ -69,8 +71,9 @@ public class MapView : Node2D {
 
 	private UnitView unitView;
 
-	public MapView(int[,] terrain, TileSet terrainSet, bool wrapHorizontally, bool wrapVertically)
+	public MapView(Game game, int[,] terrain, TileSet terrainSet, bool wrapHorizontally, bool wrapVertically)
 	{
+		this.game = game;
 		this.terrain = terrain;
 		this.terrainSet = terrainSet;
 		mapWidth = terrain.GetLength(0);
@@ -326,10 +329,15 @@ public class UnitView : Node2D {
 			int y = mapView.wrapTileY(vT.virtTileY);
 			foreach (var unit in C7Engine.EngineStorage.gameData.mapUnits)
 				if ((x == unit.location.xCoordinate) && (y == unit.location.yCoordinate)) {
+					Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
+
+					if (unit.guid == mapView.game.CurrentlySelectedUnit.guid)
+						DrawCircle(tileCenter - new Vector2(0, 16), 16, Color.Color8(255, 255, 0));
+
 					int iconIndex = unit.unitType.iconIndex;
 					Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
 					Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-					Rect2 screenRect = new Rect2(MapView.cellSize * new Vector2(x + 1, y + 1) - new Vector2(16, 32), new Vector2(32, 32));
+					Rect2 screenRect = new Rect2(tileCenter - new Vector2(16, 32), new Vector2(32, 32));
 					DrawTextureRectRegion(unitIcons, screenRect, unitRect);
 				}
 		}

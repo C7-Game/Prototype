@@ -26,7 +26,7 @@ public class Game : Node2D
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
-	MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
+	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
 	Control Toolbar;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
@@ -145,8 +145,14 @@ public class Game : Node2D
 			}
 		}
 
-		mapView = new MapView(Map, TS, false, false);
+		mapView = new MapView(this, Map, TS, false, false);
 		AddChild(mapView);
+	}
+
+	public void setSelectedUnit(MapUnit unit)
+	{
+		CurrentlySelectedUnit = unit;
+		mapView.onVisibleAreaChanged();
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -372,7 +378,7 @@ public class Game : Node2D
 
 	private void GetNextAutoselectedUnit()
 	{
-		this.CurrentlySelectedUnit = UnitInteractions.getNextSelectedUnit();
+		setSelectedUnit(UnitInteractions.getNextSelectedUnit());
 		if (CurrentlySelectedUnit == MapUnit.NONE) {
 			EmitSignal(nameof(NoMoreAutoselectableUnits));
 		}
