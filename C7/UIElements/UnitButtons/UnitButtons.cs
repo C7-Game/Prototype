@@ -60,11 +60,6 @@ public class UnitButtons : VBoxContainer
 		specializedControls.AddChild(plantForest);
 		specializedControls.AddChild(clearDamage);
 		specializedControls.AddChild(automate);
-		
-		//Button count should be calculated dynamically and be the max # of visible buttons in any row
-		//For now I've set it to 8 because I'm making other things better first.
-		int buttonCount = 8;
-		this.MarginLeft = -1 * 16 * buttonCount;
 	}
 
 	private void onButtonPressed(string buttonName)

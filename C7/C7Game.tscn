@@ -215,9 +215,8 @@ __meta__ = {
 }
 
 [node name="UnitButtons" type="VBoxContainer" parent="CanvasLayer"]
-anchor_left = 0.5
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = -112.0
 size_flags_vertical = 0
@@ -228,19 +227,24 @@ __meta__ = {
 }
 
 [node name="AdvancedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
+margin_right = 1024.0
 size_flags_vertical = 0
 custom_constants/separation = 0
 alignment = 1
 
 [node name="RenameButton" type="TextureButton" parent="CanvasLayer/UnitButtons/AdvancedUnitControls"]
+margin_left = 512.0
+margin_right = 512.0
 script = ExtResource( 8 )
 
 [node name="SpecializedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
+margin_right = 1024.0
 size_flags_vertical = 0
 custom_constants/separation = 0
 alignment = 1
 
 [node name="PrimaryUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
+margin_right = 1024.0
 size_flags_vertical = 0
 custom_constants/separation = 0
 alignment = 1
