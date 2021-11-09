@@ -81,6 +81,8 @@ public class MapView : Node2D {
 		// Init unit layer
 		unitView = new UnitView(this);
 		AddChild(unitView);
+
+		onVisibleAreaChanged();
 	}
 
 	public void initTerrainLayer()
@@ -90,7 +92,6 @@ public class MapView : Node2D {
 		terrainView.CellSize = cellSize;
 		// terrainView.CenteredTextures = true;
 		terrainView.TileSet = terrainSet;
-		resetVisibleTiles();
 		AddChild(terrainView);
 	}
 
@@ -127,11 +128,17 @@ public class MapView : Node2D {
 			return y;
 	}
 
+	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
+	private Vector2 getVisibleAreaSize()
+	{
+		var viewport = GetViewport();
+		return (viewport != null) ? viewport.Size : OS.WindowSize;
+	}
+
 	public IEnumerable<VisibleTile> visibleTiles()
 	{
 		var cLIC = cameraLocationInCells;
-		Vector2 screenSize = (GetViewport() != null) ? GetViewport().Size : OS.WindowSize;
-		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / scaledCellSize;
+		Vector2 mapViewSize = new Vector2(2, 2) + getVisibleAreaSize() / scaledCellSize;
 		for (int dy = -2; dy < mapViewSize.y; dy++)
 			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
 				int x = cLIC.cellsX + dx, y = cLIC.cellsY + dy;
@@ -146,7 +153,7 @@ public class MapView : Node2D {
 			}
 	}
 
-	public void resetVisibleTiles()
+	public void onVisibleAreaChanged()
 	{
 		terrainView.Clear();
 
@@ -161,13 +168,12 @@ public class MapView : Node2D {
 
 		// Update layer positions
 		terrainView.Position = new Vector2(-cLIC.residueX, -cLIC.residueY);
-		if (unitView != null)
-			unitView.Position = -cameraLocation;
+		unitView.Position = -cameraLocation;
 
 		foreach (var vT in visibleTiles())
 			terrainView.SetCell(vT.viewX, vT.viewY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
 
-		unitView?.Update(); // trigger redraw
+		unitView.Update(); // trigger redraw
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
@@ -190,7 +196,7 @@ public class MapView : Node2D {
 	// Zooms in or out centered on the middle of the screen
 	public void setCameraZoomFromMiddle(float newScale)
 	{
-		setCameraZoom(newScale, GetViewport().Size / 2);
+		setCameraZoom(newScale, getVisibleAreaSize() / 2);
 	}
 
 	public void moveCamera(Vector2 offset)
@@ -204,16 +210,16 @@ public class MapView : Node2D {
 		// larger than the map (if we're zoomed far out) so in that case we must apply the constraint the other way around, i.e. constrain the
 		// map to the viewport rather than the viewport to the map.
 		// TODO: Not quite perfect. When you zoom out you can still move the map a bit off the right/bottom edges.
-		Vector2 viewportSize = GetViewport().Size;
+		Vector2 visAreaSize = getVisibleAreaSize();
 		Vector2 mapPixelSize = new Vector2(cameraZoom, cameraZoom) * (new Vector2(cellSize.x * (mapWidth + 1), cellSize.y * (mapHeight + 1)));
 		if (!wrapHorizontally) {
 			float leftLim, rightLim;
 			{
-				if (mapPixelSize.x >= viewportSize.x) {
+				if (mapPixelSize.x >= visAreaSize.x) {
 					leftLim = 0;
-					rightLim = mapPixelSize.x - viewportSize.x;
+					rightLim = mapPixelSize.x - visAreaSize.x;
 				} else {
-					leftLim = mapPixelSize.x - viewportSize.x;
+					leftLim = mapPixelSize.x - visAreaSize.x;
 					rightLim = 0;
 				}
 			}
@@ -228,11 +234,11 @@ public class MapView : Node2D {
 			float topMargin = 70, bottomMargin = 140;
 			float topLim, bottomLim;
 			{
-				if (mapPixelSize.y >= viewportSize.y) {
+				if (mapPixelSize.y >= visAreaSize.y) {
 					topLim = -topMargin;
-					bottomLim = mapPixelSize.y - viewportSize.y + bottomMargin;
+					bottomLim = mapPixelSize.y - visAreaSize.y + bottomMargin;
 				} else {
-					topLim = mapPixelSize.y - viewportSize.y;
+					topLim = mapPixelSize.y - visAreaSize.y;
 					bottomLim = 0;
 				}
 			}
@@ -243,7 +249,7 @@ public class MapView : Node2D {
 		}
 
 		internalCameraLocation = location;
-		resetVisibleTiles();
+		onVisibleAreaChanged();
 	}
 
 	// Returns the location of tile (x, y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the

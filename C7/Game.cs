@@ -222,7 +222,7 @@ public class Game : Node2D
 
 	public void _OnViewportSizeChanged()
 	{
-		mapView.resetVisibleTiles();
+		mapView.onVisibleAreaChanged();
 	}
 
 	public void AdjustZoomSlider(int numSteps, Vector2 zoomCenter)
@@ -292,7 +292,7 @@ public class Game : Node2D
 				if (mapView.tileOnScreenAt(eventMouseButton.Position, out x, out y)) {
 					GD.Print("Setting terrain sprite at (" + x.ToString() + ", " + y.ToString() + ") to 0");
 					Map[x, y] = 0;
-					mapView.resetVisibleTiles();
+					mapView.onVisibleAreaChanged();
 				} else
 					GD.Print("Didn't click on any tile");
 			}
