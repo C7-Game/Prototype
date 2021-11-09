@@ -6,8 +6,8 @@ namespace C7GameData
      */
     public class GameMap
     {
-        int numTilesWide;
-        int numTilesTall;
+        public int numTilesWide { get; private set; }
+        public int numTilesTall { get; private set; }
         bool horizontalWrap;
 
         public List<Tile> tiles {get;}
@@ -30,8 +30,8 @@ namespace C7GameData
             grassland.movementCost = 1;
 
             GameMap dummyMap = new GameMap();
-            dummyMap.numTilesTall = 40;
-            dummyMap.numTilesWide = 40;
+            dummyMap.numTilesTall = 80;
+            dummyMap.numTilesWide = 80;
 
             //Uh, right, isometic.  That means we have to stagger things.
             //Also I forget how to do ranges in C#, oh well.

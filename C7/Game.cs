@@ -35,10 +35,13 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		CreateGame.createGame();
+		var map = EngineStorage.gameData.map;
+		this.TerrainAsTileMap(map.numTilesWide, map.numTilesTall);
+
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
 		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-		this.TerrainAsTileMap();
 		mapView.cameraZoom = (float)0.3;
 		// If later recreating scene, the component may already exist, hence try/catch
 		try{
@@ -47,10 +50,8 @@ public class Game : Node2D
 		catch {
 			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
 		}
-		
-		CreateGame.createGame();
 
-		// Hide slideout bar on startup		
+		// Hide slideout bar on startup
 		_on_SlideToggle_toggled(false);
 
 		GD.Print("Now in game!");
@@ -90,9 +91,7 @@ public class Game : Node2D
 		OnPlayerStartTurn();
 	}
 
-	public void TerrainAsTileMap() {
-		int mapWidth = 80, mapHeight = 80;
-
+	public void TerrainAsTileMap(int mapWidth, int mapHeight) {
 		TileSet TS = new TileSet();
 
 		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
