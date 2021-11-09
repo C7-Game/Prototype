@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Godot;
 using ConvertCiv3Media;
+using C7GameData;
+using C7Engine;
 
 public class MapView : Node2D {
 	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
@@ -321,11 +323,12 @@ public class UnitView : Node2D {
 		foreach (var vT in mapView.visibleTiles()) {
 			int x = mapView.wrapTileX(vT.virtTileX);
 			int y = mapView.wrapTileY(vT.virtTileY);
-			if ((x == 5) && (y == 5)) {
-				Rect2 screenRect = new Rect2(MapView.cellSize * new Vector2(x + 1, y + 1) - new Vector2(16, 32), new Vector2(32, 32));
-				Rect2 settlerRect = new Rect2(new Vector2(1, 1), new Vector2(32, 32));
-				DrawTextureRectRegion(unitIcons, screenRect, settlerRect);
-			}
+			foreach (var unit in C7Engine.EngineStorage.gameData.mapUnits)
+				if ((x == unit.location.xCoordinate) && (y == unit.location.yCoordinate)) {
+					Rect2 screenRect = new Rect2(MapView.cellSize * new Vector2(x + 1, y + 1) - new Vector2(16, 32), new Vector2(32, 32));
+					Rect2 settlerRect = new Rect2(new Vector2(1, 1), new Vector2(32, 32));
+					DrawTextureRectRegion(unitIcons, screenRect, settlerRect);
+				}
 		}
 
 	}
