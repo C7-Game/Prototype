@@ -341,7 +341,7 @@ public class Game : Node2D
 		{
 			// UI slider has the min/max zoom settings for now
 			VSlider slider = GetNode<VSlider>("CanvasLayer/SlideOutBar/VBoxContainer/Zoom");
-			double newScale = mapView.Scale.x * magnifyGesture.Factor;
+			double newScale = mapView.cameraZoom * magnifyGesture.Factor;
 			if (newScale < slider.MinValue)
 				newScale = slider.MinValue;
 			else if (newScale > slider.MaxValue)

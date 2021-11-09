@@ -4,6 +4,9 @@ public class MapView : Node2D {
 	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
 	// staggered and half overlap).
 	public static readonly Vector2 cellSize = new Vector2(64, 32);
+	public Vector2 scaledCellSize {
+		get { return cellSize * new Vector2(cameraZoom, cameraZoom); }
+	}
 
 	public int mapWidth  { get; private set; }
 	public int mapHeight { get; private set; }
@@ -19,8 +22,9 @@ public class MapView : Node2D {
 			setCameraLocation(value);
 		}
 	}
+	public float internalCameraZoom = 1;
 	public float cameraZoom {
-		get { return Scale.x; } // x and y are the same
+		get { return internalCameraZoom; }
 		set { setCameraZoomFromMiddle(value); }
 	}
 
@@ -34,7 +38,7 @@ public class MapView : Node2D {
 		get {
 			var tr = new CameraLocationInCells();
 
-			Vector2 tileSize = 2 * Scale * cellSize;
+			Vector2 tileSize = 2 * scaledCellSize;
 
 			int cameraPixelX = (int)cameraLocation.x;
 			int tilesX = cameraPixelX / (int)tileSize.x;
@@ -122,13 +126,13 @@ public class MapView : Node2D {
 
 		var cLIC = cameraLocationInCells;
 
-		Position = new Vector2(-cLIC.residueX, -cLIC.residueY);
+		terrainView.Position = new Vector2(-cLIC.residueX, -cLIC.residueY);
 
 		// Normally we want to use the viewport size here but GetViewport() returns null when this function gets called for the first time
 		// during new game setup so in that case use the window size.
 		Vector2 screenSize = (GetViewport() != null) ? GetViewport().Size : OS.WindowSize;
 		// The offset of 2 is to ensure the bottom and right edges of the screen are covered
-		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / (Scale * cellSize);
+		Vector2 mapViewSize = new Vector2(2, 2) + screenSize / scaledCellSize;
 
 		for (int dy = -2; dy < mapViewSize.y; dy++)
 			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
@@ -145,11 +149,12 @@ public class MapView : Node2D {
 	// function must be separate, though, so that we can change the zoom level inside that callback without entering an infinite loop.
 	public void setCameraZoom(float newScale, Vector2 center)
 	{
-		Vector2 v2NewScale = new Vector2(newScale, newScale);
-		Vector2 oldScale = Scale;
-		if (v2NewScale != oldScale) {
-			Scale = v2NewScale;
-			setCameraLocation ((v2NewScale / oldScale) * (cameraLocation + center) - center);
+		var v2NewZoom = new Vector2(newScale, newScale);
+		var v2OldZoom = new Vector2(cameraZoom, cameraZoom);
+		if (v2NewZoom != v2OldZoom) {
+			internalCameraZoom = newScale;
+			terrainView.Scale = v2NewZoom;
+			setCameraLocation ((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
 			// resetVisibleTiles(); // Don't have to call this because it's already called when the camera location is changed
 		}
 	}
@@ -172,7 +177,7 @@ public class MapView : Node2D {
 		// map to the viewport rather than the viewport to the map.
 		// TODO: Not quite perfect. When you zoom out you can still move the map a bit off the right/bottom edges.
 		Vector2 viewportSize = GetViewport().Size;
-		Vector2 mapPixelSize = Scale * (new Vector2(cellSize.x * (mapWidth + 1), cellSize.y * (mapHeight + 1)));
+		Vector2 mapPixelSize = new Vector2(cameraZoom, cameraZoom) * (new Vector2(cellSize.x * (mapWidth + 1), cellSize.y * (mapHeight + 1)));
 		if (!wrapHorizontally) {
 			float leftLim, rightLim;
 			{
@@ -223,7 +228,7 @@ public class MapView : Node2D {
 		Vector2 centeringOffset = center ? new Vector2(1, 1) : new Vector2(0, 0);
 
 		// cameraTileX/Y is what gets drawn at (0, 0) in MapView's local coordinates.
-		return Position + (centeringOffset + new Vector2(x - cLIC.cellsX, y - cLIC.cellsY)) * Scale * cellSize;
+		return terrainView.Position + (centeringOffset + new Vector2(x - cLIC.cellsX, y - cLIC.cellsY)) * scaledCellSize;
 	}
 
 	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
@@ -231,7 +236,7 @@ public class MapView : Node2D {
 	{
 		// TODO: This calculation could be made a lot more efficient by inlining screenLocationOfTile since right now it undoes several things
 		// that function does. Though this way it's more clear how the algorithm works.
-		Vector2 mapLoc = (screenLocation - screenLocationOfTile(0, 0, false)) / (Scale * cellSize);
+		Vector2 mapLoc = (screenLocation - screenLocationOfTile(0, 0, false)) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
 		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
