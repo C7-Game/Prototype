@@ -2,8 +2,13 @@ namespace C7Engine
 {
     using C7GameData;
     using System;
+    using System.Collections.Generic;
+
     public class UnitInteractions
     {
+
+        private static Queue<MapUnit> waitQueue = new Queue<MapUnit>();
+
         public static MapUnit getNextSelectedUnit()
         {
             GameData gameData = EngineStorage.gameData;
@@ -13,8 +18,13 @@ namespace C7Engine
                 //but we haven't added the concepts of players or civilizations yet.
                 if (unit.movementPointsRemaining > 0 && !unit.isFortified)
                 {
-                    return unit;
+                    if (!waitQueue.Contains(unit)) {
+                        return unit;
+                    }
                 }
+            }
+            if (waitQueue.Count > 0) {
+                return waitQueue.Dequeue();
             }
             return MapUnit.NONE;
         }
@@ -83,6 +93,25 @@ namespace C7Engine
                 }
             }
             Console.WriteLine("Failed to find a matching unit with guid " + guid);
+        }
+
+        public static void waitUnit(string guid)
+        {
+            GameData gameData = EngineStorage.gameData;
+            foreach (MapUnit unit in gameData.mapUnits)
+            {
+                if (unit.guid == guid)
+                {
+                    Console.WriteLine("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; adding it to the wait queue");
+                    waitQueue.Enqueue(unit);
+                }
+            }
+            Console.WriteLine("Failed to find a matching unit with guid " + guid);
+        }
+
+        public static void ClearWaitQueue()
+        {
+            waitQueue.Clear();
         }
     }
 }

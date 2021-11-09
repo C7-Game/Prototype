@@ -15,7 +15,7 @@ public class UnitButtons : VBoxContainer
 
 		HBoxContainer primaryControls = GetNode<HBoxContainer>("PrimaryUnitControls");
 		UnitControlButton holdButton = new UnitControlButton("hold", 0, 0, onButtonPressed);
-		UnitControlButton waitButton = new UnitControlButton("waitButton", 32, 0, onButtonPressed);
+		UnitControlButton waitButton = new UnitControlButton("wait", 32, 0, onButtonPressed);
 		UnitControlButton fortifyButton = new UnitControlButton("fortify", 64, 0, onButtonPressed);
 		UnitControlButton disbandButton = new UnitControlButton("disband", 96, 0, onButtonPressed);
 		UnitControlButton goToButton = new UnitControlButton("goTo", 128, 0, onButtonPressed);

@@ -383,7 +383,18 @@ public class Game : Node2D
 			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
 			GetNextAutoselectedUnit();
 		}
+		else if (buttonName.Equals("wait"))
+		{
+			UnitInteractions.waitUnit(CurrentlySelectedUnit.guid);
+			GetNextAutoselectedUnit();
+		}
+		else
+		{
+			//A nice sanity check if I use a different name here than where I created it...
+			GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+		}
 	}
+
 	private void _on_SlideToggle_toggled(bool buttonPressed)
 	{
 		if (buttonPressed)
