@@ -378,6 +378,11 @@ public class Game : Node2D
 			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
 			GetNextAutoselectedUnit();
 		}
+		else if (buttonName.Equals("fortify"))
+		{
+			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
+			GetNextAutoselectedUnit();
+		}
 	}
 	private void _on_SlideToggle_toggled(bool buttonPressed)
 	{

@@ -24,13 +24,17 @@ namespace C7Engine
             GameData gameData = EngineStorage.gameData;
             //This is inefficient, perhaps we'll have a map someday.  But with three units,
             //we'll survive for now.
+            Console.WriteLine("Trying to fortify unit " + guid);
             foreach (MapUnit unit in gameData.mapUnits)
             {
                 if (unit.guid == guid)
                 {
+                    Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
                     unit.isFortified = true;
+                    return;
                 }
             }
+            Console.WriteLine("Failed to find unit " + guid);
         }
 
         /**
