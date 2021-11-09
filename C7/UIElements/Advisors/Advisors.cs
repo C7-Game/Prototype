@@ -67,8 +67,14 @@ public class Advisors : CenterContainer
 				//as most of the global ones should *not* go through here.
 				if (eventKey.Pressed)
 				{
-					GD.Print("Advisor received a key press; stopping propagation.");
-					GetTree().SetInputAsHandled();
+					if (eventKey.Scancode == (int)Godot.KeyList.Escape) {
+						this.Hide();
+						GetTree().SetInputAsHandled();
+					}
+					else {
+						GD.Print("Advisor received a key press; stopping propagation.");
+						GetTree().SetInputAsHandled();
+					}
 				}
 			}
 		}
