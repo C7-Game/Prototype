@@ -14,7 +14,7 @@ namespace C7Engine
      **/
     public class EngineStorage
     {
-		public static GameData gameData {get; set;}
+		internal static GameData gameData {get; set;}
 
 		/**
 		 * Updates the game data pointer to a new set of game data.

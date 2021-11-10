@@ -327,7 +327,7 @@ public class UnitView : Node2D {
 		foreach (var vT in mapView.visibleTiles()) {
 			int x = mapView.wrapTileX(vT.virtTileX);
 			int y = mapView.wrapTileY(vT.virtTileY);
-			foreach (var unit in C7Engine.EngineStorage.gameData.mapUnits)
+			foreach (var unit in UnitInteractions.GetAllUnits())
 				if ((x == unit.location.xCoordinate) && (y == unit.location.yCoordinate)) {
 					Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
 

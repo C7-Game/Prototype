@@ -9,6 +9,14 @@ namespace C7Engine
 
         private static Queue<MapUnit> waitQueue = new Queue<MapUnit>();
 
+        /**
+         * Returns all units.  Should be used sparingly.
+         **/
+        public static List<MapUnit> GetAllUnits()
+        {
+            return EngineStorage.gameData.mapUnits;
+        }
+
         public static MapUnit getNextSelectedUnit()
         {
             GameData gameData = EngineStorage.gameData;

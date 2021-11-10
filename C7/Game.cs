@@ -36,7 +36,7 @@ public class Game : Node2D
 	public override void _Ready()
 	{
 		CreateGame.createGame();
-		var map = EngineStorage.gameData.map;
+		var map = MapInteractions.GetWholeMap();
 		this.TerrainAsTileMap(map.numTilesWide, map.numTilesTall);
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
