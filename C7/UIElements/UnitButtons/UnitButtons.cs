@@ -1,10 +1,16 @@
 using Godot;
-using System;
+using System.Collections.Generic;
+using C7GameData;
 
 public class UnitButtons : VBoxContainer
 {
 
 	[Signal] public delegate void UnitButtonPressed(string button);
+
+	private Dictionary<string, UnitControlButton> buttonMap = new Dictionary<string, UnitControlButton>();
+	HBoxContainer primaryControls;
+	HBoxContainer specializedControls;
+	HBoxContainer advancedControls;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -13,58 +19,60 @@ public class UnitButtons : VBoxContainer
 		//Remember to re-calc the margin after hiding/unhiding buttons, as that may affect the width.
 		//this.GetNode<FortifyButton>("PrimaryUnitControls/FortifyButton").Hide();
 
-		HBoxContainer primaryControls = GetNode<HBoxContainer>("PrimaryUnitControls");
-		UnitControlButton holdButton = new UnitControlButton("hold", 0, 0, onButtonPressed);
-		UnitControlButton waitButton = new UnitControlButton("wait", 1, 0, onButtonPressed);
-		UnitControlButton fortifyButton = new UnitControlButton("fortify", 2, 0, onButtonPressed);
-		UnitControlButton disbandButton = new UnitControlButton("disband", 3, 0, onButtonPressed);
-		UnitControlButton goToButton = new UnitControlButton("goTo", 4, 0, onButtonPressed);
-		UnitControlButton exploreButton = new UnitControlButton("explore", 5, 0, onButtonPressed);
-		UnitControlButton sentryButton = new UnitControlButton("sentry", 6, 0, onButtonPressed);
-		UnitControlButton sentryEnemyOnly = new UnitControlButton("sentryEnemyOnly", 2, 5, onButtonPressed);
-		primaryControls.AddChild(holdButton);
-		primaryControls.AddChild(waitButton);
-		primaryControls.AddChild(fortifyButton);
-		primaryControls.AddChild(disbandButton);
-		primaryControls.AddChild(goToButton);
-		primaryControls.AddChild(exploreButton);
-		primaryControls.AddChild(sentryButton);
-		primaryControls.AddChild(sentryEnemyOnly);
+		primaryControls = GetNode<HBoxContainer>("PrimaryUnitControls");
+		specializedControls = GetNode<HBoxContainer>("SpecializedUnitControls");
 
-		HBoxContainer specializedControls = GetNode<HBoxContainer>("SpecializedUnitControls");
-		UnitControlButton load = new UnitControlButton("load", 7, 0, onButtonPressed);
-		UnitControlButton unload = new UnitControlButton("unload", 0, 1, onButtonPressed);
-		UnitControlButton pillage = new UnitControlButton("pillage", 2, 1, onButtonPressed);
-		UnitControlButton bombard = new UnitControlButton("bombard", 3, 1, onButtonPressed);
-		UnitControlButton autobombard = new UnitControlButton("autobombard", 3, 5, onButtonPressed);
-		UnitControlButton fortress = new UnitControlButton("fortress", 0, 3, onButtonPressed);
-		UnitControlButton barricade = new UnitControlButton("barricade", 4, 4, onButtonPressed);
-		UnitControlButton mine = new UnitControlButton("mine", 1, 3, onButtonPressed);
-		UnitControlButton irrigate = new UnitControlButton("irrigate", 2, 3, onButtonPressed);
-		UnitControlButton chopForest = new UnitControlButton("chopForest", 3, 3, onButtonPressed);
-		UnitControlButton chopJungle = new UnitControlButton("chopJungle", 4, 3, onButtonPressed);
-		UnitControlButton plantForest = new UnitControlButton("plantForest", 5, 3, onButtonPressed);
-		UnitControlButton clearDamage = new UnitControlButton("clearDamage", 6, 3, onButtonPressed);
-		UnitControlButton automate = new UnitControlButton("automate", 7, 3, onButtonPressed);
-		specializedControls.AddChild(load);
-		specializedControls.AddChild(unload);
-		specializedControls.AddChild(pillage);
-		specializedControls.AddChild(bombard);
-		specializedControls.AddChild(autobombard);
-		specializedControls.AddChild(fortress);
-		specializedControls.AddChild(barricade);
-		specializedControls.AddChild(mine);
-		specializedControls.AddChild(irrigate);
-		specializedControls.AddChild(chopForest);
-		specializedControls.AddChild(chopJungle);
-		specializedControls.AddChild(plantForest);
-		specializedControls.AddChild(clearDamage);
-		specializedControls.AddChild(automate);
+		AddNewButton(primaryControls, new UnitControlButton("hold", 0, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("wait", 1, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("fortify", 2, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("disband", 3, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("goTo", 4, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("explore", 5, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("sentry", 6, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("sentryEnemyOnly", 2, 5, onButtonPressed));
+
+		//   ******* SPECIALIZED CONTROLS *************
+		AddNewButton(specializedControls, new UnitControlButton("load", 7, 0, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("unload", 0, 1, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("pillage", 2, 1, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("bombard", 3, 1, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("autobombard", 3, 5, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("paradrop", 4, 1, onButtonPressed));
+		//superfortify?
+		AddNewButton(specializedControls, new UnitControlButton("hurryBuilding", 6, 1, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("upgrade", 7, 1, onButtonPressed));
+
+		//TODO: The first two buttons in row index 2, and validate science age/colony are correct
+		AddNewButton(specializedControls, new UnitControlButton("sacrifice", 3, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("scienceAge", 3, 2, onButtonPressed));	//validate
+		AddNewButton(specializedControls, new UnitControlButton("buildColony", 4, 2, onButtonPressed));	//validate
+		AddNewButton(specializedControls, new UnitControlButton("buildCity", 5, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("road", 6, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("railroad", 7, 2, onButtonPressed));
+
+		AddNewButton(specializedControls, new UnitControlButton("fortress", 0, 3, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("barricade", 4, 4, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("mine", 1, 3, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("irrigate", 2, 3, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("chopForest", 3, 3, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("chopJungle", 4, 3, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("plantForest", 5, 3, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("clearDamage", 6, 3, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("automate", 7, 3, onButtonPressed));
+
+		//Row index 4 and later not yet added
 	}
 
-	private void onButtonPressed(string buttonName)
+	private void AddNewButton(HBoxContainer row, UnitControlButton button)
 	{
-		EmitSignal(nameof(UnitButtonPressed), buttonName);
+		row.AddChild(button);
+		GD.Print("Adding " + button.key + " to buttonMap");
+		buttonMap[button.key] = button;
+	}
+
+	private void onButtonPressed(string buttonKey)
+	{
+		EmitSignal(nameof(UnitButtonPressed), buttonKey);
 	}
 	
 	private void OnNoMoreAutoselectableUnits()
@@ -74,6 +82,22 @@ public class UnitButtons : VBoxContainer
 	
 	private void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
+		MapUnit unit = wrappedMapUnit.GetValue<MapUnit>();
+
+
+		foreach (UnitControlButton button in buttonMap.Values) {
+			button.Visible = false;
+		}
+
+		foreach (string buttonKey in unit.availableActions) {
+			if (buttonMap.ContainsKey(buttonKey)) {
+				buttonMap[buttonKey].Visible = true;
+			}
+			else {
+				GD.PrintErr("Could not find button " + buttonKey);
+			}
+		}
+
 		this.Visible = true;
 	}
 }

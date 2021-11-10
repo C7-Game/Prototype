@@ -19,7 +19,7 @@ namespace C7Engine
                 if (unit.movementPointsRemaining > 0 && !unit.isFortified)
                 {
                     if (!waitQueue.Contains(unit)) {
-                        return unit;
+                        return UnitWithAvailableActions(unit);
                     }
                 }
             }
@@ -27,6 +27,45 @@ namespace C7Engine
                 return waitQueue.Dequeue();
             }
             return MapUnit.NONE;
+        }
+
+        /**
+         * Helper function to add the available actions to a unit
+         * based on what terrain it is on.
+         **/
+        private static MapUnit UnitWithAvailableActions(MapUnit unit)
+        {
+            unit.availableActions.Clear();
+
+            //This should have "real" code someday.  For now, I'll hard-code a few things based
+            //on the unit type.  That will allow proving the end-to-end works, and we can
+            //add real support as we add more mechanics.  Probably some of it early, some of it...
+            //not so early.
+            //For now, we'll add 'all' the basic actions (e.g. vanilla, non-automated ones), though this is not necessarily right.
+            string[] basicActions = { "hold", "wait", "fortify", "disband", "goTo"};
+            unit.availableActions.AddRange(basicActions);
+
+            string unitType = unit.unitType.name;
+            if (unitType.Equals("Warrior")) {
+                unit.availableActions.Add("pillage");
+            }
+            else if (unitType.Equals("Settler")) {
+                unit.availableActions.Add("buildCity");
+            }
+            else if (unitType.Equals("Worker")) {
+                unit.availableActions.Add("road");
+                unit.availableActions.Add("mine");
+                unit.availableActions.Add("irrigate");
+            }
+            else {
+                //It must be a catapult
+                unit.availableActions.Add("bombard");
+            }
+
+            //Always add an advanced action b/c we don't have code to make the buttons show up at the right spot if they're all hidden yet
+            unit.availableActions.Add("rename");
+
+            return unit;
         }
 
         public static void fortifyUnit(string guid)

@@ -5,16 +5,16 @@ using System;
 public class UnitControlButton : TextureButton
 {
 
-    private string name;
+    public string key;
     private int graphicsX;
     private int graphicsY;
     private Action<string> onPressedAction;
 
     public static int scale = 32;   //how many pixels each button is in each direction
 
-    public UnitControlButton(string name, int graphicsX, int graphicsY, Action<string> onPressedAction)
+    public UnitControlButton(string key, int graphicsX, int graphicsY, Action<string> onPressedAction)
     {
-        this.name = name;
+        this.key = key;
         this.graphicsX = graphicsX;
         this.graphicsY = graphicsY;
         this.onPressedAction = onPressedAction;
@@ -39,6 +39,6 @@ public class UnitControlButton : TextureButton
 
     private void ButtonPressed()
     {
-        onPressedAction(this.name);
+        onPressedAction(this.key);
     }
 }
