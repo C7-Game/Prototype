@@ -1,5 +1,6 @@
 namespace C7GameData
 {
+    using System;
     using System.Collections.Generic;
     /**
      * The game map, at the top level.
@@ -15,6 +16,46 @@ namespace C7GameData
         public GameMap()
         {
             this.tiles = new List<Tile>();
+        }
+
+        public int tileCoordsToIndex(int x, int y)
+        {
+            return y * numTilesWide/2 + (y%2 == 0 ? x/2 : (x-1)/2);
+        }
+
+        public void tileIndexToCoords(int index, out int x, out int y)
+        {
+            int doubleRow = index / numTilesWide;
+            int doubleRowRem = index % numTilesWide;
+            if (doubleRowRem < numTilesWide/2) {
+                x = 2 * doubleRowRem;
+                y = 2 * doubleRow;
+            } else {
+                x = 1 + 2 * (doubleRowRem - numTilesWide/2);
+                y = 2 * doubleRow + 1;
+            }
+        }
+
+        // This method verifies that the conversion between tile index and coords is consistent for all possible valid inputs. It's not called
+        // anywhere but I'm keeping it around in case we ever need to work on the conversion methods again.
+        public void testTileIndexComputation()
+        {
+            for (int y = 0; y < numTilesTall; y++)
+                for (int x = y%2; x < numTilesWide; x += 2) {
+                    int rx, ry;
+                    int index = tileCoordsToIndex(x, y);
+                    tileIndexToCoords(index, out rx, out ry);
+                    if ((rx != x) || (ry != y))
+                        throw new System.Exception(String.Format("Error computing tile index/coords: ({0}, {1}) -> {2} -> ({3}, {4})", x, y, index, rx, ry));
+                }
+
+            for (int i = 0; i < numTilesWide * numTilesTall / 2; i++) {
+                int x, y;
+                tileIndexToCoords(i, out x, out y);
+                int ri = tileCoordsToIndex(x, y);
+                if (ri != i)
+                    throw new System.Exception(String.Format("Error computing tile index/coords: {0} -> ({1}, {2}) -> {3}", i, x, y, ri));
+            }
         }
 
         /**
