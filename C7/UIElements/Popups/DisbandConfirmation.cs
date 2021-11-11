@@ -19,8 +19,8 @@ public class DisbandConfirmation : TextureRect
 		//Create a transparent texture background of the appropriate size.
 		//This is super important as if we just add the children, the parent won't be able to figure
 		//out the size of this TextureRect, and it won't be able to align it properly.
-        //I added an extra 10 px on width for margin... maybe we should do margin another way, but 
-        //this works reliably.
+		//I added an extra 10 px on width for margin... maybe we should do margin another way, but 
+		//this works reliably.
 		ImageTexture thisTexture = new ImageTexture();
 		Image image = new Image();
 		image.Create(540, 320, false, Image.Format.Rgba8);
@@ -37,15 +37,15 @@ public class DisbandConfirmation : TextureRect
 		AddChild(AdvisorHead);
 
 		//The pop-up part is the tricky part
-		ImageTexture topLeftPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 250, 0, 62, 45);
-		ImageTexture topCenterPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 312, 0, 62, 45);
-		ImageTexture topRightPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 374, 0, 62, 45);
-		ImageTexture middleLeftPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 250, 45, 62, 45);
-		ImageTexture middleCenterPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 312, 45, 62, 45);
-		ImageTexture middleRightPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 374, 45, 62, 45);
-		ImageTexture bottomLeftPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 250, 90, 62, 45);
-		ImageTexture bottomCenterPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 312, 90, 62, 45);
-		ImageTexture bottomRightPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 374, 90, 62, 45);
+		ImageTexture topLeftPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 251, 1, 61, 44);
+		ImageTexture topCenterPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 313, 1, 61, 44);
+		ImageTexture topRightPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 375, 1, 61, 44);
+		ImageTexture middleLeftPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 251, 46, 61, 44);
+		ImageTexture middleCenterPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 313, 46, 61, 44);
+		ImageTexture middleRightPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 375, 46, 61, 44);
+		ImageTexture bottomLeftPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 251, 91, 61, 44);
+		ImageTexture bottomCenterPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 313, 91, 61, 44);
+		ImageTexture bottomRightPopup = Util.LoadTextureFromPCX("Art/popupborders.pcx", 375, 91, 61, 44);
 
 		//Dimensions are 530x320.  The leaderhead takes up 110.  So the popup is 530x210.
 		//We have multiples of... 62? For the horizontal dimension, 45 for vertical.
@@ -54,9 +54,16 @@ public class DisbandConfirmation : TextureRect
 		//Which means that partial textures can be used.  Lovely.
 
 		//Let's try adding some helper functions so this can be refactored later into a more general-purpose popup popper
-		drawRowOfPopup(110, 530, topLeftPopup, topCenterPopup, topRightPopup);
-		drawRowOfPopup(155, 530, middleLeftPopup, middleCenterPopup, middleRightPopup);
-		drawRowOfPopup(200, 530, bottomLeftPopup, bottomCenterPopup, bottomRightPopup);
+		int vOffset = 110;
+		int height = 320;
+		drawRowOfPopup(vOffset, 530, topLeftPopup, topCenterPopup, topRightPopup);
+		const int VTILE_SIZE = 44;
+		vOffset+=VTILE_SIZE;
+		for (;vOffset < height - VTILE_SIZE; vOffset += VTILE_SIZE) {
+			drawRowOfPopup(vOffset, 530, middleLeftPopup, middleCenterPopup, middleRightPopup);
+		}
+		vOffset = height - VTILE_SIZE;
+		drawRowOfPopup(vOffset, 530, bottomLeftPopup, bottomCenterPopup, bottomRightPopup);
 
 	}
 
@@ -68,8 +75,9 @@ public class DisbandConfirmation : TextureRect
 		leftRectangle.Texture = left;
 		AddChild(leftRectangle);
 
-		int leftOffset = 62;    //yes, it will always be 62.  at least with Civ graphics.  so like WildWeazel, it will be hard coded
-		for (;leftOffset < width - 62; leftOffset += 62)
+		const int TILE_SIZE = 61;   //yes, it will always be 61.  at least with Civ graphics.  so like WildWeazel, it will be hard coded
+		int leftOffset = TILE_SIZE;
+		for (;leftOffset < width - TILE_SIZE; leftOffset += TILE_SIZE)
 		{
 			TextureRect middleRectangle = new TextureRect();
 			middleRectangle.SetPosition(new Vector2(leftOffset, vOffset));
@@ -77,7 +85,7 @@ public class DisbandConfirmation : TextureRect
 			AddChild(middleRectangle);
 		}
 
-		leftOffset = width - 62;
+		leftOffset = width - TILE_SIZE;
 		TextureRect rightRectangle = new TextureRect();
 		rightRectangle.SetPosition(new Vector2(leftOffset, vOffset));
 		rightRectangle.Texture = right;
