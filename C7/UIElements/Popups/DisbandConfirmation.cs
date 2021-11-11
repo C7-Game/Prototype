@@ -16,6 +16,19 @@ public class DisbandConfirmation : TextureRect
 		//The top 110px are for the advisor leaderhead, Domestic in this case.
 		//For some reason it uses the Happy graphics.
 
+		//Create a transparent texture background of the appropriate size.
+		//This is super important as if we just add the children, the parent won't be able to figure
+		//out the size of this TextureRect, and it won't be able to align it properly.
+        //I added an extra 10 px on width for margin... maybe we should do margin another way, but 
+        //this works reliably.
+		ImageTexture thisTexture = new ImageTexture();
+		Image image = new Image();
+		image.Create(540, 320, false, Image.Format.Rgba8);
+		image.Fill(Color.Color8(0, 0, 0, 0));
+		thisTexture.CreateFromImage(image);
+		this.Texture = thisTexture;
+
+
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupDOMESTIC.pcx", 1, 40, 149, 110);
 		TextureRect AdvisorHead = new TextureRect();
 		AdvisorHead.Texture = AdvisorHappy;
