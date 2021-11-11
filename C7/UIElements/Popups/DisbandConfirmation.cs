@@ -65,6 +65,28 @@ public class DisbandConfirmation : TextureRect
 		vOffset = height - VTILE_SIZE;
 		drawRowOfPopup(vOffset, 530, bottomLeftPopup, bottomCenterPopup, bottomRightPopup);
 
+
+		//Pop-up done.  Should refactor it someday so it's reusable.  But for now let's add the other things and stuff
+		HBoxContainer header = new HBoxContainer();
+		header.Alignment = BoxContainer.AlignMode.Center;
+		Label advisorType = new Label();
+		advisorType.AddColorOverride("font_color", new Color(0, 0, 0));
+		advisorType.Set("custom_fonts/settings/size", 24);  //doesn't work
+		// advisorType.Get("custom_fonts/font").size = 24;
+		advisorType.GetFont("font").Set("size", 24);    //doesn't work
+		//advisorType.GetFont("font").Size = 24;    //Internet says it works in GDScript, not a valid property in C#
+		advisorType.Text = "Domestic Advisor";
+		//Probably going to have to figure out themes for the font size.  Seems odd to add a theme for one Label,
+		//but maybe it'll get reused, and I can't figure out how to one-off override the font size.
+
+		header.AddChild(advisorType);
+		header.SetPosition(new Vector2(0, 120));
+		header.AnchorLeft = 0.0f;
+		header.AnchorRight = 1.0f;
+		// header.HintTooltip = "Help!";
+		header.MarginRight = 10;    //For some reason this isn't causing it to be indented 10 pixels from the right.  Uncomment the line above and you'll see the tooltip goes all the way across
+		AddChild(header);
+
 	}
 
 	private void drawRowOfPopup(int vOffset, int width, ImageTexture left, ImageTexture center, ImageTexture right)
