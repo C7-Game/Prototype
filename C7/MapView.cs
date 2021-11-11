@@ -100,6 +100,7 @@ public class MapView : Node2D {
 		AddChild(terrainView);
 	}
 
+	// TODO: Use function from GameMap (in C7GameData). It's the same as this one just copied over.
 	public bool isTileAt(int x, int y)
 	{
 		bool evenRow = y%2 == 0;

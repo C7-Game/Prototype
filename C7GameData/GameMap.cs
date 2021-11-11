@@ -9,7 +9,7 @@ namespace C7GameData
     {
         public int numTilesWide { get; private set; }
         public int numTilesTall { get; private set; }
-        bool horizontalWrap;
+        bool wrapHorizontally, wrapVertically;
 
         public List<Tile> tiles {get;}
 
@@ -58,6 +58,29 @@ namespace C7GameData
             }
         }
 
+        public bool isTileAt(int x, int y)
+        {
+            bool evenRow = y%2 == 0;
+            bool xInBounds; {
+                if (wrapHorizontally)
+                    xInBounds = true;
+                else if (evenRow)
+                    xInBounds = (x >= 0) && (x <= numTilesWide - 2);
+                else
+                    xInBounds = (x >= 1) && (x <= numTilesWide - 1);
+            }
+            bool yInBounds = wrapVertically || ((y >= 0) && (y < numTilesTall));
+            return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
+        }
+
+        public Tile tileAt(int x, int y)
+        {
+            if (isTileAt(x, y))
+                return tiles[tileCoordsToIndex(x, y)];
+            else
+                return null; // TODO: Consider using empty tile object instead of null
+        }
+
         /**
          * Another temporary method.  Puppeteer has a better map in the UI.  This just generates a boring, but functional, map.
          **/
@@ -76,14 +99,14 @@ namespace C7GameData
 
             //Uh, right, isometic.  That means we have to stagger things.
             //Also I forget how to do ranges in C#, oh well.
-            for (int x = 0; x < dummyMap.numTilesTall; x++)
+            for (int y = 0; y < dummyMap.numTilesTall; y++)
             {
-                int firstYCoordinate = 0;
-                if (x % 2 == 1)
+                int firstXCoordinate = 0;
+                if (y % 2 == 1)
                 {
-                    firstYCoordinate = 1;
+                    firstXCoordinate = 1;
                 }
-                for (int y = firstYCoordinate; y < dummyMap.numTilesWide; y += 2)
+                for (int x = firstXCoordinate; x < dummyMap.numTilesWide; x += 2)
                 {
                     Tile newTile = new Tile();
                     newTile.xCoordinate = x;
