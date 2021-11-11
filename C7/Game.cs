@@ -333,30 +333,6 @@ public class Game : Node2D
 				{
 					this.OnPlayerEndTurn();
 				}
-				else {
-					//Spacebar is the shortcut for the "hold" action.  Right now, this is how
-					//we map the keyboard shortcut to it.
-					//I think we should probably have a handler at the end that says, 'if none of
-					//our non-unit key handlers fired, run against a map to see if a unit one should'.
-					//But let's wait until we have at least two before deciding what the pattern should be.
-					this.UnitButtonPressed("hold");
-				}
-			}
-			// else if (eventKey.Scancode == (int)Godot.KeyList.W)
-			// {
-			// 	GD.Print("W pressed");
-			// 	if (CurrentlySelectedUnit != MapUnit.NONE)
-			// 	{
-			// 		this.UnitButtonPressed("wait");
-			// 	}
-			// }
-			else if (eventKey.Scancode == (int)Godot.KeyList.F)
-			{
-				GD.Print("F pressed");
-				if (CurrentlySelectedUnit != MapUnit.NONE)
-				{
-					this.UnitButtonPressed("fortify");
-				}
 			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
