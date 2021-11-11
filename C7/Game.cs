@@ -342,14 +342,14 @@ public class Game : Node2D
 					this.UnitButtonPressed("hold");
 				}
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.W)
-			{
-				GD.Print("W pressed");
-				if (CurrentlySelectedUnit != MapUnit.NONE)
-				{
-					this.UnitButtonPressed("wait");
-				}
-			}
+			// else if (eventKey.Scancode == (int)Godot.KeyList.W)
+			// {
+			// 	GD.Print("W pressed");
+			// 	if (CurrentlySelectedUnit != MapUnit.NONE)
+			// 	{
+			// 		this.UnitButtonPressed("wait");
+			// 	}
+			// }
 			else if (eventKey.Scancode == (int)Godot.KeyList.F)
 			{
 				GD.Print("F pressed");

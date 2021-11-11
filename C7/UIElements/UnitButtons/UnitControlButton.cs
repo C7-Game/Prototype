@@ -9,12 +9,21 @@ public class UnitControlButton : TextureButton
     private int graphicsX;
     private int graphicsY;
     private Action<string> onPressedAction;
+    public int shortcutKey;
 
     public static int scale = 32;   //how many pixels each button is in each direction
 
     public UnitControlButton(string key, int graphicsX, int graphicsY, Action<string> onPressedAction)
     {
         this.key = key;
+        this.graphicsX = graphicsX;
+        this.graphicsY = graphicsY;
+        this.onPressedAction = onPressedAction;
+    }
+
+    public UnitControlButton(string key, int shortcut, int graphicsX, int graphicsY, Action<string> onPressedAction) {
+        this.key = key;
+        this.shortcutKey = shortcut;
         this.graphicsX = graphicsX;
         this.graphicsY = graphicsY;
         this.onPressedAction = onPressedAction;
