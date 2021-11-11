@@ -94,30 +94,45 @@ namespace C7Engine
             Console.WriteLine("Failed to find unit " + guid);
         }
 
-        /**
-         * Super dumb movement where you can only move to one tile, and back to the first one.
-         * We'll build out more movement later.
-         **/
-        public static void moveUnit(string guid)
-        {
-            GameData gameData = EngineStorage.gameData;
-            //This is inefficient, perhaps we'll have a map someday.  But with three units,
-            //we'll survive for now.
-            foreach (MapUnit unit in gameData.mapUnits)
+        // Moves a unit into a neighboring tile. direction = 1 for NE, 2 for E, 3 for SE, ..., 7 for NW, 8 for N. If direction is not in [1, 8],
+        // this function does nothing.
+        // TODO: This movement function is still pretty basic since it only works for neighboring tiles. I would call this function something like
+        // stepUnit except it's the only unit movement function we have right now so calling it moveUnit is fine. But later we might want a more
+        // powerful moveUnit function that can accept non-neighboring tiles and/or do things like rebase air units. Also direction should be an
+        // enum or something.
+        public static void moveUnit(string guid, int direction)
             {
-                if (unit.guid == guid)
+                GameData gameData = EngineStorage.gameData;
+                //This is inefficient, perhaps we'll have a map someday.  But with three units,
+                //we'll survive for now.
+                foreach (MapUnit unit in gameData.mapUnits)
                 {
-                    if (unit.location == gameData.map.tiles[168])
+                    if (unit.guid == guid)
                     {
-                        unit.location = gameData.map.tiles[169];
-                    }
-                    else
-                    {
-                        unit.location = gameData.map.tiles[168];
+                        int dx, dy;
+                        switch (direction) {
+                        case 1: dx =  1; dy = -1; break;
+                        case 2: dx =  2; dy =  0; break;
+                        case 3: dx =  1; dy =  1; break;
+                        case 4: dx =  0; dy =  2; break;
+                        case 5: dx = -1; dy =  1; break;
+                        case 6: dx = -2; dy =  0; break;
+                        case 7: dx = -1; dy = -1; break;
+                        case 8: dx =  0; dy = -2; break;
+                        default:
+                            return;
+                        }
+
+                        var newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
+                        if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
+                            unit.location = newLoc;
+                            unit.movementPointsRemaining -= 1;
+                        }
+
+                        break;
                     }
                 }
             }
-        }
 
         /**
          * I'd like to enhance this so it's like Civ4, where the hold action takes

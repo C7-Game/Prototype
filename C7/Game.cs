@@ -358,6 +358,17 @@ public class Game : Node2D
 					this.UnitButtonPressed("fortify");
 				}
 			}
+			else if ((eventKey.Scancode >= (int)Godot.KeyList.Kp1) && (eventKey.Scancode <= (int)Godot.KeyList.Kp9))
+			{
+				if (CurrentlySelectedUnit != MapUnit.NONE)
+				{
+					var dirs = new int[] {5, 4, 3, 6, 0, 2, 7, 8, 1}; // SW, S, SE, W, ., E, NW, N, NE
+					var dir = dirs[eventKey.Scancode - (int)Godot.KeyList.Kp1];
+					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					if (CurrentlySelectedUnit.movementPointsRemaining <= 0)
+						GetNextAutoselectedUnit();
+				}
+			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
 		{
