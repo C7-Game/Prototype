@@ -22,9 +22,9 @@ public class UnitButtons : VBoxContainer
 		primaryControls = GetNode<HBoxContainer>("PrimaryUnitControls");
 		specializedControls = GetNode<HBoxContainer>("SpecializedUnitControls");
 
-		AddNewButton(primaryControls, new UnitControlButton("hold", 0, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("wait", 1, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("fortify", 2, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("hold", (int)Godot.KeyList.Space, 0, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("wait", (int)Godot.KeyList.W,  1, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("fortify", (int)Godot.KeyList.F,  2, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("disband", 3, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("goTo", 4, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("explore", 5, 0, onButtonPressed));
@@ -99,5 +99,23 @@ public class UnitButtons : VBoxContainer
 		}
 
 		this.Visible = true;
+	}
+	
+	public override void _UnhandledInput(InputEvent @event) {
+		if (this.Visible)
+		{
+			if (@event is InputEventKey eventKey && eventKey.Pressed)
+			{
+				foreach (UnitControlButton button in buttonMap.Values)
+				{
+					if (button.Visible == true) {
+						if (eventKey.Scancode == button.shortcutKey) {
+							this.onButtonPressed(button.key);
+							GetTree().SetInputAsHandled();
+						}
+					}
+				}
+			}
+		}
 	}
 }

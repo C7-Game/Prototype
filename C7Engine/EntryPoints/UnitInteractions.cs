@@ -171,6 +171,24 @@ namespace C7Engine
             Console.WriteLine("Failed to find a matching unit with guid " + guid);
         }
 
+        public static void disbandUnit(string guid)
+        {
+            GameData gameData = EngineStorage.gameData;
+            MapUnit toBeDeleted = null;
+            foreach (MapUnit unit in gameData.mapUnits)
+            {
+                if (unit.guid == guid)
+                {
+                    //Set a variable and break so we don't cause a ConcurrentModificationException
+                    toBeDeleted = unit;
+                    break;
+                }
+            }
+            if (toBeDeleted != null) {
+                gameData.mapUnits.Remove(toBeDeleted);
+            }
+        }
+
         public static void ClearWaitQueue()
         {
             waitQueue.Clear();
