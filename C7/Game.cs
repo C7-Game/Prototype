@@ -389,6 +389,12 @@ public class Game : Node2D
 		else if (buttonName.Equals("disband"))
 		{
 			//TODO: Confirmation dialog.  For now, this button is dangerous!
+			CenterContainer popupOverlay = GetNode<CenterContainer>("CanvasLayer/PopupOverlay");
+			DisbandConfirmation dbc = new DisbandConfirmation();
+			popupOverlay.AddChild(dbc);
+			popupOverlay.Visible = true;
+
+
 			UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
 			GetNextAutoselectedUnit();
 		}

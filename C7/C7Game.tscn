@@ -259,6 +259,14 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="PopupOverlay" type="CenterContainer" parent="CanvasLayer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="KinematicBody2D" type="KinematicBody2D" parent="."]
 
 [node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
