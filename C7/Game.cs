@@ -386,6 +386,12 @@ public class Game : Node2D
 			UnitInteractions.waitUnit(CurrentlySelectedUnit.guid);
 			GetNextAutoselectedUnit();
 		}
+		else if (buttonName.Equals("disband"))
+		{
+			//TODO: Confirmation dialog.  For now, this button is dangerous!
+			UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+			GetNextAutoselectedUnit();
+		}
 		else
 		{
 			//A nice sanity check if I use a different name here than where I created it...
