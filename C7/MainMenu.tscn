@@ -65,5 +65,3 @@ __meta__ = {
 
 [node name="MainMenuMusicPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
 script = ExtResource( 3 )
-
-[connection signal="finished" from="CanvasLayer/MainMenuMusicPlayer" to="CanvasLayer/MainMenuMusicPlayer" method="OnMP3Finished"]

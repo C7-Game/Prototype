@@ -3,7 +3,7 @@ using System;
 
 public class MainMenuMusicPlayer : AudioStreamPlayer
 {
-	const bool musicEnabled = false;
+	const bool musicEnabled = true;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -17,16 +17,12 @@ public class MainMenuMusicPlayer : AudioStreamPlayer
 		AudioStreamMP3 mp3 = new AudioStreamMP3();
 		long fileSize = (long)mp3File.GetLen();	//might blow up if it's > 2 GB, oh well
 		mp3.Data = mp3File.GetBuffer(fileSize);
+		mp3.Loop = true;
 
 		this.Stream = mp3;
 
 		if (musicEnabled) {
 			this.Play();
 		}
-	}
-	
-	private void OnMP3Finished()
-	{
-		this.Play();
 	}
 }
