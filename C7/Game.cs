@@ -280,7 +280,7 @@ public class Game : Node2D
 						MapUnit to_select = null;
 						foreach (var unit in UnitInteractions.GetAllUnits())
 							if ((tileX == unit.location.xCoordinate) && (tileY == unit.location.yCoordinate) &&
-							    (unit.movementPointsRemaining > 0)) {
+								(unit.movementPointsRemaining > 0)) {
 								to_select = unit;
 								break;
 							}
