@@ -274,6 +274,20 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				if(eventMouseButton.IsPressed())
 				{
+					// Select unit on tile at mouse location
+					int tileX, tileY;
+					if (mapView.tileOnScreenAt(eventMouseButton.Position, out tileX, out tileY)) {
+						MapUnit to_select = null;
+						foreach (var unit in UnitInteractions.GetAllUnits())
+							if ((tileX == unit.location.xCoordinate) && (tileY == unit.location.yCoordinate) &&
+							    (unit.movementPointsRemaining > 0)) {
+								to_select = unit;
+								break;
+							}
+						if (to_select != null)
+							setSelectedUnit(to_select);
+					}
+
 					OldPosition = eventMouseButton.Position;
 					IsMovingCamera = true;
 				}
