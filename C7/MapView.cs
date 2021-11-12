@@ -311,6 +311,7 @@ public class UnitView : Node2D {
 	private MapView mapView;
 
 	private ImageTexture unitIcons;
+	private ImageTexture unitMovementIndicators;
 
 	public UnitView(MapView mapView)
 	{
@@ -318,6 +319,9 @@ public class UnitView : Node2D {
 
 		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));
 		unitIcons = PCXToGodot.getImageTextureFromPCX(iconPCX);
+
+		var moveIndPCX = new Pcx(Util.Civ3MediaPath("Art/interface/MovementLED.pcx"));
+		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
 	}
 
 	public override void _Draw()
@@ -340,6 +344,13 @@ public class UnitView : Node2D {
 					Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
 					Rect2 screenRect = new Rect2(tileCenter - new Vector2(16, 32), new Vector2(32, 32));
 					DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+
+					int mp = unit.movementPointsRemaining;
+					int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
+					Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
+					Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
+					screenRect = new Rect2(tileCenter - new Vector2(22, 32), new Vector2(6, 6));
+					DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
 				}
 		}
 
