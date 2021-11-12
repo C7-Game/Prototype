@@ -390,8 +390,11 @@ public class Game : Node2D
 		{
 			//TODO: Confirmation dialog.  For now, this button is dangerous!
 			HBoxContainer popupOverlay = GetNode<HBoxContainer>("CanvasLayer/PopupOverlay");
-			DisbandConfirmation dbc = new DisbandConfirmation();
-			popupOverlay.AddChild(dbc);
+			//TODO: Have the popup overlay handle children, we just pass the type of popup we need.
+			if (popupOverlay.GetChildCount() == 0) {
+				DisbandConfirmation dbc = new DisbandConfirmation();
+				popupOverlay.AddChild(dbc);
+			}
 			popupOverlay.Visible = true;
 
 

@@ -7,10 +7,21 @@ public class DisbandConfirmation : TextureRect
 	{
 
 	}
+	readonly int BUTTON_LABEL_OFFSET = 4;
+	ImageTexture InactiveButton;
+	ImageTexture HoverButton;
+	StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
+	StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 
 	public override void _Ready()
 	{
 		base._Ready();
+		
+		InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
+		HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
+		
+		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
+		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 
 		//Dimensions in-game are 530x320
 		//The top 110px are for the advisor leaderhead, Domestic in this case.
@@ -90,6 +101,74 @@ public class DisbandConfirmation : TextureRect
 		header.MarginRight = 10;    //For some reason this isn't causing it to be indented 10 pixels from the right.  Uncomment the line above and you'll see the tooltip goes all the way across
 		AddChild(header);
 
+		Label warningMessage = new Label();
+		//TODO: General-purpose text breaking up util.  Instead of \n
+		//This appears to be the way to do multi line labels, see: https://godotengine.org/qa/11126/how-to-break-line-on-the-label-using-gdscript
+		//Maybe there's an awesomer control we can user instead
+		warningMessage.AddColorOverride("font_color", new Color(0, 0, 0));
+		warningMessage.Text = "Disband Settler?  Pardon me but these are OUR people. Do \nyou really want to disband them?";
+		
+		// HBoxContainer messageCenteringContainer = new HBoxContainer();
+		// messageCenteringContainer.Alignment = BoxContainer.AlignMode.Center;
+		// messageCenteringContainer.SetPosition(new Vector2(0, 170));
+		// messageCenteringContainer.AnchorLeft = 0.05f;
+		// messageCenteringContainer.AnchorRight = 0.95f;
+		// messageCenteringContainer.AddChild(warningMessage);
+		// AddChild(messageCenteringContainer);
+
+		warningMessage.SetPosition(new Vector2(25, 170));
+		AddChild(warningMessage);
+
+		//30, 215
+		//50, 215
+
+		//and 245
+
+		AddButton("Yes, we need to!", 215, "disband");
+		AddButton("No. Maybe you are right, advisor.", 245, "cancel");
+	}
+
+	private void disband()
+	{
+		//tell the game to disband it.  right now we're doing that first, which is WRONG!
+		GetParent().EmitSignal("hide");
+	}
+
+	private void cancel()
+	{
+		GetParent().EmitSignal("hide");
+	}
+
+	/**
+	 * This is yanked from MainMenu.  Should be refactored into a utility method because
+	 * we will need something like it in a lot of places.
+	 **/
+	private void AddButton(string label, int verticalPosition, string actionName)
+	{
+		const int HORIZONTAL_POSITION = 30;
+		TextureButton newButton = new TextureButton();
+		newButton.TextureNormal = InactiveButton;
+		newButton.TextureHover = HoverButton;
+		newButton.SetPosition(new Vector2(HORIZONTAL_POSITION, verticalPosition));
+		this.AddChild(newButton);
+		newButton.Connect("pressed", this, actionName);
+				
+		Button newButtonLabel = new Button();
+		newButtonLabel.Text = label;
+
+		newButtonLabel.AddColorOverride("font_color", new Color(0, 0, 0));
+		//Only the Exit and part of the Credits button are getting the right color.  The rest are black.  Not sure why.
+		newButtonLabel.AddColorOverride("font_color_hover", Color.Color8(255, 0, 0));
+		newButtonLabel.AddColorOverride("font_color_pressed", Color.Color8(0, 255, 0));	//when actively being clicked
+		//Haven't figured out how to set the color after you've clicked on something (i.e. made it focused)
+
+		newButtonLabel.AddStyleboxOverride("normal", TransparentBackgroundStyle);
+		newButtonLabel.AddStyleboxOverride("hover", TransparentBackgroundHoverStyle);
+		newButtonLabel.AddStyleboxOverride("pressed", TransparentBackgroundHoverStyle);
+
+		newButtonLabel.SetPosition(new Vector2(HORIZONTAL_POSITION + 25, verticalPosition + BUTTON_LABEL_OFFSET));
+		this.AddChild(newButtonLabel);
+		newButtonLabel.Connect("pressed", this, actionName);
 	}
 
 	private void drawRowOfPopup(int vOffset, int width, ImageTexture left, ImageTexture center, ImageTexture right)
