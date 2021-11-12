@@ -2,7 +2,6 @@ using Godot;
 
 public class DisbandConfirmation : TextureRect
 {
-
 	public DisbandConfirmation() 
 	{
 
@@ -131,6 +130,7 @@ public class DisbandConfirmation : TextureRect
 	private void disband()
 	{
 		//tell the game to disband it.  right now we're doing that first, which is WRONG!
+		GetParent().EmitSignal("UnitDisbanded");
 		GetParent().EmitSignal("hide");
 	}
 

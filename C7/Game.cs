@@ -396,10 +396,6 @@ public class Game : Node2D
 				popupOverlay.AddChild(dbc);
 			}
 			popupOverlay.Visible = true;
-
-
-			UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit();
 		}
 		else
 		{
@@ -419,4 +415,11 @@ public class Game : Node2D
 			GetNode<AnimationPlayer>("CanvasLayer/SlideOutBar/AnimationPlayer").Play("SlideOutAnimation");
 		}
 	}
+	
+	private void OnUnitDisbanded()
+	{
+		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+		GetNextAutoselectedUnit();
+	}
 }
+
