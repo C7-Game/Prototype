@@ -25,8 +25,8 @@ public class UnitButtons : VBoxContainer
 		AddNewButton(primaryControls, new UnitControlButton("hold", (int)Godot.KeyList.Space, 0, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("wait", (int)Godot.KeyList.W,  1, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("fortify", (int)Godot.KeyList.F,  2, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("disband", 3, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("goTo", 4, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("disband", (int)Godot.KeyList.D, 3, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("goTo", (int)Godot.KeyList.G, 4, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("explore", 5, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("sentry", 6, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("sentryEnemyOnly", 2, 5, onButtonPressed));

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://UIElements/UpperLeftNav/AdvisorButton.cs" type="Script" id=6]
 [ext_resource path="res://UIElements/GameStatus/GameStatus.cs" type="Script" id=7]
 [ext_resource path="res://UIElements/UnitButtons/RenameButton.cs" type="Script" id=8]
+[ext_resource path="res://UIElements/Popups/PopupOverlay.cs" type="Script" id=9]
 [ext_resource path="res://UIElements/UnitButtons/UnitButtons.cs" type="Script" id=12]
 
 [sub_resource type="Animation" id=2]
@@ -259,6 +260,17 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="PopupOverlay" type="HBoxContainer" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+size_flags_horizontal = 3
+alignment = 2
+script = ExtResource( 9 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="KinematicBody2D" type="KinematicBody2D" parent="."]
 
 [node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]
@@ -284,3 +296,5 @@ current = true
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="UnitButtonPressed" from="CanvasLayer/UnitButtons" to="." method="UnitButtonPressed"]
 [connection signal="hide" from="CanvasLayer/Advisor" to="CanvasLayer/Advisor" method="_on_Advisor_hide"]
+[connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
+[connection signal="hide" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="HidePopup"]

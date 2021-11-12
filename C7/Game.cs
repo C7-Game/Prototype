@@ -415,8 +415,13 @@ public class Game : Node2D
 		else if (buttonName.Equals("disband"))
 		{
 			//TODO: Confirmation dialog.  For now, this button is dangerous!
-			UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit();
+			HBoxContainer popupOverlay = GetNode<HBoxContainer>("CanvasLayer/PopupOverlay");
+			//TODO: Have the popup overlay handle children, we just pass the type of popup we need.
+			if (popupOverlay.GetChildCount() == 0) {
+				DisbandConfirmation dbc = new DisbandConfirmation();
+				popupOverlay.AddChild(dbc);
+			}
+			popupOverlay.Visible = true;
 		}
 		else
 		{
@@ -436,4 +441,11 @@ public class Game : Node2D
 			GetNode<AnimationPlayer>("CanvasLayer/SlideOutBar/AnimationPlayer").Play("SlideOutAnimation");
 		}
 	}
+	
+	private void OnUnitDisbanded()
+	{
+		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+		GetNextAutoselectedUnit();
+	}
 }
+
