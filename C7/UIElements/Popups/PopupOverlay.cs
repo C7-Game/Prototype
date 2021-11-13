@@ -9,6 +9,13 @@ public class PopupOverlay : HBoxContainer
 	{
 		this.Hide();
 	}
+
+	public void PlaySound(AudioStreamSample wav)
+	{
+		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("PopupSound");
+		player.Stream = wav;
+		player.Play();
+	}
 }
 
 

@@ -272,6 +272,8 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="PopupSound" type="AudioStreamPlayer" parent="CanvasLayer/PopupOverlay"]
+
 [node name="KinematicBody2D" type="KinematicBody2D" parent="."]
 
 [node name="Camera2D" type="Camera2D" parent="KinematicBody2D"]

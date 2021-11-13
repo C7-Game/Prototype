@@ -80,4 +80,95 @@ public class Util
 		Pcx NewPCX = new Pcx(Util.Civ3MediaPath(relPath));
 		return PCXToGodot.getImageTextureFromPCX(NewPCX, leftStart, topStart, width, height);
 	}
+
+	static public AudioStreamSample LoadWAVFromDisk(string path)
+	{
+		File file = new File();
+		file.Open(path, Godot.File.ModeFlags.Read);
+
+		string riffString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
+		if (riffString != "RIFF")
+		{
+			throw new Exception("Unsupported file");
+		}
+		uint fileSize = file.Get32();	//minus 8 bytes
+
+		string waveString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
+		if (waveString != "WAVE")
+		{
+			throw new Exception("Unsupported file");
+		}
+
+		bool formatFound = false;
+		bool dataFound = false;
+		
+		AudioStreamSample wav = new AudioStreamSample();
+
+		while (!file.EofReached())
+		{
+			string chunk = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
+			uint chunkSize = file.Get32();
+			ulong position = file.GetPosition();
+
+			if (file.EofReached()) {
+				//May occur with e.g. an empty junk chunk
+				break;
+			}
+
+			if (chunk == "fmt ")	//format chunk
+			{
+				//There is some disagreement between the C++ and GDScript sources
+				//as to which compression codes Godot supports.  The C++ has a comment
+				//saying, "Consider revision for engine version 3.0", and noting other
+				//formats are not supported in its importer.  The GDScript seems
+				//to match up with the current FormatEnum.  I'm going to go out on
+				//a limb and say the GDScript is probably more current relative
+				//to what AudioStreamSample supports.  But that could be wrong.
+				ushort compressionCode = file.Get16();
+				if (compressionCode == 1) {
+					wav.Format = Godot.AudioStreamSample.FormatEnum.Format16Bits;
+				}
+				else if (compressionCode == 0) {
+					wav.Format = Godot.AudioStreamSample.FormatEnum.Format8Bits;
+				}
+				else if (compressionCode == 2) {
+					wav.Format = Godot.AudioStreamSample.FormatEnum.ImaAdpcm;
+				}
+
+				ushort channels = file.Get16();
+				if (channels == 2) {
+					wav.Stereo = true;
+				}
+				else if (channels < 1 || channels > 5) {
+					throw new Exception("Only mono and stream WAV files supported");
+				}
+
+				uint sampleRate = file.Get32();
+				wav.MixRate = (int)sampleRate;
+
+				uint averageBPS = file.Get32();	//unused
+				ushort blockAlign = file.Get16();	//unused
+				ushort formatBits = file.Get16();
+
+				if (formatBits % 8 != 0 || formatBits == 0) {
+					throw new Exception("Format bits must be a multiple of 8");
+				}
+				formatFound = true;
+			}
+			else if (chunk == "data")
+			{
+				byte[] allTheData = file.GetBuffer(chunkSize);
+				wav.Data = allTheData;
+				dataFound = true;
+			}
+
+			file.Seek((long)(position + chunkSize));
+		}
+
+		if (!formatFound || !dataFound) {
+			throw new Exception("Failed to find both the format and data chunks");
+		}
+		
+		return wav;
+	}
 }
