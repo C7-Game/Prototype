@@ -65,3 +65,5 @@ __meta__ = {
 
 [node name="MainMenuMusicPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
 script = ExtResource( 3 )
+
+[node name="SoundEffectPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]

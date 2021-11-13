@@ -30,14 +30,14 @@ public class MainMenu : Node2D
 			TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
 			TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 
-			AddButton("New Game", 160, "_on_Button_pressed");
-			AddButton("Quick Start", 195, "_on_Button_pressed");
-			AddButton("Tutorial", 230, "_on_Button_pressed");
-			AddButton("Load Game", 265, "_on_Button_pressed");
-			AddButton("Load Scenario", 300, "_on_Button_pressed");
-			AddButton("Hall of Fame", 335, "_on_Button_pressed");
-			AddButton("Preferences", 370, "_on_Button_pressed");
-			AddButton("Audio Preferences", 405, "_on_Button_pressed");
+			AddButton("New Game", 160, "StartGame");
+			AddButton("Quick Start", 195, "StartGame");
+			AddButton("Tutorial", 230, "StartGame");
+			AddButton("Load Game", 265, "StartGame");
+			AddButton("Load Scenario", 300, "StartGame");
+			AddButton("Hall of Fame", 335, "HallOfFame");
+			AddButton("Preferences", 370, "Preferences");
+			AddButton("Audio Preferences", 405, "Preferences");
 			AddButton("Credits", 440, "showCredits");
 			AddButton("Exit", 475, "_on_Exit_pressed");
 		}
@@ -52,7 +52,6 @@ public class MainMenu : Node2D
 		ImageTexture TitleScreenTexture = Util.LoadTextureFromPCX("Art/title.pcx");
 		MainMenuBackground = GetNode<TextureRect>("CanvasLayer/CenterContainer/MainMenuBackground");
 		MainMenuBackground.Texture = TitleScreenTexture;
-		AddChild(MainMenuBackground);
 	}
 
 	private void AddButton(string label, int verticalPosition, string actionName)
@@ -81,20 +80,40 @@ public class MainMenu : Node2D
 		newButtonLabel.Connect("pressed", this, actionName);
 	}
 
-	public void _on_Button_pressed()
+	public void StartGame()
 	{
 		GD.Print("Load button pressed");
-		GetTree().ChangeScene("res://C7Game.tscn");    
+		PlayButtonPressedSound();
+		GetTree().ChangeScene("res://C7Game.tscn");
 	}
 	
 	public void showCredits()
 	{
 		GD.Print("Credits button pressed");
-		GetTree().ChangeScene("res://Credits.tscn");    
+		GetTree().ChangeScene("res://Credits.tscn");
+	}
+
+	public void HallOfFame()
+	{
+		PlayButtonPressedSound();
+	}
+
+	public void Preferences()
+	{
+
+		PlayButtonPressedSound();
 	}
 	
 	public void _on_Exit_pressed()
 	{
 		GetTree().Quit();
+	}
+
+	private void PlayButtonPressedSound()
+	{
+		AudioStreamSample wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath("Sounds/Button1.wav"));
+		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("CanvasLayer/SoundEffectPlayer");
+		player.Stream = wav;
+		player.Play();
 	}
 }
