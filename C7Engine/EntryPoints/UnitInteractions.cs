@@ -130,6 +130,7 @@ namespace C7Engine
                             newLoc.unitsOnTile.Add(unit);
                             unit.location = newLoc;
                             unit.movementPointsRemaining -= 1;
+                            unit.isFortified = false;
                         }
 
                         break;
