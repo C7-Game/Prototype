@@ -414,16 +414,8 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("disband"))
 		{
-			//TODO: Confirmation dialog.  For now, this button is dangerous!
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-			//TODO: Have the popup overlay handle children, we just pass the type of popup we need.
-			if (popupOverlay.GetChildCount() == 1) {
-				DisbandConfirmation dbc = new DisbandConfirmation();
-				popupOverlay.AddChild(dbc);
-			}
-			AudioStreamSample wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath("Sounds/PopupAdvisor.wav"));
-			popupOverlay.PlaySound(wav);
-			popupOverlay.Visible = true;
+			popupOverlay.ShowPopup("disband", PopupOverlay.PopupCategory.Advisor);
 		}
 		else
 		{
