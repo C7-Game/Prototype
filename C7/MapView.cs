@@ -345,11 +345,17 @@ public class UnitView : Node2D {
 			int y = mapView.wrapTileY(vT.virtTileY);
 			var unitsOnTile = map.tileAt(x, y).unitsOnTile;
 			if (unitsOnTile.Count > 0) {
-				var unit = unitsOnTile[0];
 				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
 
-				if (unit.guid == mapView.game.CurrentlySelectedUnit.guid)
-					DrawCircle(tileCenter - new Vector2(0, 16), 16, Color.Color8(255, 255, 0));
+				// Find unit to draw. If the currently selected unit is on this tile, use that one (also draw a yellow circle behind
+				// it). Otherwise, use the top defender.
+				MapUnit selectedUnitOnTile = null;
+				foreach (var u in unitsOnTile)
+					if (u.guid == mapView.game.CurrentlySelectedUnit.guid) {
+						DrawCircle(tileCenter - new Vector2(0, 16), 16, Color.Color8(255, 255, 0));
+						selectedUnitOnTile = u;
+					}
+				var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : map.tileAt(x, y).findTopDefender();
 
 				int iconIndex = unit.unitType.iconIndex;
 				Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
