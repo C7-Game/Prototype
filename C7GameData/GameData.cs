@@ -10,6 +10,21 @@ namespace C7GameData
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
 
+        public MapUnit createDummyUnit(UnitPrototype proto, int tileX, int tileY)
+        {
+            if (map.isTileAt(tileX, tileY)) {
+                var tile = map.tileAt(tileX, tileY);
+                var unit = new MapUnit();
+                unit.unitType = proto;
+                unit.location = tile;
+                tile.unitsOnTile.Add(unit);
+                mapUnits.Add(unit);
+                unit.movementPointsRemaining = proto.movement;
+                return unit;
+            } else
+                throw new System.Exception("Invalid tile coordinates");
+        }
+
         /**
          * This is a placeholder method that creates a super skeletal set of game data,
          * so we can build out the most basic mechanics.
@@ -51,26 +66,9 @@ namespace C7GameData
             worker.iconIndex = 1;
             worker.canBuildRoads = true;
 
-            MapUnit mapSettler = new MapUnit();
-            mapSettler.unitType = settler;
-            //right, a convenience method for setting the tile based on X, Y would be handy
-            //we'll just hard-code a tile for now.
-            mapSettler.location = map.tiles[168];
-            mapUnits.Add(mapSettler);
-
-            MapUnit mapWarrior = new MapUnit();
-            mapWarrior.unitType = warrior;
-            mapWarrior.location = map.tiles[169];
-            mapUnits.Add(mapWarrior);
-
-            MapUnit mapWorker = new MapUnit();
-            mapWorker.unitType = worker;
-            mapWorker.location = map.tiles[170];
-            mapUnits.Add(mapWorker);
-
-            mapSettler.movementPointsRemaining = 1;
-            mapWarrior.movementPointsRemaining = 1;
-            mapWorker.movementPointsRemaining = 1;
+            createDummyUnit(settler,  6, 6);
+            createDummyUnit(warrior,  8, 6);
+            createDummyUnit(worker , 10, 6);
 
             //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
         }

@@ -277,13 +277,8 @@ public class Game : Node2D
 					// Select unit on tile at mouse location
 					int tileX, tileY;
 					if (mapView.tileOnScreenAt(eventMouseButton.Position, out tileX, out tileY)) {
-						MapUnit to_select = null;
-						foreach (var unit in UnitInteractions.GetAllUnits())
-							if ((tileX == unit.location.xCoordinate) && (tileY == unit.location.yCoordinate) &&
-								(unit.movementPointsRemaining > 0)) {
-								to_select = unit;
-								break;
-							}
+						var map = MapInteractions.GetWholeMap();
+						MapUnit to_select = map.tileAt(tileX, tileY).unitsOnTile.Find(u => u.movementPointsRemaining > 0);
 						if (to_select != null)
 							setSelectedUnit(to_select);
 					}

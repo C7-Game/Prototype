@@ -329,29 +329,31 @@ public class UnitView : Node2D {
 		base._Draw();
 
 		int unitIconsWidth = (unitIcons.GetWidth() - 1) / 33;
+		var map = MapInteractions.GetWholeMap();
 		foreach (var vT in mapView.visibleTiles()) {
 			int x = mapView.wrapTileX(vT.virtTileX);
 			int y = mapView.wrapTileY(vT.virtTileY);
-			foreach (var unit in UnitInteractions.GetAllUnits())
-				if ((x == unit.location.xCoordinate) && (y == unit.location.yCoordinate)) {
-					Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
+			var unitsOnTile = map.tileAt(x, y).unitsOnTile;
+			if (unitsOnTile.Count > 0) {
+				var unit = unitsOnTile[0];
+				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
 
-					if (unit.guid == mapView.game.CurrentlySelectedUnit.guid)
-						DrawCircle(tileCenter - new Vector2(0, 16), 16, Color.Color8(255, 255, 0));
+				if (unit.guid == mapView.game.CurrentlySelectedUnit.guid)
+					DrawCircle(tileCenter - new Vector2(0, 16), 16, Color.Color8(255, 255, 0));
 
-					int iconIndex = unit.unitType.iconIndex;
-					Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
-					Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-					Rect2 screenRect = new Rect2(tileCenter - new Vector2(16, 32), new Vector2(32, 32));
-					DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+				int iconIndex = unit.unitType.iconIndex;
+				Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
+				Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
+				Rect2 screenRect = new Rect2(tileCenter - new Vector2(16, 32), new Vector2(32, 32));
+				DrawTextureRectRegion(unitIcons, screenRect, unitRect);
 
-					int mp = unit.movementPointsRemaining;
-					int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
-					Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
-					Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-					screenRect = new Rect2(tileCenter - new Vector2(22, 32), new Vector2(6, 6));
-					DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
-				}
+				int mp = unit.movementPointsRemaining;
+				int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
+				Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
+				Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
+				screenRect = new Rect2(tileCenter - new Vector2(22, 32), new Vector2(6, 6));
+				DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+			}
 		}
 
 	}
