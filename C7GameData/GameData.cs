@@ -20,6 +20,7 @@ namespace C7GameData
                 tile.unitsOnTile.Add(unit);
                 mapUnits.Add(unit);
                 unit.movementPointsRemaining = proto.movement;
+                unit.hitPointsRemaining = 3;
                 return unit;
             } else
                 throw new System.Exception("Invalid tile coordinates");

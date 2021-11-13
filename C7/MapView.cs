@@ -324,6 +324,16 @@ public class UnitView : Node2D {
 		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
 	}
 
+	public Color getHPColor(float fractionRemaining)
+	{
+		if (fractionRemaining >= (float)0.67)
+			return Color.Color8(0, 255, 0);
+		else if (fractionRemaining >= (float)0.34)
+			return Color.Color8(255, 255, 0);
+		else
+			return Color.Color8(255, 0, 0);
+	}
+
 	public override void _Draw()
 	{
 		base._Draw();
@@ -344,15 +354,32 @@ public class UnitView : Node2D {
 				int iconIndex = unit.unitType.iconIndex;
 				Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
 				Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-				Rect2 screenRect = new Rect2(tileCenter - new Vector2(16, 32), new Vector2(32, 32));
+				Rect2 screenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
 				DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+
+				Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
 
 				int mp = unit.movementPointsRemaining;
 				int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
 				Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
 				Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-				screenRect = new Rect2(tileCenter - new Vector2(22, 32), new Vector2(6, 6));
+				screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
 				DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+
+				int hpIndHeight = 20, hpIndWidth = 6;
+				var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
+				if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
+					float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
+					DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
+					float hpHeight = hpFraction * (hpIndHeight - 2);
+					if (hpHeight < 1)
+						hpHeight = 1;
+					var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
+								       new Vector2(hpIndWidth - 2, hpHeight)); // size
+					DrawRect(hpContentsRect, getHPColor(hpFraction));
+					if (unit.isFortified)
+						DrawRect(hpIndBackgroundRect, Color.Color8(255, 255, 255), false);
+				}
 			}
 		}
 

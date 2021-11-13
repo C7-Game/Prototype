@@ -12,6 +12,12 @@ namespace C7GameData
         public Tile location {get; set;}
 
         public int movementPointsRemaining {get; set;}
+        public int hitPointsRemaining {get; set;}
+        public int maxHitPoints {
+            get {
+                return 3; // Eventually we'll add HP from experience and the type's inherent bonus
+            }
+        }
         public bool isFortified {get; set;}
         //sentry, etc. will come later.  For now, let's just have a couple things so we can cycle through units that aren't fortified.
 
