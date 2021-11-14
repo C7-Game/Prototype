@@ -100,7 +100,12 @@ public class MapView : Node2D {
 		AddChild(terrainView);
 	}
 
-	// TODO: Use function from GameMap (in C7GameData). It's the same as this one just copied over.
+	public bool isRowAt(int y)
+	{
+		return wrapVertically || ((y >= 0) && (y < mapHeight));
+	}
+
+	// TODO: Use function from GameMap (in C7GameData). Also copy isRowAt over there.
 	public bool isTileAt(int x, int y)
 	{
 		bool evenRow = y%2 == 0;
@@ -112,8 +117,7 @@ public class MapView : Node2D {
 			else
 				xInBounds = (x >= 1) && (x <= mapWidth - 1);
 		}
-		bool yInBounds = wrapVertically || ((y >= 0) && (y < mapHeight));
-		return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
+		return isRowAt(y) && xInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
 	}
 
 	public int wrapTileX(int x)
@@ -145,18 +149,21 @@ public class MapView : Node2D {
 	{
 		var cLIC = cameraLocationInCells;
 		Vector2 mapViewSize = new Vector2(2, 2) + getVisibleAreaSize() / scaledCellSize;
-		for (int dy = -2; dy < mapViewSize.y; dy++)
-			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
-				int x = cLIC.cellsX + dx, y = cLIC.cellsY + dy;
-				if (isTileAt(x, y)) {
-					VisibleTile tileInView = new VisibleTile();
-					tileInView.virtTileX = x;
-					tileInView.virtTileY = y;
-					tileInView.viewX = dx;
-					tileInView.viewY = dy;
-					yield return tileInView;
+		for (int dy = -2; dy < mapViewSize.y; dy++) {
+			int y = cLIC.cellsY + dy;
+			if (isRowAt(y))
+				for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
+					int x = cLIC.cellsX + dx;
+					if (isTileAt(x, y)) {
+						VisibleTile tileInView = new VisibleTile();
+						tileInView.virtTileX = x;
+						tileInView.virtTileY = y;
+						tileInView.viewX = dx;
+						tileInView.viewY = dy;
+						yield return tileInView;
+					}
 				}
-			}
+		}
 	}
 
 	public void onVisibleAreaChanged()
