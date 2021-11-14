@@ -359,10 +359,13 @@ public class UnitView : Node2D {
 				MapUnit selectedUnitOnTile = null;
 				foreach (var u in unitsOnTile)
 					if (u.guid == mapView.game.CurrentlySelectedUnit.guid) {
-						DrawCircle(tileCenter - new Vector2(0, 16), 16, Color.Color8(255, 255, 0));
+						DrawCircle(tileCenter, 16, Color.Color8(255, 255, 0));
 						selectedUnitOnTile = u;
 					}
 				var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : map.tileAt(x, y).findTopDefender();
+
+				// Draw colored circle at unit's feet to show who owns it
+				DrawCircle(tileCenter, 8, new Color(unit.owner.color));
 
 				int iconIndex = unit.unitType.iconIndex;
 				Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));

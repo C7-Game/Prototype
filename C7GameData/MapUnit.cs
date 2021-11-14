@@ -9,6 +9,7 @@ namespace C7GameData
     {
         public string guid  {get;}
         public UnitPrototype unitType {get; set;}
+        public Player owner {get; set;}
         public Tile location {get; set;}
 
         public int movementPointsRemaining {get; set;}

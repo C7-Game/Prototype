@@ -5,17 +5,19 @@ namespace C7GameData
     {
         public int turn {get; set;}
         public GameMap map {get; set;}
+        public List<Player> players = new List<Player>();
         List<TerrainType> terrainTypes = new List<TerrainType>();
 
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
 
-        public MapUnit createDummyUnit(UnitPrototype proto, int tileX, int tileY)
+        public MapUnit createDummyUnit(UnitPrototype proto, Player owner, int tileX, int tileY)
         {
             if (map.isTileAt(tileX, tileY)) {
                 var tile = map.tileAt(tileX, tileY);
                 var unit = new MapUnit();
                 unit.unitType = proto;
+		unit.owner = owner;
                 unit.location = tile;
                 tile.unitsOnTile.Add(unit);
                 mapUnits.Add(unit);
@@ -34,11 +36,17 @@ namespace C7GameData
          * what this generates, but as we build out more infrastructure, we'll migrate
          * to a more proper game state generation technique, be that reading from a BIQ
          * initially, or something else.
+         *
+         * Returns the human player so the caller (which is the UI) can store it.
          **/
-        public void createDummyGameData()
+        public Player createDummyGameData()
         {
             this.turn = 0;
             this.map = GameMap.generateDummyGameMap();
+
+	    int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
+	    var humanPlayer = new Player(blue);
+            players.Add(humanPlayer);
 
             //Right now, the one terrain type is in the map but not in our list here.
             //That is not great, but let's overlook that for now, as for now all our terrain type
@@ -67,11 +75,13 @@ namespace C7GameData
             worker.iconIndex = 1;
             worker.canBuildRoads = true;
 
-            createDummyUnit(settler,  6, 6);
-            createDummyUnit(warrior,  8, 6);
-            createDummyUnit(worker , 10, 6);
+            createDummyUnit(settler, humanPlayer,  6, 6);
+            createDummyUnit(warrior, humanPlayer,  8, 6);
+            createDummyUnit(worker , humanPlayer, 10, 6);
 
             //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
+
+	    return humanPlayer;
         }
     }
 }

@@ -19,7 +19,7 @@ public class Game : Node2D
 		ComputerTurn
 	}
 
-
+	Player controller; // Player that's controlling the UI.
 	int[,] Map;
 
 	private MapView mapView;
@@ -35,7 +35,7 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		CreateGame.createGame();
+		controller = CreateGame.createGame();
 		var map = MapInteractions.GetWholeMap();
 		this.TerrainAsTileMap(map.numTilesWide, map.numTilesTall);
 
