@@ -21,6 +21,7 @@ public class GameStatus : MarginContainer
 	public void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
 		MapUnit newUnit = wrappedMapUnit.GetValue<MapUnit>();
+		GD.Print("Selected unit: " + newUnit);
 		LowerRightInfoBox.UpdateUnitInfo(newUnit);
 	}
 	

@@ -147,7 +147,7 @@ public class LowerRightInfoBox : TextureRect
 		attackDefenseMovement.Visible = true;
 		terrainType.Visible = true;
 		lblUnitSelected.Text = NewUnit.unitType.name;
-		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.unitType.movement + "/" + NewUnit.unitType.movement;
+		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.movementPointsRemaining + "/" + NewUnit.unitType.movement;
 	}
 
 	///This is going to evolve a lot over time.  Probably this info box will need to keep some local state.

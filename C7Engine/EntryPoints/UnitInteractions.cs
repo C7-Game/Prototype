@@ -65,6 +65,9 @@ namespace C7Engine
                 unit.availableActions.Add("mine");
                 unit.availableActions.Add("irrigate");
             }
+            else if (unit.unitType.Equals("Chariot")) {
+                unit.availableActions.Add("pillage");
+            }
             else {
                 //It must be a catapult
                 unit.availableActions.Add("bombard");

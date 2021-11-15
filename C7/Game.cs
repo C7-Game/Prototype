@@ -365,6 +365,9 @@ public class Game : Node2D
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
 					if (CurrentlySelectedUnit.movementPointsRemaining <= 0)
 						GetNextAutoselectedUnit();
+					else {
+						setSelectedUnit(CurrentlySelectedUnit);
+					}
 					mapView.onVisibleAreaChanged();
 				}
 			}

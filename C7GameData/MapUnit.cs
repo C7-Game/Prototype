@@ -31,6 +31,16 @@ namespace C7GameData
             guid = Guid.NewGuid().ToString();
         }
 
+        public override string ToString()
+        {
+            if (this != MapUnit.NONE) {
+                return unitType.name + " with " + movementPointsRemaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
+            }
+            else {
+                return "This is the NONE unit";
+            }
+        }
+
         public static MapUnit NONE = new MapUnit();
     }
 }

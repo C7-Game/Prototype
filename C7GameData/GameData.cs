@@ -75,9 +75,17 @@ namespace C7GameData
             worker.iconIndex = 1;
             worker.canBuildRoads = true;
 
+            UnitPrototype chariot = new UnitPrototype();
+            chariot.name = "Chariot";
+            chariot.attack = 1;
+            chariot.defense = 1;
+            chariot.movement = 2;
+            chariot.iconIndex = 10;
+
             createDummyUnit(settler, humanPlayer,  6, 6);
             createDummyUnit(warrior, humanPlayer,  8, 6);
             createDummyUnit(worker , humanPlayer, 10, 6);
+            createDummyUnit(chariot, humanPlayer, 12, 6);
 
             //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
 
