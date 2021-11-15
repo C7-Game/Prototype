@@ -72,12 +72,7 @@ public class Game : Node2D
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
 		//without a manual cast to int.
 		//https://github.com/godotengine/godot/issues/16388
-		if (Input.IsKeyPressed((int)Godot.KeyList.Escape))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
-		{
-			GD.Print("User pressed escape");
-			//TODO: Display the "Oh No! Do you really want to quit?" menu
-		}
-		else if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+		if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
 			EmitSignal("ShowSpecificAdvisor", "F1");
 		}
 	}
@@ -371,6 +366,12 @@ public class Game : Node2D
 					mapView.onVisibleAreaChanged();
 				}
 			}
+			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
+			{
+				GD.Print("Got request for escape/quit");
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+				popupOverlay.ShowPopup("escapeQuit", PopupOverlay.PopupCategory.Info);
+			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
 		{
@@ -444,6 +445,15 @@ public class Game : Node2D
 	{
 		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
 		GetNextAutoselectedUnit();
+	}
+	
+	/**
+	 * User quit.  We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
+	 **/
+	private void OnQuitTheGame()
+	{
+		GD.Print("Goodbye!");
+		GetTree().Quit();
 	}
 }
 

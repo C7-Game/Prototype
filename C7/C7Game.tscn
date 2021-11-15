@@ -299,5 +299,6 @@ current = true
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="UnitButtonPressed" from="CanvasLayer/UnitButtons" to="." method="UnitButtonPressed"]
 [connection signal="hide" from="CanvasLayer/Advisor" to="CanvasLayer/Advisor" method="_on_Advisor_hide"]
+[connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
 [connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
 [connection signal="hide" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="HidePopup"]

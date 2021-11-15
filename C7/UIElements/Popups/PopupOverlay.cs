@@ -4,6 +4,7 @@ using ConvertCiv3Media;
 public class PopupOverlay : HBoxContainer
 {
 	[Signal] public delegate void UnitDisbanded();
+	[Signal] public delegate void Quit();
 	Control currentChild = null;
 	
 	const int HTILE_SIZE = 61;
@@ -12,7 +13,7 @@ public class PopupOverlay : HBoxContainer
 	public enum PopupCategory {
 		Advisor,
 		Console,
-		Info
+		Info	//Sounds similar to the above, but lower-pitched in the second half
 	}
 	
 	private void HidePopup()
@@ -34,6 +35,11 @@ public class PopupOverlay : HBoxContainer
 			DisbandConfirmation dbc = new DisbandConfirmation();
 			AddChild(dbc);
 			currentChild = dbc;
+		}
+		else if (dialogType.Equals("escapeQuit")) {
+			EscapeQuitPopup eqp = new EscapeQuitPopup();
+			AddChild(eqp);
+			currentChild = eqp;
 		}
 		
 		if (currentChild != null) {
