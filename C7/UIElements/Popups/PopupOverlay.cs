@@ -9,11 +9,26 @@ public class PopupOverlay : HBoxContainer
 	
 	const int HTILE_SIZE = 61;
 	const int VTILE_SIZE = 44;
+	private readonly static int BUTTON_LABEL_OFFSET = 4;
+	private static ImageTexture InactiveButton;
+	private static ImageTexture HoverButton;
+	private static StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
+	private static StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 
 	public enum PopupCategory {
 		Advisor,
 		Console,
 		Info	//Sounds similar to the above, but lower-pitched in the second half
+	}
+	public override void _Ready()
+	{
+		base._Ready();
+		
+		InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
+		HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
+		
+		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
+		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 	}
 	
 	private void HidePopup()
@@ -181,7 +196,33 @@ public class PopupOverlay : HBoxContainer
 			}
 		}
 	}
-	
+
+	public static void AddButton(TextureRect thePopup, string label, int verticalPosition, string actionName)
+	{
+		const int HORIZONTAL_POSITION = 30;
+		TextureButton newButton = new TextureButton();
+		newButton.TextureNormal = InactiveButton;
+		newButton.TextureHover = HoverButton;
+		newButton.SetPosition(new Vector2(HORIZONTAL_POSITION, verticalPosition));
+		thePopup.AddChild(newButton);
+		newButton.Connect("pressed", thePopup, actionName);
+				
+		Button newButtonLabel = new Button();
+		newButtonLabel.Text = label;
+
+		newButtonLabel.AddColorOverride("font_color", new Color(0, 0, 0));
+		newButtonLabel.AddColorOverride("font_color_hover", Color.Color8(255, 0, 0));
+		newButtonLabel.AddColorOverride("font_color_pressed", Color.Color8(0, 255, 0));	//when actively being clicked
+		//Haven't figured out how to set the color after you've clicked on something (i.e. made it focused)
+
+		newButtonLabel.AddStyleboxOverride("normal", TransparentBackgroundStyle);
+		newButtonLabel.AddStyleboxOverride("hover", TransparentBackgroundHoverStyle);
+		newButtonLabel.AddStyleboxOverride("pressed", TransparentBackgroundHoverStyle);
+
+		newButtonLabel.SetPosition(new Vector2(HORIZONTAL_POSITION + 25, verticalPosition + BUTTON_LABEL_OFFSET));
+		thePopup.AddChild(newButtonLabel);
+		newButtonLabel.Connect("pressed", thePopup, actionName);
+	}
 }
 
 

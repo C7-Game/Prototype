@@ -6,21 +6,10 @@ public class DisbandConfirmation : TextureRect
 	{
 
 	}
-	readonly int BUTTON_LABEL_OFFSET = 4;
-	ImageTexture InactiveButton;
-	ImageTexture HoverButton;
-	StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
-	StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 
 	public override void _Ready()
 	{
 		base._Ready();
-		
-		InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
-		HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
-		
-		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
-		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 
 		//Dimensions in-game are 530x320
 		//The top 110px are for the advisor leaderhead, Domestic in this case.
@@ -62,8 +51,8 @@ public class DisbandConfirmation : TextureRect
 		warningMessage.SetPosition(new Vector2(25, 170));
 		AddChild(warningMessage);
 
-		AddButton("Yes, we need to!", 215, "disband");
-		AddButton("No. Maybe you are right, advisor.", 245, "cancel");
+		PopupOverlay.AddButton(this, "Yes, we need to!", 215, "disband");
+		PopupOverlay.AddButton(this, "No. Maybe you are right, advisor.", 245, "cancel");
 	}
 
 	private void disband()
@@ -76,36 +65,5 @@ public class DisbandConfirmation : TextureRect
 	private void cancel()
 	{
 		GetParent().EmitSignal("hide");
-	}
-
-	/**
-	 * This is yanked from MainMenu.  Should be refactored into a utility method because
-	 * we will need something like it in a lot of places.
-	 **/
-	private void AddButton(string label, int verticalPosition, string actionName)
-	{
-		const int HORIZONTAL_POSITION = 30;
-		TextureButton newButton = new TextureButton();
-		newButton.TextureNormal = InactiveButton;
-		newButton.TextureHover = HoverButton;
-		newButton.SetPosition(new Vector2(HORIZONTAL_POSITION, verticalPosition));
-		this.AddChild(newButton);
-		newButton.Connect("pressed", this, actionName);
-				
-		Button newButtonLabel = new Button();
-		newButtonLabel.Text = label;
-
-		newButtonLabel.AddColorOverride("font_color", new Color(0, 0, 0));
-		newButtonLabel.AddColorOverride("font_color_hover", Color.Color8(255, 0, 0));
-		newButtonLabel.AddColorOverride("font_color_pressed", Color.Color8(0, 255, 0));	//when actively being clicked
-		//Haven't figured out how to set the color after you've clicked on something (i.e. made it focused)
-
-		newButtonLabel.AddStyleboxOverride("normal", TransparentBackgroundStyle);
-		newButtonLabel.AddStyleboxOverride("hover", TransparentBackgroundHoverStyle);
-		newButtonLabel.AddStyleboxOverride("pressed", TransparentBackgroundHoverStyle);
-
-		newButtonLabel.SetPosition(new Vector2(HORIZONTAL_POSITION + 25, verticalPosition + BUTTON_LABEL_OFFSET));
-		this.AddChild(newButtonLabel);
-		newButtonLabel.Connect("pressed", this, actionName);
 	}
 }
