@@ -14,5 +14,10 @@ namespace C7Engine
         {
             return EngineStorage.gameData.map;
         }
+
+        public static Tile GetTileAt(int tileX, int tileY)
+        {
+            return EngineStorage.gameData.map.tileAt(tileX, tileY);
+        }
     }
 }

@@ -148,10 +148,24 @@ public class Game : Node2D
 		AddChild(mapView);
 	}
 
+	/**
+	 * Currently (11/14/2021), all unit selection goes through here.
+	 * Both code paths are in Game.cs for now, so it's local, but we may
+	 * want to change it event driven.
+	 **/
 	public void setSelectedUnit(MapUnit unit)
 	{
-		CurrentlySelectedUnit = unit;
+		this.CurrentlySelectedUnit = unit;
 		mapView.onVisibleAreaChanged();
+
+		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
+		if (CurrentlySelectedUnit != MapUnit.NONE) {
+			ParameterWrapper wrappedUnit = new ParameterWrapper(CurrentlySelectedUnit);
+			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
+		}
+		else {
+			EmitSignal(nameof(NoMoreAutoselectableUnits));
+		}
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -277,8 +291,7 @@ public class Game : Node2D
 					// Select unit on tile at mouse location
 					int tileX, tileY;
 					if (mapView.tileOnScreenAt(eventMouseButton.Position, out tileX, out tileY)) {
-						var map = MapInteractions.GetWholeMap();
-						MapUnit to_select = map.tileAt(tileX, tileY).unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+						MapUnit to_select = MapInteractions.GetTileAt(tileX, tileY).unitsOnTile.Find(u => u.movementPointsRemaining > 0);
 						if (to_select != null)
 							setSelectedUnit(to_select);
 					}
@@ -374,14 +387,7 @@ public class Game : Node2D
 
 	private void GetNextAutoselectedUnit()
 	{
-		setSelectedUnit(UnitInteractions.getNextSelectedUnit());
-		if (CurrentlySelectedUnit == MapUnit.NONE) {
-			EmitSignal(nameof(NoMoreAutoselectableUnits));
-		}
-		else {
-			ParameterWrapper wrappedUnit = new ParameterWrapper(CurrentlySelectedUnit);
-			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
-		}
+		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit());
 	}
 
 	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
