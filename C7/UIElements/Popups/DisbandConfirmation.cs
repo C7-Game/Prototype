@@ -50,30 +50,7 @@ public class DisbandConfirmation : TextureRect
 		background.SetPosition(new Vector2(0, 110));
 		AddChild(background);
 
-		//Pop-up done.  Should refactor it someday so it's reusable.  But for now let's add the other things and stuff
-		HBoxContainer header = new HBoxContainer();
-		header.Alignment = BoxContainer.AlignMode.Center;
-		Label advisorType = new Label();
-		advisorType.AddColorOverride("font_color", new Color(0, 0, 0));
-
-		//Set the font size.  For labels, there is no one-off override, so we have to
-		//set it on a theme like this.
-		//The SetFont arguments aren't documented in a way that a non-Godot expert can understand
-		//My current understanding is that we need to set the first parameter to "font", and the
-		//second to whatever type it should apply to.  But that is based on nothing official.
-		//Also you can set the size with bigFont.Size = 72, but that applies everywhere the font
-		//is used in the whole program.  Not recommended.
-		DynamicFont bigFont = ResourceLoader.Load<DynamicFont>("res://Fonts/NSansFont24Pt.tres");
-		Theme theme = new Theme();
-		theme.SetFont("font", "Label", bigFont);
-		advisorType.Theme = theme;
-		advisorType.Text = "Domestic Advisor";
-		header.AddChild(advisorType);
-		header.SetPosition(new Vector2(0, 120));
-		header.AnchorLeft = 0.0f;
-		header.AnchorRight = 1.0f;
-		header.MarginRight = 10;    //For some reason this isn't causing it to be indented 10 pixels from the right.
-		AddChild(header);
+		PopupOverlay.AddHeaderToPopup(this, "Domestic Advisor", 120);
 
 		Label warningMessage = new Label();
 		//TODO: General-purpose text breaking up util.  Instead of \n
