@@ -31,6 +31,13 @@ public class PopupOverlay : HBoxContainer
 
 	public void ShowPopup(string dialogType, PopupCategory popupCategory)
 	{
+		this.ShowPopup(dialogType, popupCategory, AlignMode.End);
+	}
+
+	public void ShowPopup(string dialogType, PopupCategory popupCategory, AlignMode alignMode)
+	{
+		this.Alignment = alignMode;
+
 		if (dialogType.Equals("disband")) {
 			DisbandConfirmation dbc = new DisbandConfirmation();
 			AddChild(dbc);

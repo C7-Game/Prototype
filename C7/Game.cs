@@ -370,7 +370,7 @@ public class Game : Node2D
 			{
 				GD.Print("Got request for escape/quit");
 				PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-				popupOverlay.ShowPopup("escapeQuit", PopupOverlay.PopupCategory.Info);
+				popupOverlay.ShowPopup("escapeQuit", PopupOverlay.PopupCategory.Info, BoxContainer.AlignMode.Center);
 			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
