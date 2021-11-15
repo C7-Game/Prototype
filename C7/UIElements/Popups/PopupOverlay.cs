@@ -151,6 +151,29 @@ public class PopupOverlay : HBoxContainer
 		header.MarginRight = 10;    //For some reason this isn't causing it to be indented 10 pixels from the right.
 		thePopup.AddChild(header);
 	}
+
+	/**
+	 * N.B. Some popups should react to certain keys, e.g. the Build City popup should close without building if you
+	 * press escape.  Those popups will have to implement this functionality.
+	 *
+	 * If we find that the majority of popups should close on Escape, we may want to make that the default,
+	 * but so far, 2 out of 3 popups do not close on escape.
+	 **/
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (this.Visible) {
+			if (@event is InputEventKey eventKey)
+			{
+				//As I've added more shortcuts, I've realized checking all of them here could be irksome.
+				//For now, I'm thinking it would make more sense to process or allow through the ones that should go through,
+				//as most of the global ones should *not* go through here.
+				if (eventKey.Pressed)
+				{
+					GetTree().SetInputAsHandled();
+				}
+			}
+		}
+	}
 	
 }
 
