@@ -66,7 +66,6 @@ public class UnitButtons : VBoxContainer
 	private void AddNewButton(HBoxContainer row, UnitControlButton button)
 	{
 		row.AddChild(button);
-		GD.Print("Adding " + button.key + " to buttonMap");
 		buttonMap[button.key] = button;
 	}
 

@@ -86,7 +86,7 @@ public class Game : Node2D
 	{
 		GD.Print("Game starting");
 		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
-		Connect(nameof(TurnStarted), turnCntCpnt, nameof(turnCntCpnt.OnTurnStarted));
+		// Connect(nameof(TurnStarted), turnCntCpnt, "OnTurnStarted");
 		// Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
 		OnPlayerStartTurn();
 	}
