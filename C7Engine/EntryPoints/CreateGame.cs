@@ -9,12 +9,14 @@ namespace C7Engine
          * quickly.  By keeping all the client-callable APIs in the EntryPoints folder,
          * hopefully it won't be too much of a goose hunt to refactor it later if we decide to do so.
          **/
-        public static void createGame()
+        public static Player createGame()
         {
             GameData gameData = new GameData();
-            gameData.createDummyGameData();
+            var humanPlayer = gameData.createDummyGameData();
 
             EngineStorage.setGameData(gameData);
+
+            return humanPlayer;
         }
     }
 }

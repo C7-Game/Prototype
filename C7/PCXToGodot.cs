@@ -20,6 +20,14 @@ public class PCXToGodot : Godot.Object
 		Txtr.CreateFromImage(Image, 0);
 		return Txtr;
 	}
+
+	/**
+	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
+	 **/
+	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int width, int height) {
+		Image image = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
+		return image.GetRect(new Rect2(leftStart, topStart, width, height));
+	}
 	
 	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
 		Image OutImage = new Image();

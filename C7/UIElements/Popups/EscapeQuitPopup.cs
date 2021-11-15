@@ -1,57 +1,42 @@
 using Godot;
 
-public class DisbandConfirmation : TextureRect
+public class EscapeQuitPopup : TextureRect
 {
-	public DisbandConfirmation() 
-	{
-
-	}
 	readonly int BUTTON_LABEL_OFFSET = 4;
-	ImageTexture InactiveButton;
+    ImageTexture InactiveButton;
 	ImageTexture HoverButton;
 	StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
 	StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 
-	public override void _Ready()
-	{
-		base._Ready();
-		
+    public override void _Ready()
+    {
+        base._Ready();
+
 		InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
 		HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
-		
+
 		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
 		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 
-		//Dimensions in-game are 530x320
-		//The top 110px are for the advisor leaderhead, Domestic in this case.
-		//For some reason it uses the Happy graphics.
+        //Dimensions in-game are 370x295, centered at the top
+		//The top 100px are empty (this is different than the 110px when there's an advisor)
 
 		//Create a transparent texture background of the appropriate size.
 		//This is super important as if we just add the children, the parent won't be able to figure
 		//out the size of this TextureRect, and it won't be able to align it properly.
-		//I added an extra 10 px on width for margin... maybe we should do margin another way, but 
-		//this works reliably.
 		ImageTexture thisTexture = new ImageTexture();
 		Image image = new Image();
-		image.Create(540, 320, false, Image.Format.Rgba8);
+		image.Create(370, 295, false, Image.Format.Rgba8);
 		image.Fill(Color.Color8(0, 0, 0, 0));
 		thisTexture.CreateFromImage(image);
 		this.Texture = thisTexture;
 
-
-		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupDOMESTIC.pcx", 1, 40, 149, 110);
-		TextureRect AdvisorHead = new TextureRect();
-		AdvisorHead.Texture = AdvisorHappy;
-		//Appears at 400, 110 in game, but leftmost 25px are transparent with default graphics
-		AdvisorHead.SetPosition(new Vector2(375, 0));
-		AddChild(AdvisorHead);
-
-		TextureRect background = PopupOverlay.GetPopupBackground(530, 210);
-		background.SetPosition(new Vector2(0, 110));
+        TextureRect background = PopupOverlay.GetPopupBackground(370, 195);
+		background.SetPosition(new Vector2(0, 100));
 		AddChild(background);
 
-		//Pop-up done.  Should refactor it someday so it's reusable.  But for now let's add the other things and stuff
-		HBoxContainer header = new HBoxContainer();
+        /** BEGIN HEADER.  This really needs refactored. ***/
+        HBoxContainer header = new HBoxContainer();
 		header.Alignment = BoxContainer.AlignMode.Center;
 		Label advisorType = new Label();
 		advisorType.AddColorOverride("font_color", new Color(0, 0, 0));
@@ -67,33 +52,31 @@ public class DisbandConfirmation : TextureRect
 		Theme theme = new Theme();
 		theme.SetFont("font", "Label", bigFont);
 		advisorType.Theme = theme;
-		advisorType.Text = "Domestic Advisor";
+		advisorType.Text = "Oh No!";
 		header.AddChild(advisorType);
-		header.SetPosition(new Vector2(0, 120));
+		header.SetPosition(new Vector2(0, 110));
 		header.AnchorLeft = 0.0f;
 		header.AnchorRight = 1.0f;
 		header.MarginRight = 10;    //For some reason this isn't causing it to be indented 10 pixels from the right.
 		AddChild(header);
+        /** END HEADER **/
 
-		Label warningMessage = new Label();
+        Label warningMessage = new Label();
 		//TODO: General-purpose text breaking up util.  Instead of \n
 		//This appears to be the way to do multi line labels, see: https://godotengine.org/qa/11126/how-to-break-line-on-the-label-using-gdscript
 		//Maybe there's an awesomer control we can user instead
 		warningMessage.AddColorOverride("font_color", new Color(0, 0, 0));
-		warningMessage.Text = "Disband Settler?  Pardon me but these are OUR people. Do \nyou really want to disband them?";
+		warningMessage.Text = "Do you really want to quit?";
 
-		warningMessage.SetPosition(new Vector2(25, 170));
+		warningMessage.SetPosition(new Vector2(25, 162));
 		AddChild(warningMessage);
-
-		AddButton("Yes, we need to!", 215, "disband");
-		AddButton("No. Maybe you are right, advisor.", 245, "cancel");
-	}
-
-	private void disband()
+        
+		AddButton("No, not really", 188, "cancel");
+		AddButton("Yes, immediately!", 216, "quit");
+    }
+    private void quit()
 	{
-		//tell the game to disband it.  right now we're doing that first, which is WRONG!
-		GetParent().EmitSignal("UnitDisbanded");
-		GetParent().EmitSignal("hide");
+		GetParent().EmitSignal("Quit");
 	}
 
 	private void cancel()
@@ -101,11 +84,10 @@ public class DisbandConfirmation : TextureRect
 		GetParent().EmitSignal("hide");
 	}
 
-	/**
-	 * This is yanked from MainMenu.  Should be refactored into a utility method because
-	 * we will need something like it in a lot of places.
-	 **/
-	private void AddButton(string label, int verticalPosition, string actionName)
+    /**
+     * REFACTOR, DEDUPLICATE
+     **/
+    private void AddButton(string label, int verticalPosition, string actionName)
 	{
 		const int HORIZONTAL_POSITION = 30;
 		TextureButton newButton = new TextureButton();

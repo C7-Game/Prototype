@@ -65,6 +65,9 @@ namespace C7Engine
                 unit.availableActions.Add("mine");
                 unit.availableActions.Add("irrigate");
             }
+            else if (unit.unitType.Equals("Chariot")) {
+                unit.availableActions.Add("pillage");
+            }
             else {
                 //It must be a catapult
                 unit.availableActions.Add("bombard");
@@ -125,8 +128,12 @@ namespace C7Engine
 
                         var newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
                         if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
+                            if (! unit.location.unitsOnTile.Remove(unit))
+                                throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
+                            newLoc.unitsOnTile.Add(unit);
                             unit.location = newLoc;
                             unit.movementPointsRemaining -= 1;
+                            unit.isFortified = false;
                         }
 
                         break;
@@ -185,6 +192,7 @@ namespace C7Engine
                 }
             }
             if (toBeDeleted != null) {
+                toBeDeleted.location.unitsOnTile.Remove(toBeDeleted);
                 gameData.mapUnits.Remove(toBeDeleted);
             }
         }

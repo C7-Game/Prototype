@@ -100,7 +100,12 @@ public class MapView : Node2D {
 		AddChild(terrainView);
 	}
 
-	// TODO: Use function from GameMap (in C7GameData). It's the same as this one just copied over.
+	public bool isRowAt(int y)
+	{
+		return wrapVertically || ((y >= 0) && (y < mapHeight));
+	}
+
+	// TODO: Use function from GameMap (in C7GameData). Also copy isRowAt over there.
 	public bool isTileAt(int x, int y)
 	{
 		bool evenRow = y%2 == 0;
@@ -112,8 +117,7 @@ public class MapView : Node2D {
 			else
 				xInBounds = (x >= 1) && (x <= mapWidth - 1);
 		}
-		bool yInBounds = wrapVertically || ((y >= 0) && (y < mapHeight));
-		return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
+		return isRowAt(y) && xInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
 	}
 
 	public int wrapTileX(int x)
@@ -145,18 +149,21 @@ public class MapView : Node2D {
 	{
 		var cLIC = cameraLocationInCells;
 		Vector2 mapViewSize = new Vector2(2, 2) + getVisibleAreaSize() / scaledCellSize;
-		for (int dy = -2; dy < mapViewSize.y; dy++)
-			for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
-				int x = cLIC.cellsX + dx, y = cLIC.cellsY + dy;
-				if (isTileAt(x, y)) {
-					VisibleTile tileInView = new VisibleTile();
-					tileInView.virtTileX = x;
-					tileInView.virtTileY = y;
-					tileInView.viewX = dx;
-					tileInView.viewY = dy;
-					yield return tileInView;
+		for (int dy = -2; dy < mapViewSize.y; dy++) {
+			int y = cLIC.cellsY + dy;
+			if (isRowAt(y))
+				for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
+					int x = cLIC.cellsX + dx;
+					if (isTileAt(x, y)) {
+						VisibleTile tileInView = new VisibleTile();
+						tileInView.virtTileX = x;
+						tileInView.virtTileY = y;
+						tileInView.viewX = dx;
+						tileInView.viewY = dy;
+						yield return tileInView;
+					}
 				}
-			}
+		}
 	}
 
 	public void onVisibleAreaChanged()
@@ -324,34 +331,72 @@ public class UnitView : Node2D {
 		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
 	}
 
+	public Color getHPColor(float fractionRemaining)
+	{
+		if (fractionRemaining >= (float)0.67)
+			return Color.Color8(0, 255, 0);
+		else if (fractionRemaining >= (float)0.34)
+			return Color.Color8(255, 255, 0);
+		else
+			return Color.Color8(255, 0, 0);
+	}
+
 	public override void _Draw()
 	{
 		base._Draw();
 
 		int unitIconsWidth = (unitIcons.GetWidth() - 1) / 33;
+		var map = MapInteractions.GetWholeMap();
 		foreach (var vT in mapView.visibleTiles()) {
 			int x = mapView.wrapTileX(vT.virtTileX);
 			int y = mapView.wrapTileY(vT.virtTileY);
-			foreach (var unit in UnitInteractions.GetAllUnits())
-				if ((x == unit.location.xCoordinate) && (y == unit.location.yCoordinate)) {
-					Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
+			var unitsOnTile = map.tileAt(x, y).unitsOnTile;
+			if (unitsOnTile.Count > 0) {
+				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
 
-					if (unit.guid == mapView.game.CurrentlySelectedUnit.guid)
-						DrawCircle(tileCenter - new Vector2(0, 16), 16, Color.Color8(255, 255, 0));
+				// Find unit to draw. If the currently selected unit is on this tile, use that one (also draw a yellow circle behind
+				// it). Otherwise, use the top defender.
+				MapUnit selectedUnitOnTile = null;
+				foreach (var u in unitsOnTile)
+					if (u.guid == mapView.game.CurrentlySelectedUnit.guid) {
+						DrawCircle(tileCenter, 16, Color.Color8(255, 255, 0));
+						selectedUnitOnTile = u;
+					}
+				var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : map.tileAt(x, y).findTopDefender();
 
-					int iconIndex = unit.unitType.iconIndex;
-					Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
-					Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-					Rect2 screenRect = new Rect2(tileCenter - new Vector2(16, 32), new Vector2(32, 32));
-					DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+				// Draw colored circle at unit's feet to show who owns it
+				DrawCircle(tileCenter, 8, new Color(unit.owner.color));
 
-					int mp = unit.movementPointsRemaining;
-					int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
-					Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
-					Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-					screenRect = new Rect2(tileCenter - new Vector2(22, 32), new Vector2(6, 6));
-					DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+				int iconIndex = unit.unitType.iconIndex;
+				Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
+				Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
+				Rect2 screenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
+				DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+
+				Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
+
+				int mp = unit.movementPointsRemaining;
+				int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
+				Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
+				Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
+				screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
+				DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+
+				int hpIndHeight = 20, hpIndWidth = 6;
+				var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
+				if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
+					float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
+					DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
+					float hpHeight = hpFraction * (hpIndHeight - 2);
+					if (hpHeight < 1)
+						hpHeight = 1;
+					var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
+								       new Vector2(hpIndWidth - 2, hpHeight)); // size
+					DrawRect(hpContentsRect, getHPColor(hpFraction));
+					if (unit.isFortified)
+						DrawRect(hpIndBackgroundRect, Color.Color8(255, 255, 255), false);
 				}
+			}
 		}
 
 	}

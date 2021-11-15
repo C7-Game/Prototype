@@ -9,9 +9,16 @@ namespace C7GameData
     {
         public string guid  {get;}
         public UnitPrototype unitType {get; set;}
+        public Player owner {get; set;}
         public Tile location {get; set;}
 
         public int movementPointsRemaining {get; set;}
+        public int hitPointsRemaining {get; set;}
+        public int maxHitPoints {
+            get {
+                return 3; // Eventually we'll add HP from experience and the type's inherent bonus
+            }
+        }
         public bool isFortified {get; set;}
         //sentry, etc. will come later.  For now, let's just have a couple things so we can cycle through units that aren't fortified.
 
@@ -22,6 +29,16 @@ namespace C7GameData
         public MapUnit()
         {
             guid = Guid.NewGuid().ToString();
+        }
+
+        public override string ToString()
+        {
+            if (this != MapUnit.NONE) {
+                return unitType.name + " with " + movementPointsRemaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
+            }
+            else {
+                return "This is the NONE unit";
+            }
         }
 
         public static MapUnit NONE = new MapUnit();

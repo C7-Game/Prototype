@@ -19,7 +19,7 @@ public class Game : Node2D
 		ComputerTurn
 	}
 
-
+	Player controller; // Player that's controlling the UI.
 	int[,] Map;
 
 	private MapView mapView;
@@ -35,7 +35,7 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		CreateGame.createGame();
+		controller = CreateGame.createGame();
 		var map = MapInteractions.GetWholeMap();
 		this.TerrainAsTileMap(map.numTilesWide, map.numTilesTall);
 
@@ -72,12 +72,7 @@ public class Game : Node2D
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
 		//without a manual cast to int.
 		//https://github.com/godotengine/godot/issues/16388
-		if (Input.IsKeyPressed((int)Godot.KeyList.Escape))	//escape.  TODO: aka KEY_ESCAPE, which is global in GDScript but which I can't figure out how to import here.
-		{
-			GD.Print("User pressed escape");
-			//TODO: Display the "Oh No! Do you really want to quit?" menu
-		}
-		else if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+		if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
 			EmitSignal("ShowSpecificAdvisor", "F1");
 		}
 	}
@@ -148,10 +143,24 @@ public class Game : Node2D
 		AddChild(mapView);
 	}
 
+	/**
+	 * Currently (11/14/2021), all unit selection goes through here.
+	 * Both code paths are in Game.cs for now, so it's local, but we may
+	 * want to change it event driven.
+	 **/
 	public void setSelectedUnit(MapUnit unit)
 	{
-		CurrentlySelectedUnit = unit;
+		this.CurrentlySelectedUnit = unit;
 		mapView.onVisibleAreaChanged();
+
+		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
+		if (CurrentlySelectedUnit != MapUnit.NONE) {
+			ParameterWrapper wrappedUnit = new ParameterWrapper(CurrentlySelectedUnit);
+			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
+		}
+		else {
+			EmitSignal(nameof(NoMoreAutoselectableUnits));
+		}
 	}
 
 	private void _onEndTurnButtonPressed()
@@ -277,13 +286,7 @@ public class Game : Node2D
 					// Select unit on tile at mouse location
 					int tileX, tileY;
 					if (mapView.tileOnScreenAt(eventMouseButton.Position, out tileX, out tileY)) {
-						MapUnit to_select = null;
-						foreach (var unit in UnitInteractions.GetAllUnits())
-							if ((tileX == unit.location.xCoordinate) && (tileY == unit.location.yCoordinate) &&
-								(unit.movementPointsRemaining > 0)) {
-								to_select = unit;
-								break;
-							}
+						MapUnit to_select = MapInteractions.GetTileAt(tileX, tileY).unitsOnTile.Find(u => u.movementPointsRemaining > 0);
 						if (to_select != null)
 							setSelectedUnit(to_select);
 					}
@@ -357,8 +360,17 @@ public class Game : Node2D
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
 					if (CurrentlySelectedUnit.movementPointsRemaining <= 0)
 						GetNextAutoselectedUnit();
+					else {
+						setSelectedUnit(CurrentlySelectedUnit);
+					}
 					mapView.onVisibleAreaChanged();
 				}
+			}
+			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
+			{
+				GD.Print("Got request for escape/quit");
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+				popupOverlay.ShowPopup("escapeQuit", PopupOverlay.PopupCategory.Info);
 			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
@@ -379,14 +391,7 @@ public class Game : Node2D
 
 	private void GetNextAutoselectedUnit()
 	{
-		setSelectedUnit(UnitInteractions.getNextSelectedUnit());
-		if (CurrentlySelectedUnit == MapUnit.NONE) {
-			EmitSignal(nameof(NoMoreAutoselectableUnits));
-		}
-		else {
-			ParameterWrapper wrappedUnit = new ParameterWrapper(CurrentlySelectedUnit);
-			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
-		}
+		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit());
 	}
 
 	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
@@ -440,6 +445,15 @@ public class Game : Node2D
 	{
 		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
 		GetNextAutoselectedUnit();
+	}
+	
+	/**
+	 * User quit.  We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
+	 **/
+	private void OnQuitTheGame()
+	{
+		GD.Print("Goodbye!");
+		GetTree().Quit();
 	}
 }
 
