@@ -57,7 +57,7 @@ public class Game : Node2D
 		GD.Print("Now in game!");
 
 		// NOTE: TEMP HACK for animated unit prototype
-		Civ3Unit warrior = new Civ3Unit(Util.Civ3MediaPath("Art/Units/Warrior/Warrior.ini"));
+		Civ3Unit warrior = new Civ3Unit(Util.Civ3MediaPath("Art/Units/warrior/Warrior.INI"));
 		warrior.AS.Position = new Vector2(64,32);
 		warrior.Animation(UnitAction.VICTORY, Direction.SE);
 		warrior.Move(Direction.SE);
