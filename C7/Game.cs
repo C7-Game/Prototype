@@ -422,6 +422,11 @@ public class Game : Node2D
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
 			popupOverlay.ShowPopup("disband", PopupOverlay.PopupCategory.Advisor);
 		}
+		else if (buttonName.Equals("buildCity"))
+		{
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+			popupOverlay.ShowPopup("buildCity", PopupOverlay.PopupCategory.Advisor);
+		}
 		else
 		{
 			//A nice sanity check if I use a different name here than where I created it...
@@ -454,6 +459,11 @@ public class Game : Node2D
 	{
 		GD.Print("Goodbye!");
 		GetTree().Quit();
+	}
+	
+	private void OnBuildCity(string name)
+	{
+		GD.Print("The user decided to build the city of " + name);
 	}
 }
 

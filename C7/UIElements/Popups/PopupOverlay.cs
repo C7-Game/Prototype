@@ -5,6 +5,7 @@ public class PopupOverlay : HBoxContainer
 {
 	[Signal] public delegate void UnitDisbanded();
 	[Signal] public delegate void Quit();
+	[Signal] public delegate void BuildCity(string name);
 	Control currentChild = null;
 	
 	const int HTILE_SIZE = 61;
@@ -62,6 +63,11 @@ public class PopupOverlay : HBoxContainer
 			EscapeQuitPopup eqp = new EscapeQuitPopup();
 			AddChild(eqp);
 			currentChild = eqp;
+		}
+		else if (dialogType.Equals("buildCity")) {
+			BuildCityDialog bcd = new BuildCityDialog();
+			AddChild(bcd);
+			currentChild =bcd;
 		}
 		
 		if (currentChild != null) {
