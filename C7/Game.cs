@@ -55,6 +55,14 @@ public class Game : Node2D
 		_on_SlideToggle_toggled(false);
 
 		GD.Print("Now in game!");
+
+		// NOTE: TEMP HACK for animated unit prototype
+		Civ3Unit warrior = new Civ3Unit(Util.Civ3MediaPath("Art/Units/Warrior/Warrior.ini"));
+		warrior.AS.Position = new Vector2(64,32);
+		warrior.Animation(UnitAction.VICTORY, Direction.SE);
+		warrior.Move(Direction.SE);
+		AddChild(warrior.AS);
+		// END TEMP HACK for animated unit...so many issues
 	}
 
 	public override void _Process(float delta)
