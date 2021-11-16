@@ -58,10 +58,31 @@ public class BuildCityDialog : TextureRect
 
         cityName.Connect("text_entered", this, "OnCityNameEntered");
 
-        //Need real buttons here for confirm/cancel.
+        //Cancel/confirm buttons.  Note the X button is thinner than the O button.
+        ImageTexture circleTexture= Util.LoadTextureFromPCX("Art/X-o_ALLstates-sprite.pcx", 1, 1, 19, 19);
+        ImageTexture xTexture = Util.LoadTextureFromPCX("Art/X-o_ALLstates-sprite.pcx", 21, 1, 15, 19);
+        TextureButton confirmButton = new TextureButton();
+        confirmButton.TextureNormal = circleTexture;
+        confirmButton.SetPosition(new Vector2(475, 213));
+        AddChild(confirmButton);
+        TextureButton cancelButton = new TextureButton();
+        cancelButton.TextureNormal = xTexture;
+        cancelButton.SetPosition(new Vector2(500, 213));
+        AddChild(cancelButton);
+
+        confirmButton.Connect("pressed", this, "OnConfirmButtonPressed");
+        cancelButton.Connect("pressed", GetParent(), "hide");
     }
 
-    private void OnCityNameEntered(string name)
+    /**
+     * Need a second method b/c the LineEdit sends a param and the ConfirmButton doesn't.
+     **/
+    public void OnConfirmButtonPressed()
+    {
+        this.OnCityNameEntered(cityName.Text);
+    }
+
+    public void OnCityNameEntered(string name)
     {
 		GetTree().SetInputAsHandled();
         GD.Print("The user hit enter with a city name of " + name);
@@ -79,13 +100,6 @@ public class BuildCityDialog : TextureRect
 					GetTree().SetInputAsHandled();
                     GetParent().EmitSignal("hide");
 				}
-                else if (eventKey.Scancode ==(int)Godot.KeyList.Enter)
-                {
-                    GD.Print("The user hit enter with a city name of " + cityName.Text);
-                    GetTree().SetInputAsHandled();
-                    GetParent().EmitSignal("BuildCity", cityName.Text);
-                    GetParent().EmitSignal("hide");
-                }
 			}
 		}
 	}
