@@ -4,11 +4,11 @@ using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
 
-public abstract class LooseLayer {
-	public abstract void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
+public interface ILooseLayer {
+	void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
 }
 
-public class UnitLayer : LooseLayer {
+public class UnitLayer : ILooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
@@ -33,7 +33,7 @@ public class UnitLayer : LooseLayer {
 			return Color.Color8(255, 0, 0);
 	}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.unitsOnTile.Count == 0)
 			return;
@@ -85,7 +85,7 @@ public class UnitLayer : LooseLayer {
 
 public class LooseView : Node2D {
 	public MapView mapView;
-	public List<LooseLayer> layers = new List<LooseLayer>();
+	public List<ILooseLayer> layers = new List<ILooseLayer>();
 
 	public LooseView(MapView mapView)
 	{
