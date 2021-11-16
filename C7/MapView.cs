@@ -4,6 +4,110 @@ using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
 
+public abstract class LooseLayer {
+	public abstract void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
+}
+
+public class UnitLayer : LooseLayer {
+	private ImageTexture unitIcons;
+	private int unitIconsWidth;
+	private ImageTexture unitMovementIndicators;
+
+	public UnitLayer()
+	{
+		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));
+		unitIcons = PCXToGodot.getImageTextureFromPCX(iconPCX);
+		unitIconsWidth = (unitIcons.GetWidth() - 1) / 33;
+
+		var moveIndPCX = new Pcx(Util.Civ3MediaPath("Art/interface/MovementLED.pcx"));
+		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
+	}
+
+	public Color getHPColor(float fractionRemaining)
+	{
+		if (fractionRemaining >= (float)0.67)
+			return Color.Color8(0, 255, 0);
+		else if (fractionRemaining >= (float)0.34)
+			return Color.Color8(255, 255, 0);
+		else
+			return Color.Color8(255, 0, 0);
+	}
+
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		if (tile.unitsOnTile.Count == 0)
+			return;
+
+		// Find unit to draw. If the currently selected unit is on this tile, use that one (also draw a yellow circle behind
+		// it). Otherwise, use the top defender.
+		MapUnit selectedUnitOnTile = null;
+		foreach (var u in tile.unitsOnTile)
+			if (u.guid == looseView.mapView.game.CurrentlySelectedUnit.guid) {
+				looseView.DrawCircle(tileCenter, 16, Color.Color8(255, 255, 0));
+				selectedUnitOnTile = u;
+			}
+		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
+
+		// Draw colored circle at unit's feet to show who owns it
+		looseView.DrawCircle(tileCenter, 8, new Color(unit.owner.color));
+
+		int iconIndex = unit.unitType.iconIndex;
+		Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
+		Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
+		Rect2 screenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
+		looseView.DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+
+		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
+
+		int mp = unit.movementPointsRemaining;
+		int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
+		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
+		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
+		screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
+		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+
+		int hpIndHeight = 20, hpIndWidth = 6;
+		var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
+		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
+			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
+			looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
+			float hpHeight = hpFraction * (hpIndHeight - 2);
+			if (hpHeight < 1)
+				hpHeight = 1;
+			var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
+						       new Vector2(hpIndWidth - 2, hpHeight)); // size
+			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
+			if (unit.isFortified)
+				looseView.DrawRect(hpIndBackgroundRect, Color.Color8(255, 255, 255), false);
+		}
+	}
+}
+
+public class LooseView : Node2D {
+	public MapView mapView;
+	public List<LooseLayer> layers = new List<LooseLayer>();
+
+	public LooseView(MapView mapView)
+	{
+		this.mapView = mapView;
+	}
+
+	public override void _Draw()
+	{
+		base._Draw();
+
+		var map = MapInteractions.GetWholeMap();
+		foreach (var layer in layers)
+			foreach (var vT in mapView.visibleTiles()) {
+				int x = mapView.wrapTileX(vT.virtTileX);
+				int y = mapView.wrapTileY(vT.virtTileY);
+				var tile = map.tileAt(x, y);
+				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
+				layer.drawObject(this, tile, tileCenter);
+			}
+	}
+}
+
 public class MapView : Node2D {
 	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
 	// staggered and half overlap).
@@ -69,7 +173,7 @@ public class MapView : Node2D {
 	private TileMap terrainView;
 	private TileSet terrainSet;
 
-	private UnitView unitView;
+	private LooseView looseView;
 
 	public MapView(Game game, int[,] terrain, TileSet terrainSet, bool wrapHorizontally, bool wrapVertically)
 	{
@@ -81,11 +185,13 @@ public class MapView : Node2D {
 		this.wrapHorizontally = wrapHorizontally;
 		this.wrapVertically = wrapVertically;
 
-		initTerrainLayer();
+		looseView = new LooseView(this);
 
-		// Init unit layer
-		unitView = new UnitView(this);
-		AddChild(unitView);
+		// Initialize layers
+		initTerrainLayer();
+		looseView.layers.Add(new UnitLayer());
+
+		AddChild(looseView);
 
 		onVisibleAreaChanged();
 	}
@@ -181,12 +287,12 @@ public class MapView : Node2D {
 
 		// Update layer positions
 		terrainView.Position = new Vector2(-cLIC.residueX, -cLIC.residueY);
-		unitView.Position = -cameraLocation;
+		looseView.Position = -cameraLocation;
 
 		foreach (var vT in visibleTiles())
 			terrainView.SetCell(vT.viewX, vT.viewY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
 
-		unitView.Update(); // trigger redraw
+		looseView.Update(); // trigger redraw
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
@@ -200,7 +306,7 @@ public class MapView : Node2D {
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
 			terrainView.Scale = v2NewZoom;
-			unitView.Scale = v2NewZoom;
+			looseView.Scale = v2NewZoom;
 			setCameraLocation ((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
 			// resetVisibleTiles(); // Don't have to call this because it's already called when the camera location is changed
 		}
@@ -312,92 +418,4 @@ public class MapView : Node2D {
 		}
 	}
 
-}
-
-public class UnitView : Node2D {
-	private MapView mapView;
-
-	private ImageTexture unitIcons;
-	private ImageTexture unitMovementIndicators;
-
-	public UnitView(MapView mapView)
-	{
-		this.mapView = mapView;
-
-		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));
-		unitIcons = PCXToGodot.getImageTextureFromPCX(iconPCX);
-
-		var moveIndPCX = new Pcx(Util.Civ3MediaPath("Art/interface/MovementLED.pcx"));
-		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
-	}
-
-	public Color getHPColor(float fractionRemaining)
-	{
-		if (fractionRemaining >= (float)0.67)
-			return Color.Color8(0, 255, 0);
-		else if (fractionRemaining >= (float)0.34)
-			return Color.Color8(255, 255, 0);
-		else
-			return Color.Color8(255, 0, 0);
-	}
-
-	public override void _Draw()
-	{
-		base._Draw();
-
-		int unitIconsWidth = (unitIcons.GetWidth() - 1) / 33;
-		var map = MapInteractions.GetWholeMap();
-		foreach (var vT in mapView.visibleTiles()) {
-			int x = mapView.wrapTileX(vT.virtTileX);
-			int y = mapView.wrapTileY(vT.virtTileY);
-			var unitsOnTile = map.tileAt(x, y).unitsOnTile;
-			if (unitsOnTile.Count > 0) {
-				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
-
-				// Find unit to draw. If the currently selected unit is on this tile, use that one (also draw a yellow circle behind
-				// it). Otherwise, use the top defender.
-				MapUnit selectedUnitOnTile = null;
-				foreach (var u in unitsOnTile)
-					if (u.guid == mapView.game.CurrentlySelectedUnit.guid) {
-						DrawCircle(tileCenter, 16, Color.Color8(255, 255, 0));
-						selectedUnitOnTile = u;
-					}
-				var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : map.tileAt(x, y).findTopDefender();
-
-				// Draw colored circle at unit's feet to show who owns it
-				DrawCircle(tileCenter, 8, new Color(unit.owner.color));
-
-				int iconIndex = unit.unitType.iconIndex;
-				Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
-				Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-				Rect2 screenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
-				DrawTextureRectRegion(unitIcons, screenRect, unitRect);
-
-				Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
-
-				int mp = unit.movementPointsRemaining;
-				int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
-				Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
-				Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-				screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
-				DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
-
-				int hpIndHeight = 20, hpIndWidth = 6;
-				var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
-				if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
-					float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
-					DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
-					float hpHeight = hpFraction * (hpIndHeight - 2);
-					if (hpHeight < 1)
-						hpHeight = 1;
-					var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
-								       new Vector2(hpIndWidth - 2, hpHeight)); // size
-					DrawRect(hpContentsRect, getHPColor(hpFraction));
-					if (unit.isFortified)
-						DrawRect(hpIndBackgroundRect, Color.Color8(255, 255, 255), false);
-				}
-			}
-		}
-
-	}
 }
