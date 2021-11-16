@@ -10,6 +10,7 @@ namespace C7GameData
 
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
+        public List<City> cities = new List<City>();
 
         public MapUnit createDummyUnit(UnitPrototype proto, Player owner, int tileX, int tileY)
         {

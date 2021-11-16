@@ -464,6 +464,15 @@ public class Game : Node2D
 	private void OnBuildCity(string name)
 	{
 		GD.Print("The user decided to build the city of " + name);
+		Tile theTile = this.CurrentlySelectedUnit.location;
+		CityInteractions.BuildCity(theTile.xCoordinate, theTile.yCoordinate, name);
+
+		//Also dismantle the unit.  For now, I am considering that equivalent to
+		//disbanding.  Whether that makes sense long term, is debatable.
+		//I am only calling the UnitInteractions behavior (rather than OnUnitDisbanded),
+		//however, since the one here will likely play a sound someday.
+		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+		GetNextAutoselectedUnit();
 	}
 }
 

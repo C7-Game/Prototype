@@ -6,6 +6,7 @@ namespace C7GameData
         public int xCoordinate;
         public int yCoordinate;
         public TerrainType terrainType;
+        public City cityAtTile;
 
         //One thing to decide is do we want to have a tile have a list of units on it,
         //or a unit have reference to the tile it is on, or both?
