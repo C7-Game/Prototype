@@ -23,6 +23,10 @@ config/icon="res://icon.png"
 
 window/size/height=768
 
+[gui]
+
+theme/custom="res://C7Theme.tres"
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"

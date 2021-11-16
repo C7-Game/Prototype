@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Game.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://UIElements/GameStatus/GameStatus.cs" type="Script" id=7]
 [ext_resource path="res://UIElements/UnitButtons/RenameButton.cs" type="Script" id=8]
 [ext_resource path="res://UIElements/Popups/PopupOverlay.cs" type="Script" id=9]
+[ext_resource path="res://C7Theme.tres" type="Theme" id=10]
 [ext_resource path="res://UIElements/UnitButtons/UnitButtons.cs" type="Script" id=12]
 
 [sub_resource type="Animation" id=2]
@@ -255,6 +256,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource( 10 )
 script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -299,7 +301,6 @@ current = true
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="UnitButtonPressed" from="CanvasLayer/UnitButtons" to="." method="UnitButtonPressed"]
 [connection signal="hide" from="CanvasLayer/Advisor" to="CanvasLayer/Advisor" method="_on_Advisor_hide"]
-[connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
 [connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
 [connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
 [connection signal="hide" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="HidePopup"]
