@@ -57,25 +57,25 @@ public class Civ3Unit : Civ3UnitSprite
         switch (direction)
         {
             case Direction.SW:
-                AS.Velocity = new Vector2(-1, 1).Normalized() * speed;
+                AS.Velocity = new Vector2(-2, 1).Normalized() * speed;
                 break;
             case Direction.S:
                 AS.Velocity = new Vector2(0, 1) * speed;
                 break;
             case Direction.SE:
-                AS.Velocity = new Vector2(1, 1).Normalized() * speed;
+                AS.Velocity = new Vector2(2, 1).Normalized() * speed;
                 break;
             case Direction.E:
                 AS.Velocity = new Vector2(1, 0) * speed;
                 break;
             case Direction.NE:
-                AS.Velocity = new Vector2(1, -1).Normalized() * speed;
+                AS.Velocity = new Vector2(2, -1).Normalized() * speed;
                 break;
             case Direction.N:
                 AS.Velocity = new Vector2(0, -1) * speed;
                 break;
             case Direction.NW:
-                AS.Velocity = new Vector2(-1, -1).Normalized() * speed;
+                AS.Velocity = new Vector2(-2, -1).Normalized() * speed;
                 break;
             case Direction.W:
                 AS.Velocity = new Vector2(-1, 0) * speed;
