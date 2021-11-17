@@ -9,10 +9,10 @@ namespace C7Engine
          * quickly.  By keeping all the client-callable APIs in the EntryPoints folder,
          * hopefully it won't be too much of a goose hunt to refactor it later if we decide to do so.
          **/
-        public static Player createGame()
+        public static Player createGame(GameMap.TerrainNoiseMapGenerator terrainGen)
         {
             GameData gameData = new GameData();
-            var humanPlayer = gameData.createDummyGameData();
+            var humanPlayer = gameData.createDummyGameData(terrainGen);
 
             EngineStorage.setGameData(gameData);
 

@@ -34,10 +34,9 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		controller = CreateGame.createGame();
+		controller = CreateGame.createGame(genBasicTerrainNoiseMap);
 		var map = MapInteractions.GetWholeMap();
-		int[,] terrainTypeIndices = this.TerrainAsTileMap(map.numTilesWide, map.numTilesTall);
-		map.tempSetTerrainTypes(terrainTypeIndices);
+		this.TerrainAsTileMap(map);
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -94,7 +93,28 @@ public class Game : Node2D
 		OnPlayerStartTurn();
 	}
 
-	public int[,] TerrainAsTileMap(int mapWidth, int mapHeight) {
+	// This is the terrain generator that used to be part of TerrainAsTileMap. Now it gets passed to and called from generateDummyGameMap so that
+	// function can be more in charge of terrain generation. Eventually we'll want generation to be part of the engine not the UI but we can't
+	// simply move this function there right now since we don't want the engine to depend on Godot.
+	public int[,] genBasicTerrainNoiseMap(int mapWidth, int mapHeight)
+	{
+		var tr = new int[mapWidth,mapHeight];
+		Godot.OpenSimplexNoise noise = new Godot.OpenSimplexNoise();
+		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
+		// Populate map values
+		for (int y = 0; y < mapHeight; y++) {
+			for (int x = 0; x < mapWidth; x++) {
+				// Multiplying x & y for noise coordinate sampling
+				float foo = noise.GetNoise2d(x*2,y*2);
+				tr[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
+			}
+		}
+		return tr;
+	}
+
+	public void TerrainAsTileMap(GameMap map) {
+		int mapWidth = map.numTilesWide, mapHeight = map.numTilesTall;
+
 		TileSet TS = new TileSet();
 
 		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
@@ -116,17 +136,7 @@ public class Game : Node2D
 			}
 		}
 
-		int[,] terrainTypes = new int[mapWidth,mapHeight];
-		Godot.OpenSimplexNoise noise = new Godot.OpenSimplexNoise();
-		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
-		// Populate map values
-		for (int y = 0; y < mapHeight; y++) {
-			for (int x = 0; x < mapWidth; x++) {
-				// Multiplying x & y for noise coordinate sampling
-				float foo = noise.GetNoise2d(x*2,y*2);
-				terrainTypes[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
-			}
-		}
+		var terNoise = map.terrainNoiseMap;
 
 		// Loop to lookup tile ids based on terrain mask
 		//  NOTE: This layout is full width, but the tiles are every-other coordinate
@@ -135,12 +145,12 @@ public class Game : Node2D
 		int[,] terrainSprites = new int[mapWidth,mapHeight];
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = y%2; x < mapWidth; x+=2) {
-				int Top = y == 0 ? (terrainTypes[(x+1) % mapWidth,y]) : (terrainTypes[x,y-1]);
-				int Bottom = y == mapHeight - 1 ? (terrainTypes[(x+1) % mapWidth,y]) : (terrainTypes[x,y+1]);
+				int Top = y == 0 ? (terNoise[(x+1) % mapWidth,y]) : (terNoise[x,y-1]);
+				int Bottom = y == mapHeight - 1 ? (terNoise[(x+1) % mapWidth,y]) : (terNoise[x,y+1]);
 				string foo = 
-					(terrainTypes[(x+1) % mapWidth,y]).ToString("D3") +
+					(terNoise[(x+1) % mapWidth,y]).ToString("D3") +
 					Bottom.ToString("D3") +
-					(terrainTypes[Mathf.Abs((x-1) % mapWidth),y]).ToString("D3") +
+					(terNoise[Mathf.Abs((x-1) % mapWidth),y]).ToString("D3") +
 					Top.ToString("D3")
 				;
 				try {
@@ -151,8 +161,6 @@ public class Game : Node2D
 
 		mapView = new MapView(this, terrainSprites, TS, false, false);
 		AddChild(mapView);
-
-		return terrainTypes;
 	}
 
 	/**

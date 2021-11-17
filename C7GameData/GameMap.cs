@@ -11,6 +11,11 @@ namespace C7GameData
         public int numTilesTall { get; private set; }
         bool wrapHorizontally, wrapVertically;
 
+        // The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
+        // This is kind of a temporary thing. The reason it works this way right now is because I'm just rearranging the generation code from
+        // TerrainAsTileMap, eventually we'll want a more complex map generator which probably won't need this var.
+        public int[,] terrainNoiseMap;
+
         public List<TerrainType> terrainTypes = new List<TerrainType>();
         public List<Tile> tiles {get;}
 
@@ -82,10 +87,13 @@ namespace C7GameData
                 return null; // TODO: Consider using empty tile object instead of null
         }
 
+        public delegate int[,] TerrainNoiseMapGenerator(int width, int height);
+
         /**
-         * Another temporary method.  Puppeteer has a better map in the UI.  This just generates a boring, but functional, map.
+         * Temporary method to generate a map. Right now it uses the basic generator passed in all the way from the UI but eventually we'll want to
+         * implement a more sophisticated generator in the engine.
          **/
-        public static GameMap generateDummyGameMap()
+        public static GameMap generateDummyGameMap(TerrainNoiseMapGenerator terrainGen)
         {
             TerrainType grassland = new TerrainType();
             grassland.name = "Grassland";
@@ -118,35 +126,18 @@ namespace C7GameData
 	    dummyMap.terrainTypes.Add(grassland);
 	    dummyMap.terrainTypes.Add(coast);
 
-            //Uh, right, isometic.  That means we have to stagger things.
-            //Also I forget how to do ranges in C#, oh well.
+	    dummyMap.terrainNoiseMap = terrainGen(dummyMap.numTilesWide, dummyMap.numTilesTall);
+
             for (int y = 0; y < dummyMap.numTilesTall; y++)
-            {
-                int firstXCoordinate = 0;
-                if (y % 2 == 1)
-                {
-                    firstXCoordinate = 1;
-                }
-                for (int x = firstXCoordinate; x < dummyMap.numTilesWide; x += 2)
-                {
+		for (int x = y%2; x < dummyMap.numTilesWide; x += 2) {
                     Tile newTile = new Tile();
                     newTile.xCoordinate = x;
                     newTile.yCoordinate = y;
-                    newTile.terrainType = grassland;
+                    newTile.terrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
                     dummyMap.tiles.Add(newTile);
                 }
-            }
 
             return dummyMap;
-        }
-
-	// Temporary method to set the terrain types for all tiles since for now the terrain is set by TerrainAsTileMap method in the UI. The terrain
-	// type indices correspond to entries in the terrainTypes array.
-        public void tempSetTerrainTypes(int[,] terrainTypeIndices)
-        {
-            for (int y = 0; y < numTilesTall; y++)
-                for (int x = y%2; x < numTilesWide; x += 2)
-                    tileAt(x, y).terrainType = terrainTypes[terrainTypeIndices[x, y]];
         }
 
         // Inputs: noise field width and height, bool whether noise should smoothly wrap X or Y
