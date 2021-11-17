@@ -4,7 +4,18 @@ using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
 
+// Loose layers are for drawing free-form objects on the map. Unlike TileLayers (TODO: pull that out from MapView) they are not restricted to drawing
+// tile sprites from a TileSet at fixed locations. They can draw anything, anywhere, although drawing is still tied to tiles for visibility
+// purposes. The MapView contains a list of loose layers, each one an object that implements ILooseLayer. Right now to add a new layer you must modify
+// the MapView constructor to add it to the list, but (TODO) eventually that will be made moddable.
 public interface ILooseLayer {
+	// drawObject draws the things this layer is supposed to draw that are associated with the given tile. Its parameters are:
+	//   looseView: The Node2D to actually draw to, e.g., use looseView.DrawCircle(...) to draw a circle. This object also contains a reference to
+	//     the MapView in case you need it.
+	//   tile: The game tile whose contents are to be drawn. This function gets called for each tile in view of the camera and none out of
+	//     view. The same tile may be drawn multiple times at different locations due to edge wrapping.
+	//   tileCenter: The location to draw to. You should draw around this location without adjusting for the camera location or zoom since the
+	//     MapView already transforms the looseView node to account for those things.
 	void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
 }
 
