@@ -20,7 +20,6 @@ public class Game : Node2D
 	}
 
 	Player controller; // Player that's controlling the UI.
-	int[,] Map;
 
 	private MapView mapView;
 
@@ -37,7 +36,8 @@ public class Game : Node2D
 	{
 		controller = CreateGame.createGame();
 		var map = MapInteractions.GetWholeMap();
-		this.TerrainAsTileMap(map.numTilesWide, map.numTilesTall);
+		int[,] terrainTypeIndices = this.TerrainAsTileMap(map.numTilesWide, map.numTilesTall);
+		map.tempSetTerrainTypes(terrainTypeIndices);
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -94,7 +94,7 @@ public class Game : Node2D
 		OnPlayerStartTurn();
 	}
 
-	public void TerrainAsTileMap(int mapWidth, int mapHeight) {
+	public int[,] TerrainAsTileMap(int mapWidth, int mapHeight) {
 		TileSet TS = new TileSet();
 
 		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
@@ -116,7 +116,7 @@ public class Game : Node2D
 			}
 		}
 
-		Map = new int[mapWidth,mapHeight];
+		int[,] terrainTypes = new int[mapWidth,mapHeight];
 		Godot.OpenSimplexNoise noise = new Godot.OpenSimplexNoise();
 		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
 		// Populate map values
@@ -124,31 +124,35 @@ public class Game : Node2D
 			for (int x = 0; x < mapWidth; x++) {
 				// Multiplying x & y for noise coordinate sampling
 				float foo = noise.GetNoise2d(x*2,y*2);
-				Map[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
+				terrainTypes[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
 			}
 		}
+
 		// Loop to lookup tile ids based on terrain mask
 		//  NOTE: This layout is full width, but the tiles are every-other coordinate
 		//    What I've done is generated "terrain ID" all over and am deriving an
 		//    image ID on the tile placement spots based on surrounding terrain values
+		int[,] terrainSprites = new int[mapWidth,mapHeight];
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = y%2; x < mapWidth; x+=2) {
-				int Top = y == 0 ? (Map[(x+1) % mapWidth,y]) : (Map[x,y-1]);
-				int Bottom = y == mapHeight - 1 ? (Map[(x+1) % mapWidth,y]) : (Map[x,y+1]);
+				int Top = y == 0 ? (terrainTypes[(x+1) % mapWidth,y]) : (terrainTypes[x,y-1]);
+				int Bottom = y == mapHeight - 1 ? (terrainTypes[(x+1) % mapWidth,y]) : (terrainTypes[x,y+1]);
 				string foo = 
-					(Map[(x+1) % mapWidth,y]).ToString("D3") +
+					(terrainTypes[(x+1) % mapWidth,y]).ToString("D3") +
 					Bottom.ToString("D3") +
-					(Map[Mathf.Abs((x-1) % mapWidth),y]).ToString("D3") +
+					(terrainTypes[Mathf.Abs((x-1) % mapWidth),y]).ToString("D3") +
 					Top.ToString("D3")
 				;
 				try {
-				Map[x,y] = (int)Terrmask[foo];
+				terrainSprites[x,y] = (int)Terrmask[foo];
 				} catch { GD.Print(x + "," + y + " " + foo); }
 			}
 		}
 
-		mapView = new MapView(this, Map, TS, false, false);
+		mapView = new MapView(this, terrainSprites, TS, false, false);
 		AddChild(mapView);
+
+		return terrainTypes;
 	}
 
 	/**
@@ -321,9 +325,8 @@ public class Game : Node2D
 			{
 				int x, y;
 				if (mapView.tileOnScreenAt(eventMouseButton.Position, out x, out y)) {
-					GD.Print("Setting terrain sprite at (" + x.ToString() + ", " + y.ToString() + ") to 0");
-					Map[x, y] = 0;
-					mapView.onVisibleAreaChanged();
+					var terrainTypeName = MapInteractions.GetTileAt(x, y).terrainType.name;
+					GD.Print("Clicked on (" + x.ToString() + ", " + y.ToString() + "): " + terrainTypeName);
 				} else
 					GD.Print("Didn't click on any tile");
 			}

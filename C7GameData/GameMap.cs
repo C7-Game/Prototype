@@ -11,6 +11,7 @@ namespace C7GameData
         public int numTilesTall { get; private set; }
         bool wrapHorizontally, wrapVertically;
 
+        public List<TerrainType> terrainTypes = new List<TerrainType>();
         public List<Tile> tiles {get;}
 
         public GameMap()
@@ -93,9 +94,29 @@ namespace C7GameData
             grassland.baseCommerceProduction = 1;   //same as above
             grassland.movementCost = 1;
 
+            TerrainType plains = new TerrainType();
+            plains.name = "Plains";
+            plains.baseFoodProduction = 1;
+            plains.baseShieldProduction = 2;
+            plains.baseCommerceProduction = 1;
+            plains.movementCost = 1;
+
+            TerrainType coast = new TerrainType();
+            coast.name = "Coast";
+            coast.baseFoodProduction = 2;
+            coast.baseShieldProduction = 0;
+            coast.baseCommerceProduction = 1;
+            coast.movementCost = 1;
+
             GameMap dummyMap = new GameMap();
             dummyMap.numTilesTall = 80;
             dummyMap.numTilesWide = 80;
+
+	    // NOTE: The order of terrain types here must match the order used in TerrainAsTileMap since that function generates the terrain (for now)
+	    // and then the dummy map reads it in through tempSetTerrainTypes (again, for now, this is obviously messy and needs to be polished).
+	    dummyMap.terrainTypes.Add(plains);
+	    dummyMap.terrainTypes.Add(grassland);
+	    dummyMap.terrainTypes.Add(coast);
 
             //Uh, right, isometic.  That means we have to stagger things.
             //Also I forget how to do ranges in C#, oh well.
@@ -115,8 +136,19 @@ namespace C7GameData
                     dummyMap.tiles.Add(newTile);
                 }
             }
+
             return dummyMap;
         }
+
+	// Temporary method to set the terrain types for all tiles since for now the terrain is set by TerrainAsTileMap method in the UI. The terrain
+	// type indices correspond to entries in the terrainTypes array.
+        public void tempSetTerrainTypes(int[,] terrainTypeIndices)
+        {
+            for (int y = 0; y < numTilesTall; y++)
+                for (int x = y%2; x < numTilesWide; x += 2)
+                    tileAt(x, y).terrainType = terrainTypes[terrainTypeIndices[x, y]];
+        }
+
         // Inputs: noise field width and height, bool whether noise should smoothly wrap X or Y
         // Actual fake-isometric map will have different shape, but for noise we'll go straight 2d matrix
         // NOTE: Apparently this OpenSimplex implementation doesn't do octaves, including persistance or lacunarity
