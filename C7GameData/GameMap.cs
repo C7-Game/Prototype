@@ -87,13 +87,40 @@ namespace C7GameData
                 return null; // TODO: Consider using empty tile object instead of null
         }
 
-        public delegate int[,] TerrainNoiseMapGenerator(int width, int height);
+        public delegate int[,] TerrainNoiseMapGenerator(int rng, int width, int height);
+
+        public List<Tile> generateStartingLocations(Random rng, int num, int minDistBetween)
+        {
+            var tr = new List<Tile>();
+            for (int n = 0; n < num; n++) {
+                bool foundOne = false;
+                for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
+                    var randTile = tiles[rng.Next(0, tiles.Count)];
+                    if (randTile.terrainType.name == "Coast") // TODO: Write a proper check for if tile is water
+                        continue;
+                    int distToNearestOtherLoc = Int32.MaxValue;
+                    foreach (var sL in tr) {
+                        // TODO: This distance calculation is just a placeholder. Eventually we'll need to write an proper
+                        // function to find the distance between two tiles. This placeholder is not even very accurate, e.g. it
+                        // would say that a tile and its east neighbor are at distance 2.
+                        int dist = Math.Abs(sL.xCoordinate - randTile.xCoordinate) + Math.Abs(sL.yCoordinate - randTile.yCoordinate);
+                        if (dist < distToNearestOtherLoc)
+                            distToNearestOtherLoc = dist;
+                    }
+                    if (distToNearestOtherLoc >= minDistBetween) {
+                        tr.Add(randTile);
+                        foundOne = true;
+                    }
+                }
+            }
+            return tr;
+        }
 
         /**
          * Temporary method to generate a map. Right now it uses the basic generator passed in all the way from the UI but eventually we'll want to
          * implement a more sophisticated generator in the engine.
          **/
-        public static GameMap generateDummyGameMap(TerrainNoiseMapGenerator terrainGen)
+        public static GameMap generateDummyGameMap(Random rng, TerrainNoiseMapGenerator terrainGen)
         {
             TerrainType grassland = new TerrainType();
             grassland.name = "Grassland";
@@ -120,13 +147,12 @@ namespace C7GameData
             dummyMap.numTilesTall = 80;
             dummyMap.numTilesWide = 80;
 
-	    // NOTE: The order of terrain types here must match the order used in TerrainAsTileMap since that function generates the terrain (for now)
-	    // and then the dummy map reads it in through tempSetTerrainTypes (again, for now, this is obviously messy and needs to be polished).
+	    // NOTE: The order of terrain types in this array must match the indices produced by terrainGen
 	    dummyMap.terrainTypes.Add(plains);
 	    dummyMap.terrainTypes.Add(grassland);
 	    dummyMap.terrainTypes.Add(coast);
 
-	    dummyMap.terrainNoiseMap = terrainGen(dummyMap.numTilesWide, dummyMap.numTilesTall);
+	    dummyMap.terrainNoiseMap = terrainGen(rng.Next(), dummyMap.numTilesWide, dummyMap.numTilesTall);
 
             for (int y = 0; y < dummyMap.numTilesTall; y++)
 		for (int x = y%2; x < dummyMap.numTilesWide; x += 2) {

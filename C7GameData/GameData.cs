@@ -1,9 +1,11 @@
 namespace C7GameData
 {
+    using System;
     using System.Collections.Generic;
     public class GameData
     {
         public int turn {get; set;}
+        public Random rng; // TODO: Is GameData really the place for this?
         public GameMap map {get; set;}
         public List<Player> players = new List<Player>();
         List<TerrainType> terrainTypes = new List<TerrainType>();
@@ -43,7 +45,8 @@ namespace C7GameData
         public Player createDummyGameData(GameMap.TerrainNoiseMapGenerator terrainGen)
         {
             this.turn = 0;
-            this.map = GameMap.generateDummyGameMap(terrainGen);
+            this.rng = new Random();
+            this.map = GameMap.generateDummyGameMap(rng, terrainGen);
 
 	    int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
 	    var humanPlayer = new Player(blue);

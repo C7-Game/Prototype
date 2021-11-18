@@ -96,11 +96,11 @@ public class Game : Node2D
 	// This is the terrain generator that used to be part of TerrainAsTileMap. Now it gets passed to and called from generateDummyGameMap so that
 	// function can be more in charge of terrain generation. Eventually we'll want generation to be part of the engine not the UI but we can't
 	// simply move this function there right now since we don't want the engine to depend on Godot.
-	public int[,] genBasicTerrainNoiseMap(int mapWidth, int mapHeight)
+	public int[,] genBasicTerrainNoiseMap(int seed, int mapWidth, int mapHeight)
 	{
 		var tr = new int[mapWidth,mapHeight];
 		Godot.OpenSimplexNoise noise = new Godot.OpenSimplexNoise();
-		noise.Seed = (new Random()).Next(int.MinValue, int.MaxValue);
+		noise.Seed = seed;
 		// Populate map values
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = 0; x < mapWidth; x++) {
