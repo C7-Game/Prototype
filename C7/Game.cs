@@ -494,4 +494,3 @@ public class Game : Node2D
 		GetNextAutoselectedUnit();
 	}
 }
-
