@@ -2,9 +2,16 @@ using Godot;
 
 public class DisbandConfirmation : TextureRect
 {
-	public DisbandConfirmation() 
-	{
 
+	string unitType = "";
+	
+	//So Godot doesn't print error " Cannot construct temporary MonoObject because the class does not define a parameterless constructor"
+	//Not sure how important that is *shrug*
+	public DisbandConfirmation() {}
+
+	public DisbandConfirmation(string unitType) 
+	{
+		this.unitType = unitType;
 	}
 
 	public override void _Ready()
@@ -46,7 +53,7 @@ public class DisbandConfirmation : TextureRect
 		//This appears to be the way to do multi line labels, see: https://godotengine.org/qa/11126/how-to-break-line-on-the-label-using-gdscript
 		//Maybe there's an awesomer control we can user instead
 		warningMessage.AddColorOverride("font_color", new Color(0, 0, 0));
-		warningMessage.Text = "Disband Settler?  Pardon me but these are OUR people. Do \nyou really want to disband them?";
+		warningMessage.Text = "Disband " + unitType + "?  Pardon me but these are OUR people. Do \nyou really want to disband them?";
 
 		warningMessage.SetPosition(new Vector2(25, 170));
 		AddChild(warningMessage);

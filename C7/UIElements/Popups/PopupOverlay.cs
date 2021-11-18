@@ -50,15 +50,28 @@ public class PopupOverlay : HBoxContainer
 
 	public void ShowPopup(string dialogType, PopupCategory popupCategory)
 	{
-		this.ShowPopup(dialogType, popupCategory, AlignMode.End);
+		string[] args = {};
+		this.ShowPopup(dialogType, popupCategory, AlignMode.End, args);
+	}
+
+
+	public void ShowPopup(string dialogType, PopupCategory popupCategory, string[] args)
+	{
+		this.ShowPopup(dialogType, popupCategory, AlignMode.End, args);
 	}
 
 	public void ShowPopup(string dialogType, PopupCategory popupCategory, AlignMode alignMode)
 	{
+		string[] args = {};
+		this.ShowPopup(dialogType, popupCategory, alignMode, args);
+	}
+
+	public void ShowPopup(string dialogType, PopupCategory popupCategory, AlignMode alignMode, string[] args)
+	{
 		this.Alignment = alignMode;
 
 		if (dialogType.Equals("disband")) {
-			DisbandConfirmation dbc = new DisbandConfirmation();
+			DisbandConfirmation dbc = new DisbandConfirmation(args[0]);
 			AddChild(dbc);
 			currentChild = dbc;
 		}

@@ -438,8 +438,9 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("disband"))
 		{
+			string[] args = {CurrentlySelectedUnit.unitType.name};
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-			popupOverlay.ShowPopup("disband", PopupOverlay.PopupCategory.Advisor);
+			popupOverlay.ShowPopup("disband", PopupOverlay.PopupCategory.Advisor, args);
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
