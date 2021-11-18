@@ -6,6 +6,8 @@ public class PopupOverlay : HBoxContainer
 	[Signal] public delegate void UnitDisbanded();
 	[Signal] public delegate void Quit();
 	[Signal] public delegate void BuildCity(string name);
+	[Signal] public delegate void HidePopup();
+
 	Control currentChild = null;
 	
 	const int HTILE_SIZE = 61;
@@ -32,8 +34,9 @@ public class PopupOverlay : HBoxContainer
 		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 	}
 	
-	private void HidePopup()
+	private void OnHidePopup()
 	{
+		GD.Print("Hiding popup");
 		this.RemoveChild(currentChild);
 		this.Hide();
 	}
@@ -230,5 +233,3 @@ public class PopupOverlay : HBoxContainer
 		newButtonLabel.Connect("pressed", thePopup, actionName);
 	}
 }
-
-

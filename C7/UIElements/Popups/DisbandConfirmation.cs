@@ -59,11 +59,11 @@ public class DisbandConfirmation : TextureRect
 	{
 		//tell the game to disband it.  right now we're doing that first, which is WRONG!
 		GetParent().EmitSignal("UnitDisbanded");
-		GetParent().EmitSignal("hide");
+		GetParent().EmitSignal("HidePopup");
 	}
 
 	private void cancel()
 	{
-		GetParent().EmitSignal("hide");
+		GetParent().EmitSignal("HidePopup");
 	}
 }

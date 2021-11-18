@@ -46,6 +46,6 @@ public class EscapeQuitPopup : TextureRect
 
 	private void cancel()
 	{
-		GetParent().EmitSignal("hide");
+		GetParent().EmitSignal("HidePopup");
 	}
 }

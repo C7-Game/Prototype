@@ -71,7 +71,7 @@ public class BuildCityDialog : TextureRect
         AddChild(cancelButton);
 
         confirmButton.Connect("pressed", this, "OnConfirmButtonPressed");
-        cancelButton.Connect("pressed", GetParent(), "hide");
+        cancelButton.Connect("pressed", GetParent(), "OnHidePopup");
     }
 
     /**
@@ -87,7 +87,7 @@ public class BuildCityDialog : TextureRect
 		GetTree().SetInputAsHandled();
         GD.Print("The user hit enter with a city name of " + name);
         GetParent().EmitSignal("BuildCity", name);
-        GetParent().EmitSignal("hide");
+        GetParent().EmitSignal("HidePopup");
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -98,7 +98,7 @@ public class BuildCityDialog : TextureRect
 				if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 				{
 					GetTree().SetInputAsHandled();
-                    GetParent().EmitSignal("hide");
+                    GetParent().EmitSignal("HidePopup");
 				}
 			}
 		}
