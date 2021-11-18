@@ -94,6 +94,12 @@ public class LowerRightInfoBox : TextureRect
 		yearAndGold.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(yearAndGold);
 		yearAndGold.MarginLeft = -1 * (yearAndGold.RectSize.x/2.0f);
+		
+		//Setup up, but do not start, the timer.
+		blinkingTimer.OneShot = false;
+		blinkingTimer.WaitTime = 0.6f;
+		blinkingTimer.Connect("timeout", this, "toggleEndTurnButton");
+		AddChild(blinkingTimer);
 	}
 
 	public void SetEndOfTurnStatus() {
@@ -104,10 +110,6 @@ public class LowerRightInfoBox : TextureRect
 		toggleEndTurnButton();
 		
 		if (!timerStarted) {
-			blinkingTimer.OneShot = false;
-			blinkingTimer.WaitTime = 0.6f;
-			blinkingTimer.Connect("timeout", this, "toggleEndTurnButton");
-			AddChild(blinkingTimer);
 			blinkingTimer.Start();
 			GD.Print("Started a timer for blinking");
 
