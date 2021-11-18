@@ -48,9 +48,13 @@ namespace C7GameData
             this.rng = new Random();
             this.map = GameMap.generateDummyGameMap(rng, terrainGen);
 
-	    int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-	    var humanPlayer = new Player(blue);
+            int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
+            var humanPlayer = new Player(blue);
             players.Add(humanPlayer);
+
+            int white = -1; // = 0xFFFFFFFF, but we can't just use that b/c the compiler complains about uint-to-int conversion
+            var barbarianPlayer = new Player(white);
+            players.Add(barbarianPlayer);
 
             //Right now, the one terrain type is in the map but not in our list here.
             //That is not great, but let's overlook that for now, as for now all our terrain type
@@ -90,6 +94,14 @@ namespace C7GameData
             createDummyUnit(warrior, humanPlayer,  8, 6);
             createDummyUnit(worker , humanPlayer, 10, 6);
             createDummyUnit(chariot, humanPlayer, 12, 6);
+
+            var startingLocations = map.generateStartingLocations(rng, 10, 10);
+            foreach (var sL in startingLocations)
+                if (sL.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
+                    var barbWarrior = createDummyUnit(warrior, barbarianPlayer, sL.xCoordinate, sL.yCoordinate);
+                    barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
+                                                    // whole procedure of generating a map should be part of the engine not the data module.
+                }
 
             //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
 
