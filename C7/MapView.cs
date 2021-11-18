@@ -94,6 +94,28 @@ public class UnitLayer : ILooseLayer {
 	}
 }
 
+public class BuildingLayer : ILooseLayer {
+	private ImageTexture buildingsTex;
+	private Vector2 buildingSpriteSize;
+
+	public BuildingLayer()
+	{
+		var buildingsPCX = new Pcx(Util.Civ3MediaPath("Art/Terrain/TerrainBuildings.PCX"));
+		buildingsTex = PCXToGodot.getImageTextureFromPCX(buildingsPCX);
+		buildingSpriteSize = new Vector2((float)buildingsTex.GetWidth() / 3, (float)buildingsTex.GetHeight() / 4);
+	}
+
+	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		if (tile.hasBarbarianCamp) {
+			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize);
+			// TODO: Modify this calculation so it doesn't assume buildingSpriteSize is the same as the size of the terrain tiles
+			var screenRect = new Rect2(tileCenter - (float)0.5 * buildingSpriteSize, buildingSpriteSize);
+			looseView.DrawTextureRectRegion(buildingsTex, screenRect, texRect);
+		}
+	}
+}
+
 public class LooseView : Node2D {
 	public MapView mapView;
 	public List<ILooseLayer> layers = new List<ILooseLayer>();
@@ -200,6 +222,7 @@ public class MapView : Node2D {
 
 		// Initialize layers
 		initTerrainLayer();
+		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 
 		AddChild(looseView);

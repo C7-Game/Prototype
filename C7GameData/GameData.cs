@@ -101,6 +101,7 @@ namespace C7GameData
                     var barbWarrior = createDummyUnit(warrior, barbarianPlayer, sL.xCoordinate, sL.yCoordinate);
                     barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
                                                     // whole procedure of generating a map should be part of the engine not the data module.
+                    barbWarrior.location.hasBarbarianCamp = true;
                 }
 
             //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
