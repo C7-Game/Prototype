@@ -86,7 +86,7 @@ public class UnitLayer : ILooseLayer {
 			if (hpHeight < 1)
 				hpHeight = 1;
 			var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
-						       new Vector2(hpIndWidth - 2, hpHeight)); // size
+			                               new Vector2(hpIndWidth - 2, hpHeight)); // size
 			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
 			if (unit.isFortified)
 				looseView.DrawRect(hpIndBackgroundRect, Color.Color8(255, 255, 255), false);
@@ -407,23 +407,25 @@ public class MapView : Node2D {
 
 	// Returns the location of tile (x, y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the
 	// upper left. Works even if (x, y) is off screen or out of bounds.
-	public Vector2 screenLocationOfTile(int x, int y, bool center = true)
+	public Vector2 screenLocationOfTile(Tile tile, bool center = true)
 	{
 		var cLIC = cameraLocationInCells;
+		int relCellX = tile.xCoordinate - cLIC.cellsX, relCellY = tile.yCoordinate - cLIC.cellsY;
 
 		// Add one to x & y to get the tile center b/c in Civ 3 the tile at (x, y) is a diamond centered on (x+1, y+1).
 		Vector2 centeringOffset = center ? new Vector2(1, 1) : new Vector2(0, 0);
 
 		// cameraTileX/Y is what gets drawn at (0, 0) in MapView's local coordinates.
-		return terrainView.Position + (centeringOffset + new Vector2(x - cLIC.cellsX, y - cLIC.cellsY)) * scaledCellSize;
+		return terrainView.Position + (centeringOffset + new Vector2(relCellX, relCellY)) * scaledCellSize;
 	}
 
 	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
-	public bool tileOnScreenAt(Vector2 screenLocation, out int tileX, out int tileY)
+	public Tile tileOnScreenAt(Vector2 screenLocation)
 	{
+		var map = MapInteractions.GetWholeMap();
 		// TODO: This calculation could be made a lot more efficient by inlining screenLocationOfTile since right now it undoes several things
 		// that function does. Though this way it's more clear how the algorithm works.
-		Vector2 mapLoc = (screenLocation - screenLocationOfTile(0, 0, false)) / scaledCellSize;
+		Vector2 mapLoc = (screenLocation - screenLocationOfTile(map.tileAt(0, 0), false)) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
 		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
@@ -439,17 +441,12 @@ public class MapView : Node2D {
 				y -= 1;
 			}
 		}
-		x = wrapTileX(x);
-		y = wrapTileY(y);
-		if (isTileAt(x, y)) {
-			tileX = x;
-			tileY = y;
-			return true;
-		} else {
-			tileX = -1;
-			tileY = -1;
-			return false;
-		}
+		return map.tileAt(wrapTileX(x), wrapTileY(y));
 	}
 
+	public void centerCameraOnTile(Tile t)
+	{
+		var tileCenter = new Vector2(t.xCoordinate + 1, t.yCoordinate + 1) * scaledCellSize;
+		setCameraLocation(tileCenter - (float)0.5 * getVisibleAreaSize());
+	}
 }

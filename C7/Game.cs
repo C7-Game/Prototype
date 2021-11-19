@@ -304,9 +304,9 @@ public class Game : Node2D
 				if(eventMouseButton.IsPressed())
 				{
 					// Select unit on tile at mouse location
-					int tileX, tileY;
-					if (mapView.tileOnScreenAt(eventMouseButton.Position, out tileX, out tileY)) {
-						MapUnit to_select = MapInteractions.GetTileAt(tileX, tileY).unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+					var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
+					if (tile != null) {
+						MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
 						if (to_select != null)
 							setSelectedUnit(to_select);
 					}
@@ -331,10 +331,10 @@ public class Game : Node2D
 			}
 			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (! eventMouseButton.IsPressed()))
 			{
-				int x, y;
-				if (mapView.tileOnScreenAt(eventMouseButton.Position, out x, out y)) {
-					var terrainTypeName = MapInteractions.GetTileAt(x, y).terrainType.name;
-					GD.Print("Clicked on (" + x.ToString() + ", " + y.ToString() + "): " + terrainTypeName);
+				var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
+				if (tile != null) {
+					var terrainTypeName = tile.terrainType.name;
+					GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + terrainTypeName);
 				} else
 					GD.Print("Didn't click on any tile");
 			}
