@@ -8,6 +8,8 @@ expand_margin_top = 3.0
 expand_margin_bottom = 3.0
 
 [resource]
+LineEdit/colors/cursor_color = Color( 0, 0, 0, 1 )
 LineEdit/colors/font_color = Color( 0, 0, 0, 1 )
 LineEdit/colors/selection_color = Color( 0.709804, 0.807843, 0.709804, 1 )
+LineEdit/styles/focus = SubResource( 1 )
 LineEdit/styles/normal = SubResource( 1 )
