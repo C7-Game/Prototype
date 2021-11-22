@@ -307,7 +307,8 @@ public class Game : Node2D
 					var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
 					if (tile != null) {
 						MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
-						if (to_select != null)
+						//TODO: Better check for "current/human player"
+						if (to_select != null && to_select.owner.color == 0x4040FFFF)
 							setSelectedUnit(to_select);
 					}
 
