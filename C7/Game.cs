@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections;
+using System.Diagnostics;
 using ConvertCiv3Media;
 using C7Engine;
 using C7GameData;
@@ -30,6 +31,13 @@ public class Game : Node2D
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
 	private KinematicBody2D Player;
+
+	Stopwatch loadTimer = new Stopwatch();
+
+	public override void _EnterTree()
+	{
+		loadTimer.Start();
+	}
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -62,6 +70,10 @@ public class Game : Node2D
 		warrior.Move(Direction.SE);
 		AddChild(warrior.AS);
 		// END TEMP HACK for animated unit...so many issues
+
+		loadTimer.Stop();
+		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
+		GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 	}
 
 	public override void _Process(float delta)

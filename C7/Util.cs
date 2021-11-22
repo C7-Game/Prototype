@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using ConvertCiv3Media;
 
@@ -72,13 +73,34 @@ public class Util
 		return PCXToGodot.getImageTextureFromPCX(NewPCX);
 	}
 	
-	
+	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
 	//Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
 	//file, and it'll load it up and return you what you need.
 	static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height)
 	{
-		Pcx NewPCX = new Pcx(Util.Civ3MediaPath(relPath));
-		return PCXToGodot.getImageTextureFromPCX(NewPCX, leftStart, topStart, width, height);
+		string key = relPath + "-" + leftStart + "-" + topStart + "-" + width + "-" + height;
+		if (textureCache.ContainsKey(key)) {
+			return textureCache[key];
+		}
+		Pcx NewPCX = LoadPCX(relPath);
+		ImageTexture texture = PCXToGodot.getImageTextureFromPCX(NewPCX, leftStart, topStart, width, height);
+		textureCache[key] = texture;
+		return texture;
+	}
+
+	private static Dictionary<string, Pcx> PcxCache = new Dictionary<string, Pcx>();
+
+	/**
+	 * Utility method for loading PCX files that will cache them, so we don't have to load them from disk so often.
+	 **/
+	static Pcx LoadPCX(string relPath)
+	{
+		if (PcxCache.ContainsKey(relPath)) {
+			return PcxCache[relPath];
+		}
+		Pcx thePcx = new Pcx(Util.Civ3MediaPath(relPath));
+		PcxCache[relPath] = thePcx;
+		return thePcx;
 	}
 
 	static public AudioStreamSample LoadWAVFromDisk(string path)

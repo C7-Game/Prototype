@@ -1,9 +1,13 @@
 using Godot;
+using System;
+using System.Diagnostics;
 
 public class DisbandConfirmation : TextureRect
 {
 
 	string unitType = "";
+	
+	Stopwatch loadTimer = new Stopwatch();
 	
 	//So Godot doesn't print error " Cannot construct temporary MonoObject because the class does not define a parameterless constructor"
 	//Not sure how important that is *shrug*
@@ -12,6 +16,11 @@ public class DisbandConfirmation : TextureRect
 	public DisbandConfirmation(string unitType) 
 	{
 		this.unitType = unitType;
+	}
+
+	public override void _EnterTree()
+	{
+		loadTimer.Start();
 	}
 
 	public override void _Ready()
@@ -60,6 +69,10 @@ public class DisbandConfirmation : TextureRect
 
 		PopupOverlay.AddButton(this, "Yes, we need to!", 215, "disband");
 		PopupOverlay.AddButton(this, "No. Maybe you are right, advisor.", 245, "cancel");
+		
+		loadTimer.Stop();
+		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
+		GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 	}
 
 	private void disband()
