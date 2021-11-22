@@ -1,5 +1,7 @@
 using Godot;
 using ConvertCiv3Media;
+using System;
+using System.Diagnostics;
 
 public class PopupOverlay : HBoxContainer
 {
@@ -119,6 +121,8 @@ public class PopupOverlay : HBoxContainer
 		Pcx popupborders = Util.LoadPCX("Art/popupborders.pcx");
 
 		//The pop-up part is the tricky part
+		Stopwatch imageTimer = new Stopwatch();
+		imageTimer.Start();
 		Image topLeftPopup      = PCXToGodot.getImageFromPCX(popupborders, 251, 1, 61, 44);
 		Image topCenterPopup    = PCXToGodot.getImageFromPCX(popupborders, 313, 1, 61, 44);
 		Image topRightPopup     = PCXToGodot.getImageFromPCX(popupborders, 375, 1, 61, 44);
@@ -128,6 +132,9 @@ public class PopupOverlay : HBoxContainer
 		Image bottomLeftPopup   = PCXToGodot.getImageFromPCX(popupborders, 251, 91, 61, 44);
 		Image bottomCenterPopup = PCXToGodot.getImageFromPCX(popupborders, 313, 91, 61, 44);
 		Image bottomRightPopup  = PCXToGodot.getImageFromPCX(popupborders, 375, 91, 61, 44);
+		imageTimer.Stop();
+		TimeSpan stopwatchElapsed = imageTimer.Elapsed;
+		GD.Print("Image creation time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 
 		//Dimensions are 530x320.  The leaderhead takes up 110.  So the popup is 530x210.
 		//We have multiples of... 62? For the horizontal dimension, 45 for vertical.

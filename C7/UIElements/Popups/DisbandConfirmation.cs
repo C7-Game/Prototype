@@ -51,6 +51,10 @@ public class DisbandConfirmation : TextureRect
 		AdvisorHead.SetPosition(new Vector2(375, 0));
 		AddChild(AdvisorHead);
 
+		//TODO: Almost all (135 ms) of the disband confirmation creation, after the first time, is in the
+		//background creation.  90 ms or so on the first time is before this point (and is well-cached later on).
+		//Since we'll be creating the background for a lot of popups, we should optimize this.
+		//Also confirmed the blitting in drawRowOfPopup is essentially free.
 		TextureRect background = PopupOverlay.GetPopupBackground(530, 210);
 		background.SetPosition(new Vector2(0, 110));
 		AddChild(background);
