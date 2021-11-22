@@ -4,7 +4,7 @@ using ConvertCiv3Media;
 
 public class PCXToGodot : Godot.Object
 {
-	private readonly static byte LAST_INDEX = 255;
+	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 	
 	public static ImageTexture getImageTextureFromPCX(Pcx pcx) {
 		Image ImgTxtr = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
@@ -44,7 +44,7 @@ public class PCXToGodot : Godot.Object
 				byte red = palette[colorIndices[i], 0];
 				byte green = palette[colorIndices[i], 1];
 				byte blue = palette[colorIndices[i], 2];
-				byte alpha = colorIndices[i] == LAST_INDEX ? (byte)0 : (byte)255;
+				byte alpha = colorIndices[i] >= CIV3_TRANSPARENCY_START ? (byte)0 : (byte)255;
 				OutImage.SetPixel(i % width, i / width, Color.Color8(red, green, blue, alpha));
 			}
 		}
