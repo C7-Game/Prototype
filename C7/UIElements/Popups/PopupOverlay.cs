@@ -116,7 +116,7 @@ public class PopupOverlay : HBoxContainer
 		Image image = new Image();
 		image.Create(width, height, false, Image.Format.Rgba8);
 
-		Pcx popupborders = new Pcx(Util.Civ3MediaPath("Art/popupborders.pcx"));
+		Pcx popupborders = Util.LoadPCX("Art/popupborders.pcx");
 
 		//The pop-up part is the tricky part
 		Image topLeftPopup      = PCXToGodot.getImageFromPCX(popupborders, 251, 1, 61, 44);

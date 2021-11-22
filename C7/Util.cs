@@ -69,8 +69,13 @@ public class Util
 	//Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
 	static public ImageTexture LoadTextureFromPCX(string relPath)
 	{
-		Pcx NewPCX = new Pcx(Util.Civ3MediaPath(relPath));
-		return PCXToGodot.getImageTextureFromPCX(NewPCX);
+		if (textureCache.ContainsKey(relPath)) {
+			return textureCache[relPath];
+		}
+		Pcx NewPCX = LoadPCX(relPath);
+		ImageTexture texture = PCXToGodot.getImageTextureFromPCX(NewPCX);
+		textureCache[relPath] = texture;
+		return texture;
 	}
 	
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
@@ -93,7 +98,7 @@ public class Util
 	/**
 	 * Utility method for loading PCX files that will cache them, so we don't have to load them from disk so often.
 	 **/
-	static Pcx LoadPCX(string relPath)
+	static public Pcx LoadPCX(string relPath)
 	{
 		if (PcxCache.ContainsKey(relPath)) {
 			return PcxCache[relPath];
