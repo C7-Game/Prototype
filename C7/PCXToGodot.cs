@@ -13,9 +13,8 @@ public class PCXToGodot : Godot.Object
 		return Txtr;
 	}
 
-	public static ImageTexture getImageTextureFromPCX(Pcx pcx, int leftStart, int topStart, int width, int height) {
-		Image Image = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
-		Image = Image.GetRect(new Rect2(leftStart, topStart, width, height));
+	public static ImageTexture getImageTextureFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
+		Image Image = getImageFromPCX(pcx, leftStart, topStart, croppedWidth, croppedHeight);
 		ImageTexture Txtr = new ImageTexture();
 		Txtr.CreateFromImage(Image, 0);
 		return Txtr;
@@ -35,7 +34,8 @@ public class PCXToGodot : Godot.Object
 				byte red = pcx.Palette[pcx.ColorIndexAt(x, y), 0];
 				byte green = pcx.Palette[pcx.ColorIndexAt(x, y), 1];
 				byte blue = pcx.Palette[pcx.ColorIndexAt(x, y), 2];
-				image.SetPixel(x - leftStart, y - topStart, Color.Color8(red, green, blue));
+				byte alpha = pcx.ColorIndexAt(x, y) >= CIV3_TRANSPARENCY_START ? (byte)0 : (byte)255;
+				image.SetPixel(x - leftStart, y - topStart, Color.Color8(red, green, blue, alpha));
 			}
 		}
 		image.Unlock();
