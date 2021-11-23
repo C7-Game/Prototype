@@ -49,6 +49,8 @@ public class UnitLayer : ILooseLayer {
 		if (tile.unitsOnTile.Count == 0)
 			return;
 
+		var white = Color.Color8(255, 255, 255);
+
 		// Find unit to draw. If the currently selected unit is on this tile, use that one (also draw a yellow circle behind
 		// it). Otherwise, use the top defender.
 		MapUnit selectedUnitOnTile = null;
@@ -89,7 +91,19 @@ public class UnitLayer : ILooseLayer {
 			                               new Vector2(hpIndWidth - 2, hpHeight)); // size
 			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
 			if (unit.isFortified)
-				looseView.DrawRect(hpIndBackgroundRect, Color.Color8(255, 255, 255), false);
+				looseView.DrawRect(hpIndBackgroundRect, white, false);
+		}
+
+		// Draw lines to show that there are more units on this tile
+		if (tile.unitsOnTile.Count > 1) {
+			int lineCount = tile.unitsOnTile.Count;
+			if (lineCount > 5)
+				lineCount = 5;
+			for (int n = 0; n < lineCount; n++) {
+				var lineStart = indicatorLoc + new Vector2(-2, hpIndHeight + 12 + 4 * n);
+				looseView.DrawLine(lineStart                    , lineStart + new Vector2(8, 0), white);
+				looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
+			}
 		}
 	}
 }
