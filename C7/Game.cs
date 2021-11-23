@@ -178,6 +178,8 @@ public class Game : Node2D
 			var screenCenter = new Vector2((float)0.5, (float)0.5);
 			if (mapView.screenLocationOfTile(unit.location, true).DistanceTo(screenCenter) > 0.35)
 				mapView.centerCameraOnTile(unit.location);
+			else
+				mapView.onVisibleAreaChanged();
 		} else
 			mapView.onVisibleAreaChanged();
 
