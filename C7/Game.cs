@@ -171,7 +171,15 @@ public class Game : Node2D
 	public void setSelectedUnit(MapUnit unit)
 	{
 		this.CurrentlySelectedUnit = unit;
-		mapView.onVisibleAreaChanged();
+
+		// If the newly selected unit's tile is not close to the center of the screen, then move the camera to it. Otherwise just trigger a
+		// redraw (not necessary in the first case since moving the map triggers a redraw automatically).
+		if (unit != MapUnit.NONE) {
+			var screenCenter = new Vector2((float)0.5, (float)0.5);
+			if (mapView.screenLocationOfTile(unit.location, true).DistanceTo(screenCenter) > 0.35)
+				mapView.centerCameraOnTile(unit.location);
+		} else
+			mapView.onVisibleAreaChanged();
 
 		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {
