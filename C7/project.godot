@@ -31,6 +31,10 @@ window/size/height=768
 
 theme/custom="res://C7Theme.tres"
 
+[network]
+
+limits/debugger_stdout/max_chars_per_second=16384
+
 [rendering]
 
 environment/default_environment="res://default_env.tres"

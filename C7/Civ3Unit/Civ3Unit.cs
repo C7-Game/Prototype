@@ -23,12 +23,15 @@ public class Civ3Unit : Civ3UnitSprite
         foreach (UnitAction actn in Enum.GetValues(typeof(UnitAction))) {
             // Ensuring there is image data for this action
             if (Animations[(int)actn] != null) {
+                // GD.Print("Importing " + Animations[(int)actn]);
                 foreach (Direction dir in Enum.GetValues(typeof(Direction))) {
                     string ActionAndDirection = String.Format("{0}-{1}", actn.ToString(), dir.ToString());
                     SF.AddAnimation(ActionAndDirection);
                     SF.SetAnimationSpeed(ActionAndDirection, 10);
+                    // GD.Print("  Direction: " + dir);
 
                     for (int i = 0; i < Animations[(int)actn].Images.GetLength(1); i++) {
+                        // GD.Print("    Image" + i + " with width " + Animations[(int)actn].Width + ", " + Animations[(int)actn].Height);
                         Image ImgTxtr = Civ3Unit.ByteArrayToImage(
                             Animations[(int)actn].Images[(int)dir,i],
                             Animations[(int)actn].Palette,
@@ -85,19 +88,24 @@ public class Civ3Unit : Civ3UnitSprite
 
     // TODO: This is mostly duplicated in/from PCXToGodot.cs, but special indexes
     //   handled differently. Probably needs combining and refactoring
-    public static Image ByteArrayToImage(byte[] ba, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
+    public static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
         Image OutImage = new Image();
         OutImage.Create(width, height, false, Image.Format.Rgba8);
         OutImage.Lock();
-        for (int i = 0; i < width * height; i++)
+        int c = 0;
+        for (int y = 0; y < height; y++)
         {
-            if (shadows && ba[i] > 239) {
-                // using black and transparency
-                OutImage.SetPixel(i % width, i / width, Color.Color8(0,0,0, (byte)((255 -ba[i]) * 16)));
-                // using the palette color but adding transparency
-                // OutImage.SetPixel(i % width, i / width, Color.Color8(palette[ba[i],0], palette[ba[i],1], palette[ba[i],2], (byte)((255 -ba[i]) * 16)));
-            } else {
-                OutImage.SetPixel(i % width, i / width, Color.Color8(palette[ba[i],0], palette[ba[i],1], palette[ba[i],2], ba[i] == 255 ? (byte)0 : (byte)255));
+            for (int x = 0; x < width; x++)
+            {
+                if (shadows && colorIndices[c] > 239) {
+                    // using black and transparency
+                    OutImage.SetPixel(x, y, Color.Color8(0,0,0, (byte)((255 -colorIndices[c]) << 4)));
+                    // using the palette color but adding transparency
+                    // OutImage.SetPixel(i % width, i / width, Color.Color8(palette[ba[i],0], palette[ba[i],1], palette[ba[i],2], (byte)((255 -ba[i]) * 16)));
+                } else {
+                    OutImage.SetPixel(x, y, Color.Color8(palette[colorIndices[c],0], palette[colorIndices[c],1], palette[colorIndices[c],2], colorIndices[c] == 255 ? (byte)0 : (byte)255));
+                }
+                c++;
             }
         }
         OutImage.Unlock();

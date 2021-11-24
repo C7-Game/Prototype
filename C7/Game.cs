@@ -37,7 +37,7 @@ public class Game : Node2D
 
 	public override void _EnterTree()
 	{
-		loadTimer.Start();
+		// loadTimer.Start();
 	}
 	
 	// Called when the node enters the scene tree for the first time.
