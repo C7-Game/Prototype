@@ -6,8 +6,6 @@ public class MainMenu : Node2D
 {
 	readonly int BUTTON_LABEL_OFFSET = 4;
 	
-	StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
-	StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 	ImageTexture InactiveButton;
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
@@ -26,9 +24,6 @@ public class MainMenu : Node2D
 			
 			InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
 			HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
-			
-			TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
-			TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 
 			AddButton("New Game", 160, "StartGame");
 			AddButton("Quick Start", 195, "StartGame");
@@ -65,15 +60,6 @@ public class MainMenu : Node2D
 				
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
-
-		newButtonLabel.AddColorOverride("font_color", new Color(0, 0, 0));
-		//Only the Exit and part of the Credits button are getting the right color.  The rest are black.  Not sure why.
-		newButtonLabel.AddColorOverride("font_color_hover", new Color(181.0f/255, 90.0f/255, 0, 255));
-		//N.B. there are also font_color_pressed and font_color_disabled.
-
-		newButtonLabel.AddStyleboxOverride("normal", TransparentBackgroundStyle);
-		newButtonLabel.AddStyleboxOverride("hover", TransparentBackgroundHoverStyle);
-		newButtonLabel.AddStyleboxOverride("pressed", TransparentBackgroundHoverStyle);
 
 		newButtonLabel.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
 		MainMenuBackground.AddChild(newButtonLabel);

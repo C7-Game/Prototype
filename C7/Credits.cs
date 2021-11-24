@@ -22,7 +22,6 @@ public class Credits : Node2D
 
 		//Todo: Either import Text/credits.txt and scroll it as done in-game, or have our own custom credits.
 		Label creditsLabel = new Label();
-		creditsLabel.AddColorOverride("font_color", new Color(0, 0, 0));
 		creditsLabel.Text = "Project Ringleader: WildWeazel";
 		creditsLabel.SetPosition(new Vector2(360, 120));
 		AddChild(creditsLabel);

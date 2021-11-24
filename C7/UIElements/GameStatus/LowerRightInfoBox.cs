@@ -49,7 +49,6 @@ public class LowerRightInfoBox : TextureRect
 
 		//Labels and whatnot in this text box
 		lblUnitSelected.Text = "Settler";
-		lblUnitSelected.AddColorOverride("font_color", new Color(0, 0, 0));
 		lblUnitSelected.Align = Label.AlignEnum.Right;
 		lblUnitSelected.SetPosition(new Vector2(0, 20));
 		lblUnitSelected.AnchorRight = 1.0f;
@@ -57,7 +56,6 @@ public class LowerRightInfoBox : TextureRect
 		boxRightRectangle.AddChild(lblUnitSelected);
 		
 		attackDefenseMovement.Text = "0.0. 1/1";
-		attackDefenseMovement.AddColorOverride("font_color", new Color(0, 0, 0));
 		attackDefenseMovement.Align = Label.AlignEnum.Right;
 		attackDefenseMovement.SetPosition(new Vector2(0, 35));
 		attackDefenseMovement.AnchorRight = 1.0f;
@@ -65,7 +63,6 @@ public class LowerRightInfoBox : TextureRect
 		boxRightRectangle.AddChild(attackDefenseMovement);
 		
 		terrainType.Text = "Grassland";
-		terrainType.AddColorOverride("font_color", new Color(0, 0, 0));
 		terrainType.Align = Label.AlignEnum.Right;
 		terrainType.SetPosition(new Vector2(0, 50));
 		terrainType.AnchorRight = 1.0f;
@@ -78,7 +75,6 @@ public class LowerRightInfoBox : TextureRect
 		//Seems like there probably is an easier way, but I haven't found it yet.
 		Label civAndGovt = new Label();
 		civAndGovt.Text = "Rome - Despotism (5.5.0)";
-		civAndGovt.AddColorOverride("font_color", new Color(0, 0, 0));
 		civAndGovt.Align = Label.AlignEnum.Center;
 		civAndGovt.SetPosition(new Vector2(0, 90));
 		civAndGovt.AnchorLeft = 0.5f;
@@ -87,7 +83,6 @@ public class LowerRightInfoBox : TextureRect
 		civAndGovt.MarginLeft = -1 * (civAndGovt.RectSize.x/2.0f);
 
 		yearAndGold.Text = "Turn 0  10 Gold (+0 per turn)";
-		yearAndGold.AddColorOverride("font_color", new Color(0, 0, 0));
 		yearAndGold.Align = Label.AlignEnum.Center;
 		yearAndGold.SetPosition(new Vector2(0, 105));
 		yearAndGold.AnchorLeft = 0.5f;

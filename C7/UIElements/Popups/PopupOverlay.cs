@@ -15,8 +15,6 @@ public class PopupOverlay : HBoxContainer
 	private readonly static int BUTTON_LABEL_OFFSET = 4;
 	private static ImageTexture InactiveButton;
 	private static ImageTexture HoverButton;
-	private static StyleBoxFlat TransparentBackgroundStyle = new StyleBoxFlat();
-	private static StyleBoxFlat TransparentBackgroundHoverStyle = new StyleBoxFlat();
 
 	public enum PopupCategory {
 		Advisor,
@@ -29,9 +27,6 @@ public class PopupOverlay : HBoxContainer
 		
 		InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
 		HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
-		
-		TransparentBackgroundStyle.BgColor = new Color(0, 0, 0, 0);
-		TransparentBackgroundHoverStyle.BgColor = new Color(0, 0, 0, 0);
 	}
 	
 	private void OnHidePopup()
@@ -174,7 +169,6 @@ public class PopupOverlay : HBoxContainer
 		HBoxContainer header = new HBoxContainer();
 		header.Alignment = BoxContainer.AlignMode.Center;
 		Label advisorType = new Label();
-		advisorType.AddColorOverride("font_color", new Color(0, 0, 0));
 
 		//Set the font size.  For labels, there is no one-off override, so we have to
 		//set it on a theme like this.

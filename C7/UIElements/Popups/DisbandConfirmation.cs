@@ -52,7 +52,6 @@ public class DisbandConfirmation : TextureRect
 		//TODO: General-purpose text breaking up util.  Instead of \n
 		//This appears to be the way to do multi line labels, see: https://godotengine.org/qa/11126/how-to-break-line-on-the-label-using-gdscript
 		//Maybe there's an awesomer control we can user instead
-		warningMessage.AddColorOverride("font_color", new Color(0, 0, 0));
 		warningMessage.Text = "Disband " + unitType + "?  Pardon me but these are OUR people. Do \nyou really want to disband them?";
 
 		warningMessage.SetPosition(new Vector2(25, 170));

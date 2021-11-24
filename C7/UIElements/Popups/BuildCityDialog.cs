@@ -42,7 +42,6 @@ public class BuildCityDialog : TextureRect
 		labelAndName.SetPosition(new Vector2(30, 170));
 
 		Label nameLabel = new Label();
-		nameLabel.AddColorOverride("font_color", new Color(0, 0, 0));
 		nameLabel.Text = "Name: ";
 		labelAndName.AddChild(nameLabel);
 

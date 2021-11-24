@@ -37,7 +37,6 @@ public class DomesticAdvisor : TextureRect
 
 		//TODO: Multi-line capabilities
 		Label DialogBoxAdvise = new Label();
-		DialogBoxAdvise.AddColorOverride("font_color", new Color(0, 0, 0));
 		DialogBoxAdvise.Text = "You are running C7!";
 		DialogBoxAdvise.SetPosition(new Vector2(815, 119));
 		AddChild(DialogBoxAdvise);
