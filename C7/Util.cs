@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using ConvertCiv3Media;
 
@@ -68,17 +69,43 @@ public class Util
 	//Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
 	static public ImageTexture LoadTextureFromPCX(string relPath)
 	{
-		Pcx NewPCX = new Pcx(Util.Civ3MediaPath(relPath));
-		return PCXToGodot.getImageTextureFromPCX(NewPCX);
+		if (textureCache.ContainsKey(relPath)) {
+			return textureCache[relPath];
+		}
+		Pcx NewPCX = LoadPCX(relPath);
+		ImageTexture texture = PCXToGodot.getImageTextureFromPCX(NewPCX);
+		textureCache[relPath] = texture;
+		return texture;
 	}
 	
-	
+	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
 	//Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
 	//file, and it'll load it up and return you what you need.
 	static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height)
 	{
-		Pcx NewPCX = new Pcx(Util.Civ3MediaPath(relPath));
-		return PCXToGodot.getImageTextureFromPCX(NewPCX, leftStart, topStart, width, height);
+		string key = relPath + "-" + leftStart + "-" + topStart + "-" + width + "-" + height;
+		if (textureCache.ContainsKey(key)) {
+			return textureCache[key];
+		}
+		Pcx NewPCX = LoadPCX(relPath);
+		ImageTexture texture = PCXToGodot.getImageTextureFromPCX(NewPCX, leftStart, topStart, width, height);
+		textureCache[key] = texture;
+		return texture;
+	}
+
+	private static Dictionary<string, Pcx> PcxCache = new Dictionary<string, Pcx>();
+
+	/**
+	 * Utility method for loading PCX files that will cache them, so we don't have to load them from disk so often.
+	 **/
+	static public Pcx LoadPCX(string relPath)
+	{
+		if (PcxCache.ContainsKey(relPath)) {
+			return PcxCache[relPath];
+		}
+		Pcx thePcx = new Pcx(Util.Civ3MediaPath(relPath));
+		PcxCache[relPath] = thePcx;
+		return thePcx;
 	}
 
 	static public AudioStreamSample LoadWAVFromDisk(string path)

@@ -13,9 +13,8 @@ public class PCXToGodot : Godot.Object
 		return Txtr;
 	}
 
-	public static ImageTexture getImageTextureFromPCX(Pcx pcx, int leftStart, int topStart, int width, int height) {
-		Image Image = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
-		Image = Image.GetRect(new Rect2(leftStart, topStart, width, height));
+	public static ImageTexture getImageTextureFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
+		Image Image = getImageFromPCX(pcx, leftStart, topStart, croppedWidth, croppedHeight);
 		ImageTexture Txtr = new ImageTexture();
 		Txtr.CreateFromImage(Image, 0);
 		return Txtr;
@@ -24,9 +23,23 @@ public class PCXToGodot : Godot.Object
 	/**
 	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
 	 **/
-	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int width, int height) {
-		Image image = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
-		return image.GetRect(new Rect2(leftStart, topStart, width, height));
+	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
+		Image image = new Image();
+		image.Create(croppedWidth, croppedHeight, false, Image.Format.Rgba8);
+		image.Lock();
+		for (int y = topStart; y < topStart + croppedHeight; y++)
+		{
+			for (int x = leftStart; x < leftStart + croppedWidth; x++)
+			{
+				byte red = pcx.Palette[pcx.ColorIndexAt(x, y), 0];
+				byte green = pcx.Palette[pcx.ColorIndexAt(x, y), 1];
+				byte blue = pcx.Palette[pcx.ColorIndexAt(x, y), 2];
+				byte alpha = pcx.ColorIndexAt(x, y) >= CIV3_TRANSPARENCY_START ? (byte)0 : (byte)255;
+				image.SetPixel(x - leftStart, y - topStart, Color.Color8(red, green, blue, alpha));
+			}
+		}
+		image.Unlock();
+		return image;
 	}
 	
 	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
