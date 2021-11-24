@@ -162,10 +162,32 @@ public class BuildingLayer : ILooseLayer {
 	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.hasBarbarianCamp) {
-			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize);
+			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize);	//(2, 0) is the offset in the TerrainBuildings.PCX file (top row, third in)
 			// TODO: Modify this calculation so it doesn't assume buildingSpriteSize is the same as the size of the terrain tiles
 			var screenRect = new Rect2(tileCenter - (float)0.5 * buildingSpriteSize, buildingSpriteSize);
 			looseView.DrawTextureRectRegion(buildingsTex, screenRect, texRect);
+		}
+	}
+}
+
+public class CityLayer : ILooseLayer {
+	private ImageTexture cityTexture;
+	private Vector2 citySpriteSize;
+
+	public CityLayer()
+	{
+		//TODO: Generalize, support multiple city types, etc.
+		this.cityTexture = Util.LoadTextureFromPCX("Art/Cities/rROMAN.PCX", 0, 0, 167, 95);
+		this.citySpriteSize = new Vector2(167, 95);
+	}
+
+	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		if (tile.cityAtTile != null) {
+			GD.Print("Tile " + tile.xCoordinate + ", " + tile.yCoordinate + " has a city");
+			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
+			Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
+			looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
 		}
 	}
 }
@@ -243,6 +265,7 @@ public class MapView : Node2D {
 		looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
+		looseView.layers.Add(new CityLayer());
 
 		AddChild(looseView);
 

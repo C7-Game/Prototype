@@ -8,11 +8,14 @@ namespace C7GameData
         public int yLocation {get;}
         public string name;
 
-        public City(int x, int y, string name)
+        public Player owner {get; set;}
+
+        public City(int x, int y, Player owner, string name)
         {
             guid = Guid.NewGuid().ToString();
             this.xLocation = x;
             this.yLocation = y;
+            this.owner = owner;
             this.name = name;
         }
     }

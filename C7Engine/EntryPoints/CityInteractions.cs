@@ -5,11 +5,13 @@ namespace C7Engine
     public class CityInteractions
     {
         //Eventually, this will need more info such as player
-        public static void BuildCity(int x, int y, string name)
+        public static void BuildCity(int x, int y, string playerGuid, string name)
         {
             GameData gameData = EngineStorage.gameData;
 
-            City newCity = new City(x, y, name);
+            Player owner = gameData.players.Find(player => player.guid == playerGuid);
+
+            City newCity = new City(x, y, owner, name);
             gameData.cities.Add(newCity);
 
             Tile tileWithNewCity = MapInteractions.GetTileAt(x, y);
