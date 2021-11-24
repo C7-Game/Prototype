@@ -185,35 +185,8 @@ public class MapView : Node2D {
 		set { setCameraZoomFromMiddle(value); }
 	}
 
-	// Normally the camera location is stored in pixels in map coords, the cameraLocationInCells property gives the camera location in grid
-	// cells. cellX/Y is the whole number of cells and residueX/Y is the pixel location inside the cell.
-	public struct CameraLocationInCells {
-		public int cellsX, cellsY;
-		public int residueX, residueY;
-	}
-	public CameraLocationInCells cameraLocationInCells {
-		get {
-			var tr = new CameraLocationInCells();
-
-			Vector2 tileSize = 2 * scaledCellSize;
-
-			int cameraPixelX = (int)cameraLocation.x;
-			int tilesX = cameraPixelX / (int)tileSize.x;
-			tr.cellsX = 2 * tilesX;
-			tr.residueX = cameraPixelX - tilesX * (int)tileSize.x;
-
-			int cameraPixelY = (int)cameraLocation.y;
-			int tilesY = cameraPixelY / (int)tileSize.y;
-			tr.cellsY = 2 * tilesY;
-			tr.residueY = cameraPixelY - tilesY * (int)tileSize.y;
-
-			return tr;
-		}
-	}
-
 	public struct VisibleTile {
 		public int virtTileX, virtTileY; // (x, y) coords of the tile. These are "virtual", i.e. unwrapped, coordinates.
-		public int viewX, viewY; // coordinates of the cell where the tile is be drawn, for use by tiled (not loose) layers
 	}
 
 	private int[,] terrain;
@@ -251,6 +224,7 @@ public class MapView : Node2D {
 		terrainView.CellSize = cellSize;
 		// terrainView.CenteredTextures = true;
 		terrainView.TileSet = terrainSet;
+
 		AddChild(terrainView);
 	}
 
@@ -301,19 +275,18 @@ public class MapView : Node2D {
 
 	public IEnumerable<VisibleTile> visibleTiles()
 	{
-		var cLIC = cameraLocationInCells;
+		int upperLeftX, upperLeftY;
+		tileCoordsOnScreenAt(new Vector2(0, 0), out upperLeftX, out upperLeftY);
 		Vector2 mapViewSize = new Vector2(2, 2) + getVisibleAreaSize() / scaledCellSize;
 		for (int dy = -2; dy < mapViewSize.y; dy++) {
-			int y = cLIC.cellsY + dy;
+			int y = upperLeftY + dy;
 			if (isRowAt(y))
 				for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
-					int x = cLIC.cellsX + dx;
+					int x = upperLeftX + dx;
 					if (isTileAt(x, y)) {
 						VisibleTile tileInView = new VisibleTile();
 						tileInView.virtTileX = x;
 						tileInView.virtTileY = y;
-						tileInView.viewX = dx;
-						tileInView.viewY = dy;
 						yield return tileInView;
 					}
 				}
@@ -331,14 +304,12 @@ public class MapView : Node2D {
 		// what tiles are drawn (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around
 		// wrapped edges.
 
-		var cLIC = cameraLocationInCells;
-
 		// Update layer positions
-		terrainView.Position = new Vector2(-cLIC.residueX, -cLIC.residueY);
+		terrainView.Position = -cameraLocation;
 		looseView.Position = -cameraLocation;
 
 		foreach (var vT in visibleTiles())
-			terrainView.SetCell(vT.viewX, vT.viewY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
+			terrainView.SetCell(vT.virtTileX, vT.virtTileY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
 
 		looseView.Update(); // trigger redraw
 	}
@@ -419,30 +390,29 @@ public class MapView : Node2D {
 		onVisibleAreaChanged();
 	}
 
+	public Vector2 screenLocationOfTileCoords(int x, int y, bool center = true)
+	{
+		// Add one to x & y to get the tile center b/c in Civ 3 the tile at (x, y) is a diamond centered on (x+1, y+1).
+		Vector2 centeringOffset = center ? new Vector2(1, 1) : new Vector2(0, 0);
+
+		var mapLoc = (new Vector2(x, y) + centeringOffset) * cellSize;
+		return mapLoc * cameraZoom - cameraLocation;
+	}
+
 	// Returns the location of tile (x, y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the
 	// upper left. Works even if (x, y) is off screen or out of bounds.
 	public Vector2 screenLocationOfTile(Tile tile, bool center = true)
 	{
-		var cLIC = cameraLocationInCells;
-		int relCellX = tile.xCoordinate - cLIC.cellsX, relCellY = tile.yCoordinate - cLIC.cellsY;
-
-		// Add one to x & y to get the tile center b/c in Civ 3 the tile at (x, y) is a diamond centered on (x+1, y+1).
-		Vector2 centeringOffset = center ? new Vector2(1, 1) : new Vector2(0, 0);
-
-		// cameraTileX/Y is what gets drawn at (0, 0) in MapView's local coordinates.
-		return terrainView.Position + (centeringOffset + new Vector2(relCellX, relCellY)) * scaledCellSize;
+		return screenLocationOfTileCoords(tile.xCoordinate, tile.yCoordinate, center);
 	}
 
-	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
-	public Tile tileOnScreenAt(Vector2 screenLocation)
+	public void tileCoordsOnScreenAt(Vector2 screenLocation, out int x, out int y)
 	{
-		var map = MapInteractions.GetWholeMap();
-		// TODO: This calculation could be made a lot more efficient by inlining screenLocationOfTile since right now it undoes several things
-		// that function does. Though this way it's more clear how the algorithm works.
-		Vector2 mapLoc = (screenLocation - screenLocationOfTile(map.tileAt(0, 0), false)) / scaledCellSize;
+		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
-		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
+		x = (int)intMapLoc.x;
+		y = (int)intMapLoc.y;
 		bool evenColumn = x%2 == 0, evenRow = y%2 == 0;
 		if (evenColumn ^ evenRow) {
 			if (fracMapLoc.y > fracMapLoc.x)
@@ -455,7 +425,14 @@ public class MapView : Node2D {
 				y -= 1;
 			}
 		}
-		return map.tileAt(wrapTileX(x), wrapTileY(y));
+	}
+
+	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
+	public Tile tileOnScreenAt(Vector2 screenLocation)
+	{
+		int x, y;
+		tileCoordsOnScreenAt(screenLocation, out x, out y);
+		return MapInteractions.GetWholeMap().tileAt(wrapTileX(x), wrapTileY(y));
 	}
 
 	public void centerCameraOnTile(Tile t)
