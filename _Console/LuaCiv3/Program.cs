@@ -24,7 +24,6 @@ namespace LuaCiv3
     		SavData mapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(GetCiv3Path + SavFilePath), defaultBicBytes);
 
             _ = lua.Call(lua.Globals["process_sav"], mapReader);
-            Console.WriteLine(mapReader.Wrld.Width);
         }
 
         // Enables these type instances to be accessed directly by Lua
