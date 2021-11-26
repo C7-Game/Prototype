@@ -3,18 +3,10 @@ using System.IO;
 using System.Text.Json;
 using QueryCiv3;
 using MoonSharp.Interpreter;
+using C7GameData;
 
 namespace LuaCiv3
 {
-    class GameStateClass {
-        public MapTile[] MapTiles { get; set; }
-        public int MapWidth { get; set; }
-        public int MapHeight { get; set; }
-    }
-    class MockC7SaveFormat {
-        public string Version { get; set; }
-        public GameStateClass GameState { get; set; }
-    }
     class Program
     {
         // temp hack since I seem to have moved this out of QueryCiv3

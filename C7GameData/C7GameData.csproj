@@ -8,4 +8,8 @@
     <PackageReference Include="ini-parser" Version="3.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QueryCiv3\QueryCiv3.csproj" />
+  </ItemGroup>
+
 </Project>
