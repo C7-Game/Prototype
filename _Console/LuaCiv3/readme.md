@@ -1,0 +1,3 @@
+This was originally intended to be extended into a general-purpose Lua script reader to have access to QueryCiv3, but the immediate need was to export select Civ3 map data to JSON for temp use in C7-Game/Prototype. After I got Lua working and printing out the info I realized it's simpler just to skip Lua and with C# dump the MapTile data with it's current limited features.
+
+The script file reference, save file path, and civ3 path are hard-coded for now, but in the future I'd like the script to be a parameter and for any Civ3 files & paths to be either passed as parameters and/or specified in the Lua script.

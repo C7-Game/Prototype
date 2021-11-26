@@ -1,13 +1,23 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json;
 using QueryCiv3;
 using MoonSharp.Interpreter;
 
 namespace LuaCiv3
 {
+    class GameStateClass {
+        public MapTile[] MapTiles { get; set; }
+        public int MapWidth { get; set; }
+        public int MapHeight { get; set; }
+    }
+    class MockC7SaveFormat {
+        public string Version { get; set; }
+        public GameStateClass GameState { get; set; }
+    }
     class Program
     {
-        // temp hack since I seem to have move this out of QueryCiv3
+        // temp hack since I seem to have moved this out of QueryCiv3
         static string GetCiv3Path { get => @"/Users/jim/civ3"; }
         // also hack because can't be bothered to make a parameter
         static string SavFilePath { get => @"/Conquests/Saves/for-c7-seed-1234567.SAV"; }
@@ -24,6 +34,27 @@ namespace LuaCiv3
     		SavData mapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(GetCiv3Path + SavFilePath), defaultBicBytes);
 
             _ = lua.Call(lua.Globals["process_sav"], mapReader);
+
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+            {
+                // Lower-case the first letter in JSON because JSON naming standards
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                // Pretty print because...well just because, OK?
+                WriteIndented = true
+            };
+            GameStateClass gameState = new GameStateClass
+            {
+                MapTiles = mapReader.Tile,
+                MapWidth = mapReader.Wrld.Width,
+                MapHeight = mapReader.Wrld.Height,
+            };
+            MockC7SaveFormat output = new MockC7SaveFormat
+            {
+                Version = "Mock save for hard-coded map data",
+                GameState = gameState,
+            };
+            string foo = JsonSerializer.Serialize(output, jsonOptions);
+            Console.WriteLine(foo);
         }
 
         // Enables these type instances to be accessed directly by Lua
