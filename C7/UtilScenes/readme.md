@@ -12,7 +12,7 @@ Just open the scene in Godot and run it. It is not hooked up to the game menu.
 
 ## TempTiles
 
-While working on LegacyMap I need a set of 'native' tiles to pull data from. We have no native structures yet, so this is a temporary and exploratory scene and code to read a legacy SAV file and provide data for the LegacyMap renderer.
+While working on Civ3Map I need a set of 'native' tiles to pull data from. We have no native structures yet, so this is a temporary and exploratory scene and code to read a legacy SAV file and provide data for the Civ3Map renderer.
 
 Mock city and unit data may be included, too, as their info will be needed to draw a game-ready map.
 
