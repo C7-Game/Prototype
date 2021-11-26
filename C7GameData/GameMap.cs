@@ -166,6 +166,9 @@ namespace C7GameData
             return dummyMap;
         }
 
+        // STATUS 2021-11-26: This noise function is not currently referenced, but it is a very useful
+        //  noisemap generator that we will likely use in the future once we start trying
+        //  to generate a full-featured map.
         // Inputs: noise field width and height, bool whether noise should smoothly wrap X or Y
         // Actual fake-isometric map will have different shape, but for noise we'll go straight 2d matrix
         // NOTE: Apparently this OpenSimplex implementation doesn't do octaves, including persistance or lacunarity
