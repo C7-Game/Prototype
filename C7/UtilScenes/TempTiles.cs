@@ -22,25 +22,25 @@ public class TempTiles : Node2D
 				foreach (TempTile tile in Tiles)
 				{
 					// TODO: This is writing under the map and buttons for some reason
-					DrawString(MapFont, new Vector2(tile.LegacyX * 64 + 32, tile.LegacyY * 32 + 80), tile.DebugByte.ToString(), new Color(0,0,0,1));
+					DrawString(MapFont, new Vector2(tile.Civ3X * 64 + 32, tile.Civ3Y * 32 + 80), tile.DebugByte.ToString(), new Color(0,0,0,1));
 				}
 			}
 		}
 	}
 	private Util.Civ3FileDialog Dialog;
-	private QueryCiv3.SavData LegacyMapReader;
+	private QueryCiv3.SavData Civ3MapReader;
 	private List<TempTile> Tiles;
-	private class TempTile: LegacyMap.ILegacyTile
+	private class TempTile: Civ3Map.ICiv3Tile
 	{
-		public int LegacyBaseTerrainID { get; set; }
-		public int LegacyOverlayTerrainID { get; set; }
-		public int LegacyX { get; set; }
-		public int LegacyY { get; set; }
-		public int LegacyFileID { get; set; }
-		public int LegacyImageID { get; set; }
+		public int Civ3BaseTerrainID { get; set; }
+		public int Civ3OverlayTerrainID { get; set; }
+		public int Civ3X { get; set; }
+		public int Civ3Y { get; set; }
+		public int Civ3FileID { get; set; }
+		public int Civ3ImageID { get; set; }
 		public int DebugByte;
 	}
-	private LegacyMap MapUI;
+	private Civ3Map MapUI;
 	private int TileOffset = 0;
 	private DynamicFont MapFont;
 	private TextLayerClass DebugTextLayer;
@@ -59,8 +59,8 @@ public class TempTiles : Node2D
 		Dialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<Control>("CanvasLayer/ToolBar").AddChild(Dialog);
 
-		// Load LegacyMap scene (?) and attach to tree
-		MapUI = new LegacyMap();
+		// Load Civ3Map scene (?) and attach to tree
+		MapUI = new Civ3Map();
 		this.AddChild(MapUI);
 		DebugTextLayer = new TextLayerClass();
 		this.AddChild(DebugTextLayer);
@@ -110,9 +110,9 @@ public class TempTiles : Node2D
 	public void _on_FileDialog_file_selected(string path)
 	{
 		byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(Util.GetCiv3Path() + @"/Conquests/conquests.biq");
-		LegacyMapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(path), defaultBicBytes);
+		Civ3MapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(path), defaultBicBytes);
 		CreateTileSet();
-		MapUI.LegacyTiles = Tiles;
+		MapUI.Civ3Tiles = Tiles;
 		MapUI.TerrainAsTileMap();
 		Update();
 	}
@@ -159,12 +159,12 @@ public class TempTiles : Node2D
 	private void CreateTileSet()
 	{
 		// Pull mod path from embedded BIC if present
-		if (LegacyMapReader.Sav.HasCustomBic)
+		if (Civ3MapReader.Sav.HasCustomBic)
 		{
-			QueryCiv3.Civ3File customBic = new QueryCiv3.Civ3File(LegacyMapReader.Sav.CustomBic);
-			int offset = LegacyMapReader.Sav.SectionOffset("BIC ", 1) + 8;
+			QueryCiv3.Civ3File customBic = new QueryCiv3.Civ3File(Civ3MapReader.Sav.CustomBic);
+			int offset = Civ3MapReader.Sav.SectionOffset("BIC ", 1) + 8;
 			// Unsure of length of this string field, but 256 appears about right
-			string mRelPath = @"Conquests\" + LegacyMapReader.Sav.GetString(offset, 256);
+			string mRelPath = @"Conquests\" + Civ3MapReader.Sav.GetString(offset, 256);
 			MapUI.ModRelPath = mRelPath;
 		}
 		else 
@@ -172,21 +172,21 @@ public class TempTiles : Node2D
 			MapUI.ModRelPath = "";
 		}
 		Tiles = new List<TempTile>();
-		MapUI.MapHeight = LegacyMapReader.Wrld.Height;
-		MapUI.MapWidth = LegacyMapReader.Wrld.Width;
+		MapUI.MapHeight = Civ3MapReader.Wrld.Height;
+		MapUI.MapWidth = Civ3MapReader.Wrld.Width;
 
-		QueryCiv3.MapTile[] mapTiles = LegacyMapReader.Tile;
+		QueryCiv3.MapTile[] mapTiles = Civ3MapReader.Tile;
 		for (int i=0; i < mapTiles.Length; i++)
 		{
 				TempTile ThisTile = new TempTile();
-				ThisTile.LegacyY = i / (MapUI.MapWidth / 2);
-				ThisTile.LegacyX = (ThisTile.LegacyY % 2) + (2 * (i % (MapUI.MapWidth / 2)));
+				ThisTile.Civ3Y = i / (MapUI.MapWidth / 2);
+				ThisTile.Civ3X = (ThisTile.Civ3Y % 2) + (2 * (i % (MapUI.MapWidth / 2)));
 
-				ThisTile.LegacyBaseTerrainID = mapTiles[i].BaseTerrain;
-				ThisTile.LegacyOverlayTerrainID = mapTiles[i].OverlayTerrain;
-				ThisTile.DebugByte = LegacyMapReader.Sav.ReadByte(mapTiles[i].Offset+TileOffset);
-				ThisTile.LegacyFileID = mapTiles[i].BaseTerrainFileID;
-				ThisTile.LegacyImageID = mapTiles[i].BaseTerrainImageID;
+				ThisTile.Civ3BaseTerrainID = mapTiles[i].BaseTerrain;
+				ThisTile.Civ3OverlayTerrainID = mapTiles[i].OverlayTerrain;
+				ThisTile.DebugByte = Civ3MapReader.Sav.ReadByte(mapTiles[i].Offset+TileOffset);
+				ThisTile.Civ3FileID = mapTiles[i].BaseTerrainFileID;
+				ThisTile.Civ3ImageID = mapTiles[i].BaseTerrainImageID;
 				Tiles.Add(ThisTile);
 		}
 		DebugTextLayer.Visible = TileOffset != 0;

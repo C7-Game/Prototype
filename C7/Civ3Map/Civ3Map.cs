@@ -4,17 +4,25 @@ using System.Collections;
 using System.Collections.Generic;
 using ConvertCiv3Media;
 
-public class LegacyMap : Node2D
+public class Civ3Map : Node2D
 {
-	public interface ILegacyTile
-	// Tiles need to provide this info to LegacyMap
+	public class Civ3Tile : C7GameData.Tile, ICiv3Tile
 	{
-		int LegacyFileID { get; }
-		int LegacyImageID { get; }
-		int LegacyX {get;}
-		int LegacyY {get;}
+		// stubbing out interface getters
+		public int Civ3FileID => 0;
+		public int Civ3ImageID => 0;
+		public int Civ3X => 0;
+		public int Civ3Y => 0;
 	}
-	public IEnumerable<ILegacyTile> LegacyTiles;
+	public interface ICiv3Tile
+	// Tiles need to provide this info to Civ3Map
+	{
+		int Civ3FileID { get; }
+		int Civ3ImageID { get; }
+		int Civ3X {get;}
+		int Civ3Y {get;}
+	}
+	public IEnumerable<ICiv3Tile> Civ3Tiles;
 	int[,] Map;
 	TileMap TM;
 	TileSet TS;
@@ -48,13 +56,13 @@ public class LegacyMap : Node2D
 		Map = new int[MapWidth,MapHeight];
 
 		// Populate map values
-		if(LegacyTiles != null)
+		if(Civ3Tiles != null)
 		{
-			foreach (ILegacyTile tile in LegacyTiles)
+			foreach (ICiv3Tile tile in Civ3Tiles)
 			{
 				// If tile media file not loaded yet
-				if(TileIDLookup[tile.LegacyFileID,1] == 0) { LoadTileSet(tile.LegacyFileID); }
-				Map[tile.LegacyX,tile.LegacyY] = TileIDLookup[tile.LegacyFileID,tile.LegacyImageID];
+				if(TileIDLookup[tile.Civ3FileID,1] == 0) { LoadTileSet(tile.Civ3FileID); }
+				Map[tile.Civ3X,tile.Civ3Y] = TileIDLookup[tile.Civ3FileID,tile.Civ3ImageID];
 			}
 		}
 		for (int y = 0; y < MapHeight; y++) {
