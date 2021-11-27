@@ -32,7 +32,8 @@ namespace LuaCiv3
                 // Lower-case the first letter in JSON because JSON naming standards
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 // Pretty print because...well just because, OK?
-                WriteIndented = true
+                WriteIndented = true,
+                IncludeFields = true,
             };
             C7SaveFormat output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
             string foo = JsonSerializer.Serialize(output, jsonOptions);

@@ -7,8 +7,6 @@ namespace C7GameData
     The names are capitalized per C#, but I intend to use JsonSerializer
     settings to use camel case instead, unless there is reason not to.
 
-    In my brief experience, only getters will show up in JSON output,
-    but not e.g. int Value = 1;
 */
 {
     using System.Collections.Generic;

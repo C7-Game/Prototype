@@ -3,8 +3,8 @@ namespace C7GameData
     using System.Collections.Generic;
     public class Tile
     {
-        public int xCoordinate { get; set; }
-        public int yCoordinate { get; set; }
+        public int xCoordinate;
+        public int yCoordinate;
         public TerrainType terrainType;
         public City cityAtTile;
         public bool hasBarbarianCamp = false;
