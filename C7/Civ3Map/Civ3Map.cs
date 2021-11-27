@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using ConvertCiv3Media;
@@ -7,34 +6,20 @@ using C7GameData;
 
 public class Civ3Map : Node2D
 {
-	// This interface will go away when TempTiles is refactored
-	public interface ICiv3Tile
-	// Tiles need to provide this info to Civ3Map
-	{
-		int Civ3FileID { get; }
-		int Civ3ImageID { get; }
-		int Civ3X {get;}
-		int Civ3Y {get;}
-	}
 	public List<Tile> Civ3Tiles;
 	public int[,] Map { get; protected set; }
 	TileMap TM;
 	public TileSet TS { get; protected set; }
 	private int[,] TileIDLookup;
-	// NOTE: The following two must be set externally before displaying map
+	// NOTE: The following two must be set externally before running TerrainAsTileMap
 	public int MapWidth;
 	public int MapHeight;
 	// If a mod is in effect, set this, otherwise set to "" or "Conquests"
 	public string ModRelPath = "";
-	public Civ3Map(){}
 	public Civ3Map(int mapWidth, int mapHeight)
 	{
 		MapWidth = mapWidth;
 		MapHeight = mapHeight;
-	}
-	public override void _Ready()
-	{
-		//
 	}
 	public void TerrainAsTileMap() {
 		if (TM != null) { RemoveChild(TM); }
@@ -50,6 +35,7 @@ public class Civ3Map : Node2D
 		int id = TS.GetLastUnusedTileId();
 		// Make blank default tile
 		// TODO: Make red tile or similar
+		// NOTE: Need an unused tile at 0, anyway, to test to see if real tile has been loaded yet
 		TS.CreateTile(id);
 		id++;
 
@@ -67,13 +53,14 @@ public class Civ3Map : Node2D
 				Map[tile.xCoordinate,tile.yCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
 			}
 		}
+		/* This code sets the tiles for display, but that is being done by MapView now
 		for (int y = 0; y < MapHeight; y++) {
 			for (int x = y % 2; x < MapWidth; x+=2) {
 				TM.SetCellv(new Vector2(x, y), Map[x,y]);
 			}
 		}
-		// TM.Scale = new Vector2((float)0.2, (float)0.2);
 		AddChild(TM);
+		*/
 	}
 	private void LoadTileSet(int fileID)
 	{
