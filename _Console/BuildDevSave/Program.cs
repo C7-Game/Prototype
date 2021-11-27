@@ -17,16 +17,6 @@ namespace LuaCiv3
             byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(GetCiv3Path + @"/Conquests/conquests.biq");
     		SavData mapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(GetCiv3Path + SavFilePath), defaultBicBytes);
 
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions
-            {
-                // Lower-case the first letter in JSON because JSON naming standards
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                // Pretty print because...well just because, OK?
-                WriteIndented = true,
-                // By default it only serializes getters, this makes it serialize fields, too
-                IncludeFields = true,
-            };
-
             C7SaveFormat output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
             output.GameData.players.Add(new Player(-1));
             output.GameData.players.Add(new Player(0x4040FFFF));
