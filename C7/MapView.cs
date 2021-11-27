@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using Godot;
 using ConvertCiv3Media;
 using C7GameData;
@@ -239,6 +240,10 @@ public class CityLayer : ILooseLayer {
 			leftAndRightBoxes.Fill(civColor);
 			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(1, 1));
 			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(143, 1));
+			
+			Pcx cityIcons = Util.LoadPCX("Art/Cities/city icons.pcx");
+			Image nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
+			labelImage.BlendRect(nonEmbassyStar, new Rect2(0, 0, new Vector2(18, 18)), new Vector2(144, 2));
 
 			//todo: darker shades of civ color around edges
 
@@ -255,6 +260,13 @@ public class CityLayer : ILooseLayer {
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
 			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(-168/2, 24) + new Vector2(32, 10));
 			looseView.DrawString(smallFont, cityNameDestination, "Ravenna (Roman)", Color.Color8(255, 255, 255, 255));
+
+			//City pop size
+			DynamicFont midSizedFont = new DynamicFont();
+			midSizedFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
+			midSizedFont.Size = 18;
+			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(-168/2, 24) + new Vector2(11, 18));
+			looseView.DrawString(midSizedFont, popSizeDestination, "1", Color.Color8(255, 255, 255, 255));
 		}
 	}
 }
