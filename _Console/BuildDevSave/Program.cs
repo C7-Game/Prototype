@@ -26,9 +26,13 @@ namespace LuaCiv3
                 // By default it only serializes getters, this makes it serialize fields, too
                 IncludeFields = true,
             };
+
             C7SaveFormat output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
-            string foo = JsonSerializer.Serialize(output, jsonOptions);
-            Console.WriteLine(foo);
+            output.players.Add(new Player(-1));
+            output.players.Add(new Player(0x4040FFFF));
+
+            string json = JsonSerializer.Serialize(output, jsonOptions);
+            Console.WriteLine(json);
         }
     }
 }

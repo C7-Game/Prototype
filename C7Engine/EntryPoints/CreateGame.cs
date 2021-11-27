@@ -1,5 +1,7 @@
 namespace C7Engine
 {
+    using System.IO;
+    using System.Text.Json;
     using C7GameData;
     public class CreateGame
     {
@@ -11,12 +13,15 @@ namespace C7Engine
          **/
         public static Player createGame(GameMap.TerrainNoiseMapGenerator terrainGen)
         {
-            GameData gameData = new GameData();
-            var humanPlayer = gameData.createDummyGameData(terrainGen);
+            // GameData gameData = new GameData();
+            // var humanPlayer = gameData.createDummyGameData(terrainGen);
 
+            string json = File.ReadAllText(@"../C7GameData/c7-static-map-save.json");
+            GameData gameData = JsonSerializer.Deserialize<GameData>(json);
             EngineStorage.setGameData(gameData);
 
-            return humanPlayer;
+            // In a Civ3 save, player 0 is barbs and player 1 is first human player
+            return gameData.players.ToArray()[1];
         }
     }
 }

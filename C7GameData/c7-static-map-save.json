@@ -1,8 +1,10 @@
 {
   "version": "v0.0early-prototype",
-  "rules": null,
-  "gameState": {
-    "mapTiles": [
+  "turn": 0,
+  "map": {
+    "numTilesWide": 80,
+    "numTilesTall": 80,
+    "tiles": [
       {
         "extraInfo": {
           "baseTerrainFileID": 6,
@@ -38404,7 +38406,19 @@
         "unitsOnTile": []
       }
     ],
-    "mapWidth": 80,
-    "mapHeight": 80
-  }
+    "terrainTypes": []
+  },
+  "mapUnits": [],
+  "rng": null,
+  "players": [
+    {
+      "guid": "4849067d-f927-4b7e-85b6-934d77f1b431",
+      "color": -1
+    },
+    {
+      "guid": "bb03515e-a432-4ea5-9d40-c4810edd9a8e",
+      "color": 1078001663
+    }
+  ],
+  "cities": []
 }

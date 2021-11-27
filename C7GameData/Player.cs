@@ -4,14 +4,15 @@ using System;
 
 public class Player
 {
-	public string guid { get; }
-	public int color { get; }
+	public string guid { get; set; }
+	public int color { get; set; }
 
 	public Player(int color)
 	{
 		guid = Guid.NewGuid().ToString();
 		this.color = color;
 	}
+	public Player(){}
 }
 
 }
