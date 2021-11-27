@@ -24,11 +24,11 @@ namespace C7Engine
             };
 
             string json = File.ReadAllText(@"../C7GameData/c7-static-map-save.json");
-            GameData gameData = JsonSerializer.Deserialize<GameData>(json, jsonOptions);
-            EngineStorage.setGameData(gameData);
+            C7SaveFormat save = JsonSerializer.Deserialize<C7SaveFormat>(json, jsonOptions);
+            EngineStorage.setGameData(save.GameData);
 
             // In a Civ3 save, player 0 is barbs and player 1 is first human player
-            return gameData.players.ToArray()[1];
+            return save.GameData.players.ToArray()[1];
         }
     }
 }

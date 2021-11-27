@@ -4,8 +4,6 @@ namespace C7GameData
   This will read a Civ3 sav into C7 native format for immediate use or saving to native JSON save
 */
 {
-    using System.IO;
-    using System.Collections.Generic;
     using QueryCiv3;
 
     // Additional parameters used to refer to specic media files and tiles in Civ3
@@ -20,16 +18,16 @@ namespace C7GameData
         {
             // init empty C7 save
             C7SaveFormat c7Save = new C7SaveFormat();
-            c7Save.map = new GameMap();
+            c7Save.GameData = new GameData();
+            c7Save.GameData.map = new GameMap();
 
             // Get save data reader
             byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(defaultBicPath);
     		SavData civ3Save = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(savePath), defaultBicBytes);
 
             // Import data
-            c7Save.map.numTilesTall = civ3Save.Wrld.Width;
-            c7Save.map.numTilesWide = civ3Save.Wrld.Height;
-            // c7Save.map.tiles = new List<Tile>();
+            c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
+            c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
             foreach (MapTile tile in civ3Save.Tile)
             {
                 Civ3ExtraInfo extra = new Civ3ExtraInfo
@@ -43,7 +41,7 @@ namespace C7GameData
                     yCoordinate = tile.Y,
                     ExtraInfo = extra,
                 };
-                c7Save.map.tiles.Add(c7Tile);
+                c7Save.GameData.map.tiles.Add(c7Tile);
             }
             return c7Save;
         }

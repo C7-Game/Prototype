@@ -28,8 +28,8 @@ namespace LuaCiv3
             };
 
             C7SaveFormat output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
-            output.players.Add(new Player(-1));
-            output.players.Add(new Player(0x4040FFFF));
+            output.GameData.players.Add(new Player(-1));
+            output.GameData.players.Add(new Player(0x4040FFFF));
 
             string json = JsonSerializer.Serialize(output, jsonOptions);
             Console.WriteLine(json);

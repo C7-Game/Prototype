@@ -10,15 +10,18 @@ namespace C7GameData
 */
 {
     using System.Collections.Generic;
-    public class C7SaveFormat : GameData
+    public class C7SaveFormat
     {
-        public string Version;
-        // Trying to use GameData object which obviate these
-        // public C7RulesFormat Rules;
-        // public GameStateClass GameState;
-        public C7SaveFormat()
+        public string Version = "v0.0early-prototype";
+        // Rules is intended to be the analog to a BIC/X/Q
+        public C7RulesFormat Rules;
+        // This naming is probably bad form, but it makes sense to me to name it as such here
+        public GameData GameData;
+        public C7SaveFormat(){}
+        public C7SaveFormat(GameData gameData, C7RulesFormat rules = null)
         {
-            Version = "v0.0early-prototype";
+            this.GameData = gameData;
+            Rules = rules;
         }
     }
 }
