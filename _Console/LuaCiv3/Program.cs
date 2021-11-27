@@ -46,6 +46,7 @@ namespace LuaCiv3
                 Version = "Mock save for hard-coded map data",
                 GameState = gameState,
             };
+            output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
             string foo = JsonSerializer.Serialize(output, jsonOptions);
             Console.WriteLine(foo);
         }

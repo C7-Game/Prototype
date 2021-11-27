@@ -5,6 +5,7 @@ namespace C7GameData
 */
 {
     using System.IO;
+    using System.Collections.Generic;
     using QueryCiv3;
 
     // Additional parameters used to refer to specic media files and tiles in Civ3
@@ -28,6 +29,7 @@ namespace C7GameData
             // Import data
             c7Save.GameState.MapWidth = civ3Save.Wrld.Width;
             c7Save.GameState.MapHeight = civ3Save.Wrld.Height;
+            c7Save.GameState.MapTiles = new List<Tile>();
             foreach (MapTile tile in civ3Save.Tile)
             {
                 // oops, unfortunate naming here, but makes sense in original context
@@ -38,6 +40,7 @@ namespace C7GameData
                     BaseTerrainFileID = tile.BaseTerrainFileID,
                     BaseTerrainImageID = tile.BaseTerrainImageID,
                 };
+                c7Save.GameState.MapTiles.Add(c7Tile);
             }
             return c7Save;
         }

@@ -11,7 +11,7 @@ namespace C7GameData
     but not e.g. int Value = 1;
 */
 {
-    using System;
+    using System.Collections.Generic;
     public class C7SaveFormat {
         public string Version { get; set; }
         public C7RulesFormat Rules { get; set; }
@@ -21,7 +21,7 @@ namespace C7GameData
         }
     }
     public class GameStateClass {
-        public Tile[] MapTiles { get; set; }
+        public List<Tile> MapTiles { get; set; }
         public int MapWidth { get; set; }
         public int MapHeight { get; set; }
     }
