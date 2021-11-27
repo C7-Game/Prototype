@@ -36,7 +36,8 @@ namespace LuaCiv3
             };
             GameStateClass gameState = new GameStateClass
             {
-                MapTiles = mapReader.Tile,
+                // refactoring, and this breaks
+                // MapTiles = mapReader.Tile,
                 MapWidth = mapReader.Wrld.Width,
                 MapHeight = mapReader.Wrld.Height,
             };

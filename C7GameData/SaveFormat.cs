@@ -21,7 +21,7 @@ namespace C7GameData
         }
     }
     public class GameStateClass {
-        public QueryCiv3.MapTile[] MapTiles { get; set; }
+        public Tile[] MapTiles { get; set; }
         public int MapWidth { get; set; }
         public int MapHeight { get; set; }
     }

@@ -36,7 +36,11 @@ namespace QueryCiv3
             int TileLength = 212;
             int TileCount = Wrld.Height * (Wrld.Width / 2);
             List<MapTile> TileList = new List<MapTile>();
-            for(int i=0; i< TileCount; i++, TileOffset += TileLength) TileList.Add(new MapTile(this, TileOffset));
+            for(int i=0; i< TileCount; i++, TileOffset += TileLength)
+            {
+                int y = i / (Wrld.Width / 2);
+                TileList.Add(new MapTile(this, TileOffset, (i % y) + (y % 2), (i / y)));
+            }
             return TileList.ToArray();
         }}
         // TODO: Use ListSection for this?
