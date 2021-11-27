@@ -13,16 +13,8 @@ namespace C7Engine
          **/
         public static Player createGame(GameMap.TerrainNoiseMapGenerator terrainGen)
         {
-            // GameData gameData = new GameData();
-            // var humanPlayer = gameData.createDummyGameData(terrainGen);
-
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions
-            {
-                IncludeFields = true,
-                // PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-        
+            // I think this path is relative from the C7 folder, not C7GameEngine, if that matters
+            // TODO: Unsure if this will work when exported for distribution
             C7SaveFormat save = C7SaveFormat.Load(@"../C7GameData/c7-static-map-save.json");
             EngineStorage.setGameData(save.GameData);
             // possibly do something with save.Rules here when it exists
