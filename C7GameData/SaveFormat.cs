@@ -11,17 +11,17 @@ namespace C7GameData
 {
     using System.Collections.Generic;
     public class C7SaveFormat {
-        public string Version { get; set; }
-        public C7RulesFormat Rules { get; set; }
-        public GameStateClass GameState { get; set; }
+        public string Version;
+        public C7RulesFormat Rules;
+        public GameStateClass GameState;
         public C7SaveFormat() {
             Version = "v0.0early-prototype";
         }
     }
     public class GameStateClass {
-        public List<Tile> MapTiles { get; set; }
-        public int MapWidth { get; set; }
-        public int MapHeight { get; set; }
+        public List<Tile> MapTiles;
+        public int MapWidth;
+        public int MapHeight;
     }
 
 }
