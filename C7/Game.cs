@@ -44,13 +44,16 @@ public class Game : Node2D
 	{
 		controller = CreateGame.createGame(genBasicTerrainNoiseMap);
 		var map = MapInteractions.GetWholeMap();
-		this.TerrainAsTileMap(map);
-		Civ3Map tempMapDisplay = new Civ3Map();
-		tempMapDisplay.MapWidth = map.numTilesWide;
-		tempMapDisplay.MapHeight =  map.numTilesTall;
+		// this.TerrainAsTileMap(map);
+		Civ3Map tempMapDisplay = new Civ3Map(map.numTilesWide, map.numTilesTall);
+		// tempMapDisplay.MapWidth = map.numTilesWide;
+		// tempMapDisplay.MapHeight =  map.numTilesTall;
 		tempMapDisplay.Civ3Tiles = map.tiles;
 		tempMapDisplay.TerrainAsTileMap();
-		AddChild(tempMapDisplay);
+		// AddChild(tempMapDisplay);
+
+		mapView = new MapView(this, tempMapDisplay.Map, tempMapDisplay.TS, true, false);
+		AddChild(mapView);
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");

@@ -17,9 +17,9 @@ public class Civ3Map : Node2D
 		int Civ3Y {get;}
 	}
 	public List<Tile> Civ3Tiles;
-	int[,] Map;
+	public int[,] Map { get; protected set; }
 	TileMap TM;
-	TileSet TS;
+	public TileSet TS { get; protected set; }
 	private int[,] TileIDLookup;
 	// NOTE: The following two must be set externally before displaying map
 	public int MapWidth;
