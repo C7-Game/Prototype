@@ -6,14 +6,6 @@ using ConvertCiv3Media;
 
 public class Civ3Map : Node2D
 {
-	public class Civ3Tile : C7GameData.Tile, ICiv3Tile
-	{
-		// stubbing out interface getters
-		public int Civ3FileID => 0;
-		public int Civ3ImageID => 0;
-		public int Civ3X => 0;
-		public int Civ3Y => 0;
-	}
 	public interface ICiv3Tile
 	// Tiles need to provide this info to Civ3Map
 	{
