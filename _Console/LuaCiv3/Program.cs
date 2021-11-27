@@ -40,7 +40,7 @@ namespace LuaCiv3
                 MapWidth = mapReader.Wrld.Width,
                 MapHeight = mapReader.Wrld.Height,
             };
-            MockC7SaveFormat output = new MockC7SaveFormat
+            C7SaveFormat output = new C7SaveFormat
             {
                 Version = "Mock save for hard-coded map data",
                 GameState = gameState,
