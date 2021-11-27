@@ -26,6 +26,12 @@ public class Civ3Map : Node2D
 	public int MapHeight;
 	// If a mod is in effect, set this, otherwise set to "" or "Conquests"
 	public string ModRelPath = "";
+	public Civ3Map(){}
+	public Civ3Map(int mapWidth, int mapHeight)
+	{
+		MapWidth = mapWidth;
+		MapHeight = mapHeight;
+	}
 	public override void _Ready()
 	{
 		//
@@ -48,16 +54,23 @@ public class Civ3Map : Node2D
 		id++;
 
 		Map = new int[MapWidth,MapHeight];
+		GD.Print(this.MapWidth);
+		GD.Print(this.MapHeight);
 
 		// Populate map values
 		if(Civ3Tiles != null)
 		{
 			foreach (Tile tile in Civ3Tiles)
 			{
-				GD.Print("hi");
-				GD.Print(tile.xCoordinate);
+				// GD.Print("hi");
+				// GD.Print(tile.ExtraInfo.BaseTerrainFileID);
+				// GD.Print(tile.ExtraInfo.BaseTerrainImageID);
+				// GD.Print(tile.xCoordinate);
+				// GD.Print(tile.yCoordinate);
 				// If tile media file not loaded yet
 				if(TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,1] == 0) { LoadTileSet(tile.ExtraInfo.BaseTerrainFileID); }
+				var _ = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
+				Map[tile.xCoordinate,tile.yCoordinate] = 0;
 				Map[tile.xCoordinate,tile.yCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
 			}
 		}

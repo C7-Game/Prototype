@@ -44,13 +44,19 @@ public class Game : Node2D
 	{
 		controller = CreateGame.createGame(genBasicTerrainNoiseMap);
 		var map = MapInteractions.GetWholeMap();
-		if (map.tiles != null) GD.Print(map.tiles.ToArray()[0].ExtraInfo);
+		if (map.tiles != null)
+		{
+			GD.Print(map.tiles.ToArray()[0].ExtraInfo);
+			GD.Print(map.tiles.Count);
+		}
 		this.TerrainAsTileMap(map);
 		Civ3Map tempMapDisplay = new Civ3Map();
-		tempMapDisplay.Civ3Tiles = map.tiles;
+		GD.Print(map.numTilesWide);
 		tempMapDisplay.MapWidth = map.numTilesWide;
 		tempMapDisplay.MapHeight =  map.numTilesTall;
+		tempMapDisplay.Civ3Tiles = map.tiles;
 		tempMapDisplay.TerrainAsTileMap();
+		AddChild(tempMapDisplay);
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -153,6 +159,7 @@ public class Game : Node2D
 		//    What I've done is generated "terrain ID" all over and am deriving an
 		//    image ID on the tile placement spots based on surrounding terrain values
 		int[,] terrainSprites = new int[mapWidth,mapHeight];
+		/*
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = y%2; x < mapWidth; x+=2) {
 				int Top = y == 0 ? (terNoise[(x+1) % mapWidth,y]) : (terNoise[x,y-1]);
@@ -168,7 +175,7 @@ public class Game : Node2D
 				} catch { GD.Print(x + "," + y + " " + foo); }
 			}
 		}
-
+		*/
 		mapView = new MapView(this, terrainSprites, TS, false, false);
 		AddChild(mapView);
 	}

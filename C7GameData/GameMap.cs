@@ -7,8 +7,9 @@ namespace C7GameData
      */
     public class GameMap
     {
-        public int numTilesWide { get; protected internal set; }
-        public int numTilesTall { get; protected internal set; }
+        // TODO : protect setters while still allowing JSON deserialization
+        public int numTilesWide { get; set; }
+        public int numTilesTall { get; set; }
         bool wrapHorizontally, wrapVertically;
 
         // The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
