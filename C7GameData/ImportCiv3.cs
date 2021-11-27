@@ -9,10 +9,10 @@ namespace C7GameData
     using QueryCiv3;
 
     // Additional parameters used to refer to specic media files and tiles in Civ3
-    public class Civ3Tile : Tile
+    public class Civ3ExtraInfo
     {
-        public int BaseTerrainFileID { get; set; }
-        public int BaseTerrainImageID { get; set; }
+        public int BaseTerrainFileID;
+        public int BaseTerrainImageID;
     }
     public class ImportCiv3
     {
@@ -32,13 +32,16 @@ namespace C7GameData
             c7Save.GameState.MapTiles = new List<Tile>();
             foreach (MapTile tile in civ3Save.Tile)
             {
-                // oops, unfortunate naming here, but makes sense in original context
-                Civ3Tile c7Tile = new Civ3Tile
+                Civ3ExtraInfo extra = new Civ3ExtraInfo
+                {
+                    BaseTerrainFileID = tile.BaseTerrainFileID,
+                    BaseTerrainImageID = tile.BaseTerrainImageID,                    
+                };
+                Tile c7Tile = new Tile
                 {
                     xCoordinate = tile.X,
                     yCoordinate = tile.Y,
-                    BaseTerrainFileID = tile.BaseTerrainFileID,
-                    BaseTerrainImageID = tile.BaseTerrainImageID,
+                    ExtraInfo = extra,
                 };
                 c7Save.GameState.MapTiles.Add(c7Tile);
             }

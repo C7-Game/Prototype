@@ -3,6 +3,8 @@ namespace C7GameData
     using System.Collections.Generic;
     public class Tile
     {
+        // Needed to add extra info to JSON out polymorphically, but unsure how to read it back in polymorphically
+        public object ExtraInfo { get; set; }
         public int xCoordinate;
         public int yCoordinate;
         public TerrainType terrainType;
