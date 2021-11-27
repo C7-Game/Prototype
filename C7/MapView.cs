@@ -188,6 +188,73 @@ public class CityLayer : ILooseLayer {
 			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
 			Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
 			looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
+
+			//Label/name/producing area
+			Image labelImage = new Image();
+			labelImage.Create(168, 23, false, Image.Format.Rgba8);
+			labelImage.Fill(Color.Color8(0, 0, 0, 0));
+			byte transparencyLevel = 192;	//25%
+			Color civColor = Color.Color8(227, 10, 10, transparencyLevel);	//Roman Red
+			Color civColorDarker = Color.Color8(0, 0, 138, transparencyLevel);	//todo: automate the darker() function.  maybe less transparency?
+			Color topRowGrey = Color.Color8(32, 32, 32, transparencyLevel);
+			Color bottomRowGrey = Color.Color8(48, 48, 48, transparencyLevel);
+			Color backgroundGrey = Color.Color8(64, 64, 64, transparencyLevel);
+			Color borderGrey = Color.Color8(80, 80, 80, transparencyLevel);
+
+			Image horizontalBorder = new Image();
+			horizontalBorder.Create(166, 1, false, Image.Format.Rgba8);
+			horizontalBorder.Fill(borderGrey);
+			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(166, 1)), new Vector2(1, 0));
+			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(166, 1)), new Vector2(1, 22));
+
+			Image verticalBorder = new Image();
+			verticalBorder.Create(1, 21, false, Image.Format.Rgba8);
+			verticalBorder.Fill(borderGrey);
+			labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(0, 1));
+			labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(167, 1));
+
+			Image bottomRow = new Image();
+			bottomRow.Create(118, 1, false, Image.Format.Rgba8);
+			bottomRow.Fill(bottomRowGrey);
+			labelImage.BlitRect(bottomRow, new Rect2(0, 0, new Vector2(118, 1)), new Vector2(25, 21));
+
+			Image topRow = new Image();
+			topRow.Create(118, 1, false, Image.Format.Rgba8);
+			topRow.Fill(topRowGrey);
+			labelImage.BlitRect(topRow, new Rect2(0, 0, new Vector2(118, 1)), new Vector2(25, 1));
+
+			Image background = new Image();
+			background.Create(118, 9, false, Image.Format.Rgba8);
+			background.Fill(backgroundGrey);
+			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(118, 9)), new Vector2(25, 2));
+			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(118, 9)), new Vector2(25, 12));
+
+			Image centerDivider = new Image();
+			centerDivider.Create(118, 1, false, Image.Format.Rgba8);
+			centerDivider.Fill(civColor);
+			labelImage.BlitRect(centerDivider, new Rect2(0, 0, new Vector2(118, 1)), new Vector2(25, 11));
+
+			Image leftAndRightBoxes = new Image();
+			leftAndRightBoxes.Create(24, 21, false, Image.Format.Rgba8);
+			leftAndRightBoxes.Fill(civColor);
+			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(1, 1));
+			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(143, 1));
+
+			//todo: darker shades of civ color around edges
+
+			ImageTexture label = new ImageTexture();
+			label.CreateFromImage(labelImage, 0);
+
+			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(-168/2, 24), new Vector2(168, 23));	//24 is a swag
+			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(168, 23));
+			looseView.DrawTextureRectRegion(label, labelDestination, allOfTheLabel);
+
+			DynamicFont smallFont = ResourceLoader.Load<DynamicFont>("res://Fonts/NSansFont12Pt co.tres");
+			Label cityName = new Label();
+			cityName.Text = "Hippo Regius (Roman)";
+			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
+			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(-168/2, 24) + new Vector2(32, 10));
+			looseView.DrawString(smallFont, cityNameDestination, "Ravenna (Roman)", Color.Color8(255, 255, 255, 255));
 		}
 	}
 }
