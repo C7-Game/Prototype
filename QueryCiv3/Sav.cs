@@ -39,7 +39,7 @@ namespace QueryCiv3
             for(int i=0; i< TileCount; i++, TileOffset += TileLength)
             {
                 int y = i / (Wrld.Width / 2);
-                TileList.Add(new MapTile(this, TileOffset, (i % Wrld.Width / 2) + (y % 2), y));
+                TileList.Add(new MapTile(this, TileOffset, (i % (Wrld.Width / 2)) * 2 + (y % 2), y));
             }
             return TileList.ToArray();
         }}
