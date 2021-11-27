@@ -3,8 +3,10 @@ namespace C7GameData
     using System.Collections.Generic;
     public class Tile
     {
-        // Needed to add extra info to JSON out polymorphically, but unsure how to read it back in polymorphically
-        public object ExtraInfo { get; set; }
+        // This will eventually be type object and use a type descriminator in JSON to determine
+        //   how to deserialze. See https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-polymorphism
+        //   and https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#support-polymorphic-deserialization
+        public Civ3ExtraInfo ExtraInfo { get; set; }
         public int xCoordinate;
         public int yCoordinate;
         public TerrainType terrainType;
