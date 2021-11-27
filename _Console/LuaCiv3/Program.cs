@@ -34,19 +34,7 @@ namespace LuaCiv3
                 // Pretty print because...well just because, OK?
                 WriteIndented = true
             };
-            GameStateClass gameState = new GameStateClass
-            {
-                // refactoring, and this breaks
-                // MapTiles = mapReader.Tile,
-                MapWidth = mapReader.Wrld.Width,
-                MapHeight = mapReader.Wrld.Height,
-            };
-            C7SaveFormat output = new C7SaveFormat
-            {
-                Version = "Mock save for hard-coded map data",
-                GameState = gameState,
-            };
-            output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
+            C7SaveFormat output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
             string foo = JsonSerializer.Serialize(output, jsonOptions);
             Console.WriteLine(foo);
         }
