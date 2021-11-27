@@ -3,9 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using ConvertCiv3Media;
+using C7GameData;
 
 public class Civ3Map : Node2D
 {
+	// This interface will go away when TempTiles is refactored
 	public interface ICiv3Tile
 	// Tiles need to provide this info to Civ3Map
 	{
@@ -14,7 +16,7 @@ public class Civ3Map : Node2D
 		int Civ3X {get;}
 		int Civ3Y {get;}
 	}
-	public IEnumerable<ICiv3Tile> Civ3Tiles;
+	public List<Tile> Civ3Tiles;
 	int[,] Map;
 	TileMap TM;
 	TileSet TS;
@@ -50,11 +52,13 @@ public class Civ3Map : Node2D
 		// Populate map values
 		if(Civ3Tiles != null)
 		{
-			foreach (ICiv3Tile tile in Civ3Tiles)
+			foreach (Tile tile in Civ3Tiles)
 			{
+				GD.Print("hi");
+				GD.Print(tile.xCoordinate);
 				// If tile media file not loaded yet
-				if(TileIDLookup[tile.Civ3FileID,1] == 0) { LoadTileSet(tile.Civ3FileID); }
-				Map[tile.Civ3X,tile.Civ3Y] = TileIDLookup[tile.Civ3FileID,tile.Civ3ImageID];
+				if(TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,1] == 0) { LoadTileSet(tile.ExtraInfo.BaseTerrainFileID); }
+				Map[tile.xCoordinate,tile.yCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
 			}
 		}
 		for (int y = 0; y < MapHeight; y++) {

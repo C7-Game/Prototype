@@ -16,8 +16,15 @@ namespace C7Engine
             // GameData gameData = new GameData();
             // var humanPlayer = gameData.createDummyGameData(terrainGen);
 
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+            {
+                IncludeFields = true,
+                // PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
             string json = File.ReadAllText(@"../C7GameData/c7-static-map-save.json");
-            GameData gameData = JsonSerializer.Deserialize<GameData>(json);
+            GameData gameData = JsonSerializer.Deserialize<GameData>(json, jsonOptions);
             EngineStorage.setGameData(gameData);
 
             // In a Civ3 save, player 0 is barbs and player 1 is first human player

@@ -18,7 +18,7 @@ namespace C7GameData
         public int[,] terrainNoiseMap;
 
         public List<TerrainType> terrainTypes = new List<TerrainType>();
-        public List<Tile> tiles {get;}
+        public List<Tile> tiles { get; set;}
 
         public GameMap()
         {

@@ -112,8 +112,10 @@ public class TempTiles : Node2D
 		byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(Util.GetCiv3Path() + @"/Conquests/conquests.biq");
 		Civ3MapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(path), defaultBicBytes);
 		CreateTileSet();
+		/******* refactoring Civ3Map, commenting this out until can come back to fix it later
 		MapUI.Civ3Tiles = Tiles;
 		MapUI.TerrainAsTileMap();
+		*/
 		Update();
 	}
 	public override void _UnhandledInput(InputEvent @event)
