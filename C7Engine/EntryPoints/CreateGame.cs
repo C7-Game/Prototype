@@ -22,12 +22,14 @@ namespace C7Engine
                 // PropertyNameCaseInsensitive = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
-
-            string json = File.ReadAllText(@"../C7GameData/c7-static-map-save.json");
-            C7SaveFormat save = JsonSerializer.Deserialize<C7SaveFormat>(json, jsonOptions);
+        
+            C7SaveFormat save = C7SaveFormat.Load(@"../C7GameData/c7-static-map-save.json");
             EngineStorage.setGameData(save.GameData);
+            // possibly do something with save.Rules here when it exists
+            // and maybe consider if we have any need to keep a reference to the save object handy...probably not
 
             // In a Civ3 save, player 0 is barbs and player 1 is first human player
+            // Although unsure if we can rely on List to maintain a consistent order
             return save.GameData.players.ToArray()[1];
         }
     }

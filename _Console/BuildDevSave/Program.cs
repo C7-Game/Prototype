@@ -31,8 +31,7 @@ namespace LuaCiv3
             output.GameData.players.Add(new Player(-1));
             output.GameData.players.Add(new Player(0x4040FFFF));
 
-            string json = JsonSerializer.Serialize(output, jsonOptions);
-            Console.WriteLine(json);
+            C7SaveFormat.Save(output, "out.json");
         }
     }
 }

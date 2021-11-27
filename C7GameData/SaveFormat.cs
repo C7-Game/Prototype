@@ -9,7 +9,8 @@ namespace C7GameData
 
 */
 {
-    using System.Collections.Generic;
+    using System.IO;
+    using System.Text.Json;
     public class C7SaveFormat
     {
         public string Version = "v0.0early-prototype";
@@ -23,5 +24,26 @@ namespace C7GameData
             this.GameData = gameData;
             Rules = rules;
         }
+        public static C7SaveFormat Load(string path)
+        {
+            string json = File.ReadAllText(path);
+            C7SaveFormat save = JsonSerializer.Deserialize<C7SaveFormat>(json, JsonOptions);
+            return save;
+        }
+        public static void Save(C7SaveFormat save, string path)
+        {
+            string json = JsonSerializer.Serialize(save, JsonOptions);
+            File.WriteAllText(path, json);
+        }
+        public static JsonSerializerOptions JsonOptions { get => new JsonSerializerOptions
+        {
+                // Lower-case the first letter in JSON because JSON naming standards
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                // Pretty print during development; may change this for production
+                WriteIndented = true,
+                // By default it only serializes getters, this makes it serialize fields, too
+                IncludeFields = true,
+        };}
+
     }
 }
