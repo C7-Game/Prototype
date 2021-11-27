@@ -7,13 +7,14 @@ namespace C7GameData
      */
     public class GameMap
     {
-        public int numTilesWide { get; private set; }
-        public int numTilesTall { get; private set; }
+        public int numTilesWide { get; protected internal set; }
+        public int numTilesTall { get; protected internal set; }
         bool wrapHorizontally, wrapVertically;
 
         // The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
         // This is kind of a temporary thing. The reason it works this way right now is because I'm just rearranging the generation code from
         // TerrainAsTileMap, eventually we'll want a more complex map generator which probably won't need this var.
+        [System.Text.Json.Serialization.JsonIgnore]
         public int[,] terrainNoiseMap;
 
         public List<TerrainType> terrainTypes = new List<TerrainType>();

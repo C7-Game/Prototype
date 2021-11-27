@@ -10,18 +10,15 @@ namespace C7GameData
 */
 {
     using System.Collections.Generic;
-    public class C7SaveFormat {
+    public class C7SaveFormat : GameData
+    {
         public string Version;
-        public C7RulesFormat Rules;
-        public GameStateClass GameState;
-        public C7SaveFormat() {
+        // Trying to use GameData object which obviate these
+        // public C7RulesFormat Rules;
+        // public GameStateClass GameState;
+        public C7SaveFormat()
+        {
             Version = "v0.0early-prototype";
         }
     }
-    public class GameStateClass {
-        public List<Tile> MapTiles;
-        public int MapWidth;
-        public int MapHeight;
-    }
-
 }
