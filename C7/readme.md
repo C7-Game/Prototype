@@ -22,7 +22,5 @@ open /Applications/Godot_mono.app
 ## What is that?
 
 - Fonts/ - Fonts for Godot text
-- Civ3Map/ - A script to display a map using native Civ3 information and media. It is intended to be separate from game logic & data.
-- UtilScenes/ - A collection of scenes useful for dev time activities but not necessarily for game inclusion
 - MainMenu.tscn & MainMenu.cs - The startup scene and main menu
 - C7Game.tscn & Game.cs - An early prototype map view accessible from the main menu
