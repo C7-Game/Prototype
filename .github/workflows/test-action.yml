@@ -6,8 +6,8 @@ jobs:
     steps:
       - run: |
         mkdir dir
-        echo "I'm doing a thing" | tee dir/thing.txt
-        chmod 764 dir/thing.txt
+        cp LICENSE dir/license.txt
+        chmod 764 dir/license.txt
         tar -zcvf thing.tar.gz dir
         echo "I did a thing"
       - name: Upload Artifact
