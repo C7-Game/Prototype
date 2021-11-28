@@ -20,7 +20,8 @@ on:
 env:
   GODOT_VERSION: 3.4
   EXPORT_NAME: C7
-  DIR_SUFFIX: ${{ inputs.folder-suffix }}${{ '-'[ inputs.include-username == 'true' ] }}${{ github.actor[ inputs.include-username == 'true' ] }}
+  # Saw this trick using fromJSON and a boolean index to pick whether to include empty string or a value
+  DIR_SUFFIX: ${{ inputs.folder-suffix }}${{ fromJSON["'','-'""][ inputs.include-username == 'true' ] }}${{ fromJSON["'',github.actor""][ inputs.include-username == 'true' ] }}
 
 jobs:
   do-a-thing:
