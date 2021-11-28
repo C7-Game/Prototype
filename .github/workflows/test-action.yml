@@ -10,9 +10,6 @@ on:
         - Tea
       message:
         required: false
-      environment:
-        type: environment
-
 jobs:
   do-a-thing:
     runs-on: ubuntu-latest
