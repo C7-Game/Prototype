@@ -4,12 +4,13 @@ jobs:
   do-a-thing:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-        mkdir dir
-        cp LICENSE dir/license.txt
-        chmod 764 dir/license.txt
-        tar -zcvf thing.tar.gz dir
-        echo "I did a thing"
+      - name: Make a tar archive
+        run: |
+          mkdir dir
+          cp LICENSE dir/license.txt
+          chmod 764 dir/license.txt
+          tar -zcvf thing.tar.gz dir
+          echo "I did a thing"
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
