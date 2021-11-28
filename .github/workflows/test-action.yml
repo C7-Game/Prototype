@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Optionally set GH_USERNAME
-      if: github.event.inputs.include-username
+      if: github.event.inputs.include-username == 'true'
       # ref https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
       run: echo "GH_USERNAME=-${{ github.actor }}" >> $GITHUB_ENV
     - name: Echo some stuff
