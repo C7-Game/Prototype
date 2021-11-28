@@ -18,5 +18,11 @@ namespace C7GameData
             this.owner = owner;
             this.name = name;
         }
+
+        public bool IsCapital()
+        {
+            //TODO: Look through built cities, figure out if it is or not
+            return false;
+        }
     }
 }
