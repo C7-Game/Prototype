@@ -21,28 +21,41 @@ public interface ILooseLayer {
 
 public class TerrainLayer : ILooseLayer {
 
-	private ImageTexture terrainTex;
-	private static readonly Vector2 terrainSpriteSize = new Vector2(128, 64);
+	public static readonly Vector2 terrainSpriteSize = new Vector2(128, 64);
+
+	// A triple sheet is a sprite sheet containing sprites for three different terrain types including transitions between.
+	private List<ImageTexture> tripleSheets;
 
 	public TerrainLayer()
 	{
-		var terrainPCX = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
-		terrainTex = PCXToGodot.getImageTextureFromPCX(terrainPCX);
+		tripleSheets = loadTerrainTripleSheets();
+	}
+
+	public List<ImageTexture> loadTerrainTripleSheets()
+	{
+		var fileNames = new List<string> {
+			"Art/Terrain/xtgc.pcx",
+			"Art/Terrain/xpgc.pcx",
+			"Art/Terrain/xdgc.pcx",
+			"Art/Terrain/xdpc.pcx",
+			"Art/Terrain/xdgp.pcx",
+			"Art/Terrain/xggc.pcx",
+			"Art/Terrain/wCSO.pcx",
+			"Art/Terrain/wSSS.pcx",
+			"Art/Terrain/wOOO.pcx",
+		};
+		var tr = new List<ImageTexture>();
+		foreach (var fileName in fileNames)
+			tr.Add(Util.LoadTextureFromPCX(fileName));
+		return tr;
 	}
 
 	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
-		Rect2 texRect;
-		if (tile.terrainType.name == "Grassland")
-			texRect = new Rect2(new Vector2(4, 4) * terrainSpriteSize, terrainSpriteSize);
-		else if (tile.terrainType.name == "Plains")
-			texRect = new Rect2(new Vector2(0, 0) * terrainSpriteSize, terrainSpriteSize);
-		else if (tile.terrainType.name == "Coast")
-			texRect = new Rect2(new Vector2(8, 8) * terrainSpriteSize, terrainSpriteSize);
-		else
-			return;
+		int xSheet = tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tile.ExtraInfo.BaseTerrainImageID / 9;
+		Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);;
 		var screenRect = new Rect2(tileCenter - (float)0.5 * terrainSpriteSize, terrainSpriteSize);
-		looseView.DrawTextureRectRegion(terrainTex, screenRect, texRect);
+		looseView.DrawTextureRectRegion(tripleSheets[tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
 	}
 }
 
