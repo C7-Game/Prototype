@@ -26,10 +26,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Optionally set GH_USERNAME
-      if: inputs.include-username
+      if: github.event.inputs.include-username
       run: echo "::set-env name=GH_USERNAME"::-${{ github.actor }}
-    - name: Make a tar archive
+    - name: Echo some stuff
       run: |
         echo "I did a thing"
         echo "Build type is ${{ inputs.build-type }}"
-        echo "Folder/file names will be ${EXPORT_NAME}${{ inputs.folder-suffix }}${GH_USERNAME}"
+        echo "Folder/file names will be ${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}"
