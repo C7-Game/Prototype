@@ -4,4 +4,4 @@ jobs:
   do-a-thing:
     runs-on: ubuntu-latest
     steps:
-      - run echo "I did a thing"
+      - run: echo "I did a thing"
