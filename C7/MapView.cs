@@ -288,7 +288,7 @@ public class MapView : Node2D {
 	}
 
 	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
-	private Vector2 getVisibleAreaSize()
+	public Vector2 getVisibleAreaSize()
 	{
 		var viewport = GetViewport();
 		return (viewport != null) ? viewport.Size : OS.WindowSize;
