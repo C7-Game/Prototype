@@ -1,18 +1,22 @@
 name: Test Action
-on: [workflow_dispatch]
+on:
+  workflow_dispatch
+    inputs:
+      name:
+        type: choice
+        description: This selection does nothing yet, testing inputs
+        options:
+        - Pan-galactic gargle blaster
+        - Tea
+      message:
+        required: false
+      environment:
+        type: environment
+
 jobs:
   do-a-thing:
     runs-on: ubuntu-latest
     steps:
       - name: Make a tar archive
         run: |
-          mkdir dir
-          echo "I'm doing a thing" > dir/thing.txt
-          chmod 764 dir/thing.txt
-          tar -zcvf thing.tar.gz dir
           echo "I did a thing"
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Test-tar-artifact
-          path: thing.tar.gz
