@@ -279,9 +279,15 @@ public class CityLayer : ILooseLayer {
 			looseView.DrawTextureRectRegion(label, labelDestination, allOfTheLabel);
 
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
-			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(32, 10));
+			int cityNameOffset = cityNameAndGrowthWidth/-2;
+			int prodDescriptionOffset = productionDescriptionWidth/-2;
+			if (!city.IsCapital()) {
+				cityNameOffset+=12;
+				prodDescriptionOffset+=12;
+			}
+			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityNameOffset, 24) + new Vector2(0, 10));
 			looseView.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
-			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(32, 20));
+			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20));
 			looseView.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
 
 			//City pop size
