@@ -27,7 +27,8 @@ jobs:
     steps:
     - name: Optionally set GH_USERNAME
       if: github.event.inputs.include-username
-      run: echo "::set-env name=GH_USERNAME"::-${{ github.actor }}
+      # ref https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
+      run: echo "GH_USERNAME=-${{ github.actor }}" >> $GITHUB_ENV
     - name: Echo some stuff
       run: |
         echo "I did a thing"
