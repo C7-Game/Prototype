@@ -7,8 +7,8 @@ jobs:
       - name: Make a tar archive
         run: |
           mkdir dir
-          cp LICENSE dir/license.txt
-          chmod 764 dir/license.txt
+          echo "I'm doing a thing" > dir/thing.txt
+          chmod 764 dir/thing.txt
           tar -zcvf thing.tar.gz dir
           echo "I did a thing"
       - name: Upload Artifact
