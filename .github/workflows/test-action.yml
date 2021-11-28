@@ -16,6 +16,10 @@ on:
         type: boolean
         description: Append your GitHub username to the folder name
         default: true
+      include-datetime:
+        type: boolean
+        description: Append ISO8601 date/time to folder name
+        default: true
 
 env:
   GODOT_VERSION: 3.4
@@ -28,10 +32,18 @@ jobs:
     - name: Optionally set GH_USERNAME
       if: github.event.inputs.include-username == 'true'
       # ref https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
-      run: echo "GH_USERNAME=-${{ github.actor }}" >> $GITHUB_ENV
+      run: |
+        echo "GH_USERNAME=-${{ github.actor }}" >> $GITHUB_ENV
+    - name: Optionally set BUILD_TIME
+      if: github.event.inputs.include-datetime == 'true'
+      run: |
+        echo "BUILD_TIME=-$(date --iso8601=minutes)" >> $GITHUB_ENV
+    - name: Set FOLDER_NAME
+      run: |
+        echo "FOLDER_NAME=${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}${BUILD_TIME}" >> $GITHUB_ENV
     - name: Echo some stuff
       run: |
         echo "I did a thing"
         echo "Build type is ${{ github.event.inputs.build-type }}"
         echo "include-username set to ${{ github.event.inputs.include-username }}"
-        echo "Folder/file names will be ${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}"
+        echo "Folder/file names will be ${FOLDER_NAME}"
