@@ -288,8 +288,11 @@ public class CityLayer : ILooseLayer {
 			DynamicFont midSizedFont = new DynamicFont();
 			midSizedFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
 			midSizedFont.Size = 18;
-			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(11, 18));
-			looseView.DrawString(midSizedFont, popSizeDestination, "1", Color.Color8(255, 255, 255, 255));
+			string popSizeString = "24";
+			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
+			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH/2 - popSizeWidth/2;
+			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(popSizeOffset, 18));
+			looseView.DrawString(midSizedFont, popSizeDestination, popSizeString, Color.Color8(255, 255, 255, 255));
 		}
 	}
 }
