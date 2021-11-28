@@ -1,0 +1,7 @@
+name: Test Action
+on: [workflow_dispatch]
+jobs:
+  do-a-thing:
+    runs-on: ubuntu-latest
+    steps:
+      - run echo "I did a thing"
