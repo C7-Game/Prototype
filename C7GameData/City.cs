@@ -22,7 +22,7 @@ namespace C7GameData
         public bool IsCapital()
         {
             //TODO: Look through built cities, figure out if it is or not
-            return false;
+            return true;
         }
     }
 }
