@@ -21,11 +21,11 @@ jobs:
       - name: Windows Build
         run: |
           mkdir -v -p build/windows
-          cd ${EXPORT_NAME}
-          godot -v --export "Windows Desktop" ../build/windows/${EXPORT_NAME}.exe
+          cd ${{EXPORT_NAME}}
+          godot -v --export "Windows Desktop" ../build/windows/${{EXPORT_NAME}}.exe
       - name: Copy Hard-Coded Save
         run: |
-          if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/windows/; fi
+          if [ -f ${{EXPORT_NAME}}/c7-static-map-save.json ]; then cp ${{EXPORT_NAME}}/c7-static-map-save.json build/windows/; fi
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -47,18 +47,18 @@ jobs:
       - name: Linux Build
         run: |
           mkdir -v -p build/linux
-          cd ${EXPORT_NAME}
-          godot -v --export "Linux/X11" ../build/linux/${EXPORT_NAME}.x86_64
+          cd ${{EXPORT_NAME}}
+          godot -v --export "Linux/X11" ../build/linux/${{EXPORT_NAME}}.x86_64
       - name: Copy Hard-Coded Save
         run: |
-          if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/linux/; fi
+          if [ -f ${{EXPORT_NAME}}/c7-static-map-save.json ]; then cp ${{EXPORT_NAME}}/c7-static-map-save.json build/linux/; fi
       - name: Create Tar Archive
         run: |
-          tar -zcvf build/${EXPORT_NAME}.tgz build/linux
+          tar -zcvf build/${{EXPORT_NAME}}.tgz build/linux
       - name: Upload  Artifact
         uses: actions/upload-artifact@v2
         with:
-          path: build/${EXPORT_NAME}.tgz
+          path: build/${{EXPORT_NAME}}.tgz
           name: C7-Linux-x86_64
   Export-C7-Mac:
     runs-on: ubuntu-latest
@@ -76,16 +76,16 @@ jobs:
       - name: Mac Build
         run: |
           mkdir -v -p build/mac
-          cd ${EXPORT_NAME}
-          godot -v --export "Mac OSX" ../build/mac/${EXPORT_NAME}.dmg
+          cd ${{EXPORT_NAME}}
+          godot -v --export "Mac OSX" ../build/mac/${{EXPORT_NAME}}.dmg
       - name: Copy Hard-Coded Save
         run: |
-          if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/mac/; fi
+          if [ -f ${{EXPORT_NAME}}/c7-static-map-save.json ]; then cp ${{EXPORT_NAME}}/c7-static-map-save.json build/mac/; fi
       - name: Create Tar Archive
         run: |
-          tar -zcvf build/${EXPORT_NAME}.tgz build/mac
+          tar -zcvf build/${{EXPORT_NAME}}.tgz build/mac
       - name: Upload  Artifact
         uses: actions/upload-artifact@v2
         with:
           name: C7-Mac
-          path: build/${EXPORT_NAME}.tgz
+          path: build/${{EXPORT_NAME}}.tgz
