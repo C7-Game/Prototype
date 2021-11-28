@@ -185,20 +185,24 @@ public class CityLayer : ILooseLayer {
 	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.cityAtTile != null) {
-			GD.Print("Tile " + tile.xCoordinate + ", " + tile.yCoordinate + " has a city");
+			GD.Print("Tile " + tile.xCoordinate + ", " + tile.yCoordinate + " has a city named " + tile.cityAtTile.name);
 			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
 			Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
 			looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
 
+			DynamicFont smallFont = new DynamicFont();
+			smallFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
+			smallFont.Size = 11;
 
-			DynamicFont smallFont = ResourceLoader.Load<DynamicFont>("res://Fonts/NSansFont12Pt co.tres");
+			String cityNameAndGrowth = tile.cityAtTile.name + " : 10";
+			String productionDescription = "Warrior : 5";
 
-			String cityName = "Hippo Regius (Western Roman Empire)";
+			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;
+			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).x;
+			int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
+			GD.Print("Width of city name = " + maxTextWidth);
 
-			int cityNameWidth = (int)smallFont.GetStringSize(cityName).x;;
-			GD.Print("Width of city name = " + cityNameWidth);
-
-			int cityLabelWidth = cityNameWidth + 70;	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
+			int cityLabelWidth = maxTextWidth + 70;	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
 			int textAreaWidth = cityLabelWidth - 50;
 			GD.Print("City label width: " + cityLabelWidth);
 			GD.Print("Text area width: " + textAreaWidth);
@@ -273,7 +277,9 @@ public class CityLayer : ILooseLayer {
 
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
 			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(32, 10));
-			looseView.DrawString(smallFont, cityNameDestination, cityName, Color.Color8(255, 255, 255, 255));
+			looseView.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
+			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(32, 20));
+			looseView.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
 
 			//City pop size
 			DynamicFont midSizedFont = new DynamicFont();
