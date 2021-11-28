@@ -20,15 +20,16 @@ on:
 env:
   GODOT_VERSION: 3.4
   EXPORT_NAME: C7
-  # Saw this trick using fromJSON and a boolean index to pick whether to include empty string or a value
-  DIR_SUFFIX: ${{ inputs.folder-suffix }}${{ fromJSON["'','-'""][ inputs.include-username == 'true' ] }}${{ fromJSON["'',github.actor""][ inputs.include-username == 'true' ] }}
 
 jobs:
   do-a-thing:
     runs-on: ubuntu-latest
     steps:
-      - name: Make a tar archive
-        run: |
-          echo "I did a thing"
-          echo "Build type is ${{ inputs.build-type }}"
-          echo "Folder/file names will be ${EXPORT_NAME}${DIR_SUFFIX}"
+    - name: Optionally set GH_USERNAME
+      if: inputs.include-username
+      run: echo "::set-env name=GH_USERNAME"::-${{ github.actor }}
+    - name: Make a tar archive
+      run: |
+        echo "I did a thing"
+        echo "Build type is ${{ inputs.build-type }}"
+        echo "Folder/file names will be ${EXPORT_NAME}${{ inputs.folder-suffix }}${GH_USERNAME}"
