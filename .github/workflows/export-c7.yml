@@ -23,6 +23,7 @@ jobs:
           mkdir -v -p build/windows
           cd $EXPORT_NAME
           godot -v --export "Windows Desktop" ../build/windows/$EXPORT_NAME.exe
+          if [ -f ./c7-static-map-save.json ] then cp ./c7-static-map-save.json ../build/windows/
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         with:
