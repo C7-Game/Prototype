@@ -2,8 +2,13 @@
 # Godot-specific ignores
 .import/
 export.cfg
-export_presets.cfg
+### This is excluded because Android builds may have secrets in export_presets.cfg ; see https://github.com/godotengine/godot-demo-projects/issues/329
+# export_presets.cfg
 mono_crash.*.json
+
+# Exports folder ignores
+C7/Exports
+Exports/
 
 # Mono-specific ignores
 .mono/
