@@ -32,5 +32,5 @@ jobs:
     - name: Echo some stuff
       run: |
         echo "I did a thing"
-        echo "Build type is ${{ inputs.build-type }}"
+        echo "Build type is ${{ github.event.inputs.build-type }}"
         echo "Folder/file names will be ${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}"
