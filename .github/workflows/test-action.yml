@@ -10,15 +10,17 @@ on:
         - release
       folder-suffix:
         description: Will be added to "C7" for folder name
+        default: -dev-build
         required: false
       include-username:
         type: boolean
         description: Append your GitHub username to the folder name
+        default: true
 
 env:
   GODOT_VERSION: 3.4
   EXPORT_NAME: C7
-  DIR_SUFFIX: ${{ inputs.folder-suffix }}${{ fromJSON('["", "-"]') }}${{ github.actor }}
+  DIR_SUFFIX: ${{ inputs.folder-suffix }}${{ '-'[ inputs.include-username == 'true' ] }}${{ github.actor[ inputs.include-username == 'true' ] }}
 
 jobs:
   do-a-thing:
