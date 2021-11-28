@@ -2,7 +2,7 @@ name: Export C7 Game
 on: [workflow_dispatch]
 env:
   GODOT_VERSION: 3.4
-  EXPORT_NAME: c7-game
+  EXPORT_NAME: C7
 
 jobs:
   Export-C7-Windows:
