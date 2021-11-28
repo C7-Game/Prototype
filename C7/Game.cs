@@ -2,7 +2,6 @@ using Godot;
 using System;
 using System.Collections;
 using System.Diagnostics;
-using ConvertCiv3Media;
 using C7Engine;
 using C7GameData;
 
@@ -44,7 +43,12 @@ public class Game : Node2D
 	{
 		controller = CreateGame.createGame(genBasicTerrainNoiseMap);
 		var map = MapInteractions.GetWholeMap();
-		this.TerrainAsTileMap(map);
+		Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall);
+		baseTerrainMap.Civ3Tiles = map.tiles;
+		baseTerrainMap.TerrainAsTileMap();
+
+		mapView = new MapView(this, baseTerrainMap.Map, baseTerrainMap.TS, false, false);
+		AddChild(mapView);
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -114,57 +118,6 @@ public class Game : Node2D
 			}
 		}
 		return tr;
-	}
-
-	public void TerrainAsTileMap(GameMap map) {
-		int mapWidth = map.numTilesWide, mapHeight = map.numTilesTall;
-
-		TileSet TS = new TileSet();
-
-		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
-		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
-
-		int id = TS.GetLastUnusedTileId();
-		for (int y = 0; y < PcxTxtr.Height; y += 64) {
-			for (int x = 0; x < PcxTxtr.Width; x+= 128, id++) {
-				TS.CreateTile(id);
-				TS.TileSetTexture(id, Txtr);
-				TS.TileSetRegion(id, new Rect2(x, y, 128, 64));
-				// order right, bottom, left, top; 0 is plains, 1 grass, 2 coast
-				Terrmask.Add(
-					((y / 64) % 3).ToString("D3") +
-					((y / 64) / 3 % 3).ToString("D3") +
-					((x / 128) / 3 % 3).ToString("D3") +
-					((x / 128) % 3).ToString("D3")
-					, id);
-			}
-		}
-
-		var terNoise = map.terrainNoiseMap;
-
-		// Loop to lookup tile ids based on terrain mask
-		//  NOTE: This layout is full width, but the tiles are every-other coordinate
-		//    What I've done is generated "terrain ID" all over and am deriving an
-		//    image ID on the tile placement spots based on surrounding terrain values
-		int[,] terrainSprites = new int[mapWidth,mapHeight];
-		for (int y = 0; y < mapHeight; y++) {
-			for (int x = y%2; x < mapWidth; x+=2) {
-				int Top = y == 0 ? (terNoise[(x+1) % mapWidth,y]) : (terNoise[x,y-1]);
-				int Bottom = y == mapHeight - 1 ? (terNoise[(x+1) % mapWidth,y]) : (terNoise[x,y+1]);
-				string foo = 
-					(terNoise[(x+1) % mapWidth,y]).ToString("D3") +
-					Bottom.ToString("D3") +
-					(terNoise[Mathf.Abs((x-1) % mapWidth),y]).ToString("D3") +
-					Top.ToString("D3")
-				;
-				try {
-				terrainSprites[x,y] = (int)Terrmask[foo];
-				} catch { GD.Print(x + "," + y + " " + foo); }
-			}
-		}
-
-		mapView = new MapView(this, terrainSprites, TS, false, false);
-		AddChild(mapView);
 	}
 
 	/**

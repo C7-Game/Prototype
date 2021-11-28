@@ -42,11 +42,10 @@ namespace C7GameData
          *
          * Returns the human player so the caller (which is the UI) can store it.
          **/
-        public Player createDummyGameData(GameMap.TerrainNoiseMapGenerator terrainGen)
+        public Player createDummyGameData()
         {
             this.turn = 0;
             this.rng = new Random();
-            this.map = GameMap.generateDummyGameMap(rng, terrainGen);
 
             int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
             var humanPlayer = new Player(blue);

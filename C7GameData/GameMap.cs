@@ -7,17 +7,19 @@ namespace C7GameData
      */
     public class GameMap
     {
-        public int numTilesWide { get; private set; }
-        public int numTilesTall { get; private set; }
+        // TODO : protect setters while still allowing JSON deserialization
+        public int numTilesWide { get; set; }
+        public int numTilesTall { get; set; }
         bool wrapHorizontally, wrapVertically;
 
         // The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
         // This is kind of a temporary thing. The reason it works this way right now is because I'm just rearranging the generation code from
         // TerrainAsTileMap, eventually we'll want a more complex map generator which probably won't need this var.
+        [System.Text.Json.Serialization.JsonIgnore]
         public int[,] terrainNoiseMap;
 
         public List<TerrainType> terrainTypes = new List<TerrainType>();
-        public List<Tile> tiles {get;}
+        public List<Tile> tiles { get; set;}
 
         public GameMap()
         {
@@ -120,6 +122,8 @@ namespace C7GameData
          * Temporary method to generate a map. Right now it uses the basic generator passed in all the way from the UI but eventually we'll want to
          * implement a more sophisticated generator in the engine.
          **/
+         // TerrainType declarations here have been copied to ImportCiv3, and all loaded terrain is set with one of them
+         [Obsolete]
         public static GameMap generateDummyGameMap(Random rng, TerrainNoiseMapGenerator terrainGen)
         {
             TerrainType grassland = new TerrainType();
@@ -166,6 +170,9 @@ namespace C7GameData
             return dummyMap;
         }
 
+        // STATUS 2021-11-26: This noise function is not currently referenced, but it is a very useful
+        //  noisemap generator that we will likely use in the future once we start trying
+        //  to generate a full-featured map.
         // Inputs: noise field width and height, bool whether noise should smoothly wrap X or Y
         // Actual fake-isometric map will have different shape, but for noise we'll go straight 2d matrix
         // NOTE: Apparently this OpenSimplex implementation doesn't do octaves, including persistance or lacunarity

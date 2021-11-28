@@ -3,6 +3,11 @@ namespace C7GameData
     using System.Collections.Generic;
     public class Tile
     {
+        // ExtraInfo will eventually be type object and use a type descriminator in JSON to determine
+        //   how to deserialze. See https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-polymorphism
+        //   and https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#support-polymorphic-deserialization
+        //   Needed for saving to and loading from a serializable format
+        public Civ3ExtraInfo ExtraInfo;
         public int xCoordinate;
         public int yCoordinate;
         public TerrainType terrainType;

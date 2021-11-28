@@ -63,10 +63,14 @@ namespace QueryCiv3
     {
         protected SavData Data;
         public int Offset {get; protected set;}
-        public MapTile(SavData data, int offset)
+        public int X {get; protected set;}
+        public int Y {get; protected set;}
+        public MapTile(SavData data, int offset, int x, int y)
         {
             Data = data;
             Offset = offset;
+            X = x;
+            Y = y;
         }
         public int ContID { get => Data.Sav.ReadByte(Offset+30); }
         // TODO: 0x80 is barbs...sure there's more to this than that

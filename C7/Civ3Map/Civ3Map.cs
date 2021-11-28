@@ -1,32 +1,25 @@
 using Godot;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using ConvertCiv3Media;
+using C7GameData;
 
-public class LegacyMap : Node2D
+public class Civ3Map : Node2D
 {
-	public interface ILegacyTile
-	// Tiles need to provide this info to LegacyMap
-	{
-		int LegacyFileID { get; }
-		int LegacyImageID { get; }
-		int LegacyX {get;}
-		int LegacyY {get;}
-	}
-	public IEnumerable<ILegacyTile> LegacyTiles;
-	int[,] Map;
+	public List<Tile> Civ3Tiles;
+	public int[,] Map { get; protected set; }
 	TileMap TM;
-	TileSet TS;
+	public TileSet TS { get; protected set; }
 	private int[,] TileIDLookup;
-	// NOTE: The following two must be set externally before displaying map
+	// NOTE: The following two must be set externally before running TerrainAsTileMap
 	public int MapWidth;
 	public int MapHeight;
 	// If a mod is in effect, set this, otherwise set to "" or "Conquests"
 	public string ModRelPath = "";
-	public override void _Ready()
+	public Civ3Map(int mapWidth, int mapHeight)
 	{
-		//
+		MapWidth = mapWidth;
+		MapHeight = mapHeight;
 	}
 	public void TerrainAsTileMap() {
 		if (TM != null) { RemoveChild(TM); }
@@ -42,28 +35,32 @@ public class LegacyMap : Node2D
 		int id = TS.GetLastUnusedTileId();
 		// Make blank default tile
 		// TODO: Make red tile or similar
+		// NOTE: Need an unused tile at 0, anyway, to test to see if real tile has been loaded yet
 		TS.CreateTile(id);
 		id++;
 
 		Map = new int[MapWidth,MapHeight];
 
 		// Populate map values
-		if(LegacyTiles != null)
+		if(Civ3Tiles != null)
 		{
-			foreach (ILegacyTile tile in LegacyTiles)
+			foreach (Tile tile in Civ3Tiles)
 			{
 				// If tile media file not loaded yet
-				if(TileIDLookup[tile.LegacyFileID,1] == 0) { LoadTileSet(tile.LegacyFileID); }
-				Map[tile.LegacyX,tile.LegacyY] = TileIDLookup[tile.LegacyFileID,tile.LegacyImageID];
+				if(TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,1] == 0) { LoadTileSet(tile.ExtraInfo.BaseTerrainFileID); }
+				var _ = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
+				Map[tile.xCoordinate,tile.yCoordinate] = 0;
+				Map[tile.xCoordinate,tile.yCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
 			}
 		}
+		/* This code sets the tiles for display, but that is being done by MapView now
 		for (int y = 0; y < MapHeight; y++) {
 			for (int x = y % 2; x < MapWidth; x+=2) {
 				TM.SetCellv(new Vector2(x, y), Map[x,y]);
 			}
 		}
-		// TM.Scale = new Vector2((float)0.2, (float)0.2);
 		AddChild(TM);
+		*/
 	}
 	private void LoadTileSet(int fileID)
 	{
