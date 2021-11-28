@@ -18,7 +18,7 @@ on:
 env:
   GODOT_VERSION: 3.4
   EXPORT_NAME: C7
-  DIR_NAME: ${{ env.EXPORT_NAME }}${{ inputs.folder-suffix }}${{ github.actor }}
+  DIR_SUFFIX: ${{ inputs.folder-suffix }}${{ fromJSON('["", "-"]') }}${{ github.actor }}
 
 jobs:
   do-a-thing:
@@ -28,4 +28,4 @@ jobs:
         run: |
           echo "I did a thing"
           echo "Build type is ${{ inputs.build-type }}"
-          echo "Folder/file names will be ${DIR_NAME}"
+          echo "Folder/file names will be ${EXPORT_NAME}${DIR_SUFFIX}"
