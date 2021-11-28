@@ -2,13 +2,15 @@ name: Test Action
 on:
   workflow_dispatch:
     inputs:
-      name:
+      build-type:
         type: choice
-        description: This selection does nothing yet, testing inputs
+        description: This selection does nothing yet
         options:
-        - Pan-galactic gargle blaster
-        - Tea
-      message:
+        - debug
+        - release
+      folder-suffix:
+        description: Will be added to "C7" for folder/file name
+        default: -dev-build-${{ github.actor }}
         required: false
 jobs:
   do-a-thing:
@@ -17,3 +19,5 @@ jobs:
       - name: Make a tar archive
         run: |
           echo "I did a thing"
+          echo "Build type is ${{ inputs.build-type }}"
+          echo "Folder/file names will be C7${{ inputs.folder-suffix }}"
