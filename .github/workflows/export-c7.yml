@@ -1,4 +1,4 @@
-name: Test Action
+name: Export C7 Game
 on: [workflow_dispatch]
 env:
   GODOT_VERSION: 3.4
