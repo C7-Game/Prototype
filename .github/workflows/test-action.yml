@@ -6,7 +6,7 @@ jobs:
     steps:
       - run: |
         mkdir dir
-        echo "I'm doing a thing" > dir/thing.txt
+        echo "I'm doing a thing" | tee dir/thing.txt
         chmod 764 dir/thing.txt
         tar -zcvf thing.tar.gz dir
         echo "I did a thing"
