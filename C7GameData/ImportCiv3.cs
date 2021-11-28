@@ -25,6 +25,28 @@ namespace C7GameData
             byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(defaultBicPath);
     		SavData civ3Save = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(savePath), defaultBicBytes);
 
+            // Dummy data
+            TerrainType grassland = new TerrainType();
+            grassland.name = "Grassland";
+            grassland.baseFoodProduction = 2;
+            grassland.baseShieldProduction = 1; //with only one terrain type, it needs to be > 0
+            grassland.baseCommerceProduction = 1;   //same as above
+            grassland.movementCost = 1;
+
+            TerrainType plains = new TerrainType();
+            plains.name = "Plains";
+            plains.baseFoodProduction = 1;
+            plains.baseShieldProduction = 2;
+            plains.baseCommerceProduction = 1;
+            plains.movementCost = 1;
+
+            TerrainType coast = new TerrainType();
+            coast.name = "Coast";
+            coast.baseFoodProduction = 2;
+            coast.baseShieldProduction = 0;
+            coast.baseCommerceProduction = 1;
+            coast.movementCost = 1;
+
             // Import data
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
             c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
@@ -40,6 +62,8 @@ namespace C7GameData
                     xCoordinate = tile.X,
                     yCoordinate = tile.Y,
                     ExtraInfo = extra,
+                    // TEMP all water is coast, desert and plains are plains, grass and tundra are grass
+                    terrainType = tile.BaseTerrain > 10 ? coast : tile.BaseTerrain > 1 ? grassland : plains,
                 };
                 c7Save.GameData.map.tiles.Add(c7Tile);
             }

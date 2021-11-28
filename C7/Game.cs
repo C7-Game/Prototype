@@ -47,7 +47,7 @@ public class Game : Node2D
 		baseTerrainMap.Civ3Tiles = map.tiles;
 		baseTerrainMap.TerrainAsTileMap();
 
-		mapView = new MapView(this, baseTerrainMap.Map, baseTerrainMap.TS, true, false);
+		mapView = new MapView(this, baseTerrainMap.Map, baseTerrainMap.TS, false, false);
 		AddChild(mapView);
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");

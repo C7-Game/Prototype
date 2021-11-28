@@ -18,8 +18,6 @@ namespace LuaCiv3
     		SavData mapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(GetCiv3Path + SavFilePath), defaultBicBytes);
 
             C7SaveFormat output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
-            output.GameData.players.Add(new Player(-1));
-            output.GameData.players.Add(new Player(0x4040FFFF));
 
             C7SaveFormat.Save(output, "out.json");
         }

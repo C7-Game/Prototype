@@ -20,9 +20,8 @@ namespace C7Engine
             // possibly do something with save.Rules here when it exists
             // and maybe consider if we have any need to keep a reference to the save object handy...probably not
 
-            // In a Civ3 save, player 0 is barbs and player 1 is first human player
-            // Although unsure if we can rely on List to maintain a consistent order
-            return save.GameData.players.ToArray()[1];
+            var humanPlayer = save.GameData.createDummyGameData();
+            return humanPlayer;
         }
     }
 }

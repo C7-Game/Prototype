@@ -122,6 +122,8 @@ namespace C7GameData
          * Temporary method to generate a map. Right now it uses the basic generator passed in all the way from the UI but eventually we'll want to
          * implement a more sophisticated generator in the engine.
          **/
+         // TerrainType declarations here have been copied to ImportCiv3, and all loaded terrain is set with one of them
+         [Obsolete]
         public static GameMap generateDummyGameMap(Random rng, TerrainNoiseMapGenerator terrainGen)
         {
             TerrainType grassland = new TerrainType();
