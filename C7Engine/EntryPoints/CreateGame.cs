@@ -15,7 +15,7 @@ namespace C7Engine
         {
             // I think this path is relative from the C7 folder, not C7GameEngine, if that matters
             // TODO: Unsure if this will work when exported for distribution
-            C7SaveFormat save = C7SaveFormat.Load(@"../C7GameData/c7-static-map-save.json");
+            C7SaveFormat save = C7SaveFormat.Load(@"./c7-static-map-save.json");
             EngineStorage.setGameData(save.GameData);
             // possibly do something with save.Rules here when it exists
             // and maybe consider if we have any need to keep a reference to the save object handy...probably not
