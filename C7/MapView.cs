@@ -216,26 +216,17 @@ public class MapView : Node2D {
 		public int virtTileX, virtTileY; // (x, y) coords of the tile. These are "virtual", i.e. unwrapped, coordinates.
 	}
 
-	private int[,] terrain;
-	private TileMap terrainView;
-	private TileSet terrainSet;
-
 	private LooseView looseView;
 
-	public MapView(Game game, int[,] terrain, TileSet terrainSet, bool wrapHorizontally, bool wrapVertically)
+	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
 	{
 		this.game = game;
-		this.terrain = terrain;
-		this.terrainSet = terrainSet;
-		mapWidth = terrain.GetLength(0);
-		mapHeight = terrain.GetLength(1);
+		this.mapWidth = mapWidth;
+		this.mapHeight = mapHeight;
 		this.wrapHorizontally = wrapHorizontally;
 		this.wrapVertically = wrapVertically;
 
 		looseView = new LooseView(this);
-
-		// Initialize layers
-		// initTerrainLayer();
 		looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
@@ -243,17 +234,6 @@ public class MapView : Node2D {
 		AddChild(looseView);
 
 		onVisibleAreaChanged();
-	}
-
-	public void initTerrainLayer()
-	{
-		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
-		terrainView = new TileMap();
-		terrainView.CellSize = cellSize;
-		// terrainView.CenteredTextures = true;
-		terrainView.TileSet = terrainSet;
-
-		AddChild(terrainView);
 	}
 
 	public bool isRowAt(int y)
@@ -323,8 +303,6 @@ public class MapView : Node2D {
 
 	public void onVisibleAreaChanged()
 	{
-		// terrainView.Clear();
-
 		// TODO: Update this comment and move it somewhere more appropriate
 		// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire
 		// screen. For small movements, the MapView itself is moved (amount is in cameraResidueX/Y) but once the movement equals an entire
@@ -332,13 +310,7 @@ public class MapView : Node2D {
 		// what tiles are drawn (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around
 		// wrapped edges.
 
-		// Update layer positions
-		// terrainView.Position = -cameraLocation;
 		looseView.Position = -cameraLocation;
-
-		//foreach (var vT in visibleTiles())
-		//	terrainView.SetCell(vT.virtTileX, vT.virtTileY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
-
 		looseView.Update(); // trigger redraw
 	}
 
@@ -352,7 +324,6 @@ public class MapView : Node2D {
 		var v2OldZoom = new Vector2(cameraZoom, cameraZoom);
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
-			// terrainView.Scale = v2NewZoom;
 			looseView.Scale = v2NewZoom;
 			setCameraLocation ((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
 			// resetVisibleTiles(); // Don't have to call this because it's already called when the camera location is changed
