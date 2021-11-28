@@ -37,7 +37,7 @@ jobs:
     - name: Optionally set BUILD_TIME
       if: github.event.inputs.include-datetime == 'true'
       run: |
-        echo "BUILD_TIME=-$(date --iso8601=minutes)" >> $GITHUB_ENV
+        echo "BUILD_TIME=-$(date --iso-8601=minutes)" >> $GITHUB_ENV
     - name: Set FOLDER_NAME
       run: |
         echo "FOLDER_NAME=${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}${BUILD_TIME}" >> $GITHUB_ENV
@@ -46,4 +46,5 @@ jobs:
         echo "I did a thing"
         echo "Build type is ${{ github.event.inputs.build-type }}"
         echo "include-username set to ${{ github.event.inputs.include-username }}"
+        date --iso-8601=minutes
         echo "Folder/file names will be ${FOLDER_NAME}"
