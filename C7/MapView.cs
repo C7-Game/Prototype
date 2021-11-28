@@ -19,6 +19,33 @@ public interface ILooseLayer {
 	void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
 }
 
+public class TerrainLayer : ILooseLayer {
+
+	private ImageTexture terrainTex;
+	private static readonly Vector2 terrainSpriteSize = new Vector2(128, 64);
+
+	public TerrainLayer()
+	{
+		var terrainPCX = new Pcx(Util.Civ3MediaPath("Art/Terrain/xpgc.pcx"));
+		terrainTex = PCXToGodot.getImageTextureFromPCX(terrainPCX);
+	}
+
+	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		Rect2 texRect;
+		if (tile.terrainType.name == "Grassland")
+			texRect = new Rect2(new Vector2(4, 4) * terrainSpriteSize, terrainSpriteSize);
+		else if (tile.terrainType.name == "Plains")
+			texRect = new Rect2(new Vector2(0, 0) * terrainSpriteSize, terrainSpriteSize);
+		else if (tile.terrainType.name == "Coast")
+			texRect = new Rect2(new Vector2(8, 8) * terrainSpriteSize, terrainSpriteSize);
+		else
+			return;
+		var screenRect = new Rect2(tileCenter - (float)0.5 * terrainSpriteSize, terrainSpriteSize);
+		looseView.DrawTextureRectRegion(terrainTex, screenRect, texRect);
+	}
+}
+
 public class UnitLayer : ILooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
@@ -208,7 +235,8 @@ public class MapView : Node2D {
 		looseView = new LooseView(this);
 
 		// Initialize layers
-		initTerrainLayer();
+		// initTerrainLayer();
+		looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 
@@ -295,7 +323,7 @@ public class MapView : Node2D {
 
 	public void onVisibleAreaChanged()
 	{
-		terrainView.Clear();
+		// terrainView.Clear();
 
 		// TODO: Update this comment and move it somewhere more appropriate
 		// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire
@@ -305,11 +333,11 @@ public class MapView : Node2D {
 		// wrapped edges.
 
 		// Update layer positions
-		terrainView.Position = -cameraLocation;
+		// terrainView.Position = -cameraLocation;
 		looseView.Position = -cameraLocation;
 
-		foreach (var vT in visibleTiles())
-			terrainView.SetCell(vT.virtTileX, vT.virtTileY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
+		//foreach (var vT in visibleTiles())
+		//	terrainView.SetCell(vT.virtTileX, vT.virtTileY, terrain[wrapTileX(vT.virtTileX), wrapTileY(vT.virtTileY)]);
 
 		looseView.Update(); // trigger redraw
 	}
@@ -324,7 +352,7 @@ public class MapView : Node2D {
 		var v2OldZoom = new Vector2(cameraZoom, cameraZoom);
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
-			terrainView.Scale = v2NewZoom;
+			// terrainView.Scale = v2NewZoom;
 			looseView.Scale = v2NewZoom;
 			setCameraLocation ((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
 			// resetVisibleTiles(); // Don't have to call this because it's already called when the camera location is changed
