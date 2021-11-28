@@ -190,9 +190,26 @@ public class CityLayer : ILooseLayer {
 			Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
 			looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
 
+
+			DynamicFont smallFont = ResourceLoader.Load<DynamicFont>("res://Fonts/NSansFont12Pt co.tres");
+
+			String cityName = "Hippo Regius (Western Roman Empire)";
+
+			int cityNameWidth = (int)smallFont.GetStringSize(cityName).x;;
+			GD.Print("Width of city name = " + cityNameWidth);
+
+			int cityLabelWidth = cityNameWidth + 70;	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
+			int textAreaWidth = cityLabelWidth - 50;
+			GD.Print("City label width: " + cityLabelWidth);
+			GD.Print("Text area width: " + textAreaWidth);
+			const int CITY_LABEL_HEIGHT = 23;
+			const int TEXT_ROW_HEIGHT = 9;
+			const int LEFT_RIGHT_BOXES_WIDTH = 24;
+			const int LEFT_RIGHT_BOXES_HEIGHT = CITY_LABEL_HEIGHT - 2;
+
 			//Label/name/producing area
 			Image labelImage = new Image();
-			labelImage.Create(168, 23, false, Image.Format.Rgba8);
+			labelImage.Create(cityLabelWidth, CITY_LABEL_HEIGHT, false, Image.Format.Rgba8);
 			labelImage.Fill(Color.Color8(0, 0, 0, 0));
 			byte transparencyLevel = 192;	//25%
 			Color civColor = Color.Color8(227, 10, 10, transparencyLevel);	//Roman Red
@@ -203,69 +220,66 @@ public class CityLayer : ILooseLayer {
 			Color borderGrey = Color.Color8(80, 80, 80, transparencyLevel);
 
 			Image horizontalBorder = new Image();
-			horizontalBorder.Create(166, 1, false, Image.Format.Rgba8);
+			horizontalBorder.Create(cityLabelWidth - 2, 1, false, Image.Format.Rgba8);
 			horizontalBorder.Fill(borderGrey);
-			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(166, 1)), new Vector2(1, 0));
-			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(166, 1)), new Vector2(1, 22));
+			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(cityLabelWidth - 2, 1)), new Vector2(1, 0));
+			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(cityLabelWidth - 2, 1)), new Vector2(1, 22));
 
 			Image verticalBorder = new Image();
-			verticalBorder.Create(1, 21, false, Image.Format.Rgba8);
+			verticalBorder.Create(1, CITY_LABEL_HEIGHT - 2, false, Image.Format.Rgba8);
 			verticalBorder.Fill(borderGrey);
 			labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(0, 1));
-			labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(167, 1));
+			labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(cityLabelWidth - 1, 1));
 
 			Image bottomRow = new Image();
-			bottomRow.Create(118, 1, false, Image.Format.Rgba8);
+			bottomRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
 			bottomRow.Fill(bottomRowGrey);
-			labelImage.BlitRect(bottomRow, new Rect2(0, 0, new Vector2(118, 1)), new Vector2(25, 21));
+			labelImage.BlitRect(bottomRow, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 21));
 
 			Image topRow = new Image();
-			topRow.Create(118, 1, false, Image.Format.Rgba8);
+			topRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
 			topRow.Fill(topRowGrey);
-			labelImage.BlitRect(topRow, new Rect2(0, 0, new Vector2(118, 1)), new Vector2(25, 1));
+			labelImage.BlitRect(topRow, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 1));
 
 			Image background = new Image();
-			background.Create(118, 9, false, Image.Format.Rgba8);
+			background.Create(textAreaWidth, TEXT_ROW_HEIGHT, false, Image.Format.Rgba8);
 			background.Fill(backgroundGrey);
-			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(118, 9)), new Vector2(25, 2));
-			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(118, 9)), new Vector2(25, 12));
+			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(textAreaWidth, 9)), new Vector2(25, 2));
+			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(textAreaWidth, 9)), new Vector2(25, 12));
 
 			Image centerDivider = new Image();
-			centerDivider.Create(118, 1, false, Image.Format.Rgba8);
+			centerDivider.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
 			centerDivider.Fill(civColor);
-			labelImage.BlitRect(centerDivider, new Rect2(0, 0, new Vector2(118, 1)), new Vector2(25, 11));
+			labelImage.BlitRect(centerDivider, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 11));
 
 			Image leftAndRightBoxes = new Image();
-			leftAndRightBoxes.Create(24, 21, false, Image.Format.Rgba8);
+			leftAndRightBoxes.Create(LEFT_RIGHT_BOXES_WIDTH, LEFT_RIGHT_BOXES_HEIGHT, false, Image.Format.Rgba8);
 			leftAndRightBoxes.Fill(civColor);
 			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(1, 1));
-			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(143, 1));
+			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(cityLabelWidth - 25, 1));
 			
 			Pcx cityIcons = Util.LoadPCX("Art/Cities/city icons.pcx");
 			Image nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
-			labelImage.BlendRect(nonEmbassyStar, new Rect2(0, 0, new Vector2(18, 18)), new Vector2(144, 2));
+			labelImage.BlendRect(nonEmbassyStar, new Rect2(0, 0, new Vector2(18, 18)), new Vector2(cityLabelWidth - 24, 2));
 
 			//todo: darker shades of civ color around edges
 
 			ImageTexture label = new ImageTexture();
 			label.CreateFromImage(labelImage, 0);
 
-			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(-168/2, 24), new Vector2(168, 23));	//24 is a swag
-			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(168, 23));
+			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth/-2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));	//24 is a swag
+			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
 			looseView.DrawTextureRectRegion(label, labelDestination, allOfTheLabel);
 
-			DynamicFont smallFont = ResourceLoader.Load<DynamicFont>("res://Fonts/NSansFont12Pt co.tres");
-			Label cityName = new Label();
-			cityName.Text = "Hippo Regius (Roman)";
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
-			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(-168/2, 24) + new Vector2(32, 10));
-			looseView.DrawString(smallFont, cityNameDestination, "Ravenna (Roman)", Color.Color8(255, 255, 255, 255));
+			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(32, 10));
+			looseView.DrawString(smallFont, cityNameDestination, cityName, Color.Color8(255, 255, 255, 255));
 
 			//City pop size
 			DynamicFont midSizedFont = new DynamicFont();
 			midSizedFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
 			midSizedFont.Size = 18;
-			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(-168/2, 24) + new Vector2(11, 18));
+			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(11, 18));
 			looseView.DrawString(midSizedFont, popSizeDestination, "1", Color.Color8(255, 255, 255, 255));
 		}
 	}
