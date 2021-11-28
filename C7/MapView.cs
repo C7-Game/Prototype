@@ -251,6 +251,8 @@ public class MapView : Node2D {
 
 	private LooseView looseView;
 
+	public GridLayer gridLayer { get; private set; }
+
 	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
 	{
 		this.game = game;
@@ -261,7 +263,8 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
-		looseView.layers.Add(new GridLayer());
+		gridLayer = new GridLayer();
+		looseView.layers.Add(gridLayer);
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 
