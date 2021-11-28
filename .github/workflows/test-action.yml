@@ -4,4 +4,14 @@ jobs:
   do-a-thing:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "I did a thing"
+      - run: |
+        mkdir dir
+        echo "I'm doing a thing" > dir/thing.txt
+        chmod 764 dir/thing.txt
+        tar -zcvf thing.tar.gz dir
+        echo "I did a thing"
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test-tar-artifact
+          path: thing.tar.gz
