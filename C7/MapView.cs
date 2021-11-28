@@ -59,6 +59,23 @@ public class TerrainLayer : ILooseLayer {
 	}
 }
 
+public class GridLayer : ILooseLayer {
+	public Color color = Color.Color8(50, 50, 50, 150);
+	public float lineWidth = (float)1.0;
+
+	public GridLayer() {}
+
+	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		var cS = MapView.cellSize;
+		var left  = tileCenter + new Vector2(-cS.x,  0   );
+		var top   = tileCenter + new Vector2( 0   , -cS.y);
+		var right = tileCenter + new Vector2( cS.x,  0   );
+		looseView.DrawLine(left, top  , color, lineWidth);
+		looseView.DrawLine(top , right, color, lineWidth);
+	}
+}
+
 public class UnitLayer : ILooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
@@ -241,6 +258,7 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
+		looseView.layers.Add(new GridLayer());
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 
