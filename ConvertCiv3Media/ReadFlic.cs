@@ -15,9 +15,12 @@ namespace ConvertCiv3Media
         public int Width = 0;
         public int Height = 0;
 
+        private string path;
+
         // constructors
         public Flic(){}
         public Flic(string path) {
+            this.path = path;
             this.Load(path);
         }
         public void Load(string path) {
@@ -188,6 +191,11 @@ namespace ConvertCiv3Media
                 int RingChunkLength = BitConverter.ToInt32(FlicBytes, Offset);
                 Offset += RingChunkLength;
             }
+        }
+
+        public override string ToString()
+        {
+            return "FLIC " + this.path;
         }
     }
 }
