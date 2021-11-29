@@ -23,15 +23,12 @@ public class Civ3Unit : Civ3UnitSprite
         foreach (UnitAction actn in Enum.GetValues(typeof(UnitAction))) {
             // Ensuring there is image data for this action
             if (Animations[(int)actn] != null) {
-                // GD.Print("Importing " + Animations[(int)actn]);
                 foreach (Direction dir in Enum.GetValues(typeof(Direction))) {
                     string ActionAndDirection = String.Format("{0}-{1}", actn.ToString(), dir.ToString());
                     SF.AddAnimation(ActionAndDirection);
                     SF.SetAnimationSpeed(ActionAndDirection, 10);
-                    // GD.Print("  Direction: " + dir);
 
                     for (int i = 0; i < Animations[(int)actn].Images.GetLength(1); i++) {
-                        // GD.Print("    Image" + i + " with width " + Animations[(int)actn].Width + ", " + Animations[(int)actn].Height);
                         Image ImgTxtr = Civ3Unit.ByteArrayToImage(
                             Animations[(int)actn].Images[(int)dir,i],
                             Animations[(int)actn].Palette,
