@@ -20,9 +20,6 @@ jobs:
       if: github.event.inputs.must-check == 'false'
       run: |
         echo "::warning title=Box not checked::User did not click the box!"
-      run: |
-        echo "I did a thing"
-        echo "Here is your ${{ github.event.inputs.drink-order }}"
     - name: Echo some stuff
       run: |
         echo "I did a thing"
