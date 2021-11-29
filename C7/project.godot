@@ -19,6 +19,10 @@ run/main_scene="res://MainMenu.tscn"
 boot_splash/image="res://icon.png"
 config/icon="res://icon.png"
 
+[autoload]
+
+GlobalSingleton="*res://GlobalSingleton.cs"
+
 [display]
 
 window/size/height=768
