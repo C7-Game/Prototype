@@ -56,8 +56,9 @@ public class TerrainLayer : LooseLayer {
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		int xSheet = tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tile.ExtraInfo.BaseTerrainImageID / 9;
-		Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);;
-		var screenRect = new Rect2(tileCenter - (float)0.5 * terrainSpriteSize, terrainSpriteSize);
+		var texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);;
+		var terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
+		var screenRect = new Rect2(tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize);
 		looseView.DrawTextureRectRegion(tripleSheets[tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
 	}
 }
@@ -322,7 +323,7 @@ public class MapView : Node2D {
 	{
 		int upperLeftX, upperLeftY;
 		tileCoordsOnScreenAt(new Vector2(0, 0), out upperLeftX, out upperLeftY);
-		Vector2 mapViewSize = new Vector2(2, 2) + getVisibleAreaSize() / scaledCellSize;
+		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		for (int dy = -2; dy < mapViewSize.y; dy++) {
 			int y = upperLeftY + dy;
 			if (isRowAt(y))
