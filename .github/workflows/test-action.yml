@@ -12,6 +12,7 @@ on:
 jobs:
   do-a-thing:
     runs-on: ubuntu-latest
+    steps:
     - name: Echo some stuff
       run: |
         echo "I did a thing"
