@@ -2,12 +2,10 @@ name: Export C7 Game
 on:
   workflow_dispatch:
     inputs:
-      build-type:
-        type: choice
-        description: This selection does nothing yet
-        options:
-        - debug
-        - release
+      debug-build:
+        type: boolean
+        description: Checked for debug build, unchecked for release
+        default: true
       folder-suffix:
         description: Will be added to "C7" for folder name
         required: false
@@ -30,6 +28,10 @@ jobs:
     container:
       image: barichello/godot-ci:mono-3.4
     steps:
+    - name: Optionally set DEBUG_BUILD
+      if: github.event.inputs.debug-build == 'true'
+      run: |
+        echo "DEBUG_BUILD=-debug" >> $GITHUB_ENV
     - name: Optionally set GH_USERNAME
       if: github.event.inputs.include-username == 'true'
       # ref https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
@@ -54,7 +56,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
+        godot -v --export${DEBUG_BUILD} "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
     - name: Copy Hard-Coded Save
       run: |
         if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
@@ -68,6 +70,10 @@ jobs:
     container:
       image: barichello/godot-ci:mono-3.4
     steps:
+    - name: Optionally set DEBUG_BUILD
+      if: github.event.inputs.debug-build == 'true'
+      run: |
+        echo "DEBUG_BUILD=-debug" >> $GITHUB_ENV
     - name: Optionally set GH_USERNAME
       if: github.event.inputs.include-username == 'true'
       # ref https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
@@ -92,7 +98,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
+        godot -v --export${DEBUG_BUILD} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
     - name: Copy Hard-Coded Save
       run: |
         if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
@@ -109,6 +115,10 @@ jobs:
     container:
       image: barichello/godot-ci:mono-3.4
     steps:
+    - name: Optionally set DEBUG_BUILD
+      if: github.event.inputs.debug-build == 'true'
+      run: |
+        echo "DEBUG_BUILD=-debug" >> $GITHUB_ENV
     - name: Optionally set GH_USERNAME
       if: github.event.inputs.include-username == 'true'
       # ref https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
@@ -133,7 +143,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export "Mac OSX" ../build/${FOLDER_NAME}/${EXPORT_NAME}.zip
+        godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}/${EXPORT_NAME}.zip
     - name: Copy Hard-Coded Save
       run: |
         if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
