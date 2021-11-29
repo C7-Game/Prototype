@@ -41,7 +41,7 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		controller = CreateGame.createGame(genBasicTerrainNoiseMap);
+		controller = CreateGame.createGame();
 		var map = MapInteractions.GetWholeMap();
 		Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall);
 		baseTerrainMap.Civ3Tiles = map.tiles;
