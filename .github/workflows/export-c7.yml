@@ -10,7 +10,6 @@ on:
         - release
       folder-suffix:
         description: Will be added to "C7" for folder name
-        default: -dev-build
         required: false
       include-username:
         type: boolean
