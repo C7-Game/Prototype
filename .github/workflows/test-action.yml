@@ -2,49 +2,17 @@ name: Test Action
 on:
   workflow_dispatch:
     inputs:
-      build-type:
+      drink-order:
         type: choice
-        description: This selection does nothing yet
+        description: Drink Order
         options:
-        - debug
-        - release
-      folder-suffix:
-        description: Will be added to "C7" for folder name
-        default: -dev-build
-        required: false
-      include-username:
-        type: boolean
-        description: Append your GitHub username to the folder name
-        default: true
-      include-datetime:
-        type: boolean
-        description: Append ISO8601 date/time to folder name
-        default: true
-
-env:
-  GODOT_VERSION: 3.4
-  EXPORT_NAME: C7
+        - Pan-Galactic Gargle Blaster
+        - Tea
 
 jobs:
   do-a-thing:
     runs-on: ubuntu-latest
-    steps:
-    - name: Optionally set GH_USERNAME
-      if: github.event.inputs.include-username == 'true'
-      # ref https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
-      run: |
-        echo "GH_USERNAME=-${{ github.actor }}" >> $GITHUB_ENV
-    - name: Optionally set BUILD_TIME
-      if: github.event.inputs.include-datetime == 'true'
-      run: |
-        echo "BUILD_TIME=-$(date --iso-8601=minutes | sed -e 's/:/-/g' | sed -e 's/\+.*//')" >> $GITHUB_ENV
-    - name: Set FOLDER_NAME
-      run: |
-        echo "FOLDER_NAME=${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}${BUILD_TIME}" >> $GITHUB_ENV
     - name: Echo some stuff
       run: |
         echo "I did a thing"
-        echo "Build type is ${{ github.event.inputs.build-type }}"
-        echo "include-username set to ${{ github.event.inputs.include-username }}"
-        date --iso-8601=minutes | sed -e 's/:/-/g' | sed -e 's/\+.*//'
-        echo "Folder/file names will be ${FOLDER_NAME}"
+        echo "Here is your ${{ github.event.inputs.drink-order }}"
