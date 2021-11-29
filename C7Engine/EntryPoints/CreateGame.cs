@@ -11,7 +11,7 @@ namespace C7Engine
          * quickly.  By keeping all the client-callable APIs in the EntryPoints folder,
          * hopefully it won't be too much of a goose hunt to refactor it later if we decide to do so.
          **/
-        public static Player createGame(string loadFilePath = @"./c7-static-map-save.json", string defaultBicPath = "")
+        public static Player createGame(string loadFilePath, string defaultBicPath)
         {
             C7SaveFormat save;
             if (loadFilePath.EndsWith("SAV", System.StringComparison.CurrentCultureIgnoreCase))
