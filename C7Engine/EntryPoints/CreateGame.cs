@@ -11,11 +11,16 @@ namespace C7Engine
          * quickly.  By keeping all the client-callable APIs in the EntryPoints folder,
          * hopefully it won't be too much of a goose hunt to refactor it later if we decide to do so.
          **/
-        public static Player createGame(GameMap.TerrainNoiseMapGenerator terrainGen)
+        public static Player createGame(string loadFilePath, string defaultBicPath)
         {
-            // I think this path is relative from the C7 folder, not C7GameEngine, if that matters
-            // TODO: Unsure if this will work when exported for distribution
-            C7SaveFormat save = C7SaveFormat.Load(@"./c7-static-map-save.json");
+            C7SaveFormat save;
+            if (loadFilePath.EndsWith("SAV", System.StringComparison.CurrentCultureIgnoreCase))
+            {
+                save = ImportCiv3.ImportSav(loadFilePath, defaultBicPath);
+            }
+            else {
+                save = C7SaveFormat.Load(loadFilePath);
+            }
             EngineStorage.setGameData(save.GameData);
             // possibly do something with save.Rules here when it exists
             // and maybe consider if we have any need to keep a reference to the save object handy...probably not

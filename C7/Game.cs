@@ -32,6 +32,8 @@ public class Game : Node2D
 	private KinematicBody2D Player;
 
 	Stopwatch loadTimer = new Stopwatch();
+	GlobalSingleton Global;
+
 
 	public override void _EnterTree()
 	{
@@ -41,7 +43,9 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		controller = CreateGame.createGame(genBasicTerrainNoiseMap);
+		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
+		controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
+		Global.ResetLoadGamePath();
 		var map = MapInteractions.GetWholeMap();
 		Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall);
 		baseTerrainMap.Civ3Tiles = map.tiles;
