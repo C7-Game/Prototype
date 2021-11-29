@@ -28,7 +28,7 @@ export-c7.yml has 3 jobs:
     a file is opened from the load game button. The Mac build script is a little different
     than the others in that the copy save task uses `zip` to place the file into the export.
 
-Things I've learned about actions:
+## Things I've learned about actions
 
 - To set an environment variable in a script, echo the setting into $GITHUB_ENV like `echo "MYVAR=my value" >> $GITHUB_ENV` https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions#environment-files
 - After setting a variable as such, it is not available until the next step
@@ -40,7 +40,7 @@ Things I've learned about actions:
 - `workflow_dispatch` jobs can only run if they are in the repo default directory; this unfortunately makes for a lot of commit spam while testing and debugging, but the flow can run against any branch
 - Other triggers can be in their own branches and work, like `on: [push]`
 
-A very brief tour of the GitHub Actions structure
+## A very brief tour of the GitHub Actions structure
 
 ``` yaml
 name: The name of the action, visible in actions tab
