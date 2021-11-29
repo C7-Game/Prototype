@@ -136,8 +136,8 @@ public class Game : Node2D
 		// If the newly selected unit's tile is not close to the center of the screen, then move the camera to it. Otherwise just trigger a
 		// redraw (not necessary in the first case since moving the map triggers a redraw automatically).
 		if (unit != MapUnit.NONE) {
-			var screenCenter = new Vector2((float)0.5, (float)0.5);
-			if (mapView.screenLocationOfTile(unit.location, true).DistanceTo(screenCenter) > 0.35)
+			var relativeScreenLocation = mapView.screenLocationOfTile(unit.location, true) / mapView.getVisibleAreaSize();
+			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
 				mapView.centerCameraOnTile(unit.location);
 			else
 				mapView.onVisibleAreaChanged();
@@ -356,6 +356,13 @@ public class Game : Node2D
 					}
 					mapView.onVisibleAreaChanged();
 				}
+			}
+			// I key toggles the grid. This should be CTRL+G to match the original game but that key combination gets intercepted by the
+			// unit action handler.
+			else if (eventKey.Scancode == (int)Godot.KeyList.I)
+			{
+				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
+				mapView.onVisibleAreaChanged(); // Trigger redraw
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
