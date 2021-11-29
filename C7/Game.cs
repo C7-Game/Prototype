@@ -353,6 +353,13 @@ public class Game : Node2D
 					mapView.onVisibleAreaChanged();
 				}
 			}
+			// I key toggles the grid. This should be CTRL+G to match the original game but that key combination gets intercepted by the
+			// unit action handler.
+			else if (eventKey.Scancode == (int)Godot.KeyList.I)
+			{
+				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
+				mapView.onVisibleAreaChanged(); // Trigger redraw
+			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
 				GD.Print("Got request for escape/quit");

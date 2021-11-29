@@ -8,7 +8,7 @@ using C7Engine;
 // tile sprites from a TileSet at fixed locations. They can draw anything, anywhere, although drawing is still tied to tiles for visibility
 // purposes. The MapView contains a list of loose layers, each one an object that implements ILooseLayer. Right now to add a new layer you must modify
 // the MapView constructor to add it to the list, but (TODO) eventually that will be made moddable.
-public interface ILooseLayer {
+public abstract class LooseLayer {
 	// drawObject draws the things this layer is supposed to draw that are associated with the given tile. Its parameters are:
 	//   looseView: The Node2D to actually draw to, e.g., use looseView.DrawCircle(...) to draw a circle. This object also contains a reference to
 	//     the MapView in case you need it.
@@ -16,10 +16,13 @@ public interface ILooseLayer {
 	//     view. The same tile may be drawn multiple times at different locations due to edge wrapping.
 	//   tileCenter: The location to draw to. You should draw around this location without adjusting for the camera location or zoom since the
 	//     MapView already transforms the looseView node to account for those things.
-	void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
+	public abstract void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
+
+	// The layer will be skipping during map drawing if visible is false
+	public bool visible = true;
 }
 
-public class TerrainLayer : ILooseLayer {
+public class TerrainLayer : LooseLayer {
 
 	public static readonly Vector2 terrainSpriteSize = new Vector2(128, 64);
 
@@ -50,16 +53,34 @@ public class TerrainLayer : ILooseLayer {
 		return tr;
 	}
 
-	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		int xSheet = tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tile.ExtraInfo.BaseTerrainImageID / 9;
-		Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);;
-		var screenRect = new Rect2(tileCenter - (float)0.5 * terrainSpriteSize, terrainSpriteSize);
+		var texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);;
+		var terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
+		var screenRect = new Rect2(tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize);
 		looseView.DrawTextureRectRegion(tripleSheets[tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
 	}
 }
 
-public class UnitLayer : ILooseLayer {
+public class GridLayer : LooseLayer {
+	public Color color = Color.Color8(50, 50, 50, 150);
+	public float lineWidth = (float)1.0;
+
+	public GridLayer() {}
+
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		var cS = MapView.cellSize;
+		var left  = tileCenter + new Vector2(-cS.x,  0   );
+		var top   = tileCenter + new Vector2( 0   , -cS.y);
+		var right = tileCenter + new Vector2( cS.x,  0   );
+		looseView.DrawLine(left, top  , color, lineWidth);
+		looseView.DrawLine(top , right, color, lineWidth);
+	}
+}
+
+public class UnitLayer : LooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
@@ -84,7 +105,7 @@ public class UnitLayer : ILooseLayer {
 			return Color.Color8(255, 0, 0);
 	}
 
-	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.unitsOnTile.Count == 0)
 			return;
@@ -148,7 +169,7 @@ public class UnitLayer : ILooseLayer {
 	}
 }
 
-public class BuildingLayer : ILooseLayer {
+public class BuildingLayer : LooseLayer {
 	private ImageTexture buildingsTex;
 	private Vector2 buildingSpriteSize;
 
@@ -159,7 +180,7 @@ public class BuildingLayer : ILooseLayer {
 		buildingSpriteSize = new Vector2((float)buildingsTex.GetWidth() / 3, (float)buildingsTex.GetHeight() / 4);
 	}
 
-	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.hasBarbarianCamp) {
 			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize);
@@ -172,7 +193,7 @@ public class BuildingLayer : ILooseLayer {
 
 public class LooseView : Node2D {
 	public MapView mapView;
-	public List<ILooseLayer> layers = new List<ILooseLayer>();
+	public List<LooseLayer> layers = new List<LooseLayer>();
 
 	public LooseView(MapView mapView)
 	{
@@ -184,7 +205,7 @@ public class LooseView : Node2D {
 		base._Draw();
 
 		var map = MapInteractions.GetWholeMap();
-		foreach (var layer in layers)
+		foreach (var layer in layers.FindAll(L => L.visible))
 			foreach (var vT in mapView.visibleTiles()) {
 				int x = mapView.wrapTileX(vT.virtTileX);
 				int y = mapView.wrapTileY(vT.virtTileY);
@@ -231,6 +252,8 @@ public class MapView : Node2D {
 
 	private LooseView looseView;
 
+	public GridLayer gridLayer { get; private set; }
+
 	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
 	{
 		this.game = game;
@@ -241,6 +264,8 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
+		gridLayer = new GridLayer();
+		looseView.layers.Add(gridLayer);
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 
@@ -298,7 +323,7 @@ public class MapView : Node2D {
 	{
 		int upperLeftX, upperLeftY;
 		tileCoordsOnScreenAt(new Vector2(0, 0), out upperLeftX, out upperLeftY);
-		Vector2 mapViewSize = new Vector2(2, 2) + getVisibleAreaSize() / scaledCellSize;
+		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		for (int dy = -2; dy < mapViewSize.y; dy++) {
 			int y = upperLeftY + dy;
 			if (isRowAt(y))
