@@ -62,8 +62,8 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: C7-Windows
-        path: build/${FOLDER_NAME}
+        name: ${{ env.FOLDER_NAME }}-Windows
+        path: build/${{ ENV.FOLDER_NAME }}
   Export-C7-Linux:
     runs-on: ubuntu-latest
     container:
@@ -99,12 +99,12 @@ jobs:
         if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
     - name: Create Tar Archive
       run: |
-        tar -C build -zcvf build/${EXPORT_NAME}.tgz ${FOLDER_NAME}
+        tar -C build -zcvf build/${FOLDER_NAME}.tgz ${FOLDER_NAME}
     - name: Upload  Artifact
       uses: actions/upload-artifact@v2
       with:
         path: build/${{ env.FOLDER_NAME }}.tgz
-        name: C7-Linux-x86_64
+        name: ${{ env.FOLDER_NAME }}-Linux-x86_64
   Export-C7-Mac:
     runs-on: ubuntu-latest
     container:
@@ -140,9 +140,9 @@ jobs:
         if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
     - name: Create Tar Archive
       run: |
-        tar -C build -zcvf build/${EXPORT_NAME}.tgz ${FOLDER_NAME}
+        tar -C build -zcvf build/${FOLDER_NAME}.tgz ${FOLDER_NAME}
     - name: Upload  Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: C7-Mac
+        name: ${{ env.FOLDER_NAME }}-Mac
         path: build/${{ env.FOLDER_NAME }}.tgz
