@@ -134,15 +134,12 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export "Mac OSX" ../build/${FOLDER_NAME}/${EXPORT_NAME}.dmg
+        godot -v --export "Mac OSX" ../build/${FOLDER_NAME}/${EXPORT_NAME}.zip
     - name: Copy Hard-Coded Save
       run: |
         if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
-    - name: Create Tar Archive
-      run: |
-        tar -C build -zcvf build/${FOLDER_NAME}.tgz ${FOLDER_NAME}
     - name: Upload  Artifact
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.FOLDER_NAME }}-Mac
-        path: build/${{ env.FOLDER_NAME }}.tgz
+        path: build/${{ env.FOLDER_NAME }}
