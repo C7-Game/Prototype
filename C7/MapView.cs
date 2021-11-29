@@ -150,7 +150,7 @@ public class UnitLayer : LooseLayer {
 			if (hpHeight < 1)
 				hpHeight = 1;
 			var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
-			                               new Vector2(hpIndWidth - 2, hpHeight)); // size
+										   new Vector2(hpIndWidth - 2, hpHeight)); // size
 			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
 			if (unit.isFortified)
 				looseView.DrawRect(hpIndBackgroundRect, white, false);
@@ -192,7 +192,7 @@ public class BuildingLayer : LooseLayer {
 	}
 }
 
-public class CityLayer : ILooseLayer {
+public class CityLayer : LooseLayer {
 	private ImageTexture cityTexture;
 	private Vector2 citySpriteSize;
 
@@ -203,7 +203,7 @@ public class CityLayer : ILooseLayer {
 		this.citySpriteSize = new Vector2(167, 95);
 	}
 
-	public void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.cityAtTile != null) {
 			City city = tile.cityAtTile;
