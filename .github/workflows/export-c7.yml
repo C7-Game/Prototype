@@ -59,7 +59,12 @@ jobs:
         godot -v --export${DEBUG_BUILD} "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
     - name: Copy Hard-Coded Save
       run: |
-        if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
+        if cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/
+        then
+          echo "successfully copied json save to build"
+        else
+          echo "::warning title=Json Save Copy Failed::Failed to add the hard-coded save to the build"
+        fi
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
@@ -101,7 +106,12 @@ jobs:
         godot -v --export${DEBUG_BUILD} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
     - name: Copy Hard-Coded Save
       run: |
-        if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
+        if cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/
+        then
+          echo "successfully copied json save to build"
+        else
+          echo "::warning title=Json Save Copy Failed::Failed to add the hard-coded save to the build"
+        fi
     - name: Create Tar Archive
       run: |
         tar -C build -zcvf build/${FOLDER_NAME}.tgz ${FOLDER_NAME}
@@ -143,12 +153,18 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}/${EXPORT_NAME}.zip
+        godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip
     - name: Copy Hard-Coded Save
       run: |
-        if [ -f ${EXPORT_NAME}/c7-static-map-save.json ]; then cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/; fi
+        cd ${EXPORT_NAME}
+        if zip ../build/${FOLDER_NAME}.zip c7-static-map-save.json
+        then
+          echo "successfully copied json save to build"
+        else
+          echo "::warning title=Json Save Copy Failed::Failed to add the hard-coded save to the build"
+        fi
     - name: Upload  Artifact
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.FOLDER_NAME }}-Mac
-        path: build/${{ env.FOLDER_NAME }}
+        path: build/${{ env.FOLDER_NAME }}.zip
