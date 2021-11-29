@@ -464,7 +464,7 @@ public class Game : Node2D
 	{
 		GD.Print("The user decided to build the city of " + name);
 		Tile theTile = this.CurrentlySelectedUnit.location;
-		CityInteractions.BuildCity(theTile.xCoordinate, theTile.yCoordinate, name);
+		CityInteractions.BuildCity(theTile.xCoordinate, theTile.yCoordinate, controller.guid, name);
 
 		//Also dismantle the unit.  For now, I am considering that equivalent to
 		//disbanding.  Whether that makes sense long term, is debatable.

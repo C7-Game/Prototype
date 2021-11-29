@@ -89,10 +89,10 @@ namespace C7GameData
             chariot.movement = 2;
             chariot.iconIndex = 10;
 
-            createDummyUnit(settler, humanPlayer,  6, 6);
-            createDummyUnit(warrior, humanPlayer,  8, 6);
-            createDummyUnit(worker , humanPlayer, 10, 6);
-            createDummyUnit(chariot, humanPlayer, 12, 6);
+            createDummyUnit(settler, humanPlayer,  20, 26);
+            createDummyUnit(warrior, humanPlayer,  22, 26);
+            createDummyUnit(worker , humanPlayer, 24, 26);
+            createDummyUnit(chariot, humanPlayer, 26, 26);
 
             var startingLocations = map.generateStartingLocations(rng, 10, 10);
             foreach (var sL in startingLocations)
