@@ -20,19 +20,24 @@ namespace QueryCiv3
             get => (uint)this.ReadInt32(12 + this.SectionOffset("VER#", 1)) != (uint)0xcdcdcdcd;
         }
         public bool IsGameFile {get; protected set;}
+        public bool IsBicFile {get; protected set;}
         public Civ3File(byte[] fileBytes)
         {
-            IsGameFile = false;
             this.FileData = fileBytes;
-            // TODO: Check for CIV3 or BIC header?
             Sections = PopulateSections(FileData);
             byte[] Civ3Bytes = new byte[]{0x43, 0x49, 0x56, 0x33};
+            byte[] BicBytes = new byte[]{0x42, 0x49, 0x43};
             IsGameFile = true;
+            IsBicFile = true;
             for(int i=0; i < 4; i++)
             {
                 if(FileData[i] != Civ3Bytes[i])
                 {
                     IsGameFile = false;
+                }
+                if(i < 3 && FileData[i] != BicBytes[i])
+                {
+                    IsBicFile = false;
                 }
             }
         }
