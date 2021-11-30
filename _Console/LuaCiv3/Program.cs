@@ -16,17 +16,16 @@ namespace LuaCiv3
             byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(civ3Path + @"/Conquests/conquests.biq");
             foreach (string path in args)
             {
-                Console.WriteLine(path);
                 if (path.EndsWith("SAV", StringComparison.CurrentCultureIgnoreCase))
                 {
                     SavData sav = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(path), defaultBicBytes);
-                    DynValue _ = lua.Call(lua.Globals["process_save"], sav);
+                    DynValue _ = lua.Call(lua.Globals["process_save"], sav, path);
                 }
                 else
                 {
                     byte[] bicBytes = QueryCiv3.Util.ReadFile(path);
                     BicData bic = new QueryCiv3.BicData(QueryCiv3.Util.ReadFile(path));
-                    DynValue _ = lua.Call(lua.Globals["process_bic"], bic);
+                    DynValue _ = lua.Call(lua.Globals["process_bic"], bic, path);
                 }
             }
             DynValue __ = lua.Call(lua.Globals["show_results"]);

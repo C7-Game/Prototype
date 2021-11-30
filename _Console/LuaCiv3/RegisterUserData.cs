@@ -10,6 +10,7 @@ namespace LuaCiv3
             UserData.RegisterType<SavData>();
             UserData.RegisterType<BicData>();
             UserData.RegisterType<Civ3File>();
+            UserData.RegisterType<Civ3Section>();
             UserData.RegisterType<GameSection>();
             UserData.RegisterType<WrldSection>();
             UserData.RegisterType<MapTile>();

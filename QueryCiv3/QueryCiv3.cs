@@ -14,7 +14,7 @@ namespace QueryCiv3
         // NOTE: .NET 5 and later require a Nuget package and Encoder registration for these older encoding pages
         public int Civ3StringEncoding = 1252;
         protected internal byte[] FileData;
-        protected internal Civ3Section[] Sections;
+        public Civ3Section[] Sections { get; protected set; }
         public bool HasCustomBic
         {
             get => (uint)this.ReadInt32(12 + this.SectionOffset("VER#", 1)) != (uint)0xcdcdcdcd;
