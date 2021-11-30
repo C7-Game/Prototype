@@ -26,17 +26,11 @@ function process_bic (bic, path)
     pcall(io.write(hex_dump(foo)))
     io.write("\n")
     table.insert(byte_chunks, foo)
-    local bldg = false
-    local wchr = false
-    for k, v in ipairs(bic.bic.sections) do
-        if v.name == string.upper("BLDG") then bldg = true end
-        if v.name == string.upper("wchr") then wchr = true end
-    end
-    if bldg then
+    if bic.bic.sectionExists(string.upper("BLDG")) then
         num_bic_with_bldg = num_bic_with_bldg + 1
         byte_chunks[idx]["bldg"] = true
     end
-    if wchr then
+    if bic.bic.sectionExists(string.upper("WCHR")) then
         num_bic_with_wchr = num_bic_with_wchr + 1
         byte_chunks[idx]["wchr"] = true
     end
