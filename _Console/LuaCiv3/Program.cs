@@ -20,7 +20,7 @@ namespace LuaCiv3
                 if (path.EndsWith("SAV", StringComparison.CurrentCultureIgnoreCase))
                 {
                     SavData sav = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(path), defaultBicBytes);
-                    DynValue _ = lua.Call(lua.Globals["process_sav"], sav);
+                    DynValue _ = lua.Call(lua.Globals["process_save"], sav);
                 }
                 else
                 {
@@ -29,6 +29,7 @@ namespace LuaCiv3
                     DynValue _ = lua.Call(lua.Globals["process_bic"], bic);
                 }
             }
+            DynValue __ = lua.Call(lua.Globals["show_results"]);
         }
     }
 }
