@@ -6,6 +6,7 @@ namespace QueryCiv3
     public class SavData
     {
         public BicData Bic;
+        public BicData MediaBic;
         public Civ3File Sav;
         public byte[] DefaultBic;
         public GameSection Game;
@@ -49,7 +50,11 @@ namespace QueryCiv3
         {
             if(HasCustomBic)
             {
-                Bic = new BicData(CustomBic);
+                MediaBic = new BicData(CustomBic);
+                if(MediaBic.HasCustomRules)
+                    Bic = MediaBic;
+                else
+                    Bic = new BicData(DefaultBic);
             }
             else
             {
