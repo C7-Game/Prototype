@@ -10,6 +10,34 @@ namespace QueryCiv3
         public byte[] DefaultBic;
         public GameSection Game;
         public WrldSection Wrld;
+        public bool HasCustomBic
+        {
+            get => (uint)Sav.ReadInt32(12 + Sav.SectionOffset("VER#", 1)) != (uint)0xcdcdcdcd;
+        }
+        public byte[] CustomBic
+        { get {
+            if(HasCustomBic)
+            {
+                int Start;
+                int End;
+                try { Start = Sav.SectionOffset("BICX", 1); }
+                catch
+                {
+                    try { Start = Sav.SectionOffset("BICQ", 1); }
+                    catch { Start = Sav.SectionOffset("BIC ", 1); }
+                }
+                // Offset doesn't include section header bytes
+                Start -= 4;
+                try {
+                    End = Sav.SectionOffset("GAME", 2) - 4;
+                }
+                catch { End = Sav.FileData.Length; }
+                List<byte> CustomBic = new List<byte>();
+                for(int i=Start; i<End; i++) { CustomBic.Add(Sav.FileData[i]); }
+                return CustomBic.ToArray();
+            }
+            return null;
+        }}
         public SavData(byte[] savBytes, byte[] defaultBic)
         {
             // TODO: Should I just take a BicData instead of byte array?
@@ -19,9 +47,9 @@ namespace QueryCiv3
         }
         protected void Init()
         {
-            if(Sav.HasCustomBic)
+            if(HasCustomBic)
             {
-                Bic = new BicData(Sav.CustomBic);
+                Bic = new BicData(CustomBic);
             }
             else
             {
