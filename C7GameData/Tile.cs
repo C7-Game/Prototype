@@ -11,6 +11,7 @@ namespace C7GameData
         public int xCoordinate;
         public int yCoordinate;
         public TerrainType terrainType;
+        public TerrainType overlayTerrainType;
         public City cityAtTile;
         public bool hasBarbarianCamp = false;
 

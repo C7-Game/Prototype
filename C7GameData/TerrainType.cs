@@ -9,5 +9,10 @@ namespace C7GameData
         public int movementCost {get; set; }
 
         //some stuff about graphics would probably make sense, too
+
+        public override string ToString()
+        {
+            return name + "(" + baseFoodProduction + ", " + baseShieldProduction + ", " + baseCommerceProduction + ")";
+        }
     }
 }

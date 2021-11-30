@@ -64,6 +64,33 @@ public class TerrainLayer : LooseLayer {
 	}
 }
 
+public class HillsLayer : LooseLayer {
+	public static readonly Vector2 mountainSize = new Vector2(124, 88);
+	public static readonly Vector2 hillsSize = new Vector2(128, 72);
+	private ImageTexture mountainTexture;
+	private ImageTexture hillsTexture;
+
+	public HillsLayer() {
+		//1st pass: just show the same mountain every time
+		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx", 0, 0, 128, 88);
+		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx", 0, 0, 128, 72);
+	}
+
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		if (tile.overlayTerrainType.name == "Mountain") {
+			Rect2 mountain = new Rect2(0, 0, mountainSize);
+			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
+			looseView.DrawTextureRectRegion(mountainTexture, screenRect, mountain);
+		}
+		else if (tile.overlayTerrainType.name == "Hills") {
+			Rect2 hills = new Rect2(0, 0, hillsSize);
+			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
+			looseView.DrawTextureRectRegion(hillsTexture, screenRect, hills);
+		}
+	}
+}
+
 public class GridLayer : LooseLayer {
 	public Color color = Color.Color8(50, 50, 50, 150);
 	public float lineWidth = (float)1.0;
@@ -397,6 +424,7 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
+		looseView.layers.Add(new HillsLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);
 		looseView.layers.Add(new BuildingLayer());
