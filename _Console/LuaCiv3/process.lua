@@ -20,10 +20,10 @@ end
 
 -- called for each bic
 function process_bic (bic, path)
-    -- io.write("\n", path, "\n")
+    io.write("\n", path, "\n")
     -- print(bic.bic.getString(0,4))
     local foo = bic.bic.getBytes(offset, num_bytes)
-    pcall(io.write(hex_dump(foo)))
+    -- pcall(io.write(hex_dump(foo)))
     io.write("\n")
     table.insert(byte_chunks, foo)
     if bic.bic.sectionExists(string.upper("BLDG")) then
@@ -35,6 +35,7 @@ function process_bic (bic, path)
         byte_chunks[idx]["wchr"] = true
     end
     if bldg and wchr then num_bic_with_both = num_bic_with_both + 1 end
+    io.write(tostring(bic.hasCustomRules) .. " " .. tostring(bic.hasCustomMap) .. "\n")
     idx = idx + 1
 end
 
