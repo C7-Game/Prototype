@@ -6,6 +6,9 @@ namespace QueryCiv3
     public class BicData
     {
         public Civ3File Bic;
+        public bool HasCustomRules => Bic.SectionExists("BLDG");
+        public bool HasCustomMap => Bic.SectionExists("WCHR");
+
         public BicData(byte[] bicBytes)
         {
             Bic = new Civ3File(bicBytes);

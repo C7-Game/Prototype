@@ -15,10 +15,6 @@ namespace QueryCiv3
         public int Civ3StringEncoding = 1252;
         protected internal byte[] FileData;
         public Civ3Section[] Sections { get; protected set; }
-        public bool HasCustomBic
-        {
-            get => (uint)this.ReadInt32(12 + this.SectionOffset("VER#", 1)) != (uint)0xcdcdcdcd;
-        }
         public bool IsGameFile {get; protected set;}
         public bool IsBicFile {get; protected set;}
         public Civ3File(byte[] fileBytes)
@@ -41,30 +37,6 @@ namespace QueryCiv3
                 }
             }
         }
-        public byte[] CustomBic
-        { get {
-            if(HasCustomBic)
-            {
-                int Start;
-                int End;
-                try { Start = SectionOffset("BICX", 1); }
-                catch
-                {
-                    try { Start = SectionOffset("BICQ", 1); }
-                    catch { Start = SectionOffset("BIC ", 1); }
-                }
-                // Offset doesn't include section header bytes
-                Start -= 4;
-                try {
-                    End = SectionOffset("GAME", 2) - 4;
-                }
-                catch { End = this.FileData.Length; }
-                List<byte> CustomBic = new List<byte>();
-                for(int i=Start; i<End; i++) { CustomBic.Add(FileData[i]); }
-                return CustomBic.ToArray();
-            }
-            return null;
-        }}
         public Boolean SectionExists(string sectionName)
         {
             bool result = false;
