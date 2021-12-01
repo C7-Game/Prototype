@@ -59,6 +59,7 @@ namespace QueryCiv3
             else
             {
                 Bic = new BicData(DefaultBic);
+                MediaBic = Bic;
             }
             Wrld = new WrldSection(this);
             Game = new GameSection(this);
