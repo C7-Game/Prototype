@@ -384,6 +384,7 @@ public class MapView : Node2D {
 	}
 
 	private LooseView looseView;
+	private ShaderMaterial testShaderMaterial;
 
 	public GridLayer gridLayer { get; private set; }
 
@@ -404,9 +405,19 @@ public class MapView : Node2D {
 		looseView.layers.Add(new CityLayer());
 
 		AddChild(looseView);
-		AddChild(createMeshShaderTest());
+
+		testShaderMaterial = createTestShaderMaterial();
+		AddChild(createMeshShaderTest(testShaderMaterial));
 
 		onVisibleAreaChanged();
+	}
+
+	public override void _Process(float delta)
+	{
+		var r = 0.5 + 0.5 * Math.Sin((double)OS.GetTicksMsec() / 200.0);
+		var g = 0.5 + 0.5 * Math.Cos((double)OS.GetTicksMsec() / 200.0);
+		var b = 0.5 + 0.5 * Math.Sin((double)OS.GetTicksMsec() / 400.0);
+		testShaderMaterial.SetShaderParam("civColor", new Vector3((float)r, (float)g, (float)b));
 	}
 
 	public ShaderMaterial createTestShaderMaterial()
@@ -437,6 +448,14 @@ public class MapView : Node2D {
 		shader_type canvas_item;
 		uniform sampler2D palette;
 		uniform sampler2D indices;
+		uniform vec3 civColor;
+
+		vec4 applyCivColor(vec4 refColor)
+		{
+			// Return civColor with its brightness scaled by the red channel of refColor. I don't know if this is how the original game
+			// does it but it looks good enough.
+			return vec4(refColor.r * civColor, refColor.a);
+		}
 
 		void fragment()
 		{
@@ -444,7 +463,11 @@ public class MapView : Node2D {
 			if (colorIndex >= 254) // indices 254 and 255 are transparent
 				discard;
 			ivec2 paletteCoords = ivec2(colorIndex % 16, colorIndex / 16);
-			COLOR = texture(palette, vec2(paletteCoords) / 16.0);
+			vec4 refColor = texture(palette, vec2(paletteCoords) / 16.0);
+			if (colorIndex <= 48) // first 48 colors are tinted by civ (I think, just going by eye)
+				COLOR = applyCivColor(refColor);
+			else
+				COLOR = refColor;
 		}
 		";
 		var shader = new Shader();
@@ -454,28 +477,19 @@ public class MapView : Node2D {
 		tr.Shader = shader;
 		tr.SetShaderParam("palette", texPalette);
 		tr.SetShaderParam("indices", texIndices);
+		tr.SetShaderParam("civColor", new Vector3(0.4f, 0.4f, 1));
 		return tr;
 	}
 
-	public MeshInstance2D createMeshShaderTest()
+	public MeshInstance2D createMeshShaderTest(ShaderMaterial shaderMaterial)
 	{
 		var tr = new MeshInstance2D();
 		var mesh = new QuadMesh();
 		mesh.Size = new Vector2(300, 300);
 		tr.Mesh = mesh;
-		tr.Material = createTestShaderMaterial();
+		tr.Material = shaderMaterial;
 		tr.Position = new Vector2(400, 200);
 		tr.Scale = new Vector2(2, -1); // Scale Y by -1 to flip vertically, otherwise it will be drawn upside-down
-		return tr;
-	}
-
-	public Sprite createSpriteShaderTest()
-	{
-		var tr = new Sprite();
-		tr.Position = new Vector2(400, 200);
-		tr.Scale = new Vector2(4, 2);
-		tr.Texture = Util.LoadTextureFromPCX("Art/TileInfo.pcx"); // Placeholder texture until we can draw meshes instead
-		tr.Material = createTestShaderMaterial();
 		return tr;
 	}
 
