@@ -14,52 +14,42 @@ namespace QueryCiv3
         // NOTE: .NET 5 and later require a Nuget package and Encoder registration for these older encoding pages
         public int Civ3StringEncoding = 1252;
         protected internal byte[] FileData;
-        protected internal Civ3Section[] Sections;
-        public bool HasCustomBic
-        {
-            get => (uint)this.ReadInt32(12 + this.SectionOffset("VER#", 1)) != (uint)0xcdcdcdcd;
-        }
+        public Civ3Section[] Sections { get; protected set; }
         public bool IsGameFile {get; protected set;}
+        public bool IsBicFile {get; protected set;}
         public Civ3File(byte[] fileBytes)
         {
-            IsGameFile = false;
             this.FileData = fileBytes;
-            // TODO: Check for CIV3 or BIC header?
             Sections = PopulateSections(FileData);
             byte[] Civ3Bytes = new byte[]{0x43, 0x49, 0x56, 0x33};
+            byte[] BicBytes = new byte[]{0x42, 0x49, 0x43};
             IsGameFile = true;
+            IsBicFile = true;
             for(int i=0; i < 4; i++)
             {
                 if(FileData[i] != Civ3Bytes[i])
                 {
                     IsGameFile = false;
                 }
+                if(i < 3 && FileData[i] != BicBytes[i])
+                {
+                    IsBicFile = false;
+                }
             }
         }
-        public byte[] CustomBic
-        { get {
-            if(HasCustomBic)
+        public Boolean SectionExists(string sectionName)
+        {
+            bool result = false;
+            foreach (Civ3Section section in Sections)
             {
-                int Start;
-                int End;
-                try { Start = SectionOffset("BICX", 1); }
-                catch
+                if (section.Name == sectionName)
                 {
-                    try { Start = SectionOffset("BICQ", 1); }
-                    catch { Start = SectionOffset("BIC ", 1); }
+                    result = true;
+                    break;
                 }
-                // Offset doesn't include section header bytes
-                Start -= 4;
-                try {
-                    End = SectionOffset("GAME", 2) - 4;
-                }
-                catch { End = this.FileData.Length; }
-                List<byte> CustomBic = new List<byte>();
-                for(int i=Start; i<End; i++) { CustomBic.Add(FileData[i]); }
-                return CustomBic.ToArray();
             }
-            return null;
-        }}
+            return result;
+        }
         protected internal Civ3Section[] PopulateSections(byte[] Data)
         {
             int Count = 0;

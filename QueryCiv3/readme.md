@@ -4,6 +4,8 @@ QueryCiv3 is an assembly designed to read a Civilization III SAV or BIQ file, id
 
 It is a C# port of my [Go library in c3sat](https://github.com/myjimnelson/c3sat/tree/master/queryciv3).
 
+**Note:** All file access (e.g. read file from path constructors) has intentionally been removed from SaveData, BicData, and Civ3File as they are intended to be exposed to user-made Lua scripts, and I don't want any potential paths to unintended system access.
+
 ## Methods
 
 - `Civ3File.SectionOffset(string name, int nth)` - Returns an int offset of the nth (1, 2, 3, etc.) occurrence of the named section header (GAME, TILE, CITY, etc.).
