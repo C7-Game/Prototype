@@ -53,9 +53,9 @@ public class Util
 			// NOTE: May need another replace for case-sensitive filesystmes (Mac/Linux)
 			// may have removed the need for this; checking.
 			// relModPath.Replace(@"\Civ3PTW\Scenarios\", @"\civ3PTW\Extras\"),
-			"Conquests/Conquests/" + relModPath,
-			"Conquests/Scenarios/" + relModPath,
-			"civ3PTW/Scenarios/" + relModPath,
+			"Conquests/Conquests" + relModPath,
+			"Conquests/Scenarios" + relModPath,
+			"civ3PTW/Scenarios" + relModPath,
 			"Conquests",
 			"civ3PTW",
 			""

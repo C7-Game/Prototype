@@ -7,6 +7,8 @@ namespace C7GameData
      */
     public class GameMap
     {
+        // This may not belong here, but I'm not sure where it should go just now
+        public string RelativeModPath = "";
         // TODO : protect setters while still allowing JSON deserialization
         public int numTilesWide { get; set; }
         public int numTilesTall { get; set; }

@@ -67,6 +67,8 @@ namespace C7GameData
                 };
                 c7Save.GameData.map.tiles.Add(c7Tile);
             }
+            // This probably doesn't belong here, but not sure where else to put it
+            c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.RelativeModPath;
             return c7Save;
         }
         
