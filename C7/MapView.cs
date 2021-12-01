@@ -420,23 +420,34 @@ public class MapView : Node2D {
 		testShaderMaterial.SetShaderParam("civColor", new Vector3((float)r, (float)g, (float)b));
 	}
 
-	public ShaderMaterial createTestShaderMaterial()
+	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
+	// color palette and the second is the size of the image itself and contains the indices in R8 format.
+	// TODO: Move this to Util with the other PCX loading stuff
+	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string file_path)
 	{
-		Pcx pcxUnits32 = Util.LoadPCX("Art/Units/units_32.pcx");
+		var pcx = Util.LoadPCX(file_path);
 
+		// Assume a 16x16 color palette
 		var imgPalette = new Image();
 		byte[] flatPalette = new byte[3*256];
 		for (int n = 0; n < 256; n++)
 			for (int k = 0; k < 3; k++)
-				flatPalette[k + 3 * n] = pcxUnits32.Palette[n, k];
+				flatPalette[k + 3 * n] = pcx.Palette[n, k];
 		imgPalette.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
 		var texPalette = new ImageTexture();
 		texPalette.CreateFromImage(imgPalette, 0);
 
 		var imgIndices = new Image();
-		imgIndices.CreateFromData(pcxUnits32.Width, pcxUnits32.Height, false, Image.Format.R8, pcxUnits32.ColorIndices);
+		imgIndices.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
 		var texIndices = new ImageTexture();
 		texIndices.CreateFromImage(imgIndices, 0);
+
+		return (texPalette, texIndices);
+	}
+
+	public ShaderMaterial createTestShaderMaterial()
+	{
+		var (palette, indices) = loadPalettizedPCX("Art/Units/units_32.pcx");
 
 		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
 		// broken on Godot because there's no way to create a texture with a compatible format. See:
@@ -475,8 +486,8 @@ public class MapView : Node2D {
 
 		var tr = new ShaderMaterial();
 		tr.Shader = shader;
-		tr.SetShaderParam("palette", texPalette);
-		tr.SetShaderParam("indices", texIndices);
+		tr.SetShaderParam("palette", palette);
+		tr.SetShaderParam("indices", indices);
 		tr.SetShaderParam("civColor", new Vector3(0.4f, 0.4f, 1));
 		return tr;
 	}
