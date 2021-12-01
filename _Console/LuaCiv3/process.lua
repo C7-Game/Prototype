@@ -13,9 +13,29 @@ num_bic_with_bldg = 0
 num_bic_with_wchr = 0
 num_bic_with_both = 0
 
+tile_off = {}
+num_mountains = 0
+
 -- called for each sav
 function process_save (sav, path)
-    print(sav.sav.getString(0,4))
+    -- print(sav.sav.getString(0,4))
+    local mount = false
+    for i=18,23 do
+        tile_off[i] = {}
+        for ii, tile in ipairs(sav.tile) do
+            if tile.overlayTerrain == 6 then
+                io.write("Mountain! ")
+                if not mount then num_mountains = num_mountains + 1 end
+                local o = sav.sav.readByte(tile.offset + i)
+                if (not tile_off[i][o]) then 
+                    tile_off[i][o] = 1
+                else
+                    tile_off[i][o] = tile_off[i][o] + 1
+                end
+            end
+        end
+        if num_mountains > 0 then mount = true end
+    end
 end
 
 -- called for each bic
@@ -41,6 +61,22 @@ end
 
 -- called after all files processed
 function show_results()
+    save_results()
+end
+
+
+function save_results()
+    print("\n\n", num_mountains)
+    for k, v in pairs(tile_off) do
+        print(k, "\n\n")
+        for kk, vv in pairs(v) do
+            print(base2(kk), string.format( "%02x ", kk ), vv)
+        end
+    end
+end
+
+
+function bic_results()
     print("\ndone", #byte_chunks)
     print(string.upper("BLDG"), num_bic_with_bldg)
     print(string.upper("wchr"), num_bic_with_wchr)
