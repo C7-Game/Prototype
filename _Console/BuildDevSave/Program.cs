@@ -4,7 +4,7 @@ using System.Text.Json;
 using QueryCiv3;
 using C7GameData;
 
-namespace LuaCiv3
+namespace BuildDevSave
 {
     class Program
     {
