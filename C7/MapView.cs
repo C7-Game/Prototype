@@ -404,8 +404,79 @@ public class MapView : Node2D {
 		looseView.layers.Add(new CityLayer());
 
 		AddChild(looseView);
+		AddChild(createMeshShaderTest());
 
 		onVisibleAreaChanged();
+	}
+
+	public ShaderMaterial createTestShaderMaterial()
+	{
+		Pcx pcxUnits32 = Util.LoadPCX("Art/Units/units_32.pcx");
+
+		var imgPalette = new Image();
+		byte[] flatPalette = new byte[3*256];
+		for (int n = 0; n < 256; n++)
+			for (int k = 0; k < 3; k++)
+				flatPalette[k + 3 * n] = pcxUnits32.Palette[n, k];
+		imgPalette.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
+		var texPalette = new ImageTexture();
+		texPalette.CreateFromImage(imgPalette, 0);
+
+		var imgIndices = new Image();
+		imgIndices.CreateFromData(pcxUnits32.Width, pcxUnits32.Height, false, Image.Format.R8, pcxUnits32.ColorIndices);
+		var texIndices = new ImageTexture();
+		texIndices.CreateFromImage(imgIndices, 0);
+
+		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
+		// broken on Godot because there's no way to create a texture with a compatible format. See:
+		// https://www.khronos.org/opengl/wiki/Sampler_(GLSL)#Sampler_types - Says it's undefined behavior to read from a usampler2d if the
+		// attached texture format is not GL_R8UI.
+		// https://docs.godotengine.org/en/stable/classes/class_image.html#enum-image-format - None of the Godot texture formats correspond to
+		// GL_R8UI. The closest is FORMAT_R8 which corresponds to GL_RED except that won't work since it's a floating point format.
+		string shaderSource = @"
+		shader_type canvas_item;
+		uniform sampler2D palette;
+		uniform sampler2D indices;
+
+		void fragment()
+		{
+			int colorIndex = int(255.0 * texture(indices, UV).r);
+			if (colorIndex >= 254) // indices 254 and 255 are transparent
+				discard;
+			ivec2 paletteCoords = ivec2(colorIndex % 16, colorIndex / 16);
+			COLOR = texture(palette, vec2(paletteCoords) / 16.0);
+		}
+		";
+		var shader = new Shader();
+		shader.Code = shaderSource;
+
+		var tr = new ShaderMaterial();
+		tr.Shader = shader;
+		tr.SetShaderParam("palette", texPalette);
+		tr.SetShaderParam("indices", texIndices);
+		return tr;
+	}
+
+	public MeshInstance2D createMeshShaderTest()
+	{
+		var tr = new MeshInstance2D();
+		var mesh = new QuadMesh();
+		mesh.Size = new Vector2(300, 300);
+		tr.Mesh = mesh;
+		tr.Material = createTestShaderMaterial();
+		tr.Position = new Vector2(400, 200);
+		tr.Scale = new Vector2(2, -1); // Scale Y by -1 to flip vertically, otherwise it will be drawn upside-down
+		return tr;
+	}
+
+	public Sprite createSpriteShaderTest()
+	{
+		var tr = new Sprite();
+		tr.Position = new Vector2(400, 200);
+		tr.Scale = new Vector2(4, 2);
+		tr.Texture = Util.LoadTextureFromPCX("Art/TileInfo.pcx"); // Placeholder texture until we can draw meshes instead
+		tr.Material = createTestShaderMaterial();
+		return tr;
 	}
 
 	public bool isRowAt(int y)
