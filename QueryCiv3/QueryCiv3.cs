@@ -17,6 +17,7 @@ namespace QueryCiv3
         public Civ3Section[] Sections { get; protected set; }
         public bool IsGameFile {get; protected set;}
         public bool IsBicFile {get; protected set;}
+        public int Length => FileData.Length;
         public Civ3File(byte[] fileBytes)
         {
             this.FileData = fileBytes;
@@ -100,6 +101,8 @@ namespace QueryCiv3
         public byte ReadByte(int offset) => this.FileData[offset];
         public byte[] GetBytes(int offset, int length)
         {
+            if (offset > Length) return new byte[]{};
+            if (offset + length > Length) length = Length - offset;
             List<byte> Out = new List<byte>();
             for(int i=0; i<length; i++) Out.Add(FileData[i+offset]);
             return Out.ToArray();

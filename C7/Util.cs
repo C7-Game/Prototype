@@ -51,7 +51,11 @@ public class Util
 			// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
 			//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
 			// NOTE: May need another replace for case-sensitive filesystmes (Mac/Linux)
-			relModPath.Replace(@"\Civ3PTW\Scenarios\", @"\civ3PTW\Extras\"),
+			// may have removed the need for this; checking.
+			// relModPath.Replace(@"\Civ3PTW\Scenarios\", @"\civ3PTW\Extras\"),
+			"Conquests/Conquests/" + relModPath,
+			"Conquests/Scenarios/" + relModPath,
+			"civ3PTW/Scenarios/" + relModPath,
 			"Conquests",
 			"civ3PTW",
 			""

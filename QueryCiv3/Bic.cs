@@ -13,6 +13,24 @@ namespace QueryCiv3
         {
             Bic = new Civ3File(bicBytes);
         }
+        public string Title => Bic.GetString(0x2a0, 64);
+        // unsure of this length ... up to 656
+        public string Description => Bic.GetString(0x20, 640);
+        public string RelativeModPath
+        {
+            get
+            {
+                try
+                {
+                    int gameOff = Bic.SectionOffset("GAME", 1);
+                    // I don't know if this length is correct, just guessing
+                    string output = Bic.GetString(gameOff + 0xdc, 256);
+                    if (output != "") return output;
+                }
+                catch {}
+                return Title;
+            }
+        }
         public BldgSection[] Bldg { get => (new ListSection<BldgSection>(Bic, Bic.SectionOffset("BLDG", 1))).Sections.ToArray(); }
         public CtznSection[] Ctzn { get => (new ListSection<CtznSection>(Bic, Bic.SectionOffset("CTZN", 1))).Sections.ToArray(); }
         public CultSection[] Cult { get => (new ListSection<CultSection>(Bic, Bic.SectionOffset("CULT", 1))).Sections.ToArray(); }

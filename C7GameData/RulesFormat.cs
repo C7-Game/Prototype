@@ -11,5 +11,6 @@ namespace C7GameData
         public C7RulesFormat() {
             Version = "v0.0early-prototype";
         }
+        public string Civ3RelModPath;
     }
 }

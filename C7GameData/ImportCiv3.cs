@@ -67,13 +67,22 @@ namespace C7GameData
                 };
                 c7Save.GameData.map.tiles.Add(c7Tile);
             }
+
+            // BIC import
+            // NOTE: QueryCiv3 now has MediaBic and Bic which may or may not be the same
+            //  if a mod has no rules we still need the default Bic for rules, so 
+            //  grab the RelativeModPath from MediaBic if present, and the rules from Bic
+            c7Save.Rules = ImportBic(civ3Save.MediaBic);
             return c7Save;
         }
         
         // stub
-        static public C7RulesFormat ImportBic()
+        static public C7RulesFormat ImportBic(BicData bic)
         {
-            C7RulesFormat c7Save = new C7RulesFormat();
+            C7RulesFormat c7Save = new C7RulesFormat
+            {
+                Civ3RelModPath = bic.RelativeModPath,
+            };
             return c7Save;
         }
     }
