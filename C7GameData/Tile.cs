@@ -10,8 +10,8 @@ namespace C7GameData
         public Civ3ExtraInfo ExtraInfo;
         public int xCoordinate;
         public int yCoordinate;
-        public TerrainType terrainType;
-        public TerrainType overlayTerrainType;
+        public TerrainType terrainType = TerrainType.NONE;
+        public TerrainType overlayTerrainType = TerrainType.NONE;
         public City cityAtTile;
         public bool hasBarbarianCamp = false;
 
@@ -39,5 +39,18 @@ namespace C7GameData
 		    } else
 			    return MapUnit.NONE;
 	    }
+        
+        public static Tile NONE = new Tile();
+    }
+
+    public enum TileDirection {
+        NORTH,
+        NORTHEAST,
+        EAST,
+        SOUTHEAST,
+        SOUTH,
+        SOUTHWEST,
+        WEST,
+        NORTHWEST
     }
 }

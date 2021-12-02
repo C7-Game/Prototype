@@ -5,6 +5,7 @@ namespace C7GameData
 */
 {
     using QueryCiv3;
+    using System;
 
     // Additional parameters used to refer to specic media files and tiles in Civ3
     public class Civ3ExtraInfo
@@ -85,6 +86,14 @@ namespace C7GameData
                 }
                 else if (tile.OverlayTerrain == 5) {
                     c7Tile.overlayTerrainType = hills;
+                }
+                else if (tile.OverlayTerrain == 9) {
+                    Console.WriteLine("Marsh at " + tile.X + ", " + tile.Y);
+                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                }
+                else if (tile.OverlayTerrain == 10) {
+                    Console.WriteLine("Volcano at " + tile.X + ", " + tile.Y);
+                    c7Tile.overlayTerrainType = c7Tile.terrainType;
                 }
                 else {
                     c7Tile.overlayTerrainType = c7Tile.terrainType;
