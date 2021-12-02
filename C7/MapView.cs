@@ -385,6 +385,7 @@ public class MapView : Node2D {
 
 	private LooseView looseView;
 	private ShaderMaterial testShaderMaterial;
+	private ImageTexture testUnits32Indices;
 
 	public GridLayer gridLayer { get; private set; }
 
@@ -406,8 +407,8 @@ public class MapView : Node2D {
 
 		AddChild(looseView);
 
-		testShaderMaterial = createTestShaderMaterial();
-		AddChild(createInstancedMeshTest(testShaderMaterial));
+		(testShaderMaterial, testUnits32Indices) = createTestShaderMaterial();
+		AddChild(createInstancedMeshTest(testShaderMaterial, testUnits32Indices));
 
 		onVisibleAreaChanged();
 	}
@@ -445,9 +446,10 @@ public class MapView : Node2D {
 		return (texPalette, texIndices);
 	}
 
-	public ShaderMaterial createTestShaderMaterial()
+	public (ShaderMaterial, ImageTexture) createTestShaderMaterial()
 	{
 		var (palette, indices) = loadPalettizedPCX("Art/Units/units_32.pcx");
+		var spriteSize = new Vector2(32, 32);
 
 		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
 		// broken on Godot because there's no way to create a texture with a compatible format. See:
@@ -459,6 +461,7 @@ public class MapView : Node2D {
 		shader_type canvas_item;
 		uniform sampler2D palette;
 		uniform sampler2D indices;
+		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
 		uniform vec3 civColor;
 
 		vec4 applyCivColor(vec4 refColor)
@@ -466,6 +469,13 @@ public class MapView : Node2D {
 			// Return civColor with its brightness scaled by the red channel of refColor. I don't know if this is how the original game
 			// does it but it looks good enough.
 			return vec4(refColor.r * civColor, refColor.a);
+		}
+
+		void vertex()
+		{
+			// Apply sprite offset and size to UV coords. We can't do this in the fragment stage since INSTANCE_CUSTOM is not available.
+			vec2 spriteOffset = INSTANCE_CUSTOM.xy;
+			UV = spriteOffset + relSpriteSize * UV;
 		}
 
 		void fragment()
@@ -488,25 +498,34 @@ public class MapView : Node2D {
 		tr.Shader = shader;
 		tr.SetShaderParam("palette", palette);
 		tr.SetShaderParam("indices", indices);
+		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
+		tr.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
 		tr.SetShaderParam("civColor", new Vector3(0.4f, 0.4f, 1));
-		return tr;
+		return (tr, indices);
 	}
 
-	public MultiMeshInstance2D createInstancedMeshTest(ShaderMaterial shaderMaterial)
+	public MultiMeshInstance2D createInstancedMeshTest(ShaderMaterial shaderMaterial, ImageTexture indices)
 	{
+		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
+
 		var quad = new QuadMesh();
-		quad.Size = new Vector2(600, 300);
+		quad.Size = new Vector2(32, 32); // Same as sprite size
 
 		var mm = new MultiMesh();
 		mm.TransformFormat = MultiMesh.TransformFormatEnum.Transform2d;
 		mm.ColorFormat = MultiMesh.ColorFormatEnum.None;
-		mm.CustomDataFormat = MultiMesh.CustomDataFormatEnum.None;
+		mm.CustomDataFormat = MultiMesh.CustomDataFormatEnum.Float;
 		mm.Mesh = quad;
 
-		mm.InstanceCount = 1;
-		var tform = new Transform2D(0, new Vector2(300, 150));
-		tform.Scale = new Vector2(1, -1); // Flip vertically
-		mm.SetInstanceTransform2d(0, tform);
+		mm.InstanceCount = 70;
+		for (int n = 0; n < mm.InstanceCount; n++) {
+			var tform = new Transform2D(0, new Vector2(50 + 12 * n, 150 + 100 * (float)Math.Sin(0.75f * n)));
+			tform.Scale = new Vector2(1, -1); // Flip vertically
+			mm.SetInstanceTransform2d(n, tform);
+			int spriteIndex = n;
+			var spriteOffset = new Vector2(1 + 33 * (spriteIndex%14), 1 + 33 * (spriteIndex/14)) / indicesDims;
+			mm.SetInstanceCustomData(n, new Color(spriteOffset.x, spriteOffset.y, 0, 0));
+		}
 
 		var tr = new MultiMeshInstance2D();
 		tr.Material = shaderMaterial;
