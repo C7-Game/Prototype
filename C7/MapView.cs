@@ -407,7 +407,7 @@ public class MapView : Node2D {
 		AddChild(looseView);
 
 		testShaderMaterial = createTestShaderMaterial();
-		AddChild(createMeshShaderTest(testShaderMaterial));
+		AddChild(createInstancedMeshTest(testShaderMaterial));
 
 		onVisibleAreaChanged();
 	}
@@ -492,15 +492,25 @@ public class MapView : Node2D {
 		return tr;
 	}
 
-	public MeshInstance2D createMeshShaderTest(ShaderMaterial shaderMaterial)
+	public MultiMeshInstance2D createInstancedMeshTest(ShaderMaterial shaderMaterial)
 	{
-		var tr = new MeshInstance2D();
-		var mesh = new QuadMesh();
-		mesh.Size = new Vector2(300, 300);
-		tr.Mesh = mesh;
+		var quad = new QuadMesh();
+		quad.Size = new Vector2(600, 300);
+
+		var mm = new MultiMesh();
+		mm.TransformFormat = MultiMesh.TransformFormatEnum.Transform2d;
+		mm.ColorFormat = MultiMesh.ColorFormatEnum.None;
+		mm.CustomDataFormat = MultiMesh.CustomDataFormatEnum.None;
+		mm.Mesh = quad;
+
+		mm.InstanceCount = 1;
+		var tform = new Transform2D(0, new Vector2(300, 150));
+		tform.Scale = new Vector2(1, -1); // Flip vertically
+		mm.SetInstanceTransform2d(0, tform);
+
+		var tr = new MultiMeshInstance2D();
 		tr.Material = shaderMaterial;
-		tr.Position = new Vector2(400, 200);
-		tr.Scale = new Vector2(2, -1); // Scale Y by -1 to flip vertically, otherwise it will be drawn upside-down
+		tr.Multimesh = mm;
 		return tr;
 	}
 
