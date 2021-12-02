@@ -5,6 +5,7 @@ namespace C7GameData
 */
 {
     using QueryCiv3;
+    using System;
 
     // Additional parameters used to refer to specic media files and tiles in Civ3
     public class Civ3ExtraInfo
@@ -47,6 +48,20 @@ namespace C7GameData
             coast.baseCommerceProduction = 1;
             coast.movementCost = 1;
 
+            TerrainType hills = new TerrainType();
+            hills.name = "Hills";
+            hills.baseFoodProduction = 0;
+            hills.baseShieldProduction = 1;
+            hills.baseCommerceProduction = 0;
+            hills.movementCost = 2;
+
+            TerrainType mountain = new TerrainType();
+            mountain.name = "Mountain";
+            mountain.baseFoodProduction = 0;
+            mountain.baseShieldProduction = 1;
+            mountain.baseCommerceProduction = 1;
+            mountain.movementCost = 3;
+
             // Import data
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
             c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
@@ -65,6 +80,24 @@ namespace C7GameData
                     // TEMP all water is coast, desert and plains are plains, grass and tundra are grass
                     terrainType = tile.BaseTerrain > 10 ? coast : tile.BaseTerrain > 1 ? grassland : plains,
                 };
+                //Not sure how to put this inline with the c7Tile reference, or without duplicating the base terrain logic
+                if (tile.OverlayTerrain == 6) {
+                    c7Tile.overlayTerrainType = mountain;
+                }
+                else if (tile.OverlayTerrain == 5) {
+                    c7Tile.overlayTerrainType = hills;
+                }
+                else if (tile.OverlayTerrain == 9) {
+                    Console.WriteLine("Marsh at " + tile.X + ", " + tile.Y);
+                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                }
+                else if (tile.OverlayTerrain == 10) {
+                    Console.WriteLine("Volcano at " + tile.X + ", " + tile.Y);
+                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                }
+                else {
+                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                }
                 c7Save.GameData.map.tiles.Add(c7Tile);
             }
             return c7Save;

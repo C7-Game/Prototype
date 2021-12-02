@@ -9,5 +9,19 @@ namespace C7GameData
         public int movementCost {get; set; }
 
         //some stuff about graphics would probably make sense, too
+
+        public bool isHilly() {
+            if (name.Equals("Mountain") || name.Equals("Hills") || name.Equals("Volcano")) {
+                return true;
+            }
+            return false;
+        }
+
+        public override string ToString()
+        {
+            return name + "(" + baseFoodProduction + ", " + baseShieldProduction + ", " + baseCommerceProduction + ")";
+        }
+
+        public static TerrainType NONE = new TerrainType();
     }
 }
