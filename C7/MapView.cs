@@ -65,7 +65,7 @@ public class TerrainLayer : LooseLayer {
 }
 
 public class HillsLayer : LooseLayer {
-	public static readonly Vector2 mountainSize = new Vector2(124, 88);
+	public static readonly Vector2 mountainSize = new Vector2(128, 88);
 	public static readonly Vector2 hillsSize = new Vector2(128, 72);
 	private ImageTexture mountainTexture;
 	private ImageTexture hillsTexture;
