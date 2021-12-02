@@ -23,6 +23,8 @@ namespace C7GameData
         //has the best defense, or which tile a unit is on when viewing the Military Advisor.
         public List<MapUnit> unitsOnTile;
 
+        public Dictionary<TileDirection, Tile> neighbors {get; set;}
+
         public Tile()
         {
             unitsOnTile = new List<MapUnit>();
@@ -41,6 +43,11 @@ namespace C7GameData
 	    }
         
         public static Tile NONE = new Tile();
+
+        public override string ToString()
+        {
+            return "[" + xCoordinate + ", " + yCoordinate + "] (" + terrainType.name + ")";
+        }
     }
 
     public enum TileDirection {

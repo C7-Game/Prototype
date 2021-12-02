@@ -71,23 +71,44 @@ public class HillsLayer : LooseLayer {
 	private ImageTexture hillsTexture;
 
 	public HillsLayer() {
-		//1st pass: just show the same mountain every time
-		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx", 0, 0, 128, 88);
-		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx", 0, 0, 128, 72);
+		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx");
+		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx");
 	}
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
-		if (tile.overlayTerrainType.name == "Mountain") {
-			Rect2 mountain = new Rect2(0, 0, mountainSize);
-			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
-			looseView.DrawTextureRectRegion(mountainTexture, screenRect, mountain);
+		if (tile.overlayTerrainType.isHilly()) {
+			int pcxIndex = getMountainIndex(tile);
+			int row = pcxIndex/4;
+			int column = pcxIndex % 4;
+			if (tile.overlayTerrainType.name == "Mountain") {
+				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
+				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
+				looseView.DrawTextureRectRegion(mountainTexture, screenTarget, mountainRectangle);
+			}
+			else if (tile.overlayTerrainType.name == "Hills") {
+				Rect2 hillsRectangle = new Rect2(column * hillsSize.x, row * hillsSize.y, hillsSize);
+				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
+				looseView.DrawTextureRectRegion(hillsTexture, screenTarget, hillsRectangle);
+			}
 		}
-		else if (tile.overlayTerrainType.name == "Hills") {
-			Rect2 hills = new Rect2(0, 0, hillsSize);
-			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
-			looseView.DrawTextureRectRegion(hillsTexture, screenRect, hills);
+	}
+
+	private int getMountainIndex(Tile tile) {
+		int index = 0;
+		if (tile.neighbors[TileDirection.NORTHWEST].overlayTerrainType.isHilly()) {
+			index++;
 		}
+		if (tile.neighbors[TileDirection.NORTHEAST].overlayTerrainType.isHilly()) {
+			index+=2;
+		}
+		if (tile.neighbors[TileDirection.SOUTHWEST].overlayTerrainType.isHilly()) {
+			index+=4;
+		}
+		if (tile.neighbors[TileDirection.SOUTHEAST].overlayTerrainType.isHilly()) {
+			index+=8;
+		}
+		return index;
 	}
 }
 
