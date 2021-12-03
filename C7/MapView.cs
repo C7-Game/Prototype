@@ -502,7 +502,8 @@ public class MapView : Node2D {
 				discard;
 			ivec2 paletteCoords = ivec2(colorIndex % 16, colorIndex / 16);
 			vec4 refColor = texture(palette, vec2(paletteCoords) / 16.0);
-			if (colorIndex <= 48) // first 48 colors are tinted by civ (I think, just going by eye)
+			bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
+			if (tintedByCiv)
 				COLOR = applyCivColor(refColor);
 			else
 				COLOR = refColor;
