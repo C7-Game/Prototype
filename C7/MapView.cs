@@ -420,10 +420,14 @@ public class MapView : Node2D {
 
 	public override void _Process(float delta)
 	{
-		var r = 0.5 + 0.5 * Math.Sin((double)OS.GetTicksMsec() / 200.0);
-		var g = 0.5 + 0.5 * Math.Cos((double)OS.GetTicksMsec() / 200.0);
-		var b = 0.5 + 0.5 * Math.Sin((double)OS.GetTicksMsec() / 400.0);
+		var ts = (double)OS.GetTicksMsec();
+
+		var r = 0.5 + 0.5 * Math.Sin(ts / 200.0);
+		var g = 0.5 + 0.5 * Math.Cos(ts / 200.0);
+		var b = 0.5 + 0.5 * Math.Sin(ts / 400.0);
 		testShaderMaterial.SetShaderParam("civColor", new Vector3((float)r, (float)g, (float)b));
+
+		testShaderMaterial.SetShaderParam("spriteXY", new Vector2((int)(ts / 100.0) % 10, 0));
 	}
 
 	// Creates a texture from raw palette data. The data must be 256 pixels by 3 channels. Returns a 16x16 unfiltered RGB texture.
@@ -476,6 +480,7 @@ public class MapView : Node2D {
 		uniform sampler2D palette;
 		uniform sampler2D indices;
 		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
+		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
 		uniform vec3 civColor;
 
 		vec4 applyCivColor(vec4 refColor)
@@ -487,9 +492,7 @@ public class MapView : Node2D {
 
 		void vertex()
 		{
-			// Apply sprite offset and size to UV coords. We can't do this in the fragment stage since INSTANCE_CUSTOM is not available.
-			vec2 spriteOffset = INSTANCE_CUSTOM.xy;
-			// UV = spriteOffset + relSpriteSize * UV; Ignore offset and size for testing
+			UV = (spriteXY + UV) * relSpriteSize;
 		}
 
 		void fragment()
@@ -514,6 +517,7 @@ public class MapView : Node2D {
 		tr.SetShaderParam("indices", indices);
 		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
 		tr.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
+		tr.SetShaderParam("spriteXY", new Vector2(0, 0));
 		tr.SetShaderParam("civColor", new Vector3(0.4f, 0.4f, 1));
 		return tr;
 	}
