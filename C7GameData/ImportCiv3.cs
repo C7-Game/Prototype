@@ -61,6 +61,13 @@ namespace C7GameData
             mountain.baseShieldProduction = 1;
             mountain.baseCommerceProduction = 1;
             mountain.movementCost = 3;
+            
+            TerrainType volcano = new TerrainType();
+            volcano.name = "Volcano";
+            volcano.baseFoodProduction = 0;
+            volcano.baseShieldProduction = 1;
+            volcano.baseCommerceProduction = 1;
+            volcano.movementCost = 3;
 
             // Import data
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
@@ -93,7 +100,7 @@ namespace C7GameData
                 }
                 else if (tile.OverlayTerrain == 10) {
                     Console.WriteLine("Volcano at " + tile.X + ", " + tile.Y);
-                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                    c7Tile.overlayTerrainType = volcano;
                 }
                 else {
                     c7Tile.overlayTerrainType = c7Tile.terrainType;
