@@ -385,7 +385,6 @@ public class MapView : Node2D {
 
 	private LooseView looseView;
 	private ShaderMaterial testShaderMaterial;
-	private ImageTexture testUnits32Indices;
 
 	public GridLayer gridLayer { get; private set; }
 
@@ -407,8 +406,14 @@ public class MapView : Node2D {
 
 		AddChild(looseView);
 
-		(testShaderMaterial, testUnits32Indices) = createTestShaderMaterial();
-		AddChild(createInstancedMeshTest(testShaderMaterial, testUnits32Indices));
+		// var (units32Palette, units32Indices) = loadPalettizedPCX("Art/Units/units_32.pcx");
+		// testShaderMaterial = createTestShaderMaterial((units32Palette, units32Indices), new Vector2(32, 32));
+		// AddChild(createInstancedMeshTest(testShaderMaterial, units32Indices));
+		var flicTest = createFlicTest();
+		testShaderMaterial = flicTest.Material as ShaderMaterial;
+		flicTest.Position = new Vector2(300, 300);
+		flicTest.Scale = new Vector2(1, -1);
+		AddChild(flicTest);
 
 		onVisibleAreaChanged();
 	}
@@ -456,10 +461,9 @@ public class MapView : Node2D {
 		return (createPaletteTexture(pcx.Palette), texIndices);
 	}
 
-	public (ShaderMaterial, ImageTexture) createTestShaderMaterial()
+	public ShaderMaterial createTestShaderMaterial((ImageTexture, ImageTexture) paletteAndIndices, Vector2 spriteSize)
 	{
-		var (palette, indices) = loadPalettizedPCX("Art/Units/units_32.pcx");
-		var spriteSize = new Vector2(32, 32);
+		var (palette, indices) = paletteAndIndices;
 
 		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
 		// broken on Godot because there's no way to create a texture with a compatible format. See:
@@ -485,7 +489,7 @@ public class MapView : Node2D {
 		{
 			// Apply sprite offset and size to UV coords. We can't do this in the fragment stage since INSTANCE_CUSTOM is not available.
 			vec2 spriteOffset = INSTANCE_CUSTOM.xy;
-			UV = spriteOffset + relSpriteSize * UV;
+			// UV = spriteOffset + relSpriteSize * UV; Ignore offset and size for testing
 		}
 
 		void fragment()
@@ -511,7 +515,45 @@ public class MapView : Node2D {
 		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
 		tr.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
 		tr.SetShaderParam("civColor", new Vector3(0.4f, 0.4f, 1));
-		return (tr, indices);
+		return tr;
+	}
+
+
+	public MeshInstance2D createFlicTest()
+	{
+		var flic = new Flic(Util.Civ3MediaPath("Art/Units/warrior/warriorRun.flc"));
+
+		var palette = createPaletteTexture(flic.Palette);
+
+		var countColumns = flic.Images.GetLength(1); // Each column contains one frame
+		var countRows = flic.Images.GetLength(0); // Each row contains one animation
+		var countImages = countColumns * countRows;
+
+		byte[] allIndices = new byte[countRows * countColumns * flic.Width * flic.Height];
+		// row, col loop over the sprites, each one a frame of the animation
+		for (int row = 0; row < countRows; row++)
+			for (int col = 0; col < countColumns; col++)
+				// x, y loop over pixels within each sprite
+				for (int y = 0; y < flic.Height; y++)
+					for (int x = 0; x < flic.Width; x++) {
+						int pixelRow = row * flic.Height + y,
+						    pixelCol = col * flic.Width + x,
+						    pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
+						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
+					}
+
+		var imgIndices = new Image();
+		imgIndices.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
+		var texIndices = new ImageTexture();
+		texIndices.CreateFromImage(imgIndices, 0);
+
+		var quad = new QuadMesh();
+		quad.Size = new Vector2(600, 600);
+
+		var tr = new MeshInstance2D();
+		tr.Material = createTestShaderMaterial((palette, texIndices), new Vector2(flic.Width, flic.Height));
+		tr.Mesh = quad;
+		return tr;
 	}
 
 	public MultiMeshInstance2D createInstancedMeshTest(ShaderMaterial shaderMaterial, ImageTexture indices)
