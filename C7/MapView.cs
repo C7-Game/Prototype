@@ -119,8 +119,13 @@ public class UnitLayer : LooseLayer {
 	// TODO: This needs to be part of the engine eventually.
 	public ActiveAnimation getActiveAnimation(MapUnit unit)
 	{
-		var animName = String.Format("Art/Units/{0}/{0}Default.flc", unit.unitType.name);
-		return new ActiveAnimation { name = animName, direction = 0, progress = 0, offsetX = 0, offsetY = 0 };
+		if ((! unit.isFortified) || (unit.unitType.name == "Worker")) {
+			var animName = String.Format("Art/Units/{0}/{0}Default.flc", unit.unitType.name);
+			return new ActiveAnimation { name = animName, direction = 0, progress = 0, offsetX = 0, offsetY = 0 };
+		} else {
+			var animName = String.Format("Art/Units/{0}/{0}Fortify.flc", unit.unitType.name);
+			return new ActiveAnimation { name = animName, direction = 2, progress = 1, offsetX = 0, offsetY = 0 };
+		}
 	}
 
 	public class AnimationInstance {
@@ -223,9 +228,6 @@ public class UnitLayer : LooseLayer {
 				selectedUnitOnTile = u;
 			}
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
-
-		// Draw colored circle at unit's feet to show who owns it
-		looseView.DrawCircle(tileCenter, 8, new Color(unit.owner.color));
 
 		if (unit.unitType.name != "Settler") // The Flic files for settlers have nonstandard names so we can't load them right now
 			drawAnimationFrame(looseView, getActiveAnimation(unit), tileCenter, new Color(unit.owner.color));
@@ -569,17 +571,19 @@ public class MapView : Node2D {
 		// var (units32Palette, units32Indices) = loadPalettizedPCX("Art/Units/units_32.pcx");
 		// testShaderMaterial = createTestShaderMaterial((units32Palette, units32Indices), new Vector2(32, 32));
 		// AddChild(createInstancedMeshTest(testShaderMaterial, units32Indices));
-		var flicTest = createFlicTest();
-		testShaderMaterial = flicTest.Material as ShaderMaterial;
-		flicTest.Position = new Vector2(300, 300);
-		flicTest.Scale = new Vector2(1, -1);
-		AddChild(flicTest);
+		// var flicTest = createFlicTest();
+		// testShaderMaterial = flicTest.Material as ShaderMaterial;
+		// flicTest.Position = new Vector2(300, 300);
+		// flicTest.Scale = new Vector2(1, -1);
+		// AddChild(flicTest);
 
 		onVisibleAreaChanged();
 	}
 
 	public override void _Process(float delta)
 	{
+		return;
+
 		var ts = (double)OS.GetTicksMsec();
 
 		var r = 0.5 + 0.5 * Math.Sin(ts / 200.0);
