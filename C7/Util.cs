@@ -103,9 +103,42 @@ public class Util
 		if (PcxCache.ContainsKey(relPath)) {
 			return PcxCache[relPath];
 		}
-		Pcx thePcx = new Pcx(Util.Civ3MediaPath(relPath));
+		Pcx thePcx = new Pcx(Civ3MediaPath(relPath));
 		PcxCache[relPath] = thePcx;
 		return thePcx;
+	}
+
+	// Creates a texture from raw palette data. The data must be 256 pixels by 3 channels. Returns a 16x16 unfiltered RGB texture.
+	public static ImageTexture createPaletteTexture(byte[,] raw)
+	{
+		if ((raw.GetLength(0) != 256) || (raw.GetLength(1) != 3))
+			throw new Exception("Invalid palette dimensions. Palettes must be 256x3.");
+
+		// Flatten palette data since CreateFromData can't accept two-dimensional arrays
+		byte[] flatPalette = new byte[3*256];
+		for (int n = 0; n < 256; n++)
+			for (int k = 0; k < 3; k++)
+				flatPalette[k + 3 * n] = raw[n, k];
+
+		var img = new Image();
+		img.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
+		var tex = new ImageTexture();
+		tex.CreateFromImage(img, 0);
+		return tex;
+	}
+
+	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
+	// color palette and the second is the size of the image itself and contains the indices in R8 format.
+	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string file_path)
+	{
+		var pcx = LoadPCX(file_path);
+
+		var imgIndices = new Image();
+		imgIndices.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
+		var texIndices = new ImageTexture();
+		texIndices.CreateFromImage(imgIndices, 0);
+
+		return (createPaletteTexture(pcx.Palette), texIndices);
 	}
 
 	static public AudioStreamSample LoadWAVFromDisk(string path)

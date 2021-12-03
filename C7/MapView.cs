@@ -168,6 +168,58 @@ public class UnitLayer : LooseLayer {
 			}
 		}
 	}
+
+	private static Shader shader = null;
+
+	public static Shader getShader()
+	{
+		if (shader != null)
+			return shader;
+
+		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
+		// broken on Godot because there's no way to create a texture with a compatible format. See:
+		// https://www.khronos.org/opengl/wiki/Sampler_(GLSL)#Sampler_types - Says it's undefined behavior to read from a usampler2d if the
+		// attached texture format is not GL_R8UI.
+		// https://docs.godotengine.org/en/stable/classes/class_image.html#enum-image-format - None of the Godot texture formats correspond to
+		// GL_R8UI. The closest is FORMAT_R8 which corresponds to GL_RED except that won't work since it's a floating point format.
+		string shaderSource = @"
+		shader_type canvas_item;
+		uniform sampler2D palette;
+		uniform sampler2D civColorWhitePalette;
+		uniform sampler2D indices;
+		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
+		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
+		uniform vec3 civColor;
+
+		vec4 sampleCivTintedColor(vec2 paletteCoords)
+		{
+			return vec4(civColor, 1.0) * texture(civColorWhitePalette, paletteCoords);
+		}
+
+		void vertex()
+		{
+			UV = (spriteXY + UV) * relSpriteSize;
+		}
+
+		void fragment()
+		{
+			int colorIndex = int(255.0 * texture(indices, UV).r);
+			if (colorIndex >= 254) // indices 254 and 255 are transparent
+				discard;
+			vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
+			bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
+			if (tintedByCiv)
+				COLOR = sampleCivTintedColor(paletteCoords);
+			else
+				COLOR = texture(palette, paletteCoords);
+		}
+		";
+		var tr = new Shader();
+		tr.Code = shaderSource;
+
+		shader = tr;
+		return tr;
+	}
 }
 
 public class BuildingLayer : LooseLayer {
@@ -430,89 +482,14 @@ public class MapView : Node2D {
 		testShaderMaterial.SetShaderParam("spriteXY", new Vector2((int)(ts / 100.0) % 10, 0));
 	}
 
-	// Creates a texture from raw palette data. The data must be 256 pixels by 3 channels. Returns a 16x16 unfiltered RGB texture.
-	// TODO: Move this to Util with the other PCX loading stuff
-	public static ImageTexture createPaletteTexture(byte[,] raw)
-	{
-		if ((raw.GetLength(0) != 256) || (raw.GetLength(1) != 3))
-			throw new Exception("Invalid palette dimensions. Palettes must be 256x3.");
-
-		// Flatten palette data since CreateFromData can't accept two-dimensional arrays
-		byte[] flatPalette = new byte[3*256];
-		for (int n = 0; n < 256; n++)
-			for (int k = 0; k < 3; k++)
-				flatPalette[k + 3 * n] = raw[n, k];
-
-		var img = new Image();
-		img.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
-		var tex = new ImageTexture();
-		tex.CreateFromImage(img, 0);
-		return tex;
-	}
-
-	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
-	// color palette and the second is the size of the image itself and contains the indices in R8 format.
-	// TODO: Move this to Util with the other PCX loading stuff
-	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string file_path)
-	{
-		var pcx = Util.LoadPCX(file_path);
-
-		var imgIndices = new Image();
-		imgIndices.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
-		var texIndices = new ImageTexture();
-		texIndices.CreateFromImage(imgIndices, 0);
-
-		return (createPaletteTexture(pcx.Palette), texIndices);
-	}
-
 	public ShaderMaterial createTestShaderMaterial((ImageTexture, ImageTexture) paletteAndIndices, Vector2 spriteSize)
 	{
-		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
-		// broken on Godot because there's no way to create a texture with a compatible format. See:
-		// https://www.khronos.org/opengl/wiki/Sampler_(GLSL)#Sampler_types - Says it's undefined behavior to read from a usampler2d if the
-		// attached texture format is not GL_R8UI.
-		// https://docs.godotengine.org/en/stable/classes/class_image.html#enum-image-format - None of the Godot texture formats correspond to
-		// GL_R8UI. The closest is FORMAT_R8 which corresponds to GL_RED except that won't work since it's a floating point format.
-		string shaderSource = @"
-		shader_type canvas_item;
-		uniform sampler2D palette;
-		uniform sampler2D civColorWhitePalette;
-		uniform sampler2D indices;
-		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
-		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
-		uniform vec3 civColor;
 
-		vec4 sampleCivTintedColor(vec2 paletteCoords)
-		{
-			return vec4(civColor, 1.0) * texture(civColorWhitePalette, paletteCoords);
-		}
-
-		void vertex()
-		{
-			UV = (spriteXY + UV) * relSpriteSize;
-		}
-
-		void fragment()
-		{
-			int colorIndex = int(255.0 * texture(indices, UV).r);
-			if (colorIndex >= 254) // indices 254 and 255 are transparent
-				discard;
-			vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
-			bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
-			if (tintedByCiv)
-				COLOR = sampleCivTintedColor(paletteCoords);
-			else
-				COLOR = texture(palette, paletteCoords);
-		}
-		";
-		var shader = new Shader();
-		shader.Code = shaderSource;
-
-		var (civColorWhitePalette, _) = loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
+		var (civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
 		var (palette, indices) = paletteAndIndices;
 
 		var tr = new ShaderMaterial();
-		tr.Shader = shader;
+		tr.Shader = UnitLayer.getShader();
 		tr.SetShaderParam("palette", palette);
 		tr.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
 		tr.SetShaderParam("indices", indices);
@@ -528,7 +505,7 @@ public class MapView : Node2D {
 	{
 		var flic = new Flic(Util.Civ3MediaPath("Art/Units/warrior/warriorRun.flc"));
 
-		var palette = createPaletteTexture(flic.Palette);
+		var palette = Util.createPaletteTexture(flic.Palette);
 
 		var countColumns = flic.Images.GetLength(1); // Each column contains one frame
 		var countRows = flic.Images.GetLength(0); // Each row contains one animation
