@@ -19,6 +19,9 @@ public abstract class LooseLayer {
 	//     MapView already transforms the looseView node to account for those things.
 	public abstract void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
 
+	public virtual void onBeginDraw(LooseView looseView) {}
+	public virtual void onEndDraw(LooseView looseView) {}
+
 	// The layer will be skipping during map drawing if visible is false
 	public bool visible = true;
 }
@@ -106,6 +109,104 @@ public class UnitLayer : LooseLayer {
 			return Color.Color8(255, 0, 0);
 	}
 
+	public struct ActiveAnimation {
+		public string name;
+		public int direction; // TODO: Make this an enum
+		public float progress; // Varies 0 to 1
+		public float offsetX, offsetY; // Offset is in grid cells from the unit's location
+	}
+
+	// TODO: This needs to be part of the engine eventually.
+	public ActiveAnimation getActiveAnimation(MapUnit unit)
+	{
+		var animName = String.Format("Art/Units/{0}/{0}Default.flc", unit.unitType.name);
+		return new ActiveAnimation { name = animName, direction = 0, progress = 0, offsetX = 0, offsetY = 0 };
+	}
+
+	public class AnimationInstance {
+		public ShaderMaterial shaderMat;
+		public MeshInstance2D meshInst;
+
+		private static ImageTexture civColorWhitePalette = null;
+
+		public AnimationInstance(LooseView looseView)
+		{
+			if (civColorWhitePalette == null)
+				(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");;
+
+			var quad = new QuadMesh();
+			quad.Size = new Vector2(1, 1);
+
+			shaderMat = new ShaderMaterial();
+			shaderMat.Shader = getShader();
+			shaderMat.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
+
+			meshInst = new MeshInstance2D();
+			meshInst.Material = shaderMat;
+			meshInst.Mesh = quad;
+
+			looseView.AddChild(meshInst);
+			meshInst.Hide();
+		}
+	}
+
+	private List<AnimationInstance> animInsts = new List<AnimationInstance>();
+	private int nextBlankAnimInst = 0;
+
+	public AnimationInstance getBlankAnimationInstance(LooseView looseView)
+	{
+		if (nextBlankAnimInst >= animInsts.Count) {
+			animInsts.Add(new AnimationInstance(looseView));
+		}
+		var tr = animInsts[nextBlankAnimInst];
+		nextBlankAnimInst++;
+		tr.meshInst.Show();
+		return tr;
+	}
+
+	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
+
+	public void drawAnimationFrame(LooseView looseView, ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
+	{
+		var inst = getBlankAnimationInstance(looseView);
+
+		Util.FlicSheet flicSheet;
+		if (! flicSheets.TryGetValue(activeAnim.name, out flicSheet)) {
+			(flicSheet, _) = Util.loadFlicSheet(activeAnim.name);
+			flicSheets.Add(activeAnim.name, flicSheet);
+		}
+		inst.shaderMat.SetShaderParam("palette", flicSheet.palette);
+		inst.shaderMat.SetShaderParam("indices", flicSheet.indices);
+
+		var indicesDims = new Vector2(flicSheet.indices.GetWidth(), flicSheet.indices.GetHeight());
+		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
+		inst.shaderMat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
+
+		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
+		int spriteColumn = (int)(activeAnim.progress * spritesPerRow);
+		if (spriteColumn >= spritesPerRow)
+			spriteColumn = spritesPerRow - 1;
+		else if (spriteColumn < 0)
+			spriteColumn = 0;
+		inst.shaderMat.SetShaderParam("spriteXY", new Vector2(spriteColumn, activeAnim.direction));
+
+		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
+
+		// TODO: Must apply activeAnim.offsetX/Y
+		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
+		// amount but it looks close TODO: Investigate more, find the exact amount.
+		inst.meshInst.Position = tileCenter - new Vector2(0, flicSheet.spriteHeight / 4);
+		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight); // Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
+	}
+
+	public override void onBeginDraw(LooseView looseView)
+	{
+		// Reset animation instances
+		for (int n = 0; n < nextBlankAnimInst; n++)
+			animInsts[n].meshInst.Hide();
+		nextBlankAnimInst = 0;
+	}
+
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.unitsOnTile.Count == 0)
@@ -126,11 +227,15 @@ public class UnitLayer : LooseLayer {
 		// Draw colored circle at unit's feet to show who owns it
 		looseView.DrawCircle(tileCenter, 8, new Color(unit.owner.color));
 
-		int iconIndex = unit.unitType.iconIndex;
-		Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
-		Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-		Rect2 screenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
-		looseView.DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+		if (unit.unitType.name != "Settler") // The Flic files for settlers have nonstandard names so we can't load them right now
+			drawAnimationFrame(looseView, getActiveAnimation(unit), tileCenter, new Color(unit.owner.color));
+		else {
+			int iconIndex = unit.unitType.iconIndex;
+			Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
+			Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
+			Rect2 iconScreenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
+			looseView.DrawTextureRectRegion(unitIcons, iconScreenRect, unitRect);
+		}
 
 		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
 
@@ -138,7 +243,7 @@ public class UnitLayer : LooseLayer {
 		int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
 		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
 		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-		screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
+		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
 		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
 
 		int hpIndHeight = 20, hpIndWidth = 6;
@@ -390,7 +495,8 @@ public class LooseView : Node2D {
 		base._Draw();
 
 		var map = MapInteractions.GetWholeMap();
-		foreach (var layer in layers.FindAll(L => L.visible))
+		foreach (var layer in layers.FindAll(L => L.visible)) {
+			layer.onBeginDraw(this);
 			foreach (var vT in mapView.visibleTiles()) {
 				int x = mapView.wrapTileX(vT.virtTileX);
 				int y = mapView.wrapTileY(vT.virtTileY);
@@ -398,6 +504,8 @@ public class LooseView : Node2D {
 				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
 				layer.drawObject(this, tile, tileCenter);
 			}
+			layer.onEndDraw(this);
+		}
 	}
 }
 
