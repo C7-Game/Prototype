@@ -503,37 +503,13 @@ public class MapView : Node2D {
 
 	public MeshInstance2D createFlicTest()
 	{
-		var flic = new Flic(Util.Civ3MediaPath("Art/Units/warrior/warriorRun.flc"));
-
-		var palette = Util.createPaletteTexture(flic.Palette);
-
-		var countColumns = flic.Images.GetLength(1); // Each column contains one frame
-		var countRows = flic.Images.GetLength(0); // Each row contains one animation
-		var countImages = countColumns * countRows;
-
-		byte[] allIndices = new byte[countRows * countColumns * flic.Width * flic.Height];
-		// row, col loop over the sprites, each one a frame of the animation
-		for (int row = 0; row < countRows; row++)
-			for (int col = 0; col < countColumns; col++)
-				// x, y loop over pixels within each sprite
-				for (int y = 0; y < flic.Height; y++)
-					for (int x = 0; x < flic.Width; x++) {
-						int pixelRow = row * flic.Height + y,
-						    pixelCol = col * flic.Width + x,
-						    pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
-						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
-					}
-
-		var imgIndices = new Image();
-		imgIndices.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
-		var texIndices = new ImageTexture();
-		texIndices.CreateFromImage(imgIndices, 0);
+		var (flicSheet, _) = Util.loadFlicSheet("Art/Units/warrior/warriorRun.flc");
 
 		var quad = new QuadMesh();
 		quad.Size = new Vector2(600, 600);
 
 		var tr = new MeshInstance2D();
-		tr.Material = createTestShaderMaterial((palette, texIndices), new Vector2(flic.Width, flic.Height));
+		tr.Material = createTestShaderMaterial((flicSheet.palette, flicSheet.indices), new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight));
 		tr.Mesh = quad;
 		return tr;
 	}
