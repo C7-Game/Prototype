@@ -467,8 +467,6 @@ public class MapView : Node2D {
 
 	public ShaderMaterial createTestShaderMaterial((ImageTexture, ImageTexture) paletteAndIndices, Vector2 spriteSize)
 	{
-		var (palette, indices) = paletteAndIndices;
-
 		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
 		// broken on Godot because there's no way to create a texture with a compatible format. See:
 		// https://www.khronos.org/opengl/wiki/Sampler_(GLSL)#Sampler_types - Says it's undefined behavior to read from a usampler2d if the
@@ -478,16 +476,15 @@ public class MapView : Node2D {
 		string shaderSource = @"
 		shader_type canvas_item;
 		uniform sampler2D palette;
+		uniform sampler2D civColorWhitePalette;
 		uniform sampler2D indices;
 		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
 		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
 		uniform vec3 civColor;
 
-		vec4 applyCivColor(vec4 refColor)
+		vec4 sampleCivTintedColor(vec2 paletteCoords)
 		{
-			// Return civColor with its brightness scaled by the red channel of refColor. I don't know if this is how the original game
-			// does it but it looks good enough.
-			return vec4(refColor.r * civColor, refColor.a);
+			return vec4(civColor, 1.0) * texture(civColorWhitePalette, paletteCoords);
 		}
 
 		void vertex()
@@ -500,21 +497,24 @@ public class MapView : Node2D {
 			int colorIndex = int(255.0 * texture(indices, UV).r);
 			if (colorIndex >= 254) // indices 254 and 255 are transparent
 				discard;
-			ivec2 paletteCoords = ivec2(colorIndex % 16, colorIndex / 16);
-			vec4 refColor = texture(palette, vec2(paletteCoords) / 16.0);
+			vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
 			bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
 			if (tintedByCiv)
-				COLOR = applyCivColor(refColor);
+				COLOR = sampleCivTintedColor(paletteCoords);
 			else
-				COLOR = refColor;
+				COLOR = texture(palette, paletteCoords);
 		}
 		";
 		var shader = new Shader();
 		shader.Code = shaderSource;
 
+		var (civColorWhitePalette, _) = loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
+		var (palette, indices) = paletteAndIndices;
+
 		var tr = new ShaderMaterial();
 		tr.Shader = shader;
 		tr.SetShaderParam("palette", palette);
+		tr.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
 		tr.SetShaderParam("indices", indices);
 		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
 		tr.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
