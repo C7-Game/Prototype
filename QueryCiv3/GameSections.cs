@@ -80,6 +80,11 @@ namespace QueryCiv3
         public int OverlayTerrain { get => (Terrain & 0xf0) >> 4; }
         public int BaseTerrainFileID { get => Data.Sav.ReadByte(Offset+17); }
         public int BaseTerrainImageID { get => Data.Sav.ReadByte(Offset+16); }
+        public int C3CBonuses { get => Data.Sav.ReadInt32(Offset + 58);}
+        //C3C Bonuses Breakdown.  See lines 128-135 of TILE.java in Quintillus's editor for documentation
+        public bool isPineForest { get => (C3CBonuses & 32) == 32; }
+        public bool isSnowCapped { get => (C3CBonuses & 16) == 16; }
+
     }
     public class ContItem
     {

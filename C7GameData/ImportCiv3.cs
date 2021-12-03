@@ -90,16 +90,18 @@ namespace C7GameData
                 //Not sure how to put this inline with the c7Tile reference, or without duplicating the base terrain logic
                 if (tile.OverlayTerrain == 6) {
                     c7Tile.overlayTerrainType = mountain;
+                    if (tile.isSnowCapped) {
+                        c7Tile.isSnowCapped = true;
+                    }
                 }
                 else if (tile.OverlayTerrain == 5) {
                     c7Tile.overlayTerrainType = hills;
                 }
                 else if (tile.OverlayTerrain == 9) {
-                    Console.WriteLine("Marsh at " + tile.X + ", " + tile.Y);
+                    //Marsh
                     c7Tile.overlayTerrainType = c7Tile.terrainType;
                 }
                 else if (tile.OverlayTerrain == 10) {
-                    Console.WriteLine("Volcano at " + tile.X + ", " + tile.Y);
                     c7Tile.overlayTerrainType = volcano;
                 }
                 else {

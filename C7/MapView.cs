@@ -69,11 +69,13 @@ public class HillsLayer : LooseLayer {
 	public static readonly Vector2 volcanoSize = new Vector2(128, 88);	//same as mountain
 	public static readonly Vector2 hillsSize = new Vector2(128, 72);
 	private ImageTexture mountainTexture;
+	private ImageTexture snowMountainTexture;
 	private ImageTexture hillsTexture;
 	private ImageTexture volcanosTexture;
 
 	public HillsLayer() {
 		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx");
+		snowMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains-snow.pcx");
 		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx");
 		volcanosTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos.pcx");
 	}
@@ -87,7 +89,14 @@ public class HillsLayer : LooseLayer {
 			if (tile.overlayTerrainType.name == "Mountain") {
 				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
-				looseView.DrawTextureRectRegion(mountainTexture, screenTarget, mountainRectangle);
+				ImageTexture mountainGraphics;
+				if (tile.isSnowCapped) {
+					mountainGraphics = snowMountainTexture;
+				}
+				else {
+					mountainGraphics = mountainTexture;
+				}
+				looseView.DrawTextureRectRegion(mountainGraphics, screenTarget, mountainRectangle);
 			}
 			else if (tile.overlayTerrainType.name == "Hills") {
 				Rect2 hillsRectangle = new Rect2(column * hillsSize.x, row * hillsSize.y, hillsSize);
