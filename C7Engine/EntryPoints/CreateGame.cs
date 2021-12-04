@@ -21,6 +21,7 @@ namespace C7Engine
             else {
                 save = C7SaveFormat.Load(loadFilePath);
             }
+            save.GameData.PerformPostLoadActions();
             EngineStorage.setGameData(save.GameData);
             // possibly do something with save.Rules here when it exists
             // and maybe consider if we have any need to keep a reference to the save object handy...probably not
