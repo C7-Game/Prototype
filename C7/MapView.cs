@@ -70,12 +70,16 @@ public class HillsLayer : LooseLayer {
 	public static readonly Vector2 hillsSize = new Vector2(128, 72);
 	private ImageTexture mountainTexture;
 	private ImageTexture snowMountainTexture;
+	private ImageTexture forestMountainTexture;
+	private ImageTexture jungleMountainTexture;
 	private ImageTexture hillsTexture;
 	private ImageTexture volcanosTexture;
 
 	public HillsLayer() {
 		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx");
 		snowMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains-snow.pcx");
+		forestMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain forests.pcx");
+		jungleMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain jungles.pcx");
 		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx");
 		volcanosTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos.pcx");
 	}
@@ -94,7 +98,16 @@ public class HillsLayer : LooseLayer {
 					mountainGraphics = snowMountainTexture;
 				}
 				else {
-					mountainGraphics = mountainTexture;
+					TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
+					if (dominantVegetation.name == "Forest") {
+						mountainGraphics = forestMountainTexture;
+					}
+					else if (dominantVegetation.name == "Jungle") {
+						mountainGraphics = jungleMountainTexture;
+					}
+					else {
+						mountainGraphics = mountainTexture;
+					}
 				}
 				looseView.DrawTextureRectRegion(mountainGraphics, screenTarget, mountainRectangle);
 			}
@@ -109,6 +122,56 @@ public class HillsLayer : LooseLayer {
 				looseView.DrawTextureRectRegion(volcanosTexture, screenTarget, volcanoRectangle);
 			}
 		}
+	}
+
+	private TerrainType getDominantVegetationNearHillyTile(Tile center)
+	{
+		TerrainType northeastType = center.neighbors[TileDirection.NORTHEAST].terrainType;
+		TerrainType northwestType = center.neighbors[TileDirection.NORTHWEST].terrainType;
+		TerrainType southeastType = center.neighbors[TileDirection.SOUTHEAST].terrainType;
+		TerrainType southwestType = center.neighbors[TileDirection.SOUTHWEST].terrainType;
+
+		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
+
+		int hills = 0;
+		int forests = 0;
+		int jungles = 0;
+		//These references are so we can return the appropriate type, and because we don't have a good way
+		//to grab them directly at this point in time.
+		TerrainType forest = null;
+		TerrainType jungle = null;
+		foreach (TerrainType type in neighborTerrains) {
+			if (type.isHilly()) {
+				hills++;
+			}
+			else if (type.name == "Forest") {
+				forests++;
+				forest = type;
+			}
+			else if (type.name == "Jungle") {
+				jungles++;
+				jungle = type;
+			}
+		}
+
+		if (hills + forests + jungles < 4) {	//some surrounding tiles are neither forested nor hilly
+			return TerrainType.NONE;
+		}
+		if (forests == 0 && jungles == 0) {
+			return TerrainType.NONE;	//all hills
+		}
+		if (forests > jungles) {
+			return forest;
+		}
+		if (jungles > forests) {
+			return jungle;
+		}
+
+        //If we get here, it's a tie between forest and jungle.  Deterministically choose one so it doesn't change on every render
+        if (center.xCoordinate % 2 == 0) {
+            return forest;
+        }
+        return jungle;
 	}
 
 	private int getMountainIndex(Tile tile) {
