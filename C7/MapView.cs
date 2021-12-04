@@ -197,11 +197,11 @@ public class HillsLayer : LooseLayer {
 			return jungle;
 		}
 
-        //If we get here, it's a tie between forest and jungle.  Deterministically choose one so it doesn't change on every render
-        if (center.xCoordinate % 2 == 0) {
-            return forest;
-        }
-        return jungle;
+		//If we get here, it's a tie between forest and jungle.  Deterministically choose one so it doesn't change on every render
+		if (center.xCoordinate % 2 == 0) {
+			return forest;
+		}
+		return jungle;
 	}
 
 	private int getMountainIndex(Tile tile) {

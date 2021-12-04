@@ -25,15 +25,8 @@ namespace C7GameData
 
         public Dictionary<TileDirection, Tile> neighbors {get; set;}
 
-        //TODO: We should think about how we want terrain type modifiers to work.
-        //In Civ3, there are 14 terrain types, but myriad sub-types (landmark, pine forest, snow-capped, and bonus grassland)
-        //Those are indicated via bits set on the tile.  Some are graphics differences only; some change the tile yield.
-        //We don't necessarily have to follow Civ's lead in considering what a separate terrain type is.  Maybe we treat all
-        //landmarks as wholly different terrains.  Maybe we say pine forests are their own thing.  Maybe we decide snow capped
-        //mountains are fundamentally mountains, or maybe we say they're different and e.g. you can road a mountain but not
-        //a snow-capped mountain.
-        //I am kind of leaning towards counting terrains as separate by default, although I want to ponder the idea and seek thoughts
-        //before going that way.
+        //See discussion on page 4 of the "Babylon" thread (https://forums.civfanatics.com/threads/0-1-babylon-progress-thread.673959) about sub-terrain type and Civ3 properties.
+        //We may well move these properties somewhere, whether that's Civ3ExtraInfo, a Civ3Tile child class, a Dictionary property, or something else, in the future.
         public bool isSnowCapped;
 
         public Tile()
