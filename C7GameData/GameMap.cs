@@ -88,7 +88,48 @@ namespace C7GameData
             if (isTileAt(x, y))
                 return tiles[tileCoordsToIndex(x, y)];
             else
-                return null; // TODO: Consider using empty tile object instead of null
+                return Tile.NONE; // TODO: Consider using empty tile object instead of null
+        }
+
+        /**
+         * Returns the Tile that neighbors the given Tile in a certain direction,
+         * or the NONE tile if there is no neighbor in said direction.
+         **/
+        public Tile tileNeighbor(Tile center, TileDirection direction) {
+            int x = center.xCoordinate;
+            int y = center.yCoordinate;
+            switch (direction) {
+                case TileDirection.NORTH:
+                    y-=2;
+                    break;
+                case TileDirection.NORTHEAST:
+                    y--;
+                    x++;
+                    break;
+                case TileDirection.EAST:
+                    x+=2;
+                    break;
+                case TileDirection.SOUTHEAST:
+                    y++;
+                    x++;
+                    break;
+                case TileDirection.SOUTH:
+                    y+=2;
+                    break;
+                case TileDirection.SOUTHWEST:
+                    y++;
+                    x--;
+                    break;
+                case TileDirection.WEST:
+                    x-=2;
+                    break;
+                case TileDirection.NORTHWEST:
+                    x--;
+                    y--;
+                    break;
+            }
+            //TODO: World wrap should also be accounted for.
+            return tileAt(x, y);
         }
 
         public delegate int[,] TerrainNoiseMapGenerator(int rng, int width, int height);

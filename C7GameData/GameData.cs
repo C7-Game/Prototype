@@ -14,6 +14,24 @@ namespace C7GameData
         List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
         public List<City> cities = new List<City>();
 
+        /**
+         * This is intended as a place to set up post-load actions on the save, regardless of
+         * whether it is loaded from a legacy Civ3 file or a C7 native file.
+         * This likely is any sort of calculation which is useful to have in the game state, but
+         * can be re-generated from save data and does not make sense to serialize.
+         **/
+        public void PerformPostLoadActions()
+        {
+            //Let each tile know who its neighbors are.  It needs to know this so its graphics can be selected appropriately.
+            foreach (Tile tile in map.tiles) {
+                Dictionary<TileDirection, Tile> neighbors = new Dictionary<TileDirection, Tile>();
+                foreach (TileDirection direction in Enum.GetValues(typeof(TileDirection))) {
+                    neighbors[direction] = map.tileNeighbor(tile, direction);
+                }
+                tile.neighbors = neighbors;
+            }
+        }
+
         public MapUnit createDummyUnit(UnitPrototype proto, Player owner, int tileX, int tileY)
         {
             if (map.isTileAt(tileX, tileY)) {

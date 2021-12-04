@@ -64,6 +64,164 @@ public class TerrainLayer : LooseLayer {
 	}
 }
 
+public class HillsLayer : LooseLayer {
+	public static readonly Vector2 mountainSize = new Vector2(128, 88);
+	public static readonly Vector2 volcanoSize = new Vector2(128, 88);	//same as mountain
+	public static readonly Vector2 hillsSize = new Vector2(128, 72);
+	private ImageTexture mountainTexture;
+	private ImageTexture snowMountainTexture;
+	private ImageTexture forestMountainTexture;
+	private ImageTexture jungleMountainTexture;
+	private ImageTexture hillsTexture;
+	private ImageTexture forestHillsTexture;
+	private ImageTexture jungleHillsTexture;
+	private ImageTexture volcanosTexture;
+	private ImageTexture forestVolcanoTexture;
+	private ImageTexture jungleVolcanoTexture;
+
+	public HillsLayer() {
+		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx");
+		snowMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains-snow.pcx");
+		forestMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain forests.pcx");
+		jungleMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain jungles.pcx");
+		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx");
+		forestHillsTexture = Util.LoadTextureFromPCX("Art/Terrain/hill forests.pcx");
+		jungleHillsTexture = Util.LoadTextureFromPCX("Art/Terrain/hill jungle.pcx");
+		volcanosTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos.pcx");
+		forestVolcanoTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos forests.pcx");
+		jungleVolcanoTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos jungles.pcx");
+	}
+
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		if (tile.overlayTerrainType.isHilly()) {
+			int pcxIndex = getMountainIndex(tile);
+			int row = pcxIndex/4;
+			int column = pcxIndex % 4;
+			if (tile.overlayTerrainType.name == "Mountain") {
+				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
+				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
+				ImageTexture mountainGraphics;
+				if (tile.isSnowCapped) {
+					mountainGraphics = snowMountainTexture;
+				}
+				else {
+					TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
+					if (dominantVegetation.name == "Forest") {
+						mountainGraphics = forestMountainTexture;
+					}
+					else if (dominantVegetation.name == "Jungle") {
+						mountainGraphics = jungleMountainTexture;
+					}
+					else {
+						mountainGraphics = mountainTexture;
+					}
+				}
+				looseView.DrawTextureRectRegion(mountainGraphics, screenTarget, mountainRectangle);
+			}
+			else if (tile.overlayTerrainType.name == "Hills") {
+				Rect2 hillsRectangle = new Rect2(column * hillsSize.x, row * hillsSize.y, hillsSize);
+				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
+				ImageTexture hillGraphics;
+				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
+				if (dominantVegetation.name == "Forest") {
+					hillGraphics = forestHillsTexture;
+				}
+				else if (dominantVegetation.name == "Jungle") {
+					hillGraphics = jungleHillsTexture;
+				}
+				else {
+					hillGraphics = hillsTexture;
+				}
+				looseView.DrawTextureRectRegion(hillGraphics, screenTarget, hillsRectangle);
+			}
+			else if (tile.overlayTerrainType.name == "Volcano") {
+				Rect2 volcanoRectangle = new Rect2(column * volcanoSize.x, row * volcanoSize.y, volcanoSize);
+				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * volcanoSize + new Vector2(0, -12), volcanoSize);
+				ImageTexture volcanoGraphics;
+				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
+				if (dominantVegetation.name == "Forest") {
+					volcanoGraphics = forestVolcanoTexture;
+				}
+				else if (dominantVegetation.name == "Jungle") {
+					volcanoGraphics = jungleVolcanoTexture;
+				}
+				else {
+					volcanoGraphics = hillsTexture;
+				}
+				looseView.DrawTextureRectRegion(volcanoGraphics, screenTarget, volcanoRectangle);
+			}
+		}
+	}
+
+	private TerrainType getDominantVegetationNearHillyTile(Tile center)
+	{
+		TerrainType northeastType = center.neighbors[TileDirection.NORTHEAST].terrainType;
+		TerrainType northwestType = center.neighbors[TileDirection.NORTHWEST].terrainType;
+		TerrainType southeastType = center.neighbors[TileDirection.SOUTHEAST].terrainType;
+		TerrainType southwestType = center.neighbors[TileDirection.SOUTHWEST].terrainType;
+
+		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
+
+		int hills = 0;
+		int forests = 0;
+		int jungles = 0;
+		//These references are so we can return the appropriate type, and because we don't have a good way
+		//to grab them directly at this point in time.
+		TerrainType forest = null;
+		TerrainType jungle = null;
+		foreach (TerrainType type in neighborTerrains) {
+			if (type.isHilly()) {
+				hills++;
+			}
+			else if (type.name == "Forest") {
+				forests++;
+				forest = type;
+			}
+			else if (type.name == "Jungle") {
+				jungles++;
+				jungle = type;
+			}
+		}
+
+		if (hills + forests + jungles < 4) {	//some surrounding tiles are neither forested nor hilly
+			return TerrainType.NONE;
+		}
+		if (forests == 0 && jungles == 0) {
+			return TerrainType.NONE;	//all hills
+		}
+		if (forests > jungles) {
+			return forest;
+		}
+		if (jungles > forests) {
+			return jungle;
+		}
+
+		//If we get here, it's a tie between forest and jungle.  Deterministically choose one so it doesn't change on every render
+		if (center.xCoordinate % 2 == 0) {
+			return forest;
+		}
+		return jungle;
+	}
+
+	private int getMountainIndex(Tile tile) {
+		int index = 0;
+		if (tile.neighbors[TileDirection.NORTHWEST].overlayTerrainType.isHilly()) {
+			index++;
+		}
+		if (tile.neighbors[TileDirection.NORTHEAST].overlayTerrainType.isHilly()) {
+			index+=2;
+		}
+		if (tile.neighbors[TileDirection.SOUTHWEST].overlayTerrainType.isHilly()) {
+			index+=4;
+		}
+		if (tile.neighbors[TileDirection.SOUTHEAST].overlayTerrainType.isHilly()) {
+			index+=8;
+		}
+		return index;
+	}
+}
+
 public class GridLayer : LooseLayer {
 	public Color color = Color.Color8(50, 50, 50, 150);
 	public float lineWidth = (float)1.0;
@@ -397,6 +555,7 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
+		looseView.layers.Add(new HillsLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);
 		looseView.layers.Add(new BuildingLayer());

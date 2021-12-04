@@ -10,7 +10,8 @@ namespace C7GameData
         public Civ3ExtraInfo ExtraInfo;
         public int xCoordinate;
         public int yCoordinate;
-        public TerrainType terrainType;
+        public TerrainType terrainType = TerrainType.NONE;
+        public TerrainType overlayTerrainType = TerrainType.NONE;
         public City cityAtTile;
         public bool hasBarbarianCamp = false;
 
@@ -21,6 +22,12 @@ namespace C7GameData
         //efficient to perform calculations, whether you need to know which unit on a tile
         //has the best defense, or which tile a unit is on when viewing the Military Advisor.
         public List<MapUnit> unitsOnTile;
+
+        public Dictionary<TileDirection, Tile> neighbors {get; set;}
+
+        //See discussion on page 4 of the "Babylon" thread (https://forums.civfanatics.com/threads/0-1-babylon-progress-thread.673959) about sub-terrain type and Civ3 properties.
+        //We may well move these properties somewhere, whether that's Civ3ExtraInfo, a Civ3Tile child class, a Dictionary property, or something else, in the future.
+        public bool isSnowCapped;
 
         public Tile()
         {
@@ -38,5 +45,23 @@ namespace C7GameData
 		    } else
 			    return MapUnit.NONE;
 	    }
+        
+        public static Tile NONE = new Tile();
+
+        public override string ToString()
+        {
+            return "[" + xCoordinate + ", " + yCoordinate + "] (" + terrainType.name + ")";
+        }
+    }
+
+    public enum TileDirection {
+        NORTH,
+        NORTHEAST,
+        EAST,
+        SOUTHEAST,
+        SOUTH,
+        SOUTHWEST,
+        WEST,
+        NORTHWEST
     }
 }
