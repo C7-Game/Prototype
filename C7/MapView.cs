@@ -73,7 +73,11 @@ public class HillsLayer : LooseLayer {
 	private ImageTexture forestMountainTexture;
 	private ImageTexture jungleMountainTexture;
 	private ImageTexture hillsTexture;
+	private ImageTexture forestHillsTexture;
+	private ImageTexture jungleHillsTexture;
 	private ImageTexture volcanosTexture;
+	private ImageTexture forestVolcanoTexture;
+	private ImageTexture jungleVolcanoTexture;
 
 	public HillsLayer() {
 		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx");
@@ -81,7 +85,11 @@ public class HillsLayer : LooseLayer {
 		forestMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain forests.pcx");
 		jungleMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain jungles.pcx");
 		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx");
+		forestHillsTexture = Util.LoadTextureFromPCX("Art/Terrain/hill forests.pcx");
+		jungleHillsTexture = Util.LoadTextureFromPCX("Art/Terrain/hill jungle.pcx");
 		volcanosTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos.pcx");
+		forestVolcanoTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos forests.pcx");
+		jungleVolcanoTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos jungles.pcx");
 	}
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
@@ -114,12 +122,34 @@ public class HillsLayer : LooseLayer {
 			else if (tile.overlayTerrainType.name == "Hills") {
 				Rect2 hillsRectangle = new Rect2(column * hillsSize.x, row * hillsSize.y, hillsSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
-				looseView.DrawTextureRectRegion(hillsTexture, screenTarget, hillsRectangle);
+				ImageTexture hillGraphics;
+				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
+				if (dominantVegetation.name == "Forest") {
+					hillGraphics = forestHillsTexture;
+				}
+				else if (dominantVegetation.name == "Jungle") {
+					hillGraphics = jungleHillsTexture;
+				}
+				else {
+					hillGraphics = hillsTexture;
+				}
+				looseView.DrawTextureRectRegion(hillGraphics, screenTarget, hillsRectangle);
 			}
 			else if (tile.overlayTerrainType.name == "Volcano") {
 				Rect2 volcanoRectangle = new Rect2(column * volcanoSize.x, row * volcanoSize.y, volcanoSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * volcanoSize + new Vector2(0, -12), volcanoSize);
-				looseView.DrawTextureRectRegion(volcanosTexture, screenTarget, volcanoRectangle);
+				ImageTexture volcanoGraphics;
+				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
+				if (dominantVegetation.name == "Forest") {
+					volcanoGraphics = forestVolcanoTexture;
+				}
+				else if (dominantVegetation.name == "Jungle") {
+					volcanoGraphics = jungleVolcanoTexture;
+				}
+				else {
+					volcanoGraphics = hillsTexture;
+				}
+				looseView.DrawTextureRectRegion(volcanoGraphics, screenTarget, volcanoRectangle);
 			}
 		}
 	}
