@@ -90,6 +90,7 @@ namespace C7Engine
                 if (unit.guid == guid)
                 {
                     Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
+                    unit.facingDirection = TileDirection.SOUTHEAST;
                     unit.isFortified = true;
                     return;
                 }

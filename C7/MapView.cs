@@ -333,13 +333,25 @@ public class UnitLayer : LooseLayer {
 		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
 		inst.shaderMat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
 
+		int dirIndex = 0;
+		switch (activeAnim.direction) {
+		case TileDirection.NORTH:     dirIndex = 5; break;
+		case TileDirection.NORTHEAST: dirIndex = 4; break;
+		case TileDirection.EAST:      dirIndex = 3; break;
+		case TileDirection.SOUTHEAST: dirIndex = 2; break;
+		case TileDirection.SOUTH:     dirIndex = 1; break;
+		case TileDirection.SOUTHWEST: dirIndex = 0; break;
+		case TileDirection.WEST:      dirIndex = 7; break;
+		case TileDirection.NORTHWEST: dirIndex = 6; break;
+		}
+
 		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		int spriteColumn = (int)(activeAnim.progress * spritesPerRow);
 		if (spriteColumn >= spritesPerRow)
 			spriteColumn = spritesPerRow - 1;
 		else if (spriteColumn < 0)
 			spriteColumn = 0;
-		inst.shaderMat.SetShaderParam("spriteXY", new Vector2(spriteColumn, activeAnim.direction));
+		inst.shaderMat.SetShaderParam("spriteXY", new Vector2(spriteColumn, dirIndex));
 
 		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
 
