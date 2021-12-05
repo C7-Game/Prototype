@@ -727,15 +727,6 @@ public class MapView : Node2D {
 
 		AddChild(looseView);
 
-		// var (units32Palette, units32Indices) = loadPalettizedPCX("Art/Units/units_32.pcx");
-		// testShaderMaterial = createTestShaderMaterial((units32Palette, units32Indices), new Vector2(32, 32));
-		// AddChild(createInstancedMeshTest(testShaderMaterial, units32Indices));
-		// var flicTest = createFlicTest();
-		// testShaderMaterial = flicTest.Material as ShaderMaterial;
-		// flicTest.Position = new Vector2(300, 300);
-		// flicTest.Scale = new Vector2(1, -1);
-		// AddChild(flicTest);
-
 		onVisibleAreaChanged();
 	}
 
@@ -743,77 +734,6 @@ public class MapView : Node2D {
 	{
 		looseView.Update(); // Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but
 				    // long term I think it's better to redraw everything every frame like a typical modern video game.
-		return;
-
-		var ts = (double)OS.GetTicksMsec();
-
-		var r = 0.5 + 0.5 * Math.Sin(ts / 200.0);
-		var g = 0.5 + 0.5 * Math.Cos(ts / 200.0);
-		var b = 0.5 + 0.5 * Math.Sin(ts / 400.0);
-		testShaderMaterial.SetShaderParam("civColor", new Vector3((float)r, (float)g, (float)b));
-
-		testShaderMaterial.SetShaderParam("spriteXY", new Vector2((int)(ts / 100.0) % 10, 0));
-	}
-
-	public ShaderMaterial createTestShaderMaterial((ImageTexture, ImageTexture) paletteAndIndices, Vector2 spriteSize)
-	{
-
-		var (civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
-		var (palette, indices) = paletteAndIndices;
-
-		var tr = new ShaderMaterial();
-		tr.Shader = UnitLayer.getShader();
-		tr.SetShaderParam("palette", palette);
-		tr.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
-		tr.SetShaderParam("indices", indices);
-		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
-		tr.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
-		tr.SetShaderParam("spriteXY", new Vector2(0, 0));
-		tr.SetShaderParam("civColor", new Vector3(0.4f, 0.4f, 1));
-		return tr;
-	}
-
-
-	public MeshInstance2D createFlicTest()
-	{
-		var (flicSheet, _) = Util.loadFlicSheet("Art/Units/warrior/warriorRun.flc");
-
-		var quad = new QuadMesh();
-		quad.Size = new Vector2(600, 600);
-
-		var tr = new MeshInstance2D();
-		tr.Material = createTestShaderMaterial((flicSheet.palette, flicSheet.indices), new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight));
-		tr.Mesh = quad;
-		return tr;
-	}
-
-	public MultiMeshInstance2D createInstancedMeshTest(ShaderMaterial shaderMaterial, ImageTexture indices)
-	{
-		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
-
-		var quad = new QuadMesh();
-		quad.Size = new Vector2(32, 32); // Same as sprite size
-
-		var mm = new MultiMesh();
-		mm.TransformFormat = MultiMesh.TransformFormatEnum.Transform2d;
-		mm.ColorFormat = MultiMesh.ColorFormatEnum.None;
-		mm.CustomDataFormat = MultiMesh.CustomDataFormatEnum.Float;
-		mm.Mesh = quad;
-
-		mm.InstanceCount = 70;
-		for (int n = 0; n < mm.InstanceCount; n++) {
-			var tform = new Transform2D(0, new Vector2(50 + 12 * n, 150 + 100 * (float)Math.Sin(0.75f * n)));
-			tform.Scale = new Vector2(1, -1); // Flip vertically
-			mm.SetInstanceTransform2d(n, tform);
-			int spriteIndex = n;
-			var spriteOffset = new Vector2(1 + 33 * (spriteIndex%14), 1 + 33 * (spriteIndex/14)) / indicesDims;
-			mm.SetInstanceCustomData(n, new Color(spriteOffset.x, spriteOffset.y, 0, 0));
-		}
-
-		var tr = new MultiMeshInstance2D();
-		tr.Material = shaderMaterial;
-		tr.Multimesh = mm;
-		return tr;
 	}
 
 	public bool isRowAt(int y)
