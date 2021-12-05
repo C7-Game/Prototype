@@ -128,6 +128,12 @@ public class UnitLayer : LooseLayer {
 		}
 	}
 
+	// AnimationInstance represents an animation appearing on the screen. It's specific to a unit, action, and direction. AnimationInstances have
+	// two components: a ShaderMaterial and a MeshInstance2D. The ShaderMaterial runs the unit shader (created by UnitLayer.getShader) with all
+	// the parameters set to a particular texture, civ color, direction, etc. The MeshInstance2D is what's actually drawn by Godot, i.e., what's
+	// added to the node tree. AnimationInstances are only active for one frame at a time but they live as long as the UnitLayer. They are
+	// retrieved or created as needed by getBlankAnimationInstance during the drawing of units and are hidden & requeued for use at the beginning
+	// of each frame.
 	public class AnimationInstance {
 		public ShaderMaterial shaderMat;
 		public MeshInstance2D meshInst;
@@ -140,7 +146,7 @@ public class UnitLayer : LooseLayer {
 				(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");;
 
 			var quad = new QuadMesh();
-			quad.Size = new Vector2(1, 1);
+			quad.Size = new Vector2(1, 1); // The mesh will be scaled to the appropriate sprite size when this AnimationInstance is used
 
 			shaderMat = new ShaderMaterial();
 			shaderMat.Shader = getShader();
@@ -158,6 +164,7 @@ public class UnitLayer : LooseLayer {
 	private List<AnimationInstance> animInsts = new List<AnimationInstance>();
 	private int nextBlankAnimInst = 0;
 
+	// Returns the next unused AnimationInstance or creates & returns a new one if none are available.
 	public AnimationInstance getBlankAnimationInstance(LooseView looseView)
 	{
 		if (nextBlankAnimInst >= animInsts.Count) {
