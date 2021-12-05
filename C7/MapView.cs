@@ -19,6 +19,9 @@ public abstract class LooseLayer {
 	//     MapView already transforms the looseView node to account for those things.
 	public abstract void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
 
+	public virtual void onBeginDraw(LooseView looseView) {}
+	public virtual void onEndDraw(LooseView looseView) {}
+
 	// The layer will be skipping during map drawing if visible is false
 	public bool visible = true;
 }
@@ -264,6 +267,116 @@ public class UnitLayer : LooseLayer {
 			return Color.Color8(255, 0, 0);
 	}
 
+	public struct ActiveAnimation {
+		public string name;
+		public int direction; // TODO: Make this an enum
+		public float progress; // Varies 0 to 1
+		public float offsetX, offsetY; // Offset is in grid cells from the unit's location
+	}
+
+	// TODO: This needs to be part of the engine eventually.
+	public ActiveAnimation getActiveAnimation(MapUnit unit)
+	{
+		if ((! unit.isFortified) || (unit.unitType.name == "Worker")) {
+			var animName = String.Format("Art/Units/{0}/{0}Default.flc", unit.unitType.name);
+			return new ActiveAnimation { name = animName, direction = 0, progress = 0, offsetX = 0, offsetY = 0 };
+		} else {
+			var animName = String.Format("Art/Units/{0}/{0}Fortify.flc", unit.unitType.name);
+			return new ActiveAnimation { name = animName, direction = 2, progress = 1, offsetX = 0, offsetY = 0 };
+		}
+	}
+
+	// AnimationInstance represents an animation appearing on the screen. It's specific to a unit, action, and direction. AnimationInstances have
+	// two components: a ShaderMaterial and a MeshInstance2D. The ShaderMaterial runs the unit shader (created by UnitLayer.getShader) with all
+	// the parameters set to a particular texture, civ color, direction, etc. The MeshInstance2D is what's actually drawn by Godot, i.e., what's
+	// added to the node tree. AnimationInstances are only active for one frame at a time but they live as long as the UnitLayer. They are
+	// retrieved or created as needed by getBlankAnimationInstance during the drawing of units and are hidden & requeued for use at the beginning
+	// of each frame.
+	public class AnimationInstance {
+		public ShaderMaterial shaderMat;
+		public MeshInstance2D meshInst;
+
+		private static ImageTexture civColorWhitePalette = null;
+
+		public AnimationInstance(LooseView looseView)
+		{
+			if (civColorWhitePalette == null)
+				(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");;
+
+			var quad = new QuadMesh();
+			quad.Size = new Vector2(1, 1); // The mesh will be scaled to the appropriate sprite size when this AnimationInstance is used
+
+			shaderMat = new ShaderMaterial();
+			shaderMat.Shader = getShader();
+			shaderMat.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
+
+			meshInst = new MeshInstance2D();
+			meshInst.Material = shaderMat;
+			meshInst.Mesh = quad;
+
+			looseView.AddChild(meshInst);
+			meshInst.Hide();
+		}
+	}
+
+	private List<AnimationInstance> animInsts = new List<AnimationInstance>();
+	private int nextBlankAnimInst = 0;
+
+	// Returns the next unused AnimationInstance or creates & returns a new one if none are available.
+	public AnimationInstance getBlankAnimationInstance(LooseView looseView)
+	{
+		if (nextBlankAnimInst >= animInsts.Count) {
+			animInsts.Add(new AnimationInstance(looseView));
+		}
+		var tr = animInsts[nextBlankAnimInst];
+		nextBlankAnimInst++;
+		tr.meshInst.Show();
+		return tr;
+	}
+
+	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
+
+	public void drawAnimationFrame(LooseView looseView, ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
+	{
+		var inst = getBlankAnimationInstance(looseView);
+
+		Util.FlicSheet flicSheet;
+		if (! flicSheets.TryGetValue(activeAnim.name, out flicSheet)) {
+			(flicSheet, _) = Util.loadFlicSheet(activeAnim.name);
+			flicSheets.Add(activeAnim.name, flicSheet);
+		}
+		inst.shaderMat.SetShaderParam("palette", flicSheet.palette);
+		inst.shaderMat.SetShaderParam("indices", flicSheet.indices);
+
+		var indicesDims = new Vector2(flicSheet.indices.GetWidth(), flicSheet.indices.GetHeight());
+		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
+		inst.shaderMat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
+
+		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
+		int spriteColumn = (int)(activeAnim.progress * spritesPerRow);
+		if (spriteColumn >= spritesPerRow)
+			spriteColumn = spritesPerRow - 1;
+		else if (spriteColumn < 0)
+			spriteColumn = 0;
+		inst.shaderMat.SetShaderParam("spriteXY", new Vector2(spriteColumn, activeAnim.direction));
+
+		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
+
+		// TODO: Must apply activeAnim.offsetX/Y
+		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
+		// amount but it looks close TODO: Investigate more, find the exact amount.
+		inst.meshInst.Position = tileCenter - new Vector2(0, flicSheet.spriteHeight / 4);
+		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight); // Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
+	}
+
+	public override void onBeginDraw(LooseView looseView)
+	{
+		// Reset animation instances
+		for (int n = 0; n < nextBlankAnimInst; n++)
+			animInsts[n].meshInst.Hide();
+		nextBlankAnimInst = 0;
+	}
+
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.unitsOnTile.Count == 0)
@@ -281,14 +394,15 @@ public class UnitLayer : LooseLayer {
 			}
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
-		// Draw colored circle at unit's feet to show who owns it
-		looseView.DrawCircle(tileCenter, 8, new Color(unit.owner.color));
-
-		int iconIndex = unit.unitType.iconIndex;
-		Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
-		Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-		Rect2 screenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
-		looseView.DrawTextureRectRegion(unitIcons, screenRect, unitRect);
+		if (unit.unitType.name != "Settler") // The Flic files for settlers have nonstandard names so we can't load them right now
+			drawAnimationFrame(looseView, getActiveAnimation(unit), tileCenter, new Color(unit.owner.color));
+		else {
+			int iconIndex = unit.unitType.iconIndex;
+			Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
+			Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
+			Rect2 iconScreenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
+			looseView.DrawTextureRectRegion(unitIcons, iconScreenRect, unitRect);
+		}
 
 		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
 
@@ -296,7 +410,7 @@ public class UnitLayer : LooseLayer {
 		int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
 		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
 		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-		screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
+		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
 		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
 
 		int hpIndHeight = 20, hpIndWidth = 6;
@@ -325,6 +439,58 @@ public class UnitLayer : LooseLayer {
 				looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
 			}
 		}
+	}
+
+	private static Shader shader = null;
+
+	public static Shader getShader()
+	{
+		if (shader != null)
+			return shader;
+
+		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
+		// broken on Godot because there's no way to create a texture with a compatible format. See:
+		// https://www.khronos.org/opengl/wiki/Sampler_(GLSL)#Sampler_types - Says it's undefined behavior to read from a usampler2d if the
+		// attached texture format is not GL_R8UI.
+		// https://docs.godotengine.org/en/stable/classes/class_image.html#enum-image-format - None of the Godot texture formats correspond to
+		// GL_R8UI. The closest is FORMAT_R8 which corresponds to GL_RED except that won't work since it's a floating point format.
+		string shaderSource = @"
+		shader_type canvas_item;
+		uniform sampler2D palette;
+		uniform sampler2D civColorWhitePalette;
+		uniform sampler2D indices;
+		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
+		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
+		uniform vec3 civColor;
+
+		vec4 sampleCivTintedColor(vec2 paletteCoords)
+		{
+			return vec4(civColor, 1.0) * texture(civColorWhitePalette, paletteCoords);
+		}
+
+		void vertex()
+		{
+			UV = (spriteXY + UV) * relSpriteSize;
+		}
+
+		void fragment()
+		{
+			int colorIndex = int(255.0 * texture(indices, UV).r);
+			if (colorIndex >= 254) // indices 254 and 255 are transparent
+				discard;
+			vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
+			bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
+			if (tintedByCiv)
+				COLOR = sampleCivTintedColor(paletteCoords);
+			else
+				COLOR = texture(palette, paletteCoords);
+		}
+		";
+		var tr = new Shader();
+		tr.Code = shaderSource;
+
+		shader = tr;
+		return tr;
 	}
 }
 
@@ -496,7 +662,8 @@ public class LooseView : Node2D {
 		base._Draw();
 
 		var map = MapInteractions.GetWholeMap();
-		foreach (var layer in layers.FindAll(L => L.visible))
+		foreach (var layer in layers.FindAll(L => L.visible)) {
+			layer.onBeginDraw(this);
 			foreach (var vT in mapView.visibleTiles()) {
 				int x = mapView.wrapTileX(vT.virtTileX);
 				int y = mapView.wrapTileY(vT.virtTileY);
@@ -504,6 +671,8 @@ public class LooseView : Node2D {
 				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
 				layer.drawObject(this, tile, tileCenter);
 			}
+			layer.onEndDraw(this);
+		}
 	}
 }
 
@@ -542,6 +711,7 @@ public class MapView : Node2D {
 	}
 
 	private LooseView looseView;
+	private ShaderMaterial testShaderMaterial;
 
 	public GridLayer gridLayer { get; private set; }
 
@@ -564,7 +734,91 @@ public class MapView : Node2D {
 
 		AddChild(looseView);
 
+		// var (units32Palette, units32Indices) = loadPalettizedPCX("Art/Units/units_32.pcx");
+		// testShaderMaterial = createTestShaderMaterial((units32Palette, units32Indices), new Vector2(32, 32));
+		// AddChild(createInstancedMeshTest(testShaderMaterial, units32Indices));
+		// var flicTest = createFlicTest();
+		// testShaderMaterial = flicTest.Material as ShaderMaterial;
+		// flicTest.Position = new Vector2(300, 300);
+		// flicTest.Scale = new Vector2(1, -1);
+		// AddChild(flicTest);
+
 		onVisibleAreaChanged();
+	}
+
+	public override void _Process(float delta)
+	{
+		return;
+
+		var ts = (double)OS.GetTicksMsec();
+
+		var r = 0.5 + 0.5 * Math.Sin(ts / 200.0);
+		var g = 0.5 + 0.5 * Math.Cos(ts / 200.0);
+		var b = 0.5 + 0.5 * Math.Sin(ts / 400.0);
+		testShaderMaterial.SetShaderParam("civColor", new Vector3((float)r, (float)g, (float)b));
+
+		testShaderMaterial.SetShaderParam("spriteXY", new Vector2((int)(ts / 100.0) % 10, 0));
+	}
+
+	public ShaderMaterial createTestShaderMaterial((ImageTexture, ImageTexture) paletteAndIndices, Vector2 spriteSize)
+	{
+
+		var (civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
+		var (palette, indices) = paletteAndIndices;
+
+		var tr = new ShaderMaterial();
+		tr.Shader = UnitLayer.getShader();
+		tr.SetShaderParam("palette", palette);
+		tr.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
+		tr.SetShaderParam("indices", indices);
+		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
+		tr.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
+		tr.SetShaderParam("spriteXY", new Vector2(0, 0));
+		tr.SetShaderParam("civColor", new Vector3(0.4f, 0.4f, 1));
+		return tr;
+	}
+
+
+	public MeshInstance2D createFlicTest()
+	{
+		var (flicSheet, _) = Util.loadFlicSheet("Art/Units/warrior/warriorRun.flc");
+
+		var quad = new QuadMesh();
+		quad.Size = new Vector2(600, 600);
+
+		var tr = new MeshInstance2D();
+		tr.Material = createTestShaderMaterial((flicSheet.palette, flicSheet.indices), new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight));
+		tr.Mesh = quad;
+		return tr;
+	}
+
+	public MultiMeshInstance2D createInstancedMeshTest(ShaderMaterial shaderMaterial, ImageTexture indices)
+	{
+		var indicesDims = new Vector2(indices.GetWidth(), indices.GetHeight());
+
+		var quad = new QuadMesh();
+		quad.Size = new Vector2(32, 32); // Same as sprite size
+
+		var mm = new MultiMesh();
+		mm.TransformFormat = MultiMesh.TransformFormatEnum.Transform2d;
+		mm.ColorFormat = MultiMesh.ColorFormatEnum.None;
+		mm.CustomDataFormat = MultiMesh.CustomDataFormatEnum.Float;
+		mm.Mesh = quad;
+
+		mm.InstanceCount = 70;
+		for (int n = 0; n < mm.InstanceCount; n++) {
+			var tform = new Transform2D(0, new Vector2(50 + 12 * n, 150 + 100 * (float)Math.Sin(0.75f * n)));
+			tform.Scale = new Vector2(1, -1); // Flip vertically
+			mm.SetInstanceTransform2d(n, tform);
+			int spriteIndex = n;
+			var spriteOffset = new Vector2(1 + 33 * (spriteIndex%14), 1 + 33 * (spriteIndex/14)) / indicesDims;
+			mm.SetInstanceCustomData(n, new Color(spriteOffset.x, spriteOffset.y, 0, 0));
+		}
+
+		var tr = new MultiMeshInstance2D();
+		tr.Material = shaderMaterial;
+		tr.Multimesh = mm;
+		return tr;
 	}
 
 	public bool isRowAt(int y)

@@ -103,10 +103,82 @@ public class Util
 		if (PcxCache.ContainsKey(relPath)) {
 			return PcxCache[relPath];
 		}
-		Pcx thePcx = new Pcx(Util.Civ3MediaPath(relPath));
+		Pcx thePcx = new Pcx(Civ3MediaPath(relPath));
 		PcxCache[relPath] = thePcx;
 		return thePcx;
 	}
+
+	// Creates a texture from raw palette data. The data must be 256 pixels by 3 channels. Returns a 16x16 unfiltered RGB texture.
+	public static ImageTexture createPaletteTexture(byte[,] raw)
+	{
+		if ((raw.GetLength(0) != 256) || (raw.GetLength(1) != 3))
+			throw new Exception("Invalid palette dimensions. Palettes must be 256x3.");
+
+		// Flatten palette data since CreateFromData can't accept two-dimensional arrays
+		byte[] flatPalette = new byte[3*256];
+		for (int n = 0; n < 256; n++)
+			for (int k = 0; k < 3; k++)
+				flatPalette[k + 3 * n] = raw[n, k];
+
+		var img = new Image();
+		img.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
+		var tex = new ImageTexture();
+		tex.CreateFromImage(img, 0);
+		return tex;
+	}
+
+	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
+	// color palette and the second is the size of the image itself and contains the indices in R8 format.
+	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string filePath)
+	{
+		var pcx = LoadPCX(filePath);
+
+		var imgIndices = new Image();
+		imgIndices.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
+		var texIndices = new ImageTexture();
+		texIndices.CreateFromImage(imgIndices, 0);
+
+		return (createPaletteTexture(pcx.Palette), texIndices);
+	}
+
+	// A FlicSheet is a sprite sheet created from a Flic file, with each frame of the animation as its own sprite
+	public struct FlicSheet {
+		public ImageTexture palette, indices;
+		public int spriteWidth, spriteHeight;
+	}
+
+	// Loads a Flic and also converts it into a sprite sheet
+	public static (FlicSheet, Flic) loadFlicSheet(string filePath)
+	{
+		var flic = new Flic(Util.Civ3MediaPath(filePath));
+
+		var texPalette = Util.createPaletteTexture(flic.Palette);
+
+		var countColumns = flic.Images.GetLength(1); // Each column contains one frame
+		var countRows = flic.Images.GetLength(0); // Each row contains one animation
+		var countImages = countColumns * countRows;
+
+		byte[] allIndices = new byte[countRows * countColumns * flic.Width * flic.Height];
+		// row, col loop over the sprites, each one a frame of the animation
+		for (int row = 0; row < countRows; row++)
+			for (int col = 0; col < countColumns; col++)
+				// x, y loop over pixels within each sprite
+				for (int y = 0; y < flic.Height; y++)
+					for (int x = 0; x < flic.Width; x++) {
+						int pixelRow = row * flic.Height + y,
+						    pixelCol = col * flic.Width + x,
+						    pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
+						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
+					}
+
+		var imgIndices = new Image();
+		imgIndices.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
+		var texIndices = new ImageTexture();
+		texIndices.CreateFromImage(imgIndices, 0);
+
+		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);
+	}
+
 
 	static public AudioStreamSample LoadWAVFromDisk(string path)
 	{
