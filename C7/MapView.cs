@@ -726,8 +726,6 @@ public class MapView : Node2D {
 		looseView.layers.Add(new CityLayer());
 
 		AddChild(looseView);
-
-		onVisibleAreaChanged();
 	}
 
 	public override void _Process(float delta)
@@ -799,19 +797,6 @@ public class MapView : Node2D {
 					}
 				}
 		}
-	}
-
-	public void onVisibleAreaChanged()
-	{
-		// TODO: Update this comment and move it somewhere more appropriate
-		// MapView is not the entire game map, rather it is a window into the game map that stays near the origin and covers the entire
-		// screen. For small movements, the MapView itself is moved (amount is in cameraResidueX/Y) but once the movement equals an entire
-		// grid cell (2 times the tile width or height) the map is snapped back toward the origin by that amount and to compensate it changes
-		// what tiles are drawn (cameraTileX/Y). The advantage to doing things this way is that it makes it easy to duplicate tiles around
-		// wrapped edges.
-
-		looseView.Position = -cameraLocation;
-		looseView.Update(); // trigger redraw
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
@@ -886,7 +871,7 @@ public class MapView : Node2D {
 		}
 
 		internalCameraLocation = location;
-		onVisibleAreaChanged();
+		looseView.Position = -location;
 	}
 
 	public Vector2 screenLocationOfTileCoords(int x, int y, bool center = true)

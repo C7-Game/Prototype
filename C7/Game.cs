@@ -139,10 +139,7 @@ public class Game : Node2D
 			var relativeScreenLocation = mapView.screenLocationOfTile(unit.location, true) / mapView.getVisibleAreaSize();
 			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
 				mapView.centerCameraOnTile(unit.location);
-			else
-				mapView.onVisibleAreaChanged();
-		} else
-			mapView.onVisibleAreaChanged();
+		}
 
 		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {
@@ -224,11 +221,6 @@ public class Game : Node2D
 	public void _on_Zoom_value_changed(float value)
 	{
 		mapView.setCameraZoomFromMiddle(value);
-	}
-
-	public void _OnViewportSizeChanged()
-	{
-		mapView.onVisibleAreaChanged();
 	}
 
 	public void AdjustZoomSlider(int numSteps, Vector2 zoomCenter)
@@ -354,7 +346,6 @@ public class Game : Node2D
 					else {
 						setSelectedUnit(CurrentlySelectedUnit);
 					}
-					mapView.onVisibleAreaChanged();
 				}
 			}
 			// I key toggles the grid. This should be CTRL+G to match the original game but that key combination gets intercepted by the
@@ -362,7 +353,6 @@ public class Game : Node2D
 			else if (eventKey.Scancode == (int)Godot.KeyList.I)
 			{
 				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
-				mapView.onVisibleAreaChanged(); // Trigger redraw
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
