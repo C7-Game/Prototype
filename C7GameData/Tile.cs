@@ -1,5 +1,6 @@
 namespace C7GameData
 {
+    using System;
     using System.Collections.Generic;
     public class Tile
     {
@@ -64,4 +65,22 @@ namespace C7GameData
         WEST,
         NORTHWEST
     }
+
+    static class TileDirectionExtensions {
+        public static TileDirection reverse(this TileDirection dir)
+        {
+            switch (dir) {
+            case TileDirection.NORTH:     return TileDirection.SOUTH;
+            case TileDirection.NORTHEAST: return TileDirection.SOUTHWEST;
+            case TileDirection.EAST:      return TileDirection.WEST;
+            case TileDirection.SOUTHEAST: return TileDirection.NORTHWEST;
+            case TileDirection.SOUTH:     return TileDirection.NORTH;
+            case TileDirection.SOUTHWEST: return TileDirection.NORTHEAST;
+            case TileDirection.WEST:      return TileDirection.EAST;
+            case TileDirection.NORTHWEST: return TileDirection.SOUTHEAST;
+            default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+            }
+        }
+    }
+
 }
