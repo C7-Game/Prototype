@@ -92,6 +92,7 @@ namespace C7Engine
                     Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
                     unit.facingDirection = TileDirection.SOUTHEAST;
                     unit.isFortified = true;
+                    unit.animAction = MapUnit.AnimatedAction.FORTIFY;
                     unit.animStartTimeMS = currentTimeMS;
                     return;
                 }

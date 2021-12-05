@@ -355,10 +355,10 @@ public class UnitLayer : LooseLayer {
 
 		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
 
-		// TODO: Must apply activeAnim.offsetX/Y
+		var animOffset = MapView.cellSize * new Vector2(activeAnim.offsetX, activeAnim.offsetY);
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
 		// amount but it looks close TODO: Investigate more, find the exact amount.
-		inst.meshInst.Position = tileCenter - new Vector2(0, flicSheet.spriteHeight / 4);
+		inst.meshInst.Position = tileCenter + animOffset - new Vector2(0, flicSheet.spriteHeight / 4);
 		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight); // Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
 	}
 
