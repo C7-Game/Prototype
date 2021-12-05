@@ -106,43 +106,42 @@ namespace C7Engine
         // stepUnit except it's the only unit movement function we have right now so calling it moveUnit is fine. But later we might want a more
         // powerful moveUnit function that can accept non-neighboring tiles and/or do things like rebase air units. Also direction should be an
         // enum or something.
-        public static void moveUnit(string guid, int direction)
+        public static void moveUnit(string guid, TileDirection dir)
+        {
+            GameData gameData = EngineStorage.gameData;
+            //This is inefficient, perhaps we'll have a map someday.  But with three units,
+            //we'll survive for now.
+            foreach (MapUnit unit in gameData.mapUnits)
             {
-                GameData gameData = EngineStorage.gameData;
-                //This is inefficient, perhaps we'll have a map someday.  But with three units,
-                //we'll survive for now.
-                foreach (MapUnit unit in gameData.mapUnits)
+                if (unit.guid == guid)
                 {
-                    if (unit.guid == guid)
-                    {
-                        int dx, dy;
-                        switch (direction) {
-                        case 1: dx =  1; dy = -1; break;
-                        case 2: dx =  2; dy =  0; break;
-                        case 3: dx =  1; dy =  1; break;
-                        case 4: dx =  0; dy =  2; break;
-                        case 5: dx = -1; dy =  1; break;
-                        case 6: dx = -2; dy =  0; break;
-                        case 7: dx = -1; dy = -1; break;
-                        case 8: dx =  0; dy = -2; break;
-                        default:
-                            return;
-                        }
-
-                        var newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-                        if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
-                            if (! unit.location.unitsOnTile.Remove(unit))
-                                throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
-                            newLoc.unitsOnTile.Add(unit);
-                            unit.location = newLoc;
-                            unit.movementPointsRemaining -= 1;
-                            unit.isFortified = false;
-                        }
-
-                        break;
+                    int dx, dy;
+                    switch (dir) {
+                    case TileDirection.NORTH:     dx =  0; dy = -2; break;
+                    case TileDirection.NORTHEAST: dx =  1; dy = -1; break;
+                    case TileDirection.EAST:      dx =  2; dy =  0; break;
+                    case TileDirection.SOUTHEAST: dx =  1; dy =  1; break;
+                    case TileDirection.SOUTH:     dx =  0; dy =  2; break;
+                    case TileDirection.SOUTHWEST: dx = -1; dy =  1; break;
+                    case TileDirection.WEST:      dx = -2; dy =  0; break;
+                    case TileDirection.NORTHWEST: dx = -1; dy = -1; break;
+                    default: return;
                     }
+
+                    var newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
+                    if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
+                        if (! unit.location.unitsOnTile.Remove(unit))
+                            throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
+                        newLoc.unitsOnTile.Add(unit);
+                        unit.location = newLoc;
+                        unit.movementPointsRemaining -= 1;
+                        unit.isFortified = false;
+                    }
+
+                    break;
                 }
             }
+        }
 
         /**
          * I'd like to enhance this so it's like Civ4, where the hold action takes

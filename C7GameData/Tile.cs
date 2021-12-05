@@ -67,7 +67,7 @@ namespace C7GameData
     }
 
     static class TileDirectionExtensions {
-        public static TileDirection reverse(this TileDirection dir)
+        public static TileDirection reversed(this TileDirection dir)
         {
             switch (dir) {
             case TileDirection.NORTH:     return TileDirection.SOUTH;

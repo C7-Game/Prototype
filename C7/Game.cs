@@ -338,8 +338,19 @@ public class Game : Node2D
 			{
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
-					var dirs = new int[] {5, 4, 3, 6, 0, 2, 7, 8, 1}; // SW, S, SE, W, ., E, NW, N, NE
-					var dir = dirs[eventKey.Scancode - (int)Godot.KeyList.Kp1];
+					TileDirection dir;
+					switch (eventKey.Scancode - (int)Godot.KeyList.Kp1) {
+					case 0: dir = TileDirection.SOUTHWEST; break;
+					case 1: dir = TileDirection.SOUTH;     break;
+					case 2: dir = TileDirection.SOUTHEAST; break;
+					case 3: dir = TileDirection.WEST;      break;
+					case 4: return; // Key pad 5 => don't move
+					case 5: dir = TileDirection.EAST;      break;
+					case 6: dir = TileDirection.NORTHWEST; break;
+					case 7: dir = TileDirection.NORTH;     break;
+					case 8: dir = TileDirection.NORTHEAST; break;
+					default: return; // Impossible
+					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
 					if (CurrentlySelectedUnit.movementPointsRemaining <= 0)
 						GetNextAutoselectedUnit();
