@@ -106,7 +106,7 @@ namespace C7Engine
         // stepUnit except it's the only unit movement function we have right now so calling it moveUnit is fine. But later we might want a more
         // powerful moveUnit function that can accept non-neighboring tiles and/or do things like rebase air units. Also direction should be an
         // enum or something.
-        public static void moveUnit(string guid, TileDirection dir)
+        public static void moveUnit(string guid, ulong currentTimeMS, TileDirection dir)
         {
             GameData gameData = EngineStorage.gameData;
             //This is inefficient, perhaps we'll have a map someday.  But with three units,
@@ -125,6 +125,8 @@ namespace C7Engine
                         unit.facingDirection = dir;
                         unit.movementPointsRemaining -= 1;
                         unit.isFortified = false;
+                        unit.animAction = MapUnit.AnimatedAction.RUN;
+                        unit.animStartTimeMS = currentTimeMS;
                     }
 
                     break;

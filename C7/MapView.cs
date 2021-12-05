@@ -387,15 +387,7 @@ public class UnitLayer : LooseLayer {
 			}
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
-		if (unit.unitType.name != "Settler") // The Flic files for settlers have nonstandard names so we can't load them right now
-			drawAnimationFrame(looseView, unit.getActiveAnimation(OS.GetTicksMsec()), tileCenter, new Color(unit.owner.color));
-		else {
-			int iconIndex = unit.unitType.iconIndex;
-			Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
-			Rect2 unitRect = new Rect2(iconUpperLeft, new Vector2(32, 32));
-			Rect2 iconScreenRect = new Rect2(tileCenter - new Vector2(24, 40), new Vector2(48, 48));
-			looseView.DrawTextureRectRegion(unitIcons, iconScreenRect, unitRect);
-		}
+		drawAnimationFrame(looseView, unit.getActiveAnimation(OS.GetTicksMsec()), tileCenter, new Color(unit.owner.color));
 
 		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
 

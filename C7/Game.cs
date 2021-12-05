@@ -351,7 +351,7 @@ public class Game : Node2D
 					case 8: dir = TileDirection.NORTHEAST; break;
 					default: return; // Impossible
 					}
-					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec(), dir);
 					if (CurrentlySelectedUnit.movementPointsRemaining <= 0)
 						GetNextAutoselectedUnit();
 					else {

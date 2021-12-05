@@ -79,18 +79,29 @@ public class MapUnit
 				animCoreName = String.Format("{0}Fortify", unitType.name);
 			else
 				animCoreName = String.Format("{0}Default", unitType.name);
-		} else if (animAction == AnimatedAction.RUN) {
+		} else if ((animAction == AnimatedAction.RUN) && (progress < 1f)) {
 			if (unitType.name == "Worker")
 				animCoreName = "workRun";
 			else if (unitType.name == "Settler")
 				animCoreName = "settRun";
 			else
 				animCoreName = String.Format("{0}Run", unitType.name);
-		} else
-			animCoreName = String.Format("{0}Default", unitType.name);
+		} else {
+			if (unitType.name != "Settler")
+				animCoreName = String.Format("{0}Default", unitType.name);
+			else
+				animCoreName = "settDefault";
+		}
+
+		float offsetX = 0, offsetY = 0;
+		if ((animAction == AnimatedAction.RUN) && (progress < 1f)) {
+			(int dX, int dY) = facingDirection.toCoordDiff();
+			offsetX = -1 * dX * (1f - progress);
+			offsetY = -1 * dY * (1f - progress);
+		}
 
 		string animName = String.Format("Art/Units/{0}/{1}.flc", unitType.name, animCoreName);
-		return new ActiveAnimation { name = animName, direction = facingDirection, progress = progress, offsetX = 0, offsetY = 0 };
+		return new ActiveAnimation { name = animName, direction = facingDirection, progress = progress, offsetX = offsetX, offsetY = offsetY };
 	}
 
 	public static MapUnit NONE = new MapUnit();
