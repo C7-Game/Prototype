@@ -115,25 +115,14 @@ namespace C7Engine
             {
                 if (unit.guid == guid)
                 {
-                    int dx, dy;
-                    switch (dir) {
-                    case TileDirection.NORTH:     dx =  0; dy = -2; break;
-                    case TileDirection.NORTHEAST: dx =  1; dy = -1; break;
-                    case TileDirection.EAST:      dx =  2; dy =  0; break;
-                    case TileDirection.SOUTHEAST: dx =  1; dy =  1; break;
-                    case TileDirection.SOUTH:     dx =  0; dy =  2; break;
-                    case TileDirection.SOUTHWEST: dx = -1; dy =  1; break;
-                    case TileDirection.WEST:      dx = -2; dy =  0; break;
-                    case TileDirection.NORTHWEST: dx = -1; dy = -1; break;
-                    default: return;
-                    }
-
+                    (int dx, int dy) = dir.toCoordDiff();
                     var newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
                     if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
                         if (! unit.location.unitsOnTile.Remove(unit))
                             throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
                         newLoc.unitsOnTile.Add(unit);
                         unit.location = newLoc;
+                        unit.facingDirection = dir;
                         unit.movementPointsRemaining -= 1;
                         unit.isFortified = false;
                     }
