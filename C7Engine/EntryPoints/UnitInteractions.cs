@@ -79,7 +79,7 @@ namespace C7Engine
             return unit;
         }
 
-        public static void fortifyUnit(string guid)
+        public static void fortifyUnit(string guid, ulong currentTimeMS)
         {
             GameData gameData = EngineStorage.gameData;
             //This is inefficient, perhaps we'll have a map someday.  But with three units,
@@ -92,6 +92,7 @@ namespace C7Engine
                     Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
                     unit.facingDirection = TileDirection.SOUTHEAST;
                     unit.isFortified = true;
+                    unit.animStartTimeMS = currentTimeMS;
                     return;
                 }
             }

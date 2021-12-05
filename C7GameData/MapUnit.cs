@@ -3,6 +3,7 @@ namespace C7GameData
 
 using System;
 using System.Collections.Generic;
+
 /**
  * A unit on the map.  Not to be confused with a unit prototype.
  **/
@@ -51,16 +52,23 @@ public class MapUnit
 		public float offsetX, offsetY; // Offset is in grid cells from the unit's location
 	}
 
+	// public ActiveAnimation activeAnim;
+	public ulong animStartTimeMS;
+
 	// TODO: This needs to be part of the engine eventually.
-	public ActiveAnimation getActiveAnimation()
+	public ActiveAnimation getActiveAnimation(ulong currentTimeMS)
 	{
-		if ((! isFortified) || (unitType.name == "Worker")) {
-			var animName = String.Format("Art/Units/{0}/{0}Default.flc", unitType.name);
-			return new ActiveAnimation { name = animName, direction = facingDirection, progress = 0, offsetX = 0, offsetY = 0 };
-		} else {
-			var animName = String.Format("Art/Units/{0}/{0}Fortify.flc", unitType.name);
-			return new ActiveAnimation { name = animName, direction = facingDirection, progress = 1, offsetX = 0, offsetY = 0 };
-		}
+		double runningTimeS = (currentTimeMS - animStartTimeMS) / 1000.0;
+		double animDuration = 0.5; // TODO: Read this from the INI files somehow
+		float progress = (float)(runningTimeS / animDuration);
+
+		string animName;
+		if ((! isFortified) || (unitType.name == "Worker"))
+			animName = String.Format("Art/Units/{0}/{0}Default.flc", unitType.name);
+		else
+			animName = String.Format("Art/Units/{0}/{0}Fortify.flc", unitType.name);
+
+		return new ActiveAnimation { name = animName, direction = facingDirection, progress = progress, offsetX = 0, offsetY = 0 };
 	}
 
 	public static MapUnit NONE = new MapUnit();

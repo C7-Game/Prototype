@@ -407,7 +407,7 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("fortify"))
 		{
-			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
+			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec());
 			GetNextAutoselectedUnit();
 		}
 		else if (buttonName.Equals("wait"))

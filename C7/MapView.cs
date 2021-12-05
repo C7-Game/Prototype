@@ -388,7 +388,7 @@ public class UnitLayer : LooseLayer {
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
 		if (unit.unitType.name != "Settler") // The Flic files for settlers have nonstandard names so we can't load them right now
-			drawAnimationFrame(looseView, unit.getActiveAnimation(), tileCenter, new Color(unit.owner.color));
+			drawAnimationFrame(looseView, unit.getActiveAnimation(OS.GetTicksMsec()), tileCenter, new Color(unit.owner.color));
 		else {
 			int iconIndex = unit.unitType.iconIndex;
 			Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
@@ -741,6 +741,8 @@ public class MapView : Node2D {
 
 	public override void _Process(float delta)
 	{
+		looseView.Update(); // Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but
+				    // long term I think it's better to redraw everything every frame like a typical modern video game.
 		return;
 
 		var ts = (double)OS.GetTicksMsec();
