@@ -267,25 +267,6 @@ public class UnitLayer : LooseLayer {
 			return Color.Color8(255, 0, 0);
 	}
 
-	public struct ActiveAnimation {
-		public string name;
-		public int direction; // TODO: Make this an enum
-		public float progress; // Varies 0 to 1
-		public float offsetX, offsetY; // Offset is in grid cells from the unit's location
-	}
-
-	// TODO: This needs to be part of the engine eventually.
-	public ActiveAnimation getActiveAnimation(MapUnit unit)
-	{
-		if ((! unit.isFortified) || (unit.unitType.name == "Worker")) {
-			var animName = String.Format("Art/Units/{0}/{0}Default.flc", unit.unitType.name);
-			return new ActiveAnimation { name = animName, direction = 0, progress = 0, offsetX = 0, offsetY = 0 };
-		} else {
-			var animName = String.Format("Art/Units/{0}/{0}Fortify.flc", unit.unitType.name);
-			return new ActiveAnimation { name = animName, direction = 2, progress = 1, offsetX = 0, offsetY = 0 };
-		}
-	}
-
 	// AnimationInstance represents an animation appearing on the screen. It's specific to a unit, action, and direction. AnimationInstances have
 	// two components: a ShaderMaterial and a MeshInstance2D. The ShaderMaterial runs the unit shader (created by UnitLayer.getShader) with all
 	// the parameters set to a particular texture, civ color, direction, etc. The MeshInstance2D is what's actually drawn by Godot, i.e., what's
@@ -336,7 +317,7 @@ public class UnitLayer : LooseLayer {
 
 	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
 
-	public void drawAnimationFrame(LooseView looseView, ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
+	public void drawAnimationFrame(LooseView looseView, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
 	{
 		var inst = getBlankAnimationInstance(looseView);
 
@@ -395,7 +376,7 @@ public class UnitLayer : LooseLayer {
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
 		if (unit.unitType.name != "Settler") // The Flic files for settlers have nonstandard names so we can't load them right now
-			drawAnimationFrame(looseView, getActiveAnimation(unit), tileCenter, new Color(unit.owner.color));
+			drawAnimationFrame(looseView, unit.getActiveAnimation(), tileCenter, new Color(unit.owner.color));
 		else {
 			int iconIndex = unit.unitType.iconIndex;
 			Vector2 iconUpperLeft = new Vector2(1 + 33 * (iconIndex % unitIconsWidth), 1 + 33 * (iconIndex / unitIconsWidth));
