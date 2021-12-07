@@ -222,6 +222,30 @@ public class HillsLayer : LooseLayer {
 	}
 }
 
+public class ForestLayer : LooseLayer {
+	public static readonly Vector2 jungleSize = new Vector2(128, 88);
+
+	private ImageTexture largeJungleTexture;
+
+	public ForestLayer() {
+		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 0, 512, 176);
+	}
+	
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
+		if (tile.overlayTerrainType.name == "Jungle") {
+			GD.Print("Drawing a jungle at " + tile.xCoordinate + ", " + tile.yCoordinate);
+			//Randomly, but predictably, choose a large jungle graphic
+			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
+			//For the first pass, we're just always using large jungles.
+			int randomLargeJungleRow = tile.yCoordinate % 2;
+			int randomLargeJungleColumn = tile.xCoordinate % 4;
+			Rect2 jungleRectangle = new Rect2(randomLargeJungleColumn * jungleSize.x, randomLargeJungleRow * jungleSize.y, jungleSize);
+			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * jungleSize + new Vector2(0, -12), jungleSize);
+			looseView.DrawTextureRectRegion(largeJungleTexture, screenTarget, jungleRectangle);
+		}
+	}
+}
+
 public class GridLayer : LooseLayer {
 	public Color color = Color.Color8(50, 50, 50, 150);
 	public float lineWidth = (float)1.0;
@@ -556,6 +580,7 @@ public class MapView : Node2D {
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new HillsLayer());
+		looseView.layers.Add(new ForestLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);
 		looseView.layers.Add(new BuildingLayer());
