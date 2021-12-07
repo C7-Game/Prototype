@@ -10272,11 +10272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -12272,11 +12272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -14272,11 +14272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -14572,11 +14572,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -15547,11 +15547,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -15597,11 +15597,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -16597,11 +16597,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -16622,11 +16622,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -17197,11 +17197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -17597,11 +17597,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -18222,11 +18222,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -18597,11 +18597,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -19197,11 +19197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -19622,11 +19622,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -21197,11 +21197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -21272,11 +21272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -22247,11 +22247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -23197,11 +23197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -23497,11 +23497,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -23547,11 +23547,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -25197,11 +25197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -25272,11 +25272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -25347,11 +25347,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -26247,11 +26247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -26372,11 +26372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -27272,11 +27272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -27472,11 +27472,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -28397,11 +28397,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -29372,11 +29372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -29397,11 +29397,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -29497,11 +29497,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -30222,11 +30222,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -30272,11 +30272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -30922,11 +30922,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -30947,11 +30947,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -31397,11 +31397,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -31497,11 +31497,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -32197,11 +32197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -32247,11 +32247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -32272,11 +32272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -32497,11 +32497,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -32522,11 +32522,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -32547,11 +32547,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -32872,11 +32872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -33272,11 +33272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -33497,11 +33497,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -33522,11 +33522,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -33872,11 +33872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -34272,11 +34272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -34297,11 +34297,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -34747,11 +34747,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -34822,11 +34822,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -34897,11 +34897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -35272,11 +35272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -35297,11 +35297,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -35722,11 +35722,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -35797,11 +35797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -35822,11 +35822,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -35872,11 +35872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -35897,11 +35897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -36272,11 +36272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -36847,11 +36847,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -36897,11 +36897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -37247,11 +37247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -37272,11 +37272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -37847,11 +37847,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -37872,11 +37872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -37897,11 +37897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -38272,11 +38272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -38372,11 +38372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -38522,11 +38522,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -38797,11 +38797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -38897,11 +38897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39247,11 +39247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39272,11 +39272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39347,11 +39347,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39372,11 +39372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39497,11 +39497,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39847,11 +39847,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39872,11 +39872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -39897,11 +39897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40272,11 +40272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40347,11 +40347,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40372,11 +40372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40397,11 +40397,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40472,11 +40472,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40497,11 +40497,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40522,11 +40522,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40822,11 +40822,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40872,11 +40872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -40897,11 +40897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41247,11 +41247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41272,11 +41272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41347,11 +41347,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41372,11 +41372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41472,11 +41472,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41822,11 +41822,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41872,11 +41872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -41897,11 +41897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -42247,11 +42247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -42272,11 +42272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -42297,11 +42297,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -42372,11 +42372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -42397,11 +42397,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -42847,11 +42847,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -42897,11 +42897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43247,11 +43247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43297,11 +43297,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43347,11 +43347,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43372,11 +43372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43397,11 +43397,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43822,11 +43822,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43872,11 +43872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -43897,11 +43897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44322,11 +44322,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44347,11 +44347,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44372,11 +44372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44397,11 +44397,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44422,11 +44422,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44722,11 +44722,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44872,11 +44872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44897,11 +44897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -44922,11 +44922,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -45197,11 +45197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -45297,11 +45297,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -45372,11 +45372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Marsh",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -45572,11 +45572,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -45797,11 +45797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -45872,11 +45872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -45897,11 +45897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -46197,11 +46197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -46297,11 +46297,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -46422,11 +46422,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -46797,11 +46797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -46897,11 +46897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Jungle",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 0,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -47797,11 +47797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -48197,11 +48197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -48347,11 +48347,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -49147,11 +49147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -49222,11 +49222,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -49422,11 +49422,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -49672,11 +49672,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -50172,11 +50172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -50222,11 +50222,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -50897,11 +50897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -51147,11 +51147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -52147,11 +52147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -52172,11 +52172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -52822,11 +52822,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -52922,11 +52922,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -53572,11 +53572,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -53847,11 +53847,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -53897,11 +53897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -54897,11 +54897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -56372,11 +56372,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -56897,11 +56897,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -57172,11 +57172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -58272,11 +58272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -59147,11 +59147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -59172,11 +59172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -59247,11 +59247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -59547,11 +59547,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -59647,11 +59647,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -59797,11 +59797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -59872,11 +59872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -60172,11 +60172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -60647,11 +60647,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -60772,11 +60772,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -60797,11 +60797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -60872,11 +60872,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -61147,11 +61147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -61172,11 +61172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -61322,11 +61322,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -61572,11 +61572,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -61647,11 +61647,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -61797,11 +61797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -62172,11 +62172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -62547,11 +62547,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -62572,11 +62572,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -62747,11 +62747,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Plains",
+            "name": "Forest",
             "baseFoodProduction": 1,
             "baseShieldProduction": 2,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -62772,11 +62772,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63147,11 +63147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63197,11 +63197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63322,11 +63322,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63547,11 +63547,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63672,11 +63672,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63722,11 +63722,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63747,11 +63747,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -63797,11 +63797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -64172,11 +64172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -64197,11 +64197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -64797,11 +64797,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -65147,11 +65147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -65197,11 +65197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -65222,11 +65222,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -65247,11 +65247,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -65622,11 +65622,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -65672,11 +65672,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -65772,11 +65772,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -66172,11 +66172,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -66197,11 +66197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -66222,11 +66222,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -66647,11 +66647,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -66722,11 +66722,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -67147,11 +67147,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -67197,11 +67197,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -67222,11 +67222,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -67597,11 +67597,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -67647,11 +67647,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -68322,11 +68322,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -70272,11 +70272,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,
@@ -71572,11 +71572,11 @@
             "movementCost": 1
           },
           "overlayTerrainType": {
-            "name": "Grassland",
-            "baseFoodProduction": 2,
-            "baseShieldProduction": 1,
-            "baseCommerceProduction": 1,
-            "movementCost": 1
+            "name": "Forest",
+            "baseFoodProduction": 1,
+            "baseShieldProduction": 2,
+            "baseCommerceProduction": 0,
+            "movementCost": 0
           },
           "cityAtTile": null,
           "hasBarbarianCamp": false,

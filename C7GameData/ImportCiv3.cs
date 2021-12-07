@@ -69,6 +69,24 @@ namespace C7GameData
             volcano.baseCommerceProduction = 1;
             volcano.movementCost = 3;
 
+            TerrainType forest = new TerrainType();
+            forest.name = "Forest";
+            forest.baseFoodProduction = 1;
+            forest.baseShieldProduction = 2;
+            forest.baseCommerceProduction = 0;
+            
+            TerrainType jungle = new TerrainType();
+            jungle.name = "Jungle";
+            jungle.baseFoodProduction = 1;
+            jungle.baseShieldProduction = 0;
+            jungle.baseCommerceProduction = 0;
+            
+            TerrainType marsh = new TerrainType();
+            marsh.name = "Marsh";
+            marsh.baseFoodProduction = 1;
+            marsh.baseShieldProduction = 0;
+            marsh.baseCommerceProduction = 0;
+
             // Import data
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
             c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
@@ -97,9 +115,14 @@ namespace C7GameData
                 else if (tile.OverlayTerrain == 5) {
                     c7Tile.overlayTerrainType = hills;
                 }
+                else if (tile.OverlayTerrain == 7) {
+                    c7Tile.overlayTerrainType = forest;
+                }
+                else if (tile.OverlayTerrain == 8) {
+                    c7Tile.overlayTerrainType = jungle;
+                }
                 else if (tile.OverlayTerrain == 9) {
-                    //Marsh
-                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                    c7Tile.overlayTerrainType = marsh;
                 }
                 else if (tile.OverlayTerrain == 10) {
                     c7Tile.overlayTerrainType = volcano;
