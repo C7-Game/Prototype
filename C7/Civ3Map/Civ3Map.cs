@@ -16,10 +16,11 @@ public class Civ3Map : Node2D
 	public int MapHeight;
 	// If a mod is in effect, set this, otherwise set to "" or "Conquests"
 	public string ModRelPath = "";
-	public Civ3Map(int mapWidth, int mapHeight)
+	public Civ3Map(int mapWidth, int mapHeight, string modRelPath = "")
 	{
 		MapWidth = mapWidth;
 		MapHeight = mapHeight;
+		ModRelPath = modRelPath;
 	}
 	public void TerrainAsTileMap() {
 		if (TM != null) { RemoveChild(TM); }

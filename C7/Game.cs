@@ -47,7 +47,8 @@ public class Game : Node2D
 		controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
 		Global.ResetLoadGamePath();
 		var map = MapInteractions.GetWholeMap();
-		Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall);
+		GD.Print("RelativeModPath ", map.RelativeModPath);
+		Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall, map.RelativeModPath);
 		baseTerrainMap.Civ3Tiles = map.tiles;
 		baseTerrainMap.TerrainAsTileMap();
 
