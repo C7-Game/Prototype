@@ -223,12 +223,14 @@ public class HillsLayer : LooseLayer {
 }
 
 public class ForestLayer : LooseLayer {
-	public static readonly Vector2 jungleSize = new Vector2(128, 88);
+	public static readonly Vector2 forestJungleSize = new Vector2(128, 88);
 
 	private ImageTexture largeJungleTexture;
+	private ImageTexture largeForestTexture;
 
 	public ForestLayer() {
-		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 0, 512, 176);
+		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
+		largeForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
@@ -239,9 +241,17 @@ public class ForestLayer : LooseLayer {
 			//For the first pass, we're just always using large jungles.
 			int randomLargeJungleRow = tile.yCoordinate % 2;
 			int randomLargeJungleColumn = tile.xCoordinate % 4;
-			Rect2 jungleRectangle = new Rect2(randomLargeJungleColumn * jungleSize.x, randomLargeJungleRow * jungleSize.y, jungleSize);
-			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * jungleSize + new Vector2(0, -12), jungleSize);
+			Rect2 jungleRectangle = new Rect2(randomLargeJungleColumn * forestJungleSize.x, randomLargeJungleRow * forestJungleSize.y, forestJungleSize);
+			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
 			looseView.DrawTextureRectRegion(largeJungleTexture, screenTarget, jungleRectangle);
+		}
+		if (tile.overlayTerrainType.name == "Forest") {
+			GD.Print("Drawing a forest at " + tile.xCoordinate + ", " + tile.yCoordinate);
+			int randomLargeForestRow = tile.yCoordinate % 2;
+			int randomLargeForestColumn = tile.xCoordinate % 4;
+			Rect2 forestRectangle = new Rect2(randomLargeForestColumn * forestJungleSize.x, randomLargeForestRow * forestJungleSize.y, forestJungleSize);
+			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
+			looseView.DrawTextureRectRegion(largeForestTexture, screenTarget, forestRectangle);
 		}
 	}
 }
@@ -579,8 +589,8 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
-		looseView.layers.Add(new HillsLayer());
 		looseView.layers.Add(new ForestLayer());
+		looseView.layers.Add(new HillsLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);
 		looseView.layers.Add(new BuildingLayer());
