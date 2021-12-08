@@ -117,6 +117,9 @@ namespace C7GameData
                 }
                 else if (tile.OverlayTerrain == 7) {
                     c7Tile.overlayTerrainType = forest;
+                    if (tile.isPineForest) {
+                        c7Tile.isPineForest = true;
+                    }
                 }
                 else if (tile.OverlayTerrain == 8) {
                     c7Tile.overlayTerrainType = jungle;

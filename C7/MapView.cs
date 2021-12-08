@@ -227,15 +227,16 @@ public class ForestLayer : LooseLayer {
 
 	private ImageTexture largeJungleTexture;
 	private ImageTexture largeForestTexture;
+	private ImageTexture pineForestTexture;
 
 	public ForestLayer() {
 		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
 		largeForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
+		pineForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
 		if (tile.overlayTerrainType.name == "Jungle") {
-			GD.Print("Drawing a jungle at " + tile.xCoordinate + ", " + tile.yCoordinate);
 			//Randomly, but predictably, choose a large jungle graphic
 			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
 			//For the first pass, we're just always using large jungles.
@@ -246,12 +247,24 @@ public class ForestLayer : LooseLayer {
 			looseView.DrawTextureRectRegion(largeJungleTexture, screenTarget, jungleRectangle);
 		}
 		if (tile.overlayTerrainType.name == "Forest") {
-			GD.Print("Drawing a forest at " + tile.xCoordinate + ", " + tile.yCoordinate);
-			int randomLargeForestRow = tile.yCoordinate % 2;
-			int randomLargeForestColumn = tile.xCoordinate % 4;
-			Rect2 forestRectangle = new Rect2(randomLargeForestColumn * forestJungleSize.x, randomLargeForestRow * forestJungleSize.y, forestJungleSize);
+			int forestRow = 0;
+			int forestColumn = 0;
+			ImageTexture forestTexture;
+			if (tile.isPineForest) {
+				GD.Print("Pine forest at " + tile);
+				forestRow = tile.yCoordinate % 2;
+				forestColumn = tile.xCoordinate % 6;
+				forestTexture = pineForestTexture;
+			}
+			else {
+				GD.Print("Deciduous forest at " + tile);
+				forestRow = tile.yCoordinate % 2;
+				forestColumn = tile.xCoordinate % 4;
+				forestTexture = largeForestTexture;
+			}
+			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.x, forestRow * forestJungleSize.y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
-			looseView.DrawTextureRectRegion(largeForestTexture, screenTarget, forestRectangle);
+			looseView.DrawTextureRectRegion(forestTexture, screenTarget, forestRectangle);
 		}
 	}
 }
