@@ -387,9 +387,11 @@ public class UnitLayer : LooseLayer {
 			}
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
-		drawAnimationFrame(looseView, unit.getActiveAnimation(OS.GetTicksMsec()), tileCenter, new Color(unit.owner.color));
+		var activeAnim = unit.getActiveAnimation(OS.GetTicksMsec());
 
-		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40);
+		drawAnimationFrame(looseView, activeAnim, tileCenter, new Color(unit.owner.color));
+
+		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;
 
 		int mp = unit.movementPointsRemaining;
 		int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
