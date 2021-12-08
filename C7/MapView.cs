@@ -463,12 +463,16 @@ public class UnitLayer : LooseLayer {
 			int colorIndex = int(255.0 * texture(indices, UV).r);
 			if (colorIndex >= 254) // indices 254 and 255 are transparent
 				discard;
-			vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
-			bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
-			if (tintedByCiv)
-				COLOR = sampleCivTintedColor(paletteCoords);
-			else
-				COLOR = texture(palette, paletteCoords);
+			else if (colorIndex >= 240) // indices in [240, 253] are shadows
+				COLOR = vec4(0.0, 0.0, 0.0, float(16 * (255 - colorIndex)) / 255.0);
+			else {
+				vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
+				bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
+				if (tintedByCiv)
+					COLOR = sampleCivTintedColor(paletteCoords);
+				else
+					COLOR = texture(palette, paletteCoords);
+			}
 		}
 		";
 		var tr = new Shader();
