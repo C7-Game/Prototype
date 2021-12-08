@@ -78,7 +78,7 @@ public class MapUnit
 			if ((unitType.name != "Worker") && (unitType.name != "Settler"))
 				animCoreName = String.Format("{0}Fortify", unitType.name);
 			else
-				animCoreName = String.Format("{0}Default", unitType.name);
+				animCoreName = String.Format("{0}Default", unitType.name != "Settler" ? unitType.name : "sett");
 		} else if ((animAction == AnimatedAction.RUN) && (progress < 1f)) {
 			if (unitType.name == "Worker")
 				animCoreName = "workRun";
@@ -86,12 +86,8 @@ public class MapUnit
 				animCoreName = "settRun";
 			else
 				animCoreName = String.Format("{0}Run", unitType.name);
-		} else {
-			if (unitType.name != "Settler")
-				animCoreName = String.Format("{0}Default", unitType.name);
-			else
-				animCoreName = "settDefault";
-		}
+		} else
+			animCoreName = String.Format("{0}Default", unitType.name != "Settler" ? unitType.name : "sett");
 
 		float offsetX = 0, offsetY = 0;
 		if ((animAction == AnimatedAction.RUN) && (progress < 1f)) {
