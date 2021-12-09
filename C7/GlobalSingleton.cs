@@ -19,4 +19,6 @@ public class GlobalSingleton : Node
     {
         LoadGamePath = DefaultGamePath;
     }
+    // Now that we have a global thingy, I guess it's a good place to set and store Civ3 home path
+    public string Civ3Home = "";
 }

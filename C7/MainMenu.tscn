@@ -63,7 +63,22 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="SetCiv3Home" type="Button" parent="CanvasLayer"]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -169.0
+margin_top = -10.0
+margin_bottom = 10.0
+text = "Select Civ3 Home Folder"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="MainMenuMusicPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
 script = ExtResource( 3 )
 
 [node name="SoundEffectPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
+
+[connection signal="pressed" from="CanvasLayer/SetCiv3Home" to="." method="_on_SetCiv3Home_pressed"]

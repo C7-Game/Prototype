@@ -10,6 +10,7 @@ public class MainMenu : Node2D
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
 	Util.Civ3FileDialog LoadDialog;
+	Util.Civ3FileDialog SetCiv3HomeDialog;
 	GlobalSingleton Global;
 
 	// Called when the node enters the scene tree for the first time.
@@ -24,6 +25,11 @@ public class MainMenu : Node2D
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
+		SetCiv3HomeDialog = new Util.Civ3FileDialog();
+		SetCiv3HomeDialog.CurrentDir = "";
+		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
+		SetCiv3HomeDialog.Connect("dir_selected", this, nameof(_on_SetCiv3HomeDialog_dir_selected));
+		GetNode<CanvasLayer>("CanvasLayer").AddChild(SetCiv3HomeDialog);
 	}
 	
 	private void DisplayTitleScreen()
@@ -124,5 +130,15 @@ public class MainMenu : Node2D
 		Global.LoadGamePath = path;
 		GetTree().ChangeScene("res://C7Game.tscn");
 
+	}
+	private void _on_SetCiv3Home_pressed()
+	{
+		GD.Print("SetCiv3Home");
+		SetCiv3HomeDialog.Popup_();
+	}
+	private void _on_SetCiv3HomeDialog_dir_selected(string path)
+	{
+		GD.Print(path);
+		Global.Civ3Home = path;
 	}
 }
