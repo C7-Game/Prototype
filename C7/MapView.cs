@@ -226,38 +226,61 @@ public class ForestLayer : LooseLayer {
 	public static readonly Vector2 forestJungleSize = new Vector2(128, 88);
 
 	private ImageTexture largeJungleTexture;
+	private ImageTexture smallJungleTexture;
 	private ImageTexture largeForestTexture;
 	private ImageTexture pineForestTexture;
 
 	public ForestLayer() {
 		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
+		smallJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 176, 768, 176);
 		largeForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
-		pineForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
+		pineForestTexture  = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
+		TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].terrainType;
+		TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].terrainType;
+		TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].terrainType;
+		TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].terrainType;
+
+		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
+
+		bool neighborsCoast = false;
+		foreach (TerrainType type in neighborTerrains) {
+			if (type.name == "Coast") {
+				neighborsCoast = true;
+			}
+		}
+
 		if (tile.overlayTerrainType.name == "Jungle") {
 			//Randomly, but predictably, choose a large jungle graphic
 			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
 			//For the first pass, we're just always using large jungles.
-			int randomLargeJungleRow = tile.yCoordinate % 2;
-			int randomLargeJungleColumn = tile.xCoordinate % 4;
-			Rect2 jungleRectangle = new Rect2(randomLargeJungleColumn * forestJungleSize.x, randomLargeJungleRow * forestJungleSize.y, forestJungleSize);
+			int randomJungleRow = tile.yCoordinate % 2;
+			int randomJungleColumn;
+			ImageTexture jungleTexture;
+			if (neighborsCoast) {
+				randomJungleColumn = tile.xCoordinate % 6;
+				jungleTexture = smallJungleTexture;
+			}
+			else {
+				randomJungleColumn = tile.xCoordinate % 4;
+				jungleTexture = largeJungleTexture;
+			}
+			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.x, randomJungleRow * forestJungleSize.y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
-			looseView.DrawTextureRectRegion(largeJungleTexture, screenTarget, jungleRectangle);
+			looseView.DrawTextureRectRegion(jungleTexture, screenTarget, jungleRectangle);
 		}
 		if (tile.overlayTerrainType.name == "Forest") {
 			int forestRow = 0;
 			int forestColumn = 0;
 			ImageTexture forestTexture;
 			if (tile.isPineForest) {
-				GD.Print("Pine forest at " + tile);
 				forestRow = tile.yCoordinate % 2;
 				forestColumn = tile.xCoordinate % 6;
 				forestTexture = pineForestTexture;
 			}
 			else {
-				GD.Print("Deciduous forest at " + tile);
 				forestRow = tile.yCoordinate % 2;
 				forestColumn = tile.xCoordinate % 4;
 				forestTexture = largeForestTexture;
