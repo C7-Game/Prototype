@@ -246,6 +246,7 @@ public class UnitLayer : LooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
+	private Util.FlicSheet cursor;
 
 	public UnitLayer()
 	{
@@ -255,6 +256,8 @@ public class UnitLayer : LooseLayer {
 
 		var moveIndPCX = new Pcx(Util.Civ3MediaPath("Art/interface/MovementLED.pcx"));
 		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
+
+		(cursor, _) = Util.loadFlicSheet("Art/Animations/Cursor/Cursor.flc");
 	}
 
 	public Color getHPColor(float fractionRemaining)
@@ -317,21 +320,39 @@ public class UnitLayer : LooseLayer {
 
 	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
 
-	public void drawAnimationFrame(LooseView looseView, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
+	public void drawFlicFrame(LooseView looseView, Util.FlicSheet flicSheet, int row, float relativeColumn, Vector2 position, Color civColor)
 	{
 		var inst = getBlankAnimationInstance(looseView);
 
-		Util.FlicSheet flicSheet;
-		if (! flicSheets.TryGetValue(activeAnim.name, out flicSheet)) {
-			(flicSheet, _) = Util.loadFlicSheet(activeAnim.name);
-			flicSheets.Add(activeAnim.name, flicSheet);
-		}
 		inst.shaderMat.SetShaderParam("palette", flicSheet.palette);
 		inst.shaderMat.SetShaderParam("indices", flicSheet.indices);
 
 		var indicesDims = new Vector2(flicSheet.indices.GetWidth(), flicSheet.indices.GetHeight());
 		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
 		inst.shaderMat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
+
+		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
+		int spriteColumn = (int)(relativeColumn * spritesPerRow);
+		if (spriteColumn >= spritesPerRow)
+			spriteColumn = spritesPerRow - 1;
+		else if (spriteColumn < 0)
+			spriteColumn = 0;
+		inst.shaderMat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
+
+		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
+
+		inst.meshInst.Position = position;
+		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
+		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
+	}
+
+	public void drawUnitAnimFrame(LooseView looseView, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
+	{
+		Util.FlicSheet flicSheet;
+		if (! flicSheets.TryGetValue(activeAnim.name, out flicSheet)) {
+			(flicSheet, _) = Util.loadFlicSheet(activeAnim.name);
+			flicSheets.Add(activeAnim.name, flicSheet);
+		}
 
 		int dirIndex = 0;
 		switch (activeAnim.direction) {
@@ -345,21 +366,11 @@ public class UnitLayer : LooseLayer {
 		case TileDirection.NORTHWEST: dirIndex = 6; break;
 		}
 
-		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
-		int spriteColumn = (int)(activeAnim.progress * spritesPerRow);
-		if (spriteColumn >= spritesPerRow)
-			spriteColumn = spritesPerRow - 1;
-		else if (spriteColumn < 0)
-			spriteColumn = 0;
-		inst.shaderMat.SetShaderParam("spriteXY", new Vector2(spriteColumn, dirIndex));
-
-		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
-
 		var animOffset = MapView.cellSize * new Vector2(activeAnim.offsetX, activeAnim.offsetY);
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
-		// amount but it looks close TODO: Investigate more, find the exact amount.
-		inst.meshInst.Position = tileCenter + animOffset - new Vector2(0, flicSheet.spriteHeight / 4);
-		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight); // Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
+		var position = tileCenter + animOffset - new Vector2(0, flicSheet.spriteHeight / 4);
+
+		drawFlicFrame(looseView, flicSheet, dirIndex, activeAnim.progress, position, civColor);
 	}
 
 	public override void onBeginDraw(LooseView looseView)
@@ -377,21 +388,27 @@ public class UnitLayer : LooseLayer {
 
 		var white = Color.Color8(255, 255, 255);
 
-		// Find unit to draw. If the currently selected unit is on this tile, use that one (also draw a yellow circle behind
-		// it). Otherwise, use the top defender.
+		// Find unit to draw. If the currently selected unit is on this tile, use that one. Otherwise, use the top defender.
 		MapUnit selectedUnitOnTile = null;
 		foreach (var u in tile.unitsOnTile)
-			if (u.guid == looseView.mapView.game.CurrentlySelectedUnit.guid) {
-				looseView.DrawCircle(tileCenter, 16, Color.Color8(255, 255, 0));
+			if (u.guid == looseView.mapView.game.CurrentlySelectedUnit.guid)
 				selectedUnitOnTile = u;
-			}
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
 		var activeAnim = unit.getActiveAnimation(OS.GetTicksMsec());
+		var animOffset = new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;
 
-		drawAnimationFrame(looseView, activeAnim, tileCenter, new Color(unit.owner.color));
+		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
+		if ((selectedUnitOnTile != null) && (selectedUnitOnTile == unit)) {
+			var cursorPeriod = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
+			var periodCount = (double)OS.GetTicksMsec() / 1000.0 / cursorPeriod;
+			var cursorProgress = (float)(periodCount - Math.Floor(periodCount));
+			drawFlicFrame(looseView, cursor, 0, cursorProgress, tileCenter + animOffset, white);
+		}
 
-		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;
+		drawUnitAnimFrame(looseView, activeAnim, tileCenter, new Color(unit.owner.color));
+
+		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
 
 		int mp = unit.movementPointsRemaining;
 		int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
