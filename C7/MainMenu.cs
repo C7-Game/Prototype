@@ -26,7 +26,7 @@ public class MainMenu : Node2D
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
 		SetCiv3HomeDialog = new Util.Civ3FileDialog();
-		SetCiv3HomeDialog.CurrentDir = "";
+		SetCiv3HomeDialog.CurrentDir = Global.Civ3Home;
 		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
 		SetCiv3HomeDialog.Connect("dir_selected", this, nameof(_on_SetCiv3HomeDialog_dir_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(SetCiv3HomeDialog);

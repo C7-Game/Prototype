@@ -47,6 +47,20 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="SetCiv3Home" type="Button" parent="CanvasLayer"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -84.5
+margin_top = -93.7225
+margin_right = 84.5
+margin_bottom = -73.7225
+text = "Select Civ3 Home Folder"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -59,19 +73,6 @@ margin_left = 512.0
 margin_top = 384.0
 margin_right = 512.0
 margin_bottom = 384.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="SetCiv3Home" type="Button" parent="CanvasLayer"]
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-margin_left = -169.0
-margin_top = -10.0
-margin_bottom = 10.0
-text = "Select Civ3 Home Folder"
 __meta__ = {
 "_edit_use_anchors_": false
 }

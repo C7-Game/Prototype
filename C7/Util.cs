@@ -10,9 +10,12 @@ public class Util
 	// While instantiated it will return to the last-accessed folder when reopened
 	{
 		public string RelPath= "";
+		public Civ3FileDialog(FileDialog.ModeEnum mode = FileDialog.ModeEnum.OpenFile)
+		{
+			Mode = mode;
+		}
 		public override void _Ready()
 		{
-			Mode = ModeEnum.OpenFile;
 			Access = AccessEnum.Filesystem;
 			CurrentDir = Util.GetCiv3Path() + "/" + RelPath;
 			Resizable = true;
