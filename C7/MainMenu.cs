@@ -25,9 +25,8 @@ public class MainMenu : Node2D
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
-		SetCiv3HomeDialog = new Util.Civ3FileDialog();
+		SetCiv3HomeDialog = new Util.Civ3FileDialog(FileDialog.ModeEnum.OpenDir);
 		SetCiv3HomeDialog.CurrentDir = Global.Civ3Home;
-		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
 		SetCiv3HomeDialog.Connect("dir_selected", this, nameof(_on_SetCiv3HomeDialog_dir_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(SetCiv3HomeDialog);
 	}
@@ -133,12 +132,12 @@ public class MainMenu : Node2D
 	}
 	private void _on_SetCiv3Home_pressed()
 	{
-		GD.Print("SetCiv3Home");
 		SetCiv3HomeDialog.Popup_();
 	}
 	private void _on_SetCiv3HomeDialog_dir_selected(string path)
 	{
-		GD.Print(path);
 		Global.Civ3Home = path;
+		// This function should only be reachable if DisplayTitleScreen failed on previous runs, so should be OK to run here
+		DisplayTitleScreen();
 	}
 }

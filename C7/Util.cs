@@ -44,11 +44,16 @@ public class Util
 		// Assuming 64-bit platform, get vanilla Civ3 install folder from registry
 		return (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", defaultPath);
 	}
+	// Maybe temporary overload until all calls are refactored to include civ3Root paramter
+	// NOTE: I anticipate a real problem when calling with two string parameters as it's impossible to determine which overload to use
 	static public string Civ3MediaPath(string relPath, string relModPath = "")
+	{
+		return Civ3MediaPath(GetCiv3Path(), relPath, relModPath);
+	}
+	static public string Civ3MediaPath(string civ3Root, string relPath, string relModPath = "")
 	// Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
 	// Assumes Conquests/Complete
 	{
-		string Civ3Root = GetCiv3Path();
 		string [] TryPaths = new string [] {
 			relModPath,
 			// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
@@ -67,7 +72,7 @@ public class Util
 		{
 			// If relModPath not set, skip that check
 			if(i == 0 && relModPath == "") { continue; }
-			string pathCandidate = Civ3Root + "/" + TryPaths[i] + "/" + relPath;
+			string pathCandidate = civ3Root + "/" + TryPaths[i] + "/" + relPath;
 			if(System.IO.File.Exists(pathCandidate)) { return pathCandidate; }
 		}
 		throw new ApplicationException("Media path not found: " + relPath);
