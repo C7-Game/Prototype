@@ -228,12 +228,14 @@ public class ForestLayer : LooseLayer {
 	private ImageTexture largeJungleTexture;
 	private ImageTexture smallJungleTexture;
 	private ImageTexture largeForestTexture;
+	private ImageTexture smallForestTexture;
 	private ImageTexture pineForestTexture;
 
 	public ForestLayer() {
 		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
 		smallJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 176, 768, 176);
 		largeForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
+		smallForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 528, 640, 176);
 		pineForestTexture  = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
 	}
 	
@@ -282,8 +284,14 @@ public class ForestLayer : LooseLayer {
 			}
 			else {
 				forestRow = tile.yCoordinate % 2;
-				forestColumn = tile.xCoordinate % 4;
-				forestTexture = largeForestTexture;
+				if (neighborsCoast) {
+					forestColumn = tile.xCoordinate % 5;
+					forestTexture = smallForestTexture;
+				}
+				else {
+					forestColumn = tile.xCoordinate % 4;
+					forestTexture = largeForestTexture;
+				}
 			}
 			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.x, forestRow * forestJungleSize.y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
