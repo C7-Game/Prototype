@@ -246,7 +246,11 @@ public class UnitLayer : LooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
-	private Util.FlicSheet cursor;
+
+	// The unit animations and cursor are both drawn as children attached to the looseView but aren't created and attached in any particular order
+	// so we must use the ZIndex property to ensure the cursor isn't drawn over the units.
+	public const int unitAnimZIndex = 100;
+	public const int cursorZIndex = 50;
 
 	public UnitLayer()
 	{
@@ -256,8 +260,23 @@ public class UnitLayer : LooseLayer {
 
 		var moveIndPCX = new Pcx(Util.Civ3MediaPath("Art/interface/MovementLED.pcx"));
 		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
+	}
 
-		(cursor, _) = Util.loadFlicSheet("Art/Animations/Cursor/Cursor.flc");
+	// Creates a quad mesh with the given shader attached. The quad is 1.0 units long on both sides, intended to be scaled to the appropriate size
+	// when used.
+	public static (ShaderMaterial, MeshInstance2D) createShadedQuad(Shader shader)
+	{
+		var quad = new QuadMesh();
+		quad.Size = new Vector2(1, 1);
+
+		var shaderMat = new ShaderMaterial();
+		shaderMat.Shader = shader;
+
+		var meshInst = new MeshInstance2D();
+		meshInst.Material = shaderMat;
+		meshInst.Mesh = quad;
+
+		return (shaderMat, meshInst);
 	}
 
 	public Color getHPColor(float fractionRemaining)
@@ -287,16 +306,8 @@ public class UnitLayer : LooseLayer {
 			if (civColorWhitePalette == null)
 				(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");;
 
-			var quad = new QuadMesh();
-			quad.Size = new Vector2(1, 1); // The mesh will be scaled to the appropriate sprite size when this AnimationInstance is used
-
-			shaderMat = new ShaderMaterial();
-			shaderMat.Shader = getShader();
+			(shaderMat, meshInst) = createShadedQuad(getUnitShader());
 			shaderMat.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
-
-			meshInst = new MeshInstance2D();
-			meshInst.Material = shaderMat;
-			meshInst.Mesh = quad;
 
 			looseView.AddChild(meshInst);
 			meshInst.Hide();
@@ -320,16 +331,16 @@ public class UnitLayer : LooseLayer {
 
 	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
 
-	public void drawFlicFrame(LooseView looseView, Util.FlicSheet flicSheet, int row, float relativeColumn, Vector2 position, Color civColor)
+	// Sets the palette, indices, relSpriteSize, and spriteXY parameters on a ShaderMaterial to pick a sprite from a FlicSheet. relativeColumn
+	// varies between 0.0 for the first column and 1.0 for the last one.
+	public static void setFlicShaderParams(ShaderMaterial mat, Util.FlicSheet flicSheet, int row, float relativeColumn)
 	{
-		var inst = getBlankAnimationInstance(looseView);
-
-		inst.shaderMat.SetShaderParam("palette", flicSheet.palette);
-		inst.shaderMat.SetShaderParam("indices", flicSheet.indices);
+		mat.SetShaderParam("palette", flicSheet.palette);
+		mat.SetShaderParam("indices", flicSheet.indices);
 
 		var indicesDims = new Vector2(flicSheet.indices.GetWidth(), flicSheet.indices.GetHeight());
 		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
-		inst.shaderMat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
+		mat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
 
 		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		int spriteColumn = (int)(relativeColumn * spritesPerRow);
@@ -337,13 +348,20 @@ public class UnitLayer : LooseLayer {
 			spriteColumn = spritesPerRow - 1;
 		else if (spriteColumn < 0)
 			spriteColumn = 0;
-		inst.shaderMat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
+		mat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
+	}
 
+	public void drawFlicFrame(LooseView looseView, Util.FlicSheet flicSheet, int row, float relativeColumn, Vector2 position, Color civColor)
+	{
+		var inst = getBlankAnimationInstance(looseView);
+
+		setFlicShaderParams(inst.shaderMat, flicSheet, row, relativeColumn);
 		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
 
 		inst.meshInst.Position = position;
 		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
 		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
+		inst.meshInst.ZIndex = unitAnimZIndex;
 	}
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
@@ -373,12 +391,40 @@ public class UnitLayer : LooseLayer {
 		drawFlicFrame(looseView, flicSheet, dirIndex, activeAnim.progress, position, civColor);
 	}
 
+	private Util.FlicSheet cursorFlicSheet;
+	private ShaderMaterial cursorMat = null;
+	private MeshInstance2D cursorMesh = null;
+
+	public void drawCursor(LooseView looseView, Vector2 position)
+	{
+		// Initialize cursor if necessary
+		if (cursorMesh == null) {
+			(cursorFlicSheet, _) = Util.loadFlicSheet("Art/Animations/Cursor/Cursor.flc");
+			(cursorMat, cursorMesh) = createShadedQuad(getCursorShader());
+			cursorMesh.Scale = new Vector2(cursorFlicSheet.spriteWidth, -1 * cursorFlicSheet.spriteHeight);
+			cursorMesh.ZIndex = cursorZIndex;
+			looseView.AddChild(cursorMesh);
+		}
+
+		const double period = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
+		var periodCount = (double)OS.GetTicksMsec() / 1000.0 / period;
+		var progress = (float)(periodCount - Math.Floor(periodCount));
+
+		setFlicShaderParams(cursorMat, cursorFlicSheet, 0, progress);
+		cursorMesh.Position = position;
+		cursorMesh.Show();
+	}
+
 	public override void onBeginDraw(LooseView looseView)
 	{
 		// Reset animation instances
 		for (int n = 0; n < nextBlankAnimInst; n++)
 			animInsts[n].meshInst.Hide();
 		nextBlankAnimInst = 0;
+
+		// Hide cursor if it's been initialized
+		if (cursorMesh != null)
+			cursorMesh.Hide();
 	}
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
@@ -399,12 +445,8 @@ public class UnitLayer : LooseLayer {
 		var animOffset = new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
-		if ((selectedUnitOnTile != null) && (selectedUnitOnTile == unit)) {
-			var cursorPeriod = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
-			var periodCount = (double)OS.GetTicksMsec() / 1000.0 / cursorPeriod;
-			var cursorProgress = (float)(periodCount - Math.Floor(periodCount));
-			drawFlicFrame(looseView, cursor, 0, cursorProgress, tileCenter + animOffset, white);
-		}
+		if ((selectedUnitOnTile != null) && (selectedUnitOnTile == unit))
+			drawCursor(looseView, tileCenter + animOffset);
 
 		drawUnitAnimFrame(looseView, activeAnim, tileCenter, new Color(unit.owner.color));
 
@@ -445,12 +487,12 @@ public class UnitLayer : LooseLayer {
 		}
 	}
 
-	private static Shader shader = null;
+	private static Shader unitShader = null;
 
-	public static Shader getShader()
+	public static Shader getUnitShader()
 	{
-		if (shader != null)
-			return shader;
+		if (unitShader != null)
+			return unitShader;
 
 		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
 		// broken on Godot because there's no way to create a texture with a compatible format. See:
@@ -460,6 +502,7 @@ public class UnitLayer : LooseLayer {
 		// GL_R8UI. The closest is FORMAT_R8 which corresponds to GL_RED except that won't work since it's a floating point format.
 		string shaderSource = @"
 		shader_type canvas_item;
+
 		uniform sampler2D palette;
 		uniform sampler2D civColorWhitePalette;
 		uniform sampler2D indices;
@@ -497,7 +540,47 @@ public class UnitLayer : LooseLayer {
 		var tr = new Shader();
 		tr.Code = shaderSource;
 
-		shader = tr;
+		unitShader = tr;
+		return tr;
+	}
+
+	private static Shader cursorShader = null;
+
+	public static Shader getCursorShader()
+	{
+		if (cursorShader != null)
+			return cursorShader;
+
+		string shaderSource = @"
+		shader_type canvas_item;
+
+		uniform sampler2D palette;
+		uniform sampler2D indices;
+		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
+		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
+
+		void vertex()
+		{
+			UV = (spriteXY + UV) * relSpriteSize;
+		}
+
+		void fragment()
+		{
+			int colorIndex = int(255.0 * texture(indices, UV).r);
+			if ((colorIndex >= 224) && (colorIndex <= 239))
+				COLOR = vec4(1.0, 1.0, 1.0, float(colorIndex - 224) / float(239 - 224));
+			else if (colorIndex >= 254) // indices 254 and 255 are transparent
+				discard;
+			else {
+				vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
+				COLOR = texture(palette, paletteCoords);
+			}
+		}
+		";
+		var tr = new Shader();
+		tr.Code = shaderSource;
+
+		cursorShader = tr;
 		return tr;
 	}
 }
