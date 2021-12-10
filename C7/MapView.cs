@@ -228,19 +228,27 @@ public class ForestLayer : LooseLayer {
 	private ImageTexture largeJungleTexture;
 	private ImageTexture smallJungleTexture;
 	private ImageTexture largeForestTexture;
+	private ImageTexture largePlainsForestTexture;
+	private ImageTexture largeTundraForestTexture;
 	private ImageTexture smallForestTexture;
+	private ImageTexture smallPlainsForestTexture;
+	private ImageTexture smallTundraForestTexture;
 	private ImageTexture pineForestTexture;
 	private ImageTexture pinePlainsTexture;
 	private ImageTexture pineTundraTexture;
 
 	public ForestLayer() {
-		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
-		smallJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 176, 768, 176);
-		largeForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
-		smallForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 528, 640, 176);
-		pineForestTexture  = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
-		pinePlainsTexture  = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx"   , 0, 704, 768, 176);
-		pineTundraTexture  = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx"   , 0, 704, 768, 176);
+		largeJungleTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
+		smallJungleTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 176, 768, 176);
+		largeForestTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
+		largePlainsForestTexture = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx",    0, 352, 512, 176);
+		largeTundraForestTexture = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx",    0, 352, 512, 176);
+		smallForestTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 528, 640, 176);
+		smallPlainsForestTexture = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx",    0, 528, 640, 176);
+		smallTundraForestTexture = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx",    0, 528, 640, 176);
+		pineForestTexture        = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
+		pinePlainsTexture        = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx"   , 0, 704, 768, 176);
+		pineTundraTexture        = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx"   , 0, 704, 768, 176);
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
@@ -298,11 +306,27 @@ public class ForestLayer : LooseLayer {
 				forestRow = tile.yCoordinate % 2;
 				if (neighborsCoast) {
 					forestColumn = tile.xCoordinate % 5;
-					forestTexture = smallForestTexture;
+					if (tile.baseTerrainType.name == "Grassland") {
+						forestTexture = smallForestTexture;
+					}
+					else if (tile.baseTerrainType.name == "Plains") {
+						forestTexture = smallPlainsForestTexture;
+					}
+					else {	//tundra
+						forestTexture = smallTundraForestTexture;
+					}
 				}
 				else {
 					forestColumn = tile.xCoordinate % 4;
-					forestTexture = largeForestTexture;
+					if (tile.baseTerrainType.name == "Grassland") {
+						forestTexture = largeForestTexture;
+					}
+					else if (tile.baseTerrainType.name == "Plains") {
+						forestTexture = largePlainsForestTexture;
+					}
+					else {	//tundra
+						forestTexture = largeTundraForestTexture;
+					}
 				}
 			}
 			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.x, forestRow * forestJungleSize.y, forestJungleSize);
