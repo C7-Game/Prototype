@@ -147,7 +147,7 @@ public class HillsLayer : LooseLayer {
 					volcanoGraphics = jungleVolcanoTexture;
 				}
 				else {
-					volcanoGraphics = hillsTexture;
+					volcanoGraphics = volcanosTexture;
 				}
 				looseView.DrawTextureRectRegion(volcanoGraphics, screenTarget, volcanoRectangle);
 			}
