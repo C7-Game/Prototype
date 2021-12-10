@@ -284,7 +284,6 @@ public class ForestLayer : LooseLayer {
 			if (tile.isPineForest) {
 				forestRow = tile.yCoordinate % 2;
 				forestColumn = tile.xCoordinate % 6;
-				GD.Print("Pine forest at " + tile + " has terrain type " + tile.terrainType.name);
 				if (tile.terrainType.name == "Grassland") {
 					forestTexture = pineForestTexture;
 				}

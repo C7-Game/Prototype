@@ -27,6 +27,13 @@ namespace C7GameData
     		SavData civ3Save = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(savePath), defaultBicBytes);
 
             // Dummy data
+            TerrainType desert = new TerrainType();
+            desert.name = "Desert";
+            desert.baseFoodProduction = 0;
+            desert.baseShieldProduction = 1;
+            desert.baseCommerceProduction = 0;
+            desert.movementCost = 1;
+
             TerrainType grassland = new TerrainType();
             grassland.name = "Grassland";
             grassland.baseFoodProduction = 2;
@@ -40,6 +47,13 @@ namespace C7GameData
             plains.baseShieldProduction = 2;
             plains.baseCommerceProduction = 1;
             plains.movementCost = 1;
+            
+            TerrainType tundra = new TerrainType();
+            tundra.name = "Tundra";
+            tundra.baseFoodProduction = 1;
+            tundra.baseShieldProduction = 0;
+            tundra.baseCommerceProduction = 0;
+            tundra.movementCost = 1;
 
             TerrainType coast = new TerrainType();
             coast.name = "Coast";
@@ -105,6 +119,18 @@ namespace C7GameData
                     // TEMP all water is coast, desert and plains are plains, grass and tundra are grass
                     terrainType = tile.BaseTerrain > 10 ? coast : tile.BaseTerrain > 1 ? grassland : plains,
                 };
+                if (tile.BaseTerrain == 3) {
+                    c7Tile.terrainType = tundra;
+                }
+                else if (tile.BaseTerrain == 2) {
+                    c7Tile.terrainType = grassland;
+                }
+                else if (tile.BaseTerrain == 1) {
+                    c7Tile.terrainType = plains;
+                }
+                else if (tile.BaseTerrain == 0) {
+                    c7Tile.terrainType = desert;
+                }
                 //Not sure how to put this inline with the c7Tile reference, or without duplicating the base terrain logic
                 if (tile.OverlayTerrain == 6) {
                     c7Tile.overlayTerrainType = mountain;
