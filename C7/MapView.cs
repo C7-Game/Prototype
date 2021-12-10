@@ -230,6 +230,8 @@ public class ForestLayer : LooseLayer {
 	private ImageTexture largeForestTexture;
 	private ImageTexture smallForestTexture;
 	private ImageTexture pineForestTexture;
+	private ImageTexture pinePlainsTexture;
+	private ImageTexture pineTundraTexture;
 
 	public ForestLayer() {
 		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
@@ -237,6 +239,8 @@ public class ForestLayer : LooseLayer {
 		largeForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
 		smallForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 528, 640, 176);
 		pineForestTexture  = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
+		pinePlainsTexture  = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx"   , 0, 704, 768, 176);
+		pineTundraTexture  = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx"   , 0, 704, 768, 176);
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
@@ -280,7 +284,16 @@ public class ForestLayer : LooseLayer {
 			if (tile.isPineForest) {
 				forestRow = tile.yCoordinate % 2;
 				forestColumn = tile.xCoordinate % 6;
-				forestTexture = pineForestTexture;
+				GD.Print("Pine forest at " + tile + " has terrain type " + tile.terrainType.name);
+				if (tile.terrainType.name == "Grassland") {
+					forestTexture = pineForestTexture;
+				}
+				else if (tile.terrainType.name == "Plains") {
+					forestTexture = pinePlainsTexture;
+				}
+				else { //Tundra
+					forestTexture = pineTundraTexture;
+				}
 			}
 			else {
 				forestRow = tile.yCoordinate % 2;
