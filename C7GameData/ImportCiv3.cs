@@ -117,19 +117,19 @@ namespace C7GameData
                     yCoordinate = tile.Y,
                     ExtraInfo = extra,
                     // TEMP all water is coast, desert and plains are plains, grass and tundra are grass
-                    terrainType = tile.BaseTerrain > 10 ? coast : tile.BaseTerrain > 1 ? grassland : plains,
+                    baseTerrainType = tile.BaseTerrain > 10 ? coast : tile.BaseTerrain > 1 ? grassland : plains,
                 };
                 if (tile.BaseTerrain == 3) {
-                    c7Tile.terrainType = tundra;
+                    c7Tile.baseTerrainType = tundra;
                 }
                 else if (tile.BaseTerrain == 2) {
-                    c7Tile.terrainType = grassland;
+                    c7Tile.baseTerrainType = grassland;
                 }
                 else if (tile.BaseTerrain == 1) {
-                    c7Tile.terrainType = plains;
+                    c7Tile.baseTerrainType = plains;
                 }
                 else if (tile.BaseTerrain == 0) {
-                    c7Tile.terrainType = desert;
+                    c7Tile.baseTerrainType = desert;
                 }
                 //Not sure how to put this inline with the c7Tile reference, or without duplicating the base terrain logic
                 if (tile.OverlayTerrain == 6) {
@@ -157,7 +157,7 @@ namespace C7GameData
                     c7Tile.overlayTerrainType = volcano;
                 }
                 else {
-                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                    c7Tile.overlayTerrainType = c7Tile.baseTerrainType;
                 }
                 c7Save.GameData.map.tiles.Add(c7Tile);
             }

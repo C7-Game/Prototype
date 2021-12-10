@@ -10,7 +10,7 @@ namespace C7GameData
         public Civ3ExtraInfo ExtraInfo;
         public int xCoordinate;
         public int yCoordinate;
-        public TerrainType terrainType = TerrainType.NONE;
+        public TerrainType baseTerrainType = TerrainType.NONE;
         public TerrainType overlayTerrainType = TerrainType.NONE;
         public City cityAtTile;
         public bool hasBarbarianCamp = false;
@@ -51,7 +51,7 @@ namespace C7GameData
 
         public override string ToString()
         {
-            return "[" + xCoordinate + ", " + yCoordinate + "] (" + terrainType.name + ")";
+            return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
         }
     }
 

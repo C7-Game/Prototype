@@ -244,10 +244,10 @@ public class ForestLayer : LooseLayer {
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
-		TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].terrainType;
-		TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].terrainType;
-		TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].terrainType;
-		TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].terrainType;
+		TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].baseTerrainType;
+		TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].baseTerrainType;
+		TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].baseTerrainType;
+		TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].baseTerrainType;
 
 		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
 
@@ -284,10 +284,10 @@ public class ForestLayer : LooseLayer {
 			if (tile.isPineForest) {
 				forestRow = tile.yCoordinate % 2;
 				forestColumn = tile.xCoordinate % 6;
-				if (tile.terrainType.name == "Grassland") {
+				if (tile.baseTerrainType.name == "Grassland") {
 					forestTexture = pineForestTexture;
 				}
-				else if (tile.terrainType.name == "Plains") {
+				else if (tile.baseTerrainType.name == "Plains") {
 					forestTexture = pinePlainsTexture;
 				}
 				else { //Tundra
