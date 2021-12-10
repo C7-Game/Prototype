@@ -156,10 +156,10 @@ public class HillsLayer : LooseLayer {
 
 	private TerrainType getDominantVegetationNearHillyTile(Tile center)
 	{
-		TerrainType northeastType = center.neighbors[TileDirection.NORTHEAST].terrainType;
-		TerrainType northwestType = center.neighbors[TileDirection.NORTHWEST].terrainType;
-		TerrainType southeastType = center.neighbors[TileDirection.SOUTHEAST].terrainType;
-		TerrainType southwestType = center.neighbors[TileDirection.SOUTHWEST].terrainType;
+		TerrainType northeastType = center.neighbors[TileDirection.NORTHEAST].overlayTerrainType;
+		TerrainType northwestType = center.neighbors[TileDirection.NORTHWEST].overlayTerrainType;
+		TerrainType southeastType = center.neighbors[TileDirection.SOUTHEAST].overlayTerrainType;
+		TerrainType southwestType = center.neighbors[TileDirection.SOUTHWEST].overlayTerrainType;
 
 		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
 
