@@ -150,7 +150,7 @@ public class HillsLayer : LooseLayer {
 					volcanoGraphics = jungleVolcanoTexture;
 				}
 				else {
-					volcanoGraphics = hillsTexture;
+					volcanoGraphics = volcanosTexture;
 				}
 				looseView.DrawTextureRectRegion(volcanoGraphics, screenTarget, volcanoRectangle);
 			}
@@ -159,10 +159,10 @@ public class HillsLayer : LooseLayer {
 
 	private TerrainType getDominantVegetationNearHillyTile(Tile center)
 	{
-		TerrainType northeastType = center.neighbors[TileDirection.NORTHEAST].terrainType;
-		TerrainType northwestType = center.neighbors[TileDirection.NORTHWEST].terrainType;
-		TerrainType southeastType = center.neighbors[TileDirection.SOUTHEAST].terrainType;
-		TerrainType southwestType = center.neighbors[TileDirection.SOUTHWEST].terrainType;
+		TerrainType northeastType = center.neighbors[TileDirection.NORTHEAST].overlayTerrainType;
+		TerrainType northwestType = center.neighbors[TileDirection.NORTHWEST].overlayTerrainType;
+		TerrainType southeastType = center.neighbors[TileDirection.SOUTHEAST].overlayTerrainType;
+		TerrainType southwestType = center.neighbors[TileDirection.SOUTHWEST].overlayTerrainType;
 
 		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
 
@@ -222,6 +222,120 @@ public class HillsLayer : LooseLayer {
 			index+=8;
 		}
 		return index;
+	}
+}
+
+public class ForestLayer : LooseLayer {
+	public static readonly Vector2 forestJungleSize = new Vector2(128, 88);
+
+	private ImageTexture largeJungleTexture;
+	private ImageTexture smallJungleTexture;
+	private ImageTexture largeForestTexture;
+	private ImageTexture largePlainsForestTexture;
+	private ImageTexture largeTundraForestTexture;
+	private ImageTexture smallForestTexture;
+	private ImageTexture smallPlainsForestTexture;
+	private ImageTexture smallTundraForestTexture;
+	private ImageTexture pineForestTexture;
+	private ImageTexture pinePlainsTexture;
+	private ImageTexture pineTundraTexture;
+
+	public ForestLayer() {
+		largeJungleTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0,   0, 512, 176);
+		smallJungleTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 176, 768, 176);
+		largeForestTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
+		largePlainsForestTexture = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx",    0, 352, 512, 176);
+		largeTundraForestTexture = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx",    0, 352, 512, 176);
+		smallForestTexture       = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 528, 640, 176);
+		smallPlainsForestTexture = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx",    0, 528, 640, 176);
+		smallTundraForestTexture = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx",    0, 528, 640, 176);
+		pineForestTexture        = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
+		pinePlainsTexture        = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx"   , 0, 704, 768, 176);
+		pineTundraTexture        = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx"   , 0, 704, 768, 176);
+	}
+	
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
+		TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].baseTerrainType;
+		TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].baseTerrainType;
+		TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].baseTerrainType;
+		TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].baseTerrainType;
+
+		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
+
+		bool neighborsCoast = false;
+		foreach (TerrainType type in neighborTerrains) {
+			if (type.name == "Coast") {
+				neighborsCoast = true;
+			}
+		}
+
+		if (tile.overlayTerrainType.name == "Jungle") {
+			//Randomly, but predictably, choose a large jungle graphic
+			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
+			//For the first pass, we're just always using large jungles.
+			int randomJungleRow = tile.yCoordinate % 2;
+			int randomJungleColumn;
+			ImageTexture jungleTexture;
+			if (neighborsCoast) {
+				randomJungleColumn = tile.xCoordinate % 6;
+				jungleTexture = smallJungleTexture;
+			}
+			else {
+				randomJungleColumn = tile.xCoordinate % 4;
+				jungleTexture = largeJungleTexture;
+			}
+			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.x, randomJungleRow * forestJungleSize.y, forestJungleSize);
+			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
+			looseView.DrawTextureRectRegion(jungleTexture, screenTarget, jungleRectangle);
+		}
+		if (tile.overlayTerrainType.name == "Forest") {
+			int forestRow = 0;
+			int forestColumn = 0;
+			ImageTexture forestTexture;
+			if (tile.isPineForest) {
+				forestRow = tile.yCoordinate % 2;
+				forestColumn = tile.xCoordinate % 6;
+				if (tile.baseTerrainType.name == "Grassland") {
+					forestTexture = pineForestTexture;
+				}
+				else if (tile.baseTerrainType.name == "Plains") {
+					forestTexture = pinePlainsTexture;
+				}
+				else { //Tundra
+					forestTexture = pineTundraTexture;
+				}
+			}
+			else {
+				forestRow = tile.yCoordinate % 2;
+				if (neighborsCoast) {
+					forestColumn = tile.xCoordinate % 5;
+					if (tile.baseTerrainType.name == "Grassland") {
+						forestTexture = smallForestTexture;
+					}
+					else if (tile.baseTerrainType.name == "Plains") {
+						forestTexture = smallPlainsForestTexture;
+					}
+					else {	//tundra
+						forestTexture = smallTundraForestTexture;
+					}
+				}
+				else {
+					forestColumn = tile.xCoordinate % 4;
+					if (tile.baseTerrainType.name == "Grassland") {
+						forestTexture = largeForestTexture;
+					}
+					else if (tile.baseTerrainType.name == "Plains") {
+						forestTexture = largePlainsForestTexture;
+					}
+					else {	//tundra
+						forestTexture = largeTundraForestTexture;
+					}
+				}
+			}
+			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.x, forestRow * forestJungleSize.y, forestJungleSize);
+			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
+			looseView.DrawTextureRectRegion(forestTexture, screenTarget, forestRectangle);
+		}
 	}
 }
 
@@ -816,6 +930,7 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
+		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new HillsLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);

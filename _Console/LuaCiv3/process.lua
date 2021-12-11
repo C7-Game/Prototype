@@ -4,42 +4,44 @@ civ3_home = "/Users/jim/civ3"
 
 -- variable init
 
+-- vars for bic flag hunt
 byte_chunks = {}
 offset = 0
 num_bytes = 32
 idx = 1
-
 num_bic_with_bldg = 0
 num_bic_with_wchr = 0
 num_bic_with_both = 0
 
+-- vars for tile hunt
 tile_off = {}
 num_mountains = 0
 
 -- called for each sav
 function process_save (sav, path)
-    -- print(sav.sav.getString(0,4))
-    local mount = false
-    for i=18,23 do
-        tile_off[i] = {}
-        for ii, tile in ipairs(sav.tile) do
-            if tile.overlayTerrain == 6 then
-                io.write("Mountain! ")
-                if not mount then num_mountains = num_mountains + 1 end
-                local o = sav.sav.readByte(tile.offset + i)
-                if (not tile_off[i][o]) then 
-                    tile_off[i][o] = 1
-                else
-                    tile_off[i][o] = tile_off[i][o] + 1
-                end
-            end
-        end
-        if num_mountains > 0 then mount = true end
-    end
+    tile_hunt(sav, path)
 end
+
 
 -- called for each bic
 function process_bic (bic, path)
+    -- flag_hunt(bic, path)
+    path_hunt(bic, path)
+end
+
+function path_hunt (bic, path)
+    -- print("Hi")
+    local gameoff = bic.bic.sectionOffset("GAME", 1)
+    io.write(bic.title .. "\n\n")
+    io.write(bic.description .. "\n\n")
+    io.write(bic.relativeModPath .. "\n\n")
+    -- io.write(bic.bic.getString(gameoff + 0xdc, 64) .. "\n")
+    -- io.write(hex_dump(bic.bic.getBytes(gameoff + 0xdc, 656)))
+    io.write("\n\n\n")
+end
+
+
+function flag_hunt(bic, path)
     io.write("\n", path, "\n")
     -- print(bic.bic.getString(0,4))
     local foo = bic.bic.getBytes(offset, num_bytes)
@@ -61,7 +63,9 @@ end
 
 -- called after all files processed
 function show_results()
-    save_results()
+    -- save_results()
+    -- finish writing to stdout before exit
+    io.flush()
 end
 
 
@@ -112,16 +116,17 @@ end
 -- other stuff
 
 -- adapted from https://gist.github.com/Elemecca/6361899
-function hex_dump (str)
+function hex_dump (str, offset)
     local len = #str
     local dump = ""
     local hex = ""
     local asc = ""
+    offset = offset or 0
     
     for i = 1, len do
         if 1 == i % 8 then
             dump = dump .. hex .. asc .. "\n"
-            hex = string.format( "%04x: ", i - 1 )
+            hex = string.format( "%04x: ", i - 1 + offset )
             asc = ""
         end
         
@@ -149,4 +154,25 @@ function base2 (num)
         end
     end
     return out
+end
+
+function tile_hunt (sav, path)
+    -- print(sav.sav.getString(0,4))
+local mount = false
+for i=18,23 do
+    tile_off[i] = {}
+    for ii, tile in ipairs(sav.tile) do
+        if tile.overlayTerrain == 6 then
+            io.write("Mountain! ")
+            if not mount then num_mountains = num_mountains + 1 end
+            local o = sav.sav.readByte(tile.offset + i)
+            if (not tile_off[i][o]) then 
+                tile_off[i][o] = 1
+            else
+                tile_off[i][o] = tile_off[i][o] + 1
+            end
+        end
+    end
+    if num_mountains > 0 then mount = true end
+end
 end

@@ -27,6 +27,13 @@ namespace C7GameData
     		SavData civ3Save = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(savePath), defaultBicBytes);
 
             // Dummy data
+            TerrainType desert = new TerrainType();
+            desert.name = "Desert";
+            desert.baseFoodProduction = 0;
+            desert.baseShieldProduction = 1;
+            desert.baseCommerceProduction = 0;
+            desert.movementCost = 1;
+
             TerrainType grassland = new TerrainType();
             grassland.name = "Grassland";
             grassland.baseFoodProduction = 2;
@@ -40,6 +47,13 @@ namespace C7GameData
             plains.baseShieldProduction = 2;
             plains.baseCommerceProduction = 1;
             plains.movementCost = 1;
+            
+            TerrainType tundra = new TerrainType();
+            tundra.name = "Tundra";
+            tundra.baseFoodProduction = 1;
+            tundra.baseShieldProduction = 0;
+            tundra.baseCommerceProduction = 0;
+            tundra.movementCost = 1;
 
             TerrainType coast = new TerrainType();
             coast.name = "Coast";
@@ -69,6 +83,24 @@ namespace C7GameData
             volcano.baseCommerceProduction = 1;
             volcano.movementCost = 3;
 
+            TerrainType forest = new TerrainType();
+            forest.name = "Forest";
+            forest.baseFoodProduction = 1;
+            forest.baseShieldProduction = 2;
+            forest.baseCommerceProduction = 0;
+            
+            TerrainType jungle = new TerrainType();
+            jungle.name = "Jungle";
+            jungle.baseFoodProduction = 1;
+            jungle.baseShieldProduction = 0;
+            jungle.baseCommerceProduction = 0;
+            
+            TerrainType marsh = new TerrainType();
+            marsh.name = "Marsh";
+            marsh.baseFoodProduction = 1;
+            marsh.baseShieldProduction = 0;
+            marsh.baseCommerceProduction = 0;
+
             // Import data
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
             c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
@@ -85,8 +117,20 @@ namespace C7GameData
                     yCoordinate = tile.Y,
                     ExtraInfo = extra,
                     // TEMP all water is coast, desert and plains are plains, grass and tundra are grass
-                    terrainType = tile.BaseTerrain > 10 ? coast : tile.BaseTerrain > 1 ? grassland : plains,
+                    baseTerrainType = tile.BaseTerrain > 10 ? coast : tile.BaseTerrain > 1 ? grassland : plains,
                 };
+                if (tile.BaseTerrain == 3) {
+                    c7Tile.baseTerrainType = tundra;
+                }
+                else if (tile.BaseTerrain == 2) {
+                    c7Tile.baseTerrainType = grassland;
+                }
+                else if (tile.BaseTerrain == 1) {
+                    c7Tile.baseTerrainType = plains;
+                }
+                else if (tile.BaseTerrain == 0) {
+                    c7Tile.baseTerrainType = desert;
+                }
                 //Not sure how to put this inline with the c7Tile reference, or without duplicating the base terrain logic
                 if (tile.OverlayTerrain == 6) {
                     c7Tile.overlayTerrainType = mountain;
@@ -97,18 +141,28 @@ namespace C7GameData
                 else if (tile.OverlayTerrain == 5) {
                     c7Tile.overlayTerrainType = hills;
                 }
+                else if (tile.OverlayTerrain == 7) {
+                    c7Tile.overlayTerrainType = forest;
+                    if (tile.isPineForest) {
+                        c7Tile.isPineForest = true;
+                    }
+                }
+                else if (tile.OverlayTerrain == 8) {
+                    c7Tile.overlayTerrainType = jungle;
+                }
                 else if (tile.OverlayTerrain == 9) {
-                    //Marsh
-                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                    c7Tile.overlayTerrainType = marsh;
                 }
                 else if (tile.OverlayTerrain == 10) {
                     c7Tile.overlayTerrainType = volcano;
                 }
                 else {
-                    c7Tile.overlayTerrainType = c7Tile.terrainType;
+                    c7Tile.overlayTerrainType = c7Tile.baseTerrainType;
                 }
                 c7Save.GameData.map.tiles.Add(c7Tile);
             }
+            // This probably doesn't belong here, but not sure where else to put it
+            c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.RelativeModPath;
             return c7Save;
         }
         
