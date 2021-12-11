@@ -50,6 +50,15 @@ public class MapUnit
 		public TileDirection direction;
 		public float progress; // Varies 0 to 1
 		public float offsetX, offsetY; // Offset is in grid cells from the unit's location
+
+		// When true, indicates that the animation is still playing (f.e. a unit is still running between tiles) so the UI shouldn't yet
+		// autoselect another unit.
+		public bool keepUnitSelected()
+		{
+			// TODO: Special rules for different animations. We don't need to see workers do their thing but we do want to watch units
+			// move. IMO we should also not show units fortifying even though I know the original game does.
+			return progress < 1.0;
+		}
 	}
 
 	// public ActiveAnimation activeAnim;

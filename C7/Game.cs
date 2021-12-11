@@ -85,6 +85,13 @@ public class Game : Node2D
 				StartGame();
 				break;
 			case GameState.PlayerTurn:
+				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
+				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
+				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
+				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
+				    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+				    (! CurrentlySelectedUnit.getActiveAnimation(OS.GetTicksMsec()).keepUnitSelected()))
+					GetNextAutoselectedUnit();
 				break;
 			case GameState.ComputerTurn:
 				break;
@@ -352,7 +359,8 @@ public class Game : Node2D
 					default: return; // Impossible
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec(), dir);
-					if (CurrentlySelectedUnit.movementPointsRemaining <= 0)
+					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+					    (! CurrentlySelectedUnit.getActiveAnimation(OS.GetTicksMsec()).keepUnitSelected()))
 						GetNextAutoselectedUnit();
 					else {
 						setSelectedUnit(CurrentlySelectedUnit);
@@ -409,7 +417,7 @@ public class Game : Node2D
 		else if (buttonName.Equals("fortify"))
 		{
 			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec());
-			GetNextAutoselectedUnit();
+			GetNextAutoselectedUnit(); // This skips the animation but if we don't do this the unit will stay selected
 		}
 		else if (buttonName.Equals("wait"))
 		{
