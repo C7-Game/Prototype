@@ -465,19 +465,6 @@ public class UnitLayer : LooseLayer {
 		mat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
 	}
 
-	public void drawFlicFrame(LooseView looseView, Util.FlicSheet flicSheet, int row, float relativeColumn, Vector2 position, Color civColor)
-	{
-		var inst = getBlankAnimationInstance(looseView);
-
-		setFlicShaderParams(inst.shaderMat, flicSheet, row, relativeColumn);
-		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
-
-		inst.meshInst.Position = position;
-		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
-		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
-		inst.meshInst.ZIndex = unitAnimZIndex;
-	}
-
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
 	{
 		Util.FlicSheet flicSheet;
@@ -502,7 +489,16 @@ public class UnitLayer : LooseLayer {
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
 		var position = tileCenter + animOffset - new Vector2(0, flicSheet.spriteHeight / 4);
 
-		drawFlicFrame(looseView, flicSheet, dirIndex, activeAnim.progress, position, civColor);
+		var inst = getBlankAnimationInstance(looseView);
+
+		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, activeAnim.progress);
+		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
+
+		inst.meshInst.Position = position;
+		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
+		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
+		inst.meshInst.ZIndex = unitAnimZIndex;
+
 	}
 
 	private Util.FlicSheet cursorFlicSheet;
