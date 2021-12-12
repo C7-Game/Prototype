@@ -465,13 +465,36 @@ public class UnitLayer : LooseLayer {
 		mat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
 	}
 
-	public void drawUnitAnimFrame(LooseView looseView, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter, Color civColor)
+	public Util.FlicSheet getAnimFlicSheet(string unitTypeName, MapUnit.AnimatedAction action)
 	{
-		Util.FlicSheet flicSheet;
-		if (! flicSheets.TryGetValue(activeAnim.name, out flicSheet)) {
-			(flicSheet, _) = Util.loadFlicSheet(activeAnim.name);
-			flicSheets.Add(activeAnim.name, flicSheet);
+		Util.FlicSheet tr;
+		var key = String.Format("{0}.{1}", unitTypeName, action.ToString());
+		if (! flicSheets.TryGetValue(key, out tr)) {
+			string animCoreName;
+			if (action == MapUnit.AnimatedAction.FORTIFY) {
+				if ((unitTypeName != "Worker") && (unitTypeName != "Settler"))
+					animCoreName = String.Format("{0}Fortify", unitTypeName);
+				else
+					animCoreName = String.Format("{0}Default", unitTypeName != "Settler" ? unitTypeName : "sett");
+			} else if (action == MapUnit.AnimatedAction.RUN) {
+				if (unitTypeName == "Worker")
+					animCoreName = "workRun";
+				else if (unitTypeName == "Settler")
+					animCoreName = "settRun";
+				else
+					animCoreName = String.Format("{0}Run", unitTypeName);
+			} else
+				animCoreName = String.Format("{0}Default", unitTypeName != "Settler" ? unitTypeName : "sett");
+
+			(tr, _) = Util.loadFlicSheet(String.Format("Art/Units/{0}/{1}.flc", unitTypeName, animCoreName));
+			flicSheets.Add(key, tr);
 		}
+		return tr;
+	}
+
+	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter)
+	{
+		var flicSheet = getAnimFlicSheet(unit.unitType.name, activeAnim.action);
 
 		int dirIndex = 0;
 		switch (activeAnim.direction) {
@@ -492,6 +515,7 @@ public class UnitLayer : LooseLayer {
 		var inst = getBlankAnimationInstance(looseView);
 
 		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, activeAnim.progress);
+		var civColor = new Color(unit.owner.color);
 		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
 
 		inst.meshInst.Position = position;
@@ -558,7 +582,7 @@ public class UnitLayer : LooseLayer {
 		if ((selectedUnitOnTile != null) && (selectedUnitOnTile == unit))
 			drawCursor(looseView, tileCenter + animOffset);
 
-		drawUnitAnimFrame(looseView, activeAnim, tileCenter, new Color(unit.owner.color));
+		drawUnitAnimFrame(looseView, unit, activeAnim, tileCenter);
 
 		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
 

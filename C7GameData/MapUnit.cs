@@ -45,8 +45,38 @@ public class MapUnit
 		}
 	}
 
+	// TODO: The contents of this enum are copy-pasted from UnitAction in Civ3UnitSprite.cs. We should unify these so we don't have two different
+	// but virtually identical enums.
+	public enum AnimatedAction {
+		BLANK,
+		DEFAULT,
+		WALK,
+		RUN,
+		ATTACK1,
+		ATTACK2,
+		ATTACK3,
+		DEFEND,
+		DEATH,
+		DEAD,
+		FORTIFY,
+		FORTIFYHOLD,
+		FIDGET,
+		VICTORY,
+		TURNLEFT,
+		TURNRIGHT,
+		BUILD,
+		ROAD,
+		MINE,
+		IRRIGATE,
+		FORTRESS,
+		CAPTURE,
+		JUNGLE,
+		FOREST,
+		PLANT
+	}
+
 	public struct ActiveAnimation {
-		public string name; // Flic file name. TODO: Maybe this should be an enum of animation types?
+		public AnimatedAction action;
 		public TileDirection direction;
 		public float progress; // Varies 0 to 1
 		public float offsetX, offsetY; // Offset is in grid cells from the unit's location
@@ -61,42 +91,20 @@ public class MapUnit
 		}
 	}
 
-	// public ActiveAnimation activeAnim;
 	public ulong animStartTimeMS;
+	public AnimatedAction animAction = AnimatedAction.DEFAULT;
 
-	// TODO: We should use the UnitAction enum from Civ3UnitSprite.cs instead here
-	public enum AnimatedAction {
-		IDLE,
-		FORTIFY,
-		RUN
-	}
-
-	public AnimatedAction animAction = AnimatedAction.IDLE;
-
-	// TODO: This needs to be part of the engine eventually.
 	public ActiveAnimation getActiveAnimation(ulong currentTimeMS)
 	{
 		double runningTimeS = (currentTimeMS - animStartTimeMS) / 1000.0;
 		double animDuration = 0.5; // TODO: Read this from the INI files somehow
 		float progress = (float)(runningTimeS / animDuration);
 
-		// TODO: Load these names from the INI files, and consider moving this stuff into UnitLayer and having ActiveAnimation store an action
-		// enum or something like that instead.
-		string animCoreName;
-		if (animAction == AnimatedAction.FORTIFY) {
-			if ((unitType.name != "Worker") && (unitType.name != "Settler"))
-				animCoreName = String.Format("{0}Fortify", unitType.name);
-			else
-				animCoreName = String.Format("{0}Default", unitType.name != "Settler" ? unitType.name : "sett");
-		} else if ((animAction == AnimatedAction.RUN) && (progress < 1f)) {
-			if (unitType.name == "Worker")
-				animCoreName = "workRun";
-			else if (unitType.name == "Settler")
-				animCoreName = "settRun";
-			else
-				animCoreName = String.Format("{0}Run", unitType.name);
-		} else
-			animCoreName = String.Format("{0}Default", unitType.name != "Settler" ? unitType.name : "sett");
+		var animAction = this.animAction;
+
+		// Replace run animation with default after the running is finished
+		if ((animAction == AnimatedAction.RUN) && (progress >= 1f))
+			animAction = AnimatedAction.DEFAULT;
 
 		float offsetX = 0, offsetY = 0;
 		if ((animAction == AnimatedAction.RUN) && (progress < 1f)) {
@@ -105,8 +113,7 @@ public class MapUnit
 			offsetY = -1 * dY * (1f - progress);
 		}
 
-		string animName = String.Format("Art/Units/{0}/{1}.flc", unitType.name, animCoreName);
-		return new ActiveAnimation { name = animName, direction = facingDirection, progress = progress, offsetX = offsetX, offsetY = offsetY };
+		return new ActiveAnimation { action = animAction, direction = facingDirection, progress = progress, offsetX = offsetX, offsetY = offsetY };
 	}
 
 	public static MapUnit NONE = new MapUnit();
