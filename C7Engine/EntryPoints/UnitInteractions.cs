@@ -126,13 +126,13 @@ namespace C7Engine
                             return;
                         }
 
-                        var newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
+                        Tile newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
                         if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
                             if (! unit.location.unitsOnTile.Remove(unit))
                                 throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
                             newLoc.unitsOnTile.Add(unit);
                             unit.location = newLoc;
-                            unit.movementPointsRemaining -= 1;
+                            unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
                             unit.isFortified = false;
                         }
 
