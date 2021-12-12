@@ -1,11 +1,58 @@
 namespace C7Engine
 {
     using C7GameData;
+    using System;
     public class TurnHandling
     {
         public static void EndTurn()
         {
             GameData gameData = EngineStorage.gameData;
+            //Barbarians
+            //We should really have a top-level list of tiles with barb camps
+            foreach (Tile tile in gameData.map.tiles)
+            {
+                if (tile.hasBarbarianCamp) {
+                    //7% chance of a new barbarian.  Probably should scale based on barbarian activity.  
+                    Random rnd = new Random();
+                    int result = rnd.Next(100);
+                    Console.WriteLine("Random barb result = " + result);
+                    if (result < 7) {
+                        MapUnit newUnit = new MapUnit();
+                        newUnit.location = tile;
+                        newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
+                        UnitPrototype newUnitPrototype = new UnitPrototype();
+                        newUnitPrototype.name = "Warrior";
+                        newUnitPrototype.attack = 1;
+                        newUnitPrototype.defense = 1;
+                        newUnitPrototype.movement = 1;
+                        newUnitPrototype.iconIndex = 6;
+                        newUnit.unitType = newUnitPrototype;
+                        newUnit.isFortified = true; //todo: hack for unit selection
+
+                        tile.unitsOnTile.Add(newUnit);
+                        gameData.mapUnits.Add(newUnit);
+                        Console.WriteLine("New barbarian added at " + tile);
+                    }
+                }
+            }
+            foreach(MapUnit unit in gameData.mapUnits) {
+                if (unit.owner == gameData.players[1]) {
+                    if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
+                        //Move randomly
+                        Tile newLocation = unit.location.neighbors[Tile.RandomDirection()];
+                        //Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
+                        //if it tries to move e.g. north from the north pole.  Hence, this check.
+                        //Longer term, we should enhance the code to only return valid destinations (which also means not water, etc.)
+                        if (newLocation != Tile.NONE) {
+                            Console.WriteLine("Moving barbarian at " + unit.location + " to " + newLocation);
+                            unit.location.unitsOnTile.Remove(unit);
+                            newLocation.unitsOnTile.Add(unit);
+                            unit.location = newLocation;
+                        }
+                    }
+                }
+            }
+
             //City Production
             foreach (City city in gameData.cities)
             {

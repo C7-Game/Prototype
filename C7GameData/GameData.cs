@@ -112,10 +112,10 @@ namespace C7GameData
             createDummyUnit(worker , humanPlayer, 24, 26);
             createDummyUnit(chariot, humanPlayer, 26, 26);
 
-            var startingLocations = map.generateStartingLocations(rng, 10, 10);
-            foreach (var sL in startingLocations)
-                if (sL.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-                    var barbWarrior = createDummyUnit(warrior, barbarianPlayer, sL.xCoordinate, sL.yCoordinate);
+            List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
+            foreach (Tile barbCampLocation in barbarianCamps)
+                if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
+                    var barbWarrior = createDummyUnit(warrior, barbarianPlayer, barbCampLocation.xCoordinate, barbCampLocation.yCoordinate);
                     barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
                                                     // whole procedure of generating a map should be part of the engine not the data module.
                     barbWarrior.location.hasBarbarianCamp = true;

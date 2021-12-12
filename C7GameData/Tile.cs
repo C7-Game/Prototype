@@ -1,5 +1,6 @@
 namespace C7GameData
 {
+    using System;
     using System.Collections.Generic;
     public class Tile
     {
@@ -52,6 +53,12 @@ namespace C7GameData
         public override string ToString()
         {
             return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
+        }
+
+        public static TileDirection RandomDirection() {
+            Random rnd = new Random();
+            int index = rnd.Next(8);
+            return (TileDirection)(Enum.GetValues(TileDirection.NORTH.GetType())).GetValue(index);
         }
     }
 

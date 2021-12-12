@@ -450,7 +450,8 @@ public class BuildingLayer : LooseLayer {
 	{
 		var buildingsPCX = new Pcx(Util.Civ3MediaPath("Art/Terrain/TerrainBuildings.PCX"));
 		buildingsTex = PCXToGodot.getImageTextureFromPCX(buildingsPCX);
-		buildingSpriteSize = new Vector2((float)buildingsTex.GetWidth() / 3, (float)buildingsTex.GetHeight() / 4);
+		//In Conquests, this graphic is 4x4, and the search path will now find the Conquests one first
+		buildingSpriteSize = new Vector2((float)buildingsTex.GetWidth() / 4, (float)buildingsTex.GetHeight() / 4);
 	}
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
