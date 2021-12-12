@@ -38,7 +38,7 @@ namespace C7GameData
                 var tile = map.tileAt(tileX, tileY);
                 var unit = new MapUnit();
                 unit.unitType = proto;
-		unit.owner = owner;
+		        unit.owner = owner;
                 unit.location = tile;
                 tile.unitsOnTile.Add(unit);
                 mapUnits.Add(unit);
