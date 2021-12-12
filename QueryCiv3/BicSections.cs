@@ -22,33 +22,20 @@ namespace QueryCiv3
     public class TechSection : SectionListItem {}
     public class TfrmSection : SectionListItem {}
     public class TerrSection : SectionListItem {
-        //TODO: This is probably not how Puppeteer intended us to fetch the data.
-        public int numPossibleResources {
-            get => BitConverter.ToInt32(RawBytes, 0);
-        }
+        public int numPossibleResources { get => Bic.ReadInt32(Offset); }
+
         //This contains one byte for each 8 resources available on the tile.
         //Thus, if there are 0 resource, 0 bytes; 1-8 resources, 1 bytes, 9-16, 2 bytes, etc.
-        public byte[] possibleResources {
+        public byte[] resourcesAllowedOnTerrain {
             get {
-                int possibleResourceByteCount = (numPossibleResources + 7) /8;
-                byte[] possibleResources = new byte[possibleResourceByteCount];
-                Array.Copy(RawBytes, 4, possibleResources, 0, possibleResources.Length);
-                return possibleResources;
+                int bytesNeededForResources = (numPossibleResources + 7) /8;
+                byte[] byteBuffer = new byte[bytesNeededForResources];
+                Array.Copy(RawBytes, 4, byteBuffer, 0, byteBuffer.Length);
+                return byteBuffer;
             }
         }
-        public int terrainNameOffset {
-            get {
-                return 4 + possibleResources.Length;
-            }
-        }
-        public string terrainName {
-            get {
-                byte[] terrainNameBytes = new byte[32];
-                Array.Copy(RawBytes, terrainNameOffset, terrainNameBytes, 0, terrainNameBytes.Length);
-                string terrainName = System.Text.Encoding.GetEncoding("Windows-1252").GetString(terrainNameBytes);
-                return terrainName;
-            }
-        }
+        public int terrainNameOffset { get => Offset + 4 + resourcesAllowedOnTerrain.Length; }
+        public string terrainName { get => Bic.GetString(terrainNameOffset, 32); }
 
         public override string ToString() {
             return "Terrain " + terrainName + " with " + numPossibleResources + " possible resources";
