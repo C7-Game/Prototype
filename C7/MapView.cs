@@ -470,23 +470,21 @@ public class UnitLayer : LooseLayer {
 		Util.FlicSheet tr;
 		var key = String.Format("{0}.{1}", unitTypeName, action.ToString());
 		if (! flicSheets.TryGetValue(key, out tr)) {
-			string animCoreName;
-			if (action == MapUnit.AnimatedAction.FORTIFY) {
-				if ((unitTypeName != "Worker") && (unitTypeName != "Settler"))
-					animCoreName = String.Format("{0}Fortify", unitTypeName);
+			// Read the name of the FLC file corresponding to this action from the unit's INI file. If the action does not have an FLC
+			// file then use the "default" animation file instead. If the unit does not have a file for its default animation, throw an
+			// exception (TODO: Consider drawing nothing instead).
+			// Also TODO: We could cache these iniInfo's. As it is they're reloaded for each action. I doubt it would make a noticeable
+			// difference in performance, though.
+			string animFileName;
+			var iniInfo = Civ3UnitSprite.getINIAnimationsInfo(Util.Civ3MediaPath(String.Format("Art/Units/{0}/{0}.INI", unitTypeName)));
+			if (! iniInfo.TryGetValue(action.ToString(), out animFileName)) {
+				if (action != MapUnit.AnimatedAction.DEFAULT)
+					return getAnimFlicSheet(unitTypeName, MapUnit.AnimatedAction.DEFAULT);
 				else
-					animCoreName = String.Format("{0}Default", unitTypeName != "Settler" ? unitTypeName : "sett");
-			} else if (action == MapUnit.AnimatedAction.RUN) {
-				if (unitTypeName == "Worker")
-					animCoreName = "workRun";
-				else if (unitTypeName == "Settler")
-					animCoreName = "settRun";
-				else
-					animCoreName = String.Format("{0}Run", unitTypeName);
-			} else
-				animCoreName = String.Format("{0}Default", unitTypeName != "Settler" ? unitTypeName : "sett");
+					throw new Exception(String.Format("Unit type \"{0}\" is missing a default animation.", unitTypeName));
+			}
 
-			(tr, _) = Util.loadFlicSheet(String.Format("Art/Units/{0}/{1}.flc", unitTypeName, animCoreName));
+			(tr, _) = Util.loadFlicSheet(String.Format("Art/Units/{0}/{1}", unitTypeName, animFileName));
 			flicSheets.Add(key, tr);
 		}
 		return tr;
