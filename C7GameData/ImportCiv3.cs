@@ -101,6 +101,12 @@ namespace C7GameData
             marsh.baseShieldProduction = 0;
             marsh.baseCommerceProduction = 0;
 
+            //Not dummy data
+            Console.WriteLine("Printing all terrains");
+            foreach (TerrSection terrain in civ3Save.Bic.Terr) {
+                Console.WriteLine(terrain);
+            }
+
             // Import data
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
             c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
