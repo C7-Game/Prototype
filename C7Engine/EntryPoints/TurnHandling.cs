@@ -7,7 +7,7 @@ namespace C7Engine
         public static void EndTurn()
         {
             GameData gameData = EngineStorage.gameData;
-            //Barbarians
+            //Barbarians.  First, generate new barbarian units.
             //We should really have a top-level list of tiles with barb camps
             foreach (Tile tile in gameData.map.tiles)
             {
@@ -35,23 +35,11 @@ namespace C7Engine
                     }
                 }
             }
-            foreach(MapUnit unit in gameData.mapUnits) {
-                if (unit.owner == gameData.players[1]) {
-                    if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
-                        //Move randomly
-                        Tile newLocation = unit.location.neighbors[Tile.RandomDirection()];
-                        //Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
-                        //if it tries to move e.g. north from the north pole.  Hence, this check.
-                        //Longer term, we should enhance the code to only return valid destinations (which also means not water, etc.)
-                        if (newLocation != Tile.NONE) {
-                            Console.WriteLine("Moving barbarian at " + unit.location + " to " + newLocation);
-                            unit.location.unitsOnTile.Remove(unit);
-                            newLocation.unitsOnTile.Add(unit);
-                            unit.location = newLocation;
-                        }
-                    }
-                }
-            }
+            //Call the barbarian AI
+            //TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans, strategy, etc.)
+            //For now, we only have a random AI, so that will be in a future commit
+            BarbarianAI barbarianAI = new BarbarianAI();
+            barbarianAI.PlayTurn(gameData.players[1], gameData);
 
             //City Production
             foreach (City city in gameData.cities)

@@ -71,6 +71,7 @@ namespace C7GameData
 
             int white = -1; // = 0xFFFFFFFF, but we can't just use that b/c the compiler complains about uint-to-int conversion
             var barbarianPlayer = new Player(white);
+            barbarianPlayer.isBarbarians = true;
             players.Add(barbarianPlayer);
 
             //Right now, the one terrain type is in the map but not in our list here.

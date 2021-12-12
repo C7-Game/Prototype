@@ -6,6 +6,7 @@ public class Player
 {
 	public string guid { get; set; }
 	public int color { get; set; }
+	public bool isBarbarians = false;
 
 	public Player(int color)
 	{
