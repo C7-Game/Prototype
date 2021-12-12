@@ -488,8 +488,8 @@ public class CityLayer : LooseLayer {
 			smallFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
 			smallFont.Size = 11;
 
-			String cityNameAndGrowth = city.name + " : 10";
-			String productionDescription = "Warrior : 5";
+			String cityNameAndGrowth = city.name + " : " + city.TurnsUntilGrowth();
+			String productionDescription = city.itemBeingProduced + " : " + city.TurnsUntilProductionFinished();
 
 			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;
 			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).x;
@@ -587,7 +587,7 @@ public class CityLayer : LooseLayer {
 			DynamicFont midSizedFont = new DynamicFont();
 			midSizedFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
 			midSizedFont.Size = 18;
-			string popSizeString = "24";
+			string popSizeString = "" + city.size;
 			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
 			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH/2 - popSizeWidth/2;
 			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(popSizeOffset, 18));
