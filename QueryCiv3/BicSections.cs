@@ -36,9 +36,45 @@ namespace QueryCiv3
         }
         public int terrainNameOffset { get => Offset + 4 + resourcesAllowedOnTerrain.Length; }
         public string terrainName { get => Bic.GetString(terrainNameOffset, 32); }
+        public string civilopediaEntry { get => Bic.GetString(terrainNameOffset + 32, 32); }
+        public int irrigationBonus { get => Bic.ReadInt32(terrainNameOffset + 64);}
+        public int miningBonus { get => Bic.ReadInt32(terrainNameOffset + 68);}
+        public int roadBonus { get => Bic.ReadInt32(terrainNameOffset + 72);}
+        public int defenseBonus { get => Bic.ReadInt32(terrainNameOffset + 76);}
+        public int movementCost { get => Bic.ReadInt32(terrainNameOffset + 80);}
+        public int food { get => Bic.ReadInt32(terrainNameOffset + 84);}
+        public int shields { get => Bic.ReadInt32(terrainNameOffset + 88);}
+        public int commerce { get => Bic.ReadInt32(terrainNameOffset + 92);}
+        //Which worker job (TFRM) can be performed on this terrain type
+        public int workerJobAllowed { get => Bic.ReadInt32(terrainNameOffset + 96);}
+        //Which Terrain this Terrain becomes if affected by pollution.  -1 = not affected.  14 = Base Terrain Type (probably 12 in Vanilla/PTW)
+        public int pollutionEffect { get => Bic.ReadInt32(terrainNameOffset + 100);}
+        public byte allowCities { get => Bic.ReadByte(terrainNameOffset + 104);}
+        public byte allowColonies { get => Bic.ReadByte(terrainNameOffset + 105);}
+        public byte impassable { get => Bic.ReadByte(terrainNameOffset + 106);}
+        public byte impassableByWheeled { get => Bic.ReadByte(terrainNameOffset + 107);}
+        public byte allowAirfields { get => Bic.ReadByte(terrainNameOffset + 108);}
+        public byte allowForts { get => Bic.ReadByte(terrainNameOffset + 109);}
+        public byte allowOutposts { get => Bic.ReadByte(terrainNameOffset + 110);}
+        public byte allowRadarTowers { get => Bic.ReadByte(terrainNameOffset + 111);}
+        public int unknownOne { get => Bic.ReadInt32(terrainNameOffset + 112);}
+        public byte landmarkEnabled { get => Bic.ReadByte(terrainNameOffset + 116);}
+        public int landmarkFood { get => Bic.ReadInt32(terrainNameOffset + 117);}
+        public int landmarkShields { get => Bic.ReadInt32(terrainNameOffset + 121);}
+        public int landmarkCommerce { get => Bic.ReadInt32(terrainNameOffset + 125);}
+        public int landmarkIrrigationBonus { get => Bic.ReadInt32(terrainNameOffset + 129);}
+        public int landmarkMiningBonus { get => Bic.ReadInt32(terrainNameOffset + 133);}
+        public int landmarkRoadBonus { get => Bic.ReadInt32(terrainNameOffset + 137);}
+        public int landmarkMovementCost { get => Bic.ReadInt32(terrainNameOffset + 141);}
+        public int landmarkDefensiveBonus { get => Bic.ReadInt32(terrainNameOffset + 145);}
+        public string landmarkName { get => Bic.GetString(terrainNameOffset + 149, 32);}
+        public string landmarkCivilopediaEntry { get => Bic.GetString(terrainNameOffset + 181, 32);}
+        public int unknownTwo { get => Bic.ReadInt32(terrainNameOffset + 213);}
+        public int terrainFlags { get => Bic.ReadInt32(terrainNameOffset + 217);}
+        public int diseaseStrength { get => Bic.ReadInt32(terrainNameOffset + 221);}
 
         public override string ToString() {
-            return "Terrain " + terrainName + " with " + numPossibleResources + " possible resources";
+            return terrainName + " (" + food + "/" + shields + "/" + commerce + "); LM name = " + landmarkName;
         }
     }
     public class WsizSection : SectionListItem {}
