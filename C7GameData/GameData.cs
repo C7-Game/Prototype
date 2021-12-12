@@ -8,7 +8,7 @@ namespace C7GameData
         public Random rng; // TODO: Is GameData really the place for this?
         public GameMap map {get; set;}
         public List<Player> players = new List<Player>();
-        List<TerrainType> terrainTypes = new List<TerrainType>();
+        public List<TerrainType> terrainTypes = new List<TerrainType>();
 
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
