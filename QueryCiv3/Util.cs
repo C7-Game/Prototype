@@ -38,5 +38,10 @@ namespace QueryCiv3
             Match NoNullMatch = TrimAfterNull.Match(Out);
             return NoNullMatch.Value;
         }
+
+        static public bool GetFlag(byte flags, int index)
+        {
+            return (((flags >> index) & 1) == 1);
+        }
     }
 }
