@@ -9,7 +9,9 @@ namespace QueryCiv3.Biq
         public int Length;
         public int NumPossibleResources;
         /*
-
+            In the TERR section of Civ 3 BIQ files, there is a bit array for possible resources
+            One bit for each resource (as defined in GOOD), round up to the nearest byte for space
+            Because this is a dynamic-length section, it is stored separately from this struct
         */
 
         private fixed byte Text[64];

@@ -28,7 +28,6 @@ namespace C7GameData
     		SavData civ3Save = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(savePath), defaultBicBytes);
 
             //Not dummy data.  Import Civ3 terrains.
-            Console.WriteLine("Printing all terrains");
             foreach (TERR terrain in civ3Save.Bic.Terr) {
                 TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
                 c7Save.GameData.terrainTypes.Add(c7TerrainType);

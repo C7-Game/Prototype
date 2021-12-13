@@ -38,22 +38,31 @@ namespace QueryCiv3
         public WMAP[] Wmap;
         public WSIZ[] Wsiz;
 
+        public bool[,] TerrGood; // which resources are allowed on which types of terrain
+
         public unsafe BicData(byte[] bicBytes)
         {
             Bic = new Civ3File(bicBytes);
 
             fixed (byte* bytePtr = bicBytes)
             {
-                int offset = 736;
+                int offset = 736; // byte index of the first header in BIQ files
                 string header;
                 int count = 0;
                 int dataLength = 0;
 
-                while (offset < bicBytes.Length - 12) {
+                while (offset < bicBytes.Length - 12) { // Don't read past the end
+                    // We don't know what orders the headers come in or which headers will be set, so get the next header and switch off it:
                     header = Bic.GetString(offset, 4);
                     count = Bic.ReadInt32(offset + 4);
                     offset += 8;
 
+                    // Section data structures are stored in the BiqSections/ folder
+                    // We can divide the BIQ sections into two types: static and dynamic
+                    // Static have a fixed length always, which means they can be read directly memory-copied into our structs with no special logic
+                    //   The static sections are: BLDG, CTZN, CULT, DIFF, ERAS, ESPN, EXPR, GOOD, TECH, TFRM, WSIZ, WCHR, TILE, CONT, SLOC, UNIT, CLNY
+                    // Dynamic sections have at least one component with varying length, and so require multiple structs and special logic
+                    //   The dynamic sections are: GOVT, RULE, PRTO, RACE, TERR, FLAV, WMAP, CITY, GAME, LEAD
                     switch (header) {
                         case "BLDG":
                             dataLength = count * sizeof(BLDG);
@@ -148,13 +157,23 @@ namespace QueryCiv3
                             dataLength = -7;
                             break;
                         case "TERR":
-                            int terrLen = Bic.ReadInt32(offset) + 4;
+                            int terrLen = Bic.ReadInt32(offset) + 4; // Add 4 because length must also include the 32-bit integer that is itself
                             dataLength = count * terrLen;
                             Terr = new TERR[count];
+                            int goodCount = Bic.ReadInt32(offset + 4);
+                            TerrGood = new bool[count, goodCount];
+
                             fixed (void* ptr = Terr) {
                                 byte* terrBytePtr = (byte*)ptr;
+                                // TERR contains dynamic data, so it can't be read in as a block. Instead, read in data for each TERR
                                 for (int i = 0; i < count; i++) {
+                                    // Copy first 8 bytes into TERR struct:
                                     Buffer.MemoryCopy(bytePtr + offset + i * terrLen, terrBytePtr, 8, 8);
+                                    // Get TerrGood flags, dynamic data which determines which resources are allowed on which terrain types
+                                    for (int j = 0; j < goodCount; j++) {
+                                        TerrGood[i,j] = Util.GetFlag(*(bytePtr + offset + i * terrLen + 8 + (j / 8)), j % 8);
+                                    }
+                                    // Copy remaining bytes into TERR struct:
                                     Buffer.MemoryCopy(bytePtr + offset + (i + 1) * terrLen - sizeof(TERR) + 8, terrBytePtr + 8, sizeof(TERR) - 8, sizeof(TERR) - 8);
                                     terrBytePtr += sizeof(TERR);
                                 }
@@ -179,7 +198,9 @@ namespace QueryCiv3
                             dataLength = -7;
                             break;
                         default:
-                            dataLength = -7;
+                            // Once every BIQ section is set up with the correct associate struct(s), the default case where a header isn't found
+                            // should never occur. However, for now, if a header isn't found, we'll just increment by 1 to keep searching
+                            dataLength = -7; // We added 8 earlier, so subtract 7
                             break;
                     }
                     offset += dataLength;
