@@ -29,7 +29,7 @@ namespace QueryCiv3
         }
         // TODO: Return Bic sections, not IDs
         public int DifficultyID { get => Data.Sav.ReadInt32(Offset+20); }
-        public DiffSection Difficulty { get => Data.Bic.Diff[DifficultyID]; }
+        public Biq.DIFF Difficulty { get => Data.Bic.Diff[DifficultyID]; }
         public int UnitCount { get => Data.Sav.ReadInt32(Offset+28); }
         public int CityCount { get => Data.Sav.ReadInt32(Offset+32); }
         // The per-civ tech list is actually a per-tech 32-bit bitmask, and the number of continents impacts its offset
@@ -55,7 +55,7 @@ namespace QueryCiv3
         }
         public short ContinentCount { get => Data.Sav.ReadInt16(Offset1+4); }
         public int WsizID { get => Data.Sav.ReadInt32(Offset1+234); }
-        public WsizSection WorldSize { get => Data.Bic.Wsiz[WsizID]; }
+        public Biq.WSIZ WorldSize { get => Data.Bic.Wsiz[WsizID]; }
         public int Height { get => Data.Sav.ReadInt32(Offset2+8); }
         public int Width { get => Data.Sav.ReadInt32(Offset2+28); }
     }
@@ -112,16 +112,16 @@ namespace QueryCiv3
         }
         public int PlayerNumber { get => Data.Sav.ReadInt32(Offset+4); }
         public int RaceID { get => Data.Sav.ReadInt32(Offset+8); }
-        public RaceSection Race { get => Data.Bic.Race[RaceID]; }
+        public Biq.RACE Race { get => Data.Bic.Race[RaceID]; }
         public int Gold { get => Data.Sav.ReadInt32(Offset+44) + Data.Sav.ReadInt32(Offset+48); }
         public int GovtID { get => Data.Sav.ReadInt32(Offset+136); }
-        public GovtSection Govt { get => Data.Bic.Govt[GovtID]; }
+        public Biq.GOVT Govt { get => Data.Bic.Govt[GovtID]; }
         public int MobilizationLevel { get => Data.Sav.ReadInt32(Offset+140); }
         public int TilesDiscovered { get => Data.Sav.ReadInt32(Offset+144); }
         public int ErasID { get => Data.Sav.ReadInt32(Offset+220); }
         public int ResearchBeakers { get => Data.Sav.ReadInt32(Offset+224); }
         public int CurrentResearchTechID { get => Data.Sav.ReadInt32(Offset+228); }
-        public TechSection Tech { get => Data.Bic.Tech[CurrentResearchTechID]; }
+        public Biq.TECH Tech { get => Data.Bic.Tech[CurrentResearchTechID]; }
         public int CurrentResearchTurns { get => Data.Sav.ReadInt32(Offset+232); }
         public int FutureTechsCount { get => Data.Sav.ReadInt32(Offset+236); }
         public int ArmiesCount { get => Data.Sav.ReadInt32(Offset+368); }
@@ -146,7 +146,7 @@ namespace QueryCiv3
         public int X { get => Data.Sav.ReadInt16(Offset+8); }
         public int Y { get => Data.Sav.ReadInt16(Offset+10); }
         public int RaceID { get => Data.Sav.ReadInt32(Offset+12); }
-        public RaceSection Race { get => Data.Bic.Race[RaceID]; }
+        public Biq.RACE Race { get => Data.Bic.Race[RaceID]; }
         public int StoredFood { get => Data.Sav.ReadInt32(Offset+36); }
         public int StoredShields { get => Data.Sav.ReadInt32(Offset+40); }
         public string Name { get => Data.Sav.GetString(Offset+0x184, 20); }

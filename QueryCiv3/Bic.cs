@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using QueryCiv3.Biq;
 
 namespace QueryCiv3
 {
@@ -10,10 +11,59 @@ namespace QueryCiv3
         public bool HasCustomMap => Bic.SectionExists("WCHR");
 
         public BLDG[] Bldg;
+        public CITY[] City;
+        public CLNY[] Clny;
+        public CONT[] Cont;
+        public CTZN[] Ctzn;
+        public CULT[] Cult;
+        public DIFF[] Diff;
+        public ERAS[] Eras;
+        public ESPN[] Espn;
+        public EXPR[] Expr;
+        public FLAV[] Flav;
+        public GAME[] Game;
+        public GOOD[] Good;
+        public GOVT[] Govt;
+        public LEAD[] Lead;
+        public PRTO[] Prto;
+        public RACE[] Race;
+        public RULE[] Rule;
+        public SLOC[] Sloc;
+        public TECH[] Tech;
+        public TERR[] Terr;
+        public TFRM[] Tfrm;
+        public TILE[] Tile;
+        public UNIT[] Unit;
+        public WCHR[] Wchr;
+        public WMAP[] Wmap;
+        public WSIZ[] Wsiz;
 
-        public BicData(byte[] bicBytes)
+        public unsafe BicData(byte[] bicBytes)
         {
             Bic = new Civ3File(bicBytes);
+
+            fixed (byte* bytePtr = bicBytes) {
+                int offset = 736;
+                while (offset < bicBytes.Length) {
+                    string header = Bic.GetString(offset, 4);
+                    switch (header) {
+                        case "BLDG":
+                            int buildingCount = Bic.ReadInt32(offset + 4);
+                            offset += 8;
+                            int dataLength = buildingCount * sizeof(BLDG);
+                            Console.WriteLine("{0} {1}", buildingCount, dataLength);
+                            Bldg = new BLDG[buildingCount];
+                            fixed (BLDG* bldgPtr = Bldg) {
+                                Buffer.MemoryCopy(bytePtr + offset, bldgPtr, dataLength, dataLength);
+                            }
+                            offset += dataLength;
+                            break;
+                        default:
+                            offset = bicBytes.Length; // exit loop
+                            break;
+                    }
+                }
+            }
         }
         public string Title => Bic.GetString(0x2a0, 64);
         // unsure of this length ... up to 656
@@ -33,20 +83,5 @@ namespace QueryCiv3
                 return Title;
             }
         }
-        public CtznSection[] Ctzn { get => (new ListSection<CtznSection>(Bic, Bic.SectionOffset("CTZN", 1))).Sections.ToArray(); }
-        public CultSection[] Cult { get => (new ListSection<CultSection>(Bic, Bic.SectionOffset("CULT", 1))).Sections.ToArray(); }
-        public DiffSection[] Diff { get => (new ListSection<DiffSection>(Bic, Bic.SectionOffset("DIFF", 1))).Sections.ToArray(); }
-        public ErasSection[] Eras { get => (new ListSection<ErasSection>(Bic, Bic.SectionOffset("ERAS", 1))).Sections.ToArray(); }
-        public EspnSection[] Espn { get => (new ListSection<EspnSection>(Bic, Bic.SectionOffset("ESPN", 1))).Sections.ToArray(); }
-        public ExprSection[] Expr { get => (new ListSection<ExprSection>(Bic, Bic.SectionOffset("EXPR", 1))).Sections.ToArray(); }
-        public GoodSection[] Good { get => (new ListSection<GoodSection>(Bic, Bic.SectionOffset("GOOD", 1))).Sections.ToArray(); }
-        public GovtSection[] Govt { get => (new ListSection<GovtSection>(Bic, Bic.SectionOffset("GOVT", 1))).Sections.ToArray(); }
-        public PrtoSection[] Prto { get => (new ListSection<PrtoSection>(Bic, Bic.SectionOffset("PRTO", 1))).Sections.ToArray(); }
-        public RaceSection[] Race { get => (new ListSection<RaceSection>(Bic, Bic.SectionOffset("RACE", 1))).Sections.ToArray(); }
-        public TechSection[] Tech { get => (new ListSection<TechSection>(Bic, Bic.SectionOffset("TECH", 1))).Sections.ToArray(); }
-        public TfrmSection[] Tfrm { get => (new ListSection<TfrmSection>(Bic, Bic.SectionOffset("TFRM", 1))).Sections.ToArray(); }
-        public TerrSection[] Terr { get => (new ListSection<TerrSection>(Bic, Bic.SectionOffset("TERR", 1))).Sections.ToArray(); }
-        public WsizSection[] Wsiz { get => (new ListSection<WsizSection>(Bic, Bic.SectionOffset("WSIZ", 1))).Sections.ToArray(); }
-        public FlavSection[] Flav { get => (new ListSection<FlavSection>(Bic, Bic.SectionOffset("FLAV", 1))).Sections.ToArray(); }
     }
 }
