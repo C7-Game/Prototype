@@ -10,7 +10,7 @@ public class MainMenu : Node2D
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
 	Util.Civ3FileDialog LoadDialog;
-	Util.Civ3FileDialog SetCiv3HomeDialog;
+	FileDialog SetCiv3HomeDialog;
 	GlobalSingleton Global;
 
 	// Called when the node enters the scene tree for the first time.
@@ -25,10 +25,9 @@ public class MainMenu : Node2D
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
-		SetCiv3HomeDialog = new Util.Civ3FileDialog(FileDialog.ModeEnum.OpenDir);
-		SetCiv3HomeDialog.CurrentDir = Global.Civ3Home;
-		SetCiv3HomeDialog.Connect("dir_selected", this, nameof(_on_SetCiv3HomeDialog_dir_selected));
-		GetNode<CanvasLayer>("CanvasLayer").AddChild(SetCiv3HomeDialog);
+		SetCiv3HomeDialog = GetNode<FileDialog>("CanvasLayer/SetCiv3HomeDialog");
+		// For some reason this option isn't available in the scene UI
+		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
 	}
 	
 	private void DisplayTitleScreen()
