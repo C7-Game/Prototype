@@ -75,7 +75,11 @@ namespace QueryCiv3
                             dataLength = -7;
                             break;
                         case "CLNY":
-                            dataLength = -7;
+                            dataLength = count * sizeof(CLNY);
+                            Clny = new CLNY[count];
+                            fixed (void* ptr = Clny) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "CONT":
                             dataLength = -7;
@@ -151,7 +155,11 @@ namespace QueryCiv3
                             dataLength = -7;
                             break;
                         case "SLOC":
-                            dataLength = -7;
+                            dataLength = count * sizeof(SLOC);
+                            Sloc = new SLOC[count];
+                            fixed (void* ptr = Sloc) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "TECH":
                             dataLength = count * sizeof(TECH);
@@ -191,19 +199,35 @@ namespace QueryCiv3
                             }
                             break;
                         case "TILE":
-                            dataLength = -7;
+                            dataLength = count * sizeof(TILE);
+                            Tile = new TILE[count];
+                            fixed (void* ptr = Tile) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "UNIT":
-                            dataLength = -7;
+                            dataLength = count * sizeof(UNIT);
+                            Unit = new UNIT[count];
+                            fixed (void* ptr = Unit) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "WCHR":
-                            dataLength = -7;
+                            dataLength = count * sizeof(WCHR);
+                            Wchr = new WCHR[count];
+                            fixed (void* ptr = Wchr) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "WMAP":
                             dataLength = -7;
                             break;
                         case "WSIZ":
-                            dataLength = -7;
+                            dataLength = count * sizeof(WSIZ);
+                            Wsiz = new WSIZ[count];
+                            fixed (void* ptr = Wsiz) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         default:
                             // Once every BIQ section is set up with the correct associate struct(s), the default case where a header isn't found
