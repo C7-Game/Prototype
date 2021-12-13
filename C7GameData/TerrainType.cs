@@ -1,5 +1,8 @@
 namespace C7GameData
 {
+    using QueryCiv3;
+    using QueryCiv3.Biq;
+
     public class TerrainType
     {
         public string name {get; set; }
@@ -23,5 +26,17 @@ namespace C7GameData
         }
 
         public static TerrainType NONE = new TerrainType();
+
+
+        public static TerrainType ImportFromCiv3(TERR civ3Terrain)
+        {
+            TerrainType c7Terrain = new TerrainType();
+            c7Terrain.name = civ3Terrain.TerrainName;
+            c7Terrain.baseFoodProduction = civ3Terrain.Food;
+            c7Terrain.baseShieldProduction = civ3Terrain.Shields;
+            c7Terrain.baseCommerceProduction = civ3Terrain.Commerce;
+            c7Terrain.movementCost = civ3Terrain.MovementCost;
+            return c7Terrain;
+        }
     }
 }
