@@ -9,6 +9,8 @@ namespace QueryCiv3
         public bool HasCustomRules => Bic.SectionExists("BLDG");
         public bool HasCustomMap => Bic.SectionExists("WCHR");
 
+        public BLDG[] Bldg;
+
         public BicData(byte[] bicBytes)
         {
             Bic = new Civ3File(bicBytes);
@@ -31,7 +33,6 @@ namespace QueryCiv3
                 return Title;
             }
         }
-        public BldgSection[] Bldg { get => (new ListSection<BldgSection>(Bic, Bic.SectionOffset("BLDG", 1))).Sections.ToArray(); }
         public CtznSection[] Ctzn { get => (new ListSection<CtznSection>(Bic, Bic.SectionOffset("CTZN", 1))).Sections.ToArray(); }
         public CultSection[] Cult { get => (new ListSection<CultSection>(Bic, Bic.SectionOffset("CULT", 1))).Sections.ToArray(); }
         public DiffSection[] Diff { get => (new ListSection<DiffSection>(Bic, Bic.SectionOffset("DIFF", 1))).Sections.ToArray(); }
