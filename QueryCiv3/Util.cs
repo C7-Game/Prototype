@@ -39,6 +39,15 @@ namespace QueryCiv3
             return NoNullMatch.Value;
         }
 
+        static public unsafe string GetString<T>(ref T structData, int start, int length) where T : unmanaged
+        {
+            var Arr = new byte[length];
+            fixed (void* dataPtr = &structData, arrPtr = Arr) {
+                Buffer.MemoryCopy(((byte*)dataPtr) + start, (byte*)arrPtr, length, length);
+            }
+            return Util.GetString(Arr);
+        }
+
         static public bool GetFlag(byte flags, int index)
         {
             return (((flags >> index) & 1) == 1);

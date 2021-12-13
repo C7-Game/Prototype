@@ -15,24 +15,8 @@ namespace QueryCiv3.Biq
         */
 
         private fixed byte Text[64];
-        public string TerrainName {
-            get {
-                var Entry = new byte[32];
-                fixed (byte* p1 = Text, p2 = Entry) {
-                    Buffer.MemoryCopy(p1, p2, 32, 32);
-                }
-                return Util.GetString(Entry);
-            }
-        }
-        public string CivilopediaEntry {
-            get {
-                var Entry = new byte[32];
-                fixed (byte* p1 = Text, p2 = Entry) {
-                    Buffer.MemoryCopy(p1 + 32, p2, 32, 32);
-                }
-                return Util.GetString(Entry);
-            }
-        }
+        public string Name { get => Util.GetString(ref this, 8, 32); }
+        public string CivilopediaEntry { get => Util.GetString(ref this, 40, 32); }
 
         public int IrrigationBonus;
         public int MiningBonus;
@@ -66,24 +50,8 @@ namespace QueryCiv3.Biq
         public int LandmarkDefensiveBonus;
 
         private fixed byte Text2[64];
-        public string LandmarkName {
-            get {
-                var Entry = new byte[32];
-                fixed (byte* p1 = Text2, p2 = Entry) {
-                    Buffer.MemoryCopy(p1, p2, 32, 32);
-                }
-                return Util.GetString(Entry);
-            }
-        }
-        public string LandmarkCivilopediaEntry {
-            get {
-                var Entry = new byte[32];
-                fixed (byte* p1 = Text2, p2 = Entry) {
-                    Buffer.MemoryCopy(p1 + 32, p2, 32, 32);
-                }
-                return Util.GetString(Entry);
-            }
-        }
+        public string LandmarkName { get => Util.GetString(ref this, 157, 32); }
+        public string LandmarkCivilopediaEntry { get => Util.GetString(ref this, 189, 32); }
 
         private fixed byte Unknown2[4];
         public int TerrainFlags;

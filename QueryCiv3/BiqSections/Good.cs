@@ -9,24 +9,8 @@ namespace QueryCiv3.Biq
         public int Length;
 
         private fixed byte Text[56];
-        public string ResourceName {
-            get {
-                var Entry = new byte[24];
-                fixed (byte* p1 = Text, p2 = Entry) {
-                    Buffer.MemoryCopy(p1, p2, 24, 24);
-                }
-                return Util.GetString(Entry);
-            }
-        }
-        public string CivilopediaEntry {
-            get {
-                var Entry = new byte[32];
-                fixed (byte* p1 = Text, p2 = Entry) {
-                    Buffer.MemoryCopy(p1 + 24, p2, 32, 32);
-                }
-                return Util.GetString(Entry);
-            }
-        }
+        public string Name { get => Util.GetString(ref this, 4, 24); }
+        public string CivilopediaEntry { get => Util.GetString(ref this, 28, 32); }
 
         public int Type;
         public int AppearanceRatio;

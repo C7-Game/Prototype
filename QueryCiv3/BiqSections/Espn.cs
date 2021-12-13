@@ -9,33 +9,9 @@ namespace QueryCiv3.Biq
         public int Length;
 
         private fixed byte Text[224];
-        public string Description {
-            get {
-                var Entry = new byte[128];
-                fixed (byte* p1 = Text, p2 = Entry) {
-                    Buffer.MemoryCopy(p1, p2, 128, 128);
-                }
-                return Util.GetString(Entry);
-            }
-        }
-        public string MissionName {
-            get {
-                var Entry = new byte[64];
-                fixed (byte* p1 = Text, p2 = Entry) {
-                    Buffer.MemoryCopy(p1 + 128, p2, 64, 64);
-                }
-                return Util.GetString(Entry);
-            }
-        }
-        public string CivilopediaEntry {
-            get {
-                var Entry = new byte[32];
-                fixed (byte* p1 = Text, p2 = Entry) {
-                    Buffer.MemoryCopy(p1 + 192, p2, 32, 32);
-                }
-                return Util.GetString(Entry);
-            }
-        }
+        public string Description { get => Util.GetString(ref this, 4, 128); }
+        public string Name { get => Util.GetString(ref this, 132, 64); }
+        public string CivilopediaEntry { get => Util.GetString(ref this, 196, 32); }
 
         private fixed byte Flags[4];
         public bool Diplomat { get => Util.GetFlag(Flags[0], 0); }
