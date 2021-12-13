@@ -154,7 +154,11 @@ namespace QueryCiv3
                             dataLength = -7;
                             break;
                         case "TECH":
-                            dataLength = -7;
+                            dataLength = count * sizeof(TECH);
+                            Tech = new TECH[count];
+                            fixed (void* ptr = Tech) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "TERR":
                             int terrLen = Bic.ReadInt32(offset) + 4; // Add 4 because length must also include the 32-bit integer that is itself
@@ -180,7 +184,11 @@ namespace QueryCiv3
                             }
                             break;
                         case "TFRM":
-                            dataLength = -7;
+                            dataLength = count * sizeof(TFRM);
+                            Tfrm = new TFRM[count];
+                            fixed (void* ptr = Tfrm) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "TILE":
                             dataLength = -7;
