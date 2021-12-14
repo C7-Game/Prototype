@@ -91,31 +91,6 @@ public class MapUnit
 		}
 	}
 
-	public ulong animStartTimeMS;
-	public AnimatedAction animAction = AnimatedAction.DEFAULT;
-
-	public ActiveAnimation getActiveAnimation(ulong currentTimeMS)
-	{
-		double runningTimeS = (currentTimeMS - animStartTimeMS) / 1000.0;
-		double animDuration = 0.5; // TODO: Read this from the INI files somehow
-		float progress = (float)(runningTimeS / animDuration);
-
-		var animAction = this.animAction;
-
-		// Replace run animation with default after the running is finished
-		if ((animAction == AnimatedAction.RUN) && (progress >= 1f))
-			animAction = AnimatedAction.DEFAULT;
-
-		float offsetX = 0, offsetY = 0;
-		if ((animAction == AnimatedAction.RUN) && (progress < 1f)) {
-			(int dX, int dY) = facingDirection.toCoordDiff();
-			offsetX = -1 * dX * (1f - progress);
-			offsetY = -1 * dY * (1f - progress);
-		}
-
-		return new ActiveAnimation { action = animAction, direction = facingDirection, progress = progress, offsetX = offsetX, offsetY = offsetY };
-	}
-
 	public static MapUnit NONE = new MapUnit();
 }
 

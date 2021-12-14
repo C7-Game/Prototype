@@ -573,7 +573,7 @@ public class UnitLayer : LooseLayer {
 				selectedUnitOnTile = u;
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
-		var activeAnim = unit.getActiveAnimation(OS.GetTicksMsec());
+		var activeAnim = UnitInteractions.getActiveAnimation(unit.guid, OS.GetTicksMsec());
 		var animOffset = new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it

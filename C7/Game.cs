@@ -92,7 +92,7 @@ public class Game : Node2D
 				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
 				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
 				    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-				    (! CurrentlySelectedUnit.getActiveAnimation(OS.GetTicksMsec()).keepUnitSelected()))
+				    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid, OS.GetTicksMsec()).keepUnitSelected()))
 					GetNextAutoselectedUnit();
 				break;
 			case GameState.ComputerTurn:
@@ -363,7 +363,7 @@ public class Game : Node2D
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec(), dir);
 					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-					    (! CurrentlySelectedUnit.getActiveAnimation(OS.GetTicksMsec()).keepUnitSelected()))
+					    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid, OS.GetTicksMsec()).keepUnitSelected()))
 						GetNextAutoselectedUnit();
 					else {
 						setSelectedUnit(CurrentlySelectedUnit);

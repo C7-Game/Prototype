@@ -92,8 +92,7 @@ namespace C7Engine
                     Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
                     unit.facingDirection = TileDirection.SOUTHEAST;
                     unit.isFortified = true;
-                    unit.animAction = MapUnit.AnimatedAction.FORTIFY;
-                    unit.animStartTimeMS = currentTimeMS;
+                    EngineStorage.animTracker.startAnimation(currentTimeMS, guid, MapUnit.AnimatedAction.FORTIFY, null);
                     return;
                 }
             }
@@ -125,8 +124,7 @@ namespace C7Engine
                         unit.facingDirection = dir;
                         unit.movementPointsRemaining -= 1;
                         unit.isFortified = false;
-                        unit.animAction = MapUnit.AnimatedAction.RUN;
-                        unit.animStartTimeMS = currentTimeMS;
+                        EngineStorage.animTracker.startAnimation(currentTimeMS, guid, MapUnit.AnimatedAction.RUN, null);
                     }
 
                     break;
@@ -193,6 +191,51 @@ namespace C7Engine
         public static void ClearWaitQueue()
         {
             waitQueue.Clear();
+        }
+
+        public static MapUnit.ActiveAnimation getActiveAnimation(string guid, ulong currentTimeMS)
+        {
+            var unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == guid);
+            if (unit == null)
+                throw new Exception("Invalid unit GUID");
+
+            if (EngineStorage.animTracker.hasCurrentAction(guid)) {
+                var (action, period) = EngineStorage.animTracker.getCurrentActionAndPeriod(guid, currentTimeMS);
+
+                var isNonRepeatingAction =
+                    (action == MapUnit.AnimatedAction.RUN) ||
+                    (action == MapUnit.AnimatedAction.DEATH) ||
+                    (action == MapUnit.AnimatedAction.FORTIFY) ||
+                    (action == MapUnit.AnimatedAction.VICTORY);
+
+                float progress;
+                if (isNonRepeatingAction)
+                    progress = (period <= 1.0) ? (float)period : 1f;
+                else
+                    progress = (float)(period - Math.Floor(period));
+
+                float offsetX = 0, offsetY = 0;
+                if (action == MapUnit.AnimatedAction.RUN) {
+                    (int dX, int dY) = unit.facingDirection.toCoordDiff();
+                    offsetX = -1 * dX * (1f - progress);
+                    offsetY = -1 * dY * (1f - progress);
+                }
+
+                return new MapUnit.ActiveAnimation {
+                    action = action,
+                    direction = unit.facingDirection,
+                    progress = progress,
+                    offsetX = offsetX,
+                    offsetY = offsetY
+                };
+            } else
+                return new MapUnit.ActiveAnimation {
+                    action = unit.isFortified ? MapUnit.AnimatedAction.FORTIFY : MapUnit.AnimatedAction.DEFAULT,
+                    direction = unit.facingDirection,
+                    progress = 1f,
+                    offsetX = 0f,
+                    offsetY = 0f
+                };
         }
     }
 }
