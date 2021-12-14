@@ -370,6 +370,19 @@ public class Game : Node2D
 				PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
 				popupOverlay.ShowPopup("escapeQuit", PopupOverlay.PopupCategory.Info, BoxContainer.AlignMode.Center);
 			}
+			else if (eventKey.Scancode == (int)Godot.KeyList.Z)
+			{
+				if (mapView.cameraZoom != 1) {
+					mapView.setCameraZoomFromMiddle(1.0f);
+					VSlider slider = GetNode<VSlider>("CanvasLayer/SlideOutBar/VBoxContainer/Zoom");
+					slider.Value = 1.0f;
+				}
+				else {
+					mapView.setCameraZoomFromMiddle(0.5f);
+					VSlider slider = GetNode<VSlider>("CanvasLayer/SlideOutBar/VBoxContainer/Zoom");
+					slider.Value = 0.5f;
+				}
+			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
 		{
