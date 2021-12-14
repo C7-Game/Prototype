@@ -41,13 +41,24 @@ namespace QueryCiv3
         public bool[,] TerrGood; // which resources are allowed on which types of terrain
         public GOVTGOVT[,] GovtGovt; // relationships between governments
 
+        private const int SECTION_HEADERS_START = 736;
+        // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
+        // The sum of the LEN constants for each section equals the total size of that section's struct
+        // eg. GOVT_LEN_1 + GOVT_LEN_2 == sizeof(GOVT)
+        private const int GOVT_LEN_1 = 400;
+        private const int GOVT_LEN_2 = 76;
+        private const int TERR_LEN_1 = 8;
+        private const int TERR_LEN_2 = 225;
+
         public unsafe BicData(byte[] bicBytes)
         {
             Bic = new Civ3File(bicBytes);
 
             fixed (byte* bytePtr = bicBytes)
             {
-                int offset = 736; // byte index of the first header in BIQ files
+                // For now, we're skipping over the VER# and BIQ file header information to get right to the structs
+                // The first section is likely to be BLDG in BIQ files, but the current approach supports any ordering of the sections
+                int offset = SECTION_HEADERS_START;
                 string header;
                 int count = 0;
                 int dataLength = 0;
@@ -151,10 +162,11 @@ namespace QueryCiv3
                                 byte* govtPtr = (byte*)ptr;
                                 byte* govtgovtPtr = (byte*)ptr2;
                                 byte* dataPtr = bytePtr + offset;
+
                                 for (int i = 0; i < count; i++) {
-                                    Buffer.MemoryCopy(dataPtr, govtPtr, 400, 400);
-                                    Buffer.MemoryCopy(dataPtr + 400, govtgovtPtr, govtgovtRowLength, govtgovtRowLength);
-                                    Buffer.MemoryCopy(dataPtr + 400 + govtgovtRowLength, govtPtr + 400, 76, 76);
+                                    Buffer.MemoryCopy(dataPtr, govtPtr, GOVT_LEN_1, GOVT_LEN_1);
+                                    Buffer.MemoryCopy(dataPtr + GOVT_LEN_1, govtgovtPtr, govtgovtRowLength, govtgovtRowLength);
+                                    Buffer.MemoryCopy(dataPtr + GOVT_LEN_1 + govtgovtRowLength, govtPtr + GOVT_LEN_1, GOVT_LEN_2, GOVT_LEN_2);
                                     govtPtr += sizeof(GOVT);
                                     govtgovtPtr += govtgovtRowLength;
                                     dataPtr += govtLen;
@@ -196,17 +208,23 @@ namespace QueryCiv3
 
                             fixed (void* ptr = Terr) {
                                 byte* terrBytePtr = (byte*)ptr;
+                                byte* dataPtr = bytePtr + offset;
+
                                 // TERR contains dynamic data, so it can't be read in as a block. Instead, read in data for each TERR
                                 for (int i = 0; i < count; i++) {
-                                    // Copy first 8 bytes into TERR struct:
-                                    Buffer.MemoryCopy(bytePtr + offset + i * terrLen, terrBytePtr, 8, 8);
+                                    Buffer.MemoryCopy(dataPtr, terrBytePtr, TERR_LEN_1, TERR_LEN_1);
+                                    dataPtr += TERR_LEN_1;
+
                                     // Get TerrGood flags, dynamic data which determines which resources are allowed on which terrain types
                                     for (int j = 0; j < goodCount; j++) {
-                                        TerrGood[i,j] = Util.GetFlag(*(bytePtr + offset + i * terrLen + 8 + (j / 8)), j % 8);
+                                        TerrGood[i, j] = Util.GetFlag(*dataPtr, j % 8);
+                                        // Incrememt byte position every 8th bit read or after all bits read:
+                                        if (j % 8 == 7 || j == goodCount - 1) dataPtr++;
                                     }
-                                    // Copy remaining bytes into TERR struct:
-                                    Buffer.MemoryCopy(bytePtr + offset + (i + 1) * terrLen - sizeof(TERR) + 8, terrBytePtr + 8, sizeof(TERR) - 8, sizeof(TERR) - 8);
+
+                                    Buffer.MemoryCopy(dataPtr, terrBytePtr + TERR_LEN_1, TERR_LEN_2, TERR_LEN_2);
                                     terrBytePtr += sizeof(TERR);
+                                    dataPtr += TERR_LEN_2;
                                 }
                             }
                             break;
