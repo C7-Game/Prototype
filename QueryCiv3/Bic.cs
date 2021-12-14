@@ -39,6 +39,7 @@ namespace QueryCiv3
         public WSIZ[] Wsiz;
 
         public bool[,] TerrGood; // which resources are allowed on which types of terrain
+        public GOVTGOVT[,] GovtGovt; // relationships between governments
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -140,7 +141,25 @@ namespace QueryCiv3
                             }
                             break;
                         case "GOVT":
-                            dataLength = -7;
+                            int govtLen = Bic.ReadInt32(offset) + 4;
+                            dataLength = count * govtLen;
+                            Govt = new GOVT[count];
+                            GovtGovt = new GOVTGOVT[count, count];
+                            int govtgovtRowLength = count * sizeof(GOVTGOVT);
+
+                            fixed (void* ptr = Govt, ptr2 = GovtGovt) {
+                                byte* govtPtr = (byte*)ptr;
+                                byte* govtgovtPtr = (byte*)ptr2;
+                                byte* dataPtr = bytePtr + offset;
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, govtPtr, 400, 400);
+                                    Buffer.MemoryCopy(dataPtr + 400, govtgovtPtr, govtgovtRowLength, govtgovtRowLength);
+                                    Buffer.MemoryCopy(dataPtr + 400 + govtgovtRowLength, govtPtr + 400, 76, 76);
+                                    govtPtr += sizeof(GOVT);
+                                    govtgovtPtr += govtgovtRowLength;
+                                    dataPtr += govtLen;
+                                }
+                            }
                             break;
                         case "LEAD":
                             dataLength = -7;
