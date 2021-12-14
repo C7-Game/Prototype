@@ -15,6 +15,7 @@ namespace C7Engine
     public class EngineStorage
     {
 		internal static GameData gameData {get; set;}
+		public static AnimationTracker animTracker = new AnimationTracker();
 
 		/**
 		 * Updates the game data pointer to a new set of game data.

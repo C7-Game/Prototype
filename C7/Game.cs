@@ -85,6 +85,8 @@ public class Game : Node2D
 				StartGame();
 				break;
 			case GameState.PlayerTurn:
+				EngineStorage.animTracker.update(OS.GetTicksMsec());
+
 				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
 				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
 				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
@@ -94,6 +96,7 @@ public class Game : Node2D
 					GetNextAutoselectedUnit();
 				break;
 			case GameState.ComputerTurn:
+				EngineStorage.animTracker.update(OS.GetTicksMsec());
 				break;
 		}
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
@@ -432,8 +435,14 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-			popupOverlay.ShowPopup("buildCity", PopupOverlay.PopupCategory.Advisor);
+			EngineStorage.animTracker.startAnimation(
+				OS.GetTicksMsec(),
+				CurrentlySelectedUnit.guid,
+				MapUnit.AnimatedAction.BUILD,
+				(unitGUID, action) => {
+					PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+					popupOverlay.ShowPopup("buildCity", PopupOverlay.PopupCategory.Advisor);
+				});
 		}
 		else
 		{
