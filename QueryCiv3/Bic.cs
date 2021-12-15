@@ -49,6 +49,7 @@ namespace QueryCiv3
         public RACEERA[,] RaceEra; // the file names for each era for each civ
         public RACELEADERNAME[][] RaceGreatLeaderName; // the great leaders for each civ
         public RACELEADERNAME[][] RaceScientificLeaderName; // the scientific leaders for each civ
+        public int[][] CityBuilding;
 
         private const int SECTION_HEADERS_START = 736;
         // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
@@ -62,6 +63,8 @@ namespace QueryCiv3
         private const int RACE_LEN_2 = 4;
         private const int RACE_LEN_3 = 208;
         private const int RACE_LEN_4 = 92;
+        private const int CITY_LEN_1 = 38;
+        private const int CITY_LEN_2 = 36;
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -97,7 +100,27 @@ namespace QueryCiv3
                             }
                             break;
                         case "CITY":
-                            dataLength = -7;
+                            dataLength = 0;
+                            City = new CITY[count];
+                            CityBuilding = new int[count][];
+                            int buildingRowLength = 0;
+
+                            fixed (void* ptr = City) {
+                                byte* cityPtr = (byte*)ptr;
+                                byte* dataPtr = bytePtr + offset;
+
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, cityPtr, CITY_LEN_1, CITY_LEN_1);
+                                    CityBuilding[i] = new int[City[i].NumberOfBuildings];
+                                    buildingRowLength = City[i].NumberOfBuildings * sizeof(int);
+                                    fixed (void* ptr2 = CityBuilding[i]) Buffer.MemoryCopy(dataPtr + CITY_LEN_1, ptr2, buildingRowLength, buildingRowLength);
+                                    Buffer.MemoryCopy(dataPtr + CITY_LEN_1 + buildingRowLength, cityPtr + CITY_LEN_1, CITY_LEN_2, CITY_LEN_2);
+
+                                    cityPtr += sizeof(CITY);
+                                    dataPtr += City[i].Length + 4;
+                                    dataLength += City[i].Length + 4;
+                                }
+                            }
                             break;
                         case "CLNY":
                             dataLength = count * sizeof(CLNY);
