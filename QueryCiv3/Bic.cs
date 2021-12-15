@@ -54,6 +54,8 @@ namespace QueryCiv3
         public int[][] PrtoPrto; // Stealth unit targets per unit
         public LEADPRTO[][] LeadPrto; // starting unit data for each leader
         public int[][] LeadTech; // starting tech data for each leader
+        public RULECULT[][] RuleCult; // culture level names per rule
+        public int[][] RuleSpaceship; // spaceship quantity requirements per rule
 
         private const int SECTION_HEADERS_START = 736;
         // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
@@ -76,6 +78,9 @@ namespace QueryCiv3
         private const int LEAD_LEN_1 =  56;
         private const int LEAD_LEN_2 =   8;
         private const int LEAD_LEN_3 =  33;
+        private const int RULE_LEN_1 = 104;
+        private const int RULE_LEN_2 = 164;
+        private const int RULE_LEN_3 =  32;
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -349,7 +354,38 @@ namespace QueryCiv3
 
                             break;
                         case "RULE":
-                            dataLength = -7;
+                            dataLength = 0;
+                            Rule = new RULE[count];
+                            RuleCult = new RULECULT[count][];
+                            RuleSpaceship = new int[count][];
+
+                            fixed (void* ptr = Rule) {
+                                byte* rulePtr = (byte*)ptr;
+                                byte* dataPtr = bytePtr + offset;
+                                int rowLength = 0;
+
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, rulePtr, RULE_LEN_1, RULE_LEN_1);
+                                    rulePtr += RULE_LEN_1;
+                                    RuleSpaceship[i] = new int[Rule[i].NumberOfSpaceshipParts];
+                                    rowLength = Rule[i].NumberOfSpaceshipParts * sizeof(int);
+                                    fixed (void* ptr2 = RuleSpaceship[i]) Buffer.MemoryCopy(dataPtr + RULE_LEN_1, ptr2, rowLength, rowLength);
+                                    dataPtr += RULE_LEN_1 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, rulePtr, RULE_LEN_2, RULE_LEN_2);
+                                    rulePtr += RULE_LEN_2;
+                                    RuleCult[i] = new RULECULT[Rule[i].NumberOfCultureLevels];
+                                    rowLength = Rule[i].NumberOfCultureLevels * sizeof(RULECULT);
+                                    fixed (void* ptr2 = RuleCult[i]) Buffer.MemoryCopy(dataPtr + RULE_LEN_2, ptr2, rowLength, rowLength);
+                                    dataPtr += RULE_LEN_2 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, rulePtr, RULE_LEN_3, RULE_LEN_3);
+                                    rulePtr += RULE_LEN_3;
+                                    dataPtr += RULE_LEN_3;
+
+                                    dataLength += Rule[i].Length + 4;
+                                }
+                            }
                             break;
                         case "SLOC":
                             dataLength = count * sizeof(SLOC);
