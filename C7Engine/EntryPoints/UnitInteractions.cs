@@ -183,6 +183,7 @@ namespace C7Engine
                 }
             }
             if (toBeDeleted != null) {
+                EngineStorage.animTracker.endAnimation(toBeDeleted.guid, false);
                 toBeDeleted.location.unitsOnTile.Remove(toBeDeleted);
                 gameData.mapUnits.Remove(toBeDeleted);
             }
@@ -206,7 +207,8 @@ namespace C7Engine
                     (action == MapUnit.AnimatedAction.RUN) ||
                     (action == MapUnit.AnimatedAction.DEATH) ||
                     (action == MapUnit.AnimatedAction.FORTIFY) ||
-                    (action == MapUnit.AnimatedAction.VICTORY);
+                    (action == MapUnit.AnimatedAction.VICTORY) ||
+                    (action == MapUnit.AnimatedAction.BUILD);
 
                 float progress;
                 if (isNonRepeatingAction)

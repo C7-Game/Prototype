@@ -21,9 +21,9 @@ using System.Linq;
 using C7GameData;
 
 public class AnimationTracker {
-	public delegate void OnAnimationCompleted(string unitGUID, MapUnit.AnimatedAction action);
+	public delegate bool OnAnimationCompleted(string unitGUID, MapUnit.AnimatedAction action);
 
-	public static readonly OnAnimationCompleted doNothing = (unitGUID, action) => {};
+	public static readonly OnAnimationCompleted doNothing = (unitGUID, action) => { return true; };
 
 	public struct ActiveAnimation {
 		public ulong startTimeMS, endTimeMS;
@@ -31,7 +31,8 @@ public class AnimationTracker {
 		public OnAnimationCompleted callback;
 	}
 
-	private Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
+	private Dictionary<string, ActiveAnimation> activeAnims    = new Dictionary<string, ActiveAnimation>();
+	private Dictionary<string, ActiveAnimation> completedAnims = new Dictionary<string, ActiveAnimation>();
 
 	public void startAnimation(ulong currentTimeMS, string unitGUID, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
 	{
@@ -45,16 +46,34 @@ public class AnimationTracker {
 		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, callback = callback ?? doNothing };
 
 		activeAnims[unitGUID] = aa;
+		completedAnims.Remove(unitGUID);
+	}
+
+	public void endAnimation(string unitGUID, bool triggerCallback = true)
+	{
+		ActiveAnimation aa;
+		if (triggerCallback && activeAnims.TryGetValue(unitGUID, out aa)) {
+			var forget = aa.callback(unitGUID, aa.action);
+			if (! forget)
+				completedAnims[unitGUID] = aa;
+			activeAnims.Remove(unitGUID);
+		} else {
+			activeAnims   .Remove(unitGUID);
+			completedAnims.Remove(unitGUID);
+		}
 	}
 
 	public bool hasCurrentAction(string unitGUID)
 	{
-		return activeAnims.ContainsKey(unitGUID);
+		return activeAnims.ContainsKey(unitGUID) || completedAnims.ContainsKey(unitGUID);
 	}
 
 	public (MapUnit.AnimatedAction, double) getCurrentActionAndPeriod(string unitGUID, ulong currentTimeMS)
 	{
-		ActiveAnimation aa = activeAnims[unitGUID];
+		ActiveAnimation aa;
+		if (! activeAnims.TryGetValue(unitGUID, out aa))
+			aa = completedAnims[unitGUID];
+
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
@@ -67,7 +86,9 @@ public class AnimationTracker {
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (unitGUID, aa) = (guidAAPair.Key, guidAAPair.Value);
-			aa.callback(unitGUID, aa.action);
+			var forget = aa.callback(unitGUID, aa.action);
+			if (! forget)
+				completedAnims[unitGUID] = aa;
 			keysToRemove.Add(unitGUID);
 		}
 		foreach (var key in keysToRemove)
