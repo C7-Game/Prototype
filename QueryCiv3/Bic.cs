@@ -49,25 +49,28 @@ namespace QueryCiv3
         public RACEERA[,] RaceEra; // the file names for each era for each civ
         public RACELEADERNAME[][] RaceGreatLeaderName; // the great leaders for each civ
         public RACELEADERNAME[][] RaceScientificLeaderName; // the scientific leaders for each civ
-        public int[][] CityBuilding;
+        public int[][] CityBuilding; // Building IDs in each city
         public int[][] WmapResource;
+        public int[][] PrtoPrto; // Stealth unit targets per unit
 
         private const int SECTION_HEADERS_START = 736;
         // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
         // The sum of the LEN constants for each section equals the total size of that section's struct
         // eg. GOVT_LEN_1 + GOVT_LEN_2 == sizeof(GOVT)
         private const int GOVT_LEN_1 = 400;
-        private const int GOVT_LEN_2 = 76;
-        private const int TERR_LEN_1 = 8;
+        private const int GOVT_LEN_2 =  76;
+        private const int TERR_LEN_1 =   8;
         private const int TERR_LEN_2 = 225;
-        private const int RACE_LEN_1 = 8;
-        private const int RACE_LEN_2 = 4;
+        private const int RACE_LEN_1 =   8;
+        private const int RACE_LEN_2 =   4;
         private const int RACE_LEN_3 = 208;
-        private const int RACE_LEN_4 = 92;
-        private const int CITY_LEN_1 = 38;
-        private const int CITY_LEN_2 = 36;
-        private const int WMAP_LEN_1 = 8;
+        private const int RACE_LEN_4 =  92;
+        private const int CITY_LEN_1 =  38;
+        private const int CITY_LEN_2 =  36;
+        private const int WMAP_LEN_1 =   8;
         private const int WMAP_LEN_2 = 164;
+        private const int PRTO_LEN_1 = 238;
+        private const int PRTO_LEN_2 =  21;
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -220,7 +223,27 @@ namespace QueryCiv3
                             dataLength = -7;
                             break;
                         case "PRTO":
-                            dataLength = -7;
+                            dataLength = 0;
+                            Prto = new PRTO[count];
+                            PrtoPrto = new int[count][];
+                            int prtoprtoRowLength = 0;
+
+                            fixed (void* ptr = Prto) {
+                                byte* prtoPtr = (byte*)ptr;
+                                byte* dataPtr = bytePtr + offset;
+
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, prtoPtr, PRTO_LEN_1, PRTO_LEN_1);
+                                    PrtoPrto[i] = new int[Prto[i].NumberOfStealthTargets];
+                                    prtoprtoRowLength = Prto[i].NumberOfStealthTargets * sizeof(int);
+                                    fixed (void* ptr2 = PrtoPrto[i]) Buffer.MemoryCopy(dataPtr + PRTO_LEN_1, ptr2, prtoprtoRowLength, prtoprtoRowLength);
+                                    Buffer.MemoryCopy(dataPtr + PRTO_LEN_1 + prtoprtoRowLength, prtoPtr + PRTO_LEN_1, PRTO_LEN_2, PRTO_LEN_2);
+
+                                    prtoPtr += sizeof(PRTO);
+                                    dataPtr += Prto[i].Length + 4;
+                                    dataLength += Prto[i].Length + 4;
+                                }
+                            }
                             break;
                         case "RACE":
                             dataLength = 0;
