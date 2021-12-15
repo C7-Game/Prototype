@@ -52,6 +52,8 @@ namespace QueryCiv3
         public int[][] CityBuilding; // Building IDs in each city
         public int[][] WmapResource;
         public int[][] PrtoPrto; // Stealth unit targets per unit
+        public LEADPRTO[][] LeadPrto; // starting unit data for each leader
+        public int[][] LeadTech; // starting tech data for each leader
 
         private const int SECTION_HEADERS_START = 736;
         // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
@@ -71,6 +73,9 @@ namespace QueryCiv3
         private const int WMAP_LEN_2 = 164;
         private const int PRTO_LEN_1 = 238;
         private const int PRTO_LEN_2 =  21;
+        private const int LEAD_LEN_1 =  56;
+        private const int LEAD_LEN_2 =   8;
+        private const int LEAD_LEN_3 =  33;
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -220,7 +225,38 @@ namespace QueryCiv3
                             }
                             break;
                         case "LEAD":
-                            dataLength = -7;
+                            dataLength = 0;
+                            Lead = new LEAD[count];
+                            LeadPrto = new LEADPRTO[count][];
+                            LeadTech = new int[count][];
+
+                            fixed (void* ptr = Lead) {
+                                byte* leadPtr = (byte*)ptr;
+                                byte* dataPtr = bytePtr + offset;
+                                int rowLength = 0;
+
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, leadPtr, LEAD_LEN_1, LEAD_LEN_1);
+                                    leadPtr += LEAD_LEN_1;
+                                    LeadPrto[i] = new LEADPRTO[Lead[i].NumberOfStartUnitTypes];
+                                    rowLength = Lead[i].NumberOfStartUnitTypes * sizeof(LEADPRTO);
+                                    fixed (void* ptr2 = LeadPrto[i]) Buffer.MemoryCopy(dataPtr + LEAD_LEN_1, ptr2, rowLength, rowLength);
+                                    dataPtr += LEAD_LEN_1 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, leadPtr, LEAD_LEN_2, LEAD_LEN_2);
+                                    leadPtr += LEAD_LEN_2;
+                                    LeadTech[i] = new int[Lead[i].NumberOfStartingTechnologies];
+                                    rowLength = Lead[i].NumberOfStartingTechnologies * sizeof(int);
+                                    fixed (void* ptr2 = LeadTech[i]) Buffer.MemoryCopy(dataPtr + LEAD_LEN_2, ptr2, rowLength, rowLength);
+                                    dataPtr += LEAD_LEN_2 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, leadPtr, LEAD_LEN_3, LEAD_LEN_3);
+                                    leadPtr += LEAD_LEN_3;
+                                    dataPtr += LEAD_LEN_3;
+
+                                    dataLength += Lead[i].Length + 4;
+                                }
+                            }
                             break;
                         case "PRTO":
                             dataLength = 0;
@@ -261,12 +297,12 @@ namespace QueryCiv3
                             int eras = Eras.Length;
                             RaceEra = new RACEERA[count, eras];
                             int raceeraRowLength = eras * sizeof(RACEERA);
-                            int rowLength = 0;
 
                             fixed (void* ptr = Race, ptr2 = RaceEra) {
                                 byte* racePtr = (byte*)ptr;
                                 byte* raceeraPtr = (byte*)ptr2;
                                 byte* dataPtr = bytePtr + offset;
+                                int rowLength = 0;
 
                                 for (int i = 0; i < count; i++) {
                                     Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_1, RACE_LEN_1);
