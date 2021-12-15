@@ -50,6 +50,7 @@ namespace QueryCiv3
         public RACELEADERNAME[][] RaceGreatLeaderName; // the great leaders for each civ
         public RACELEADERNAME[][] RaceScientificLeaderName; // the scientific leaders for each civ
         public int[][] CityBuilding;
+        public int[][] WmapResource;
 
         private const int SECTION_HEADERS_START = 736;
         // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
@@ -65,6 +66,8 @@ namespace QueryCiv3
         private const int RACE_LEN_4 = 92;
         private const int CITY_LEN_1 = 38;
         private const int CITY_LEN_2 = 36;
+        private const int WMAP_LEN_1 = 8;
+        private const int WMAP_LEN_2 = 164;
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -350,7 +353,27 @@ namespace QueryCiv3
                             }
                             break;
                         case "WMAP":
-                            dataLength = -7;
+                            dataLength = 0;
+                            Wmap = new WMAP[count];
+                            WmapResource = new int[count][];
+                            int wmapResourceLength = 0;
+
+                            fixed (void* ptr = Wmap) {
+                                byte* wmapPtr = (byte*)ptr;
+                                byte* dataPtr = bytePtr + offset;
+
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, wmapPtr, WMAP_LEN_1, WMAP_LEN_1);
+                                    WmapResource[i] = new int[Wmap[i].NumberOfResources];
+                                    wmapResourceLength = Wmap[i].NumberOfResources * sizeof(int);
+                                    fixed (void* ptr2 = WmapResource[i]) Buffer.MemoryCopy(dataPtr + WMAP_LEN_1, ptr2, wmapResourceLength, wmapResourceLength);
+                                    Buffer.MemoryCopy(dataPtr + WMAP_LEN_1 + wmapResourceLength, wmapPtr + WMAP_LEN_1, WMAP_LEN_2, WMAP_LEN_2);
+
+                                    wmapPtr += sizeof(WMAP);
+                                    dataPtr += Wmap[i].Length + 4;
+                                    dataLength += Wmap[i].Length + 4;
+                                }
+                            }
                             break;
                         case "WSIZ":
                             dataLength = count * sizeof(WSIZ);
