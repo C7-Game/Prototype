@@ -5,6 +5,7 @@ namespace C7GameData
 */
 {
     using QueryCiv3;
+    using QueryCiv3.Biq;
     using System;
 
     // Additional parameters used to refer to specic media files and tiles in Civ3
@@ -27,9 +28,7 @@ namespace C7GameData
     		SavData civ3Save = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(savePath), defaultBicBytes);
 
             //Not dummy data.  Import Civ3 terrains.
-            Console.WriteLine("Printing all terrains");
-            foreach (TerrSection terrain in civ3Save.Bic.Terr) {
-                Console.WriteLine(terrain);
+            foreach (TERR terrain in civ3Save.Bic.Terr) {
                 TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
                 c7Save.GameData.terrainTypes.Add(c7TerrainType);
             }
@@ -42,7 +41,7 @@ namespace C7GameData
                 Civ3ExtraInfo extra = new Civ3ExtraInfo
                 {
                     BaseTerrainFileID = civ3Tile.BaseTerrainFileID,
-                    BaseTerrainImageID = civ3Tile.BaseTerrainImageID,                    
+                    BaseTerrainImageID = civ3Tile.BaseTerrainImageID,
                 };
                 Tile c7Tile = new Tile
                 {
@@ -64,7 +63,7 @@ namespace C7GameData
             c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.RelativeModPath;
             return c7Save;
         }
-        
+
         // stub
         static public C7RulesFormat ImportBic()
         {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace QueryCiv3
 {
@@ -9,10 +8,6 @@ namespace QueryCiv3
         public int Offset;
     }
     public class Civ3File {
-        // Encoding code page ID; 1252 is Civ3 encoding for US language version
-        //   See https://docs.microsoft.com/en-us/dotnet/api/system.text.encoding?view=net-5.0 for other values
-        // NOTE: .NET 5 and later require a Nuget package and Encoder registration for these older encoding pages
-        public int Civ3StringEncoding = 1252;
         protected internal byte[] FileData;
         public Civ3Section[] Sections { get; protected set; }
         public bool IsGameFile {get; protected set;}
@@ -111,10 +106,7 @@ namespace QueryCiv3
         public string GetString(int offset, int length)
         {
             byte[] StringBytes = GetBytes(offset, length);
-            string Out = System.Text.Encoding.GetEncoding(Civ3StringEncoding).GetString(StringBytes);
-            Regex TrimAfterNull = new Regex(@"^[^\0]*");
-            Match NoNullMatch = TrimAfterNull.Match(Out);
-            return NoNullMatch.Value;
+            return Util.GetString(StringBytes);
         }
     }
 }
