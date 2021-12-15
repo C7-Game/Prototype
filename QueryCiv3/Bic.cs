@@ -99,9 +99,9 @@ namespace QueryCiv3
                     // Section data structures are stored in the BiqSections/ folder
                     // We can divide the BIQ sections into two types: static and dynamic
                     // Static have a fixed length always, which means they can be read directly memory-copied into our structs with no special logic
-                    //   The static sections are: BLDG, CTZN, CULT, DIFF, ERAS, ESPN, EXPR, GOOD, TECH, TFRM, WSIZ, WCHR, TILE, CONT, SLOC, UNIT, CLNY
+                    //   The static sections are: BLDG, CTZN, CULT, DIFF, ERAS, ESPN, EXPR, FLAV(??), GOOD, TECH, TFRM, WSIZ, WCHR, TILE, CONT, SLOC, UNIT, CLNY
                     // Dynamic sections have at least one component with varying length, and so require multiple structs and special logic
-                    //   The dynamic sections are: GOVT, RULE, PRTO, RACE, TERR, FLAV, WMAP, CITY, GAME, LEAD
+                    //   The dynamic sections are: GOVT, RULE, PRTO, RACE, TERR, WMAP, CITY, GAME, LEAD
                     switch (header) {
                         case "BLDG":
                             dataLength = count * sizeof(BLDG);
@@ -190,7 +190,18 @@ namespace QueryCiv3
                             }
                             break;
                         case "FLAV":
-                            dataLength = -7;
+                            // FLAV has two oddities compared with other sections:
+                            // 1. FLAV's count is not technically locked at 7, but is practically so. This means it can be treated as static (see FLAV.cs)
+                            count = 7;
+                            // 2. FLAV is the only section which is divided into section groups. However, the number of section groups is always 1,
+                            //   so again for practical usage, all that needs to happen is that the offset needs to be shifted an extra 4 for the extra int
+                            offset += 4;
+
+                            dataLength = count * sizeof(FLAV);
+                            Flav = new FLAV[count];
+                            fixed (void* ptr = Flav) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "GAME":
                             dataLength = -7;
