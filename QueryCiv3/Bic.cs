@@ -38,8 +38,17 @@ namespace QueryCiv3
         public WMAP[] Wmap;
         public WSIZ[] Wsiz;
 
+        /*
+            Note which of the following are rectangular 2d arrays [,] vs which are jagged 2d arrays [][]
+            A rectangular array means that the second dimension for all components is the same eg. for RaceEra, every civ shares the same # of Eras
+            A jagged array means that the second dimension can vary between components eg. for RaceCityName, each civ can have a different # of Cities
+        */
         public bool[,] TerrGood; // which resources are allowed on which types of terrain
         public GOVTGOVT[,] GovtGovt; // relationships between governments
+        public RACECITYNAME[][] RaceCityName; // the list of city names for each civ
+        public RACEERA[,] RaceEra; // the file names for each era for each civ
+        public RACELEADERNAME[][] RaceGreatLeaderName; // the great leaders for each civ
+        public RACELEADERNAME[][] RaceScientificLeaderName; // the scientific leaders for each civ
 
         private const int SECTION_HEADERS_START = 736;
         // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
@@ -49,6 +58,10 @@ namespace QueryCiv3
         private const int GOVT_LEN_2 = 76;
         private const int TERR_LEN_1 = 8;
         private const int TERR_LEN_2 = 225;
+        private const int RACE_LEN_1 = 8;
+        private const int RACE_LEN_2 = 4;
+        private const int RACE_LEN_3 = 208;
+        private const int RACE_LEN_4 = 92;
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -180,7 +193,60 @@ namespace QueryCiv3
                             dataLength = -7;
                             break;
                         case "RACE":
-                            dataLength = -7;
+                            dataLength = 0;
+                            Race = new RACE[count];
+                            RaceCityName = new RACECITYNAME[count][];
+                            RaceScientificLeaderName = new RACELEADERNAME[count][];
+                            RaceGreatLeaderName = new RACELEADERNAME[count][];
+                            /*
+                                For getting dynamic race data, we need to know the number of eras as defined earlier
+                                Presumably this means that the ERAS section of BIQ will always appear before the RACE section
+                                However, if ERAS ever appears after RACE, then that will be a problem
+                                I considered throwing an exception here in that case, but C# will throw a NullReferenceException anyway for
+                                  trying to get the length of an uninitialized array, which is sufficient
+                            */
+                            int eras = Eras.Length;
+                            RaceEra = new RACEERA[count, eras];
+                            int raceeraRowLength = eras * sizeof(RACEERA);
+                            int rowLength = 0;
+
+                            fixed (void* ptr = Race, ptr2 = RaceEra) {
+                                byte* racePtr = (byte*)ptr;
+                                byte* raceeraPtr = (byte*)ptr2;
+                                byte* dataPtr = bytePtr + offset;
+
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_1, RACE_LEN_1);
+                                    racePtr += RACE_LEN_1;
+                                    RaceCityName[i] = new RACECITYNAME[Race[i].NumberOfCities];
+                                    rowLength = Race[i].NumberOfCities * sizeof(RACECITYNAME);
+                                    fixed (void* ptr3 = RaceCityName[i]) Buffer.MemoryCopy(dataPtr + RACE_LEN_1, ptr3, rowLength, rowLength);
+                                    dataPtr += RACE_LEN_1 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_2, RACE_LEN_2);
+                                    racePtr += RACE_LEN_2;
+                                    RaceGreatLeaderName[i] = new RACELEADERNAME[Race[i].NumberOfGreatLeaders];
+                                    rowLength = Race[i].NumberOfGreatLeaders * sizeof(RACELEADERNAME);
+                                    fixed (void* ptr3 = RaceGreatLeaderName[i]) Buffer.MemoryCopy(dataPtr + RACE_LEN_2, ptr3, rowLength, rowLength);
+                                    dataPtr += RACE_LEN_2 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_3, RACE_LEN_3);
+                                    racePtr += RACE_LEN_3;
+                                    Buffer.MemoryCopy(dataPtr + RACE_LEN_3, raceeraPtr, raceeraRowLength, raceeraRowLength);
+                                    dataPtr += RACE_LEN_3 + raceeraRowLength;
+                                    raceeraPtr += raceeraRowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_4, RACE_LEN_4);
+                                    racePtr += RACE_LEN_4;
+                                    RaceScientificLeaderName[i] = new RACELEADERNAME[Race[i].NumberOfScientificLeaders];
+                                    rowLength = Race[i].NumberOfScientificLeaders * sizeof(RACELEADERNAME);
+                                    fixed (void* ptr3 = RaceScientificLeaderName[i]) Buffer.MemoryCopy(dataPtr + RACE_LEN_4, ptr3, rowLength, rowLength);
+                                    dataPtr += RACE_LEN_4 + rowLength;
+
+                                    dataLength += Race[i].Length + 4;
+                                }
+                            }
+
                             break;
                         case "RULE":
                             dataLength = -7;
