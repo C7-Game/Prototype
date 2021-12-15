@@ -130,7 +130,11 @@ namespace QueryCiv3
                             }
                             break;
                         case "CONT":
-                            dataLength = -7;
+                            dataLength = count * sizeof(CONT);
+                            Cont = new CONT[count];
+                            fixed (void* ptr = Cont) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, dataLength, dataLength);
+                            }
                             break;
                         case "CTZN":
                             dataLength = count * sizeof(CTZN);
