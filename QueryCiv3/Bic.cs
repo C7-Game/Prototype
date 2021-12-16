@@ -56,31 +56,36 @@ namespace QueryCiv3
         public int[][] LeadTech; // starting tech data for each leader
         public RULECULT[][] RuleCult; // culture level names per rule
         public int[][] RuleSpaceship; // spaceship quantity requirements per rule
+        public int[][] GameCiv; // Playable civs for game
+        public int[][] GameAlliance; // Civ alliances for game
 
         private const int SECTION_HEADERS_START = 736;
         // Dynamic sections need to have their static subcomponents read in as discrete chunks, which these length constants help with
         // The sum of the LEN constants for each section equals the total size of that section's struct
         // eg. GOVT_LEN_1 + GOVT_LEN_2 == sizeof(GOVT)
-        private const int GOVT_LEN_1 = 400;
-        private const int GOVT_LEN_2 =  76;
-        private const int TERR_LEN_1 =   8;
-        private const int TERR_LEN_2 = 225;
-        private const int RACE_LEN_1 =   8;
-        private const int RACE_LEN_2 =   4;
-        private const int RACE_LEN_3 = 208;
-        private const int RACE_LEN_4 =  92;
-        private const int CITY_LEN_1 =  38;
-        private const int CITY_LEN_2 =  36;
-        private const int WMAP_LEN_1 =   8;
-        private const int WMAP_LEN_2 = 164;
-        private const int PRTO_LEN_1 = 238;
-        private const int PRTO_LEN_2 =  21;
-        private const int LEAD_LEN_1 =  56;
-        private const int LEAD_LEN_2 =   8;
-        private const int LEAD_LEN_3 =  33;
-        private const int RULE_LEN_1 = 104;
-        private const int RULE_LEN_2 = 164;
-        private const int RULE_LEN_3 =  32;
+        private const int GOVT_LEN_1 =  400;
+        private const int GOVT_LEN_2 =   76;
+        private const int TERR_LEN_1 =    8;
+        private const int TERR_LEN_2 =  225;
+        private const int RACE_LEN_1 =    8;
+        private const int RACE_LEN_2 =    4;
+        private const int RACE_LEN_3 =  208;
+        private const int RACE_LEN_4 =   92;
+        private const int CITY_LEN_1 =   38;
+        private const int CITY_LEN_2 =   36;
+        private const int WMAP_LEN_1 =    8;
+        private const int WMAP_LEN_2 =  164;
+        private const int PRTO_LEN_1 =  238;
+        private const int PRTO_LEN_2 =   21;
+        private const int LEAD_LEN_1 =   56;
+        private const int LEAD_LEN_2 =    8;
+        private const int LEAD_LEN_3 =   33;
+        private const int RULE_LEN_1 =  104;
+        private const int RULE_LEN_2 =  164;
+        private const int RULE_LEN_3 =   32;
+        private const int GAME_LEN_1 =   16;
+        private const int GAME_LEN_2 = 5304;
+        private const int GAME_LEN_3 = 2017;
 
         public unsafe BicData(byte[] bicBytes)
         {
@@ -209,7 +214,39 @@ namespace QueryCiv3
                             }
                             break;
                         case "GAME":
-                            dataLength = -7;
+                            dataLength = 0;
+                            Game = new GAME[count];
+                            GameCiv = new int[count][];
+                            GameAlliance = new int[count][];
+
+                            fixed (void* ptr = Game) {
+                                byte* gamePtr = (byte*)ptr;
+                                byte* dataPtr = bytePtr + offset;
+                                int rowLength = 0;
+                                int playableCivs = 0;
+
+                                for (int i = 0; i < count; i++) {
+                                    Buffer.MemoryCopy(dataPtr, gamePtr, GAME_LEN_1, GAME_LEN_1);
+                                    gamePtr += GAME_LEN_1;
+                                    playableCivs = Game[i].NumberOfPlayableCivs == 0 ? 31 : Game[i].NumberOfPlayableCivs;
+                                    GameCiv[i] = new int[playableCivs];
+                                    rowLength = playableCivs * sizeof(int);
+                                    fixed (void* ptr2 = GameCiv[i]) Buffer.MemoryCopy(dataPtr + GAME_LEN_1, ptr2, rowLength, rowLength);
+                                    dataPtr += GAME_LEN_1 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, gamePtr, GAME_LEN_2, GAME_LEN_2);
+                                    gamePtr += GAME_LEN_2;
+                                    GameAlliance[i] = new int[playableCivs];
+                                    fixed (void* ptr2 = GameAlliance[i]) Buffer.MemoryCopy(dataPtr + GAME_LEN_2, ptr2, rowLength, rowLength);
+                                    dataPtr += GAME_LEN_2 + rowLength;
+
+                                    Buffer.MemoryCopy(dataPtr, gamePtr, GAME_LEN_3, GAME_LEN_3);
+                                    gamePtr += GAME_LEN_3;
+                                    dataPtr += GAME_LEN_3;
+
+                                    dataLength += Game[i].Length + 4;
+                                }
+                            }
                             break;
                         case "GOOD":
                             dataLength = count * sizeof(GOOD);
