@@ -10,6 +10,8 @@ namespace QueryCiv3
         public bool HasCustomRules => Bic.SectionExists("BLDG");
         public bool HasCustomMap => Bic.SectionExists("WCHR");
 
+        // RULE, WCHR, WMAP, and GAME all seem to only ever have a maximum of 1 header in the biq files, but I'm not certain on that
+        // If that's confirmed to be the case, they can be demoted from arrays to singular variables and the code simplified accordingly
         public BLDG[] Bldg;
         public CITY[] City;
         public CLNY[] Clny;
@@ -87,9 +89,19 @@ namespace QueryCiv3
         private const int GAME_LEN_2 = 5304;
         private const int GAME_LEN_3 = 2017;
 
+        public string Title;
+        public string Description;
+
         public unsafe BicData(byte[] bicBytes)
         {
+            Load(bicBytes);
+        }
+
+        public unsafe void Load(byte[] bicBytes)
+        {
             Bic = new Civ3File(bicBytes);
+            Description = Bic.GetString(32, 640);
+            Title = Bic.GetString(672, 64);
 
             fixed (byte* bytePtr = bicBytes)
             {
@@ -100,7 +112,7 @@ namespace QueryCiv3
                 int count = 0;
                 int dataLength = 0;
 
-                while (offset < bicBytes.Length - 12) { // Don't read past the end
+                while (offset < bicBytes.Length) { // Don't read past the end
                     // We don't know what orders the headers come in or which headers will be set, so get the next header and switch off it:
                     header = Bic.GetString(offset, 4);
                     count = Bic.ReadInt32(offset + 4);
@@ -526,31 +538,11 @@ namespace QueryCiv3
                             }
                             break;
                         default:
-                            // Once every BIQ section is set up with the correct associate struct(s), the default case where a header isn't found
-                            // should never occur. However, for now, if a header isn't found, we'll just increment by 1 to keep searching
-                            dataLength = -7; // We added 8 earlier, so subtract 7
+                            throw new Exception("An error occured while parsing the BIQ file because a header was not found where expected.");
                             break;
                     }
                     offset += dataLength;
                 }
-            }
-        }
-        public string Title => Bic.GetString(0x2a0, 64);
-        // unsure of this length ... up to 656
-        public string Description => Bic.GetString(0x20, 640);
-        public string RelativeModPath
-        {
-            get
-            {
-                try
-                {
-                    int gameOff = Bic.SectionOffset("GAME", 1);
-                    // I don't know if this length is correct, just guessing
-                    string output = Bic.GetString(gameOff + 0xdc, 256);
-                    if (output != "") return output;
-                }
-                catch {}
-                return Title;
             }
         }
     }
