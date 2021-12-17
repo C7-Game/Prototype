@@ -336,6 +336,52 @@ public class ForestLayer : LooseLayer {
 	}
 }
 
+public class MarshLayer : LooseLayer {
+	public static readonly Vector2 marshSize = new Vector2(128, 88);
+	
+	private ImageTexture largeMarshTexture;
+	private ImageTexture smallMarshTexture;
+
+	public MarshLayer() {
+		largeMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0,   0, 512, 176);
+		smallMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0, 176, 640, 176);
+	}
+
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
+		if (tile.overlayTerrainType.name == "Marsh") {
+			//TODO: Refactor out duplication
+			TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].baseTerrainType;
+			TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].baseTerrainType;
+			TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].baseTerrainType;
+			TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].baseTerrainType;
+
+			TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
+
+			bool neighborsCoast = false;
+			foreach (TerrainType type in neighborTerrains) {
+				if (type.name == "Coast") {
+					neighborsCoast = true;
+				}
+			}
+
+			int randomJungleRow = tile.yCoordinate % 2;
+			int randomMarshColumn;
+			ImageTexture marshTexture;
+			if (neighborsCoast) {
+				randomMarshColumn = tile.xCoordinate % 5;
+				marshTexture = smallMarshTexture;
+			}
+			else {
+				randomMarshColumn = tile.xCoordinate % 4;
+				marshTexture = largeMarshTexture;
+			}
+			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.x, randomJungleRow * marshSize.y, marshSize);
+			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * marshSize + new Vector2(0, -12), marshSize);
+			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);			
+		}
+	}
+}
+
 public class GridLayer : LooseLayer {
 	public Color color = Color.Color8(50, 50, 50, 150);
 	public float lineWidth = (float)1.0;
@@ -671,6 +717,7 @@ public class MapView : Node2D {
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new ForestLayer());
+		looseView.layers.Add(new MarshLayer());
 		looseView.layers.Add(new HillsLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);
