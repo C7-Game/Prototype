@@ -17,45 +17,6 @@ namespace QueryCiv3
         public byte[] RawBytes { get => Data.Sav.GetBytes(Offset, Length); }
     }
 
-    public class MapTile
-    {
-        protected SavData Data;
-        public int Offset {get; protected set;}
-        public int X {get; protected set;}
-        public int Y {get; protected set;}
-        public MapTile(SavData data, int offset, int x, int y)
-        {
-            Data = data;
-            Offset = offset;
-            X = x;
-            Y = y;
-        }
-        public int ContID { get => Data.Sav.ReadByte(Offset+30); }
-        // TODO: 0x80 is barbs...sure there's more to this than that
-        public int BarbMask { get => Data.Sav.ReadByte(Offset+48); }
-        public int Terrain { get => Data.Sav.ReadByte(Offset+53); }
-        public int BaseTerrain { get => Terrain & 0x0f; }
-        public int OverlayTerrain { get => (Terrain & 0xf0) >> 4; }
-        public int BaseTerrainFileID { get => Data.Sav.ReadByte(Offset+17); }
-        public int BaseTerrainImageID { get => Data.Sav.ReadByte(Offset+16); }
-        public int C3CBonuses { get => Data.Sav.ReadInt32(Offset + 58);}
-        //C3C Bonuses Breakdown.  See lines 128-135 of TILE.java in Quintillus's editor for documentation
-        public bool isPineForest { get => (C3CBonuses & 32) == 32; }
-        public bool isSnowCapped { get => (C3CBonuses & 16) == 16; }
-
-    }
-    public class ContItem
-    {
-        protected SavData Data;
-        protected int Offset;
-        public ContItem(SavData data, int offset)
-        {
-            Data = data;
-            Offset = offset;
-        }
-        public bool IsLand { get => Data.Sav.ReadInt32(Offset+4) != 0; }
-        public int TileCount { get => Data.Sav.ReadInt32(Offset+8); }
-    }
     public class LeaderItem
     // NOTE: If relative offset is wrong, try adjusting up (or down) by 4
     //  At various phases of my project history I've counted from different base points

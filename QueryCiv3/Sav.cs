@@ -14,11 +14,13 @@ namespace QueryCiv3
         public GAME Game;
         public WRLD Wrld;
         public TILE[] Tile;
+        public CONT[] Cont;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
         public int[] GreatWonderCityIDs;
         public bool[] GreatWondersBuilt;
+        public int[] ResourceCounts;
 
         private const int SECTION_HEADERS_START = 736;
 
@@ -74,6 +76,10 @@ namespace QueryCiv3
                         case 0x454c4954: // TILE
                             AllocateAndCopy(ref Tile, Wrld.Width * Wrld.Height / 2);
                             break;
+                        case 0x544e4f43:
+                            AllocateAndCopy(ref Cont, Game.NumberOfContinents);
+                            AllocateAndCopy(ref ResourceCounts, Bic.Good.Length);
+                            break;
                         default:
                             scan++;
                             break;
@@ -82,18 +88,6 @@ namespace QueryCiv3
             }
         }
 
-        // TODO: Use ListSection for this?
-        public ContItem[] Cont
-        { get {
-            int ContCount = Wrld.ContinentCount;
-            List<ContItem> LeadList = new List<ContItem>();
-            for(int i=0; i< ContCount; i++)
-            {
-                int LeadOffset = Sav.SectionOffset("CONT", i+1);
-                LeadList.Add(new ContItem(this, LeadOffset));
-            }
-            return LeadList.ToArray();
-        }}
         public LeaderItem[] Lead
         { get {
             int LeadCount = 32;
