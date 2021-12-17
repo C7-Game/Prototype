@@ -4,11 +4,11 @@ using QueryCiv3.Biq;
 
 namespace QueryCiv3
 {
-    public class BicData
+    public class BiqData
     {
-        public Civ3File Bic;
-        public bool HasCustomRules => Bic.SectionExists("BLDG");
-        public bool HasCustomMap => Bic.SectionExists("WCHR");
+        public Civ3File FileData;
+        public bool HasCustomRules => FileData.SectionExists("BLDG");
+        public bool HasCustomMap => FileData.SectionExists("WCHR");
 
         // RULE, WCHR, WMAP, and GAME all seem to only ever have a maximum of 1 header in the biq files, but I'm not certain on that
         // If that's confirmed to be the case, they can be demoted from arrays to singular variables and the code simplified accordingly
@@ -92,18 +92,18 @@ namespace QueryCiv3
         public string Title;
         public string Description;
 
-        public unsafe BicData(byte[] bicBytes)
+        public unsafe BiqData(byte[] biqBytes)
         {
-            Load(bicBytes);
+            Load(biqBytes);
         }
 
-        public unsafe void Load(byte[] bicBytes)
+        public unsafe void Load(byte[] biqBytes)
         {
-            Bic = new Civ3File(bicBytes);
-            Description = Bic.GetString(32, 640);
-            Title = Bic.GetString(672, 64);
+            FileData = new Civ3File(biqBytes);
+            Description = FileData.GetString(32, 640);
+            Title = FileData.GetString(672, 64);
 
-            fixed (byte* bytePtr = bicBytes)
+            fixed (byte* bytePtr = biqBytes)
             {
                 // For now, we're skipping over the VER# and BIQ file header information to get right to the structs
                 // The first section is likely to be BLDG in BIQ files, but the current approach supports any ordering of the sections
@@ -112,10 +112,10 @@ namespace QueryCiv3
                 int count = 0;
                 int dataLength = 0;
 
-                while (offset < bicBytes.Length) { // Don't read past the end
+                while (offset < biqBytes.Length) { // Don't read past the end
                     // We don't know what orders the headers come in or which headers will be set, so get the next header and switch off it:
-                    header = Bic.GetString(offset, 4);
-                    count = Bic.ReadInt32(offset + 4);
+                    header = FileData.GetString(offset, 4);
+                    count = FileData.ReadInt32(offset + 4);
                     offset += 8;
 
                     // Section data structures are stored in the BiqSections/ folder
@@ -268,7 +268,7 @@ namespace QueryCiv3
                             }
                             break;
                         case "GOVT":
-                            int govtLen = Bic.ReadInt32(offset) + 4;
+                            int govtLen = FileData.ReadInt32(offset) + 4;
                             dataLength = count * govtLen;
                             Govt = new GOVT[count];
                             GovtGovt = new GOVTGOVT[count, count];
@@ -451,10 +451,10 @@ namespace QueryCiv3
                             }
                             break;
                         case "TERR":
-                            int terrLen = Bic.ReadInt32(offset) + 4; // Add 4 because length must also include the 32-bit integer that is itself
+                            int terrLen = FileData.ReadInt32(offset) + 4; // Add 4 because length must also include the 32-bit integer that is itself
                             dataLength = count * terrLen;
                             Terr = new TERR[count];
-                            int goodCount = Bic.ReadInt32(offset + 4);
+                            int goodCount = FileData.ReadInt32(offset + 4);
                             TerrGood = new bool[count, goodCount];
 
                             fixed (void* ptr = Terr) {
