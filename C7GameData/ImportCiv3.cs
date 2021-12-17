@@ -36,28 +36,32 @@ namespace C7GameData
             // Import tiles
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
             c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
-            foreach (MapTile civ3Tile in civ3Save.Tile)
+            int i = 0;
+            foreach (QueryCiv3.Sav.TILE civ3Tile in civ3Save.Tile)
             {
                 Civ3ExtraInfo extra = new Civ3ExtraInfo
                 {
-                    BaseTerrainFileID = civ3Tile.BaseTerrainFileID,
-                    BaseTerrainImageID = civ3Tile.BaseTerrainImageID,
+                    BaseTerrainFileID = civ3Tile.TextureFile,
+                    BaseTerrainImageID = civ3Tile.TextureLocation,
                 };
+                int y = i / (civ3Save.Wrld.Width / 2);
+                int x = (i % (civ3Save.Wrld.Width / 2)) * 2 + (y % 2);
                 Tile c7Tile = new Tile
                 {
-                    xCoordinate = civ3Tile.X,
-                    yCoordinate = civ3Tile.Y,
+                    xCoordinate = x,
+                    yCoordinate = y,
                     ExtraInfo = extra,
                     baseTerrainType = c7Save.GameData.terrainTypes[civ3Tile.BaseTerrain],
                     overlayTerrainType = c7Save.GameData.terrainTypes[civ3Tile.OverlayTerrain],
                 };
-                if (civ3Tile.isSnowCapped) {
+                if (civ3Tile.SnowCapped) {
                     c7Tile.isSnowCapped = true;
                 }
-                if (civ3Tile.isPineForest) {
+                if (civ3Tile.PineForest) {
                     c7Tile.isPineForest = true;
                 }
                 c7Save.GameData.map.tiles.Add(c7Tile);
+                i++;
             }
             // This probably doesn't belong here, but not sure where else to put it
             // c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.Game[0].ScenarioSearchFolders;

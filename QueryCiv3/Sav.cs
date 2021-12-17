@@ -13,6 +13,7 @@ namespace QueryCiv3
 
         public GAME Game;
         public WRLD Wrld;
+        public TILE[] Tile;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -35,7 +36,7 @@ namespace QueryCiv3
             scan += length;
         }
 
-        public unsafe void CreateAndCopy<T>(ref T[] data, int length) where T : unmanaged
+        public unsafe void AllocateAndCopy<T>(ref T[] data, int length) where T : unmanaged
         {
             data = new T[length];
             int dataLength = length * sizeof(T);
@@ -62,13 +63,16 @@ namespace QueryCiv3
                     switch (*header) {
                         case 0x454d4147: // GAME
                             Copy(ref Game, sizeof(GAME));
-                            CreateAndCopy(ref CitiesPerContinent, Game.NumberOfContinents);
-                            CreateAndCopy(ref KnownTechFlags, Bic.Tech.Length);
-                            CreateAndCopy(ref GreatWonderCityIDs, Bic.Bldg.Length);
-                            CreateAndCopy(ref GreatWondersBuilt, Bic.Bldg.Length);
+                            AllocateAndCopy(ref CitiesPerContinent, Game.NumberOfContinents);
+                            AllocateAndCopy(ref KnownTechFlags, Bic.Tech.Length);
+                            AllocateAndCopy(ref GreatWonderCityIDs, Bic.Bldg.Length);
+                            AllocateAndCopy(ref GreatWondersBuilt, Bic.Bldg.Length);
                             break;
                         case 0x444c5257: // WRLD
                             Copy(ref Wrld, sizeof(WRLD));
+                            break;
+                        case 0x454c4954: // TILE
+                            AllocateAndCopy(ref Tile, Wrld.Width * Wrld.Height / 2);
                             break;
                         default:
                             scan++;
@@ -78,19 +82,6 @@ namespace QueryCiv3
             }
         }
 
-        public MapTile[] Tile
-        { get {
-            int TileOffset = Sav.SectionOffset("TILE", 1);
-            int TileLength = 212;
-            int TileCount = Wrld.Height * (Wrld.Width / 2);
-            List<MapTile> TileList = new List<MapTile>();
-            for(int i=0; i< TileCount; i++, TileOffset += TileLength)
-            {
-                int y = i / (Wrld.Width / 2);
-                TileList.Add(new MapTile(this, TileOffset, (i % (Wrld.Width / 2)) * 2 + (y % 2), y));
-            }
-            return TileList.ToArray();
-        }}
         // TODO: Use ListSection for this?
         public ContItem[] Cont
         { get {
