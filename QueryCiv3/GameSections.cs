@@ -42,23 +42,7 @@ namespace QueryCiv3
             return Out.ToArray();
         }}
     }
-   public class WrldSection
-    {
-        private SavData Data;
-        private int Offset1, Offset2, Offset3;
-        public WrldSection(SavData sav)
-        {
-            Data = sav;
-            Offset1 = Data.Sav.SectionOffset("WRLD", 1);
-            Offset2 = Data.Sav.SectionOffset("WRLD", 2);
-            Offset3 = Data.Sav.SectionOffset("WRLD", 3);
-        }
-        public short ContinentCount { get => Data.Sav.ReadInt16(Offset1+4); }
-        public int WsizID { get => Data.Sav.ReadInt32(Offset1+234); }
-        public Biq.WSIZ WorldSize { get => Data.Bic.Wsiz[WsizID]; }
-        public int Height { get => Data.Sav.ReadInt32(Offset2+8); }
-        public int Width { get => Data.Sav.ReadInt32(Offset2+28); }
-    }
+
     public class MapTile
     {
         protected SavData Data;

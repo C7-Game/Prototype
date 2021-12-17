@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using QueryCiv3.Sav;
 
 namespace QueryCiv3
 {
@@ -8,8 +9,11 @@ namespace QueryCiv3
         public BiqData Bic;
         public Civ3File Sav;
 
-        public WrldSection Wrld;
         public GameSection Game;
+
+        public WRLD Wrld;
+
+        private const int SECTION_HEADERS_START = 736;
 
         public SavData(byte[] savBytes, byte[] biqBytes)
         {
@@ -20,8 +24,30 @@ namespace QueryCiv3
         public unsafe void Load(byte[] savBytes)
         {
             Sav = new Civ3File(savBytes);
-            Wrld = new WrldSection(this);
             Game = new GameSection(this);
+
+            fixed (byte* bytePtr = savBytes)
+            {
+                int offset = 0;
+                int header;
+                int count = 0;
+
+                while (offset < savBytes.Length - 16) {
+                    header = Sav.ReadInt32(offset);
+
+                    switch (header) {
+                        case 0x444c5257: // WRLD
+                            fixed (void* ptr = &Wrld) {
+                                Buffer.MemoryCopy(bytePtr + offset, ptr, sizeof(WRLD), sizeof(WRLD));
+                            }
+                            offset += sizeof(WRLD);
+                            break;
+                        default:
+                            offset++;
+                            break;
+                    }
+                }
+            }
         }
 
         public MapTile[] Tile
