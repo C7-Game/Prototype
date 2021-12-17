@@ -4,14 +4,20 @@ using QueryCiv3.Sav;
 
 namespace QueryCiv3
 {
-    public class SavData
+    public unsafe class SavData
     {
         public BiqData Bic;
         public Civ3File Sav;
 
-        public GameSection Game;
+        public byte* scan;
 
+        public GAME Game;
         public WRLD Wrld;
+
+        public int[] CitiesPerContinent;
+        public IntBitmap[] KnownTechFlags;
+        public int[] GreatWonderCityIDs;
+        public bool[] GreatWondersBuilt;
 
         private const int SECTION_HEADERS_START = 736;
 
@@ -21,29 +27,51 @@ namespace QueryCiv3
             Load(savBytes);
         }
 
+        public unsafe void Copy<T>(ref T data, int length) where T : unmanaged
+        {
+            fixed (void* destPtr = &data) {
+                Buffer.MemoryCopy(scan, destPtr, length, length);
+            }
+            scan += length;
+        }
+
+        public unsafe void CreateAndCopy<T>(ref T[] data, int length) where T : unmanaged
+        {
+            data = new T[length];
+            int dataLength = length * sizeof(T);
+
+            fixed (void* destPtr = data) {
+                Buffer.MemoryCopy(scan, destPtr, dataLength, dataLength);
+            }
+            scan += dataLength;
+        }
+
         public unsafe void Load(byte[] savBytes)
         {
             Sav = new Civ3File(savBytes);
-            Game = new GameSection(this);
 
             fixed (byte* bytePtr = savBytes)
             {
-                int offset = 0;
-                int header;
-                int count = 0;
+                int* header;
+                scan = bytePtr;
+                byte* end = bytePtr + savBytes.Length;
 
-                while (offset < savBytes.Length - 16) {
-                    header = Sav.ReadInt32(offset);
+                while (scan < end) {
+                    header = (int*)scan;
 
-                    switch (header) {
+                    switch (*header) {
+                        case 0x454d4147: // GAME
+                            Copy(ref Game, sizeof(GAME));
+                            CreateAndCopy(ref CitiesPerContinent, Game.NumberOfContinents);
+                            CreateAndCopy(ref KnownTechFlags, Bic.Tech.Length);
+                            CreateAndCopy(ref GreatWonderCityIDs, Bic.Bldg.Length);
+                            CreateAndCopy(ref GreatWondersBuilt, Bic.Bldg.Length);
+                            break;
                         case 0x444c5257: // WRLD
-                            fixed (void* ptr = &Wrld) {
-                                Buffer.MemoryCopy(bytePtr + offset, ptr, sizeof(WRLD), sizeof(WRLD));
-                            }
-                            offset += sizeof(WRLD);
+                            Copy(ref Wrld, sizeof(WRLD));
                             break;
                         default:
-                            offset++;
+                            scan++;
                             break;
                     }
                 }
