@@ -71,6 +71,7 @@ namespace C7GameData
 
             int white = -1; // = 0xFFFFFFFF, but we can't just use that b/c the compiler complains about uint-to-int conversion
             var barbarianPlayer = new Player(white);
+            barbarianPlayer.isBarbarians = true;
             players.Add(barbarianPlayer);
 
             //Right now, the one terrain type is in the map but not in our list here.
@@ -112,10 +113,10 @@ namespace C7GameData
             createDummyUnit(worker , humanPlayer, 24, 26);
             createDummyUnit(chariot, humanPlayer, 26, 26);
 
-            var startingLocations = map.generateStartingLocations(rng, 10, 10);
-            foreach (var sL in startingLocations)
-                if (sL.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-                    var barbWarrior = createDummyUnit(warrior, barbarianPlayer, sL.xCoordinate, sL.yCoordinate);
+            List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
+            foreach (Tile barbCampLocation in barbarianCamps)
+                if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
+                    var barbWarrior = createDummyUnit(warrior, barbarianPlayer, barbCampLocation.xCoordinate, barbCampLocation.yCoordinate);
                     barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
                                                     // whole procedure of generating a map should be part of the engine not the data module.
                     barbWarrior.location.hasBarbarianCamp = true;
