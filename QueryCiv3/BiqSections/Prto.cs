@@ -80,6 +80,10 @@ namespace QueryCiv3.Biq
         public bool CanCarryTacticalMissiles{ get => Util.GetFlag(Flags1[3], 0); }
         public bool RangedAttackAnimations  { get => Util.GetFlag(Flags1[3], 1); }
         public bool TurnToAttack            { get => Util.GetFlag(Flags1[3], 2); }
+        public bool LethalLandBombardment   { get => Util.GetFlag(Flags1[3], 3); }
+        public bool LethalSeaBombardment    { get => Util.GetFlag(Flags1[3], 4); }
+        public bool King                    { get => Util.GetFlag(Flags1[3], 5); }
+        public bool RequiresEscort          { get => Util.GetFlag(Flags1[3], 6); }
 
         public bool AIOffense               { get => Util.GetFlag(Flags1[4], 0); }
         public bool AIDefense               { get => Util.GetFlag(Flags1[4], 1); }
@@ -101,6 +105,8 @@ namespace QueryCiv3.Biq
 
         public bool AIICBM                  { get => Util.GetFlag(Flags1[6], 0); }
         public bool AINavalMissileTransport { get => Util.GetFlag(Flags1[6], 1); }
+        public bool AIFlag                  { get => Util.GetFlag(Flags1[6], 2); }
+        public bool AIKing                  { get => Util.GetFlag(Flags1[6], 3); }
 
         public PRTORACE AvailableTo; // Binary flag for each civ 0-31
         private fixed byte Flags2[8];
@@ -146,6 +152,8 @@ namespace QueryCiv3.Biq
         public bool BuildAirfield           { get => Util.GetFlag(Flags3[9], 5); }
         public bool BuildRadarTower         { get => Util.GetFlag(Flags3[9], 6); }
         public bool BuildOutpost            { get => Util.GetFlag(Flags3[9], 7); }
+
+        public bool BuildBarricade          { get => Util.GetFlag(Flags3[10], 0); }
 
         public bool Bombing                 { get => Util.GetFlag(Flags3[12], 0); }
         public bool Recon                   { get => Util.GetFlag(Flags3[12], 1); }
