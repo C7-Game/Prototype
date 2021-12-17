@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace QueryCiv3.Biq
 {
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct RULECULT
+    public unsafe struct RULE_CULT
     {
         private fixed byte Text[64];
         public string Name { get => Util.GetString(ref this, 0, 64); }

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace QueryCiv3.Biq
 {
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct LEADPRTO
+    public unsafe struct LEAD_Unit
     {
         public int NumberOfStartUnits;
         public int UnitType;

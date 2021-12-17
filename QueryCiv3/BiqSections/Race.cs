@@ -4,21 +4,21 @@ using System.Runtime.InteropServices;
 namespace QueryCiv3.Biq
 {
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct RACECITYNAME
+    public unsafe struct RACE_City
     {
         private fixed byte Text[24];
         public string Name { get => Util.GetString(ref this, 0, 24); }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct RACELEADERNAME
+    public unsafe struct RACE_LeaderName
     {
         private fixed byte Text[32];
         public string Name { get => Util.GetString(ref this, 0, 32); }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct RACEERA
+    public unsafe struct RACE_ERAS
     {
         private fixed byte Text[520];
         public string ForwardFilename { get => Util.GetString(ref this, 0, 260); }
