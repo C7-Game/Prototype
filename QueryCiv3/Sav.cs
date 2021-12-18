@@ -45,14 +45,22 @@ namespace QueryCiv3
         private const int LEAD_LEN_3 = 108;
         private const int LEAD_LEN_4 = 292;
 
+        public RPLT[] Rplt;
+        public RPLE[][] RpltRple;
+        public string[][] RpltRpleDescription;
+
         public SavData(byte[] savBytes, byte[] biqBytes)
         {
             Bic = new BiqData(biqBytes);
             Load(savBytes);
         }
 
-        public unsafe void Copy<T>(ref T data, int length, int offset = 0) where T : unmanaged
+        public unsafe void Copy<T>(ref T data, int length = -1, int offset = 0) where T : unmanaged
         {
+            if (length == -1) {
+                length = sizeof(T);
+            }
+
             fixed (void* destPtr = &data) {
                 Buffer.MemoryCopy(scan, (byte*)destPtr + offset, length, length);
             }
@@ -87,14 +95,14 @@ namespace QueryCiv3
                     // Switching off of these hex values is substantially faster than string switching, but comes at the expense of readability
                     switch (*header) {
                         case 0x454d4147: // GAME
-                            Copy(ref Game, sizeof(GAME));
+                            Copy(ref Game);
                             CopyArray(ref CitiesPerContinent, Game.NumberOfContinents);
                             CopyArray(ref KnownTechFlags, Bic.Tech.Length);
                             CopyArray(ref GreatWonderCityIDs, Bic.Bldg.Length);
                             CopyArray(ref GreatWondersBuilt, Bic.Bldg.Length);
                             break;
                         case 0x444c5257: // WRLD
-                            Copy(ref Wrld, sizeof(WRLD));
+                            Copy(ref Wrld);
                             break;
                         case 0x454c4954: // TILE
                             CopyArray(ref Tile, Wrld.Width * Wrld.Height / 2);
@@ -156,6 +164,41 @@ namespace QueryCiv3
                                 CopyArray(ref LeadTechQueue[i], Lead[i].ScienceQueueSize);
                                 Copy(ref Lead[i], LEAD_LEN_4, LEAD_LEN_1 + LEAD_LEN_2 + LEAD_LEN_3);
                             }
+                            break;
+                        case 0x534c5052: // RPLS
+                            // RPLS just consists of the 4-byte header and a 32-bit integer for the number of turns (RPLTs)
+                            // Because it's so simple, don't even both memory-copying into a struct for it and just get the RPLT length
+                            header = (int*)(scan + 4);
+                            int rpltLength = *header;
+                            scan += 8; // skip RPLS header and length integer
+
+                            Rplt = new RPLT[rpltLength];
+                            RpltRple = new RPLE[rpltLength][];
+                            RpltRpleDescription = new string[rpltLength][];
+                            const int MAX_STRING_LENGTH = 1024; // surely no event string is longer than 1024 characters?
+                            byte[] stringBuffer = new byte[MAX_STRING_LENGTH];
+
+                            fixed (byte* strPtr = stringBuffer) {
+                                Console.WriteLine(rpltLength);
+                                for (int i = 0; i < rpltLength; i++) {
+                                    Copy(ref Rplt[i]);
+                                    int rpleLength = Rplt[i].EventCount;
+
+                                    RpltRple[i] = new RPLE[rpleLength];
+                                    RpltRpleDescription[i] = new string[rpleLength];
+                                    for (int j = 0; j < rpleLength; j++) {
+                                        Copy(ref RpltRple[i][j]);
+                                        // Retrieve null-terminated string:
+                                        int counter = 0;
+                                        while (scan[counter++] != 0) {} // Keep incrementing until null character reached
+                                        Buffer.MemoryCopy(scan, strPtr, MAX_STRING_LENGTH, counter);
+                                        // Calling Util.GetString with the full buffer works, but is inefficient. Optimizing this is a TODO
+                                        RpltRpleDescription[i][j] = Util.GetString(stringBuffer);
+                                        scan += counter;
+                                    }
+                                }
+                            }
+
                             break;
                         default:
                             scan++;

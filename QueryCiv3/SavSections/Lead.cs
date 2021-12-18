@@ -59,7 +59,6 @@ namespace QueryCiv3.Sav
     public unsafe struct LEAD
     {
         private fixed byte HeaderText[4];
-        public string temp { get => Util.GetString(ref this, 0, 4); }
         public int Length;
         public int PlayerID;
         public int RaceID;
