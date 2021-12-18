@@ -122,7 +122,7 @@ namespace C7Engine
                         newLoc.unitsOnTile.Add(unit);
                         unit.location = newLoc;
                         unit.facingDirection = dir;
-                        unit.movementPointsRemaining -= 1;
+                        unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
                         unit.isFortified = false;
                         EngineStorage.animTracker.startAnimation(currentTimeMS, guid, MapUnit.AnimatedAction.RUN, null);
                     }

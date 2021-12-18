@@ -54,6 +54,12 @@ namespace C7GameData
         {
             return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
         }
+
+        public static TileDirection RandomDirection() {
+            Random rnd = new Random();
+            int index = rnd.Next(8);
+            return (TileDirection)(Enum.GetValues(TileDirection.NORTH.GetType())).GetValue(index);
+        }
     }
 
     public enum TileDirection {
