@@ -18,7 +18,7 @@ namespace QueryCiv3.Sav
         public int PercentWater; // is this int or float?
         private fixed byte UnknownBuffer1[4];
         public int Width;
-        private fixed int PlayerData[32]; // Does this need to be dynamic? Will the number of players ever not be 32?
+        private fixed int PlayerData[32];
         public int WorldSeed;
 
         private fixed byte Flags[4];

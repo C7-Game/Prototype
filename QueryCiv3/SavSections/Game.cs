@@ -11,7 +11,7 @@ namespace QueryCiv3.Sav
         private fixed byte UnknownBuffer[4];
 
         private fixed byte Flags[12];
-
+        // TODO: add flags
 
         public int DifficultyID;
         private fixed byte UnknownBuffer2[4];
@@ -34,7 +34,7 @@ namespace QueryCiv3.Sav
         public byte PowerbarCheck;
         public byte MegaTrainerXLCheck;
         private fixed byte UnknownBuffer6[54];
-        private fixed int UnknownBuffer7[32]; // dynamic?
+        private fixed int UnknownBuffer7[32];
         public int NumberOfContinents;
         public int NumberOfPlayers;
 
