@@ -455,6 +455,7 @@ public class Game : Node2D
 				(unitGUID, action) => {
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
 					popupOverlay.ShowPopup("buildCity", PopupOverlay.PopupCategory.Advisor);
+					return false;
 				});
 		}
 		else
