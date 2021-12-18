@@ -71,7 +71,9 @@ namespace QueryCiv3.Sav
         public int GoldenAgeEndTurn; // -1 if GA not yet triggered
 
         private fixed byte Flags[4];
-        // TODO: flags
+        // Are these correct?
+        public bool HasVictoriousArmy   { get => Util.GetFlag(Flags[0], 0); }
+        public bool HasRespawned        { get => Util.GetFlag(Flags[0], 1); }
 
         private int Gold1;
         private int Gold2;

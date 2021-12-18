@@ -40,8 +40,6 @@ namespace QueryCiv3
         public int[][] LeadContCityCount;
         public int[][] LeadTechQueue;
 
-        private const int SECTION_HEADERS_START = 736;
-
         private const int LEAD_LEN_1 = 412;
         private const int LEAD_LEN_2 = 2696;
         private const int LEAD_LEN_3 = 108;
@@ -85,6 +83,8 @@ namespace QueryCiv3
                 while (scan < end) {
                     header = (int*)scan;
 
+                    // Every header in civ 3 files is exactly 4-chars long, which means they can be represented as 32-bit integers instead of strings
+                    // Switching off of these hex values is substantially faster than string switching, but comes at the expense of readability
                     switch (*header) {
                         case 0x454d4147: // GAME
                             Copy(ref Game, sizeof(GAME));
@@ -104,8 +104,7 @@ namespace QueryCiv3
                             CopyArray(ref ResourceCounts, Bic.Good.Length);
                             break;
                         case 0x4441454c: // LEAD
-                            // LEAD_COUNT should always be 32 in Conquests savs
-                            const int LEAD_COUNT = 32;
+                            const int LEAD_COUNT = 32; // LEAD_COUNT should always be 32 in Conquests savs
                             Lead = new LEAD[LEAD_COUNT];
                             ReputationRelationship = new LEAD_LEAD[LEAD_COUNT][];
                             LeadLeadDiplomacy = new LEAD_LEAD_Diplomacy[LEAD_COUNT, LEAD_COUNT][];
@@ -129,6 +128,7 @@ namespace QueryCiv3
                                 Copy(ref Lead[i], LEAD_LEN_2, LEAD_LEN_1);
 
                                 for (int j = 0; j < LEAD_COUNT; j++) {
+                                    // Number of diplomacy entries stored as integer, so get pointer to that and then skip over those 4 bytes:
                                     header = (int*)scan;
                                     scan += 4;
                                     CopyArray(ref LeadLeadDiplomacy[i, j], *header);
