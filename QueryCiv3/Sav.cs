@@ -22,9 +22,22 @@ namespace QueryCiv3
         public int[] GreatWonderCityIDs;
         public bool[] GreatWondersBuilt;
         public int[] ResourceCounts;
+
+        // LEAD section logic (blegh!):
         public LEAD_LEAD[][] ReputationRelationship;
         public LEAD_LEAD_Diplomacy[,][] LeadLeadDiplomacy;
-
+        public short[][] LeadBldgCount;
+        public short[][] LeadBldgInConstruction;
+        public short[][] LeadBldgData;
+        public int[][] LeadBldgSmallWonderCity;
+        public bool[][] LeadBldgSmallWonderBuilt;
+        public short[][] LeadPrtoCount;
+        public short[][] LeadPrtoInConstruction;
+        public short[][] LeadPrtoData;
+        public short[][] LeadSpaceshipParts;
+        public LEAD_GOOD_LEAD[,][] LeadGoodLead;
+        public bool[][] LeadGoodAvailable;
+        public int[][] LeadContCityCount;
         public int[][] LeadTechQueue;
 
         private const int SECTION_HEADERS_START = 736;
@@ -91,33 +104,56 @@ namespace QueryCiv3
                             CopyArray(ref ResourceCounts, Bic.Good.Length);
                             break;
                         case 0x4441454c: // LEAD
+                            // LEAD_COUNT should always be 32 in Conquests savs
                             const int LEAD_COUNT = 32;
                             Lead = new LEAD[LEAD_COUNT];
                             ReputationRelationship = new LEAD_LEAD[LEAD_COUNT][];
                             LeadLeadDiplomacy = new LEAD_LEAD_Diplomacy[LEAD_COUNT, LEAD_COUNT][];
+                            LeadBldgCount = new short[LEAD_COUNT][];
+                            LeadBldgInConstruction = new short[LEAD_COUNT][];
+                            LeadBldgData = new short[LEAD_COUNT][];
+                            LeadBldgSmallWonderCity = new int[LEAD_COUNT][];
+                            LeadBldgSmallWonderBuilt = new bool[LEAD_COUNT][];
+                            LeadPrtoCount = new short[LEAD_COUNT][];
+                            LeadPrtoInConstruction = new short[LEAD_COUNT][];
+                            LeadPrtoData = new short[LEAD_COUNT][];
+                            LeadSpaceshipParts = new short[LEAD_COUNT][];
+                            LeadGoodLead = new LEAD_GOOD_LEAD[LEAD_COUNT, Bic.Good.Length][];
+                            LeadGoodAvailable = new bool[LEAD_COUNT][];
+                            LeadContCityCount = new int[LEAD_COUNT][];
+                            LeadTechQueue = new int[LEAD_COUNT][];
 
-                            for (int i = 0; i < 32; i++) {
+                            for (int i = 0; i < LEAD_COUNT; i++) {
                                 Copy(ref Lead[i], LEAD_LEN_1);
                                 CopyArray(ref ReputationRelationship[i], LEAD_COUNT);
                                 Copy(ref Lead[i], LEAD_LEN_2, LEAD_LEN_1);
 
-                                for (int j = 0; j < 32; j++) {
+                                for (int j = 0; j < LEAD_COUNT; j++) {
                                     header = (int*)scan;
                                     scan += 4;
                                     CopyArray(ref LeadLeadDiplomacy[i, j], *header);
                                 }
 
-                                if (Lead[i].RaceID != -1) {
-                                    scan += Bic.Bldg.Length * 11;
-                                    scan += Bic.Prto.Length * 6;
-                                    scan += Bic.Rule[0].NumberOfSpaceshipParts * 2;
-                                    scan += Bic.Good.Length * 32 * 3;
-                                    scan += Bic.Good.Length;
-                                    scan += Wrld.ContinentCount * 20;
+                                if (Lead[i].RaceID != -1) { // if an actual leader
+                                    CopyArray(ref LeadBldgCount[i], Bic.Bldg.Length);
+                                    CopyArray(ref LeadBldgInConstruction[i], Bic.Bldg.Length);
+                                    CopyArray(ref LeadBldgData[i], Bic.Bldg.Length);
+                                    CopyArray(ref LeadBldgSmallWonderCity[i], Bic.Bldg.Length);
+                                    CopyArray(ref LeadBldgSmallWonderBuilt[i], Bic.Bldg.Length);
+                                    CopyArray(ref LeadPrtoCount[i], Bic.Prto.Length);
+                                    CopyArray(ref LeadPrtoInConstruction[i], Bic.Prto.Length);
+                                    CopyArray(ref LeadPrtoData[i], Bic.Prto.Length);
+                                    CopyArray(ref LeadSpaceshipParts[i], Bic.Rule[0].NumberOfSpaceshipParts);
+                                    for (int j = 0; j < Bic.Good.Length; j++) {
+                                        CopyArray(ref LeadGoodLead[i, j], LEAD_COUNT);
+                                    }
+                                    CopyArray(ref LeadGoodAvailable[i], Bic.Good.Length);
+                                    scan += Wrld.ContinentCount * 16; // 16 bytes of unknown data per continent
+                                    CopyArray(ref LeadContCityCount[i], Wrld.ContinentCount);
                                 }
 
                                 Copy(ref Lead[i], LEAD_LEN_3, LEAD_LEN_1 + LEAD_LEN_2);
-                                scan += Lead[i].ScienceQueueSize * 4;
+                                CopyArray(ref LeadTechQueue[i], Lead[i].ScienceQueueSize);
                                 Copy(ref Lead[i], LEAD_LEN_4, LEAD_LEN_1 + LEAD_LEN_2 + LEAD_LEN_3);
                             }
                             break;

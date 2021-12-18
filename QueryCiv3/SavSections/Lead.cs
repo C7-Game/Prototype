@@ -48,6 +48,14 @@ namespace QueryCiv3.Sav
     }
 
     [StructLayout(LayoutKind.Sequential, Pack=1)]
+    public unsafe struct LEAD_GOOD_LEAD
+    {
+        public bool HasResource;
+        public bool ImportExport;
+        public bool Tradeable;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack=1)]
     public unsafe struct LEAD
     {
         private fixed byte HeaderText[4];
@@ -63,7 +71,7 @@ namespace QueryCiv3.Sav
         public int GoldenAgeEndTurn; // -1 if GA not yet triggered
 
         private fixed byte Flags[4];
-
+        // TODO: flags
 
         private int Gold1;
         private int Gold2;
@@ -112,7 +120,7 @@ namespace QueryCiv3.Sav
         private fixed int Alliances[32];
         private fixed int Embargoes[32];
         private fixed byte UnknownBuffer9[72];
-        public int Color; // is this a color index or an RGBA color?
+        public int Color;
 
         private fixed byte Text[176];
         public string LeaderName { get => Util.GetString(ref this, 1896, 32); }
