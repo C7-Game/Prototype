@@ -252,20 +252,6 @@ public class ForestLayer : LooseLayer {
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
-		TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].baseTerrainType;
-		TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].baseTerrainType;
-		TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].baseTerrainType;
-		TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].baseTerrainType;
-
-		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
-
-		bool neighborsCoast = false;
-		foreach (TerrainType type in neighborTerrains) {
-			if (type.name == "Coast") {
-				neighborsCoast = true;
-			}
-		}
-
 		if (tile.overlayTerrainType.name == "Jungle") {
 			//Randomly, but predictably, choose a large jungle graphic
 			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
@@ -273,7 +259,7 @@ public class ForestLayer : LooseLayer {
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
-			if (neighborsCoast) {
+			if (tile.neighborsCoast()) {
 				randomJungleColumn = tile.xCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			}
@@ -304,7 +290,7 @@ public class ForestLayer : LooseLayer {
 			}
 			else {
 				forestRow = tile.yCoordinate % 2;
-				if (neighborsCoast) {
+				if (tile.neighborsCoast()) {
 					forestColumn = tile.xCoordinate % 5;
 					if (tile.baseTerrainType.name == "Grassland") {
 						forestTexture = smallForestTexture;
@@ -349,25 +335,10 @@ public class MarshLayer : LooseLayer {
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
 		if (tile.overlayTerrainType.name == "Marsh") {
-			//TODO: Refactor out duplication
-			TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].baseTerrainType;
-			TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].baseTerrainType;
-			TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].baseTerrainType;
-			TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].baseTerrainType;
-
-			TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
-
-			bool neighborsCoast = false;
-			foreach (TerrainType type in neighborTerrains) {
-				if (type.name == "Coast") {
-					neighborsCoast = true;
-				}
-			}
-
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomMarshColumn;
 			ImageTexture marshTexture;
-			if (neighborsCoast) {
+			if (tile.neighborsCoast()) {
 				randomMarshColumn = tile.xCoordinate % 5;
 				marshTexture = smallMarshTexture;
 			}
