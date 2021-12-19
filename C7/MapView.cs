@@ -324,7 +324,6 @@ public class ForestLayer : LooseLayer {
 		}
 	}
 }
-
 public class MarshLayer : LooseLayer {
 	public static readonly Vector2 marshSize = new Vector2(128, 88);
 	//Because the marsh graphics are 88 pixels tall instead of the 64 of a tile, we also need an addition 12 pixel offset to the top
@@ -356,6 +355,24 @@ public class MarshLayer : LooseLayer {
 			Rect2 screenTarget = new Rect2(tileCenter - MARSH_OFFSET, marshSize);
 			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);			
 		}
+	}
+}
+
+public class RiverLayer : LooseLayer
+{
+	public RiverLayer() { }
+
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	{
+		Tile north = tile.neighbors[TileDirection.NORTHEAST];
+		Tile east = tile.neighbors[TileDirection.EAST];
+		Tile west = tile;
+		Tile south = tile.neighbors[TileDirection.SOUTHEAST];
+
+		int riverGraphicsIndex = 0;
+
+		//if (north.)
+
 	}
 }
 

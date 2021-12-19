@@ -57,6 +57,11 @@ namespace C7GameData
                 if (civ3Tile.isPineForest) {
                     c7Tile.isPineForest = true;
                 }
+                //Converting from MapTile to C7Tile.
+                // if (civ3Tile.RiverConnectionNortheast)
+                // {
+                //     c7Tile.riverNortheast = true;
+                // }
                 c7Save.GameData.map.tiles.Add(c7Tile);
             }
             // This probably doesn't belong here, but not sure where else to put it

@@ -32,24 +32,53 @@ namespace C7GameData
 		public bool isSnowCapped;
 		public bool isPineForest;
 
-		public Tile()
-		{
-			unitsOnTile = new List<MapUnit>();
-		}
+        public bool riverNortheast;
+        public bool riverSoutheast;
+        public bool riverSouthwest;
+        public bool riverNorthwest;
 
-		public MapUnit findTopDefender()
-		{
-			if (unitsOnTile.Count > 0) {
-				var tr = unitsOnTile[0];
-				foreach (var u in unitsOnTile)
-					if (u.unitType.defense * u.hitPointsRemaining > tr.unitType.defense * tr.hitPointsRemaining)
-						tr = u;
-				return tr;
-			} else
-				return MapUnit.NONE;
-		}
-		
-		public static Tile NONE = new Tile();
+        public Tile()
+        {
+            unitsOnTile = new List<MapUnit>();
+        }
+
+        
+        public Tile(GameData c7data, int x, int y, QueryCiv3.Biq.TILE civ3Tile) {
+            unitsOnTile = new List<MapUnit>();
+            Civ3ExtraInfo extra = new Civ3ExtraInfo
+            {
+                BaseTerrainFileID = civ3Tile.TextureFile,
+                BaseTerrainImageID = civ3Tile.TextureLocation,
+            };
+            Tile c7Tile = new Tile
+            {
+                xCoordinate = x,
+                yCoordinate = y,
+                ExtraInfo = extra,
+                baseTerrainType = c7data.terrainTypes[civ3Tile.Terrain & 0x0f],
+                overlayTerrainType = c7data.terrainTypes[(civ3Tile.Terrain * 0xf0) >> 4],
+            };
+            if (civ3Tile.SnowCappedMountain) {
+                c7Tile.isSnowCapped = true;
+            }
+            if (civ3Tile.PineForest) {
+                c7Tile.isPineForest = true;
+            }
+        }
+
+	    public MapUnit findTopDefender()
+	    {
+		    if (unitsOnTile.Count > 0) {
+			    var tr = unitsOnTile[0];
+			    foreach (var u in unitsOnTile)
+				    if (u.unitType.defense * u.hitPointsRemaining > tr.unitType.defense * tr.hitPointsRemaining)
+					    tr = u;
+			    return tr;
+		    } else
+			    return MapUnit.NONE;
+	    }
+        
+        public static Tile NONE = new Tile();
 
 		public bool NeighborsCoast() {
 			foreach (Tile neighbor in getDiagonalNeighbors()) {
