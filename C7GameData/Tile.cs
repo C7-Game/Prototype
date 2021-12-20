@@ -57,6 +57,10 @@ namespace C7GameData
                 ExtraInfo = extra,
                 baseTerrainType = c7data.terrainTypes[civ3Tile.Terrain & 0x0f],
                 overlayTerrainType = c7data.terrainTypes[(civ3Tile.Terrain * 0xf0) >> 4],
+                riverNortheast = civ3Tile.RiverConnectionNortheast,
+                riverNorthwest = civ3Tile.RiverConnectionNorthwest,
+                riverSoutheast = civ3Tile.RiverConnectionSoutheast,
+                riverSouthwest = civ3Tile.RiverConnectionSouthwest,
             };
             if (civ3Tile.SnowCappedMountain) {
                 c7Tile.isSnowCapped = true;

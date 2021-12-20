@@ -360,7 +360,12 @@ public class MarshLayer : LooseLayer {
 
 public class RiverLayer : LooseLayer
 {
-	public RiverLayer() { }
+	public static readonly Vector2 riverSize = new Vector2(128, 64);
+	private ImageTexture riverTexture;
+
+	public RiverLayer() { 
+		riverTexture = Util.LoadTextureFromPCX("Art/Terrain/mtnRivers.pcx");
+	}
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
@@ -371,8 +376,24 @@ public class RiverLayer : LooseLayer
 
 		int riverGraphicsIndex = 0;
 
-		//if (north.)
+		if (north.riverSouthwest) {
+			riverGraphicsIndex++;
+		}
+		if (east.riverNorthwest) {
+			riverGraphicsIndex+=2;
+		}
+		if (south.riverNortheast) {
+			riverGraphicsIndex+=4;
+		}
+		if (west.riverSoutheast) {
+			riverGraphicsIndex+=8;
+		}
+		int riverRow = riverGraphicsIndex / 4;
+		int riverColumn = riverGraphicsIndex % 4;
 
+		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.x, riverRow * riverSize.y, riverSize);
+		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize, riverSize);
+		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);		
 	}
 }
 

@@ -39,6 +39,7 @@ namespace C7GameData
 
             int tileIndex = 0;
             int x, y;
+            Console.WriteLine("Tile: " + civ3Save.Bic.Tile);
             foreach (TILE civ3Tile in civ3Save.Bic.Tile)
             {
                 c7Save.GameData.map.tileIndexToCoords(tileIndex, out x, out y);
