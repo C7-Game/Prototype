@@ -34,6 +34,7 @@ public class Game : Node2D
 	Stopwatch loadTimer = new Stopwatch();
 	GlobalSingleton Global;
 
+	bool errorOnLoad = false;
 
 	public override void _EnterTree()
 	{
@@ -44,27 +45,36 @@ public class Game : Node2D
 	public override void _Ready()
 	{
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
-		controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
-		Global.ResetLoadGamePath();
-		var map = MapInteractions.GetWholeMap();
-		GD.Print("RelativeModPath ", map.RelativeModPath);
-		Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall, map.RelativeModPath);
-		baseTerrainMap.Civ3Tiles = map.tiles;
-		baseTerrainMap.TerrainAsTileMap();
+		try {
+			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
+			Global.ResetLoadGamePath();
+			var map = MapInteractions.GetWholeMap();
+			GD.Print("RelativeModPath ", map.RelativeModPath);
+			Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall, map.RelativeModPath);
+			baseTerrainMap.Civ3Tiles = map.tiles;
+			baseTerrainMap.TerrainAsTileMap();
 
-		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
-		AddChild(mapView);
+			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
+			AddChild(mapView);
 
-		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
-		Player = GetNode<KinematicBody2D>("KinematicBody2D");
-		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-		mapView.cameraZoom = (float)0.3;
-		// If later recreating scene, the component may already exist, hence try/catch
-		try{
-			ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
+			Player = GetNode<KinematicBody2D>("KinematicBody2D");
+			GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
+			mapView.cameraZoom = (float)0.3;
+			// If later recreating scene, the component may already exist, hence try/catch
+			try{
+				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+			}
+			catch {
+				ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
+			}
 		}
-		catch {
-			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
+		catch(Exception ex) {
+			errorOnLoad = true;
+			string[] args = { ex.Message };
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+			popupOverlay.ShowPopup("error", PopupOverlay.PopupCategory.Info, BoxContainer.AlignMode.Center, args);
+			GD.PrintErr(ex);
 		}
 
 		// Hide slideout bar on startup
@@ -79,21 +89,23 @@ public class Game : Node2D
 
 	public override void _Process(float delta)
 	{
-		switch (CurrentState)
-		{
-			case GameState.PreGame:
-				StartGame();
-				break;
-			case GameState.PlayerTurn:
-				break;
-			case GameState.ComputerTurn:
-				break;
-		}
-		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
-		//without a manual cast to int.
-		//https://github.com/godotengine/godot/issues/16388
-		if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-			EmitSignal("ShowSpecificAdvisor", "F1");
+		if (!errorOnLoad) {
+			switch (CurrentState)
+			{
+				case GameState.PreGame:
+					StartGame();
+					break;
+				case GameState.PlayerTurn:
+					break;
+				case GameState.ComputerTurn:
+					break;
+			}
+			//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
+			//without a manual cast to int.
+			//https://github.com/godotengine/godot/issues/16388
+			if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+				EmitSignal("ShowSpecificAdvisor", "F1");
+			}
 		}
 	}
 

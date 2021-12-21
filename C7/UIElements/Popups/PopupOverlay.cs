@@ -82,6 +82,11 @@ public class PopupOverlay : HBoxContainer
 			AddChild(bcd);
 			currentChild =bcd;
 		}
+		else if (dialogType.Equals("error")) {
+			ErrorMessage em = new ErrorMessage(args[0]);
+			AddChild(em);
+			currentChild = em;
+		}
 		
 		if (currentChild != null) {
 			string soundFile = "";

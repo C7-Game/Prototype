@@ -18,6 +18,10 @@ namespace C7Engine
             {
                 save = ImportCiv3.ImportSav(loadFilePath, defaultBicPath);
             }
+            else if (loadFilePath.EndsWith("BIQ", System.StringComparison.CurrentCultureIgnoreCase)) {
+                //Probably need an ImportBiq variant someday.  Maybe.
+                save = ImportCiv3.ImportSav(loadFilePath, defaultBicPath);
+            }
             else {
                 save = C7SaveFormat.Load(loadFilePath);
             }
