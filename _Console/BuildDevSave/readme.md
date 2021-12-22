@@ -4,8 +4,7 @@ The script file reference, save file path, and civ3 path are hard-coded for now,
 
 #### Build & Use
 
-- Either registry or CIV3_HOME must be pointing to the Civ3 home folder
-- /Conquests/Saves/for-c7-seed-1234567.SAV must exist
+- Civ3 home is currently hard, coded, and so is relative /Conquests/Saves/for-c7-seed-1234567.SAV 
 - `nuget restore BuildDevSave.csproj`
 - `msbuild`
 - `mono bin/Debug/net472/BuildDevSave.exe`
