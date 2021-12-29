@@ -349,16 +349,16 @@ public class Game : Node2D
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
-					switch (eventKey.Scancode - (int)Godot.KeyList.Kp1) {
-					case 0: dir = TileDirection.SOUTHWEST; break;
-					case 1: dir = TileDirection.SOUTH;     break;
-					case 2: dir = TileDirection.SOUTHEAST; break;
-					case 3: dir = TileDirection.WEST;      break;
-					case 4: return; // Key pad 5 => don't move
-					case 5: dir = TileDirection.EAST;      break;
-					case 6: dir = TileDirection.NORTHWEST; break;
-					case 7: dir = TileDirection.NORTH;     break;
-					case 8: dir = TileDirection.NORTHEAST; break;
+					switch (eventKey.Scancode - (int)Godot.KeyList.Kp0) {
+					case 1: dir = TileDirection.SOUTHWEST; break;
+					case 2: dir = TileDirection.SOUTH;     break;
+					case 3: dir = TileDirection.SOUTHEAST; break;
+					case 4: dir = TileDirection.WEST;      break;
+					case 5: return; // Key pad 5 => don't move
+					case 6: dir = TileDirection.EAST;      break;
+					case 7: dir = TileDirection.NORTHWEST; break;
+					case 8: dir = TileDirection.NORTH;     break;
+					case 9: dir = TileDirection.NORTHEAST; break;
 					default: return; // Impossible
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec(), dir);
