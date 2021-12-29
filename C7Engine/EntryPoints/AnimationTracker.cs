@@ -68,7 +68,7 @@ public class AnimationTracker {
 		return activeAnims.ContainsKey(unitGUID) || completedAnims.ContainsKey(unitGUID);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndPeriod(string unitGUID, ulong currentTimeMS)
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(string unitGUID, ulong currentTimeMS)
 	{
 		ActiveAnimation aa;
 		if (! activeAnims.TryGetValue(unitGUID, out aa))
@@ -77,8 +77,8 @@ public class AnimationTracker {
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
-		var period = (double)(currentTimeMS - aa.startTimeMS) / durationMS;
-		return (aa.action, period);
+		var repCount = (double)(currentTimeMS - aa.startTimeMS) / durationMS;
+		return (aa.action, repCount);
 	}
 
 	public void update(ulong currentTimeMS)

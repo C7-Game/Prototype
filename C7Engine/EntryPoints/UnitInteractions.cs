@@ -201,7 +201,7 @@ namespace C7Engine
                 throw new Exception("Invalid unit GUID");
 
             if (EngineStorage.animTracker.hasCurrentAction(guid)) {
-                var (action, period) = EngineStorage.animTracker.getCurrentActionAndPeriod(guid, currentTimeMS);
+                var (action, repCount) = EngineStorage.animTracker.getCurrentActionAndRepetitionCount(guid, currentTimeMS);
 
                 var isNonRepeatingAction =
                     (action == MapUnit.AnimatedAction.RUN) ||
@@ -212,9 +212,9 @@ namespace C7Engine
 
                 float progress;
                 if (isNonRepeatingAction)
-                    progress = (period <= 1.0) ? (float)period : 1f;
+                    progress = (repCount <= 1.0) ? (float)repCount : 1f;
                 else
-                    progress = (float)(period - Math.Floor(period));
+                    progress = (float)(repCount - Math.Floor(repCount));
 
                 float offsetX = 0, offsetY = 0;
                 if (action == MapUnit.AnimatedAction.RUN) {
