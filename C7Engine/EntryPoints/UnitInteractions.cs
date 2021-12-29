@@ -79,7 +79,7 @@ namespace C7Engine
             return unit;
         }
 
-        public static void fortifyUnit(string guid, ulong currentTimeMS)
+        public static void fortifyUnit(string guid)
         {
             GameData gameData = EngineStorage.gameData;
             //This is inefficient, perhaps we'll have a map someday.  But with three units,
@@ -92,7 +92,7 @@ namespace C7Engine
                     Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
                     unit.facingDirection = TileDirection.SOUTHEAST;
                     unit.isFortified = true;
-                    EngineStorage.animTracker.startAnimation(currentTimeMS, guid, MapUnit.AnimatedAction.FORTIFY, null);
+                    EngineStorage.animTracker.startAnimation(guid, MapUnit.AnimatedAction.FORTIFY, null);
                     return;
                 }
             }
@@ -105,7 +105,7 @@ namespace C7Engine
         // stepUnit except it's the only unit movement function we have right now so calling it moveUnit is fine. But later we might want a more
         // powerful moveUnit function that can accept non-neighboring tiles and/or do things like rebase air units. Also direction should be an
         // enum or something.
-        public static void moveUnit(string guid, ulong currentTimeMS, TileDirection dir)
+        public static void moveUnit(string guid, TileDirection dir)
         {
             GameData gameData = EngineStorage.gameData;
             //This is inefficient, perhaps we'll have a map someday.  But with three units,
@@ -124,7 +124,7 @@ namespace C7Engine
                         unit.facingDirection = dir;
                         unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
                         unit.isFortified = false;
-                        EngineStorage.animTracker.startAnimation(currentTimeMS, guid, MapUnit.AnimatedAction.RUN, null);
+                        EngineStorage.animTracker.startAnimation(guid, MapUnit.AnimatedAction.RUN, null);
                     }
 
                     break;
@@ -194,14 +194,14 @@ namespace C7Engine
             waitQueue.Clear();
         }
 
-        public static MapUnit.ActiveAnimation getActiveAnimation(string guid, ulong currentTimeMS)
+        public static MapUnit.ActiveAnimation getActiveAnimation(string guid)
         {
             var unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == guid);
             if (unit == null)
                 throw new Exception("Invalid unit GUID");
 
             if (EngineStorage.animTracker.hasCurrentAction(guid)) {
-                var (action, repCount) = EngineStorage.animTracker.getCurrentActionAndRepetitionCount(guid, currentTimeMS);
+                var (action, repCount) = EngineStorage.animTracker.getCurrentActionAndRepetitionCount(guid);
 
                 var isNonRepeatingAction =
                     (action == MapUnit.AnimatedAction.RUN) ||

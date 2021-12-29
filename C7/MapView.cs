@@ -539,8 +539,8 @@ public class UnitLayer : LooseLayer {
 		}
 
 		const double period = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
-		var periodCount = (double)OS.GetTicksMsec() / 1000.0 / period;
-		var progress = (float)(periodCount - Math.Floor(periodCount));
+		var repCount = (double)OS.GetTicksMsec() / 1000.0 / period;
+		var progress = (float)(repCount - Math.Floor(repCount));
 
 		setFlicShaderParams(cursorMat, cursorFlicSheet, 0, progress);
 		cursorMesh.Position = position;
@@ -573,7 +573,7 @@ public class UnitLayer : LooseLayer {
 				selectedUnitOnTile = u;
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
 
-		var activeAnim = UnitInteractions.getActiveAnimation(unit.guid, OS.GetTicksMsec());
+		var activeAnim = UnitInteractions.getActiveAnimation(unit.guid);
 		var animOffset = new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it

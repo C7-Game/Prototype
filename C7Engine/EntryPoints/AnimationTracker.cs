@@ -16,6 +16,7 @@
 
 namespace C7Engine
 {
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using C7GameData;
@@ -26,7 +27,7 @@ public class AnimationTracker {
 	public static readonly OnAnimationCompleted doNothing = (unitGUID, action) => { return true; };
 
 	public struct ActiveAnimation {
-		public ulong startTimeMS, endTimeMS;
+		public long startTimeMS, endTimeMS;
 		public MapUnit.AnimatedAction action;
 		public OnAnimationCompleted callback;
 	}
@@ -34,9 +35,15 @@ public class AnimationTracker {
 	private Dictionary<string, ActiveAnimation> activeAnims    = new Dictionary<string, ActiveAnimation>();
 	private Dictionary<string, ActiveAnimation> completedAnims = new Dictionary<string, ActiveAnimation>();
 
-	public void startAnimation(ulong currentTimeMS, string unitGUID, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
+	public long getCurrentTimeMS()
 	{
-		ulong animDurationMS = 500; // Hard-code durations to 0.5 sec for now. Ultimately we'll want to figure this out based on the INI file.
+		return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+	}
+
+	public void startAnimation(string unitGUID, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
+	{
+		long currentTimeMS = getCurrentTimeMS();
+		long animDurationMS = 500; // Hard-code durations to 0.5 sec for now. Ultimately we'll want to figure this out based on the INI file.
 
 		ActiveAnimation aa;
 		if (activeAnims.TryGetValue(unitGUID, out aa)) {
@@ -68,7 +75,7 @@ public class AnimationTracker {
 		return activeAnims.ContainsKey(unitGUID) || completedAnims.ContainsKey(unitGUID);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(string unitGUID, ulong currentTimeMS)
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(string unitGUID)
 	{
 		ActiveAnimation aa;
 		if (! activeAnims.TryGetValue(unitGUID, out aa))
@@ -77,12 +84,13 @@ public class AnimationTracker {
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
-		var repCount = (double)(currentTimeMS - aa.startTimeMS) / durationMS;
+		var repCount = (double)(getCurrentTimeMS() - aa.startTimeMS) / durationMS;
 		return (aa.action, repCount);
 	}
 
-	public void update(ulong currentTimeMS)
+	public void update()
 	{
+		long currentTimeMS = getCurrentTimeMS();
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (unitGUID, aa) = (guidAAPair.Key, guidAAPair.Value);

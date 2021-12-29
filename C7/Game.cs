@@ -85,18 +85,18 @@ public class Game : Node2D
 				StartGame();
 				break;
 			case GameState.PlayerTurn:
-				EngineStorage.animTracker.update(OS.GetTicksMsec());
+				EngineStorage.animTracker.update();
 
 				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
 				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
 				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
 				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
 				    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-				    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid, OS.GetTicksMsec()).keepUnitSelected()))
+				    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid).keepUnitSelected()))
 					GetNextAutoselectedUnit();
 				break;
 			case GameState.ComputerTurn:
-				EngineStorage.animTracker.update(OS.GetTicksMsec());
+				EngineStorage.animTracker.update();
 				break;
 		}
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
@@ -361,9 +361,9 @@ public class Game : Node2D
 					case 9: dir = TileDirection.NORTHEAST; break;
 					default: return; // Impossible
 					}
-					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec(), dir);
+					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
 					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-					    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid, OS.GetTicksMsec()).keepUnitSelected()))
+					    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid).keepUnitSelected()))
 						GetNextAutoselectedUnit();
 					else {
 						setSelectedUnit(CurrentlySelectedUnit);
@@ -432,7 +432,7 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("fortify"))
 		{
-			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid, OS.GetTicksMsec());
+			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
 			GetNextAutoselectedUnit(); // This skips the animation but if we don't do this the unit will stay selected
 		}
 		else if (buttonName.Equals("wait"))
@@ -449,7 +449,6 @@ public class Game : Node2D
 		else if (buttonName.Equals("buildCity"))
 		{
 			EngineStorage.animTracker.startAnimation(
-				OS.GetTicksMsec(),
 				CurrentlySelectedUnit.guid,
 				MapUnit.AnimatedAction.BUILD,
 				(unitGUID, action) => {
