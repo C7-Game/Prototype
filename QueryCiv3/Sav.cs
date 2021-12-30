@@ -21,6 +21,7 @@ namespace QueryCiv3
         public VLOC[] Vloc;
         public RADT[] Radt;
         public CITY[] City;
+        public PEER Peer;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -252,6 +253,9 @@ namespace QueryCiv3
                                 scan = scan + scan[4] + 8; // Skip ahead header length (4) + length integer length (4) + length integer (scan[4])
                             }
 
+                            break;
+                        case 0x52454550: // PEER
+                            Copy(ref Peer);
                             break;
                         default:
                             scan++;
