@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace QueryCiv3
 {
+    /*
     public class GenericSection
     {
         public int Offset { get; protected set; }
@@ -61,4 +62,5 @@ namespace QueryCiv3
         }
         public byte[] RawBytes { get => Data.Sav.GetBytes(Offset, 64); }
     }
+    */
 }

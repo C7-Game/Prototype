@@ -20,6 +20,7 @@ namespace QueryCiv3
         public OUTP[] Outp;
         public VLOC[] Vloc;
         public RADT[] Radt;
+        public CITY[] City;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -52,6 +53,15 @@ namespace QueryCiv3
         public RPLT[] Rplt;
         public RPLE[][] RpltRple;
         public string[][] RpltRpleDescription;
+
+        public CTZN[][] CityCtzn;
+        public CITY_Building[][] CityBuilding;
+
+        private const int CITY_LEN_1 = 556;
+        private const int CITY_LEN_2 = 12;
+        private const int CITY_LEN_3 = 140;
+
+        private bool CitySectionCovered = false;
 
         private const int BIQ_SECTION_START = 562;
 
@@ -220,6 +230,32 @@ namespace QueryCiv3
                         case 0x54444152: // RADT
                             CopyArray(ref Radt, Game.NumberOfRadarTowers);
                             break;
+                        case 0x59544943: // CITY
+                            if (CitySectionCovered) {
+                                scan++;
+                            } else {
+                                CitySectionCovered = true;
+                                int CityCount = 0;
+                                City = new CITY[Game.NumberOfCities];
+                                CityCtzn = new CTZN[Game.NumberOfCities][];
+                                CityBuilding = new CITY_Building[Game.NumberOfCities][];
+
+                                while (CityCount < Game.NumberOfCities) {
+                                    int Length = scan[4];
+                                    if (Length != 0x88) {
+                                        scan += 8 + Length;
+                                    } else {
+                                        Copy(ref City[CityCount], CITY_LEN_1);
+                                        CopyArray(ref CityCtzn[CityCount], City[CityCount].Popd.CitizenCount);
+                                        Copy(ref City[CityCount], CITY_LEN_2, CITY_LEN_1);
+                                        CopyArray(ref CityBuilding[CityCount], City[CityCount].Binf.BuildingCount);
+                                        Copy(ref City[CityCount], CITY_LEN_3, CITY_LEN_1 + CITY_LEN_2);
+                                        CityCount++;
+                                    }
+                                }
+                            }
+
+                            break;
                         default:
                             scan++;
                             break;
@@ -227,7 +263,7 @@ namespace QueryCiv3
                 }
             }
         }
-
+        /*
         public CityItem[] City
         { get {
             // Since "CITY" can sometimes appear in dirty data, let's find the first
@@ -248,6 +284,6 @@ namespace QueryCiv3
                 CityOffset += 0x228 + (CityList[i].CitizenCount * 300) + (Bic.Bldg.Length * 8) + 0x30;
             }
             return CityList;
-        }}
+        }}*/
     }
 }
