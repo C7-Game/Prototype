@@ -57,11 +57,11 @@ namespace QueryCiv3
         public CTZN[][] CityCtzn;
         public CITY_Building[][] CityBuilding;
 
+        private int CityCount = 0;
+        private const int VALID_CITY_LENGTH = 136;
         private const int CITY_LEN_1 = 556;
         private const int CITY_LEN_2 = 12;
         private const int CITY_LEN_3 = 140;
-
-        private bool CitySectionCovered = false;
 
         private const int BIQ_SECTION_START = 562;
 
@@ -119,6 +119,14 @@ namespace QueryCiv3
                             CopyArray(ref KnownTechFlags, Bic.Tech.Length);
                             CopyArray(ref GreatWonderCityIDs, Bic.Bldg.Length);
                             CopyArray(ref GreatWondersBuilt, Bic.Bldg.Length);
+
+                            // Instantiate City arrays after getting city count
+                            // Normally it'd be more straightforward to do this at the city case statement itself, but city sections are unique
+                            //   in that they can have many "dirty" sections which means the case statement might be encountered multiple times
+                            City = new CITY[Game.NumberOfCities];
+                            CityCtzn = new CTZN[Game.NumberOfCities][];
+                            CityBuilding = new CITY_Building[Game.NumberOfCities][];
+
                             break;
                         case 0x444c5257: // WRLD
                             Copy(ref Wrld);
@@ -231,28 +239,17 @@ namespace QueryCiv3
                             CopyArray(ref Radt, Game.NumberOfRadarTowers);
                             break;
                         case 0x59544943: // CITY
-                            if (CitySectionCovered) {
-                                scan++;
+                            // Sav files contain many "bad" City headers. In fact, there are more bad ones than valid ones
+                            // The purpose behind these headers is yet to be determined, but for now, they can be skipped
+                            if (scan[4] == VALID_CITY_LENGTH) {
+                                Copy(ref City[CityCount], CITY_LEN_1);
+                                CopyArray(ref CityCtzn[CityCount], City[CityCount].Popd.CitizenCount);
+                                Copy(ref City[CityCount], CITY_LEN_2, CITY_LEN_1);
+                                CopyArray(ref CityBuilding[CityCount], City[CityCount].Binf.BuildingCount);
+                                Copy(ref City[CityCount], CITY_LEN_3, CITY_LEN_1 + CITY_LEN_2);
+                                CityCount++;
                             } else {
-                                CitySectionCovered = true;
-                                int CityCount = 0;
-                                City = new CITY[Game.NumberOfCities];
-                                CityCtzn = new CTZN[Game.NumberOfCities][];
-                                CityBuilding = new CITY_Building[Game.NumberOfCities][];
-
-                                while (CityCount < Game.NumberOfCities) {
-                                    int Length = scan[4];
-                                    if (Length != 0x88) {
-                                        scan += 8 + Length;
-                                    } else {
-                                        Copy(ref City[CityCount], CITY_LEN_1);
-                                        CopyArray(ref CityCtzn[CityCount], City[CityCount].Popd.CitizenCount);
-                                        Copy(ref City[CityCount], CITY_LEN_2, CITY_LEN_1);
-                                        CopyArray(ref CityBuilding[CityCount], City[CityCount].Binf.BuildingCount);
-                                        Copy(ref City[CityCount], CITY_LEN_3, CITY_LEN_1 + CITY_LEN_2);
-                                        CityCount++;
-                                    }
-                                }
+                                scan = scan + scan[4] + 8; // Skip ahead header length (4) + length integer length (4) + length integer (scan[4])
                             }
 
                             break;
@@ -263,27 +260,5 @@ namespace QueryCiv3
                 }
             }
         }
-        /*
-        public CityItem[] City
-        { get {
-            // Since "CITY" can sometimes appear in dirty data, let's find the first
-            //   "CITY" with 0x00000088 after it
-            int CityOffset = 0;
-            for(int i=0, chk=0; chk!=0x88; i++)
-            {
-                CityOffset = Sav.SectionOffset("CITY", i+1);
-                chk = Sav.ReadInt32(CityOffset);
-            }
-            int CityCount = 1; // TEMP HACK // Game.CityCount;
-
-            CityItem[] CityList = new CityItem[CityCount];
-            for(int i=0; i< CityCount; i++)
-            {
-                CityList[i] = new CityItem(this, CityOffset);
-                // incomplete; still need to account for bytes after Ctzn and list w/count after buildings stats
-                CityOffset += 0x228 + (CityList[i].CitizenCount * 300) + (Bic.Bldg.Length * 8) + 0x30;
-            }
-            return CityList;
-        }}*/
     }
 }
