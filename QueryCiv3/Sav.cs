@@ -19,6 +19,7 @@ namespace QueryCiv3
         public AIBS[] Aibs;
         public OUTP[] Outp;
         public VLOC[] Vloc;
+        public RADT[] Radt;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -215,6 +216,9 @@ namespace QueryCiv3
                             break;
                         case 0x434f4c56: // VLOC
                             CopyArray(ref Vloc, Game.NumberOfVPLocations);
+                            break;
+                        case 0x54444152: // RADT
+                            CopyArray(ref Radt, Game.NumberOfRadarTowers);
                             break;
                         default:
                             scan++;
