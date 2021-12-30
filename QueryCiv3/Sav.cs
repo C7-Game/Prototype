@@ -17,6 +17,7 @@ namespace QueryCiv3
         public CONT[] Cont;
         public LEAD[] Lead;
         public AIBS[] Aibs;
+        public OUTP[] Outp;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -202,6 +203,9 @@ namespace QueryCiv3
                             break;
                         case 0x53424941: // AIBS
                             CopyArray(ref Aibs, Game.NumberOfAirbases);
+                            break;
+                        case 0x5054554f: // OUTP
+                            CopyArray(ref Outp, Game.NumberOfOutposts);
                             break;
                         default:
                             scan++;
