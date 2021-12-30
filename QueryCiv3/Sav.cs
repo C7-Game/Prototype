@@ -22,6 +22,7 @@ namespace QueryCiv3
         public RADT[] Radt;
         public CITY[] City;
         public PEER Peer;
+        public PALV[] Palv;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -46,6 +47,7 @@ namespace QueryCiv3
         public int[][] LeadContCityCount;
         public int[][] LeadTechQueue;
 
+        private const int LEAD_COUNT = 32; // should always be 32 in Conquests savs
         private const int LEAD_LEN_1 = 412;
         private const int LEAD_LEN_2 = 2696;
         private const int LEAD_LEN_3 = 108;
@@ -140,7 +142,6 @@ namespace QueryCiv3
                             CopyArray(ref ResourceCounts, Bic.Good.Length);
                             break;
                         case 0x4441454c: // LEAD
-                            const int LEAD_COUNT = 32; // LEAD_COUNT should always be 32 in Conquests savs
                             Lead = new LEAD[LEAD_COUNT];
                             ReputationRelationship = new LEAD_LEAD[LEAD_COUNT][];
                             LeadLeadDiplomacy = new LEAD_LEAD_Diplomacy[LEAD_COUNT, LEAD_COUNT][];
@@ -256,6 +257,9 @@ namespace QueryCiv3
                             break;
                         case 0x52454550: // PEER
                             Copy(ref Peer);
+                            break;
+                        case 0x564c4150: // PALV
+                            CopyArray(ref Palv, LEAD_COUNT);
                             break;
                         default:
                             scan++;
