@@ -56,6 +56,7 @@ public class Game : Node2D
 		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
 		AddChild(mapView);
 		animTracker = new AnimationTracker();
+		EngineStorage.animTracker = animTracker;
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");

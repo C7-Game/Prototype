@@ -18,10 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using C7GameData;
+using C7Engine; // for IAnimationControl, OnAnimationCompleted
 
-public class AnimationTracker {
-	public delegate bool OnAnimationCompleted(string unitGUID, MapUnit.AnimatedAction action);
-
+public class AnimationTracker : IAnimationControl {
 	public static readonly OnAnimationCompleted doNothing = (unitGUID, action) => { return true; };
 
 	public struct ActiveAnimation {
