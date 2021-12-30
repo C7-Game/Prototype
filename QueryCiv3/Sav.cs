@@ -23,6 +23,11 @@ namespace QueryCiv3
         public CITY[] City;
         public PEER Peer;
         public PALV[] Palv;
+        public DATE Date;
+        public PLGI Plgi;
+        public CNSL Cnsl;
+        public TUTR Tutr;
+        public FAXX Faxx;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -260,6 +265,21 @@ namespace QueryCiv3
                             break;
                         case 0x564c4150: // PALV
                             CopyArray(ref Palv, LEAD_COUNT);
+                            break;
+                        case 0x45544144: // DATE
+                            Copy(ref Date);
+                            break;
+                        case 0x49474c50: // PLGI
+                            Copy(ref Plgi);
+                            break;
+                        case 0x4c534e43: // CNSL
+                            Copy(ref Cnsl);
+                            break;
+                        case 0x52545554: // TUTR
+                            Copy(ref Tutr);
+                            break;
+                        case 0x58584146: // FAXX
+                            Copy(ref Faxx);
                             break;
                         default:
                             scan++;
