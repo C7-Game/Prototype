@@ -51,6 +51,8 @@ namespace QueryCiv3
         public RPLE[][] RpltRple;
         public string[][] RpltRpleDescription;
 
+        private const int BIQ_SECTION_START = 562;
+
         public SavData(byte[] savBytes, byte[] biqBytes)
         {
             Bic = new BiqData(biqBytes);
@@ -83,11 +85,14 @@ namespace QueryCiv3
         public unsafe void Load(byte[] savBytes)
         {
             Sav = new Civ3File(savBytes);
+            // Load in any biq sections contained in Sav file, overwriting existing biq sections:
+            int BiqSectionLength = Sav.ReadInt32(38);
+            Bic.Load(Sav.GetBytes(BIQ_SECTION_START, BiqSectionLength));
 
             fixed (byte* bytePtr = savBytes)
             {
                 int* header;
-                scan = bytePtr;
+                scan = bytePtr + BIQ_SECTION_START + BiqSectionLength;
                 byte* end = bytePtr + savBytes.Length;
 
                 while (scan < end) {
