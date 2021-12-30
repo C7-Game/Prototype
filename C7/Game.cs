@@ -22,6 +22,7 @@ public class Game : Node2D
 	Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
+	public AnimationTracker animTracker;
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
@@ -54,6 +55,7 @@ public class Game : Node2D
 
 		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
 		AddChild(mapView);
+		animTracker = new AnimationTracker();
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -85,18 +87,18 @@ public class Game : Node2D
 				StartGame();
 				break;
 			case GameState.PlayerTurn:
-				EngineStorage.animTracker.update();
+				animTracker.update();
 
 				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
 				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
 				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
 				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
 				    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-				    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid).keepUnitSelected()))
+				    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
 					GetNextAutoselectedUnit();
 				break;
 			case GameState.ComputerTurn:
-				EngineStorage.animTracker.update();
+				animTracker.update();
 				break;
 		}
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
@@ -363,7 +365,7 @@ public class Game : Node2D
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
 					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-					    (! UnitInteractions.getActiveAnimation(CurrentlySelectedUnit.guid).keepUnitSelected()))
+					    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
 						GetNextAutoselectedUnit();
 					else {
 						setSelectedUnit(CurrentlySelectedUnit);
@@ -448,7 +450,7 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
-			EngineStorage.animTracker.startAnimation(
+			animTracker.startAnimation(
 				CurrentlySelectedUnit.guid,
 				MapUnit.AnimatedAction.BUILD,
 				(unitGUID, action) => {
