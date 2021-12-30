@@ -16,6 +16,7 @@ namespace QueryCiv3
         public TILE[] Tile;
         public CONT[] Cont;
         public LEAD[] Lead;
+        public AIBS[] Aibs;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -179,7 +180,6 @@ namespace QueryCiv3
                             byte[] stringBuffer = new byte[MAX_STRING_LENGTH];
 
                             fixed (byte* strPtr = stringBuffer) {
-                                Console.WriteLine(rpltLength);
                                 for (int i = 0; i < rpltLength; i++) {
                                     Copy(ref Rplt[i]);
                                     int rpleLength = Rplt[i].EventCount;
@@ -199,6 +199,9 @@ namespace QueryCiv3
                                 }
                             }
 
+                            break;
+                        case 0x53424941: // AIBS
+                            CopyArray(ref Aibs, Game.NumberOfAirbases);
                             break;
                         default:
                             scan++;
