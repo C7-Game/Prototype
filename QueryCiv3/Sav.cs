@@ -23,7 +23,7 @@ namespace QueryCiv3
         public CITY[] City;
         public PEER Peer;
         public PALV[] Palv;
-        public DATE Date;
+        public DATE[] Date = new DATE[3];
         public PLGI Plgi;
         public CNSL Cnsl;
         public TUTR Tutr;
@@ -31,12 +31,21 @@ namespace QueryCiv3
         public HIST Hist;
         public UNIT[] Unit;
         public IDLS[] Idls;
+        public CLNY[] Clny;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
         public int[] GreatWonderCityIDs;
         public bool[] GreatWondersBuilt;
+        public int[] BuildingData1;
+        public int[] BuildingData2;
+        public int[] PrototypeStrategy1;
+        public int[] PrototypeStrategy2;
+        public int[] TechData;
+
         public int[] ResourceCounts;
+
+        private int DateIndex = 0;
 
         // LEAD section logic (blegh!):
         public LEAD_LEAD[][] ReputationRelationship;
@@ -68,7 +77,7 @@ namespace QueryCiv3
         public CTZN[][] CityCtzn;
         public CITY_Building[][] CityBuilding;
 
-        private int CityCount = 0;
+        private int CityIndex = 0;
         private const int VALID_CITY_LENGTH = 136;
         private const int CITY_LEN_1 = 556;
         private const int CITY_LEN_2 = 12;
@@ -137,6 +146,11 @@ namespace QueryCiv3
                             CopyArray(ref KnownTechFlags, Bic.Tech.Length);
                             CopyArray(ref GreatWonderCityIDs, Bic.Bldg.Length);
                             CopyArray(ref GreatWondersBuilt, Bic.Bldg.Length);
+                            CopyArray(ref BuildingData1, Bic.Bldg.Length);
+                            CopyArray(ref BuildingData2, Bic.Bldg.Length);
+                            CopyArray(ref PrototypeStrategy1, Bic.Prto.Length);
+                            CopyArray(ref PrototypeStrategy2, Bic.Prto.Length);
+                            CopyArray(ref TechData, Bic.Tech.Length);
 
                             // Instantiate City arrays after getting city count
                             // Normally it'd be more straightforward to do this at the city case statement itself, but city sections are unique
@@ -259,12 +273,12 @@ namespace QueryCiv3
                             // Sav files contain many "bad" City headers. In fact, there are more bad ones than valid ones
                             // The purpose behind these headers is yet to be determined, but for now, they can be skipped
                             if (scan[4] == VALID_CITY_LENGTH) {
-                                Copy(ref City[CityCount], CITY_LEN_1);
-                                CopyArray(ref CityCtzn[CityCount], City[CityCount].Popd.CitizenCount);
-                                Copy(ref City[CityCount], CITY_LEN_2, CITY_LEN_1);
-                                CopyArray(ref CityBuilding[CityCount], City[CityCount].Binf.BuildingCount);
-                                Copy(ref City[CityCount], CITY_LEN_3, CITY_LEN_1 + CITY_LEN_2);
-                                CityCount++;
+                                Copy(ref City[CityIndex], CITY_LEN_1);
+                                CopyArray(ref CityCtzn[CityIndex], City[CityIndex].Popd.CitizenCount);
+                                Copy(ref City[CityIndex], CITY_LEN_2, CITY_LEN_1);
+                                CopyArray(ref CityBuilding[CityIndex], City[CityIndex].Binf.BuildingCount);
+                                Copy(ref City[CityIndex], CITY_LEN_3, CITY_LEN_1 + CITY_LEN_2);
+                                CityIndex++;
                             } else {
                                 scan = scan + scan[4] + 8; // Skip ahead header length (4) + length integer length (4) + length integer (scan[4])
                             }
@@ -277,7 +291,7 @@ namespace QueryCiv3
                             CopyArray(ref Palv, LEAD_COUNT);
                             break;
                         case 0x45544144: // DATE
-                            Copy(ref Date);
+                            Copy(ref Date[DateIndex++]);
                             break;
                         case 0x49474c50: // PLGI
                             Copy(ref Plgi);
@@ -327,8 +341,27 @@ namespace QueryCiv3
                             }
 
                             break;
+                        case 0x47505443: // CTPG
+                            // It's unclear what CTPG does, so for now, give it the invalid CITY treatment
+                            scan = scan + scan[4] + 8;
+                            break;
+                        case 0x594e4c43: // CLNY
+                            CopyArray(ref Clny, Game.NumberOfColonies);
+                            break;
                         default:
-                            scan++;
+                            // There are 3 places in the Sav files where an inexplicable but consistent gap between sections exists
+                            // In any other case where a header isn't encounterd, we'll throw an error because something has gone wrong in the read
+                            // But for these 3, I guess just skip them for now...
+                            // Thoroughly magic
+                            if (header[2] == 0x4c534e43) {
+                                scan += 8;
+                            } else if (header[64] == 0x564c4150) {
+                                scan += 256;
+                            } else if (header[1] == 0x52454550) {
+                                scan += 4;
+                            } else {
+                                throw new Exception("An error occured while parsing the SAV file because no header was found where one was expected.");
+                            }
                             break;
                     }
                 }
