@@ -1,7 +1,7 @@
 
 // Civ3UnitAnim's purpose is to store the data associated with Civ 3 unit animations, meaning the contents of the folders in Art\Units. It does lazy
 // loading & memoization so each file is loaded only when it's needed and then stored so it is only ever loaded once per game. The main (and only)
-// instance of Civ3UnitAnim is kept in Game.
+// instance of Civ3UnitAnim is kept in Game, AnimationTracker holds a reference to it.
 
 // It would be nice to load this data close to where it's used, e.g., have UnitLayer load the FlicSheets, instead of putting all the loading code in
 // one detached class like this. That's how things originally worked but I created Civ3UnitAnim to solve two issues:
@@ -60,6 +60,8 @@ public class Civ3UnitAnim
 
 	public double getDuration(string unitTypeName, MapUnit.AnimatedAction action)
 	{
-		return 0.5;
+		Util.FlicSheet flicSheet = getFlicSheet(unitTypeName, action);
+		double frameCount = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
+		return frameCount / 20.0; // Civ 3 anims often run at 20 FPS   TODO: Do they all? How could we tell? Is it exactly 20 FPS?
 	}
 }

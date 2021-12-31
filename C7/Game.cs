@@ -57,7 +57,7 @@ public class Game : Node2D
 		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
 		AddChild(mapView);
 		civ3UnitAnim = new Civ3UnitAnim();
-		animTracker = new AnimationTracker();
+		animTracker = new AnimationTracker(civ3UnitAnim);
 		EngineStorage.animTracker = animTracker;
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");

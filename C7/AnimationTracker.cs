@@ -23,6 +23,13 @@ using C7Engine; // for IAnimationControl, OnAnimationCompleted
 public class AnimationTracker : IAnimationControl {
 	public static readonly OnAnimationCompleted doNothing = (unitGUID, action) => { return true; };
 
+	private Civ3UnitAnim civ3UnitAnim;
+
+	public AnimationTracker(Civ3UnitAnim civ3UnitAnim)
+	{
+		this.civ3UnitAnim = civ3UnitAnim;
+	}
+
 	public struct ActiveAnimation {
 		public long startTimeMS, endTimeMS;
 		public MapUnit.AnimatedAction action;
@@ -40,7 +47,7 @@ public class AnimationTracker : IAnimationControl {
 	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
 	{
 		long currentTimeMS = getCurrentTimeMS();
-		long animDurationMS = 500; // Hard-code durations to 0.5 sec for now. Ultimately we'll want to figure this out based on the INI file.
+		long animDurationMS = (long)(1000.0 * civ3UnitAnim.getDuration(unit.unitType.name, action));
 
 		ActiveAnimation aa;
 		if (activeAnims.TryGetValue(unit.guid, out aa)) {
