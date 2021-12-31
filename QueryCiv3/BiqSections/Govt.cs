@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace QueryCiv3.Biq
 {
-    public struct GOVTGOVT {
+    public struct GOVT_GOVT {
         public int CanBribe;
         public int BriberyModifier;
         public int ResistanceModifier;
