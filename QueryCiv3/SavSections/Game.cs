@@ -10,8 +10,26 @@ namespace QueryCiv3.Sav
         public int Length;
         private fixed byte UnknownBuffer[4];
 
+        // TODO: fully populate flags:
         private fixed byte Flags[12];
-        // TODO: add flags
+        public bool DominationVictory           { get => Util.GetFlag(Flags[4], 0); }
+        public bool SpaceRaceVictory            { get => Util.GetFlag(Flags[4], 1); }
+        public bool DiplomaticVictory           { get => Util.GetFlag(Flags[4], 2); }
+        public bool ConquestVictory             { get => Util.GetFlag(Flags[4], 3); }
+        public bool CulturalVictory             { get => Util.GetFlag(Flags[4], 4); }
+        public bool CivSpecificAbilities        { get => Util.GetFlag(Flags[4], 5); }
+        public bool CulturallyLinkedStart       { get => Util.GetFlag(Flags[4], 6); }
+        public bool RestartPlayers              { get => Util.GetFlag(Flags[4], 7); }
+
+        public bool PreserveRandomSeed          { get => Util.GetFlag(Flags[5], 0); }
+        public bool AcceleratedProduction       { get => Util.GetFlag(Flags[5], 1); }
+        public bool Elimination                 { get => Util.GetFlag(Flags[5], 2); }
+        public bool Regicide                    { get => Util.GetFlag(Flags[5], 3); }
+        public bool MassRegicide                { get => Util.GetFlag(Flags[5], 4); }
+        public bool VictoryLocations            { get => Util.GetFlag(Flags[5], 5); }
+        public bool CaptureTheFlag              { get => Util.GetFlag(Flags[5], 6); }
+        public bool AllowCulturalConversions    { get => Util.GetFlag(Flags[5], 7); }
+
 
         public int DifficultyID;
         private fixed byte UnknownBuffer2[4];

@@ -28,6 +28,7 @@ namespace QueryCiv3
         public CNSL Cnsl;
         public TUTR Tutr;
         public FAXX Faxx;
+        public HIST Hist;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -70,6 +71,13 @@ namespace QueryCiv3
         private const int CITY_LEN_1 = 556;
         private const int CITY_LEN_2 = 12;
         private const int CITY_LEN_3 = 140;
+
+        public Turn[] HistTurn;
+        public int[][] TurnCiv;
+        public int[][] TurnPower;
+        public int[][] TurnScore;
+        public int[][] TurnCulture;
+        public int[][] TurnVP;
 
         private const int BIQ_SECTION_START = 562;
 
@@ -280,6 +288,28 @@ namespace QueryCiv3
                             break;
                         case 0x58584146: // FAXX
                             Copy(ref Faxx);
+                            break;
+                        case 0x54534948: // HIST
+                            Copy(ref Hist);
+                            HistTurn = new Turn[Hist.TurnCount];
+                            TurnCiv = new int[Hist.TurnCount][];
+                            TurnPower = new int[Hist.TurnCount][];
+                            TurnScore = new int[Hist.TurnCount][];
+                            TurnCulture = new int[Hist.TurnCount][];
+                            TurnVP = new int[Hist.TurnCount][];
+
+                            // Histogram tracks Power, Score, Culture, and optionally Victory Points if that victory condition is enabled:
+                            for (int i = 0; i < Hist.TurnCount; i++) {
+                                Copy(ref HistTurn[i]);
+                                int CivCount = HistTurn[i].RemainingCivs;
+                                CopyArray(ref TurnCiv[i], CivCount);
+                                CopyArray(ref TurnPower[i], CivCount);
+                                CopyArray(ref TurnScore[i], CivCount);
+                                CopyArray(ref TurnCulture[i], CivCount);
+                                if (Game.VictoryLocations) {
+                                    CopyArray(ref TurnVP[i], CivCount);
+                                }
+                            }
                             break;
                         default:
                             scan++;
