@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using Godot;
 using IniParser;
 using IniParser.Model;
 using C7GameData;
@@ -19,6 +20,13 @@ using C7GameData;
 public class Civ3UnitAnim
 {
 	private Dictionary<string, IniData> unitIniDatas = new Dictionary<string, IniData>();
+
+	private AudioStreamPlayer audioPlayer;
+
+	public Civ3UnitAnim(AudioStreamPlayer audioPlayer)
+	{
+		this.audioPlayer = audioPlayer;
+	}
 
 	public IniData getUnitINIData(string unitTypeName)
 	{
@@ -56,6 +64,23 @@ public class Civ3UnitAnim
 			flicSheets.Add(key, tr);
 		}
 		return tr;
+	}
+
+	private Dictionary<string, AudioStreamSample> wavs = new Dictionary<string, AudioStreamSample>();
+
+	public void playSound(string unitTypeName, MapUnit.AnimatedAction action)
+	{
+		string fileName = getUnitINIData(unitTypeName)["Sound Effects"][action.ToString()];
+		if (fileName.EndsWith(".WAV", StringComparison.CurrentCultureIgnoreCase)) {
+			AudioStreamSample wav;
+			var key = String.Format("{0}.{1}", unitTypeName, action.ToString());
+			if (! wavs.TryGetValue(key, out wav)) {
+				wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(String.Format("Art/Units/{0}/{1}", unitTypeName, fileName)));
+				wavs.Add(key, wav);
+			}
+			audioPlayer.Stream = wav;
+			audioPlayer.Play();
+		}
 	}
 
 	public double getDuration(string unitTypeName, MapUnit.AnimatedAction action)

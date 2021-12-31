@@ -56,6 +56,8 @@ public class AnimationTracker : IAnimationControl {
 		}
 		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, callback = callback ?? doNothing };
 
+		civ3UnitAnim.playSound(unit.unitType.name, action);
+
 		activeAnims[unit.guid] = aa;
 		completedAnims.Remove(unit.guid);
 	}

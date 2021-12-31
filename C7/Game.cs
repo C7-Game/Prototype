@@ -56,7 +56,9 @@ public class Game : Node2D
 
 		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
 		AddChild(mapView);
-		civ3UnitAnim = new Civ3UnitAnim();
+		var unitAnimSoundPlayer = new AudioStreamPlayer();
+		AddChild(unitAnimSoundPlayer);
+		civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
 		animTracker = new AnimationTracker(civ3UnitAnim);
 		EngineStorage.animTracker = animTracker;
 
