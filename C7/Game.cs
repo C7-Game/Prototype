@@ -22,6 +22,7 @@ public class Game : Node2D
 	Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
+	public Civ3UnitAnim civ3UnitAnim;
 	public AnimationTracker animTracker;
 
 	Hashtable Terrmask = new Hashtable();
@@ -55,6 +56,7 @@ public class Game : Node2D
 
 		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
 		AddChild(mapView);
+		civ3UnitAnim = new Civ3UnitAnim();
 		animTracker = new AnimationTracker();
 		EngineStorage.animTracker = animTracker;
 

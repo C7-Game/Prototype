@@ -443,8 +443,6 @@ public class UnitLayer : LooseLayer {
 		return tr;
 	}
 
-	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
-
 	// Sets the palette, indices, relSpriteSize, and spriteXY parameters on a ShaderMaterial to pick a sprite from a FlicSheet. relativeColumn
 	// varies between 0.0 for the first column and 1.0 for the last one.
 	public static void setFlicShaderParams(ShaderMaterial mat, Util.FlicSheet flicSheet, int row, float relativeColumn)
@@ -465,34 +463,9 @@ public class UnitLayer : LooseLayer {
 		mat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
 	}
 
-	public Util.FlicSheet getAnimFlicSheet(string unitTypeName, MapUnit.AnimatedAction action)
-	{
-		Util.FlicSheet tr;
-		var key = String.Format("{0}.{1}", unitTypeName, action.ToString());
-		if (! flicSheets.TryGetValue(key, out tr)) {
-			// Read the name of the FLC file corresponding to this action from the unit's INI file. If the action does not have an FLC
-			// file then use the "default" animation file instead. If the unit does not have a file for its default animation, throw an
-			// exception (TODO: Consider drawing nothing instead).
-			// Also TODO: We could cache these iniInfo's. As it is they're reloaded for each action. I doubt it would make a noticeable
-			// difference in performance, though.
-			string animFileName;
-			var iniInfo = Civ3UnitSprite.getINIAnimationsInfo(Util.Civ3MediaPath(String.Format("Art/Units/{0}/{0}.INI", unitTypeName)));
-			if (! iniInfo.TryGetValue(action.ToString(), out animFileName)) {
-				if (action != MapUnit.AnimatedAction.DEFAULT)
-					return getAnimFlicSheet(unitTypeName, MapUnit.AnimatedAction.DEFAULT);
-				else
-					throw new Exception(String.Format("Unit type \"{0}\" is missing a default animation.", unitTypeName));
-			}
-
-			(tr, _) = Util.loadFlicSheet(String.Format("Art/Units/{0}/{1}", unitTypeName, animFileName));
-			flicSheets.Add(key, tr);
-		}
-		return tr;
-	}
-
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter)
 	{
-		var flicSheet = getAnimFlicSheet(unit.unitType.name, activeAnim.action);
+		var flicSheet = looseView.mapView.game.civ3UnitAnim.getFlicSheet(unit.unitType.name, activeAnim.action);
 
 		int dirIndex = 0;
 		switch (activeAnim.direction) {
