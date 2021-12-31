@@ -29,6 +29,8 @@ namespace QueryCiv3
         public TUTR Tutr;
         public FAXX Faxx;
         public HIST Hist;
+        public UNIT[] Unit;
+        public IDLS[] Idls;
 
         public int[] CitiesPerContinent;
         public IntBitmap[] KnownTechFlags;
@@ -310,6 +312,20 @@ namespace QueryCiv3
                                     CopyArray(ref TurnVP[i], CivCount);
                                 }
                             }
+                            break;
+                        case 0x54494e55: // UNIT
+                            // Because most units have IDLS sections, it's easier to keep the array lengths the same and accept
+                            // that some indexes of Idls will be unused
+                            Unit = new UNIT[Game.NumberOfUnits];
+                            Idls = new IDLS[Game.NumberOfUnits];
+
+                            for (int i = 0; i < Game.NumberOfUnits; i++) {
+                                Copy(ref Unit[i]);
+                                if (Unit[i].HasIDLSSection) {
+                                    Copy(ref Idls[i]);
+                                }
+                            }
+
                             break;
                         default:
                             scan++;
