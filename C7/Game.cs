@@ -454,7 +454,7 @@ public class Game : Node2D
 		else if (buttonName.Equals("buildCity"))
 		{
 			animTracker.startAnimation(
-				CurrentlySelectedUnit.guid,
+				CurrentlySelectedUnit,
 				MapUnit.AnimatedAction.BUILD,
 				(unitGUID, action) => {
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");

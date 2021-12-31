@@ -92,7 +92,7 @@ namespace C7Engine
                     Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
                     unit.facingDirection = TileDirection.SOUTHEAST;
                     unit.isFortified = true;
-                    EngineStorage.animTracker.startAnimation(guid, MapUnit.AnimatedAction.FORTIFY, null);
+                    EngineStorage.animTracker.startAnimation(unit, MapUnit.AnimatedAction.FORTIFY, null);
                     return;
                 }
             }
@@ -124,7 +124,7 @@ namespace C7Engine
                         unit.facingDirection = dir;
                         unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
                         unit.isFortified = false;
-                        EngineStorage.animTracker.startAnimation(guid, MapUnit.AnimatedAction.RUN, null);
+                        EngineStorage.animTracker.startAnimation(unit, MapUnit.AnimatedAction.RUN, null);
                     }
 
                     break;
@@ -183,7 +183,7 @@ namespace C7Engine
                 }
             }
             if (toBeDeleted != null) {
-                EngineStorage.animTracker.endAnimation(toBeDeleted.guid, false);
+                EngineStorage.animTracker.endAnimation(toBeDeleted, false);
                 toBeDeleted.location.unitsOnTile.Remove(toBeDeleted);
                 gameData.mapUnits.Remove(toBeDeleted);
             }

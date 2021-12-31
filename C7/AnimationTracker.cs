@@ -37,46 +37,46 @@ public class AnimationTracker : IAnimationControl {
 		return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 	}
 
-	public void startAnimation(string unitGUID, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
+	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
 	{
 		long currentTimeMS = getCurrentTimeMS();
 		long animDurationMS = 500; // Hard-code durations to 0.5 sec for now. Ultimately we'll want to figure this out based on the INI file.
 
 		ActiveAnimation aa;
-		if (activeAnims.TryGetValue(unitGUID, out aa)) {
+		if (activeAnims.TryGetValue(unit.guid, out aa)) {
 			// If there's already an animation playing for this unit, end it first before replacing it
-			aa.callback(unitGUID, aa.action);
+			aa.callback(unit.guid, aa.action);
 		}
 		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, callback = callback ?? doNothing };
 
-		activeAnims[unitGUID] = aa;
-		completedAnims.Remove(unitGUID);
+		activeAnims[unit.guid] = aa;
+		completedAnims.Remove(unit.guid);
 	}
 
-	public void endAnimation(string unitGUID, bool triggerCallback = true)
+	public void endAnimation(MapUnit unit, bool triggerCallback = true)
 	{
 		ActiveAnimation aa;
-		if (triggerCallback && activeAnims.TryGetValue(unitGUID, out aa)) {
-			var forget = aa.callback(unitGUID, aa.action);
+		if (triggerCallback && activeAnims.TryGetValue(unit.guid, out aa)) {
+			var forget = aa.callback(unit.guid, aa.action);
 			if (! forget)
-				completedAnims[unitGUID] = aa;
-			activeAnims.Remove(unitGUID);
+				completedAnims[unit.guid] = aa;
+			activeAnims.Remove(unit.guid);
 		} else {
-			activeAnims   .Remove(unitGUID);
-			completedAnims.Remove(unitGUID);
+			activeAnims   .Remove(unit.guid);
+			completedAnims.Remove(unit.guid);
 		}
 	}
 
-	public bool hasCurrentAction(string unitGUID)
+	public bool hasCurrentAction(MapUnit unit)
 	{
-		return activeAnims.ContainsKey(unitGUID) || completedAnims.ContainsKey(unitGUID);
+		return activeAnims.ContainsKey(unit.guid) || completedAnims.ContainsKey(unit.guid);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(string unitGUID)
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(MapUnit unit)
 	{
 		ActiveAnimation aa;
-		if (! activeAnims.TryGetValue(unitGUID, out aa))
-			aa = completedAnims[unitGUID];
+		if (! activeAnims.TryGetValue(unit.guid, out aa))
+			aa = completedAnims[unit.guid];
 
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
@@ -102,8 +102,8 @@ public class AnimationTracker : IAnimationControl {
 
         public MapUnit.ActiveAnimation getActiveAnimation(MapUnit unit)
         {
-            if (hasCurrentAction(unit.guid)) {
-                var (action, repCount) = getCurrentActionAndRepetitionCount(unit.guid);
+            if (hasCurrentAction(unit)) {
+                var (action, repCount) = getCurrentActionAndRepetitionCount(unit);
 
                 var isNonRepeatingAction =
                     (action == MapUnit.AnimatedAction.RUN) ||
