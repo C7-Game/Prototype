@@ -24,6 +24,9 @@ public class PCXToGodot : Godot.Object
 
 	// BufferData should be as large as the largest PCX file needed to be loaded in pixels
 	// For now, I will assume no PCX file is larger than 4k resolution
+	// It's efficient to use a shared BufferData, ColorData, and AlphaData instead of having to reinitialize these arrays for every Image load
+	// However, this will become a problem if (when?) we move towards parallelization
+	// But for now, it's an improvement
 	public static int[] BufferData = new int[3840 * 2160];
 	public static int[] ColorData = new int[256];
 	public static int[] AlphaData = new int[256];
@@ -34,9 +37,9 @@ public class PCXToGodot : Godot.Object
 
 		for (int i = 0; i < 256; i++) {
 			Red = palette[i, 0];
-			Green = palette[i, 1];
-			Blue = palette[i, 2];
-			ColorData[i] = Red + (Green << 8) + (Blue << 16) + Alpha;
+			Green = palette[i, 1] << 8;
+			Blue = palette[i, 2] << 16;
+			ColorData[i] = Red + Green + Blue + Alpha;
 		}
 
 		for (int i = CIV3_TRANSPARENCY_START; i < 256; i++) {
@@ -56,6 +59,7 @@ public class PCXToGodot : Godot.Object
 			// Examining it with breakpoints in my Java code, it appears it starts at 255, 255, 255, and goes down one at a time.  But this code
 			// doesn't assume that, it only assumes the grayscale aspect.  In theory, this should work for any transparency, 0 to 255.
 			AlphaData[i] = palette[i, 0] << 24;
+			ColorData[i] = ColorData[i] &= 0x00ffffff;
 		}
 	}
 
@@ -119,7 +123,7 @@ public class PCXToGodot : Godot.Object
 			Index = y * imagePcx.Width + leftStart;
 			AlphaIndex = (y - alphaRowOffset) * imagePcx.Width + leftStart;
 			for (int x = leftStart; x < xEnd; x++) {
-				BufferData[DataIndex++] = (ColorData[imagePcx.ColorIndices[Index++]] & 0x00ffffff) | AlphaData[alphaPcx.ColorIndices[AlphaIndex++]];
+				BufferData[DataIndex++] = ColorData[imagePcx.ColorIndices[Index++]] | AlphaData[alphaPcx.ColorIndices[AlphaIndex++]];
 			}
 		}
 
