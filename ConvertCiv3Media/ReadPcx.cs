@@ -6,8 +6,8 @@ namespace ConvertCiv3Media
 {
     public class Pcx {
 
-        public byte[,] Palette = new byte[256,3];
-        public byte[] ColorIndices = new byte[]{};
+        public byte[,] Palette = new byte[256, 3];
+        public byte[] ColorIndices;
         public int Width = 0;
         public int Height = 0;
 
@@ -43,44 +43,48 @@ namespace ConvertCiv3Media
             int PaletteOffset = PcxBytes.Length - 768;
 
             // Populate color palette
-            for (int i = 0; i < 256; i++) {
-                this.Palette[i,0] = PcxBytes[PaletteOffset + i * 3];
-                this.Palette[i,1] = PcxBytes[PaletteOffset + i * 3 + 1];
-                this.Palette[i,2] = PcxBytes[PaletteOffset + i * 3 + 2];
-            }
+            Buffer.BlockCopy(PcxBytes, PaletteOffset, Palette, 0, 768);
 
-            // Populate image byte array
-            List<byte> ListImage = new List<byte>();
+            int Length = Width * Height;
+            ColorIndices = new byte[Length];
+
             // Encoding always have even number of bytes per line; if image width is odd, there is a junk byte in every row
             bool JunkByte = BytesPerLine > Width;
+            byte PcxData;
+
             // Loop to decode run-length-encoded image data which begins at file offset 0x80
-            for (int ImgIdx = 0, PcxIdx = 0x80, RunLen = 0, LineIdx = 0; ImgIdx < Width * Height; ) {
+            for (int ImgIdx = 0, PcxIdx = 0x80, RunLen = 0, LineIdx = 0; ImgIdx < Length; ) {
                 // if two most significant bits are 11
-                if ((PcxBytes[PcxIdx] & 0xc0) == 0xc0) {
+                PcxData = PcxBytes[PcxIdx];
+                if ((PcxData & 0xc0) == 0xc0) {
                     // then it & 0x3f is the run length of the following byte
-                    RunLen = PcxBytes[PcxIdx] & 0x3f;
+                    RunLen = PcxData & 0x3f;
                     PcxIdx++;
                     // Repeat the pixel in the image RunLen times
                     for (int j = 0; j < RunLen; j++) {
                         // Add pixel copy if it's not a junk byte
-                        if (!(JunkByte && LineIdx % BytesPerLine == BytesPerLine - 1)) {
-                            ListImage.Add(PcxBytes[PcxIdx]);
-                            ImgIdx++;
+                        if (JunkByte) {
+                            if (++LineIdx == BytesPerLine) {
+                                LineIdx = 0;
+                                ImgIdx--;
+                            }
                         }
-                        LineIdx++;
+                        ColorIndices[ImgIdx++] = PcxBytes[PcxIdx];
                     }
                     PcxIdx++;
                 } else {
                     // Add as literal pixel if it's not a junk byte
-                    if (!(JunkByte && LineIdx % BytesPerLine == BytesPerLine - 1)) {
-                        ListImage.Add(PcxBytes[PcxIdx]);
-                        ImgIdx++;
-                    }
+                    ColorIndices[ImgIdx++] = PcxData;
                     PcxIdx++;
-                    LineIdx++;
+
+                    if (JunkByte) {
+                        if (++LineIdx == BytesPerLine) {
+                            LineIdx = 0;
+                            ImgIdx--;
+                        }
+                    }
                 }
             }
-            this.ColorIndices = ListImage.ToArray();
         }
     }
 }
