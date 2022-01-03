@@ -15,5 +15,10 @@ namespace C7GameData.DataClasses
         public List<Tech> techsResearched;
         public Tech researching;
         public List<CivCiv> relationships;
+
+        public bool isBarbarian;
+        public bool isHuman;
+        public int gold;
+        public bool skipFirstTurn;
     }
 }
