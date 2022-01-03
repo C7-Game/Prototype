@@ -22,5 +22,6 @@ namespace C7GameData.DataClasses
         public List<Event> events;
         public List<Overlay> overlays;
         public List<Terrain> terrains;
+        public List<Experience> experiences;
     }
 }

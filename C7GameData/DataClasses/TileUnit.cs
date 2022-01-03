@@ -14,5 +14,16 @@ namespace C7GameData.DataClasses
         public Tile goToTile;
         public TileUnit loadedOn;
         public List<TileUnit> unitsLoaded;
+        public Experience experienceLevel;
+        public Action performingAction;
+
+        public string name;
+        public int movementPointsRemaining;
+        public int hitPointsRemaining;
+        public int barbarianTribe;
+        public bool attackedThisTurn;
+        public bool generatedLeader;
+        public int turnsSpentPerformingAction;
+        public bool fortified;
     }
 }
