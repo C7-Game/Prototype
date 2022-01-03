@@ -103,45 +103,45 @@ public class AnimationTracker : IAnimationControl {
 			activeAnims.Remove(key);
 	}
 
-        public MapUnit.ActiveAnimation getActiveAnimation(MapUnit unit)
-        {
-            if (hasCurrentAction(unit)) {
-                var (action, repCount) = getCurrentActionAndRepetitionCount(unit);
+	public MapUnit.ActiveAnimation getActiveAnimation(MapUnit unit)
+	{
+		if (hasCurrentAction(unit)) {
+			var (action, repCount) = getCurrentActionAndRepetitionCount(unit);
 
-                var isNonRepeatingAction =
-                    (action == MapUnit.AnimatedAction.RUN) ||
-                    (action == MapUnit.AnimatedAction.DEATH) ||
-                    (action == MapUnit.AnimatedAction.FORTIFY) ||
-                    (action == MapUnit.AnimatedAction.VICTORY) ||
-                    (action == MapUnit.AnimatedAction.BUILD);
+			var isNonRepeatingAction =
+				(action == MapUnit.AnimatedAction.RUN) ||
+				(action == MapUnit.AnimatedAction.DEATH) ||
+				(action == MapUnit.AnimatedAction.FORTIFY) ||
+				(action == MapUnit.AnimatedAction.VICTORY) ||
+				(action == MapUnit.AnimatedAction.BUILD);
 
-                float progress;
-                if (isNonRepeatingAction)
-                    progress = (repCount <= 1.0) ? (float)repCount : 1f;
-                else
-                    progress = (float)(repCount - Math.Floor(repCount));
+			float progress;
+			if (isNonRepeatingAction)
+				progress = (repCount <= 1.0) ? (float)repCount : 1f;
+			else
+				progress = (float)(repCount - Math.Floor(repCount));
 
-                float offsetX = 0, offsetY = 0;
-                if (action == MapUnit.AnimatedAction.RUN) {
-                    (int dX, int dY) = unit.facingDirection.toCoordDiff();
-                    offsetX = -1 * dX * (1f - progress);
-                    offsetY = -1 * dY * (1f - progress);
-                }
+			float offsetX = 0, offsetY = 0;
+			if (action == MapUnit.AnimatedAction.RUN) {
+				(int dX, int dY) = unit.facingDirection.toCoordDiff();
+				offsetX = -1 * dX * (1f - progress);
+				offsetY = -1 * dY * (1f - progress);
+			}
 
-                return new MapUnit.ActiveAnimation {
-                    action = action,
-                    direction = unit.facingDirection,
-                    progress = progress,
-                    offsetX = offsetX,
-                    offsetY = offsetY
-                };
-            } else
-                return new MapUnit.ActiveAnimation {
-                    action = unit.isFortified ? MapUnit.AnimatedAction.FORTIFY : MapUnit.AnimatedAction.DEFAULT,
-                    direction = unit.facingDirection,
-                    progress = 1f,
-                    offsetX = 0f,
-                    offsetY = 0f
-                };
-        }
+			return new MapUnit.ActiveAnimation {
+				action = action,
+					direction = unit.facingDirection,
+					progress = progress,
+					offsetX = offsetX,
+					offsetY = offsetY
+					};
+		} else
+			return new MapUnit.ActiveAnimation {
+				action = unit.isFortified ? MapUnit.AnimatedAction.FORTIFY : MapUnit.AnimatedAction.DEFAULT,
+					direction = unit.facingDirection,
+					progress = 1f,
+					offsetX = 0f,
+					offsetY = 0f
+					};
+	}
 }
