@@ -4,10 +4,8 @@ using System.Collections.Generic;
 namespace C7GameData.DataClasses
 {
     // A unit type (eg. Warrior, Worker)
-    public class Unit
+    public class Unit: Producible
     {
-        public List<Resource> requiredResources;
-        public Tech requiredTech;
         public List<Unit> upgradesTo;
         public List<Unit> upgradesFrom;
         public List<Building> buildingsThatProduce;
