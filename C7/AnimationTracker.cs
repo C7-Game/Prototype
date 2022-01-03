@@ -1,18 +1,12 @@
 
-// The purpose of the AnimationTracker is to store the state of all ongoing animations in a module separate from the rest of the engine. It doesn't do
+// The purpose of the AnimationTracker is to store the state of all ongoing animations in a module separate from the rest of the UI. It doesn't do
 // anything with the animations, it simply keeps record of them while they're playing then calls a callback function when they're done. So it's
 // basically just a stopwatch. Its update function must be called regularly so it can follow the passage of time, right now this is done in the Game
-// class's _Process method.
-
-// I pulled AnimationTracker out from the rest of the engine so it can more easily be moved into the UI module later if wanted. Still that would be
-// awkward since the UI doesn't have much to do with animations, it only cares about drawing them, compared to the engine which has the much more
-// complex task of synchronizing them with the rest of the game state. Though the problem with leaving the engine in control of animations is that it
-// pulls in a lot of additional baggage. Specifically it means the engine must know about real world time, unit INI files, and the player's interface
-// settings.
+// class's _Process method. There is one instance of AnimationTracker and it is located in Game. TODO: Consider moving it to MapView.
 
 // The callbacks are hopefully temporary. I don't like using them since they obscure control flow as they get called at some later time potentially by
 // a different thread. The threading issue doesn't matter at the moment since everything important runs on one thread but this could change if we want
-// to have separate UI and engine threads (as I believe we should). A better design would be to use async & await.
+// to have separate UI and engine threads (as I believe we should).
 
 using System;
 using System.Collections.Generic;
