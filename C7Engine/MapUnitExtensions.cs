@@ -28,6 +28,15 @@ public static class MapUnitExtensions {
 		}
 	}
 
+	public static void skipTurn(this MapUnit unit)
+	{
+		/**
+		* I'd like to enhance this so it's like Civ4, where the skip turn action takes the unit out of the rotation, but you can change your
+		* mind if need be.  But for now it'll be like Civ3, where you're out of luck if you realize that unit was needed for something; that
+		* also simplifies things here.
+		**/
+		unit.movementPointsRemaining = 0;
+	}
 }
 
 }

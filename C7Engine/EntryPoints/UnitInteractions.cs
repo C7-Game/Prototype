@@ -89,27 +89,9 @@ namespace C7Engine
             new MsgMoveUnit(guid, dir).send();
         }
 
-        /**
-         * I'd like to enhance this so it's like Civ4, where the hold action takes
-         * the unit out of the rotation, but you can change your mind if need be.
-         * But for now it'll be like Civ3, where you're out of luck if you realize
-         * that unit was needed for something; that also simplifies things here.
-         **/
         public static void holdUnit(string guid)
         {
-            GameData gameData = EngineStorage.gameData;
-            //This is inefficient, perhaps we'll have a map someday.  But with three units,
-            //we'll survive for now.
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    Console.WriteLine("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; settings its movement to zero");
-                    unit.movementPointsRemaining = 0;
-                    return;
-                }
-            }
-            Console.WriteLine("Failed to find a matching unit with guid " + guid);
+            new MsgSkipUnitTurn(guid).send();
         }
 
         public static void waitUnit(string guid)

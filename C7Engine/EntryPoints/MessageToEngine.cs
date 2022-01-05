@@ -60,4 +60,21 @@ public class MsgMoveUnit : MessageToEngine
 	}
 }
 
+public class MsgSkipUnitTurn : MessageToEngine
+{
+	private string unitGUID;
+
+	public MsgSkipUnitTurn(string unitGUID)
+	{
+		this.unitGUID = unitGUID;
+	}
+
+	public override void process()
+	{
+		MapUnit unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == unitGUID);
+		if (unit != null)
+			unit.skipTurn();
+	}
+}
+
 }
