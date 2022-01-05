@@ -1,5 +1,6 @@
 namespace C7Engine
 {
+
 using System;
 using C7GameData;
 
@@ -39,4 +40,24 @@ public class MsgFortifyUnit : MessageToEngine
 			unit.fortify();
 	}
 }
+
+public class MsgMoveUnit : MessageToEngine
+{
+	private string unitGUID;
+	private TileDirection dir;
+
+	public MsgMoveUnit(string unitGUID, TileDirection dir)
+	{
+		this.unitGUID = unitGUID;
+		this.dir = dir;
+	}
+
+	public override void process()
+	{
+		MapUnit unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == unitGUID);
+		if (unit != null)
+			unit.move(dir);
+	}
+}
+
 }

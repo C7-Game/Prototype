@@ -84,37 +84,9 @@ namespace C7Engine
             new MsgFortifyUnit(guid).send();
         }
 
-        // Moves a unit into a neighboring tile. direction = 1 for NE, 2 for E, 3 for SE, ..., 7 for NW, 8 for N. If direction is not in [1, 8],
-        // this function does nothing.
-        // TODO: This movement function is still pretty basic since it only works for neighboring tiles. I would call this function something like
-        // stepUnit except it's the only unit movement function we have right now so calling it moveUnit is fine. But later we might want a more
-        // powerful moveUnit function that can accept non-neighboring tiles and/or do things like rebase air units. Also direction should be an
-        // enum or something.
         public static void moveUnit(string guid, TileDirection dir)
         {
-            GameData gameData = EngineStorage.gameData;
-            //This is inefficient, perhaps we'll have a map someday.  But with three units,
-            //we'll survive for now.
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    (int dx, int dy) = dir.toCoordDiff();
-                    var newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-                    if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
-                        if (! unit.location.unitsOnTile.Remove(unit))
-                            throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
-                        newLoc.unitsOnTile.Add(unit);
-                        unit.location = newLoc;
-                        unit.facingDirection = dir;
-                        unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
-                        unit.isFortified = false;
-                        EngineStorage.animTracker.startAnimation(unit, MapUnit.AnimatedAction.RUN, null);
-                    }
-
-                    break;
-                }
-            }
+            new MsgMoveUnit(guid, dir).send();
         }
 
         /**
