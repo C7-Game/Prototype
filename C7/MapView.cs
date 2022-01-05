@@ -1117,11 +1117,11 @@ public class MapView : Node2D {
 	}
 
 	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
-	public Tile tileOnScreenAt(Vector2 screenLocation)
+	public Tile tileOnScreenAt(GameMap map, Vector2 screenLocation)
 	{
 		int x, y;
 		tileCoordsOnScreenAt(screenLocation, out x, out y);
-		return MapInteractions.GetWholeMap().tileAt(wrapTileX(x), wrapTileY(y));
+		return map.tileAt(wrapTileX(x), wrapTileY(y));
 	}
 
 	public void centerCameraOnTile(Tile t)

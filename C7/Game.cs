@@ -54,14 +54,13 @@ public class Game : Node2D
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
 		Global.ResetLoadGamePath();
-		var map = MapInteractions.GetWholeMap();
-		GD.Print("RelativeModPath ", map.RelativeModPath);
-		Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall, map.RelativeModPath);
-		baseTerrainMap.Civ3Tiles = map.tiles;
-		baseTerrainMap.TerrainAsTileMap();
 
-		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
-		AddChild(mapView);
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			GameMap map = gameDataAccess.gameData.map;
+			GD.Print("RelativeModPath ", map.RelativeModPath);
+			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
+			AddChild(mapView);
+		}
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -87,43 +86,47 @@ public class Game : Node2D
 
 	public override void _Process(float delta)
 	{
-		// Process messages from the engine
-		MessageToUI msg;
-		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
-			switch (msg) {
-			case MsgStartAnimation startAnimation:
-				MapUnit unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == startAnimation.unitGUID);
-				if (unit != null)
-					animTracker.startAnimation(unit, startAnimation.action, null);
-				break;
+		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			GameData gD = gameDataAccess.gameData;
+
+			// Process messages from the engine
+			MessageToUI msg;
+			while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
+				switch (msg) {
+				case MsgStartAnimation startAnimation:
+					MapUnit unit = gD.mapUnits.Find(u => u.guid == startAnimation.unitGUID);
+					if (unit != null)
+						animTracker.startAnimation(unit, startAnimation.action, null);
+					break;
+				}
 			}
-		}
 
-		switch (CurrentState)
-		{
-			case GameState.PreGame:
-				StartGame();
-				break;
-			case GameState.PlayerTurn:
-				animTracker.update();
+			switch (CurrentState) {
+				case GameState.PreGame:
+					StartGame();
+					break;
+				case GameState.PlayerTurn:
+					animTracker.update();
 
-				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
-				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
-				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
-				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-				    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-				    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
-					GetNextAutoselectedUnit();
-				break;
-			case GameState.ComputerTurn:
-				animTracker.update();
-				break;
-		}
-		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
-		//without a manual cast to int.
-		//https://github.com/godotengine/godot/issues/16388
-		if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-			EmitSignal("ShowSpecificAdvisor", "F1");
+					// Check if we're triggered to advance to the next autoselected unit by an animation completing.
+					// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
+					// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
+					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
+					    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+					    (!animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
+						GetNextAutoselectedUnit();
+					break;
+				case GameState.ComputerTurn:
+					animTracker.update();
+					break;
+			}
+			//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
+			//without a manual cast to int.
+			//https://github.com/godotengine/godot/issues/16388
+			if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+				EmitSignal("ShowSpecificAdvisor", "F1");
+			}
 		}
 	}
 
@@ -298,12 +301,14 @@ public class Game : Node2D
 				if(eventMouseButton.IsPressed())
 				{
 					// Select unit on tile at mouse location
-					var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
-					if (tile != null) {
-						MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
-						//TODO: Better check for "current/human player"
-						if (to_select != null && to_select.owner.color == 0x4040FFFF)
-							setSelectedUnit(to_select);
+					using (var gameDataAccess = new UIGameDataAccess()) {
+						var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+						if (tile != null) {
+							MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+							//TODO: Better check for "current/human player"
+							if (to_select != null && to_select.owner.color == 0x4040FFFF)
+								setSelectedUnit(to_select);
+						}
 					}
 
 					OldPosition = eventMouseButton.Position;
@@ -326,11 +331,13 @@ public class Game : Node2D
 			}
 			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (! eventMouseButton.IsPressed()))
 			{
-				var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
-				if (tile != null) {
-					GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.name);
-				} else
-					GD.Print("Didn't click on any tile");
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+					if (tile != null) {
+						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.name);
+					} else
+						GD.Print("Didn't click on any tile");
+				}
 			}
 		}
 		else if(@event is InputEventMouseMotion eventMouseMotion)
@@ -429,7 +436,6 @@ public class Game : Node2D
 			// Update the UI slider
 			slider.Value = newScale;
 		}
-
 	}
 
 	private void GetNextAutoselectedUnit()

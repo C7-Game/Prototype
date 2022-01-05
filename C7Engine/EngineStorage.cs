@@ -1,5 +1,6 @@
 namespace C7Engine
 {
+	using System;
 	using System.Threading;
 	using System.Collections.Concurrent;
 	using C7GameData;
@@ -16,7 +17,7 @@ namespace C7Engine
 	public static class EngineStorage
 	{
 		public static Mutex gameDataMutex = new Mutex();
-		public static GameData gameData {get; set;} // MAKING THIS PUBLIC IS SUPER TEMPORARY!!!!
+		internal static GameData gameData {get; set;}
 
 		private static Thread engineThread;
 		internal static ConcurrentQueue<MessageToEngine> pendingMessages = new ConcurrentQueue<MessageToEngine>();
@@ -66,6 +67,24 @@ namespace C7Engine
 		public static void setGameData(GameData newGameData)
 		{
 			gameData = newGameData;
+		}
+	}
+
+	public class UIGameDataAccess : IDisposable {
+		public UIGameDataAccess()
+		{
+			EngineStorage.gameDataMutex.WaitOne();
+		}
+
+		public void Dispose()
+		{
+			EngineStorage.gameDataMutex.ReleaseMutex();
+		}
+
+		public GameData gameData {
+			get {
+				return EngineStorage.gameData;
+			}
 		}
 	}
 }
