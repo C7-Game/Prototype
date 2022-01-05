@@ -45,6 +45,12 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		var unitAnimSoundPlayer = new AudioStreamPlayer();
+		AddChild(unitAnimSoundPlayer);
+		civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
+		animTracker = new AnimationTracker(civ3UnitAnim);
+		EngineStorage.initialize(animTracker); // Spawns engine thread
+
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
 		Global.ResetLoadGamePath();
@@ -56,11 +62,6 @@ public class Game : Node2D
 
 		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
 		AddChild(mapView);
-		var unitAnimSoundPlayer = new AudioStreamPlayer();
-		AddChild(unitAnimSoundPlayer);
-		civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
-		animTracker = new AnimationTracker(civ3UnitAnim);
-		EngineStorage.animTracker = animTracker;
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
