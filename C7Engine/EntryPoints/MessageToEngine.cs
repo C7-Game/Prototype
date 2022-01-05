@@ -4,9 +4,15 @@ using System;
 
 public abstract class MessageToEngine {
 	public abstract void process();
+
+	public void send()
+	{
+		EngineStorage.pendingMessages.Enqueue(this);
+		EngineStorage.actionAddedToQueue.Set();
+	}
 }
 
-public class ShutdownEngine : MessageToEngine {
+public class MsgShutdownEngine : MessageToEngine {
 	public override void process()
 	{
 		Console.WriteLine("Engine received shutdown message.");

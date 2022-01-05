@@ -33,7 +33,7 @@ namespace C7Engine
 				gameDataMutex.WaitOne();
 				while (pendingMessages.TryDequeue(out msg)) {
 					msg.process();
-					if (msg is ShutdownEngine) {
+					if (msg is MsgShutdownEngine) {
 						stopProcessing = true;
 						break;
 					}
