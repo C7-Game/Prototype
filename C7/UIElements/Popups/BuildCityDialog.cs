@@ -1,10 +1,16 @@
 using Godot;
 
-public class BuildCityDialog : TextureRect
+public class BuildCityDialog : Popup
 {
 	
 	LineEdit cityName = new LineEdit();
-	
+
+	public BuildCityDialog()
+    {
+		alignment = BoxContainer.AlignMode.End;
+		margins = new Margins();
+    }
+
 	public override void _Ready()
 	{
 		base._Ready();
@@ -12,7 +18,7 @@ public class BuildCityDialog : TextureRect
 		//Dimensions are 530x260 (roughly).
 		//The top 110 px are for the advisor.
 
-		//Transparent background.  Add 10 px on the right for offset.
+		//Transparent background. Add 10 px on the right for offset.
 		ImageTexture thisTexture = new ImageTexture();
 		Image image = new Image();
 		image.Create(540, 260, false, Image.Format.Rgba8);
@@ -27,11 +33,9 @@ public class BuildCityDialog : TextureRect
 		AdvisorHead.SetPosition(new Vector2(375, 0));
 		AddChild(AdvisorHead);
 
-		TextureRect background = PopupOverlay.GetPopupBackground(530, 150);
-		background.SetPosition(new Vector2(0, 110));
-		AddChild(background);
+		AddBackground(530, 150, 110);
 
-		PopupOverlay.AddHeaderToPopup(this, "Name this town?", 120);
+		AddHeader("Name this town?", 120);
 
 		HBoxContainer labelAndName = new HBoxContainer();
 		labelAndName.Alignment = BoxContainer.AlignMode.Begin;
