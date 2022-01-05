@@ -367,7 +367,7 @@ public class Game : Node2D
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
 				GD.Print("Got request for escape/quit");
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 				popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Z)
@@ -430,12 +430,12 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("disband"))
 		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
 		}
 		else

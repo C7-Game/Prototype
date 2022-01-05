@@ -20,6 +20,14 @@ public class Margins
     public float right;
 }
 
+/*
+ * Popup displays a popup menu or dialog. Margins alignment determines where the popup appears on the screen,
+ * and margins can be used to add spacing around the popup. The AddBackground method will add the background
+ * texture to the popup, which will be rendered at the position determined by the alignment and margins specified.
+ * Additionally, AddBackground accepts an int vOffset parameter which will render the background texture vOffset
+ * pixels lower than it would otherwise. This is used when a popup includes an advisor, since the vOffset adds a
+ * transparent region above the top of the popup background in which the advisor texture can be drawn.
+ */
 public class Popup : TextureRect
 {
     public BoxContainer.AlignMode alignment;
