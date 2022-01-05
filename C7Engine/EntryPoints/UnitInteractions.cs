@@ -81,22 +81,7 @@ namespace C7Engine
 
         public static void fortifyUnit(string guid)
         {
-            GameData gameData = EngineStorage.gameData;
-            //This is inefficient, perhaps we'll have a map someday.  But with three units,
-            //we'll survive for now.
-            Console.WriteLine("Trying to fortify unit " + guid);
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
-                    unit.facingDirection = TileDirection.SOUTHEAST;
-                    unit.isFortified = true;
-                    EngineStorage.animTracker.startAnimation(unit, MapUnit.AnimatedAction.FORTIFY, null);
-                    return;
-                }
-            }
-            Console.WriteLine("Failed to find unit " + guid);
+            new MsgFortifyUnit(guid).send();
         }
 
         // Moves a unit into a neighboring tile. direction = 1 for NE, 2 for E, 3 for SE, ..., 7 for NW, 8 for N. If direction is not in [1, 8],
