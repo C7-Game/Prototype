@@ -16,11 +16,13 @@ namespace C7Engine
 	public static class EngineStorage
 	{
 		public static Mutex gameDataMutex = new Mutex();
-		internal static GameData gameData {get; set;}
+		public static GameData gameData {get; set;} // MAKING THIS PUBLIC IS SUPER TEMPORARY!!!!
 
 		private static Thread engineThread;
 		internal static ConcurrentQueue<MessageToEngine> pendingMessages = new ConcurrentQueue<MessageToEngine>();
 		internal static AutoResetEvent actionAddedToQueue = new AutoResetEvent(false);
+
+		public static ConcurrentQueue<MessageToUI> messagesToUI = new ConcurrentQueue<MessageToUI>();
 
 		public static IAnimationControl animTracker; // Must be set by the UI during initialization
 

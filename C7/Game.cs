@@ -87,6 +87,18 @@ public class Game : Node2D
 
 	public override void _Process(float delta)
 	{
+		// Process messages from the engine
+		MessageToUI msg;
+		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
+			switch (msg) {
+			case MsgStartAnimation startAnimation:
+				MapUnit unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == startAnimation.unitGUID);
+				if (unit != null)
+					animTracker.startAnimation(unit, startAnimation.action, null);
+				break;
+			}
+		}
+
 		switch (CurrentState)
 		{
 			case GameState.PreGame:

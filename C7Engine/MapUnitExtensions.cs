@@ -8,9 +8,7 @@ public static class MapUnitExtensions {
 	{
 		unit.facingDirection = TileDirection.SOUTHEAST;
 		unit.isFortified = true;
-
-		// Must send message to UI. Can't call animTracker directly since it doesn't belong to the engine. This is a race condition.
-		// EngineStorage.animTracker.startAnimation(unit, MapUnit.AnimatedAction.FORTIFY, null);
+		new MsgStartAnimation(unit, MapUnit.AnimatedAction.FORTIFY, null).send();
 	}
 }
 
