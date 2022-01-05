@@ -8,7 +8,7 @@ public class BuildCityDialog : Popup
 	public BuildCityDialog()
     {
 		alignment = BoxContainer.AlignMode.End;
-		margins = new Margins();
+		margins = new Margins(right: 10); // 10px margin on the right
     }
 
 	public override void _Ready()
@@ -18,13 +18,7 @@ public class BuildCityDialog : Popup
 		//Dimensions are 530x260 (roughly).
 		//The top 110 px are for the advisor.
 
-		//Transparent background. Add 10 px on the right for offset.
-		ImageTexture thisTexture = new ImageTexture();
-		Image image = new Image();
-		image.Create(540, 260, false, Image.Format.Rgba8);
-		image.Fill(Color.Color8(0, 0, 0, 0));
-		thisTexture.CreateFromImage(image);
-		this.Texture = thisTexture;
+		AddTexture(530, 260);
 
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupCULTURE.pcx", 1, 40, 149, 110);
 		TextureRect AdvisorHead = new TextureRect();

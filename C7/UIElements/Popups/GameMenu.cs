@@ -12,13 +12,7 @@ public class GameMenu : Popup
     {
         base._Ready();
 
-        ImageTexture thisTexture = new ImageTexture();
-        Image image = new Image();
-        image.Create(370, 300, false, Image.Format.Rgb8);
-        image.Fill(Color.Color8(0, 0, 0, 0));
-        thisTexture.CreateFromImage(image);
-        this.Texture = thisTexture;
-
+        AddTexture(370, 300);
         AddBackground(370, 300);
 
         AddHeader("Main Menu", 10);

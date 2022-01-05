@@ -13,19 +13,13 @@ public class EscapeQuitPopup : Popup
     {
         base._Ready();
 
-        // Dimensions in-game are 270x295, centered at the top
+		// Dimensions in-game are 270x295, centered at the top
 		// 100px margin from the top (this is different than the 110px when there's an advisor)
 
 		// Create a transparent texture background of the appropriate size.
 		// This is super important as if we just add the children, the parent won't be able to figure
 		// out the size of this TextureRect, and it won't be able to align it properly.
-		ImageTexture thisTexture = new ImageTexture();
-		Image image = new Image();
-		image.Create(270, 295, false, Image.Format.Rgba8);
-		image.Fill(Color.Color8(0, 0, 0, 0));
-		thisTexture.CreateFromImage(image);
-		this.Texture = thisTexture;
-
+		AddTexture(270, 195);
 		AddBackground(270, 195);
 
 		AddHeader("Oh No!", 10);

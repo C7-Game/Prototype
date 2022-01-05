@@ -100,6 +100,16 @@ public class Popup : TextureRect
         image.BlitRect(right, new Rect2(new Vector2(0, 0), new Vector2(right.GetWidth(), right.GetHeight())), new Vector2(leftOffset, vOffset));
     }
 
+    protected void AddTexture(int width, int height)
+    {
+        ImageTexture tex = new ImageTexture();
+        Image image = new Image();
+        image.Create(width, height, false, Image.Format.Rgba8);
+        image.Fill(Color.Color8(0, 0, 0, 0));
+        tex.CreateFromImage(image);
+        Texture = tex;
+    }
+
     protected void AddBackground(int width, int height, int vOffset = 0)
     {
         TextureRect background = CreateBackground(width, height);
