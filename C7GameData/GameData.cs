@@ -46,7 +46,7 @@ namespace C7GameData
                 unit.hitPointsRemaining = 3;
                 return unit;
             } else
-                throw new System.Exception("Invalid tile coordinates");
+                throw new System.Exception("Invalid tile coordinates " + tileX + ", " + tileY);
         }
 
         /**
