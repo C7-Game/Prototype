@@ -17,10 +17,10 @@ public abstract class LooseLayer {
 	//     view. The same tile may be drawn multiple times at different locations due to edge wrapping.
 	//   tileCenter: The location to draw to. You should draw around this location without adjusting for the camera location or zoom since the
 	//     MapView already transforms the looseView node to account for those things.
-	public abstract void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter);
+	public abstract void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter);
 
-	public virtual void onBeginDraw(LooseView looseView) {}
-	public virtual void onEndDraw(LooseView looseView) {}
+	public virtual void onBeginDraw(LooseView looseView, GameData gameData) {}
+	public virtual void onEndDraw(LooseView looseView, GameData gameData) {}
 
 	// The layer will be skipping during map drawing if visible is false
 	public bool visible = true;
@@ -57,7 +57,7 @@ public class TerrainLayer : LooseLayer {
 		return tr;
 	}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		int xSheet = tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tile.ExtraInfo.BaseTerrainImageID / 9;
 		var texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);;
@@ -95,7 +95,7 @@ public class HillsLayer : LooseLayer {
 		jungleVolcanoTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos jungles.pcx");
 	}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.overlayTerrainType.isHilly()) {
 			int pcxIndex = getMountainIndex(tile);
@@ -254,7 +254,7 @@ public class ForestLayer : LooseLayer {
 		pineTundraTexture        = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx"   , 0, 704, 768, 176);
 	}
 	
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].baseTerrainType;
 		TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].baseTerrainType;
 		TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].baseTerrainType;
@@ -345,7 +345,7 @@ public class GridLayer : LooseLayer {
 
 	public GridLayer() {}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		var cS = MapView.cellSize;
 		var left  = tileCenter + new Vector2(-cS.x,  0   );
@@ -520,7 +520,7 @@ public class UnitLayer : LooseLayer {
 		cursorMesh.Show();
 	}
 
-	public override void onBeginDraw(LooseView looseView)
+	public override void onBeginDraw(LooseView looseView, GameData gameData)
 	{
 		// Reset animation instances
 		for (int n = 0; n < nextBlankAnimInst; n++)
@@ -532,7 +532,7 @@ public class UnitLayer : LooseLayer {
 			cursorMesh.Hide();
 	}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.unitsOnTile.Count == 0)
 			return;
@@ -702,7 +702,7 @@ public class BuildingLayer : LooseLayer {
 		buildingSpriteSize = new Vector2((float)buildingsTex.GetWidth() / 4, (float)buildingsTex.GetHeight() / 4);
 	}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.hasBarbarianCamp) {
 			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize);	//(2, 0) is the offset in the TerrainBuildings.PCX file (top row, third in)
@@ -724,7 +724,7 @@ public class CityLayer : LooseLayer {
 		this.citySpriteSize = new Vector2(167, 95);
 	}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.cityAtTile != null) {
 			City city = tile.cityAtTile;
@@ -858,17 +858,19 @@ public class LooseView : Node2D {
 	{
 		base._Draw();
 
-		var map = MapInteractions.GetWholeMap();
-		foreach (var layer in layers.FindAll(L => L.visible)) {
-			layer.onBeginDraw(this);
-			foreach (var vT in mapView.visibleTiles()) {
-				int x = mapView.wrapTileX(vT.virtTileX);
-				int y = mapView.wrapTileY(vT.virtTileY);
-				var tile = map.tileAt(x, y);
-				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
-				layer.drawObject(this, tile, tileCenter);
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			GameData gD = gameDataAccess.gameData;
+			foreach (var layer in layers.FindAll(L => L.visible)) {
+				layer.onBeginDraw(this, gD);
+				foreach (var vT in mapView.visibleTiles()) {
+					int x = mapView.wrapTileX(vT.virtTileX);
+					int y = mapView.wrapTileY(vT.virtTileY);
+					var tile = gD.map.tileAt(x, y);
+					Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
+					layer.drawObject(this, gD, tile, tileCenter);
+				}
+				layer.onEndDraw(this, gD);
 			}
-			layer.onEndDraw(this);
 		}
 	}
 }
