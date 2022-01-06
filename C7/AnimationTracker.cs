@@ -10,13 +10,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Linq;
 using C7GameData;
 using C7Engine; // for IAnimationControl, OnAnimationCompleted
 
-public class AnimationTracker : IAnimationControl {
-	public static readonly OnAnimationCompleted doNothing = (unitGUID, action) => { return true; };
-
+public class AnimationTracker {
 	private Civ3UnitAnim civ3UnitAnim;
 
 	public AnimationTracker(Civ3UnitAnim civ3UnitAnim)
@@ -27,7 +26,7 @@ public class AnimationTracker : IAnimationControl {
 	public struct ActiveAnimation {
 		public long startTimeMS, endTimeMS;
 		public MapUnit.AnimatedAction action;
-		public OnAnimationCompleted callback;
+		public AutoResetEvent completionEvent;
 	}
 
 	private Dictionary<string, ActiveAnimation> activeAnims    = new Dictionary<string, ActiveAnimation>();
@@ -38,7 +37,7 @@ public class AnimationTracker : IAnimationControl {
 		return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 	}
 
-	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
+	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent)
 	{
 		long currentTimeMS = getCurrentTimeMS();
 		long animDurationMS = (long)(1000.0 * civ3UnitAnim.getDuration(unit.unitType.name, action));
@@ -46,9 +45,11 @@ public class AnimationTracker : IAnimationControl {
 		ActiveAnimation aa;
 		if (activeAnims.TryGetValue(unit.guid, out aa)) {
 			// If there's already an animation playing for this unit, end it first before replacing it
-			aa.callback(unit.guid, aa.action);
+			// TODO: Consider instead queueing up the new animation until after the first one is completed
+			if (aa.completionEvent != null)
+				aa.completionEvent.Set();
 		}
-		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, callback = callback ?? doNothing };
+		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, completionEvent = completionEvent };
 
 		civ3UnitAnim.playSound(unit.unitType.name, action);
 
@@ -60,9 +61,8 @@ public class AnimationTracker : IAnimationControl {
 	{
 		ActiveAnimation aa;
 		if (triggerCallback && activeAnims.TryGetValue(unit.guid, out aa)) {
-			var forget = aa.callback(unit.guid, aa.action);
-			if (! forget)
-				completedAnims[unit.guid] = aa;
+			if (aa.completionEvent != null)
+				aa.completionEvent.Set();
 			activeAnims.Remove(unit.guid);
 		} else {
 			activeAnims   .Remove(unit.guid);
@@ -94,9 +94,8 @@ public class AnimationTracker : IAnimationControl {
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (unitGUID, aa) = (guidAAPair.Key, guidAAPair.Value);
-			var forget = aa.callback(unitGUID, aa.action);
-			if (! forget)
-				completedAnims[unitGUID] = aa;
+			if (aa.completionEvent != null)
+				aa.completionEvent.Set();
 			keysToRemove.Add(unitGUID);
 		}
 		foreach (var key in keysToRemove)

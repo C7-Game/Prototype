@@ -4,13 +4,22 @@ namespace C7Engine
 using C7GameData;
 
 public static class MapUnitExtensions {
+	public static void animate(this MapUnit unit, MapUnit.AnimatedAction action, bool wait)
+	{
+		new MsgStartAnimation(unit, action, wait ? EngineStorage.uiEvent : null).send();
+		if (wait) {
+			EngineStorage.gameDataMutex.ReleaseMutex();
+			EngineStorage.uiEvent.WaitOne();
+			EngineStorage.gameDataMutex.WaitOne();
+		}
+	}
+
 	public static void fortify(this MapUnit unit)
 	{
 		unit.facingDirection = TileDirection.SOUTHEAST;
 		unit.isFortified = true;
-		new MsgStartAnimation(unit, MapUnit.AnimatedAction.FORTIFY, null).send();
+		unit.animate(MapUnit.AnimatedAction.FORTIFY, false);
 	}
-
 
 	public static void move(this MapUnit unit, TileDirection dir)
 	{
@@ -24,7 +33,7 @@ public static class MapUnitExtensions {
 			unit.facingDirection = dir;
 			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
 			unit.isFortified = false;
-			new MsgStartAnimation(unit, MapUnit.AnimatedAction.RUN, null).send();
+			unit.animate(MapUnit.AnimatedAction.RUN, false);
 		}
 	}
 
@@ -51,6 +60,8 @@ public static class MapUnitExtensions {
 
 	public static void buildCity(this MapUnit unit, string cityName)
 	{
+		unit.animate(MapUnit.AnimatedAction.BUILD, true);
+
 		// TODO: Need to check somewhere that this unit is allowed to build a city on its current tile. Either do that here or in every caller
 		// (probably best to just do it here).
 		CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, unit.owner.guid, cityName);

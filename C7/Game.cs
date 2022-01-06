@@ -55,7 +55,7 @@ public class Game : Node2D
 		AddChild(unitAnimSoundPlayer);
 		civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
 		animTracker = new AnimationTracker(civ3UnitAnim);
-		EngineStorage.initialize(animTracker); // Spawns engine thread
+		EngineStorage.initialize(); // Spawns engine thread
 
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
@@ -94,16 +94,16 @@ public class Game : Node2D
 	{
 		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
 		using (var gameDataAccess = new UIGameDataAccess()) {
-			GameData gD = gameDataAccess.gameData;
+			GameData gameData = gameDataAccess.gameData;
 
 			// Process messages from the engine
 			MessageToUI msg;
 			while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
 				switch (msg) {
-				case MsgStartAnimation startAnimation:
-					MapUnit unit = gD.mapUnits.Find(u => u.guid == startAnimation.unitGUID);
+				case MsgStartAnimation mSA:
+					MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSA.unitGUID);
 					if (unit != null)
-						animTracker.startAnimation(unit, startAnimation.action, null);
+						animTracker.startAnimation(unit, mSA.action, mSA.completionEvent);
 					break;
 				}
 			}
@@ -476,14 +476,8 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
-			animTracker.startAnimation(
-				CurrentlySelectedUnit,
-				MapUnit.AnimatedAction.BUILD,
-				(unitGUID, action) => {
-					PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-					popupOverlay.ShowPopup("buildCity", PopupOverlay.PopupCategory.Advisor);
-					return false;
-				});
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
+			popupOverlay.ShowPopup("buildCity", PopupOverlay.PopupCategory.Advisor);
 		}
 		else
 		{

@@ -20,12 +20,13 @@ namespace C7Engine
 		internal static GameData gameData {get; set;}
 
 		private static Thread engineThread;
+		internal static AutoResetEvent uiEvent = new AutoResetEvent(false); // Used to block engineThread while waiting for the UI, f.e. while
+										   // an animation plays.
+
 		internal static ConcurrentQueue<MessageToEngine> pendingMessages = new ConcurrentQueue<MessageToEngine>();
 		internal static AutoResetEvent actionAddedToQueue = new AutoResetEvent(false);
 
 		public static ConcurrentQueue<MessageToUI> messagesToUI = new ConcurrentQueue<MessageToUI>();
-
-		public static IAnimationControl animTracker; // Must be set by the UI during initialization
 
 		private static void processActions()
 		{
@@ -45,14 +46,12 @@ namespace C7Engine
 			}
 		}
 
-		// The UI must call this function to set up the engine. Right now all it does it set animTracker and spawn the engine thread. There is
-		// no deinitialize function b/c the way to deinit the engine is to pass it a ShutdownEngine message.
+		// The UI must call this function to set up the engine. Right now all it does is spawn the engine thread. There is no deinitialize
+		// function b/c the way to deinit the engine is to pass it a ShutdownEngine message.
 		// TODO: This initialize function and the thread, message queue, and AutoResetEvent should be moved somewhere other than
 		// EngineStorage. I'm just dropping them here for now since this is the closest thing we have to a root Engine class.
-		public static void initialize(IAnimationControl _animTracker)
+		public static void initialize()
 		{
-			animTracker = _animTracker;
-
 			// TODO: If engineThread is already created and running, stop it first
 			engineThread = new Thread(processActions);
 			engineThread.Start();
