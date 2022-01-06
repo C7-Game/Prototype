@@ -27,7 +27,13 @@ public class Game : Node2D
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
+
+	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
 	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
+	public bool KeepCSUWhenFortified = false; // Normally if the currently selected unit (CSU) becomes fortified, we advance to the next
+	                                          // autoselected unit. If this flag is set, we won't do that. This is useful so that the unit
+	                                          // autoselector can be prevented from interfering with the player selecting fortified units.
+
 	Control Toolbar;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
@@ -109,12 +115,15 @@ public class Game : Node2D
 				case GameState.PlayerTurn:
 					animTracker.update();
 
-					// Check if we're triggered to advance to the next autoselected unit by an animation completing.
-					// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
-					// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
+					// If the selected unit is unfortified, prepare to autoselect the next one if it becomes fortified
+					if ((CurrentlySelectedUnit != MapUnit.NONE) && (! CurrentlySelectedUnit.isFortified))
+						KeepCSUWhenFortified = false;
+
+					// Advance off the currently selected unit to the next one if it's out of moves and not playing an animation
+					// we want to watch or if it's fortified and we aren't set to keep fortified units selected.
 					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-					    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-					    (!animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
+					    ((CurrentlySelectedUnit.movementPointsRemaining <= 0 && ! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()) ||
+					     (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit();
 					break;
 				case GameState.ComputerTurn:
@@ -166,6 +175,7 @@ public class Game : Node2D
 	public void setSelectedUnit(MapUnit unit)
 	{
 		this.CurrentlySelectedUnit = unit;
+		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 
 		// If the newly selected unit's tile is not close to the center of the screen, then move the camera to it. Otherwise just trigger a
 		// redraw (not necessary in the first case since moving the map triggers a redraw automatically).
@@ -389,12 +399,6 @@ public class Game : Node2D
 					default: return; // Impossible
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
-					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-					    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
-						GetNextAutoselectedUnit();
-					else {
-						setSelectedUnit(CurrentlySelectedUnit);
-					}
 				}
 			}
 			// I key toggles the grid. This should be CTRL+G to match the original game but that key combination gets intercepted by the
@@ -454,17 +458,14 @@ public class Game : Node2D
 		if (buttonName.Equals("hold"))
 		{
 			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit();
 		}
 		else if (buttonName.Equals("fortify"))
 		{
 			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit(); // This skips the animation but if we don't do this the unit will stay selected
 		}
 		else if (buttonName.Equals("wait"))
 		{
 			UnitInteractions.waitUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit();
 		}
 		else if (buttonName.Equals("disband"))
 		{
