@@ -503,12 +503,6 @@ public class Game : Node2D
 		}
 	}
 	
-	private void OnUnitDisbanded()
-	{
-		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
-		GetNextAutoselectedUnit();
-	}
-	
 	/**
 	 * User quit.  We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
 	 **/
@@ -526,8 +520,6 @@ public class Game : Node2D
 
 		//Also dismantle the unit.  For now, I am considering that equivalent to
 		//disbanding.  Whether that makes sense long term, is debatable.
-		//I am only calling the UnitInteractions behavior (rather than OnUnitDisbanded),
-		//however, since the one here will likely play a sound someday.
 		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
 		GetNextAutoselectedUnit();
 	}
