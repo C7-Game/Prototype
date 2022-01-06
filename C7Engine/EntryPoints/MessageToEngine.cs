@@ -93,4 +93,22 @@ public class MsgDisbandUnit : MessageToEngine {
 	}
 }
 
+public class MsgBuildCity : MessageToEngine {
+	private string unitGUID;
+	private string cityName;
+
+	public MsgBuildCity(string unitGUID, string cityName)
+	{
+		this.unitGUID = unitGUID;
+		this.cityName = cityName;
+	}
+
+	public override void process()
+	{
+		MapUnit unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == unitGUID);
+		if (unit != null)
+			unit.buildCity(cityName);
+	}
+}
+
 }
