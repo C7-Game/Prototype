@@ -110,22 +110,7 @@ namespace C7Engine
 
         public static void disbandUnit(string guid)
         {
-            GameData gameData = EngineStorage.gameData;
-            MapUnit toBeDeleted = null;
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    //Set a variable and break so we don't cause a ConcurrentModificationException
-                    toBeDeleted = unit;
-                    break;
-                }
-            }
-            if (toBeDeleted != null) {
-                EngineStorage.animTracker.endAnimation(toBeDeleted, false);
-                toBeDeleted.location.unitsOnTile.Remove(toBeDeleted);
-                gameData.mapUnits.Remove(toBeDeleted);
-            }
+            new MsgDisbandUnit(guid).send();
         }
 
         public static void ClearWaitQueue()

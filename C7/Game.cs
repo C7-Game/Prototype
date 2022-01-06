@@ -119,10 +119,11 @@ public class Game : Node2D
 					if ((CurrentlySelectedUnit != MapUnit.NONE) && (! CurrentlySelectedUnit.isFortified))
 						KeepCSUWhenFortified = false;
 
-					// Advance off the currently selected unit to the next one if it's out of moves and not playing an animation
-					// we want to watch or if it's fortified and we aren't set to keep fortified units selected.
+					// Advance off the currently selected unit to the next one if it's out of moves or HP and not playing an
+					// animation we want to watch, or if it's fortified and we aren't set to keep fortified units selected.
 					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-					    ((CurrentlySelectedUnit.movementPointsRemaining <= 0 && ! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()) ||
+					    (((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
+					      ! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()) ||
 					     (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit();
 					break;
@@ -503,6 +504,12 @@ public class Game : Node2D
 		}
 	}
 	
+	// Called by the disband popup
+	private void OnUnitDisbanded()
+	{
+		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+	}
+
 	/**
 	 * User quit.  We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
 	 **/

@@ -37,6 +37,18 @@ public static class MapUnitExtensions {
 		**/
 		unit.movementPointsRemaining = 0;
 	}
+
+	public static void disband(this MapUnit unit)
+	{
+		// Set unit's hit points to zero to indicate that it's no longer alive. Ultimately we may not want to do this. I'm only doing it right
+		// now since this way all the UI needs to do to check if the selected unit has been destroyed is to check its hit points.
+		unit.hitPointsRemaining = 0;
+
+		// EngineStorage.animTracker.endAnimation(unit, false);   TODO: Must send message instead of call directly
+		unit.location.unitsOnTile.Remove(unit);
+		EngineStorage.gameData.mapUnits.Remove(unit);
+	}
+
 }
 
 }

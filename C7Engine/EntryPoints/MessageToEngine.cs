@@ -77,4 +77,20 @@ public class MsgSkipUnitTurn : MessageToEngine
 	}
 }
 
+public class MsgDisbandUnit : MessageToEngine {
+	private string unitGUID;
+
+	public MsgDisbandUnit(string unitGUID)
+	{
+		this.unitGUID = unitGUID;
+	}
+
+	public override void process()
+	{
+		MapUnit unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == unitGUID);
+		if (unit != null)
+			unit.disband();
+	}
+}
+
 }
