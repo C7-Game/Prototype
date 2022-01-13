@@ -324,6 +324,9 @@ public class ForestLayer : LooseLayer {
 
 public class MarshLayer : LooseLayer {
 	public static readonly Vector2 marshSize = new Vector2(128, 88);
+	//Because the marsh graphics are 88 pixels tall instead of the 64 of a tile, we also need an addition 12 pixel offset to the top
+	//88 - 64 = 24; 24/2 = 12.  This keeps the marsh centered with half the extra 24 pixels above the tile and half below.
+	readonly Vector2 MARSH_OFFSET = (float)0.5 * marshSize + new Vector2(0, -12);
 	
 	private ImageTexture largeMarshTexture;
 	private ImageTexture smallMarshTexture;
@@ -347,7 +350,7 @@ public class MarshLayer : LooseLayer {
 				marshTexture = largeMarshTexture;
 			}
 			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.x, randomJungleRow * marshSize.y, marshSize);
-			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * marshSize + new Vector2(0, -12), marshSize);
+			Rect2 screenTarget = new Rect2(tileCenter - MARSH_OFFSET, marshSize);
 			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);			
 		}
 	}
