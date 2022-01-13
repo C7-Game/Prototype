@@ -51,19 +51,17 @@ namespace C7GameData
 		public static Tile NONE = new Tile();
 
 		public bool neighborsCoast() {
-			TerrainType northeastType = neighbors[TileDirection.NORTHEAST].baseTerrainType;
-			TerrainType northwestType = neighbors[TileDirection.NORTHWEST].baseTerrainType;
-			TerrainType southeastType = neighbors[TileDirection.SOUTHEAST].baseTerrainType;
-			TerrainType southwestType = neighbors[TileDirection.SOUTHWEST].baseTerrainType;
-
-			TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
-
-			foreach (TerrainType type in neighborTerrains) {
-				if (type.name == "Coast") {
+			foreach (Tile neighbor in getDiagonalNeighbors()) {
+				if (neighbor.baseTerrainType.name == "Coast") {
 					return true;
 				}
 			}
 			return false;
+		}
+
+		public Tile[] getDiagonalNeighbors() {
+			Tile[] diagonalNeighbors =  { neighbors[TileDirection.NORTHEAST], neighbors[TileDirection.NORTHWEST], neighbors[TileDirection.SOUTHEAST], neighbors[TileDirection.SOUTHWEST]};
+			return diagonalNeighbors;
 		}
 
 		public override string ToString()
