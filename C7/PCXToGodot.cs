@@ -22,18 +22,10 @@ public class PCXToGodot : Godot.Object
 		return getImageTextureFromImage(image);
 	}
 
-	// BufferData should be as large as the largest PCX file needed to be loaded in pixels
-	// For now, I will assume no PCX file is larger than 4k resolution
-	// It's efficient to use a shared BufferData, ColorData, and AlphaData instead of having to reinitialize these arrays for every Image load
-	// However, this will become a problem if (when?) we move towards parallelization
-	// But for now, it's an improvement
-	private static int[] BufferData = new int[3840 * 2160];
-	private static int[] ColorData = new int[256];
-	private static int[] AlphaData = new int[256];
-
-	private static void loadPalette(byte[,] palette, bool shadows = false) {
+	private static int[] loadPalette(byte[,] palette, bool shadows = false) {
 		int Red, Green, Blue;
 		int Alpha = 255 << 24;
+		int[] ColorData = new int[256];
 
 		for (int i = 0; i < 256; i++) {
 			Red = palette[i, 0];
@@ -51,9 +43,13 @@ public class PCXToGodot : Godot.Object
 				ColorData[i] = ((255 - i) * 16) << 24;
 			}
 		}
+
+		return ColorData;
 	}
 
-	private static void loadAlphaPalette(byte[,] palette) {
+	private static int[] loadAlphaPalette(byte[,] palette, int[] ColorData) {
+		int[] AlphaData = new int[256];
+
 		for (int i = 0; i < 256; i++) {
 			// Assumption based on menuButtonsAlpha.pcx: The palette in the alpha PCX always has the same red, green, and blue values (i.e. is grayscale).
 			// Examining it with breakpoints in my Java code, it appears it starts at 255, 255, 255, and goes down one at a time.  But this code
@@ -61,12 +57,14 @@ public class PCXToGodot : Godot.Object
 			AlphaData[i] = palette[i, 0] << 24;
 			ColorData[i] = ColorData[i] &= 0x00ffffff;
 		}
+
+		return AlphaData;
 	}
 
-	private static Image getImageFromBufferData(int width, int height) {
+	private static Image getImageFromBufferData(int width, int height, int[] bufferData) {
 		Image image = new Image();
 		var Data = new byte[4 * width * height];
-		Buffer.BlockCopy(BufferData, 0, Data, 0, 4 * width * height);
+		Buffer.BlockCopy(bufferData, 0, Data, 0, 4 * width * height);
 		image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
 		return image;
 	}
@@ -75,7 +73,8 @@ public class PCXToGodot : Godot.Object
 	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
 	 **/
 	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
-		loadPalette(pcx.Palette);
+		int[] ColorData = loadPalette(pcx.Palette);
+		int[] BufferData = new int[croppedWidth * croppedHeight];
 
 		int DataIndex = 0;
 
@@ -86,17 +85,18 @@ public class PCXToGodot : Godot.Object
 			}
 		}
 
-		return getImageFromBufferData(croppedWidth, croppedHeight);
+		return getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
 	}
 
 	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
-		loadPalette(palette, shadows);
+		int[] ColorData = loadPalette(palette, shadows);
+		int[] BufferData = new int[width * height];
 
 		for (int i = 0; i < width * height; i++) {
 			BufferData[i] = ColorData[colorIndices[i]];
 		}
 
-		return getImageFromBufferData(width, height);
+		return getImageFromBufferData(width, height, BufferData);
 	}
 
 	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx) {
@@ -106,8 +106,9 @@ public class PCXToGodot : Godot.Object
 	//Combines two PCXs, one used for the alpha, to produce a final output image.
 	//Some files, such as Art/interface/menuButtons.pcx and Art/interface/menuButtonsAlpha.pcx, use this method.
 	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight, int alphaRowOffset = 0) {
-		loadPalette(imagePcx.Palette);
-		loadAlphaPalette(alphaPcx.Palette);
+		int[] ColorData = loadPalette(imagePcx.Palette);
+		int[] AlphaData = loadAlphaPalette(alphaPcx.Palette, ColorData);
+		int[] BufferData = new int[croppedWidth * croppedHeight];
 
 		int AlphaIndex;
 		int DataIndex = 0;
@@ -121,7 +122,7 @@ public class PCXToGodot : Godot.Object
 			}
 		}
 
-		Image OutImage = getImageFromBufferData(croppedWidth, croppedHeight);
+		Image OutImage = getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
 		return getImageTextureFromImage(OutImage);
 	}
 }
