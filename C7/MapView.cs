@@ -252,20 +252,6 @@ public class ForestLayer : LooseLayer {
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
-		TerrainType northeastType = tile.neighbors[TileDirection.NORTHEAST].baseTerrainType;
-		TerrainType northwestType = tile.neighbors[TileDirection.NORTHWEST].baseTerrainType;
-		TerrainType southeastType = tile.neighbors[TileDirection.SOUTHEAST].baseTerrainType;
-		TerrainType southwestType = tile.neighbors[TileDirection.SOUTHWEST].baseTerrainType;
-
-		TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
-
-		bool neighborsCoast = false;
-		foreach (TerrainType type in neighborTerrains) {
-			if (type.name == "Coast") {
-				neighborsCoast = true;
-			}
-		}
-
 		if (tile.overlayTerrainType.name == "Jungle") {
 			//Randomly, but predictably, choose a large jungle graphic
 			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
@@ -273,7 +259,7 @@ public class ForestLayer : LooseLayer {
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
-			if (neighborsCoast) {
+			if (tile.neighborsCoast()) {
 				randomJungleColumn = tile.xCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			}
@@ -304,7 +290,7 @@ public class ForestLayer : LooseLayer {
 			}
 			else {
 				forestRow = tile.yCoordinate % 2;
-				if (neighborsCoast) {
+				if (tile.neighborsCoast()) {
 					forestColumn = tile.xCoordinate % 5;
 					if (tile.baseTerrainType.name == "Grassland") {
 						forestTexture = smallForestTexture;
@@ -332,6 +318,40 @@ public class ForestLayer : LooseLayer {
 			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.x, forestRow * forestJungleSize.y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
 			looseView.DrawTextureRectRegion(forestTexture, screenTarget, forestRectangle);
+		}
+	}
+}
+
+public class MarshLayer : LooseLayer {
+	public static readonly Vector2 marshSize = new Vector2(128, 88);
+	//Because the marsh graphics are 88 pixels tall instead of the 64 of a tile, we also need an addition 12 pixel offset to the top
+	//88 - 64 = 24; 24/2 = 12.  This keeps the marsh centered with half the extra 24 pixels above the tile and half below.
+	readonly Vector2 MARSH_OFFSET = (float)0.5 * marshSize + new Vector2(0, -12);
+	
+	private ImageTexture largeMarshTexture;
+	private ImageTexture smallMarshTexture;
+
+	public MarshLayer() {
+		largeMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0,   0, 512, 176);
+		smallMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0, 176, 640, 176);
+	}
+
+	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
+		if (tile.overlayTerrainType.name == "Marsh") {
+			int randomJungleRow = tile.yCoordinate % 2;
+			int randomMarshColumn;
+			ImageTexture marshTexture;
+			if (tile.neighborsCoast()) {
+				randomMarshColumn = tile.xCoordinate % 5;
+				marshTexture = smallMarshTexture;
+			}
+			else {
+				randomMarshColumn = tile.xCoordinate % 4;
+				marshTexture = largeMarshTexture;
+			}
+			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.x, randomJungleRow * marshSize.y, marshSize);
+			Rect2 screenTarget = new Rect2(tileCenter - MARSH_OFFSET, marshSize);
+			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);			
 		}
 	}
 }
@@ -671,6 +691,7 @@ public class MapView : Node2D {
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new ForestLayer());
+		looseView.layers.Add(new MarshLayer());
 		looseView.layers.Add(new HillsLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);
