@@ -6,12 +6,6 @@ public class PCXToGodot : Godot.Object
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 
-	private static ImageTexture getImageTextureFromImage(Image image) {
-		ImageTexture Txtr = new ImageTexture();
-		Txtr.CreateFromImage(image, 0);
-		return Txtr;
-	}
-
 	public static ImageTexture getImageTextureFromPCX(Pcx pcx) {
 		Image ImgTxtr = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
 		return getImageTextureFromImage(ImgTxtr);
@@ -20,6 +14,77 @@ public class PCXToGodot : Godot.Object
 	public static ImageTexture getImageTextureFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
 		Image image = getImageFromPCX(pcx, leftStart, topStart, croppedWidth, croppedHeight);
 		return getImageTextureFromImage(image);
+	}
+
+	/**
+	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
+	 **/
+	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
+		int[] ColorData = loadPalette(pcx.Palette);
+		int[] BufferData = new int[croppedWidth * croppedHeight];
+
+		int DataIndex = 0;
+
+		for (int y = topStart; y < topStart + croppedHeight; y++) {
+			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
+				BufferData[DataIndex] = ColorData[pcx.ColorIndexAt(x, y)];
+				DataIndex++;
+			}
+		}
+
+		return getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
+	}
+
+	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx) {
+		return getImageFromPCXWithAlphaBlend(imagePcx, alphaPcx, 0, 0, imagePcx.Width, imagePcx.Height);
+	}
+
+	//Combines two PCXs, one used for the alpha, to produce a final output image.
+	//Some files, such as Art/interface/menuButtons.pcx and Art/interface/menuButtonsAlpha.pcx, use this method.
+	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight, int alphaRowOffset = 0) {
+		int[] ColorData = loadPalette(imagePcx.Palette);
+		int[] AlphaData = loadAlphaPalette(alphaPcx.Palette, ColorData);
+		int[] BufferData = new int[croppedWidth * croppedHeight];
+
+		int AlphaIndex;
+		int DataIndex = 0;
+
+		for (int y = topStart; y < topStart + croppedHeight; y++) {
+			AlphaIndex = (y - alphaRowOffset) * imagePcx.Width + leftStart;
+			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
+				BufferData[DataIndex] = ColorData[imagePcx.ColorIndexAt(x, y)] | AlphaData[alphaPcx.ColorIndices[AlphaIndex]];
+				DataIndex++;
+				AlphaIndex++;
+			}
+		}
+
+		Image OutImage = getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
+		return getImageTextureFromImage(OutImage);
+	}
+
+	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
+		int[] ColorData = loadPalette(palette, shadows);
+		int[] BufferData = new int[width * height];
+
+		for (int i = 0; i < width * height; i++) {
+			BufferData[i] = ColorData[colorIndices[i]];
+		}
+
+		return getImageFromBufferData(width, height, BufferData);
+	}
+
+	private static Image getImageFromBufferData(int width, int height, int[] bufferData) {
+		Image image = new Image();
+		var Data = new byte[4 * width * height];
+		Buffer.BlockCopy(bufferData, 0, Data, 0, 4 * width * height);
+		image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
+		return image;
+	}
+
+	private static ImageTexture getImageTextureFromImage(Image image) {
+		ImageTexture Txtr = new ImageTexture();
+		Txtr.CreateFromImage(image, 0);
+		return Txtr;
 	}
 
 	private static int[] loadPalette(byte[,] palette, bool shadows = false) {
@@ -59,70 +124,5 @@ public class PCXToGodot : Godot.Object
 		}
 
 		return AlphaData;
-	}
-
-	private static Image getImageFromBufferData(int width, int height, int[] bufferData) {
-		Image image = new Image();
-		var Data = new byte[4 * width * height];
-		Buffer.BlockCopy(bufferData, 0, Data, 0, 4 * width * height);
-		image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
-		return image;
-	}
-
-	/**
-	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
-	 **/
-	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
-		int[] ColorData = loadPalette(pcx.Palette);
-		int[] BufferData = new int[croppedWidth * croppedHeight];
-
-		int DataIndex = 0;
-
-		for (int y = topStart; y < topStart + croppedHeight; y++) {
-			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
-				BufferData[DataIndex] = ColorData[pcx.ColorIndexAt(x, y)];
-				DataIndex++;
-			}
-		}
-
-		return getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
-	}
-
-	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
-		int[] ColorData = loadPalette(palette, shadows);
-		int[] BufferData = new int[width * height];
-
-		for (int i = 0; i < width * height; i++) {
-			BufferData[i] = ColorData[colorIndices[i]];
-		}
-
-		return getImageFromBufferData(width, height, BufferData);
-	}
-
-	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx) {
-		return getImageFromPCXWithAlphaBlend(imagePcx, alphaPcx, 0, 0, imagePcx.Width, imagePcx.Height);
-	}
-
-	//Combines two PCXs, one used for the alpha, to produce a final output image.
-	//Some files, such as Art/interface/menuButtons.pcx and Art/interface/menuButtonsAlpha.pcx, use this method.
-	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight, int alphaRowOffset = 0) {
-		int[] ColorData = loadPalette(imagePcx.Palette);
-		int[] AlphaData = loadAlphaPalette(alphaPcx.Palette, ColorData);
-		int[] BufferData = new int[croppedWidth * croppedHeight];
-
-		int AlphaIndex;
-		int DataIndex = 0;
-
-		for (int y = topStart; y < topStart + croppedHeight; y++) {
-			AlphaIndex = (y - alphaRowOffset) * imagePcx.Width + leftStart;
-			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
-				BufferData[DataIndex] = ColorData[imagePcx.ColorIndexAt(x, y)] | AlphaData[alphaPcx.ColorIndices[AlphaIndex]];
-				DataIndex++;
-				AlphaIndex++;
-			}
-		}
-
-		Image OutImage = getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
-		return getImageTextureFromImage(OutImage);
 	}
 }
