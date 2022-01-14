@@ -6,7 +6,7 @@ public class PCXToGodot : Godot.Object
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 
-	public static ImageTexture getImageTextureFromImage(Image image) {
+	private static ImageTexture getImageTextureFromImage(Image image) {
 		ImageTexture Txtr = new ImageTexture();
 		Txtr.CreateFromImage(image, 0);
 		return Txtr;
@@ -27,11 +27,11 @@ public class PCXToGodot : Godot.Object
 	// It's efficient to use a shared BufferData, ColorData, and AlphaData instead of having to reinitialize these arrays for every Image load
 	// However, this will become a problem if (when?) we move towards parallelization
 	// But for now, it's an improvement
-	public static int[] BufferData = new int[3840 * 2160];
-	public static int[] ColorData = new int[256];
-	public static int[] AlphaData = new int[256];
+	private static int[] BufferData = new int[3840 * 2160];
+	private static int[] ColorData = new int[256];
+	private static int[] AlphaData = new int[256];
 
-	public static void loadPalette(byte[,] palette, bool shadows = false) {
+	private static void loadPalette(byte[,] palette, bool shadows = false) {
 		int Red, Green, Blue;
 		int Alpha = 255 << 24;
 
@@ -53,7 +53,7 @@ public class PCXToGodot : Godot.Object
 		}
 	}
 
-	public static void loadAlphaPalette(byte[,] palette) {
+	private static void loadAlphaPalette(byte[,] palette) {
 		for (int i = 0; i < 256; i++) {
 			// Assumption based on menuButtonsAlpha.pcx: The palette in the alpha PCX always has the same red, green, and blue values (i.e. is grayscale).
 			// Examining it with breakpoints in my Java code, it appears it starts at 255, 255, 255, and goes down one at a time.  But this code
@@ -63,7 +63,7 @@ public class PCXToGodot : Godot.Object
 		}
 	}
 
-	public static Image getImageFromBufferData(int width, int height) {
+	private static Image getImageFromBufferData(int width, int height) {
 		Image image = new Image();
 		var Data = new byte[4 * width * height];
 		Buffer.BlockCopy(BufferData, 0, Data, 0, 4 * width * height);
@@ -77,15 +77,12 @@ public class PCXToGodot : Godot.Object
 	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
 		loadPalette(pcx.Palette);
 
-		int yEnd = topStart + croppedHeight;
-		int xEnd = leftStart + croppedWidth;
-		int Index;
 		int DataIndex = 0;
 
-		for (int y = topStart; y < yEnd; y++) {
-			Index = y * pcx.Width + leftStart;
-			for (int x = leftStart; x < xEnd; x++) {
-				BufferData[DataIndex++] = ColorData[pcx.ColorIndices[Index++]];
+		for (int y = topStart; y < topStart + croppedHeight; y++) {
+			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
+				BufferData[DataIndex] = ColorData[pcx.ColorIndexAt(x, y)];
+				DataIndex++;
 			}
 		}
 
@@ -95,8 +92,7 @@ public class PCXToGodot : Godot.Object
 	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
 		loadPalette(palette, shadows);
 
-		int length = width * height;
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < width * height; i++) {
 			BufferData[i] = ColorData[colorIndices[i]];
 		}
 
@@ -113,17 +109,15 @@ public class PCXToGodot : Godot.Object
 		loadPalette(imagePcx.Palette);
 		loadAlphaPalette(alphaPcx.Palette);
 
-		int yEnd = topStart + croppedHeight;
-		int xEnd = leftStart + croppedWidth;
-		int Index;
 		int AlphaIndex;
 		int DataIndex = 0;
 
-		for (int y = topStart; y < yEnd; y++) {
-			Index = y * imagePcx.Width + leftStart;
+		for (int y = topStart; y < topStart + croppedHeight; y++) {
 			AlphaIndex = (y - alphaRowOffset) * imagePcx.Width + leftStart;
-			for (int x = leftStart; x < xEnd; x++) {
-				BufferData[DataIndex++] = ColorData[imagePcx.ColorIndices[Index++]] | AlphaData[alphaPcx.ColorIndices[AlphaIndex++]];
+			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
+				BufferData[DataIndex] = ColorData[imagePcx.ColorIndexAt(x, y)] | AlphaData[alphaPcx.ColorIndices[AlphaIndex]];
+				DataIndex++;
+				AlphaIndex++;
 			}
 		}
 

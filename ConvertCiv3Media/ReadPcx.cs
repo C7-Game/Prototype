@@ -45,44 +45,36 @@ namespace ConvertCiv3Media
             // Populate color palette
             Buffer.BlockCopy(PcxBytes, PaletteOffset, Palette, 0, 768);
 
-            int Length = Width * Height;
-            ColorIndices = new byte[Length];
+            ColorIndices = new byte[Width * Height];
 
             // Encoding always have even number of bytes per line; if image width is odd, there is a junk byte in every row
             bool JunkByte = BytesPerLine > Width;
-            byte PcxData;
 
             // Loop to decode run-length-encoded image data which begins at file offset 0x80
-            for (int ImgIdx = 0, PcxIdx = 0x80, RunLen = 0, LineIdx = 0; ImgIdx < Length; ) {
+            for (int ImgIdx = 0, PcxIdx = 0x80, RunLen = 0, LineIdx = 0; ImgIdx < Width * Height; ) {
                 // if two most significant bits are 11
-                PcxData = PcxBytes[PcxIdx];
-                if ((PcxData & 0xc0) == 0xc0) {
+                if ((PcxBytes[PcxIdx] & 0xc0) == 0xc0) {
                     // then it & 0x3f is the run length of the following byte
-                    RunLen = PcxData & 0x3f;
+                    RunLen = PcxBytes[PcxIdx] & 0x3f;
                     PcxIdx++;
                     // Repeat the pixel in the image RunLen times
                     for (int j = 0; j < RunLen; j++) {
                         // Add pixel copy if it's not a junk byte
-                        if (JunkByte) {
-                            if (++LineIdx == BytesPerLine) {
-                                LineIdx = 0;
-                                ImgIdx--;
-                            }
+                        if (!(JunkByte && LineIdx % BytesPerLine == BytesPerLine - 1)) {
+                            ColorIndices[ImgIdx] = PcxBytes[PcxIdx];
+                            ImgIdx++;
                         }
-                        ColorIndices[ImgIdx++] = PcxBytes[PcxIdx];
+                        LineIdx++;
                     }
                     PcxIdx++;
                 } else {
                     // Add as literal pixel if it's not a junk byte
-                    ColorIndices[ImgIdx++] = PcxData;
-                    PcxIdx++;
-
-                    if (JunkByte) {
-                        if (++LineIdx == BytesPerLine) {
-                            LineIdx = 0;
-                            ImgIdx--;
-                        }
+                    if (!(JunkByte && LineIdx % BytesPerLine == BytesPerLine - 1)) {
+                        ColorIndices[ImgIdx] = PcxBytes[PcxIdx];
+                        ImgIdx++;
                     }
+                    PcxIdx++;
+                    LineIdx++;
                 }
             }
         }
