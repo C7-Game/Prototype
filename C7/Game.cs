@@ -90,31 +90,44 @@ public class Game : Node2D
 		GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 	}
 
+	// Must only be called while holding the game data mutex
+	public void processEngineMessages(GameData gameData)
+	{
+		MessageToUI msg;
+		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
+			switch (msg) {
+			case MsgStartAnimation mSA:
+				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSA.unitGUID);
+				if (unit != null)
+					animTracker.startAnimation(unit, mSA.action, mSA.completionEvent);
+				break;
+			}
+		}
+	}
+
+	// Instead of Game calling animTracker.update periodically (this used to happen in _Process), this method gets called as necessary to bring
+	// the animations up to date. Right now it's called from UnitLayer right before it draws the units on the map. This method also processes all
+	// waiting messages b/c some of them might pertain to animations. TODO: Consider processing only the animation messages here.
+	// Must only be called while holding the game data mutex
+	public void updateAnimations(GameData gameData)
+	{
+		processEngineMessages(gameData);
+		animTracker.update();
+	}
+
 	public override void _Process(float delta)
 	{
 		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			GameData gameData = gameDataAccess.gameData;
 
-			// Process messages from the engine
-			MessageToUI msg;
-			while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
-				switch (msg) {
-				case MsgStartAnimation mSA:
-					MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSA.unitGUID);
-					if (unit != null)
-						animTracker.startAnimation(unit, mSA.action, mSA.completionEvent);
-					break;
-				}
-			}
+			processEngineMessages(gameData);
 
 			switch (CurrentState) {
 				case GameState.PreGame:
 					StartGame();
 					break;
 				case GameState.PlayerTurn:
-					animTracker.update();
-
 					// If the selected unit is unfortified, prepare to autoselect the next one if it becomes fortified
 					if ((CurrentlySelectedUnit != MapUnit.NONE) && (! CurrentlySelectedUnit.isFortified))
 						KeepCSUWhenFortified = false;
@@ -128,7 +141,6 @@ public class Game : Node2D
 						GetNextAutoselectedUnit();
 					break;
 				case GameState.ComputerTurn:
-					animTracker.update();
 					break;
 			}
 			//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work

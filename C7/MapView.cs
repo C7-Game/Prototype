@@ -550,6 +550,8 @@ public class UnitLayer : LooseLayer {
 		// Hide cursor if it's been initialized
 		if (cursorMesh != null)
 			cursorMesh.Hide();
+
+		looseView.mapView.game.updateAnimations(gameData);
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
