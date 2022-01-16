@@ -29,8 +29,7 @@ public class AnimationTracker {
 		public AutoResetEvent completionEvent;
 	}
 
-	private Dictionary<string, ActiveAnimation> activeAnims    = new Dictionary<string, ActiveAnimation>();
-	private Dictionary<string, ActiveAnimation> completedAnims = new Dictionary<string, ActiveAnimation>();
+	private Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
 
 	public long getCurrentTimeMS()
 	{
@@ -54,7 +53,6 @@ public class AnimationTracker {
 		civ3UnitAnim.playSound(unit.unitType.name, action);
 
 		activeAnims[unit.guid] = aa;
-		completedAnims.Remove(unit.guid);
 	}
 
 	public void endAnimation(MapUnit unit, bool triggerCallback = true)
@@ -64,23 +62,18 @@ public class AnimationTracker {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
 			activeAnims.Remove(unit.guid);
-		} else {
-			activeAnims   .Remove(unit.guid);
-			completedAnims.Remove(unit.guid);
-		}
+		} else
+			activeAnims.Remove(unit.guid);
 	}
 
 	public bool hasCurrentAction(MapUnit unit)
 	{
-		return activeAnims.ContainsKey(unit.guid) || completedAnims.ContainsKey(unit.guid);
+		return activeAnims.ContainsKey(unit.guid);
 	}
 
 	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(MapUnit unit)
 	{
-		ActiveAnimation aa;
-		if (! activeAnims.TryGetValue(unit.guid, out aa))
-			aa = completedAnims[unit.guid];
-
+		ActiveAnimation aa = activeAnims[unit.guid];
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
