@@ -1,19 +1,10 @@
 
-// The purpose of the AnimationTracker is to store the state of all ongoing animations in a module separate from the rest of the UI. It doesn't do
-// anything with the animations, it simply keeps record of them while they're playing then calls a callback function when they're done. So it's
-// basically just a stopwatch. Its update function must be called regularly so it can follow the passage of time, right now this is done in the Game
-// class's _Process method. There is one instance of AnimationTracker and it is located in Game. TODO: Consider moving it to MapView.
-
-// The callbacks are hopefully temporary. I don't like using them since they obscure control flow as they get called at some later time potentially by
-// a different thread. The threading issue doesn't matter at the moment since everything important runs on one thread but this could change if we want
-// to have separate UI and engine threads (as I believe we should).
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using C7GameData;
-using C7Engine; // for IAnimationControl, OnAnimationCompleted
+using C7Engine;
 
 public class AnimationTracker {
 	private Civ3UnitAnim civ3UnitAnim;
