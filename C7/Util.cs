@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Godot;
 using ConvertCiv3Media;
 
@@ -57,9 +58,12 @@ public class Util
 		if (System.IO.File.Exists(fullPath))
 			return fullPath;
 
-		// If that didn't work, do a case-insensitive search starting at the root path and stepping through each piece of the extension.
+		// If that didn't work, do a case-insensitive search starting at the root path and stepping through each piece of the extension. Skip
+		// this step if the root directory doesn't exist or if running on Windows. Skipping this step on Windows avoids a potential problem
+		// with mixed forward and back slashes in the path.
 		string tr = null;
-		if (System.IO.Directory.Exists(exactCaseRoot)) {
+		if ((! RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) &&
+		    System.IO.Directory.Exists(exactCaseRoot)) {
 			tr = exactCaseRoot;
 			foreach (string step in ignoredCaseExtension.Replace('\\', '/').Split('/')) {
 				string goal = (tr + "/" + step).Replace("//", "/"); // Sometimes tr will already end in a slash so goal will end up
