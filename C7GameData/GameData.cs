@@ -40,6 +40,7 @@ namespace C7GameData
                 unit.unitType = proto;
 		        unit.owner = owner;
                 unit.location = tile;
+                unit.facingDirection = TileDirection.SOUTHWEST;
                 tile.unitsOnTile.Add(unit);
                 mapUnits.Add(unit);
                 unit.movementPointsRemaining = proto.movement;
@@ -119,6 +120,7 @@ namespace C7GameData
                     var barbWarrior = createDummyUnit(warrior, barbarianPlayer, barbCampLocation.xCoordinate, barbCampLocation.yCoordinate);
                     barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
                                                     // whole procedure of generating a map should be part of the engine not the data module.
+                    barbWarrior.facingDirection = TileDirection.SOUTHEAST;
                     barbWarrior.location.hasBarbarianCamp = true;
                 }
 
