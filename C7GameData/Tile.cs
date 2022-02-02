@@ -69,53 +69,54 @@ namespace C7GameData
 			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
 		}
 
-		public enum TileDirection {
-			NORTH,
-			NORTHEAST,
-			EAST,
-			SOUTHEAST,
-			SOUTH,
-			SOUTHWEST,
-			WEST,
-			NORTHWEST
-		}
-
-		public static class TileDirectionExtensions {
-			public static TileDirection reversed(this TileDirection dir)
-			{
-				switch (dir) {
-				case TileDirection.NORTH:	 return TileDirection.SOUTH;
-				case TileDirection.NORTHEAST: return TileDirection.SOUTHWEST;
-				case TileDirection.EAST:	  return TileDirection.WEST;
-				case TileDirection.SOUTHEAST: return TileDirection.NORTHWEST;
-				case TileDirection.SOUTH:	 return TileDirection.NORTH;
-				case TileDirection.SOUTHWEST: return TileDirection.NORTHEAST;
-				case TileDirection.WEST:	  return TileDirection.EAST;
-				case TileDirection.NORTHWEST: return TileDirection.SOUTHEAST;
-				default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
-				}
-			}
-
-			public static (int, int) toCoordDiff(this TileDirection dir)
-			{
-				switch (dir) {
-				case TileDirection.NORTH:	 return ( 0, -2);
-				case TileDirection.NORTHEAST: return ( 1, -1);
-				case TileDirection.EAST:	  return ( 2,  0);
-				case TileDirection.SOUTHEAST: return ( 1,  1);
-				case TileDirection.SOUTH:	 return ( 0,  2);
-				case TileDirection.SOUTHWEST: return (-1,  1);
-				case TileDirection.WEST:	  return (-2,  0);
-				case TileDirection.NORTHWEST: return (-1, -1);
-				default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
-				}
-			}
-		}
-
 		public static TileDirection RandomDirection() {
 			Random rnd = new Random();
 			int index = rnd.Next(8);
 			return (TileDirection)(Enum.GetValues(TileDirection.NORTH.GetType())).GetValue(index);
 		}
 	}
+
+	public enum TileDirection {
+		NORTH,
+		NORTHEAST,
+		EAST,
+		SOUTHEAST,
+		SOUTH,
+		SOUTHWEST,
+		WEST,
+		NORTHWEST
+	}
+
+	public static class TileDirectionExtensions {
+		public static TileDirection reversed(this TileDirection dir)
+		{
+			switch (dir) {
+			case TileDirection.NORTH:	 return TileDirection.SOUTH;
+			case TileDirection.NORTHEAST: return TileDirection.SOUTHWEST;
+			case TileDirection.EAST:	  return TileDirection.WEST;
+			case TileDirection.SOUTHEAST: return TileDirection.NORTHWEST;
+			case TileDirection.SOUTH:	 return TileDirection.NORTH;
+			case TileDirection.SOUTHWEST: return TileDirection.NORTHEAST;
+			case TileDirection.WEST:	  return TileDirection.EAST;
+			case TileDirection.NORTHWEST: return TileDirection.SOUTHEAST;
+			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
+		}
+
+		public static (int, int) toCoordDiff(this TileDirection dir)
+		{
+			switch (dir) {
+			case TileDirection.NORTH:	 return ( 0, -2);
+			case TileDirection.NORTHEAST: return ( 1, -1);
+			case TileDirection.EAST:	  return ( 2,  0);
+			case TileDirection.SOUTHEAST: return ( 1,  1);
+			case TileDirection.SOUTH:	 return ( 0,  2);
+			case TileDirection.SOUTHWEST: return (-1,  1);
+			case TileDirection.WEST:	  return (-2,  0);
+			case TileDirection.NORTHWEST: return (-1, -1);
+			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
+		}
+	}
+
 }
