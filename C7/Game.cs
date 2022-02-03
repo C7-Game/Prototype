@@ -30,9 +30,10 @@ public class Game : Node2D
 
 	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
 	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
-	public bool KeepCSUWhenFortified = false; // Normally if the currently selected unit (CSU) becomes fortified, we advance to the next
-	                                          // autoselected unit. If this flag is set, we won't do that. This is useful so that the unit
-	                                          // autoselector can be prevented from interfering with the player selecting fortified units.
+
+	// Normally if the currently selected unit (CSU) becomes fortified, we advance to the next autoselected unit. If this flag is set, we won't do
+	// that. This is useful so that the unit autoselector can be prevented from interfering with the player selecting fortified units.
+	public bool KeepCSUWhenFortified = false;
 
 	Control Toolbar;
 	private bool IsMovingCamera;
@@ -42,6 +43,7 @@ public class Game : Node2D
 	Stopwatch loadTimer = new Stopwatch();
 	GlobalSingleton Global;
 
+	bool errorOnLoad = false;
 
 	public override void _EnterTree()
 	{
@@ -51,33 +53,41 @@ public class Game : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		var unitAnimSoundPlayer = new AudioStreamPlayer();
-		AddChild(unitAnimSoundPlayer);
-		civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
-		animTracker = new AnimationTracker(civ3UnitAnim);
-		EngineStorage.initialize(); // Spawns engine thread
-
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
-		controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
-		Global.ResetLoadGamePath();
+		try {
+			var unitAnimSoundPlayer = new AudioStreamPlayer();
+			AddChild(unitAnimSoundPlayer);
+			civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
+			animTracker = new AnimationTracker(civ3UnitAnim);
+			EngineStorage.initialize(); // Spawns engine thread
 
-		using (var gameDataAccess = new UIGameDataAccess()) {
-			GameMap map = gameDataAccess.gameData.map;
-			GD.Print("RelativeModPath ", map.RelativeModPath);
-			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
-			AddChild(mapView);
-		}
+			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
+			Global.ResetLoadGamePath();
 
-		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
-		Player = GetNode<KinematicBody2D>("KinematicBody2D");
-		GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-		mapView.cameraZoom = (float)0.3;
-		// If later recreating scene, the component may already exist, hence try/catch
-		try{
-			ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+			using (var gameDataAccess = new UIGameDataAccess()) {
+				GameMap map = gameDataAccess.gameData.map;
+				GD.Print("RelativeModPath ", map.RelativeModPath);
+				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
+				AddChild(mapView);
+			}
+
+			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
+			Player = GetNode<KinematicBody2D>("KinematicBody2D");
+			GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
+			mapView.cameraZoom = (float)0.3;
+			// If later recreating scene, the component may already exist, hence try/catch
+			try{
+				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
+			}
+			catch {
+				ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
+			}
 		}
-		catch {
-			ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
+		catch(Exception ex) {
+			errorOnLoad = true;
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
+			GD.PrintErr(ex);
 		}
 
 		// Hide slideout bar on startup
@@ -123,7 +133,9 @@ public class Game : Node2D
 
 			processEngineMessages(gameData);
 
-			switch (CurrentState) {
+			if (!errorOnLoad) {
+				switch (CurrentState)
+				{
 				case GameState.PreGame:
 					StartGame();
 					break;
@@ -135,19 +147,20 @@ public class Game : Node2D
 					// Advance off the currently selected unit to the next one if it's out of moves or HP and not playing an
 					// animation we want to watch, or if it's fortified and we aren't set to keep fortified units selected.
 					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-					    (((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
-					      ! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()) ||
-					     (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
+						(((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
+						  ! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()) ||
+						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit();
 					break;
 				case GameState.ComputerTurn:
 					break;
-			}
-			//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
-			//without a manual cast to int.
-			//https://github.com/godotengine/godot/issues/16388
-			if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-				EmitSignal("ShowSpecificAdvisor", "F1");
+				}
+				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
+				//without a manual cast to int.
+				//https://github.com/godotengine/godot/issues/16388
+				if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+					EmitSignal("ShowSpecificAdvisor", "F1");
+				}
 			}
 		}
 	}
@@ -423,8 +436,8 @@ public class Game : Node2D
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
 				GD.Print("Got request for escape/quit");
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-				popupOverlay.ShowPopup("escapeQuit", PopupOverlay.PopupCategory.Info, BoxContainer.AlignMode.Center);
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Z)
 			{
@@ -482,14 +495,13 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("disband"))
 		{
-			string[] args = {CurrentlySelectedUnit.unitType.name};
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-			popupOverlay.ShowPopup("disband", PopupOverlay.PopupCategory.Advisor, args);
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+			popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-			popupOverlay.ShowPopup("buildCity", PopupOverlay.PopupCategory.Advisor);
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+			popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
 		}
 		else
 		{

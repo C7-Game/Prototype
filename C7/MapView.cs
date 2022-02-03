@@ -101,7 +101,7 @@ public class HillsLayer : LooseLayer {
 			int pcxIndex = getMountainIndex(tile);
 			int row = pcxIndex/4;
 			int column = pcxIndex % 4;
-			if (tile.overlayTerrainType.name == "Mountain") {
+			if (tile.overlayTerrainType.name == "Mountains") {
 				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
 				ImageTexture mountainGraphics;
@@ -961,7 +961,7 @@ public class MapView : Node2D {
 	public override void _Process(float delta)
 	{
 		looseView.Update(); // Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but
-				    // long term I think it's better to redraw everything every frame like a typical modern video game.
+					// long term I think it's better to redraw everything every frame like a typical modern video game.
 	}
 
 	public bool isRowAt(int y)

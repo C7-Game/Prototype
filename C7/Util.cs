@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Godot;
 using ConvertCiv3Media;
 
@@ -47,23 +48,23 @@ public class Util
 	// necessary, otherwise returns null. This function is needed for the game to work on Linux & Mac with the .NET Core runtime. It's not needed
 	// on Windows, which has a case insensitive filesystem, or when using the Mono runtime, which emulates case insensitivity out of the
 	// box. Arguments:
-	//   exactCaseRoot: The first part of the file path, not made case-insensitive. Must end in a forward slash. This is intended be the root Civ
-	//   3 path returned by GetCiv3Path().
+	//   exactCaseRoot: The first part of the file path, not made case-insensitive. This is intended be the root Civ 3 path from GetCiv3Path().
 	//   ignoredCaseExtension: The second part of the file path that will be searched ignoring case.
 	static public string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension)
 	{
 		// First try the basic built-in File.Exists method since it's adequate in most cases.
-		string fullPath = exactCaseRoot + ignoredCaseExtension;
+		string fullPath = System.IO.Path.Combine(exactCaseRoot, ignoredCaseExtension);
 		if (System.IO.File.Exists(fullPath))
 			return fullPath;
 
-		// If that didn't work, do a case-insensitive search starting at the root path and stepping through each piece of the extension.
+		// If that didn't work, do a case-insensitive search starting at the root path and stepping through each piece of the extension. Skip
+		// this step if the root directory doesn't exist or if running on Windows.
 		string tr = null;
-		if (System.IO.Directory.Exists(exactCaseRoot)) {
+		if ((! RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) &&
+			System.IO.Directory.Exists(exactCaseRoot)) {
 			tr = exactCaseRoot;
 			foreach (string step in ignoredCaseExtension.Replace('\\', '/').Split('/')) {
-				string goal = (tr + "/" + step).Replace("//", "/"); // Sometimes tr will already end in a slash so goal will end up
-				                                                    // with two in a row. The Replace is a lazy fix for that.
+				string goal = System.IO.Path.Combine(tr, step);
 				List<string> matches = System.IO.Directory.EnumerateFileSystemEntries(tr, "*")
 					.Where(p => p.Equals(goal, StringComparison.CurrentCultureIgnoreCase))
 					.ToList();
@@ -209,8 +210,8 @@ public class Util
 				for (int y = 0; y < flic.Height; y++)
 					for (int x = 0; x < flic.Width; x++) {
 						int pixelRow = row * flic.Height + y,
-						    pixelCol = col * flic.Width + x,
-						    pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
+							pixelCol = col * flic.Width + x,
+							pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
 						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
 					}
 
