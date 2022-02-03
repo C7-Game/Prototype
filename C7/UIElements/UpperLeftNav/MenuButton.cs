@@ -3,6 +3,7 @@ using ConvertCiv3Media;
 
 public class MenuButton : TextureButton
 {
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -12,4 +13,11 @@ public class MenuButton : TextureButton
 		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, 0, 1, 35, 29);
 		this.TextureNormal = menuTexture;
 	}
+
+	public override void _Pressed()
+	{
+		PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+		popupOverlay.ShowPopup(new GameMenu(), PopupOverlay.PopupCategory.Info);
+	}
+
 }
