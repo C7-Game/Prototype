@@ -14,7 +14,7 @@ namespace C7GameData
         //some stuff about graphics would probably make sense, too
 
         public bool isHilly() {
-            if (name.Equals("Mountain") || name.Equals("Hills") || name.Equals("Volcano")) {
+            if (name.Equals("Mountains") || name.Equals("Hills") || name.Equals("Volcano")) {
                 return true;
             }
             return false;

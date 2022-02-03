@@ -101,7 +101,7 @@ public class HillsLayer : LooseLayer {
 			int pcxIndex = getMountainIndex(tile);
 			int row = pcxIndex/4;
 			int column = pcxIndex % 4;
-			if (tile.overlayTerrainType.name == "Mountain") {
+			if (tile.overlayTerrainType.name == "Mountains") {
 				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
 				ImageTexture mountainGraphics;
