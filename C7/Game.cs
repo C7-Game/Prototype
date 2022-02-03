@@ -22,6 +22,8 @@ public class Game : Node2D
 	Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
+	public Civ3UnitAnim civ3UnitAnim;
+	public AnimationTracker animTracker;
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
@@ -54,6 +56,11 @@ public class Game : Node2D
 
 		mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
 		AddChild(mapView);
+		var unitAnimSoundPlayer = new AudioStreamPlayer();
+		AddChild(unitAnimSoundPlayer);
+		civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
+		animTracker = new AnimationTracker(civ3UnitAnim);
+		EngineStorage.animTracker = animTracker;
 
 		Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 		Player = GetNode<KinematicBody2D>("KinematicBody2D");
@@ -85,8 +92,18 @@ public class Game : Node2D
 				StartGame();
 				break;
 			case GameState.PlayerTurn:
+				animTracker.update();
+
+				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
+				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
+				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
+				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
+				    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+				    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
+					GetNextAutoselectedUnit();
 				break;
 			case GameState.ComputerTurn:
+				animTracker.update();
 				break;
 		}
 		//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
@@ -140,10 +157,7 @@ public class Game : Node2D
 			var relativeScreenLocation = mapView.screenLocationOfTile(unit.location, true) / mapView.getVisibleAreaSize();
 			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
 				mapView.centerCameraOnTile(unit.location);
-			else
-				mapView.onVisibleAreaChanged();
-		} else
-			mapView.onVisibleAreaChanged();
+		}
 
 		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {
@@ -225,11 +239,6 @@ public class Game : Node2D
 	public void _on_Zoom_value_changed(float value)
 	{
 		mapView.setCameraZoomFromMiddle(value);
-	}
-
-	public void _OnViewportSizeChanged()
-	{
-		mapView.onVisibleAreaChanged();
 	}
 
 	public void AdjustZoomSlider(int numSteps, Vector2 zoomCenter)
@@ -346,15 +355,26 @@ public class Game : Node2D
 			{
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
-					var dirs = new int[] {5, 4, 3, 6, 0, 2, 7, 8, 1}; // SW, S, SE, W, ., E, NW, N, NE
-					var dir = dirs[eventKey.Scancode - (int)Godot.KeyList.Kp1];
+					TileDirection dir;
+					switch (eventKey.Scancode - (int)Godot.KeyList.Kp0) {
+					case 1: dir = TileDirection.SOUTHWEST; break;
+					case 2: dir = TileDirection.SOUTH;     break;
+					case 3: dir = TileDirection.SOUTHEAST; break;
+					case 4: dir = TileDirection.WEST;      break;
+					case 5: return; // Key pad 5 => don't move
+					case 6: dir = TileDirection.EAST;      break;
+					case 7: dir = TileDirection.NORTHWEST; break;
+					case 8: dir = TileDirection.NORTH;     break;
+					case 9: dir = TileDirection.NORTHEAST; break;
+					default: return; // Impossible
+					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
-					if (CurrentlySelectedUnit.movementPointsRemaining <= 0)
+					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+					    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
 						GetNextAutoselectedUnit();
 					else {
 						setSelectedUnit(CurrentlySelectedUnit);
 					}
-					mapView.onVisibleAreaChanged();
 				}
 			}
 			// I key toggles the grid. This should be CTRL+G to match the original game but that key combination gets intercepted by the
@@ -362,7 +382,6 @@ public class Game : Node2D
 			else if (eventKey.Scancode == (int)Godot.KeyList.I)
 			{
 				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
-				mapView.onVisibleAreaChanged(); // Trigger redraw
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
@@ -421,7 +440,7 @@ public class Game : Node2D
 		else if (buttonName.Equals("fortify"))
 		{
 			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit();
+			GetNextAutoselectedUnit(); // This skips the animation but if we don't do this the unit will stay selected
 		}
 		else if (buttonName.Equals("wait"))
 		{
@@ -435,8 +454,14 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
+			animTracker.startAnimation(
+				CurrentlySelectedUnit,
+				MapUnit.AnimatedAction.BUILD,
+				(unitGUID, action) => {
+          PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+          popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
+					return false;
+				});
 		}
 		else
 		{

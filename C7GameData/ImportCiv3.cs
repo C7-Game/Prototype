@@ -34,8 +34,8 @@ namespace C7GameData
             }
 
             // Import tiles
-            c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
-            c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
+            c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Width;
+            c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Height;
             foreach (MapTile civ3Tile in civ3Save.Tile)
             {
                 Civ3ExtraInfo extra = new Civ3ExtraInfo
