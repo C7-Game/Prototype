@@ -61,7 +61,7 @@ public class Util
 		// this step if the root directory doesn't exist or if running on Windows.
 		string tr = null;
 		if ((! RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) &&
-		    System.IO.Directory.Exists(exactCaseRoot)) {
+			System.IO.Directory.Exists(exactCaseRoot)) {
 			tr = exactCaseRoot;
 			foreach (string step in ignoredCaseExtension.Replace('\\', '/').Split('/')) {
 				string goal = System.IO.Path.Combine(tr, step);
