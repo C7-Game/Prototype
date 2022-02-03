@@ -141,7 +141,7 @@ namespace C7GameData
                 bool foundOne = false;
                 for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
                     var randTile = tiles[rng.Next(0, tiles.Count)];
-                    if (randTile.baseTerrainType.name == "Coast") // TODO: Write a proper check for if tile is water
+                    if (randTile.baseTerrainType.isWater())
                         continue;
                     int distToNearestOtherLoc = Int32.MaxValue;
                     foreach (var sL in tr) {
