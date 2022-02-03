@@ -99,22 +99,22 @@ public class Game : Node2D
 			switch (CurrentState)
 			{
 				case GameState.PreGame:
-				StartGame();
-				break;
+					StartGame();
+					break;
 				case GameState.PlayerTurn:
-				animTracker.update();
+					animTracker.update();
 
-				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
-				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
-				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
-				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-					(CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-					(! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
-					GetNextAutoselectedUnit();
-				break;
+					// Check if we're triggered to advance to the next autoselected unit by an animation completing.
+					// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
+					// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
+					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
+						(CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+						(! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
+						GetNextAutoselectedUnit();
+					break;
 				case GameState.ComputerTurn:
-				animTracker.update();
-				break;
+					animTracker.update();
+					break;
 			}
 			//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
 			//without a manual cast to int.
