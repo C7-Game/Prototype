@@ -6,10 +6,10 @@ public class BuildCityDialog : Popup
 	LineEdit cityName = new LineEdit();
 
 	public BuildCityDialog()
-    {
+	{
 		alignment = BoxContainer.AlignMode.End;
-		margins = new Margins(right: 10); // 10px margin on the right
-    }
+		margins = new Margins(right: -10); // 10px margin from the right
+	}
 
 	public override void _Ready()
 	{
