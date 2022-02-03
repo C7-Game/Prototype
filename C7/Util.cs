@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Godot;
 using ConvertCiv3Media;
 
@@ -41,6 +43,42 @@ public class Util
 		// Assuming 64-bit platform, get vanilla Civ3 install folder from registry
 		return (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", defaultPath);
 	}
+
+	// Checks if a file exists ignoring case on the latter parts of its path. If the file is found, returns its full path re-capitalized as
+	// necessary, otherwise returns null. This function is needed for the game to work on Linux & Mac with the .NET Core runtime. It's not needed
+	// on Windows, which has a case insensitive filesystem, or when using the Mono runtime, which emulates case insensitivity out of the
+	// box. Arguments:
+	//   exactCaseRoot: The first part of the file path, not made case-insensitive. This is intended be the root Civ 3 path from GetCiv3Path().
+	//   ignoredCaseExtension: The second part of the file path that will be searched ignoring case.
+	static public string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension)
+	{
+		// First try the basic built-in File.Exists method since it's adequate in most cases.
+		string fullPath = System.IO.Path.Combine(exactCaseRoot, ignoredCaseExtension);
+		if (System.IO.File.Exists(fullPath))
+			return fullPath;
+
+		// If that didn't work, do a case-insensitive search starting at the root path and stepping through each piece of the extension. Skip
+		// this step if the root directory doesn't exist or if running on Windows.
+		string tr = null;
+		if ((! RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) &&
+			System.IO.Directory.Exists(exactCaseRoot)) {
+			tr = exactCaseRoot;
+			foreach (string step in ignoredCaseExtension.Replace('\\', '/').Split('/')) {
+				string goal = System.IO.Path.Combine(tr, step);
+				List<string> matches = System.IO.Directory.EnumerateFileSystemEntries(tr, "*")
+					.Where(p => p.Equals(goal, StringComparison.CurrentCultureIgnoreCase))
+					.ToList();
+				if (matches.Count > 0)
+					tr = matches[0];
+				else {
+					tr = null;
+					break;
+				}
+			}
+		}
+		return tr;
+	}
+
 	static public string Civ3MediaPath(string relPath, string relModPath = "")
 	// Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
 	// Assumes Conquests/Complete
@@ -50,9 +88,6 @@ public class Util
 			relModPath,
 			// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
 			//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
-			// NOTE: May need another replace for case-sensitive filesystmes (Mac/Linux)
-			// may have removed the need for this; checking.
-			// relModPath.Replace(@"\Civ3PTW\Scenarios\", @"\civ3PTW\Extras\"),
 			"Conquests/Conquests" + relModPath,
 			"Conquests/Scenarios" + relModPath,
 			"civ3PTW/Scenarios" + relModPath,
@@ -64,8 +99,13 @@ public class Util
 		{
 			// If relModPath not set, skip that check
 			if(i == 0 && relModPath == "") { continue; }
-			string pathCandidate = Civ3Root + "/" + TryPaths[i] + "/" + relPath;
-			if(System.IO.File.Exists(pathCandidate)) { return pathCandidate; }
+
+			// Combine TryPaths[i] and relPath. Make sure not to leave an erroneous forward slash at the start if TryPaths[i] is empty
+			string tryRelPath = TryPaths[i] != "" ? TryPaths[i] + "/" + relPath : relPath;
+
+			string actualCasePath = FileExistsIgnoringCase(Civ3Root, tryRelPath);
+			if (actualCasePath != null)
+				return actualCasePath;
 		}
 		throw new ApplicationException("Media path not found: " + relPath);
 	}
