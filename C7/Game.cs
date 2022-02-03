@@ -48,26 +48,26 @@ public class Game : Node2D
 	{
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
-      controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
-      Global.ResetLoadGamePath();
-      var map = MapInteractions.GetWholeMap();
-      GD.Print("RelativeModPath ", map.RelativeModPath);
-      Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall, map.RelativeModPath);
-      baseTerrainMap.Civ3Tiles = map.tiles;
-      baseTerrainMap.TerrainAsTileMap();
+			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
+			Global.ResetLoadGamePath();
+			var map = MapInteractions.GetWholeMap();
+			GD.Print("RelativeModPath ", map.RelativeModPath);
+			Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall, map.RelativeModPath);
+			baseTerrainMap.Civ3Tiles = map.tiles;
+			baseTerrainMap.TerrainAsTileMap();
 
-      mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
-      AddChild(mapView);
-      var unitAnimSoundPlayer = new AudioStreamPlayer();
-      AddChild(unitAnimSoundPlayer);
-      civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
-      animTracker = new AnimationTracker(civ3UnitAnim);
-      EngineStorage.animTracker = animTracker;
+			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
+			AddChild(mapView);
+			var unitAnimSoundPlayer = new AudioStreamPlayer();
+			AddChild(unitAnimSoundPlayer);
+			civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
+			animTracker = new AnimationTracker(civ3UnitAnim);
+			EngineStorage.animTracker = animTracker;
 
-      Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
-      Player = GetNode<KinematicBody2D>("KinematicBody2D");
-      GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-      mapView.cameraZoom = (float)0.3;
+			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
+			Player = GetNode<KinematicBody2D>("KinematicBody2D");
+			GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
+			mapView.cameraZoom = (float)0.3;
 			// If later recreating scene, the component may already exist, hence try/catch
 			try{
 				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
@@ -78,9 +78,8 @@ public class Game : Node2D
 		}
 		catch(Exception ex) {
 			errorOnLoad = true;
-			string[] args = { ex.Message };
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>("CanvasLayer/PopupOverlay");
-			popupOverlay.ShowPopup("error", PopupOverlay.PopupCategory.Info, BoxContainer.AlignMode.Center, args);
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
 			GD.PrintErr(ex);
 		}
 
@@ -99,30 +98,30 @@ public class Game : Node2D
 		if (!errorOnLoad) {
 			switch (CurrentState)
 			{
-        case GameState.PreGame:
-          StartGame();
-          break;
-        case GameState.PlayerTurn:
-          animTracker.update();
+				case GameState.PreGame:
+				StartGame();
+				break;
+				case GameState.PlayerTurn:
+				animTracker.update();
 
-          // Check if we're triggered to advance to the next autoselected unit by an animation completing.
-          // TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
-          // cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
-          if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-            (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-            (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
-            GetNextAutoselectedUnit();
-          break;
-        case GameState.ComputerTurn:
-          animTracker.update();
-          break;
-      }
-      //Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
-      //without a manual cast to int.
-      //https://github.com/godotengine/godot/issues/16388
-      if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-        EmitSignal("ShowSpecificAdvisor", "F1");
-      }
+				// Check if we're triggered to advance to the next autoselected unit by an animation completing.
+				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
+				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
+				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
+					(CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+					(! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
+					GetNextAutoselectedUnit();
+				break;
+				case GameState.ComputerTurn:
+				animTracker.update();
+				break;
+			}
+			//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
+			//without a manual cast to int.
+			//https://github.com/godotengine/godot/issues/16388
+			if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+				EmitSignal("ShowSpecificAdvisor", "F1");
+			}
 		}
 	}
 
@@ -470,8 +469,8 @@ public class Game : Node2D
 				CurrentlySelectedUnit,
 				MapUnit.AnimatedAction.BUILD,
 				(unitGUID, action) => {
-		  PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-		  popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
+					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+					popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
 					return false;
 				});
 		}
