@@ -957,7 +957,7 @@ public class MapView : Node2D {
 	public override void _Process(float delta)
 	{
 		looseView.Update(); // Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but
-				    // long term I think it's better to redraw everything every frame like a typical modern video game.
+					// long term I think it's better to redraw everything every frame like a typical modern video game.
 	}
 
 	public bool isRowAt(int y)

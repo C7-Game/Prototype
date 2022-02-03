@@ -42,7 +42,7 @@ public class PopupOverlay : HBoxContainer
 	public void ShowPopup(Popup child, PopupCategory category)
 	{
 		if (child == null) // not necessary if we don't pass null?
-        {
+		{
 			GD.PrintErr("Received request to show null popup");
 			return;
 		}
@@ -58,7 +58,7 @@ public class PopupOverlay : HBoxContainer
 
 		string soundFile = "";
 		switch (category)
-        {
+		{
 			case PopupCategory.Advisor:
 				soundFile = "Sounds/PopupAdvisor.wav";
 				break;
@@ -75,7 +75,7 @@ public class PopupOverlay : HBoxContainer
 		AudioStreamSample wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
 		Visible = true;
 		PlaySound(wav);
-    }
+	}
 
 	/**
 	 * N.B. Some popups should react to certain keys, e.g. the Build City popup should close without building if you

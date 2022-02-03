@@ -98,8 +98,8 @@ public class Game : Node2D
 				// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
 				// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
 				if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-				    (CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-				    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
+					(CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
+					(! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
 					GetNextAutoselectedUnit();
 				break;
 			case GameState.ComputerTurn:
@@ -370,7 +370,7 @@ public class Game : Node2D
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
 					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-					    (! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
+						(! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
 						GetNextAutoselectedUnit();
 					else {
 						setSelectedUnit(CurrentlySelectedUnit);
@@ -458,8 +458,8 @@ public class Game : Node2D
 				CurrentlySelectedUnit,
 				MapUnit.AnimatedAction.BUILD,
 				(unitGUID, action) => {
-          PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-          popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
+		  PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+		  popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
 					return false;
 				});
 		}

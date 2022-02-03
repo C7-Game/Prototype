@@ -170,8 +170,8 @@ public class Util
 				for (int y = 0; y < flic.Height; y++)
 					for (int x = 0; x < flic.Width; x++) {
 						int pixelRow = row * flic.Height + y,
-						    pixelCol = col * flic.Width + x,
-						    pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
+							pixelCol = col * flic.Width + x,
+							pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
 						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
 					}
 
