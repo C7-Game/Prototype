@@ -225,7 +225,7 @@ public class Game : Node2D
 
 	public async void ComputerSimulateTurn()
 	{
-		await ToSignal(GetTree().CreateTimer(2), "timeout");
+		await ToSignal(GetTree().CreateTimer(1), "timeout");
 		OnComputerEndTurn();
 	}
 

@@ -2,6 +2,7 @@ namespace C7GameData
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	public class Tile
 	{
 		// ExtraInfo will eventually be type object and use a type descriminator in JSON to determine
@@ -73,6 +74,11 @@ namespace C7GameData
 			Random rnd = new Random();
 			int index = rnd.Next(8);
 			return (TileDirection)(Enum.GetValues(TileDirection.NORTH.GetType())).GetValue(index);
+		}
+
+		public Tile RandomLandNeighbor() {
+			List<Tile> landNeighbors = neighbors.Values.ToList().Where(tile => !tile.baseTerrainType.isWater()).ToList();
+			return landNeighbors[new Random().Next(landNeighbors.Count)];
 		}
 	}
 
