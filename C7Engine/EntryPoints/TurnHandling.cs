@@ -24,12 +24,31 @@ namespace C7Engine
                     newUnitPrototype.defense = 1;
                     newUnitPrototype.movement = 1;
                     newUnitPrototype.iconIndex = 6;
+                    newUnit.hitPointsRemaining = 3;
                     newUnit.unitType = newUnitPrototype;
                     newUnit.isFortified = true; //todo: hack for unit selection
 
                     tile.unitsOnTile.Add(newUnit);
                     gameData.mapUnits.Add(newUnit);
                     Console.WriteLine("New barbarian added at " + tile);
+                }
+                else if (tile.NeighborsCoast() && result < 10) {
+                    MapUnit newUnit = new MapUnit();
+                    newUnit.location = tile;
+                    newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
+                    SeaUnit newUnitPrototype = new SeaUnit();
+                    newUnitPrototype.name = "Galley";
+                    newUnitPrototype.attack = 1;
+                    newUnitPrototype.defense = 1;
+                    newUnitPrototype.movement = 3;
+                    newUnitPrototype.iconIndex = 29;
+                    newUnit.hitPointsRemaining = 3;
+                    newUnit.unitType = newUnitPrototype;
+                    newUnit.isFortified = true; //todo: hack for unit selection
+
+                    tile.unitsOnTile.Add(newUnit);
+                    gameData.mapUnits.Add(newUnit);
+                    Console.WriteLine("New barbarian galley added at " + tile);
                 }
             }
             //Call the barbarian AI

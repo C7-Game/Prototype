@@ -51,7 +51,7 @@ namespace C7GameData
 		
 		public static Tile NONE = new Tile();
 
-		public bool neighborsCoast() {
+		public bool NeighborsCoast() {
 			foreach (Tile neighbor in getDiagonalNeighbors()) {
 				if (neighbor.baseTerrainType.name == "Coast") {
 					return true;
@@ -79,6 +79,12 @@ namespace C7GameData
 		public Tile RandomLandNeighbor() {
 			List<Tile> landNeighbors = neighbors.Values.ToList().Where(tile => !tile.baseTerrainType.isWater()).ToList();
 			return landNeighbors[new Random().Next(landNeighbors.Count)];
+		}
+
+		public Tile RandomCoastNeighbor()
+		{
+			List<Tile> seaNeighbors = neighbors.Values.ToList().Where(tile => tile.baseTerrainType.name == "Coast").ToList();
+			return seaNeighbors[new Random().Next(seaNeighbors.Count)];
 		}
 	}
 
