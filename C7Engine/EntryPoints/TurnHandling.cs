@@ -18,14 +18,8 @@ namespace C7Engine
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
                     newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
-                    UnitPrototype newUnitPrototype = new UnitPrototype();
-                    newUnitPrototype.name = "Warrior";
-                    newUnitPrototype.attack = 1;
-                    newUnitPrototype.defense = 1;
-                    newUnitPrototype.movement = 1;
-                    newUnitPrototype.iconIndex = 6;
+                    newUnit.unitType = gameData.unitPrototypes["Warrior"];
                     newUnit.hitPointsRemaining = 3;
-                    newUnit.unitType = newUnitPrototype;
                     newUnit.isFortified = true; //todo: hack for unit selection
 
                     tile.unitsOnTile.Add(newUnit);
@@ -36,14 +30,8 @@ namespace C7Engine
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
                     newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
-                    SeaUnit newUnitPrototype = new SeaUnit();
-                    newUnitPrototype.name = "Galley";
-                    newUnitPrototype.attack = 1;
-                    newUnitPrototype.defense = 1;
-                    newUnitPrototype.movement = 3;
-                    newUnitPrototype.iconIndex = 29;
+                    newUnit.unitType = gameData.unitPrototypes["Galley"];
                     newUnit.hitPointsRemaining = 3;
-                    newUnit.unitType = newUnitPrototype;
                     newUnit.isFortified = true; //todo: hack for unit selection
 
                     tile.unitsOnTile.Add(newUnit);
