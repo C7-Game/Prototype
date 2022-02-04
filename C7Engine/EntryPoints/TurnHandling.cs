@@ -50,9 +50,9 @@ namespace C7Engine
             {
                 string producedItem = city.ComputeTurnProduction();
                 if (producedItem != "") {
+	                //TODO: Cleanup
                     MapUnit newUnit = new MapUnit();
-                    //TODO: It's inconsistent that one of them stores Tile, the other stores X, Y coordinates
-                    newUnit.location = gameData.map.tileAt(city.xLocation, city.yLocation);
+                    newUnit.location = city.location;
                     newUnit.hitPointsRemaining = 3;
                     newUnit.owner = gameData.players[0];
                     //This should not be re-genned here

@@ -4,13 +4,12 @@ namespace C7GameData
     public class City
     {
         public string guid {get;}
-        public int xLocation {get;}
-        public int yLocation {get;}
+        public Tile location {get;}
         public string name;
         public int size = 1;
 
         //Temporary production code because production is fun.
-        public string itemBeingProduced = "Warrior";
+        public IProducable itemBeingProduced;
         public int shieldCost = 10;
         public int shieldsStored = 0;
         public int shieldsPerTurn = 2;
@@ -20,14 +19,26 @@ namespace C7GameData
         public int foodGrowthPerTurn = 2;
 
         public Player owner {get; set;}
+        
+        public delegate void OnUnitCompletedDelegate(MapUnit newUnit);
+        private OnUnitCompletedDelegate onUnitCompleted;
 
-        public City(int x, int y, Player owner, string name)
+        public delegate IProducable GetNextItemToBeProducedDelegate(City city, IProducable lastItemProduced);
+        private GetNextItemToBeProducedDelegate getNextItemToBeProduced;
+
+        public City(Tile location, Player owner, string name, OnUnitCompletedDelegate ouc, GetNextItemToBeProducedDelegate gnitbpd)
         {
             guid = Guid.NewGuid().ToString();
-            this.xLocation = x;
-            this.yLocation = y;
+            this.location = location;
             this.owner = owner;
             this.name = name;
+            this.onUnitCompleted = ouc;
+            getNextItemToBeProduced = gnitbpd;
+        }
+
+        public void SetItemBeingProduced(IProducable producable)
+        {
+            this.itemBeingProduced = producable;
         }
 
         public bool IsCapital()
@@ -66,21 +77,30 @@ namespace C7GameData
 
             shieldsStored+=shieldsPerTurn;
             if (shieldsStored >= shieldCost) {
-                itemProduced = itemBeingProduced;
+				if (itemBeingProduced is UnitPrototype prototype) {
+					MapUnit newUnit = prototype.GetInstance();
+					newUnit.owner = this.owner;
+					newUnit.location = this.location;
+					newUnit.facingDirection = TileDirection.SOUTHWEST;
+					
+					location.unitsOnTile.Add(newUnit);
+					
+					//Figuring out the paradigms here.  We're sorta object-oriented,
+					//but we're also trying to not box ourselves in to not being able to
+					//be client-server.  C7GameData is a child of C7Engine, so the engine
+					//has to add the unit to the list.
+					//Probably the engine should be doing most of the other stuff, too.
+					onUnitCompleted(newUnit);
+					
+					//In reality, the human would set the next produced unit (unless it's an AI)
+					//For now I'm going to figure something out that gets a new unit, but is more
+					//engine/AI level
+					itemBeingProduced = getNextItemToBeProduced(this, prototype);
+				}
+				else {
+				    //building.  adding later
+				}
                 shieldsStored = 0;
-                if (itemProduced == "Warrior") {
-                    itemBeingProduced = "Chariot";
-                    shieldCost = 20;
-                }
-                else if (itemProduced == "Chariot") {
-                    itemBeingProduced = "Settler";
-                    shieldCost = 30;
-                }
-                else if (itemProduced == "Settler") {
-                    size -= 2;
-                    itemBeingProduced = "Warrior";
-                    shieldCost = 10;
-                }
             }
 
             return itemProduced;

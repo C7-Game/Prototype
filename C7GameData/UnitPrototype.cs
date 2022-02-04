@@ -4,7 +4,7 @@ namespace C7GameData
      * The prototype for a unit, which defines the characteristics of a unit.
      * For example, a Spearman might have 1 attack, 2 defense, and 1 movement.
      **/
-    public class UnitPrototype
+    public class UnitPrototype : IProducable
     {
         public string name {get; set;}
         public int attack {get; set;}
@@ -20,6 +20,19 @@ namespace C7GameData
         public override string ToString()
         {
             return name + " (" + attack + "/" + defense + "/" + movement + ")";
+        }
+        public string GetName()
+        {
+            return name;
+        }
+
+        public MapUnit GetInstance()
+        {
+            MapUnit instance = new MapUnit();
+            instance.unitType = this;
+            instance.hitPointsRemaining = 3;    //todo: make this configurable
+            instance.movementPointsRemaining = movement;
+            return instance;
         }
     }
 }
