@@ -86,6 +86,11 @@ namespace C7GameData
 			List<Tile> seaNeighbors = neighbors.Values.ToList().Where(tile => tile.baseTerrainType.name == "Coast").ToList();
 			return seaNeighbors[new Random().Next(seaNeighbors.Count)];
 		}
+
+		public bool IsLand()
+		{
+			return !baseTerrainType.isWater();
+		}
 	}
 
 	public enum TileDirection {
