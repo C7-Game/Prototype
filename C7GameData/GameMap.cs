@@ -22,6 +22,7 @@ namespace C7GameData
 
         public List<TerrainType> terrainTypes = new List<TerrainType>();
         public List<Tile> tiles { get; set;}
+		public List<Tile> barbarianCamps = new List<Tile>();
 
         public GameMap()
         {

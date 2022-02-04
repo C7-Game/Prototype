@@ -30,7 +30,7 @@ namespace C7Engine
             // possibly do something with save.Rules here when it exists
             // and maybe consider if we have any need to keep a reference to the save object handy...probably not
 
-            var humanPlayer = save.GameData.createDummyGameData();
+            var humanPlayer = save.GameData.CreateDummyGameData();
             return humanPlayer;
         }
     }
