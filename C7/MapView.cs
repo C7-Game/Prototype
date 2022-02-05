@@ -758,7 +758,7 @@ public class CityLayer : LooseLayer {
 			smallFont.Size = 11;
 
 			String cityNameAndGrowth = city.name + " : " + city.TurnsUntilGrowth();
-			String productionDescription = city.itemBeingProduced + " : " + city.TurnsUntilProductionFinished();
+			String productionDescription = city.itemBeingProduced.name + " : " + city.TurnsUntilProductionFinished();
 
 			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;
 			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).x;

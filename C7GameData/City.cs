@@ -10,7 +10,6 @@ namespace C7GameData
 
         //Temporary production code because production is fun.
         public IProducable itemBeingProduced;
-        public int shieldCost = 10;
         public int shieldsStored = 0;
         public int shieldsPerTurn = 2;
 
@@ -48,8 +47,8 @@ namespace C7GameData
         }
 
         public int TurnsUntilProductionFinished() {
-            int turnsRoundedDown = (shieldCost - shieldsStored) / shieldsPerTurn;
-            if ((shieldCost - shieldsStored) % shieldsPerTurn != 0) {
+            int turnsRoundedDown = (itemBeingProduced.shieldCost - shieldsStored) / shieldsPerTurn;
+            if ((itemBeingProduced.shieldCost - shieldsStored) % shieldsPerTurn != 0) {
                 return turnsRoundedDown++;
             }
             return turnsRoundedDown;
@@ -68,8 +67,11 @@ namespace C7GameData
             }
 
             shieldsStored+=shieldsPerTurn;
-            if (shieldsStored >= shieldCost) {
+            if (shieldsStored >= itemBeingProduced.shieldCost) {
 	            shieldsStored = 0;
+	            if (itemBeingProduced.populationCost > 0) {
+		            size -= itemBeingProduced.populationCost;
+	            }
                 return itemBeingProduced;
             }
 

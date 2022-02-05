@@ -6,7 +6,6 @@ namespace C7GameData
      **/
     public class UnitPrototype : IProducable
     {
-        public string name {get; set;}
         public int attack {get; set;}
         public int defense {get; set;}
         public int movement {get; set;}
@@ -20,10 +19,6 @@ namespace C7GameData
         public override string ToString()
         {
             return name + " (" + attack + "/" + defense + "/" + movement + ")";
-        }
-        public string GetName()
-        {
-            return name;
         }
 
         public MapUnit GetInstance()

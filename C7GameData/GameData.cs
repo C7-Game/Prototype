@@ -108,6 +108,7 @@ namespace C7GameData
             warrior.defense = 1;
             warrior.movement = 1;
             warrior.iconIndex = 6;
+            warrior.shieldCost = 10;
 
             UnitPrototype settler = new UnitPrototype();
             settler.name = "Settler";
@@ -116,6 +117,8 @@ namespace C7GameData
             settler.movement = 1;
             settler.iconIndex = 0;
             settler.canFoundCity = true;
+            settler.shieldCost = 30;
+            settler.populationCost = 2;
 
             UnitPrototype worker = new UnitPrototype();
             worker.name = "Worker";
@@ -124,6 +127,8 @@ namespace C7GameData
             worker.movement = 1;
             worker.iconIndex = 1;
             worker.canBuildRoads = true;
+            worker.shieldCost = 1;
+            worker.populationCost = 1;
 
             UnitPrototype chariot = new UnitPrototype();
             chariot.name = "Chariot";
@@ -131,6 +136,7 @@ namespace C7GameData
             chariot.defense = 1;
             chariot.movement = 2;
             chariot.iconIndex = 10;
+            chariot.shieldCost = 30;
 
             UnitPrototype galley = new SeaUnit();
             galley.name = "Galley";
@@ -138,6 +144,7 @@ namespace C7GameData
             galley.defense = 1;
             galley.movement = 3;
             galley.iconIndex = 29;
+            galley.shieldCost = 30;
             
             unitPrototypes["Warrior"] = warrior;
             unitPrototypes["Settler"] = settler;
