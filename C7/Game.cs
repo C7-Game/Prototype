@@ -150,7 +150,7 @@ public class Game : Node2D
 						(((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
 						  ! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()) ||
 						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
-						GetNextAutoselectedUnit();
+						GetNextAutoselectedUnit(gameData);
 					break;
 				case GameState.ComputerTurn:
 					break;
@@ -240,7 +240,9 @@ public class Game : Node2D
 		EmitSignal(nameof(TurnStarted), turnNumber);
 		CurrentState = GameState.PlayerTurn;
 
-		GetNextAutoselectedUnit();
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			GetNextAutoselectedUnit(gameDataAccess.gameData);
+		}
 	}
 
 	private void OnPlayerEndTurn()
@@ -468,9 +470,9 @@ public class Game : Node2D
 		}
 	}
 
-	private void GetNextAutoselectedUnit()
+	private void GetNextAutoselectedUnit(GameData gameData)
 	{
-		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit());
+		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit(gameData));
 	}
 
 	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
@@ -491,7 +493,9 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("wait"))
 		{
-			UnitInteractions.waitUnit(CurrentlySelectedUnit.guid);
+			using (var gameDataAccess = new UIGameDataAccess()) {
+				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+			}
 		}
 		else if (buttonName.Equals("disband"))
 		{

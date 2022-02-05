@@ -9,9 +9,8 @@ namespace C7Engine
 
         private static Queue<MapUnit> waitQueue = new Queue<MapUnit>();
 
-        public static MapUnit getNextSelectedUnit()
+        public static MapUnit getNextSelectedUnit(GameData gameData)
         {
-            GameData gameData = EngineStorage.gameData;
             foreach (MapUnit unit in gameData.mapUnits)
             {
                 //Eventually we'll have to check ownership,
@@ -86,9 +85,8 @@ namespace C7Engine
             new MsgSkipUnitTurn(guid).send();
         }
 
-        public static void waitUnit(string guid)
+        public static void waitUnit(GameData gameData, string guid)
         {
-            GameData gameData = EngineStorage.gameData;
             foreach (MapUnit unit in gameData.mapUnits)
             {
                 if (unit.guid == guid)
