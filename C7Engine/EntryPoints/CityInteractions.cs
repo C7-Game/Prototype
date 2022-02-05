@@ -14,7 +14,7 @@ namespace C7Engine
             City newCity = new City(x, y, owner, name);
             gameData.cities.Add(newCity);
 
-            Tile tileWithNewCity = MapInteractions.GetTileAt(x, y);
+            Tile tileWithNewCity = EngineStorage.gameData.map.tileAt(x, y);
             tileWithNewCity.cityAtTile = newCity;
         }
     }
