@@ -19,21 +19,13 @@ namespace C7GameData
         public int foodGrowthPerTurn = 2;
 
         public Player owner {get; set;}
-        
-        public delegate void OnUnitCompletedDelegate(MapUnit newUnit);
-        private OnUnitCompletedDelegate onUnitCompleted;
 
-        public delegate IProducable GetNextItemToBeProducedDelegate(City city, IProducable lastItemProduced);
-        private GetNextItemToBeProducedDelegate getNextItemToBeProduced;
-
-        public City(Tile location, Player owner, string name, OnUnitCompletedDelegate ouc, GetNextItemToBeProducedDelegate gnitbpd)
+        public City(Tile location, Player owner, string name)
         {
             guid = Guid.NewGuid().ToString();
             this.location = location;
             this.owner = owner;
             this.name = name;
-            this.onUnitCompleted = ouc;
-            getNextItemToBeProduced = gnitbpd;
         }
 
         public void SetItemBeingProduced(IProducable producable)
@@ -63,12 +55,12 @@ namespace C7GameData
             return turnsRoundedDown;
         }
 
-        //Placeholder for now.  Don't be alarmed that it ignores things like the produce-next popup
-        //Probably don't want to return a string here.  Just doing things the wrong way to add behavior quickly so Babylon is more fun.
-        public string ComputeTurnProduction()
+        /**
+         * Computes turn production.  Adjusts population if need be.  If the production queue finishes,
+         * returns the item that is built.  Otherwise, returns null.
+         */
+        public IProducable ComputeTurnProduction()
         {
-            string itemProduced = "";
-
             foodStored+=foodGrowthPerTurn;
             if (foodStored >= foodNeededToGrow) {
                 size++;
@@ -77,33 +69,12 @@ namespace C7GameData
 
             shieldsStored+=shieldsPerTurn;
             if (shieldsStored >= shieldCost) {
-				if (itemBeingProduced is UnitPrototype prototype) {
-					MapUnit newUnit = prototype.GetInstance();
-					newUnit.owner = this.owner;
-					newUnit.location = this.location;
-					newUnit.facingDirection = TileDirection.SOUTHWEST;
-					
-					location.unitsOnTile.Add(newUnit);
-					
-					//Figuring out the paradigms here.  We're sorta object-oriented,
-					//but we're also trying to not box ourselves in to not being able to
-					//be client-server.  C7GameData is a child of C7Engine, so the engine
-					//has to add the unit to the list.
-					//Probably the engine should be doing most of the other stuff, too.
-					onUnitCompleted(newUnit);
-					
-					//In reality, the human would set the next produced unit (unless it's an AI)
-					//For now I'm going to figure something out that gets a new unit, but is more
-					//engine/AI level
-					itemBeingProduced = getNextItemToBeProduced(this, prototype);
-				}
-				else {
-				    //building.  adding later
-				}
-                shieldsStored = 0;
+	            shieldsStored = 0;
+                return itemBeingProduced;
             }
 
-            return itemProduced;
+            return null;
         }
+        
     }
 }

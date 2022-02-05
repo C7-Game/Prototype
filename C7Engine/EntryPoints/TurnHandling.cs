@@ -48,42 +48,19 @@ namespace C7Engine
             //City Production
             foreach (City city in gameData.cities)
             {
-                string producedItem = city.ComputeTurnProduction();
-                if (producedItem != "") {
-	                //TODO: Cleanup
-                    MapUnit newUnit = new MapUnit();
-                    newUnit.location = city.location;
-                    newUnit.hitPointsRemaining = 3;
-                    newUnit.owner = gameData.players[0];
-                    //This should not be re-genned here
-                    UnitPrototype newUnitPrototype = new UnitPrototype();
+                IProducable producedItem = city.ComputeTurnProduction();
+                if (producedItem != null) {
+					if (producedItem is UnitPrototype prototype) {
+						MapUnit newUnit = prototype.GetInstance();
+						newUnit.owner = city.owner;
+						newUnit.location = city.location;
+						newUnit.facingDirection = TileDirection.SOUTHWEST;
 
-                    if (producedItem == "Warrior") {
-                        newUnitPrototype.name = "Warrior";
-                        newUnitPrototype.attack = 1;
-                        newUnitPrototype.defense = 1;
-                        newUnitPrototype.movement = 1;
-                        newUnitPrototype.iconIndex = 6;
-                        newUnit.unitType = newUnitPrototype;
-                    }
-                    else if (producedItem == "Chariot") {
-                        newUnitPrototype.name = "Chariot";
-                        newUnitPrototype.attack = 1;
-                        newUnitPrototype.defense = 1;
-                        newUnitPrototype.movement = 3;
-                        newUnitPrototype.iconIndex = 10;
-                        newUnit.unitType = newUnitPrototype;
-                    }
-                    else if (producedItem == "Settler") {
-                        newUnitPrototype.name = "Settler";
-                        newUnitPrototype.attack = 0;
-                        newUnitPrototype.defense = 0;
-                        newUnitPrototype.movement = 1;
-                        newUnitPrototype.iconIndex = 0;
-                        newUnit.unitType = newUnitPrototype;
-                    }
-                    newUnit.location.unitsOnTile.Add(newUnit);
-                    gameData.mapUnits.Add(newUnit);
+						city.location.unitsOnTile.Add(newUnit);
+						gameData.mapUnits.Add(newUnit);
+	                }
+					
+					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
                 }
             }
             //Reset movement points available for all units
