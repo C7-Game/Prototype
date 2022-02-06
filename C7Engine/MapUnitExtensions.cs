@@ -21,18 +21,54 @@ public static class MapUnitExtensions {
 		unit.animate(MapUnit.AnimatedAction.FORTIFY, false);
 	}
 
+	public static bool fight(this MapUnit unit, MapUnit defender)
+	{
+		// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
+		var defenderOriginalDirection = defender.facingDirection;
+		defender.facingDirection = unit.facingDirection.reversed();
+
+		// Do combat rounds. Play attack animation each time and flip a coin to determine who takes damage (TODO: weight by unit strengths).
+		while ((unit.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
+			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
+			unit    .animate(MapUnit.AnimatedAction.ATTACK1, true );
+			if (EngineStorage.gameData.rng.Next(100) < 50)
+				defender.hitPointsRemaining -= 1;
+			else
+				unit.hitPointsRemaining -= 1;
+		}
+
+		// Play death animation
+		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : unit;
+		loser.animate(MapUnit.AnimatedAction.DEATH, true);
+		loser.disband();
+
+		if (defender != loser)
+			defender.facingDirection = defenderOriginalDirection;
+
+		return unit != loser;
+	}
+
 	public static void move(this MapUnit unit, TileDirection dir)
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
 		if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
+			unit.facingDirection = dir;
+			unit.isFortified = false;
+
+			// Trigger combat if the tile we're moving into has an enemy unit
+			MapUnit defender = newLoc.findTopDefender(unit);
+			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
+				bool unitWonCombat = unit.fight(defender);
+				if (! unitWonCombat)
+					return;
+			}
+
 			if (!unit.location.unitsOnTile.Remove(unit))
 				throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 			newLoc.unitsOnTile.Add(unit);
 			unit.location = newLoc;
-			unit.facingDirection = dir;
 			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
-			unit.isFortified = false;
 			unit.animate(MapUnit.AnimatedAction.RUN, false);
 		}
 	}
