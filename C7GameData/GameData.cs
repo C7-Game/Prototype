@@ -5,7 +5,7 @@ namespace C7GameData
     public class GameData
     {
         public int turn {get; set;}
-        private Random rng; // TODO: Is GameData really the place for this?
+        public Random rng; // TODO: Is GameData really the place for this?
         public GameMap map {get; set;}
         public List<Player> players = new List<Player>();
         public List<TerrainType> terrainTypes = new List<TerrainType>();
@@ -13,6 +13,11 @@ namespace C7GameData
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
         public List<City> cities = new List<City>();
+
+        public GameData()
+        {
+	        rng = new Random();
+        }
 
         /**
          * This is intended as a place to set up post-load actions on the save, regardless of
@@ -64,7 +69,6 @@ namespace C7GameData
         public Player CreateDummyGameData()
         {
             this.turn = 0;
-            this.rng = new Random();
 
             int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
             Player humanPlayer = new Player(blue);
@@ -85,9 +89,8 @@ namespace C7GameData
             warrior.defense = 1;
             warrior.movement = 1;
             warrior.iconIndex = 6;
-
+            
             CreateStartingDummyUnits(humanPlayer);
-
             List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
             foreach (Tile barbCampLocation in barbarianCamps) {
                 if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
