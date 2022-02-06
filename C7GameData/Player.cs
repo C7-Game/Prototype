@@ -9,7 +9,10 @@ public class Player
 	public string guid { get; set; }
 	public int color { get; set; }
 	public bool isBarbarians = false;
-	private List<MapUnit> units = new List<MapUnit>();
+	//TODO: Refactor front-end so it sends player GUID with requests.
+	//We should allow multiple humans, this is a temporary measure.
+	public bool isHuman = false;
+	public List<MapUnit> units = new List<MapUnit>();
 
 	public Player(int color)
 	{
@@ -21,6 +24,7 @@ public class Player
 	{
 		this.units.Add(unit);
 	}
+
 	public Player(){}
 }
 

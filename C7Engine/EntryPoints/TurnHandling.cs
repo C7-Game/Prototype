@@ -43,7 +43,7 @@ namespace C7Engine
             //TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans, strategy, etc.)
             //For now, we only have a random AI, so that will be in a future commit
             BarbarianAI barbarianAI = new BarbarianAI();
-            barbarianAI.PlayTurn(gameData.players[1], gameData);
+            barbarianAI.PlayTurn(gameData.players[0], gameData);
 
             //City Production
             foreach (City city in gameData.cities)
@@ -58,6 +58,7 @@ namespace C7Engine
 
 						city.location.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
+						city.owner.AddUnit(newUnit);
 	                }
 					
 					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));

@@ -57,6 +57,7 @@ namespace C7GameData
 
             int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
             Player humanPlayer = new Player(blue);
+            humanPlayer.isHuman = true;
             players.Add(humanPlayer);
 
             int green = 0x00FF00FF;

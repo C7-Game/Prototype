@@ -9,7 +9,8 @@ namespace C7Engine {
             }
 
             foreach(MapUnit unit in gameData.mapUnits) {
-                if (unit.owner == gameData.players[1]) {
+	            //TODO: Make it better fit the barbs and not be hard-coded to a magic number
+                if (unit.owner == gameData.players[0]) {
                     if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
                         //Move randomly
                         Tile newLocation = unit.unitType is SeaUnit ? unit.location.RandomCoastNeighbor() : unit.location.RandomLandNeighbor();
