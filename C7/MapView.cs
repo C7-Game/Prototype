@@ -566,7 +566,7 @@ public class UnitLayer : LooseLayer {
 		foreach (var u in tile.unitsOnTile)
 			if (u.guid == looseView.mapView.game.CurrentlySelectedUnit.guid)
 				selectedUnitOnTile = u;
-		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender();
+		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender(looseView.mapView.game.CurrentlySelectedUnit);
 
 		var activeAnim = looseView.mapView.game.animTracker.getActiveAnimation(unit);
 		var animOffset = new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;

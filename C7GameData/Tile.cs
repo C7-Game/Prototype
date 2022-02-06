@@ -36,12 +36,12 @@ namespace C7GameData
 			unitsOnTile = new List<MapUnit>();
 		}
 
-		public MapUnit findTopDefender()
+		public MapUnit findTopDefender(MapUnit opponent)
 		{
 			if (unitsOnTile.Count > 0) {
 				var tr = unitsOnTile[0];
 				foreach (var u in unitsOnTile)
-					if (u.unitType.defense * u.hitPointsRemaining > tr.unitType.defense * tr.hitPointsRemaining)
+					if (u.HasPriorityAsDefender(tr, opponent))
 						tr = u;
 				return tr;
 			} else
