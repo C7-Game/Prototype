@@ -70,6 +70,13 @@ public static class MapUnitExtensions {
 				bool unitWonCombat = unit.fight(defender);
 				if (! unitWonCombat)
 					return;
+
+				// If there are still more enemy units on the destination tile we can't actually move into it
+				defender = newLoc.findTopDefender(unit);
+				if ((defender != MapUnit.NONE) && (! unit.owner.IsAtPeaceWith(defender.owner))) {
+					unit.movementPointsRemaining -= 1;
+					return;
+				}
 			}
 
 			if (!unit.location.unitsOnTile.Remove(unit))
