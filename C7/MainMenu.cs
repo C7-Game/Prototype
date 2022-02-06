@@ -21,12 +21,12 @@ public class MainMenu : Node2D
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		Global.ResetLoadGamePath();
+		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
 		DisplayTitleScreen();
 		LoadDialog = new Util.Civ3FileDialog();
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
-		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
 		SetCiv3HomeDialog = GetNode<FileDialog>("CanvasLayer/SetCiv3HomeDialog");
 		// For some reason this option isn't available in the scene UI
 		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
@@ -56,7 +56,7 @@ public class MainMenu : Node2D
 		}
 		catch(Exception ex)
 		{
-			GD.Print("Could not set up the main menu");
+			GD.Print("Could not set up the main menu: ", ex);
 		}
 	}
 
