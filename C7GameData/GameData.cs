@@ -32,24 +32,6 @@ namespace C7GameData
             }
         }
 
-        private MapUnit createDummyUnit(UnitPrototype proto, Player owner, int tileX, int tileY)
-        {
-            if (map.isTileAt(tileX, tileY)) {
-                Tile tile = map.tileAt(tileX, tileY);
-                MapUnit unit = new MapUnit();
-                unit.unitType = proto;
-		        unit.owner = owner;
-                unit.location = tile;
-                unit.facingDirection = TileDirection.SOUTHWEST;
-                tile.unitsOnTile.Add(unit);
-                mapUnits.Add(unit);
-                unit.movementPointsRemaining = proto.movement;
-                unit.hitPointsRemaining = 3;
-                return unit;
-            } else
-                throw new System.Exception("Invalid tile coordinates " + tileX + ", " + tileY);
-        }
-
         /**
          * This is a placeholder method that creates a super skeletal set of game data,
          * so we can build out the most basic mechanics.
@@ -65,28 +47,49 @@ namespace C7GameData
         {
             this.turn = 0;
             this.rng = new Random();
-
-            int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-            Player humanPlayer = new Player(blue);
-            players.Add(humanPlayer);
-
+            
+            CreateDefaultUnitPrototypes();
+            
             int white = -1; // = 0xFFFFFFFF, but we can't just use that b/c the compiler complains about uint-to-int conversion
             Player barbarianPlayer = new Player(white);
             barbarianPlayer.isBarbarians = true;
             players.Add(barbarianPlayer);
 
-            //Right now, the one terrain type is in the map but not in our list here.
-            //That is not great, but let's overlook that for now, as for now all our terrain type
-            //references will be via the map.
-            
-            CreateDefaultUnitPrototypes();
+            int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
+            Player humanPlayer = new Player(blue);
+            players.Add(humanPlayer);
 
-            CreateStartingDummyUnits(humanPlayer);
+            int green = 0x00FF00FF;
+            Player computerPlayOne = new Player(green);
+            players.Add(computerPlayOne);
 
+            int teal = 0x40FFFFFF;
+            Player computerPlayerTwo = new Player(teal);
+            players.Add(computerPlayerTwo);
+
+            int purple = 0x6040D0FF;
+            Player computerPlayerThree = new Player(purple);
+            players.Add(computerPlayerThree);
+
+			List<Tile> startingLocations = map.generateStartingLocations(rng, 4, 10);
+
+			int i = 0;
+			foreach (Player player in players)
+			{
+				if (player.isBarbarians) {
+					continue;
+				}
+				CreateStartingDummyUnits(player, startingLocations[i]);
+				i++;
+			}
+
+			//Todo: We're using the same method for start locs and barb camps.  Really, we should use a similar one for
+			//variation, but the barb camp one should also take into account things like not spawning in revealed
+			//tiles.  It also would be really nice to be able to generate them separately and not have them overlap.
             List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
             foreach (Tile barbCampLocation in barbarianCamps) {
                 if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-                    MapUnit barbWarrior = createDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation.xCoordinate, barbCampLocation.yCoordinate);
+                    MapUnit barbWarrior = CreateDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);
                     barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
                     // whole procedure of generating a map should be part of the engine not the data module.
                     barbWarrior.facingDirection = TileDirection.SOUTHEAST;
@@ -100,6 +103,35 @@ namespace C7GameData
 
             return humanPlayer;
         }
+        
+		private void CreateStartingDummyUnits(Player player, Tile location)
+		{
+			CreateDummyUnit(unitPrototypes["Settler"], player, location);
+			CreateDummyUnit(unitPrototypes["Warrior"], player, location);
+			CreateDummyUnit(unitPrototypes["Worker"],  player, location);
+			CreateDummyUnit(unitPrototypes["Chariot"], player, location);
+		}
+
+		private MapUnit CreateDummyUnit(UnitPrototype proto, Player owner, Tile tile)
+		{
+			//TODO: The fact that we have to check for this makes me wonder why...
+			if (tile != Tile.NONE) {
+				//TODO: Generate unit from its prototype
+				MapUnit unit = new MapUnit();
+				unit.unitType = proto;
+				unit.owner = owner;
+				unit.location = tile;
+				unit.facingDirection = TileDirection.SOUTHWEST;
+				unit.movementPointsRemaining = proto.movement;
+				unit.hitPointsRemaining = 3;
+				tile.unitsOnTile.Add(unit);
+				//TODO: Probably remove mapUnits
+				mapUnits.Add(unit);
+				owner.AddUnit(unit);
+				return unit;
+			} else
+				throw new System.Exception("Tried to add dummy unit at Tile.NONE");
+		}
         private void CreateDefaultUnitPrototypes()
         {
             UnitPrototype warrior = new UnitPrototype();
@@ -151,14 +183,6 @@ namespace C7GameData
             unitPrototypes["Worker"] = worker;
             unitPrototypes["Chariot"] = chariot;
             unitPrototypes["Galley"] = galley;
-        }
-
-        private void CreateStartingDummyUnits(Player humanPlayer)
-        {
-            createDummyUnit(unitPrototypes["Settler"], humanPlayer, 20, 26);
-            createDummyUnit(unitPrototypes["Warrior"], humanPlayer, 22, 26);
-            createDummyUnit(unitPrototypes["Worker"], humanPlayer, 24, 26);
-            createDummyUnit(unitPrototypes["Chariot"], humanPlayer, 22, 24);
         }
     }
 }
