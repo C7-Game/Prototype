@@ -10,9 +10,8 @@ namespace C7Engine
             //Barbarians.  First, generate new barbarian units.
             foreach (Tile tile in gameData.map.barbarianCamps)
             {
-                //7% chance of a new barbarian.  Probably should scale based on barbarian activity.  
-                Random rnd = new Random();
-                int result = rnd.Next(100);
+                //7% chance of a new barbarian.  Probably should scale based on barbarian activity.
+                int result = gameData.rng.Next(100);
                 Console.WriteLine("Random barb result = " + result);
                 if (result < 7) {
                     MapUnit newUnit = new MapUnit();
