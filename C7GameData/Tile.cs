@@ -71,12 +71,12 @@ namespace C7GameData
 		}
 
 		public List<Tile> GetLandNeighbors() {
-			return neighbors.Values.ToList().Where(tile => !tile.baseTerrainType.isWater()).ToList();
+			return neighbors.Values.Where(tile => !tile.baseTerrainType.isWater()).ToList();
 		}
 
 		public List<Tile> GetCoastNeighbors()
 		{
-			return neighbors.Values.ToList().Where(tile => tile.baseTerrainType.name == "Coast").ToList();
+			return neighbors.Values.Where(tile => tile.baseTerrainType.name == "Coast").ToList();
 		}
 
 		public bool IsLand()
