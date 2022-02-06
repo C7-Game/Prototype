@@ -10,6 +10,7 @@ public class MainMenu : Node2D
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
 	Util.Civ3FileDialog LoadDialog;
+	Button SetCiv3Home;
 	FileDialog SetCiv3HomeDialog;
 	GlobalSingleton Global;
 
@@ -25,6 +26,7 @@ public class MainMenu : Node2D
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
+		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
 		SetCiv3HomeDialog = GetNode<FileDialog>("CanvasLayer/SetCiv3HomeDialog");
 		// For some reason this option isn't available in the scene UI
 		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
@@ -48,6 +50,9 @@ public class MainMenu : Node2D
 			AddButton("Audio Preferences", 405, "Preferences");
 			AddButton("Credits", 440, "showCredits");
 			AddButton("Exit", 475, "_on_Exit_pressed");
+
+			// Hide select home folder if valid path is present as proven by reaching this point in code
+			SetCiv3Home.Visible = false;
 		}
 		catch(Exception ex)
 		{
