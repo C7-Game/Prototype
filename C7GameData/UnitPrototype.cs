@@ -18,7 +18,7 @@ namespace C7GameData
 
         public override string ToString()
         {
-            return name + " (" + attack + "/" + defense + "/" + movement + ")";
+            return $"{name} ({attack}/{defense}/{movement})";
         }
 
         public MapUnit GetInstance()
