@@ -7,6 +7,7 @@ using ConvertCiv3Media;
 
 public class Util
 {
+	static public string Civ3Root = GetCiv3Path();
 	public class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 	// While instantiated it will return to the last-accessed folder when reopened
@@ -86,7 +87,6 @@ public class Util
 	// Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
 	// Assumes Conquests/Complete
 	{
-		string Civ3Root = GetCiv3Path();
 		string [] TryPaths = new string [] {
 			relModPath,
 			// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios

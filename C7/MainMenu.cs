@@ -135,7 +135,7 @@ public class MainMenu : Node2D
 	}
 	private void _on_SetCiv3HomeDialog_dir_selected(string path)
 	{
-		Global.Civ3Home = path;
+		Util.Civ3Root = path;
 		// This function should only be reachable if DisplayTitleScreen failed on previous runs, so should be OK to run here
 		DisplayTitleScreen();
 	}
