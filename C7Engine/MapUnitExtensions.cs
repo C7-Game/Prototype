@@ -27,11 +27,19 @@ public static class MapUnitExtensions {
 		var defenderOriginalDirection = defender.facingDirection;
 		defender.facingDirection = unit.facingDirection.reversed();
 
-		// Do combat rounds. Play attack animation each time and flip a coin to determine who takes damage (TODO: weight by unit strengths).
+		int attackerStrength = unit.unitType.attack;
+		int defenderStrength = defender.unitType.defense;
+
+		if (attackerStrength + defenderStrength == 0)
+			return false;
+
+		double attackerOdds = (double)attackerStrength / (attackerStrength + defenderStrength);
+
+		// Do combat rounds
 		while ((unit.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
 			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
 			unit    .animate(MapUnit.AnimatedAction.ATTACK1, true );
-			if (EngineStorage.gameData.rng.Next(100) < 50)
+			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds)
 				defender.hitPointsRemaining -= 1;
 			else
 				unit.hitPointsRemaining -= 1;
