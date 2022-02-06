@@ -19,7 +19,7 @@ namespace C7Engine
                 if (result < 7) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
-                    newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
+                    newUnit.owner = gameData.players[0];
                     newUnit.unitType = gameData.unitPrototypes["Warrior"];
                     newUnit.hitPointsRemaining = 3;
                     newUnit.isFortified = true; //todo: hack for unit selection
@@ -31,7 +31,7 @@ namespace C7Engine
                 else if (tile.NeighborsCoast() && result < 10) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
-                    newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
+                    newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
                     newUnit.unitType = gameData.unitPrototypes["Galley"];
                     newUnit.hitPointsRemaining = 3;
                     newUnit.isFortified = true; //todo: hack for unit selection

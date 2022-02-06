@@ -779,7 +779,8 @@ public class CityLayer : LooseLayer {
 			labelImage.Create(cityLabelWidth, CITY_LABEL_HEIGHT, false, Image.Format.Rgba8);
 			labelImage.Fill(Color.Color8(0, 0, 0, 0));
 			byte transparencyLevel = 192;	//25%
-			Color civColor = Color.Color8(227, 10, 10, transparencyLevel);	//Roman Red
+			Color civColor = new Color(city.owner.color);
+			civColor = new Color(civColor, transparencyLevel);
 			Color civColorDarker = Color.Color8(0, 0, 138, transparencyLevel);	//todo: automate the darker() function.  maybe less transparency?
 			Color topRowGrey = Color.Color8(32, 32, 32, transparencyLevel);
 			Color bottomRowGrey = Color.Color8(48, 48, 48, transparencyLevel);

@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace C7GameData
 {
     using System;
@@ -50,26 +52,26 @@ namespace C7GameData
             
             CreateDefaultUnitPrototypes();
             
-            int white = -1; // = 0xFFFFFFFF, but we can't just use that b/c the compiler complains about uint-to-int conversion
+            uint white = 0xFFFFFFFF;
             Player barbarianPlayer = new Player(white);
             barbarianPlayer.isBarbarians = true;
             players.Add(barbarianPlayer);
 
-            int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
+            uint blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
             Player humanPlayer = new Player(blue);
             humanPlayer.isHuman = true;
             players.Add(humanPlayer);
 
-            int green = 0x00FF00FF;
+            uint green = 0x00FF00FF;
             Player computerPlayOne = new Player(green);
             players.Add(computerPlayOne);
 
-            int teal = 0x40FFFFFF;
+            uint teal = 0x40FFFFFF;
             Player computerPlayerTwo = new Player(teal);
             players.Add(computerPlayerTwo);
 
-            int purple = 0x6040D0FF;
-            Player computerPlayerThree = new Player(purple);
+            uint orange = 0xFFAB12FF;
+            Player computerPlayerThree = new Player(orange);
             players.Add(computerPlayerThree);
 
 			List<Tile> startingLocations = map.generateStartingLocations(rng, 4, 10);

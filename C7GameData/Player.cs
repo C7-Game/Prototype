@@ -14,10 +14,10 @@ public class Player
 	public bool isHuman = false;
 	public List<MapUnit> units = new List<MapUnit>();
 
-	public Player(int color)
+	public Player(uint color)
 	{
 		guid = Guid.NewGuid().ToString();
-		this.color = color;
+		this.color = (int)(color & 0xFFFFFFFF);
 	}
 
 	public void AddUnit(MapUnit unit)
