@@ -141,7 +141,7 @@ namespace C7GameData
                 bool foundOne = false;
                 for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
                     var randTile = tiles[rng.Next(0, tiles.Count)];
-                    if (randTile.terrainType.name == "Coast") // TODO: Write a proper check for if tile is water
+                    if (randTile.baseTerrainType.name == "Coast") // TODO: Write a proper check for if tile is water
                         continue;
                     int distToNearestOtherLoc = Int32.MaxValue;
                     foreach (var sL in tr) {
@@ -206,7 +206,7 @@ namespace C7GameData
                     Tile newTile = new Tile();
                     newTile.xCoordinate = x;
                     newTile.yCoordinate = y;
-                    newTile.terrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
+                    newTile.baseTerrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
                     dummyMap.tiles.Add(newTile);
                 }
 
