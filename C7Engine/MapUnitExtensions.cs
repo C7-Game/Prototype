@@ -56,6 +56,19 @@ public static class MapUnitExtensions {
 		return unit != loser;
 	}
 
+	public static void OnEnterTile(this MapUnit unit, Tile tile)
+	{
+		// Disperse barb camp
+		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians))
+			tile.hasBarbarianCamp = false;
+
+		// Destroy enemy city on tile
+		if ((tile.cityAtTile != null) && (!unit.owner.IsAtPeaceWith(tile.cityAtTile.owner))) {
+			EngineStorage.gameData.cities.Remove(tile.cityAtTile);
+			tile.cityAtTile = null;
+		}
+	}
+
 	public static void move(this MapUnit unit, TileDirection dir)
 	{
 		(int dx, int dy) = dir.toCoordDiff();
@@ -84,6 +97,7 @@ public static class MapUnitExtensions {
 			newLoc.unitsOnTile.Add(unit);
 			unit.location = newLoc;
 			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
+			unit.OnEnterTile(newLoc);
 			unit.animate(MapUnit.AnimatedAction.RUN, false);
 		}
 	}
