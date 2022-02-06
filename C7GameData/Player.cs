@@ -14,6 +14,12 @@ public class Player
 		this.color = color;
 	}
 	public Player(){}
+
+	public bool IsAtPeaceWith(Player other)
+	{
+		// Right now it's a free-for-all but eventually we'll implement peace treaties and alliances
+		return false;
+	}
 }
 
 }
