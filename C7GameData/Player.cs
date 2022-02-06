@@ -18,7 +18,7 @@ public class Player
 	public bool IsAtPeaceWith(Player other)
 	{
 		// Right now it's a free-for-all but eventually we'll implement peace treaties and alliances
-		return false;
+		return other == this;
 	}
 }
 
