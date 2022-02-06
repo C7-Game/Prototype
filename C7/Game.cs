@@ -111,6 +111,11 @@ public class Game : Node2D
 				if (unit != null)
 					animTracker.startAnimation(unit, mSA.action, mSA.completionEvent);
 				break;
+			case MsgStartTurn mST:
+				//Simulating processing so the turn doesn't end too quickly
+				ComputerSimulateTurn();
+				GD.Print("Thinking...");
+				break;
 			}
 		}
 	}
@@ -260,10 +265,7 @@ public class Game : Node2D
 		GD.Print("Starting computer turn");
 		CurrentState = GameState.ComputerTurn;
 		//Actual backend processing
-		TurnHandling.EndTurn();
-		//Simulating processing so the turn doesn't end too quickly
-		ComputerSimulateTurn();
-		GD.Print("Thinking...");
+		new MsgEndTurn().send();
 	}
 
 	public async void ComputerSimulateTurn()

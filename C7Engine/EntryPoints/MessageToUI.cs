@@ -23,4 +23,6 @@ public class MsgStartAnimation : MessageToUI {
 		this.completionEvent = completionEvent;
 	}
 }
+
+public class MsgStartTurn : MessageToUI {}
 }

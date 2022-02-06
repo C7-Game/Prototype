@@ -111,4 +111,11 @@ public class MsgBuildCity : MessageToEngine {
 	}
 }
 
+public class MsgEndTurn : MessageToEngine {
+	public override void process()
+	{
+		TurnHandling.EndTurn();
+	}
+}
+
 }
