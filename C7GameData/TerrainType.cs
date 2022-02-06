@@ -20,6 +20,12 @@ namespace C7GameData
             return false;
         }
 
+		//TODO: Once we have IDs, this should *not* rely on the display name.
+		//That will be after issue 58, which will be after PR 70.
+		public bool isWater() {
+			return name.Equals("Coast") || name.Equals("Sea") || name.Equals("Ocean");
+		}
+
         public override string ToString()
         {
             return name + "(" + baseFoodProduction + ", " + baseShieldProduction + ", " + baseCommerceProduction + ")";
