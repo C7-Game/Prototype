@@ -47,7 +47,7 @@ namespace C7Engine
             //City Production
             foreach (City city in gameData.cities)
             {
-                IProducable producedItem = city.ComputeTurnProduction();
+                IProducible producedItem = city.ComputeTurnProduction();
                 if (producedItem != null) {
 					if (producedItem is UnitPrototype prototype) {
 						MapUnit newUnit = prototype.GetInstance();

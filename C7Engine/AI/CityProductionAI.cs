@@ -25,7 +25,7 @@ namespace C7Engine
 		 * Maybe we'll wind up with some sort of collection of AI parameters to pass someday?  For now I'm not going to
 		 * get hung up on knowing exactly how it should be done the road.
 		 */
-		public static IProducable GetNextItemToBeProduced(City city, IProducable lastProduced)
+		public static IProducible GetNextItemToBeProduced(City city, IProducible lastProduced)
 		{
 			Dictionary<string, UnitPrototype> unitPrototypes = EngineStorage.gameData.unitPrototypes;
 			if (lastProduced == unitPrototypes["Warrior"]) {
