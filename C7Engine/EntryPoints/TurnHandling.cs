@@ -65,7 +65,7 @@ namespace C7Engine
 					if (unit.currentAIBehavior is SettlerAI settlerAi) {
 						if (unit.location == settlerAi.destination) {
 							Console.WriteLine("Building city with " + unit);
-							CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, "Neo-Tokyo");
+							CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
 							UnitInteractions.disbandUnit(unit.guid);
 						}
 						else {

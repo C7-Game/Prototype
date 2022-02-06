@@ -12,6 +12,10 @@ public class Player
 	//TODO: Refactor front-end so it sends player GUID with requests.
 	//We should allow multiple humans, this is a temporary measure.
 	public bool isHuman = false;
+
+	public Civilization civilization;
+	private int cityNameIndex = 0;
+	
 	public List<MapUnit> units = new List<MapUnit>();
 
 	public Player(uint color)
@@ -20,9 +24,24 @@ public class Player
 		this.color = (int)(color & 0xFFFFFFFF);
 	}
 
+	public Player(Civilization civilization, uint color)
+	{
+		this.civilization = civilization;
+		guid = Guid.NewGuid().ToString();
+		this.color = (int)(color & 0xFFFFFFFF);
+	}
+
 	public void AddUnit(MapUnit unit)
 	{
 		this.units.Add(unit);
+	}
+
+	public string GetNextCityName()
+	{
+		//TODO: Bounds checking
+		string name = civilization.cityNames[cityNameIndex];
+		cityNameIndex++;
+		return name;
 	}
 
 	public Player(){}

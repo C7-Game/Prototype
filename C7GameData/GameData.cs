@@ -57,21 +57,74 @@ namespace C7GameData
             barbarianPlayer.isBarbarians = true;
             players.Add(barbarianPlayer);
 
+			Civilization babylon = new Civilization();
+			babylon.cityNames.Add("Babylon");
+			babylon.cityNames.Add("Kish");
+			babylon.cityNames.Add("Sippar");
+			babylon.cityNames.Add("Nippur");
+			babylon.cityNames.Add("Isin");
+			babylon.cityNames.Add("Eshnunna");
+			babylon.cityNames.Add("Uruk");
+			babylon.cityNames.Add("Larsa");
+			babylon.cityNames.Add("Lagash");
+			babylon.cityNames.Add("Ur");
+			babylon.cityNames.Add("Eridu");
+			babylon.cityNames.Add("Malgium");
+			babylon.cityNames.Add("Rapiqum");
+			babylon.cityNames.Add("Mari");
+			babylon.cityNames.Add("Nineveh");
+
             uint blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-            Player humanPlayer = new Player(blue);
+            Player humanPlayer = new Player(babylon, blue);
             humanPlayer.isHuman = true;
             players.Add(humanPlayer);
 
-            uint green = 0x00FF00FF;
-            Player computerPlayOne = new Player(green);
+			Civilization greece = new Civilization();
+			greece.cityNames.Add("Athens");
+			greece.cityNames.Add("Sparta");
+			greece.cityNames.Add("Corinth");
+			greece.cityNames.Add("Delphi");
+			greece.cityNames.Add("Thebes");
+			greece.cityNames.Add("Argos");
+			greece.cityNames.Add("Larissa");
+
+            uint green = 0x00EE00FF;
+            Player computerPlayOne = new Player(greece, green);
             players.Add(computerPlayOne);
 
-            uint teal = 0x40FFFFFF;
-            Player computerPlayerTwo = new Player(teal);
+			Civilization america = new Civilization();
+			america.cityNames.Add("Philadelphia");
+			america.cityNames.Add("New York");
+			america.cityNames.Add("Boston");
+			america.cityNames.Add("Charleston");
+			america.cityNames.Add("Baltimore");
+			america.cityNames.Add("Washington");
+			america.cityNames.Add("Providence");
+			america.cityNames.Add("New Haven");
+			america.cityNames.Add("Norfolk");
+			america.cityNames.Add("New Orleans");
+			america.cityNames.Add("Cincinnati");
+			america.cityNames.Add("St. Louis");
+			america.cityNames.Add("Albany");
+			america.cityNames.Add("Pittsburgh");
+			america.cityNames.Add("Louisville");
+
+            uint teal = 0x40EEEEFF;
+            Player computerPlayerTwo = new Player(america, teal);
             players.Add(computerPlayerTwo);
 
+			Civilization theNetherlands = new Civilization();
+			theNetherlands.cityNames.Add("Amsterdam");
+			theNetherlands.cityNames.Add("Rotterdam");
+			theNetherlands.cityNames.Add("The Hague");
+			theNetherlands.cityNames.Add("Utrecht");
+			theNetherlands.cityNames.Add("Eindhoven");
+			theNetherlands.cityNames.Add("Groningen");
+			theNetherlands.cityNames.Add("Groningen");
+			theNetherlands.cityNames.Add("Tilburg");
+
             uint orange = 0xFFAB12FF;
-            Player computerPlayerThree = new Player(orange);
+            Player computerPlayerThree = new Player(theNetherlands, orange);
             players.Add(computerPlayerThree);
 
 			List<Tile> startingLocations = map.generateStartingLocations(rng, 4, 10);

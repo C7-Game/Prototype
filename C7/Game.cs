@@ -470,7 +470,7 @@ public class Game : Node2D
 				MapUnit.AnimatedAction.BUILD,
 				(unitGUID, action) => {
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-					popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
+					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
 					return false;
 				});
 		}
