@@ -905,20 +905,34 @@ public class LooseView : Node2D {
 		this.mapView = mapView;
 	}
 
+	private struct ProcessedVisibleTile
+	{
+		public Tile tile;
+		public Vector2 tileCenter;
+	}
+
 	public override void _Draw()
 	{
 		base._Draw();
 
+		// Iterating over visible tiles is unfortunately pretty expensive. Process them first, converting virtual tile coords into a tile
+		// object and location, before iterating over the layers. This small change improves framerate by ~45% on my system.
 		var map = MapInteractions.GetWholeMap();
+		var pVTs = new List<ProcessedVisibleTile>();
+		foreach (var vT in mapView.visibleTiles()) {
+			var pVT = new ProcessedVisibleTile();
+			int x = mapView.wrapTileX(vT.virtTileX);
+			int y = mapView.wrapTileY(vT.virtTileY);
+			pVT.tile = map.tileAt(x, y);
+			pVT.tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
+			pVTs.Add(pVT);
+
+		}
+
 		foreach (var layer in layers.FindAll(L => L.visible)) {
 			layer.onBeginDraw(this);
-			foreach (var vT in mapView.visibleTiles()) {
-				int x = mapView.wrapTileX(vT.virtTileX);
-				int y = mapView.wrapTileY(vT.virtTileY);
-				var tile = map.tileAt(x, y);
-				Vector2 tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
-				layer.drawObject(this, tile, tileCenter);
-			}
+			foreach (var pVT in pVTs)
+				layer.drawObject(this, pVT.tile, pVT.tileCenter);
 			layer.onEndDraw(this);
 		}
 	}
