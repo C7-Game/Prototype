@@ -42,6 +42,23 @@ namespace C7Engine
 			HashSet<Tile> candidates = new HashSet<Tile>();
 			candidates.UnionWith(ringThree);
 			candidates.UnionWith(ringFour);
+			Dictionary<Tile, int> scores = AssignTileScores(candidates);
+
+			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
+			//Debugging: Print out scores
+			Tile returnValue = null;
+			foreach (KeyValuePair<Tile, int> kvp in orderedScores)
+			{
+				if (returnValue == null) {
+					returnValue = kvp.Key;
+				}
+				Console.WriteLine("Tile " + kvp.Key + " scored " + kvp.Value);
+			}
+			return returnValue;
+		}
+		private static Dictionary<Tile, int> AssignTileScores(HashSet<Tile> candidates)
+		{
+
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
 			foreach (Tile t in candidates) {
 				//TODO: Look at whether we can place cities here.  Hard-coded for now.
@@ -65,7 +82,7 @@ namespace C7Engine
 					score = score + nt.overlayTerrainType.baseCommerceProduction * 2;
 				}
 				//TODO: Also look at the next ring out, with lower weights.
-				
+
 				//Prefer hills for defense, and coast for boats and such.
 				if (t.baseTerrainType.name == "Hills") {
 					score += 10;
@@ -76,18 +93,7 @@ namespace C7Engine
 				//TODO: Exclude locations that are already settled or too close to another civ.
 				scores[t] = score;
 			}
-
-			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
-			//Debugging: Print out scores
-			Tile returnValue = null;
-			foreach (KeyValuePair<Tile, int> kvp in orderedScores)
-			{
-				if (returnValue == null) {
-					returnValue = kvp.Key;
-				}
-				Console.WriteLine("Tile " + kvp.Key + " scored " + kvp.Value);
-			}
-			return returnValue;
+			return scores;
 		}
 	}
 }
