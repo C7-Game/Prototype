@@ -905,7 +905,7 @@ public class LooseView : Node2D {
 		this.mapView = mapView;
 	}
 
-	private struct ProcessedVisibleTile
+	private struct VisibleTile
 	{
 		public Tile tile;
 		public Vector2 tileCenter;
@@ -915,24 +915,24 @@ public class LooseView : Node2D {
 	{
 		base._Draw();
 
-		// Iterating over visible tiles is unfortunately pretty expensive. Process them first, converting virtual tile coords into a tile
-		// object and location, before iterating over the layers. This small change improves framerate by ~45% on my system.
 		var map = MapInteractions.GetWholeMap();
-		var pVTs = new List<ProcessedVisibleTile>();
-		foreach (var vT in mapView.visibleTiles()) {
-			var pVT = new ProcessedVisibleTile();
-			int x = mapView.wrapTileX(vT.virtTileX);
-			int y = mapView.wrapTileY(vT.virtTileY);
-			pVT.tile = map.tileAt(x, y);
-			pVT.tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1);
-			pVTs.Add(pVT);
 
-		}
+		// Iterating over visible tiles is unfortunately pretty expensive. Assemble a list of Tile references and centers first so we don't
+		// have to reiterate for each layer. Doing this improves framerate significantly.
+		MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
+		var visibleTiles = new List<VisibleTile>();
+		for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
+			if (mapView.isRowAt(y))
+				for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
+					Tile tile = map.tileAt(x, y);
+					if (tile != Tile.NONE)
+						visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
+				}
 
 		foreach (var layer in layers.FindAll(L => L.visible)) {
 			layer.onBeginDraw(this);
-			foreach (var pVT in pVTs)
-				layer.drawObject(this, pVT.tile, pVT.tileCenter);
+			foreach (VisibleTile vT in visibleTiles)
+				layer.drawObject(this, vT.tile, vT.tileCenter);
 			layer.onEndDraw(this);
 		}
 	}
@@ -968,12 +968,22 @@ public class MapView : Node2D {
 		set { setCameraZoomFromMiddle(value); }
 	}
 
-	public struct VisibleTile {
-		public int virtTileX, virtTileY; // (x, y) coords of the tile. These are "virtual", i.e. unwrapped, coordinates.
-	}
-
 	private LooseView looseView;
 	private ShaderMaterial testShaderMaterial;
+
+	// Specifies a rectangular block of tiles that are currently potentially on screen. Accessible through getVisibleRegion(). Tile coordinates
+	// are "virtual", i.e. "unwrapped", so there isn't necessarily a tile at each location. The region is intended to include the upper left
+	// coordinates but not the lower right ones. When iterating over all tiles in the region you must account for the fact that map rows are
+	// staggered, see LooseView._Draw for an example.
+	public struct VisibleRegion {
+		public int upperLeftX, upperLeftY;
+		public int lowerRightX, lowerRightY;
+
+		public int getRowStartX(int y)
+		{
+			return upperLeftX + (y - upperLeftY)%2;
+		}
+	}
 
 	public GridLayer gridLayer { get; private set; }
 
@@ -1050,24 +1060,13 @@ public class MapView : Node2D {
 		return (viewport != null) ? viewport.Size : OS.WindowSize;
 	}
 
-	public IEnumerable<VisibleTile> visibleTiles()
+	public VisibleRegion getVisibleRegion()
 	{
-		int upperLeftX, upperLeftY;
-		tileCoordsOnScreenAt(new Vector2(0, 0), out upperLeftX, out upperLeftY);
+		int x0, y0;
+		tileCoordsOnScreenAt(new Vector2(0, 0), out x0, out y0);
 		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
-		for (int dy = -2; dy < mapViewSize.y; dy++) {
-			int y = upperLeftY + dy;
-			if (isRowAt(y))
-				for (int dx = -2 + dy%2; dx < mapViewSize.x; dx += 2) {
-					int x = upperLeftX + dx;
-					if (isTileAt(x, y)) {
-						VisibleTile tileInView = new VisibleTile();
-						tileInView.virtTileX = x;
-						tileInView.virtTileY = y;
-						yield return tileInView;
-					}
-				}
-		}
+		return new VisibleRegion { upperLeftX = x0 - 2, upperLeftY = y0 - 2,
+			lowerRightX = x0 + (int)mapViewSize.x, lowerRightY = y0 + (int)mapViewSize.y };
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
