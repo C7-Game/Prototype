@@ -73,7 +73,7 @@ public static class MapUnitExtensions {
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-		if ((newLoc != null) && (unit.movementPointsRemaining > 0)) {
+		if ((newLoc != Tile.NONE) && newLoc.IsLand() && (unit.movementPointsRemaining > 0)) {
 			unit.facingDirection = dir;
 			unit.isFortified = false;
 

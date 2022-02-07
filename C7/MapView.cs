@@ -262,7 +262,7 @@ public class ForestLayer : LooseLayer {
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
-			if (tile.neighborsCoast()) {
+			if (tile.NeighborsCoast()) {
 				randomJungleColumn = tile.xCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			}
@@ -293,7 +293,7 @@ public class ForestLayer : LooseLayer {
 			}
 			else {
 				forestRow = tile.yCoordinate % 2;
-				if (tile.neighborsCoast()) {
+				if (tile.NeighborsCoast()) {
 					forestColumn = tile.xCoordinate % 5;
 					if (tile.baseTerrainType.name == "Grassland") {
 						forestTexture = smallForestTexture;
@@ -344,7 +344,7 @@ public class MarshLayer : LooseLayer {
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomMarshColumn;
 			ImageTexture marshTexture;
-			if (tile.neighborsCoast()) {
+			if (tile.NeighborsCoast()) {
 				randomMarshColumn = tile.xCoordinate % 5;
 				marshTexture = smallMarshTexture;
 			}

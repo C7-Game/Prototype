@@ -2,6 +2,7 @@ namespace C7GameData
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	public class Tile
 	{
 		// ExtraInfo will eventually be type object and use a type descriminator in JSON to determine
@@ -50,7 +51,7 @@ namespace C7GameData
 		
 		public static Tile NONE = new Tile();
 
-		public bool neighborsCoast() {
+		public bool NeighborsCoast() {
 			foreach (Tile neighbor in getDiagonalNeighbors()) {
 				if (neighbor.baseTerrainType.name == "Coast") {
 					return true;
@@ -69,10 +70,41 @@ namespace C7GameData
 			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
 		}
 
-		public static TileDirection RandomDirection() {
-			Random rnd = new Random();
-			int index = rnd.Next(8);
-			return (TileDirection)(Enum.GetValues(TileDirection.NORTH.GetType())).GetValue(index);
+		public List<Tile> GetLandNeighbors() {
+			return neighbors.Values.Where(tile => !tile.baseTerrainType.isWater()).ToList();
+		}
+
+		public List<Tile> GetCoastNeighbors()
+		{
+			return neighbors.Values.Where(tile => tile.baseTerrainType.name == "Coast").ToList();
+		}
+
+		public bool IsLand()
+		{
+			return !baseTerrainType.isWater();
+		}
+
+		public TileDirection directionTo(Tile other)
+		{
+			// TODO: Consider edge wrapping, the direction should point along the shortest path as the crow flies.
+
+			if ((this == NONE) || (other == NONE))
+				throw new System.Exception("Can't get direction toward NONE Tile since it doesn't have a meaningful location");
+
+			// y calculation is reversed so dy is in typical Cartesian coords instead of tile coords, where y is inverted
+			int dx = other.xCoordinate - this.xCoordinate;
+			int dy = this.yCoordinate - other.yCoordinate;
+			double angle = Math.Atan2(dy, dx); // angle is in interval [-pi, pi]
+
+			if      (angle < -7.0/8.0 * Math.PI) return TileDirection.WEST;
+			else if (angle < -5.0/8.0 * Math.PI) return TileDirection.NORTHWEST;
+			else if (angle < -3.0/8.0 * Math.PI) return TileDirection.NORTH;
+			else if (angle < -1.0/8.0 * Math.PI) return TileDirection.NORTHEAST;
+			else if (angle <  1.0/8.0 * Math.PI) return TileDirection.EAST;
+			else if (angle <  3.0/8.0 * Math.PI) return TileDirection.SOUTHEAST;
+			else if (angle <  5.0/8.0 * Math.PI) return TileDirection.SOUTH;
+			else if (angle <  7.0/8.0 * Math.PI) return TileDirection.SOUTHWEST;
+			else                                 return TileDirection.WEST;
 		}
 	}
 
