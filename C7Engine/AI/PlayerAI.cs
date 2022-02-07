@@ -17,7 +17,7 @@ namespace C7Engine
 			foreach (MapUnit unit in player.units.ToArray())
 			{
 				if (unit.currentAIBehavior == null) {
-					SetAIForUnit(unit);
+					SetAIForUnit(unit, player);
 				}
 				
 				//Now actually take actions
@@ -85,7 +85,7 @@ namespace C7Engine
 			unit.location = nextTile;
 		}
 
-		private static void SetAIForUnit(MapUnit unit) 
+		private static void SetAIForUnit(MapUnit unit, Player player) 
 		{
 			//figure out an AI behavior
 			//TODO: Use strategies, not names
@@ -97,7 +97,7 @@ namespace C7Engine
 					settlerAI.destination = unit.location;
 				}
 				else {
-					settlerAI.destination = SettlerLocationAI.findSettlerLocation(unit.location);
+					settlerAI.destination = SettlerLocationAI.findSettlerLocation(unit.location, player.cities);
 				}
 				Console.WriteLine("Set AI for unit to settler AI with destination of " + settlerAI.destination);
 				unit.currentAIBehavior = settlerAI;
