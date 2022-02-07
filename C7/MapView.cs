@@ -5,10 +5,10 @@ using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
 
-// Loose layers are for drawing free-form objects on the map. Unlike TileLayers (TODO: pull that out from MapView) they are not restricted to drawing
-// tile sprites from a TileSet at fixed locations. They can draw anything, anywhere, although drawing is still tied to tiles for visibility
-// purposes. The MapView contains a list of loose layers, each one an object that implements ILooseLayer. Right now to add a new layer you must modify
-// the MapView constructor to add it to the list, but (TODO) eventually that will be made moddable.
+// Loose layers are for drawing things on the map on a per-tile basis. (Historical aside: There used to be another kind of layer called a TileLayer
+// that was intended to draw regularly tiled objects like terrain sprites but using LooseLayers for everything was found to be a prefereable
+// approach.) LooseLayer is effectively the standard map layer. The MapView contains a list of loose layers, inside a LooseView object. Right now to
+// add a new layer you must modify the MapView constructor to add it to the list, but (TODO) eventually that will be made moddable.
 public abstract class LooseLayer {
 	// drawObject draws the things this layer is supposed to draw that are associated with the given tile. Its parameters are:
 	//   looseView: The Node2D to actually draw to, e.g., use looseView.DrawCircle(...) to draw a circle. This object also contains a reference to
@@ -1010,8 +1010,9 @@ public class MapView : Node2D {
 
 	public override void _Process(float delta)
 	{
-		looseView.Update(); // Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but
-					// long term I think it's better to redraw everything every frame like a typical modern video game.
+		// Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but long term I think it's
+		// better to redraw everything every frame like a typical modern video game.
+		looseView.Update();
 	}
 
 	public int wrapTileX(int x)
@@ -1059,7 +1060,6 @@ public class MapView : Node2D {
 			internalCameraZoom = newScale;
 			looseView.Scale = v2NewZoom;
 			setCameraLocation ((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
-			// resetVisibleTiles(); // Don't have to call this because it's already called when the camera location is changed
 		}
 	}
 
@@ -1079,7 +1079,6 @@ public class MapView : Node2D {
 		// Prevent the camera from moving beyond an unwrapped edge of the map. One complication here is that the viewport might actually be
 		// larger than the map (if we're zoomed far out) so in that case we must apply the constraint the other way around, i.e. constrain the
 		// map to the viewport rather than the viewport to the map.
-		// TODO: Not quite perfect. When you zoom out you can still move the map a bit off the right/bottom edges.
 		Vector2 visAreaSize = getVisibleAreaSize();
 		Vector2 mapPixelSize = new Vector2(cameraZoom, cameraZoom) * (new Vector2(cellSize.x * (mapWidth + 1), cellSize.y * (mapHeight + 1)));
 		if (!wrapHorizontally) {
@@ -1138,6 +1137,8 @@ public class MapView : Node2D {
 		return screenLocationOfTileCoords(tile.xCoordinate, tile.yCoordinate, center);
 	}
 
+	// Returns the virtual tile coordinates on screen at the given location. "Virtual" meaning the coordinates are unwrapped and there isn't
+	// necessarily a tile there at all.
 	public (int, int) tileCoordsOnScreenAt(Vector2 screenLocation)
 	{
 		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
@@ -1159,7 +1160,6 @@ public class MapView : Node2D {
 		return (x, y);
 	}
 
-	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
 	public Tile tileOnScreenAt(Vector2 screenLocation)
 	{
 		(int x, int y) = tileCoordsOnScreenAt(screenLocation);
