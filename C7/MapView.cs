@@ -464,15 +464,10 @@ public class UnitLayer : LooseLayer {
 		public ShaderMaterial shaderMat;
 		public MeshInstance2D meshInst;
 
-		private static ImageTexture civColorWhitePalette = null;
-
 		public AnimationInstance(LooseView looseView)
 		{
-			if (civColorWhitePalette == null)
-				(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");;
-
 			(shaderMat, meshInst) = createShadedQuad(getUnitShader());
-			shaderMat.SetShaderParam("civColorWhitePalette", civColorWhitePalette);
+			shaderMat.SetShaderParam("civColorWhitePalette", looseView.mapView.civColorWhitePalette);
 
 			looseView.AddChild(meshInst);
 			meshInst.Hide();
@@ -986,6 +981,8 @@ public class MapView : Node2D {
 
 	public GridLayer gridLayer { get; private set; }
 
+	public ImageTexture civColorWhitePalette = null;
+
 	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
 	{
 		this.game = game;
@@ -1004,6 +1001,8 @@ public class MapView : Node2D {
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new CityLayer());
+
+		(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
 
 		AddChild(looseView);
 	}
