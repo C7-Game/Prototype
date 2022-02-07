@@ -70,21 +70,13 @@ namespace C7GameData
 			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
 		}
 
-		public static TileDirection RandomDirection() {
-			Random rnd = new Random();
-			int index = rnd.Next(8);
-			return (TileDirection)(Enum.GetValues(TileDirection.NORTH.GetType())).GetValue(index);
+		public List<Tile> GetLandNeighbors() {
+			return neighbors.Values.Where(tile => !tile.baseTerrainType.isWater()).ToList();
 		}
 
-		public Tile RandomLandNeighbor() {
-			List<Tile> landNeighbors = neighbors.Values.ToList().Where(tile => !tile.baseTerrainType.isWater()).ToList();
-			return landNeighbors[new Random().Next(landNeighbors.Count)];
-		}
-
-		public Tile RandomCoastNeighbor()
+		public List<Tile> GetCoastNeighbors()
 		{
-			List<Tile> seaNeighbors = neighbors.Values.ToList().Where(tile => tile.baseTerrainType.name == "Coast").ToList();
-			return seaNeighbors[new Random().Next(seaNeighbors.Count)];
+			return neighbors.Values.Where(tile => tile.baseTerrainType.name == "Coast").ToList();
 		}
 
 		public bool IsLand()

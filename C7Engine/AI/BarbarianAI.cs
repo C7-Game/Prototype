@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace C7Engine {
     using C7GameData;
     using System;
@@ -13,7 +15,8 @@ namespace C7Engine {
                 if (unit.owner == gameData.players[0]) {
                     if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
                         //Move randomly
-                        Tile newLocation = unit.unitType is SeaUnit ? unit.location.RandomCoastNeighbor() : unit.location.RandomLandNeighbor();
+                        List<Tile> validTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
+                        Tile newLocation = validTiles[gameData.rng.Next(validTiles.Count)];
                         //Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
                         //if it tries to move e.g. north from the north pole.  Hence, this check.
                         if (newLocation != Tile.NONE) {

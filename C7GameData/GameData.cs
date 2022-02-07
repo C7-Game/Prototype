@@ -7,7 +7,7 @@ namespace C7GameData
     public class GameData
     {
         public int turn {get; set;}
-        private Random rng; // TODO: Is GameData really the place for this?
+        public Random rng; // TODO: Is GameData really the place for this?
         public GameMap map {get; set;}
         public List<Player> players = new List<Player>();
         public List<TerrainType> terrainTypes = new List<TerrainType>();
@@ -15,6 +15,11 @@ namespace C7GameData
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
         public List<City> cities = new List<City>();
+
+        public GameData()
+        {
+	        rng = new Random();
+        }
 
         /**
          * This is intended as a place to set up post-load actions on the save, regardless of
@@ -48,7 +53,6 @@ namespace C7GameData
         public Player CreateDummyGameData()
         {
             this.turn = 0;
-            this.rng = new Random();
             
             CreateDefaultUnitPrototypes();
             
@@ -190,55 +194,14 @@ namespace C7GameData
 		}
         private void CreateDefaultUnitPrototypes()
         {
-            UnitPrototype warrior = new UnitPrototype();
-            warrior.name = "Warrior";
-            warrior.attack = 1;
-            warrior.defense = 1;
-            warrior.movement = 1;
-            warrior.iconIndex = 6;
-            warrior.shieldCost = 10;
-
-            UnitPrototype settler = new UnitPrototype();
-            settler.name = "Settler";
-            settler.attack = 0;
-            settler.defense = 0;
-            settler.movement = 1;
-            settler.iconIndex = 0;
-            settler.canFoundCity = true;
-            settler.shieldCost = 30;
-            settler.populationCost = 2;
-
-            UnitPrototype worker = new UnitPrototype();
-            worker.name = "Worker";
-            worker.attack = 0;
-            worker.defense = 0;
-            worker.movement = 1;
-            worker.iconIndex = 1;
-            worker.canBuildRoads = true;
-            worker.shieldCost = 1;
-            worker.populationCost = 1;
-
-            UnitPrototype chariot = new UnitPrototype();
-            chariot.name = "Chariot";
-            chariot.attack = 1;
-            chariot.defense = 1;
-            chariot.movement = 2;
-            chariot.iconIndex = 10;
-            chariot.shieldCost = 30;
-
-            UnitPrototype galley = new SeaUnit();
-            galley.name = "Galley";
-            galley.attack = 1;
-            galley.defense = 1;
-            galley.movement = 3;
-            galley.iconIndex = 29;
-            galley.shieldCost = 30;
-            
-            unitPrototypes["Warrior"] = warrior;
-            unitPrototypes["Settler"] = settler;
-            unitPrototypes["Worker"] = worker;
-            unitPrototypes["Chariot"] = chariot;
-            unitPrototypes["Galley"] = galley;
+			unitPrototypes = new Dictionary<string, UnitPrototype>()
+			{
+				{ "Warrior", new UnitPrototype { name = "Warrior", attack = 1, defense = 1, movement = 1, iconIndex =  6, shieldCost = 10 }},
+				{ "Settler", new UnitPrototype { name = "Settler", attack = 0, defense = 0, movement = 1, iconIndex =  0, shieldCost = 30, populationCost = 2 }},
+				{ "Worker",  new UnitPrototype { name = "Worker",  attack = 0, defense = 0, movement = 1, iconIndex =  1, shieldCost = 30, populationCost = 1 }},
+				{ "Chariot", new UnitPrototype { name = "Chariot", attack = 1, defense = 1, movement = 2, iconIndex = 10, shieldCost = 20 }},
+				{ "Galley",  new SeaUnit       { name = "Galley",  attack = 1, defense = 1, movement = 3, iconIndex = 29, shieldCost = 30 }},
+			};
         }
     }
 }

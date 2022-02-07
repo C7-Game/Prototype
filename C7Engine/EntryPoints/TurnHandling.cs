@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using C7GameData.AIData;
 
 namespace C7Engine
@@ -12,9 +13,8 @@ namespace C7Engine
             //Barbarians.  First, generate new barbarian units.
             foreach (Tile tile in gameData.map.barbarianCamps)
             {
-                //7% chance of a new barbarian.  Probably should scale based on barbarian activity.  
-                Random rnd = new Random();
-                int result = rnd.Next(100);
+                //7% chance of a new barbarian.  Probably should scale based on barbarian activity.
+                int result = gameData.rng.Next(100);
                 Console.WriteLine("Random barb result = " + result);
                 if (result < 7) {
                     MapUnit newUnit = new MapUnit();
@@ -88,7 +88,8 @@ namespace C7Engine
 						//TODO: Distinguish between types of exploration
 						//TODO: Make sure ON_A_BOAT units stay on the boat
 						//Move randomly
-						Tile newLocation = unit.unitType is SeaUnit ? unit.location.RandomCoastNeighbor() : unit.location.RandomLandNeighbor();
+						List<Tile> possibleNewLocations = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
+						Tile newLocation = possibleNewLocations[gameData.rng.Next(possibleNewLocations.Count)];
 						//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
 						//if it tries to move e.g. north from the north pole.  Hence, this check.
 						if (newLocation != Tile.NONE) {
@@ -104,7 +105,7 @@ namespace C7Engine
             //City Production
             foreach (City city in gameData.cities)
             {
-                IProducable producedItem = city.ComputeTurnProduction();
+                IProducible producedItem = city.ComputeTurnProduction();
                 if (producedItem != null) {
 					if (producedItem is UnitPrototype prototype) {
 						MapUnit newUnit = prototype.GetInstance();

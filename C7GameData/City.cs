@@ -9,7 +9,7 @@ namespace C7GameData
         public int size = 1;
 
         //Temporary production code because production is fun.
-        public IProducable itemBeingProduced;
+        public IProducible itemBeingProduced;
         public int shieldsStored = 0;
         public int shieldsPerTurn = 2;
 
@@ -27,9 +27,9 @@ namespace C7GameData
             this.name = name;
         }
 
-        public void SetItemBeingProduced(IProducable producable)
+        public void SetItemBeingProduced(IProducible producible)
         {
-            this.itemBeingProduced = producable;
+            this.itemBeingProduced = producible;
         }
 
         public bool IsCapital()
@@ -58,7 +58,7 @@ namespace C7GameData
          * Computes turn production.  Adjusts population if need be.  If the production queue finishes,
          * returns the item that is built.  Otherwise, returns null.
          */
-        public IProducable ComputeTurnProduction()
+        public IProducible ComputeTurnProduction()
         {
             foodStored+=foodGrowthPerTurn;
             if (foodStored >= foodNeededToGrow) {
