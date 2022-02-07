@@ -38,8 +38,15 @@ public class Player
 
 	public string GetNextCityName()
 	{
-		//TODO: Bounds checking
-		string name = civilization.cityNames[cityNameIndex];
+		string name = civilization.cityNames[cityNameIndex % civilization.cityNames.Count];
+		int bonusLoops = cityNameIndex / civilization.cityNames.Count;
+		if (bonusLoops % 2 == 1) {
+			name = "New " + name;
+		}
+		int suffix = (bonusLoops / 2) + 1;
+		if (suffix > 1) {
+			name = name + suffix; //e.g. for bonusLoops = 2, we'll have "Athens 2"
+		}
 		cityNameIndex++;
 		return name;
 	}

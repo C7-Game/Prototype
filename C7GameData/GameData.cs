@@ -91,6 +91,10 @@ namespace C7GameData
 			greece.cityNames.Add("Thebes");
 			greece.cityNames.Add("Argos");
 			greece.cityNames.Add("Larissa");
+			greece.cityNames.Add("Olympia");
+			greece.cityNames.Add("Tegea");
+			greece.cityNames.Add("Thessaloniki");
+			greece.cityNames.Add("Miletus");
 
             uint green = 0x00EE00FF;
             Player computerPlayOne = new Player(greece, green);
@@ -115,7 +119,7 @@ namespace C7GameData
 
             uint teal = 0x40EEEEFF;
             Player computerPlayerTwo = new Player(america, teal);
-            players.Add(computerPlayerTwo);
+            // players.Add(computerPlayerTwo);
 
 			Civilization theNetherlands = new Civilization();
 			theNetherlands.cityNames.Add("Amsterdam");
@@ -129,7 +133,7 @@ namespace C7GameData
 
             uint orange = 0xFFAB12FF;
             Player computerPlayerThree = new Player(theNetherlands, orange);
-            players.Add(computerPlayerThree);
+            // players.Add(computerPlayerThree);
 
 			List<Tile> startingLocations = map.generateStartingLocations(rng, 4, 10);
 

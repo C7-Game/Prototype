@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using C7GameData.AIData;
 
 namespace C7Engine
@@ -69,8 +70,26 @@ namespace C7Engine
 							UnitInteractions.disbandUnit(unit.guid);
 						}
 						else {
-							//TODO: Move towards the destination
-							Console.WriteLine("Moving settler unit towards " + settlerAi.destination);
+							//Figure out how to get there.
+							//Eventually we should consider roads terrain cost
+							//For now we'll assume there aren't any of those fancy roads, and no dangerous obstacles
+							Dictionary<Tile, int> distances = new Dictionary<Tile, int>();
+							foreach (Tile option in unit.location.GetLandNeighbors()) {
+								distances[option] = settlerAi.destination.distanceToOtherTile(option);
+							}
+							IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = distances.OrderBy(t => t.Value);
+							Tile nextTile = null;
+							foreach(KeyValuePair<Tile, int> kvp in orderedScores)
+							{
+								if (nextTile == null) {
+									nextTile = kvp.Key;
+								}
+								Console.WriteLine("Settler could move to " + kvp.Key + " with distance value " + kvp.Value);
+							}
+							Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
+							unit.location.unitsOnTile.Remove(unit);
+							nextTile.unitsOnTile.Add(unit);
+							unit.location = nextTile;
 						}
 					}
 					else if (unit.currentAIBehavior is DefenderAI defenderAI) {
@@ -139,9 +158,13 @@ namespace C7Engine
 	        if (unit.unitType.name == "Settler") {
 		        SettlerAI settlerAI = new SettlerAI();
 		        settlerAI.goal = SettlerAI.SettlerGoal.BUILD_CITY;
-		        //TODO: Better way of finding a destination
-		        //TODO: Find a destination if there's already a city here.
-		        settlerAI.destination = unit.location;
+		        //If it's the starting settler, have it settle in place.  Otherwise, use an AI to find a location.
+		        if (unit.location.cityAtTile == null) {
+			        settlerAI.destination = unit.location;
+		        }
+		        else {
+			        settlerAI.destination = SettlerLocationAI.findSettlerLocation(unit.location);
+		        }
 		        Console.WriteLine("Set AI for unit to settler AI with destination of " + settlerAI.destination);
 		        unit.currentAIBehavior = settlerAI;
 	        }
