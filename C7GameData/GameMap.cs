@@ -88,10 +88,28 @@ namespace C7GameData
             return xInBounds && isRowAt(y) && (evenRow ? (x%2 == 0) : (x%2 != 0));
         }
 
+        public int wrapTileX(int x)
+        {
+            if (wrapHorizontally) {
+                int tr = x % numTilesWide;
+                return (tr >= 0) ? tr : tr + numTilesWide;
+            } else
+                return x;
+        }
+
+        public int wrapTileY(int y)
+        {
+            if (wrapVertically) {
+                int tr = y % numTilesTall;
+                return (tr >= 0) ? tr : tr + numTilesTall;
+            } else
+                return y;
+        }
+
         public Tile tileAt(int x, int y)
         {
             if (isTileAt(x, y))
-                return tiles[tileCoordsToIndex(x, y)];
+                return tiles[tileCoordsToIndex(wrapTileX(x), wrapTileY(y))];
             else
                 return Tile.NONE; // TODO: Consider using empty tile object instead of null
         }

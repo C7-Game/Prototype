@@ -1014,24 +1014,6 @@ public class MapView : Node2D {
 		looseView.Update();
 	}
 
-	public int wrapTileX(int x)
-	{
-		if (wrapHorizontally) {
-			int tr = x % mapWidth;
-			return (tr >= 0) ? tr : tr + mapWidth;
-		} else
-			return x;
-	}
-
-	public int wrapTileY(int y)
-	{
-		if (wrapVertically) {
-			int tr = y % mapHeight;
-			return (tr >= 0) ? tr : tr + mapHeight;
-		} else
-			return y;
-	}
-
 	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
 	public Vector2 getVisibleAreaSize()
 	{
@@ -1162,7 +1144,7 @@ public class MapView : Node2D {
 	public Tile tileOnScreenAt(Vector2 screenLocation)
 	{
 		(int x, int y) = tileCoordsOnScreenAt(screenLocation);
-		return MapInteractions.GetWholeMap().tileAt(wrapTileX(x), wrapTileY(y));
+		return MapInteractions.GetWholeMap().tileAt(x, y);
 	}
 
 	public void centerCameraOnTile(Tile t)
