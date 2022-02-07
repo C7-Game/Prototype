@@ -1041,8 +1041,7 @@ public class MapView : Node2D {
 
 	public VisibleRegion getVisibleRegion()
 	{
-		int x0, y0;
-		tileCoordsOnScreenAt(new Vector2(0, 0), out x0, out y0);
+		(int x0, int y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
 		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		return new VisibleRegion { upperLeftX = x0 - 2, upperLeftY = y0 - 2,
 			lowerRightX = x0 + (int)mapViewSize.x, lowerRightY = y0 + (int)mapViewSize.y };
@@ -1139,13 +1138,12 @@ public class MapView : Node2D {
 		return screenLocationOfTileCoords(tile.xCoordinate, tile.yCoordinate, center);
 	}
 
-	public void tileCoordsOnScreenAt(Vector2 screenLocation, out int x, out int y)
+	public (int, int) tileCoordsOnScreenAt(Vector2 screenLocation)
 	{
 		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
-		x = (int)intMapLoc.x;
-		y = (int)intMapLoc.y;
+		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
 		bool evenColumn = x%2 == 0, evenRow = y%2 == 0;
 		if (evenColumn ^ evenRow) {
 			if (fracMapLoc.y > fracMapLoc.x)
@@ -1158,13 +1156,13 @@ public class MapView : Node2D {
 				y -= 1;
 			}
 		}
+		return (x, y);
 	}
 
 	// Returns the coordinates of the tile at the given screen location and true if there is one, otherwise returns (-1, -1) and false.
 	public Tile tileOnScreenAt(Vector2 screenLocation)
 	{
-		int x, y;
-		tileCoordsOnScreenAt(screenLocation, out x, out y);
+		(int x, int y) = tileCoordsOnScreenAt(screenLocation);
 		return MapInteractions.GetWholeMap().tileAt(wrapTileX(x), wrapTileY(y));
 	}
 
