@@ -969,7 +969,6 @@ public class MapView : Node2D {
 	}
 
 	private LooseView looseView;
-	private ShaderMaterial testShaderMaterial;
 
 	// Specifies a rectangular block of tiles that are currently potentially on screen. Accessible through getVisibleRegion(). Tile coordinates
 	// are "virtual", i.e. "unwrapped", so there isn't necessarily a tile at each location. The region is intended to include the upper left
