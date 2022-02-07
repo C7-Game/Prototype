@@ -33,6 +33,29 @@ public class TerrainLayer : LooseLayer {
 	// A triple sheet is a sprite sheet containing sprites for three different terrain types including transitions between.
 	private List<ImageTexture> tripleSheets;
 
+	// TileToDraw stores the arguments passed to drawObject so the draws can be sorted by texture before being submitted. This significantly
+	// reduces the number of draw calls Godot must generate (1483 to 312 when fully zoomed out on our test map) and modestly improves framerate
+	// (by about 14% on my system).
+	private class TileToDraw : IComparable<TileToDraw>
+	{
+		public Tile tile;
+		public Vector2 tileCenter;
+
+		public TileToDraw(Tile tile, Vector2 tileCenter)
+		{
+			this.tile = tile;
+			this.tileCenter = tileCenter;
+		}
+
+		public int CompareTo(TileToDraw other)
+		{
+			// "other" might be null, in which case we should return that this object is greater, according to an example on MSDN
+			return (other != null) ? this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other.tile.ExtraInfo.BaseTerrainFileID) : 1;
+		}
+	}
+
+	private List<TileToDraw> tilesToDraw = new List<TileToDraw>();
+
 	public TerrainLayer()
 	{
 		tripleSheets = loadTerrainTripleSheets();
@@ -59,11 +82,19 @@ public class TerrainLayer : LooseLayer {
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
-		int xSheet = tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tile.ExtraInfo.BaseTerrainImageID / 9;
-		var texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);;
-		var terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
-		var screenRect = new Rect2(tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize);
-		looseView.DrawTextureRectRegion(tripleSheets[tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
+		tilesToDraw.Add(new TileToDraw(tile, tileCenter));
+	}
+
+	public override void onEndDraw(LooseView looseView) {
+		tilesToDraw.Sort();
+		foreach (TileToDraw tTD in tilesToDraw) {
+			int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
+			var texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
+			var terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
+			var screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize);
+			looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
+		}
+		tilesToDraw.Clear();
 	}
 }
 
