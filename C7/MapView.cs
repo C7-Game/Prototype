@@ -922,7 +922,7 @@ public class LooseView : Node2D {
 		MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
 		var visibleTiles = new List<VisibleTile>();
 		for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
-			if (mapView.isRowAt(y))
+			if (map.isRowAt(y))
 				for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 					Tile tile = map.tileAt(x, y);
 					if (tile != Tile.NONE)
@@ -1013,26 +1013,6 @@ public class MapView : Node2D {
 	{
 		looseView.Update(); // Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but
 					// long term I think it's better to redraw everything every frame like a typical modern video game.
-	}
-
-	public bool isRowAt(int y)
-	{
-		return wrapVertically || ((y >= 0) && (y < mapHeight));
-	}
-
-	// TODO: Use function from GameMap (in C7GameData). Also copy isRowAt over there.
-	public bool isTileAt(int x, int y)
-	{
-		bool evenRow = y%2 == 0;
-		bool xInBounds; {
-			if (wrapHorizontally)
-				xInBounds = true;
-			else if (evenRow)
-				xInBounds = (x >= 0) && (x <= mapWidth - 2);
-			else
-				xInBounds = (x >= 1) && (x <= mapWidth - 1);
-		}
-		return isRowAt(y) && xInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
 	}
 
 	public int wrapTileX(int x)

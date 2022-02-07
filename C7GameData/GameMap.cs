@@ -69,6 +69,11 @@ namespace C7GameData
             }
         }
 
+        public bool isRowAt(int y)
+        {
+            return wrapVertically || ((y >= 0) && (y < numTilesTall));
+        }
+
         public bool isTileAt(int x, int y)
         {
             bool evenRow = y%2 == 0;
@@ -80,8 +85,7 @@ namespace C7GameData
                 else
                     xInBounds = (x >= 1) && (x <= numTilesWide - 1);
             }
-            bool yInBounds = wrapVertically || ((y >= 0) && (y < numTilesTall));
-            return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
+            return xInBounds && isRowAt(y) && (evenRow ? (x%2 == 0) : (x%2 != 0));
         }
 
         public Tile tileAt(int x, int y)
