@@ -39,8 +39,10 @@ namespace C7Engine
 				}
 				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
 					if (defenderAI.destination == unit.location) {
-						UnitInteractions.fortifyUnit(unit.guid);
-						Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
+						if (!unit.isFortified) {
+							UnitInteractions.fortifyUnit(unit.guid);
+							Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
+						}
 					}
 					else {
 						//TODO: Move towards destination

@@ -18,6 +18,7 @@ namespace C7Engine {
                         //Move randomly
                         List<Tile> validTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
                         if (validTiles.Count == 0) {
+	                        //This can happen if a barbarian galley spawns next to a 1-tile lake, moves there, and doesn't have anywhere else to go.
 	                        Console.WriteLine("WARNING: No valid tiles for barbarian to move to");
 	                        continue;
                         }
