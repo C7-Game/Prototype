@@ -388,6 +388,9 @@ public class RiverLayer : LooseLayer
 		if (west.riverSoutheast) {
 			riverGraphicsIndex+=8;
 		}
+		if (riverGraphicsIndex == 0) {
+			return;
+		}
 		int riverRow = riverGraphicsIndex / 4;
 		int riverColumn = riverGraphicsIndex % 4;
 
@@ -980,6 +983,7 @@ public class MapView : Node2D {
 
 		looseView = new LooseView(this);
 		looseView.layers.Add(new TerrainLayer());
+		looseView.layers.Add(new RiverLayer());
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());
 		looseView.layers.Add(new HillsLayer());
