@@ -1,21 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using C7GameData;
 using System.Linq;
+using C7GameData.AIData;
 
 namespace C7Engine
 {
 	public class SettlerLocationAI
 	{
 		//Figures out where to plant Settlers
-		public static Tile findSettlerLocation(Tile start, List<City> playerCities)
+		public static Tile findSettlerLocation(Tile start, List<City> playerCities, List<MapUnit> playerUnits)
 		{
 			HashSet<Tile> candidates = GetCandidateTiles(start);
 			foreach (City city in playerCities) {
 				HashSet<Tile> moreCandidates = GetCandidateTiles(city.location);
 				candidates.UnionWith(moreCandidates);
 			}
-			Dictionary<Tile, int> scores = AssignTileScores(start, candidates);
+			Dictionary<Tile, int> scores = AssignTileScores(start, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
+			if (scores.Values.Max() <= 0) {
+				return Tile.NONE;	//nowhere to settle
+			}
 
 			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
 			//Debugging: Print out scores
@@ -25,7 +30,9 @@ namespace C7Engine
 				if (returnValue == null) {
 					returnValue = kvp.Key;
 				}
-				Console.WriteLine("Tile " + kvp.Key + " scored " + kvp.Value);
+				if (kvp.Value > 0) {
+					Console.WriteLine("Tile " + kvp.Key + " scored " + kvp.Value);
+				}
 			}
 			return returnValue;
 		}
@@ -66,19 +73,32 @@ namespace C7Engine
 			candidates.UnionWith(ringFour);
 			return candidates;
 		}
-		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, HashSet<Tile> candidates)
+		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, HashSet<Tile> candidates, List<MapUnit> playerSettlers)
 		{
 
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
 			foreach (Tile t in candidates) {
 				//TODO: Look at whether we can place cities here.  Hard-coded for now.
-				if (t.baseTerrainType.name == "Mountains") {
+				if (t.overlayTerrainType.name == "Mountains") {
 					scores[t] = 0;
 					continue;
 				}
 				if (t.cityAtTile != null || t.GetLandNeighbors().Exists(n => n.cityAtTile != null)) {
 					scores[t] = 0;
 					continue;
+				}
+				foreach (MapUnit otherSettler in playerSettlers)
+				{
+					if (otherSettler.currentAIBehavior is SettlerAI otherSettlerAI) {
+						if (otherSettlerAI.destination == t) {
+							scores[t] = 0;
+							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.
+						}
+						if (otherSettlerAI.destination.GetLandNeighbors().Exists(n => n == t)) {
+							scores[t] = 0;
+							goto nextcandidate;
+						}
+					}
 				}
 				int score = 0;
 				score = score + t.overlayTerrainType.baseFoodProduction * 5;
@@ -111,6 +131,7 @@ namespace C7Engine
 				//TODO: Remove locations that we already have another Settler moving towards
 				
 				scores[t] = score;
+nextcandidate: ;
 			}
 			return scores;
 		}

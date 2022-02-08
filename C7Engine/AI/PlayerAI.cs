@@ -43,7 +43,7 @@ namespace C7Engine
 					}
 				}
 				else if (unit.currentAIBehavior is ExplorerAI explorerAi) {
-					Console.Write("Moving explorer AI for " + unit);
+					// Console.Write("Moving explorer AI for " + unit);
 					//TODO: Distinguish between types of exploration
 					//TODO: Make sure ON_A_BOAT units stay on the boat
 					//Move randomly
@@ -52,7 +52,7 @@ namespace C7Engine
 					//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
 					//if it tries to move e.g. north from the north pole.  Hence, this check.
 					if (newLocation != Tile.NONE) {
-						Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
+						// Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
 						unit.location.unitsOnTile.Remove(unit);
 						newLocation.unitsOnTile.Add(unit);
 						unit.location = newLocation;
@@ -77,7 +77,7 @@ namespace C7Engine
 				if (nextTile == null) {
 					nextTile = kvp.Key;
 				}
-				Console.WriteLine("Settler could move to " + kvp.Key + " with distance value " + kvp.Value);
+				// Console.WriteLine("Settler could move to " + kvp.Key + " with distance value " + kvp.Value);
 			}
 			Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
 			unit.location.unitsOnTile.Remove(unit);
@@ -97,7 +97,13 @@ namespace C7Engine
 					settlerAI.destination = unit.location;
 				}
 				else {
-					settlerAI.destination = SettlerLocationAI.findSettlerLocation(unit.location, player.cities);
+					settlerAI.destination = SettlerLocationAI.findSettlerLocation(unit.location, player.cities, player.units);
+					if (settlerAI.destination == Tile.NONE) {
+						//This is possible if all tiles within 4 tiles of a city are either not land, or already claimed
+						//by another colonist.  Longer-term, the AI shouldn't be building settlers if that is the case,
+						//but right now we'll just spike the football to stop the clock and avoid building immediately next to another city.
+						settlerAI.goal = SettlerAI.SettlerGoal.JOIN_CITY;
+					}
 				}
 				Console.WriteLine("Set AI for unit to settler AI with destination of " + settlerAI.destination);
 				unit.currentAIBehavior = settlerAI;
