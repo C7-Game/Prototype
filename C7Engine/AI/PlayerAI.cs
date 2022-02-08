@@ -23,7 +23,12 @@ namespace C7Engine
 				//Now actually take actions
 				//TODO: Move these into an AI method
 				if (unit.currentAIBehavior is SettlerAI settlerAi) {
-					if (unit.location == settlerAi.destination) {
+					if (settlerAi.goal == SettlerAI.SettlerGoal.JOIN_CITY && unit.location.cityAtTile != null) {
+						//TODO: Actually join the city.  Haven't added that action.
+						//For now, just get rid of the unit.  Sorry, bro.
+						UnitInteractions.disbandUnit(unit.guid);
+					}
+					else if (unit.location == settlerAi.destination) {
 						Console.WriteLine("Building city with " + unit);
 						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
 						UnitInteractions.disbandUnit(unit.guid);
@@ -108,7 +113,7 @@ namespace C7Engine
 				Console.WriteLine("Set AI for unit to settler AI with destination of " + settlerAI.destination);
 				unit.currentAIBehavior = settlerAI;
 			}
-			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count == 0) {
+			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
 				DefenderAI ai = new DefenderAI();
 				ai.goal = DefenderAI.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;
