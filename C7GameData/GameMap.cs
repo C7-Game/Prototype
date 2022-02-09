@@ -22,6 +22,7 @@ namespace C7GameData
 
         public List<TerrainType> terrainTypes = new List<TerrainType>();
         public List<Tile> tiles { get; set;}
+		public List<Tile> barbarianCamps = new List<Tile>();
 
         public GameMap()
         {
@@ -141,7 +142,7 @@ namespace C7GameData
                 bool foundOne = false;
                 for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
                     var randTile = tiles[rng.Next(0, tiles.Count)];
-                    if (randTile.baseTerrainType.name == "Coast") // TODO: Write a proper check for if tile is water
+                    if (randTile.baseTerrainType.isWater())
                         continue;
                     int distToNearestOtherLoc = Int32.MaxValue;
                     foreach (var sL in tr) {
@@ -194,24 +195,24 @@ namespace C7GameData
             dummyMap.numTilesTall = 80;
             dummyMap.numTilesWide = 80;
 
-	    // NOTE: The order of terrain types in this array must match the indices produced by terrainGen
-	    dummyMap.terrainTypes.Add(plains);
-	    dummyMap.terrainTypes.Add(grassland);
-	    dummyMap.terrainTypes.Add(coast);
+			// NOTE: The order of terrain types in this array must match the indices produced by terrainGen
+			dummyMap.terrainTypes.Add(plains);
+			dummyMap.terrainTypes.Add(grassland);
+			dummyMap.terrainTypes.Add(coast);
 
-	    dummyMap.terrainNoiseMap = terrainGen(rng.Next(), dummyMap.numTilesWide, dummyMap.numTilesTall);
+			dummyMap.terrainNoiseMap = terrainGen(rng.Next(), dummyMap.numTilesWide, dummyMap.numTilesTall);
 
-            for (int y = 0; y < dummyMap.numTilesTall; y++)
-		for (int x = y%2; x < dummyMap.numTilesWide; x += 2) {
-                    Tile newTile = new Tile();
-                    newTile.xCoordinate = x;
-                    newTile.yCoordinate = y;
-                    newTile.baseTerrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
-                    dummyMap.tiles.Add(newTile);
-                }
-
-            return dummyMap;
-        }
+			for (int y = 0; y < dummyMap.numTilesTall; y++) {
+				for (int x = y%2; x < dummyMap.numTilesWide; x += 2) {
+					Tile newTile = new Tile();
+					newTile.xCoordinate = x;
+					newTile.yCoordinate = y;
+					newTile.baseTerrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
+					dummyMap.tiles.Add(newTile);
+				}
+			}
+			return dummyMap;
+		}
 
         // STATUS 2021-11-26: This noise function is not currently referenced, but it is a very useful
         //  noisemap generator that we will likely use in the future once we start trying

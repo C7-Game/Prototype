@@ -4,21 +4,21 @@ using System.Runtime.InteropServices;
 namespace QueryCiv3.Biq
 {
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct RACECITYNAME
+    public unsafe struct RACE_City
     {
         private fixed byte Text[24];
         public string Name { get => Util.GetString(ref this, 0, 24); }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct RACELEADERNAME
+    public unsafe struct RACE_LeaderName
     {
         private fixed byte Text[32];
         public string Name { get => Util.GetString(ref this, 0, 32); }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack=1)]
-    public unsafe struct RACEERA
+    public unsafe struct RACE_ERAS
     {
         private fixed byte Text[520];
         public string ForwardFilename { get => Util.GetString(ref this, 0, 260); }
@@ -81,6 +81,8 @@ namespace QueryCiv3.Biq
         public bool Scientific                  { get => Util.GetFlag(Flags[0], 3); }
         public bool Religious                   { get => Util.GetFlag(Flags[0], 4); }
         public bool Industrious                 { get => Util.GetFlag(Flags[0], 5); }
+        public bool Agricultural                { get => Util.GetFlag(Flags[0], 6); }
+        public bool Seafaring                   { get => Util.GetFlag(Flags[0], 7); }
 
         public bool ManageCitizens              { get => Util.GetFlag(Flags[4], 0); }
         public bool EmphasizeFood               { get => Util.GetFlag(Flags[4], 1); }

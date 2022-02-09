@@ -46,17 +46,17 @@ namespace QueryCiv3
             A jagged array means that the second dimension can vary between components eg. for RaceCityName, each civ can have a different # of Cities
         */
         public bool[,] TerrGood; // which resources are allowed on which types of terrain
-        public GOVTGOVT[,] GovtGovt; // relationships between governments
-        public RACECITYNAME[][] RaceCityName; // the list of city names for each civ
-        public RACEERA[,] RaceEra; // the file names for each era for each civ
-        public RACELEADERNAME[][] RaceGreatLeaderName; // the great leaders for each civ
-        public RACELEADERNAME[][] RaceScientificLeaderName; // the scientific leaders for each civ
+        public GOVT_GOVT[,] GovtGovt; // relationships between governments
+        public RACE_City[][] RaceCityName; // the list of city names for each civ
+        public RACE_ERAS[,] RaceEra; // the file names for each era for each civ
+        public RACE_LeaderName[][] RaceGreatLeaderName; // the great leaders for each civ
+        public RACE_LeaderName[][] RaceScientificLeaderName; // the scientific leaders for each civ
         public int[][] CityBuilding; // Building IDs in each city
         public int[][] WmapResource;
         public int[][] PrtoPrto; // Stealth unit targets per unit
-        public LEADPRTO[][] LeadPrto; // starting unit data for each leader
+        public LEAD_Unit[][] LeadPrto; // starting unit data for each leader
         public int[][] LeadTech; // starting tech data for each leader
-        public RULECULT[][] RuleCult; // culture level names per rule
+        public RULE_CULT[][] RuleCult; // culture level names per rule
         public int[][] RuleSpaceship; // spaceship quantity requirements per rule
         public int[][] GameCiv; // Playable civs for game
         public int[][] GameAlliance; // Civ alliances for game
@@ -271,8 +271,8 @@ namespace QueryCiv3
                             int govtLen = FileData.ReadInt32(offset) + 4;
                             dataLength = count * govtLen;
                             Govt = new GOVT[count];
-                            GovtGovt = new GOVTGOVT[count, count];
-                            int govtgovtRowLength = count * sizeof(GOVTGOVT);
+                            GovtGovt = new GOVT_GOVT[count, count];
+                            int govtgovtRowLength = count * sizeof(GOVT_GOVT);
 
                             fixed (void* ptr = Govt, ptr2 = GovtGovt) {
                                 byte* govtPtr = (byte*)ptr;
@@ -292,7 +292,7 @@ namespace QueryCiv3
                         case "LEAD":
                             dataLength = 0;
                             Lead = new LEAD[count];
-                            LeadPrto = new LEADPRTO[count][];
+                            LeadPrto = new LEAD_Unit[count][];
                             LeadTech = new int[count][];
 
                             fixed (void* ptr = Lead) {
@@ -303,8 +303,8 @@ namespace QueryCiv3
                                 for (int i = 0; i < count; i++) {
                                     Buffer.MemoryCopy(dataPtr, leadPtr, LEAD_LEN_1, LEAD_LEN_1);
                                     leadPtr += LEAD_LEN_1;
-                                    LeadPrto[i] = new LEADPRTO[Lead[i].NumberOfStartUnitTypes];
-                                    rowLength = Lead[i].NumberOfStartUnitTypes * sizeof(LEADPRTO);
+                                    LeadPrto[i] = new LEAD_Unit[Lead[i].NumberOfStartUnitTypes];
+                                    rowLength = Lead[i].NumberOfStartUnitTypes * sizeof(LEAD_Unit);
                                     fixed (void* ptr2 = LeadPrto[i]) Buffer.MemoryCopy(dataPtr + LEAD_LEN_1, ptr2, rowLength, rowLength);
                                     dataPtr += LEAD_LEN_1 + rowLength;
 
@@ -349,9 +349,9 @@ namespace QueryCiv3
                         case "RACE":
                             dataLength = 0;
                             Race = new RACE[count];
-                            RaceCityName = new RACECITYNAME[count][];
-                            RaceScientificLeaderName = new RACELEADERNAME[count][];
-                            RaceGreatLeaderName = new RACELEADERNAME[count][];
+                            RaceCityName = new RACE_City[count][];
+                            RaceScientificLeaderName = new RACE_LeaderName[count][];
+                            RaceGreatLeaderName = new RACE_LeaderName[count][];
                             /*
                                 For getting dynamic race data, we need to know the number of eras as defined earlier
                                 Presumably this means that the ERAS section of BIQ will always appear before the RACE section
@@ -360,8 +360,8 @@ namespace QueryCiv3
                                   trying to get the length of an uninitialized array, which is sufficient
                             */
                             int eras = Eras.Length;
-                            RaceEra = new RACEERA[count, eras];
-                            int raceeraRowLength = eras * sizeof(RACEERA);
+                            RaceEra = new RACE_ERAS[count, eras];
+                            int raceeraRowLength = eras * sizeof(RACE_ERAS);
 
                             fixed (void* ptr = Race, ptr2 = RaceEra) {
                                 byte* racePtr = (byte*)ptr;
@@ -372,15 +372,15 @@ namespace QueryCiv3
                                 for (int i = 0; i < count; i++) {
                                     Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_1, RACE_LEN_1);
                                     racePtr += RACE_LEN_1;
-                                    RaceCityName[i] = new RACECITYNAME[Race[i].NumberOfCities];
-                                    rowLength = Race[i].NumberOfCities * sizeof(RACECITYNAME);
+                                    RaceCityName[i] = new RACE_City[Race[i].NumberOfCities];
+                                    rowLength = Race[i].NumberOfCities * sizeof(RACE_City);
                                     fixed (void* ptr3 = RaceCityName[i]) Buffer.MemoryCopy(dataPtr + RACE_LEN_1, ptr3, rowLength, rowLength);
                                     dataPtr += RACE_LEN_1 + rowLength;
 
                                     Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_2, RACE_LEN_2);
                                     racePtr += RACE_LEN_2;
-                                    RaceGreatLeaderName[i] = new RACELEADERNAME[Race[i].NumberOfGreatLeaders];
-                                    rowLength = Race[i].NumberOfGreatLeaders * sizeof(RACELEADERNAME);
+                                    RaceGreatLeaderName[i] = new RACE_LeaderName[Race[i].NumberOfGreatLeaders];
+                                    rowLength = Race[i].NumberOfGreatLeaders * sizeof(RACE_LeaderName);
                                     fixed (void* ptr3 = RaceGreatLeaderName[i]) Buffer.MemoryCopy(dataPtr + RACE_LEN_2, ptr3, rowLength, rowLength);
                                     dataPtr += RACE_LEN_2 + rowLength;
 
@@ -392,8 +392,8 @@ namespace QueryCiv3
 
                                     Buffer.MemoryCopy(dataPtr, racePtr, RACE_LEN_4, RACE_LEN_4);
                                     racePtr += RACE_LEN_4;
-                                    RaceScientificLeaderName[i] = new RACELEADERNAME[Race[i].NumberOfScientificLeaders];
-                                    rowLength = Race[i].NumberOfScientificLeaders * sizeof(RACELEADERNAME);
+                                    RaceScientificLeaderName[i] = new RACE_LeaderName[Race[i].NumberOfScientificLeaders];
+                                    rowLength = Race[i].NumberOfScientificLeaders * sizeof(RACE_LeaderName);
                                     fixed (void* ptr3 = RaceScientificLeaderName[i]) Buffer.MemoryCopy(dataPtr + RACE_LEN_4, ptr3, rowLength, rowLength);
                                     dataPtr += RACE_LEN_4 + rowLength;
 
@@ -405,7 +405,7 @@ namespace QueryCiv3
                         case "RULE":
                             dataLength = 0;
                             Rule = new RULE[count];
-                            RuleCult = new RULECULT[count][];
+                            RuleCult = new RULE_CULT[count][];
                             RuleSpaceship = new int[count][];
 
                             fixed (void* ptr = Rule) {
@@ -423,8 +423,8 @@ namespace QueryCiv3
 
                                     Buffer.MemoryCopy(dataPtr, rulePtr, RULE_LEN_2, RULE_LEN_2);
                                     rulePtr += RULE_LEN_2;
-                                    RuleCult[i] = new RULECULT[Rule[i].NumberOfCultureLevels];
-                                    rowLength = Rule[i].NumberOfCultureLevels * sizeof(RULECULT);
+                                    RuleCult[i] = new RULE_CULT[Rule[i].NumberOfCultureLevels];
+                                    rowLength = Rule[i].NumberOfCultureLevels * sizeof(RULE_CULT);
                                     fixed (void* ptr2 = RuleCult[i]) Buffer.MemoryCopy(dataPtr + RULE_LEN_2, ptr2, rowLength, rowLength);
                                     dataPtr += RULE_LEN_2 + rowLength;
 

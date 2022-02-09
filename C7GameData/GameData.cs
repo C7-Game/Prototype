@@ -14,6 +14,11 @@ namespace C7GameData
         List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
         public List<City> cities = new List<City>();
 
+        public GameData()
+        {
+	        rng = new Random();
+        }
+
         /**
          * This is intended as a place to set up post-load actions on the save, regardless of
          * whether it is loaded from a legacy Civ3 file or a C7 native file.
@@ -32,21 +37,22 @@ namespace C7GameData
             }
         }
 
-        public MapUnit createDummyUnit(UnitPrototype proto, Player owner, int tileX, int tileY)
+        private MapUnit createDummyUnit(UnitPrototype proto, Player owner, int tileX, int tileY)
         {
             if (map.isTileAt(tileX, tileY)) {
-                var tile = map.tileAt(tileX, tileY);
-                var unit = new MapUnit();
+                Tile tile = map.tileAt(tileX, tileY);
+                MapUnit unit = new MapUnit();
                 unit.unitType = proto;
-		unit.owner = owner;
+		        unit.owner = owner;
                 unit.location = tile;
+                unit.facingDirection = TileDirection.SOUTHWEST;
                 tile.unitsOnTile.Add(unit);
                 mapUnits.Add(unit);
                 unit.movementPointsRemaining = proto.movement;
                 unit.hitPointsRemaining = 3;
                 return unit;
             } else
-                throw new System.Exception("Invalid tile coordinates");
+                throw new System.Exception("Invalid tile coordinates " + tileX + ", " + tileY);
         }
 
         /**
@@ -60,23 +66,51 @@ namespace C7GameData
          *
          * Returns the human player so the caller (which is the UI) can store it.
          **/
-        public Player createDummyGameData()
+        public Player CreateDummyGameData()
         {
             this.turn = 0;
-            this.rng = new Random();
 
             int blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-            var humanPlayer = new Player(blue);
+            Player humanPlayer = new Player(blue);
             players.Add(humanPlayer);
 
             int white = -1; // = 0xFFFFFFFF, but we can't just use that b/c the compiler complains about uint-to-int conversion
-            var barbarianPlayer = new Player(white);
+            Player barbarianPlayer = new Player(white);
+            barbarianPlayer.isBarbarians = true;
             players.Add(barbarianPlayer);
 
             //Right now, the one terrain type is in the map but not in our list here.
             //That is not great, but let's overlook that for now, as for now all our terrain type
             //references will be via the map.
+            
+            UnitPrototype warrior = new UnitPrototype();
+            warrior.name = "Warrior";
+            warrior.attack = 1;
+            warrior.defense = 1;
+            warrior.movement = 1;
+            warrior.iconIndex = 6;
+            
+            CreateStartingDummyUnits(humanPlayer);
+            List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
+            foreach (Tile barbCampLocation in barbarianCamps) {
+                if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
+                    MapUnit barbWarrior = createDummyUnit(warrior, barbarianPlayer, barbCampLocation.xCoordinate, barbCampLocation.yCoordinate);
+                    barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
+                    // whole procedure of generating a map should be part of the engine not the data module.
+                    barbWarrior.facingDirection = TileDirection.SOUTHEAST;
+                    barbWarrior.location.hasBarbarianCamp = true;
+                    map.barbarianCamps.Add(barbCampLocation);
+                }
+            }
 
+
+            //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
+
+            return humanPlayer;
+        }
+
+        private void CreateStartingDummyUnits(Player humanPlayer)
+        {
             UnitPrototype settler = new UnitPrototype();
             settler.name = "Settler";
             settler.attack = 0;
@@ -107,23 +141,10 @@ namespace C7GameData
             chariot.movement = 2;
             chariot.iconIndex = 10;
 
-            createDummyUnit(settler, humanPlayer,  20, 26);
-            createDummyUnit(warrior, humanPlayer,  22, 26);
-            createDummyUnit(worker , humanPlayer, 24, 26);
+            createDummyUnit(settler, humanPlayer, 20, 26);
+            createDummyUnit(warrior, humanPlayer, 22, 26);
+            createDummyUnit(worker, humanPlayer, 24, 26);
             createDummyUnit(chariot, humanPlayer, 26, 26);
-
-            var startingLocations = map.generateStartingLocations(rng, 10, 10);
-            foreach (var sL in startingLocations)
-                if (sL.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-                    var barbWarrior = createDummyUnit(warrior, barbarianPlayer, sL.xCoordinate, sL.yCoordinate);
-                    barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
-                                                    // whole procedure of generating a map should be part of the engine not the data module.
-                    barbWarrior.location.hasBarbarianCamp = true;
-                }
-
-            //Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
-
-	    return humanPlayer;
         }
     }
 }

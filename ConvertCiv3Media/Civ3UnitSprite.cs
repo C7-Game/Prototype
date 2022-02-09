@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using IniParser;
 using IniParser.Model;
 
@@ -101,6 +102,22 @@ namespace ConvertCiv3Media
                 }
             }
         }
+
+        // Returns all non-empty key, value pairs for the "Animations" section of a unit INI file. I'm copying this out of the Civ3UnitSprite
+        // constructor for use by UnitLayer.
+        public static Dictionary<string, string> getINIAnimationsInfo(string iniPath)
+        {
+            FileIniDataParser UnitIniFile = new FileIniDataParser();
+            IniData UnitIniData = UnitIniFile.ReadFile(iniPath);
+            var tr = new Dictionary<string, string>();
+            foreach (UnitAction actn in Enum.GetValues(typeof(UnitAction))) {
+                var fileName = UnitIniData["Animations"][actn.ToString()];
+                if ((fileName != null) && (fileName != ""))
+                    tr[actn.ToString()] = fileName;
+            }
+            return tr;
+        }
+
         /*
         public virtual void InitDisplay() {
             // override this method in the display framework to convert media to display framework objects

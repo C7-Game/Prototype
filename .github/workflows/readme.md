@@ -8,6 +8,8 @@ I've been using test-action.yml to try out GitHub action features before integra
 
 ## export-c7.yml
 
+This build action uses [the godot-ci:mono-\<version> Docker image](https://hub.docker.com/r/barichello/godot-ci) which is based on [the latest mono Docker image](https://hub.docker.com/_/mono) which together contain the mono SDK, headless Godot, and Godot export templates.
+
 export-c7.yml has 3 jobs:
 
 - Windows export
