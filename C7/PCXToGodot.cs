@@ -5,65 +5,34 @@ using ConvertCiv3Media;
 public class PCXToGodot : Godot.Object
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
-	
+
 	public static ImageTexture getImageTextureFromPCX(Pcx pcx) {
 		Image ImgTxtr = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
-		ImageTexture Txtr = new ImageTexture();
-		Txtr.CreateFromImage(ImgTxtr, 0);
-		return Txtr;
+		return getImageTextureFromImage(ImgTxtr);
 	}
 
 	public static ImageTexture getImageTextureFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
-		Image Image = getImageFromPCX(pcx, leftStart, topStart, croppedWidth, croppedHeight);
-		ImageTexture Txtr = new ImageTexture();
-		Txtr.CreateFromImage(Image, 0);
-		return Txtr;
+		Image image = getImageFromPCX(pcx, leftStart, topStart, croppedWidth, croppedHeight);
+		return getImageTextureFromImage(image);
 	}
 
 	/**
 	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
 	 **/
 	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
-		Image image = new Image();
-		image.Create(croppedWidth, croppedHeight, false, Image.Format.Rgba8);
-		image.Lock();
-		for (int y = topStart; y < topStart + croppedHeight; y++)
-		{
-			for (int x = leftStart; x < leftStart + croppedWidth; x++)
-			{
-				byte red = pcx.Palette[pcx.ColorIndexAt(x, y), 0];
-				byte green = pcx.Palette[pcx.ColorIndexAt(x, y), 1];
-				byte blue = pcx.Palette[pcx.ColorIndexAt(x, y), 2];
-				byte alpha = pcx.ColorIndexAt(x, y) >= CIV3_TRANSPARENCY_START ? (byte)0 : (byte)255;
-				image.SetPixel(x - leftStart, y - topStart, Color.Color8(red, green, blue, alpha));
-			}
-		}
-		image.Unlock();
-		return image;
-	}
-	
-	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
-		Image OutImage = new Image();
-		OutImage.Create(width, height, false, Image.Format.Rgba8);
-		OutImage.Lock();
-		for (int i = 0; i < width * height; i++)
-		{
-			if (shadows && colorIndices[i] > 239) {
-				// using black and transparency
-				OutImage.SetPixel(i % width, i / width, Color.Color8(0,0,0, (byte)((255 -colorIndices[i]) * 16)));
-				// using the palette color but adding transparency
-				// OutImage.SetPixel(i % width, i / width, Color.Color8(palette[ba[i],0], palette[ba[i],1], palette[ba[i],2], (byte)((255 -ba[i]) * 16)));
-			} else {
-				byte red = palette[colorIndices[i], 0];
-				byte green = palette[colorIndices[i], 1];
-				byte blue = palette[colorIndices[i], 2];
-				byte alpha = colorIndices[i] >= CIV3_TRANSPARENCY_START ? (byte)0 : (byte)255;
-				OutImage.SetPixel(i % width, i / width, Color.Color8(red, green, blue, alpha));
-			}
-		}
-		OutImage.Unlock();
+		int[] ColorData = loadPalette(pcx.Palette);
+		int[] BufferData = new int[croppedWidth * croppedHeight];
 
-		return OutImage;
+		int DataIndex = 0;
+
+		for (int y = topStart; y < topStart + croppedHeight; y++) {
+			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
+				BufferData[DataIndex] = ColorData[pcx.ColorIndexAt(x, y)];
+				DataIndex++;
+			}
+		}
+
+		return getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
 	}
 
 	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx) {
@@ -73,30 +42,87 @@ public class PCXToGodot : Godot.Object
 	//Combines two PCXs, one used for the alpha, to produce a final output image.
 	//Some files, such as Art/interface/menuButtons.pcx and Art/interface/menuButtonsAlpha.pcx, use this method.
 	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight, int alphaRowOffset = 0) {
-		Image OutImage = new Image();
-		OutImage.Create(croppedWidth, croppedHeight, false, Image.Format.Rgba8);
-		OutImage.Lock();
-		for (int y = topStart; y < topStart + croppedHeight; y++)
-		{
-			for (int x = leftStart; x < leftStart + croppedWidth; x++)
-			{
-				int currentPixel = y * imagePcx.Width + x;
-				byte red = imagePcx.Palette[imagePcx.ColorIndexAt(x, y), 0];
-				byte green = imagePcx.Palette[imagePcx.ColorIndexAt(x, y), 1];
-				byte blue = imagePcx.Palette[imagePcx.ColorIndexAt(x, y), 2];
-				//Assumption based on menuButtonsAlpha.pcx: The palette in the alpha PCX always has the same red, green, and blue values (i.e. is grayscale).
-				//Examining it with breakpoints in my Java code, it appears it starts at 255, 255, 255, and goes down one at a time.  But this code
-				//doesn't assume that, it only assumes the grayscale aspect.  In theory, this should work for any transparency, 0 to 255.
-				byte alpha = alphaPcx.Palette[alphaPcx.ColorIndexAt(x, y - alphaRowOffset), 0];
-				OutImage.SetPixel(x - leftStart, y - topStart, Color.Color8(red, green, blue, alpha));
+		int[] ColorData = loadPalette(imagePcx.Palette);
+		int[] AlphaData = loadAlphaPalette(alphaPcx.Palette, ColorData);
+		int[] BufferData = new int[croppedWidth * croppedHeight];
+
+		int AlphaIndex;
+		int DataIndex = 0;
+
+		for (int y = topStart; y < topStart + croppedHeight; y++) {
+			AlphaIndex = (y - alphaRowOffset) * imagePcx.Width + leftStart;
+			for (int x = leftStart; x < leftStart + croppedWidth; x++) {
+				BufferData[DataIndex] = ColorData[imagePcx.ColorIndexAt(x, y)] | AlphaData[alphaPcx.ColorIndices[AlphaIndex]];
+				DataIndex++;
+				AlphaIndex++;
 			}
 		}
-		OutImage.Unlock();
 
+		Image OutImage = getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
+		return getImageTextureFromImage(OutImage);
+	}
+
+	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
+		int[] ColorData = loadPalette(palette, shadows);
+		int[] BufferData = new int[width * height];
+
+		for (int i = 0; i < width * height; i++) {
+			BufferData[i] = ColorData[colorIndices[i]];
+		}
+
+		return getImageFromBufferData(width, height, BufferData);
+	}
+
+	private static Image getImageFromBufferData(int width, int height, int[] bufferData) {
+		Image image = new Image();
+		var Data = new byte[4 * width * height];
+		Buffer.BlockCopy(bufferData, 0, Data, 0, 4 * width * height);
+		image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
+		return image;
+	}
+
+	private static ImageTexture getImageTextureFromImage(Image image) {
 		ImageTexture Txtr = new ImageTexture();
-		Txtr.CreateFromImage(OutImage, 0);
+		Txtr.CreateFromImage(image, 0);
 		return Txtr;
+	}
 
+	private static int[] loadPalette(byte[,] palette, bool shadows = false) {
+		int Red, Green, Blue;
+		int Alpha = 255 << 24;
+		int[] ColorData = new int[256];
 
+		for (int i = 0; i < 256; i++) {
+			Red = palette[i, 0];
+			Green = palette[i, 1] << 8;
+			Blue = palette[i, 2] << 16;
+			ColorData[i] = Red + Green + Blue + Alpha;
+		}
+
+		for (int i = CIV3_TRANSPARENCY_START; i < 256; i++) {
+			ColorData[i] &= 0x00ffffff;
+		}
+
+		if (shadows) {
+			for (int i = 240; i < 256; i++) {
+				ColorData[i] = ((255 - i) * 16) << 24;
+			}
+		}
+
+		return ColorData;
+	}
+
+	private static int[] loadAlphaPalette(byte[,] palette, int[] ColorData) {
+		int[] AlphaData = new int[256];
+
+		for (int i = 0; i < 256; i++) {
+			// Assumption based on menuButtonsAlpha.pcx: The palette in the alpha PCX always has the same red, green, and blue values (i.e. is grayscale).
+			// Examining it with breakpoints in my Java code, it appears it starts at 255, 255, 255, and goes down one at a time.  But this code
+			// doesn't assume that, it only assumes the grayscale aspect.  In theory, this should work for any transparency, 0 to 255.
+			AlphaData[i] = palette[i, 0] << 24;
+			ColorData[i] = ColorData[i] &= 0x00ffffff;
+		}
+
+		return AlphaData;
 	}
 }
