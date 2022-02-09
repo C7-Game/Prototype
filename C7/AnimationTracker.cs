@@ -46,6 +46,11 @@ public class AnimationTracker {
 		activeAnims[unit.guid] = aa;
 	}
 
+	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent)
+	{
+		// TODO: Implement me
+	}
+
 	public void endAnimation(MapUnit unit, bool triggerCallback = true)
 	{
 		ActiveAnimation aa;

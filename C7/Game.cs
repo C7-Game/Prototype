@@ -106,10 +106,17 @@ public class Game : Node2D
 		MessageToUI msg;
 		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
 			switch (msg) {
-			case MsgStartAnimation mSA:
-				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSA.unitGUID);
+			case MsgStartUnitAnimation mSUA:
+				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSUA.unitGUID);
 				if (unit != null)
-					animTracker.startAnimation(unit, mSA.action, mSA.completionEvent);
+					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent);
+				break;
+			case MsgStartEffectAnimation mSEA:
+				int x, y;
+				gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
+				Tile tile = gameData.map.tileAt(x, y);
+				if (tile != Tile.NONE)
+					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent);
 				break;
 			case MsgStartTurn mST:
 				//Simulating processing so the turn doesn't end too quickly

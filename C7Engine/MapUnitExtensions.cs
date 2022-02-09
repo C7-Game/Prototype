@@ -6,7 +6,7 @@ using C7GameData;
 public static class MapUnitExtensions {
 	public static void animate(this MapUnit unit, MapUnit.AnimatedAction action, bool wait)
 	{
-		new MsgStartAnimation(unit, action, wait ? EngineStorage.uiEvent : null).send();
+		new MsgStartUnitAnimation(unit, action, wait ? EngineStorage.uiEvent : null).send();
 		if (wait) {
 			EngineStorage.gameDataMutex.ReleaseMutex();
 			EngineStorage.uiEvent.WaitOne();
