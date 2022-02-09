@@ -10,6 +10,10 @@
 // 2. AnimationTracker needs to know the duration of animations, which awkwardly cannot be determined based on the INI files alone. In order to know
 // the duration of an anim you must know how many frames it has, and the only way to know that is to read its flic file.
 
+// The intended usage is to access the animation data through a Civ3Anim object obtained through the "forUnit" or "forEffect" methods. For example:
+//   civ3AnimData.forUnit("Warrior", MapUnit.AnimatedAction.FORTIFY).playSound()
+// To play the warrior's foritfy sound effect.
+
 using System;
 using System.Collections.Generic;
 using Godot;
@@ -26,13 +30,9 @@ public class Civ3AnimData
 		this.audioPlayer = audioPlayer;
 	}
 
-
-
-
-
 	private Dictionary<string, IniData> iniDatas = new Dictionary<string, IniData>();
 
-	private IniData getINIData(string pathKey)
+	public IniData getINIData(string pathKey)
 	{
 		IniData tr;
 		if (! iniDatas.TryGetValue(pathKey, out tr)) {
@@ -48,26 +48,6 @@ public class Civ3AnimData
 		return getINIData(String.Format("Art/Units/{0}/{0}.INI", unitTypeName));
 	}
 
-	public IniData getEffectINIData(AnimatedEffect effect)
-	{
-		string path;
-		switch (effect) {
-		case AnimatedEffect.Hit:       path = "Art/Animations/Trajectory/hit.ini"       ; break;
-		case AnimatedEffect.Hit2:      path = "Art/Animations/Trajectory/hit2.ini"      ; break;
-		case AnimatedEffect.Hit3:      path = "Art/Animations/Trajectory/hit3.ini"      ; break;
-		case AnimatedEffect.Hit5:      path = "Art/Animations/Trajectory/hit5.ini"      ; break;
-		case AnimatedEffect.Miss:      path = "Art/Animations/Trajectory/miss.ini"      ; break;
-		case AnimatedEffect.WaterMiss: path = "Art/Animations/Trajectory/water miss.ini"; break;
-		default:
-			throw new System.Exception ("Must provide path to INI file for effect: " + effect.ToString());
-		}
-		return getINIData(path);
-	}
-
-
-
-
-
 	// Looks up the name of the flic file associated with a given action in an animation INI. If there is no flic file listed for the action,
 	// returns instead the file name for the default action, and if that's missing too, throws an exception.
 	public string getFlicFileName(IniData iniData, MapUnit.AnimatedAction action)
@@ -80,10 +60,6 @@ public class Civ3AnimData
 		else
 			throw new Exception("Missing default animation"); // TODO: Add the INI's file name to the error message
 	}
-
-
-
-
 
 	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
 
@@ -98,71 +74,96 @@ public class Civ3AnimData
 		return tr;
 	}
 
-	public Util.FlicSheet getFlicSheet(string unitTypeName, MapUnit.AnimatedAction action)
-	{
-		return getFlicSheet("Art/Units/" + unitTypeName, getUnitINIData(unitTypeName), action);
-	}
-
-	public Util.FlicSheet getFlicSheet(AnimatedEffect effect)
-	{
-		// TODO: Refactor this along with the paths in getEffectINIData
-		string category;
-		switch (effect) {
-		case AnimatedEffect.Hit:       category = "Trajectory"; break;
-		case AnimatedEffect.Hit2:      category = "Trajectory"; break;
-		case AnimatedEffect.Hit3:      category = "Trajectory"; break;
-		case AnimatedEffect.Hit5:      category = "Trajectory"; break;
-		case AnimatedEffect.Miss:      category = "Trajectory"; break;
-		case AnimatedEffect.WaterMiss: category = "Trajectory"; break;
-		default:
-			throw new System.Exception ("Must provide category for effect: " + effect.ToString());
-		}
-		return getFlicSheet("Art/Animations/" + category, getEffectINIData(effect), MapUnit.AnimatedAction.DEATH);
-	}
-
-
-
-
-
 	private Dictionary<string, AudioStreamSample> wavs = new Dictionary<string, AudioStreamSample>();
 
-	public void playSound(string unitTypeName, MapUnit.AnimatedAction action)
+	public void playSound(string rootPath, IniData iniData, MapUnit.AnimatedAction action)
 	{
-		string fileName = getUnitINIData(unitTypeName)["Sound Effects"][action.ToString()];
+		string fileName = iniData["Sound Effects"][action.ToString()];
 		if (fileName.EndsWith(".WAV", StringComparison.CurrentCultureIgnoreCase)) {
 			AudioStreamSample wav;
-			var key = String.Format("{0}.{1}", unitTypeName, action.ToString());
-			if (! wavs.TryGetValue(key, out wav)) {
-				wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(String.Format("Art/Units/{0}/{1}", unitTypeName, fileName)));
-				wavs.Add(key, wav);
+			var pathKey = rootPath + "/" + fileName;
+			if (! wavs.TryGetValue(pathKey, out wav)) {
+				wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(pathKey));
+				wavs.Add(pathKey, wav);
 			}
 			audioPlayer.Stream = wav;
 			audioPlayer.Play();
 		}
 	}
 
-	public void playSound(AnimatedEffect effect)
+	public Civ3Anim forUnit(string unitTypeName, MapUnit.AnimatedAction action)
 	{
-		// TODO: Implement this
+		return new Civ3Anim(this, unitTypeName, action);
 	}
 
-
-
-
-
-	public double getDuration(Util.FlicSheet flicSheet)
+	public Civ3Anim forEffect(AnimatedEffect effect)
 	{
+		return new Civ3Anim(this, effect);
+	}
+}
+
+public class Civ3Anim
+{
+	public Civ3AnimData civ3AnimData  { get; private set; }
+	public string folderPath { get; private set; } // For example "Art/Units/Warrior" or "Art/Animations/Trajectory"
+	public string iniFileName { get; private set; }
+	public MapUnit.AnimatedAction action { get; private set; }
+
+	public Civ3Anim(Civ3AnimData civ3AnimData, string unitTypeName, MapUnit.AnimatedAction action)
+	{
+		this.civ3AnimData = civ3AnimData;
+		this.folderPath = "Art/Units/" + unitTypeName;
+		this.iniFileName = unitTypeName + ".ini";
+		this.action = action;
+	}
+
+	public static readonly Dictionary<AnimatedEffect, string> effectCategories = new Dictionary<AnimatedEffect, string>
+	{
+		{ AnimatedEffect.Hit      , "Trajectory" },
+		{ AnimatedEffect.Hit2     , "Trajectory" },
+		{ AnimatedEffect.Hit3     , "Trajectory" },
+		{ AnimatedEffect.Hit5     , "Trajectory" },
+		{ AnimatedEffect.Miss     , "Trajectory" },
+		{ AnimatedEffect.WaterMiss, "Trajectory" }
+	};
+
+	public static readonly Dictionary<AnimatedEffect, string> effectINIFileNames = new Dictionary<AnimatedEffect, string>
+	{
+		{ AnimatedEffect.Hit      , "hit.ini" },
+		{ AnimatedEffect.Hit2     , "hit2.ini" },
+		{ AnimatedEffect.Hit3     , "hit3.ini" },
+		{ AnimatedEffect.Hit5     , "hit5.ini" },
+		{ AnimatedEffect.Miss     , "miss.ini" },
+		{ AnimatedEffect.WaterMiss, "water miss.ini" }
+	};
+
+	public Civ3Anim(Civ3AnimData civ3AnimData, AnimatedEffect effect)
+	{
+		this.civ3AnimData = civ3AnimData;
+		this.folderPath = "Art/Animations/" + effectCategories[effect];
+		this.iniFileName = effectINIFileNames[effect];
+		this.action = MapUnit.AnimatedAction.DEATH;
+	}
+
+	public IniData getINIData()
+	{
+		return civ3AnimData.getINIData(folderPath + "/" + iniFileName);
+	}
+
+	public Util.FlicSheet getFlicSheet()
+	{
+		return civ3AnimData.getFlicSheet(folderPath, getINIData(), action);
+	}
+
+	public void playSound()
+	{
+		civ3AnimData.playSound(folderPath, getINIData(), action);
+	}
+
+	public double getDuration()
+	{
+		Util.FlicSheet flicSheet = getFlicSheet();
 		double frameCount = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		return frameCount / 20.0; // Civ 3 anims often run at 20 FPS   TODO: Do they all? How could we tell? Is it exactly 20 FPS?
-	}
-
-	public double getDuration(string unitTypeName, MapUnit.AnimatedAction action)
-	{
-		return getDuration(getFlicSheet(unitTypeName, action));
-	}
-
-	public double getDuration(AnimatedEffect effect)
-	{
-		return getDuration(getFlicSheet(effect));
 	}
 }

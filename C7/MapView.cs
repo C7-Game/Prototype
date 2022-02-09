@@ -485,7 +485,7 @@ public class UnitLayer : LooseLayer {
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter)
 	{
-		var flicSheet = looseView.mapView.game.civ3AnimData.getFlicSheet(unit.unitType.name, appearance.action);
+		var flicSheet = looseView.mapView.game.civ3AnimData.forUnit(unit.unitType.name, appearance.action).getFlicSheet();
 
 		int dirIndex = 0;
 		switch (appearance.direction) {

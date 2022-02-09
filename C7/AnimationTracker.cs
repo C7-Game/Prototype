@@ -29,8 +29,9 @@ public class AnimationTracker {
 
 	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent)
 	{
+		Civ3Anim anim = civ3AnimData.forUnit(unit.unitType.name, action);
 		long currentTimeMS = getCurrentTimeMS();
-		long animDurationMS = (long)(1000.0 * civ3AnimData.getDuration(unit.unitType.name, action));
+		long animDurationMS = (long)(1000.0 * anim.getDuration());
 
 		ActiveAnimation aa;
 		if (activeAnims.TryGetValue(unit.guid, out aa)) {
@@ -41,7 +42,7 @@ public class AnimationTracker {
 		}
 		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, completionEvent = completionEvent };
 
-		civ3AnimData.playSound(unit.unitType.name, action);
+		anim.playSound();
 
 		activeAnims[unit.guid] = aa;
 	}
