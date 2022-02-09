@@ -96,14 +96,14 @@ namespace C7GameData
 			int dy = this.yCoordinate - other.yCoordinate;
 			double angle = Math.Atan2(dy, dx); // angle is in interval [-pi, pi]
 
-			if      (angle < -7.0/8.0 * Math.PI) return TileDirection.WEST;
-			else if (angle < -5.0/8.0 * Math.PI) return TileDirection.NORTHWEST;
-			else if (angle < -3.0/8.0 * Math.PI) return TileDirection.NORTH;
-			else if (angle < -1.0/8.0 * Math.PI) return TileDirection.NORTHEAST;
-			else if (angle <  1.0/8.0 * Math.PI) return TileDirection.EAST;
-			else if (angle <  3.0/8.0 * Math.PI) return TileDirection.SOUTHEAST;
-			else if (angle <  5.0/8.0 * Math.PI) return TileDirection.SOUTH;
-			else if (angle <  7.0/8.0 * Math.PI) return TileDirection.SOUTHWEST;
+			if      (angle >  7.0/8.0 * Math.PI) return TileDirection.WEST;
+			else if (angle >  5.0/8.0 * Math.PI) return TileDirection.NORTHWEST;
+			else if (angle >  3.0/8.0 * Math.PI) return TileDirection.NORTH;
+			else if (angle >  1.0/8.0 * Math.PI) return TileDirection.NORTHEAST;
+			else if (angle > -1.0/8.0 * Math.PI) return TileDirection.EAST;
+			else if (angle > -3.0/8.0 * Math.PI) return TileDirection.SOUTHEAST;
+			else if (angle > -5.0/8.0 * Math.PI) return TileDirection.SOUTH;
+			else if (angle > -7.0/8.0 * Math.PI) return TileDirection.SOUTHWEST;
 			else                                 return TileDirection.WEST;
 		}
 	}
