@@ -27,29 +27,40 @@ public class AnimationTracker {
 		return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 	}
 
-	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent)
+	private string getTileID(Tile tile)
 	{
-		Civ3Anim anim = civ3AnimData.forUnit(unit.unitType.name, action);
+		// Generate a string to ID this tile that won't conflict with the unit GUIDs. TODO: Eventually we'll implement a common way of ID'ing
+		// all game objects. Use that here instead.
+		return String.Format("Tile.{0}.{1}", tile.xCoordinate, tile.yCoordinate);
+	}
+
+	private void startAnimation(string id, Civ3Anim anim, AutoResetEvent completionEvent)
+	{
 		long currentTimeMS = getCurrentTimeMS();
 		long animDurationMS = (long)(1000.0 * anim.getDuration());
 
 		ActiveAnimation aa;
-		if (activeAnims.TryGetValue(unit.guid, out aa)) {
+		if (activeAnims.TryGetValue(id, out aa)) {
 			// If there's already an animation playing for this unit, end it first before replacing it
 			// TODO: Consider instead queueing up the new animation until after the first one is completed
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
 		}
-		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, completionEvent = completionEvent };
+		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = anim.action, completionEvent = completionEvent };
 
 		anim.playSound();
 
-		activeAnims[unit.guid] = aa;
+		activeAnims[id] = aa;
+	}
+
+	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent)
+	{
+		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType.name, action), completionEvent);
 	}
 
 	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent)
 	{
-		// TODO: Implement me
+		startAnimation(getTileID(tile), civ3AnimData.forEffect(effect), completionEvent);
 	}
 
 	public void endAnimation(MapUnit unit)
@@ -82,10 +93,10 @@ public class AnimationTracker {
 		long currentTimeMS = getCurrentTimeMS();
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
-			var (unitGUID, aa) = (guidAAPair.Key, guidAAPair.Value);
+			var (id, aa) = (guidAAPair.Key, guidAAPair.Value);
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
-			keysToRemove.Add(unitGUID);
+			keysToRemove.Add(id);
 		}
 		foreach (var key in keysToRemove)
 			activeAnims.Remove(key);
