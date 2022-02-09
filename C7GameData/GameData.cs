@@ -111,10 +111,19 @@ namespace C7GameData
 
         private void CreateStartingDummyUnits(Player humanPlayer)
         {
+            UnitPrototype catapult = new UnitPrototype();
+            catapult.name = "Catapult";
+            catapult.attack = 0;
+            catapult.defense = 0;
+            catapult.bombard = 6;
+            catapult.movement = 10;
+            catapult.iconIndex = 22;
+
             UnitPrototype settler = new UnitPrototype();
             settler.name = "Settler";
             settler.attack = 0;
             settler.defense = 0;
+            settler.bombard = 0;
             settler.movement = 1;
             settler.iconIndex = 0;
             settler.canFoundCity = true;
@@ -123,6 +132,7 @@ namespace C7GameData
             warrior.name = "Warrior";
             warrior.attack = 1;
             warrior.defense = 1;
+            warrior.bombard = 0;
             warrior.movement = 1;
             warrior.iconIndex = 6;
 
@@ -130,6 +140,7 @@ namespace C7GameData
             worker.name = "Worker";
             worker.attack = 0;
             worker.defense = 0;
+            worker.bombard = 0;
             worker.movement = 1;
             worker.iconIndex = 1;
             worker.canBuildRoads = true;
@@ -138,9 +149,11 @@ namespace C7GameData
             chariot.name = "Chariot";
             chariot.attack = 1;
             chariot.defense = 1;
+            chariot.bombard = 0;
             chariot.movement = 2;
             chariot.iconIndex = 10;
 
+            createDummyUnit(catapult, humanPlayer, 18, 26);
             createDummyUnit(settler, humanPlayer, 20, 26);
             createDummyUnit(warrior, humanPlayer, 22, 26);
             createDummyUnit(worker, humanPlayer, 24, 26);

@@ -92,9 +92,6 @@ public static class MapUnitExtensions {
 				}
 			}
 
-			// Spawn explosion as unit is leaving, just to test animated effects
-			new MsgStartEffectAnimation(unit.location, AnimatedEffect.Hit3, null).send();
-
 			if (!unit.location.unitsOnTile.Remove(unit))
 				throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 			newLoc.unitsOnTile.Add(unit);

@@ -9,6 +9,7 @@ namespace C7GameData
         public string name {get; set;}
         public int attack {get; set;}
         public int defense {get; set;}
+        public int bombard {get; set;}
         public int movement {get; set;}
         public int iconIndex {get; set;}
 
