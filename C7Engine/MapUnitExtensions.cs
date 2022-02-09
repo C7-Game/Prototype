@@ -56,6 +56,34 @@ public static class MapUnitExtensions {
 		return unit != loser;
 	}
 
+	public static void bombard(this MapUnit unit, Tile tile)
+	{
+		MapUnit target = tile.findTopDefender(unit);
+		if ((unit.unitType.bombard == 0) || (target == MapUnit.NONE))
+			return; // Do nothing if we don't have a unit to attack. TODO: Attack city or tile improv if possible
+
+		var unitOriginalOrientation = unit.facingDirection;
+		unit.facingDirection = unit.location.directionTo(tile);
+
+		int defenderStrength = target.unitType.defense;
+		double attackerOdds = defenderStrength > 0 ? (double)unit.unitType.bombard / (unit.unitType.bombard + defenderStrength) : 1.0;
+
+		unit.animate(MapUnit.AnimatedAction.ATTACK1, true);
+		unit.movementPointsRemaining -= 1;
+		if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
+			target.hitPointsRemaining -= 1;
+			new MsgStartEffectAnimation(tile, AnimatedEffect.Hit3, null).send();
+		} else
+			new MsgStartEffectAnimation(tile, AnimatedEffect.Miss, null).send();
+
+		if (target.hitPointsRemaining <= 0) {
+			target.animate(MapUnit.AnimatedAction.DEATH, true);
+			target.disband();
+		}
+
+		unit.facingDirection = unitOriginalOrientation;
+	}
+
 	public static void OnEnterTile(this MapUnit unit, Tile tile)
 	{
 		// Disperse barb camp
@@ -77,19 +105,25 @@ public static class MapUnitExtensions {
 			unit.facingDirection = dir;
 			unit.isFortified = false;
 
-			// Trigger combat if the tile we're moving into has an enemy unit
+			// Trigger combat if the tile we're moving into has an enemy unit. Or if this unit can't fight, do nothing.
 			MapUnit defender = newLoc.findTopDefender(unit);
 			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
-				bool unitWonCombat = unit.fight(defender);
-				if (! unitWonCombat)
-					return;
+				if (unit.unitType.attack > 0) {
+					bool unitWonCombat = unit.fight(defender);
+					if (! unitWonCombat)
+						return;
 
-				// If there are still more enemy units on the destination tile we can't actually move into it
-				defender = newLoc.findTopDefender(unit);
-				if ((defender != MapUnit.NONE) && (! unit.owner.IsAtPeaceWith(defender.owner))) {
-					unit.movementPointsRemaining -= 1;
+					// If there are still more enemy units on the destination tile we can't actually move into it
+					defender = newLoc.findTopDefender(unit);
+					if ((defender != MapUnit.NONE) && (! unit.owner.IsAtPeaceWith(defender.owner))) {
+						unit.movementPointsRemaining -= 1;
+						return;
+					}
+				} else if (unit.unitType.bombard > 0) {
+					unit.bombard(newLoc);
 					return;
-				}
+				} else
+					return;
 			}
 
 			if (!unit.location.unitsOnTile.Remove(unit))
