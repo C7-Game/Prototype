@@ -369,23 +369,26 @@ public class RiverLayer : LooseLayer
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
 	{
-		Tile north = tile.neighbors[TileDirection.NORTHEAST];
-		Tile east = tile.neighbors[TileDirection.EAST];
-		Tile west = tile;
-		Tile south = tile.neighbors[TileDirection.SOUTHEAST];
+		//The "point" is the easternmost point of the tile for which we are drawing rivers.
+		//Which river graphics to used is calculated by evaluating the tiles that neighbor
+		//that point.
+		Tile northOfPoint = tile.neighbors[TileDirection.NORTHEAST];
+		Tile eastOfPoint = tile.neighbors[TileDirection.EAST];
+		Tile westOfPoint = tile;
+		Tile southOfPoint = tile.neighbors[TileDirection.SOUTHEAST];
 
 		int riverGraphicsIndex = 0;
 
-		if (north.riverSouthwest) {
+		if (northOfPoint.riverSouthwest) {
 			riverGraphicsIndex++;
 		}
-		if (east.riverNorthwest) {
+		if (eastOfPoint.riverNorthwest) {
 			riverGraphicsIndex+=2;
 		}
-		if (south.riverNortheast) {
+		if (westOfPoint.riverSoutheast) {
 			riverGraphicsIndex+=4;
 		}
-		if (west.riverSoutheast) {
+		if (southOfPoint.riverNortheast) {
 			riverGraphicsIndex+=8;
 		}
 		if (riverGraphicsIndex == 0) {
