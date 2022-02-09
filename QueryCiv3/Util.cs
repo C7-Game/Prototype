@@ -6,6 +6,16 @@ using System.Text;
 
 namespace QueryCiv3
 {
+    public struct ByteBitmap {
+        private byte Flags;
+        public bool this[int i] { get => ((Flags >> i) & 1) == 1; }
+    }
+
+    public struct IntBitmap {
+        private int Flags;
+        public bool this[int i] { get => ((Flags >> i) & 1) == 1; }
+    }
+
     public class Util
     {
         // Encoding code page ID; 1252 is Civ3 encoding for US language version
