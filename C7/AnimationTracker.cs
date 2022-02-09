@@ -51,15 +51,14 @@ public class AnimationTracker {
 		// TODO: Implement me
 	}
 
-	public void endAnimation(MapUnit unit, bool triggerCallback = true)
+	public void endAnimation(MapUnit unit)
 	{
 		ActiveAnimation aa;
-		if (triggerCallback && activeAnims.TryGetValue(unit.guid, out aa)) {
+		if (activeAnims.TryGetValue(unit.guid, out aa)) {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
 			activeAnims.Remove(unit.guid);
-		} else
-			activeAnims.Remove(unit.guid);
+		}
 	}
 
 	public bool hasCurrentAction(MapUnit unit)
