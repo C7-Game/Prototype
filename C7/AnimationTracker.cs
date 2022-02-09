@@ -16,8 +16,8 @@ public class AnimationTracker {
 
 	public struct ActiveAnimation {
 		public long startTimeMS, endTimeMS;
-		public MapUnit.AnimatedAction action;
 		public AutoResetEvent completionEvent;
+		public Civ3Anim anim;
 	}
 
 	private Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
@@ -46,7 +46,7 @@ public class AnimationTracker {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
 		}
-		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = anim.action, completionEvent = completionEvent };
+		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, completionEvent = completionEvent, anim = anim };
 
 		anim.playSound();
 
@@ -85,7 +85,7 @@ public class AnimationTracker {
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
 		var repCount = (double)(getCurrentTimeMS() - aa.startTimeMS) / durationMS;
-		return (aa.action, repCount);
+		return (aa.anim.action, repCount);
 	}
 
 	public void update()
