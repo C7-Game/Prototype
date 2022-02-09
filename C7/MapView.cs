@@ -483,12 +483,12 @@ public class UnitLayer : LooseLayer {
 		mat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
 	}
 
-	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.ActiveAnimation activeAnim, Vector2 tileCenter)
+	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter)
 	{
-		var flicSheet = looseView.mapView.game.civ3AnimData.getFlicSheet(unit.unitType.name, activeAnim.action);
+		var flicSheet = looseView.mapView.game.civ3AnimData.getFlicSheet(unit.unitType.name, appearance.action);
 
 		int dirIndex = 0;
-		switch (activeAnim.direction) {
+		switch (appearance.direction) {
 		case TileDirection.NORTH:     dirIndex = 5; break;
 		case TileDirection.NORTHEAST: dirIndex = 4; break;
 		case TileDirection.EAST:      dirIndex = 3; break;
@@ -499,13 +499,13 @@ public class UnitLayer : LooseLayer {
 		case TileDirection.NORTHWEST: dirIndex = 6; break;
 		}
 
-		var animOffset = MapView.cellSize * new Vector2(activeAnim.offsetX, activeAnim.offsetY);
+		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
 		var position = tileCenter + animOffset - new Vector2(0, flicSheet.spriteHeight / 4);
 
 		var inst = getBlankAnimationInstance(looseView);
 
-		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, activeAnim.progress);
+		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, appearance.progress);
 		var civColor = new Color(unit.owner.color);
 		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
 
@@ -568,14 +568,14 @@ public class UnitLayer : LooseLayer {
 				selectedUnitOnTile = u;
 		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender(looseView.mapView.game.CurrentlySelectedUnit);
 
-		var activeAnim = looseView.mapView.game.animTracker.getActiveAnimation(unit);
-		var animOffset = new Vector2(activeAnim.offsetX, activeAnim.offsetY) * MapView.cellSize;
+		var appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
+		var animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
 		if ((selectedUnitOnTile != null) && (selectedUnitOnTile == unit))
 			drawCursor(looseView, tileCenter + animOffset);
 
-		drawUnitAnimFrame(looseView, unit, activeAnim, tileCenter);
+		drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
 
 		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
 

@@ -160,7 +160,7 @@ public class Game : Node2D
 					// animation we want to watch, or if it's fortified and we aren't set to keep fortified units selected.
 					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
 						(((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
-						  ! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()) ||
+						  ! animTracker.getUnitAppearance(CurrentlySelectedUnit).keepUnitSelected()) ||
 						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
 					break;

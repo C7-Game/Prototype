@@ -90,7 +90,7 @@ public class AnimationTracker {
 			activeAnims.Remove(key);
 	}
 
-	public MapUnit.ActiveAnimation getActiveAnimation(MapUnit unit)
+	public MapUnit.Appearance getUnitAppearance(MapUnit unit)
 	{
 		if (hasCurrentAction(unit)) {
 			var (action, repCount) = getCurrentActionAndRepetitionCount(unit);
@@ -115,20 +115,20 @@ public class AnimationTracker {
 				offsetY = -1 * dY * (1f - progress);
 			}
 
-			return new MapUnit.ActiveAnimation {
+			return new MapUnit.Appearance {
 				action = action,
-					direction = unit.facingDirection,
-					progress = progress,
-					offsetX = offsetX,
-					offsetY = offsetY
-					};
+				direction = unit.facingDirection,
+				progress = progress,
+				offsetX = offsetX,
+				offsetY = offsetY
+				};
 		} else
-			return new MapUnit.ActiveAnimation {
+			return new MapUnit.Appearance {
 				action = unit.isFortified ? MapUnit.AnimatedAction.FORTIFY : MapUnit.AnimatedAction.DEFAULT,
-					direction = unit.facingDirection,
-					progress = 1f,
-					offsetX = 0f,
-					offsetY = 0f
-					};
+				direction = unit.facingDirection,
+				progress = 1f,
+				offsetX = 0f,
+				offsetY = 0f
+				};
 	}
 }

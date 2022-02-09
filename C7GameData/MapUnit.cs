@@ -92,7 +92,7 @@ public class MapUnit
 		PLANT
 	}
 
-	public struct ActiveAnimation {
+	public struct Appearance {
 		public AnimatedAction action;
 		public TileDirection direction;
 		public float progress; // Varies 0 to 1
