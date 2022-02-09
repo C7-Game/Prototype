@@ -60,6 +60,10 @@ namespace C7GameData
                 if (civ3Tile.PineForest) {
                     c7Tile.isPineForest = true;
                 }
+                c7Tile.riverNortheast = civ3Tile.RiverNortheast;
+                c7Tile.riverSoutheast = civ3Tile.RiverSoutheast;
+                c7Tile.riverSouthwest = civ3Tile.RiverSouthwest;
+                c7Tile.riverNorthwest = civ3Tile.RiverNorthwest;
                 c7Save.GameData.map.tiles.Add(c7Tile);
                 i++;
             }
