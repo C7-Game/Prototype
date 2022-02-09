@@ -4,11 +4,11 @@
 namespace C7GameData
 {
 public enum AnimatedEffect {
-	HIT,
-	HIT2,
-	HIT3,
-	HIT5,
-	MISS,
-	WATER_MISS
+	Hit,
+	Hit2,
+	Hit3,
+	Hit5,
+	Miss,
+	WaterMiss
 }
 }
