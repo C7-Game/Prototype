@@ -115,8 +115,8 @@ namespace C7GameData
             catapult.name = "Catapult";
             catapult.attack = 0;
             catapult.defense = 0;
-            catapult.bombard = 6;
-            catapult.movement = 10;
+            catapult.bombard = 4;
+            catapult.movement = 1;
             catapult.iconIndex = 22;
 
             UnitPrototype settler = new UnitPrototype();
