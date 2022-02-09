@@ -381,8 +381,9 @@ public class UnitLayer : LooseLayer {
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
 
-	// The unit animations and cursor are both drawn as children attached to the looseView but aren't created and attached in any particular order
-	// so we must use the ZIndex property to ensure the cursor isn't drawn over the units.
+	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
+	// any particular order so we must use the ZIndex property to ensure they're properly layered.
+	public const int effectAnimZIndex = 150;
 	public const int unitAnimZIndex = 100;
 	public const int cursorZIndex = 50;
 
@@ -513,7 +514,18 @@ public class UnitLayer : LooseLayer {
 		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
 		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
 		inst.meshInst.ZIndex = unitAnimZIndex;
+	}
 
+	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, double repCount, Vector2 tileCenter)
+	{
+		var flicSheet = anim.getFlicSheet();
+		var inst = getBlankAnimationInstance(looseView);
+		float progress = repCount > 1.0 ? 1f : (float)repCount; // TODO: We want some effects to loop
+		setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
+		inst.shaderMat.SetShaderParam("civColor", new Vector3(1, 1, 1));
+		inst.meshInst.Position = tileCenter;
+		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
+		inst.meshInst.ZIndex = effectAnimZIndex;
 	}
 
 	private Util.FlicSheet cursorFlicSheet;
@@ -556,6 +568,13 @@ public class UnitLayer : LooseLayer {
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
+		// First draw animated effects. These will always appear over top of units regardless of draw order due to z-index.
+		Civ3Anim tileEffect = looseView.mapView.game.animTracker.getTileEffect(tile);
+		if (tileEffect != null) {
+			(_, double repCount) = looseView.mapView.game.animTracker.getCurrentActionAndRepetitionCount(tile);
+			drawEffectAnimFrame(looseView, tileEffect, repCount, tileCenter);
+		}
+
 		if (tile.unitsOnTile.Count == 0)
 			return;
 

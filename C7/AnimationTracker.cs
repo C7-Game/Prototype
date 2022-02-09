@@ -78,14 +78,24 @@ public class AnimationTracker {
 		return activeAnims.ContainsKey(unit.guid);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(MapUnit unit)
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(string id)
 	{
-		ActiveAnimation aa = activeAnims[unit.guid];
+		ActiveAnimation aa = activeAnims[id];
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
 		var repCount = (double)(getCurrentTimeMS() - aa.startTimeMS) / durationMS;
 		return (aa.anim.action, repCount);
+	}
+
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(MapUnit unit)
+	{
+		return getCurrentActionAndRepetitionCount(unit.guid);
+	}
+
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(Tile tile)
+	{
+		return getCurrentActionAndRepetitionCount(getTileID(tile));
 	}
 
 	public void update()
@@ -142,5 +152,14 @@ public class AnimationTracker {
 				offsetX = 0f,
 				offsetY = 0f
 				};
+	}
+
+	public Civ3Anim getTileEffect(Tile tile)
+	{
+		ActiveAnimation aa;
+		if (activeAnims.TryGetValue(getTileID(tile), out aa))
+			return aa.anim;
+		else
+			return null;
 	}
 }
