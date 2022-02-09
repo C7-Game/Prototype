@@ -1,10 +1,10 @@
 
-// Civ3UnitAnim's purpose is to store the data associated with Civ 3 unit animations, meaning the contents of the folders in Art\Units. It does lazy
+// Civ3AnimData's purpose is to store the data associated with Civ 3 animations, for example the contents of each folder in Art/Units. It does lazy
 // loading & memoization so each file is loaded only when it's needed and then stored so it is only ever loaded once per game. The main (and only)
-// instance of Civ3UnitAnim is kept in Game, AnimationTracker holds a reference to it.
+// instance of Civ3AnimData is kept in Game, AnimationTracker holds a reference to it.
 
 // It would be nice to load this data close to where it's used, e.g., have UnitLayer load the FlicSheets, instead of putting all the loading code in
-// one detached class like this. That's how things originally worked but I created Civ3UnitAnim to solve two issues:
+// one detached class like this. That's how things originally worked but I created Civ3AnimData to solve two issues:
 // 1. AnimationTracker and UnitLayer both need to load the unit INIs. So we either have a common place to store the INIs or duplication of work, and I
 // think the former is the better choice.
 // 2. AnimationTracker needs to know the duration of animations, which awkwardly cannot be determined based on the INI files alone. In order to know
@@ -17,11 +17,11 @@ using IniParser;
 using IniParser.Model;
 using C7GameData;
 
-public class Civ3UnitAnim
+public class Civ3AnimData
 {
 	private AudioStreamPlayer audioPlayer;
 
-	public Civ3UnitAnim(AudioStreamPlayer audioPlayer)
+	public Civ3AnimData(AudioStreamPlayer audioPlayer)
 	{
 		this.audioPlayer = audioPlayer;
 	}

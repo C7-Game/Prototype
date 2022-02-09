@@ -22,7 +22,7 @@ public class Game : Node2D
 	Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
-	public Civ3UnitAnim civ3UnitAnim;
+	public Civ3AnimData civ3AnimData;
 	public AnimationTracker animTracker;
 
 	Hashtable Terrmask = new Hashtable();
@@ -55,10 +55,10 @@ public class Game : Node2D
 	{
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
-			var unitAnimSoundPlayer = new AudioStreamPlayer();
-			AddChild(unitAnimSoundPlayer);
-			civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
-			animTracker = new AnimationTracker(civ3UnitAnim);
+			var animSoundPlayer = new AudioStreamPlayer();
+			AddChild(animSoundPlayer);
+			civ3AnimData = new Civ3AnimData(animSoundPlayer);
+			animTracker = new AnimationTracker(civ3AnimData);
 			EngineStorage.initialize(); // Spawns engine thread
 
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);

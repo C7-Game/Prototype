@@ -7,11 +7,11 @@ using C7GameData;
 using C7Engine;
 
 public class AnimationTracker {
-	private Civ3UnitAnim civ3UnitAnim;
+	private Civ3AnimData civ3AnimData;
 
-	public AnimationTracker(Civ3UnitAnim civ3UnitAnim)
+	public AnimationTracker(Civ3AnimData civ3AnimData)
 	{
-		this.civ3UnitAnim = civ3UnitAnim;
+		this.civ3AnimData = civ3AnimData;
 	}
 
 	public struct ActiveAnimation {
@@ -30,7 +30,7 @@ public class AnimationTracker {
 	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent)
 	{
 		long currentTimeMS = getCurrentTimeMS();
-		long animDurationMS = (long)(1000.0 * civ3UnitAnim.getDuration(unit.unitType.name, action));
+		long animDurationMS = (long)(1000.0 * civ3AnimData.getDuration(unit.unitType.name, action));
 
 		ActiveAnimation aa;
 		if (activeAnims.TryGetValue(unit.guid, out aa)) {
@@ -41,7 +41,7 @@ public class AnimationTracker {
 		}
 		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, completionEvent = completionEvent };
 
-		civ3UnitAnim.playSound(unit.unitType.name, action);
+		civ3AnimData.playSound(unit.unitType.name, action);
 
 		activeAnims[unit.guid] = aa;
 	}
