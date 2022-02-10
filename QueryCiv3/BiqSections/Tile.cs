@@ -56,7 +56,10 @@ namespace QueryCiv3.Biq
         public bool Outpost         { get => Util.GetFlag(C3COverlays[3], 7); }
 
         private fixed byte UnknownBuffer3[1];
-        public byte C3CTerrain;
+        private fixed byte C3CTerrain[1];
+        public byte BaseTerrain => (byte)((C3CTerrain[0] & 0x0F) >> 4);
+        public byte OverlayTerrain => (byte)((C3CTerrain[0] & 0xF0) >> 4);
+
         private fixed byte UnknownBuffer4[2];
         public short FogOfWar;
 
