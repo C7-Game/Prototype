@@ -361,6 +361,7 @@ public class MarshLayer : LooseLayer {
 public class RiverLayer : LooseLayer
 {
 	public static readonly Vector2 riverSize = new Vector2(128, 64);
+	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.x / 2, 0);
 	private ImageTexture riverTexture;
 
 	public RiverLayer() { 
@@ -398,7 +399,7 @@ public class RiverLayer : LooseLayer
 		int riverColumn = riverGraphicsIndex % 4;
 
 		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.x, riverRow * riverSize.y, riverSize);
-		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize, riverSize);
+		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize + riverCenterOffset, riverSize);
 		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);		
 	}
 }
