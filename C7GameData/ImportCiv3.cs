@@ -34,7 +34,6 @@ namespace C7GameData
             }
 
             // Import tiles
-            //TODO: This looks very swapped.
             c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
             c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
             int i = 0;
