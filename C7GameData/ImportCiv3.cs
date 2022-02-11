@@ -6,9 +6,8 @@ namespace C7GameData
 {
     using QueryCiv3;
     using QueryCiv3.Biq;
-    using System;
 
-    // Additional parameters used to refer to specic media files and tiles in Civ3
+    // Additional parameters used to refer to specific media files and tiles in Civ3
     public class Civ3ExtraInfo
     {
         public int BaseTerrainFileID;
@@ -16,26 +15,20 @@ namespace C7GameData
     }
     public class ImportCiv3
     {
-        static public C7SaveFormat ImportSav(string savePath, string defaultBicPath)
+        public static C7SaveFormat ImportSav(string savePath, string defaultBicPath)
         {
             // init empty C7 save
             C7SaveFormat c7Save = new C7SaveFormat();
-            c7Save.GameData = new GameData();
-            c7Save.GameData.map = new GameMap();
 
             // Get save data reader
-            byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(defaultBicPath);
-    		SavData civ3Save = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(savePath), defaultBicBytes);
+            byte[] defaultBicBytes = Util.ReadFile(defaultBicPath);
+    		SavData civ3Save = new SavData(Util.ReadFile(savePath), defaultBicBytes);
+            BiqData theBiq = civ3Save.Bic;
 
-            //Not dummy data.  Import Civ3 terrains.
-            foreach (TERR terrain in civ3Save.Bic.Terr) {
-                TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
-                c7Save.GameData.terrainTypes.Add(c7TerrainType);
-            }
+            ImportCiv3Tiles(theBiq, c7Save);
+            SetMapDimensions(c7Save, theBiq);
 
-            // Import tiles
-            c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Width;
-            c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Height;
+            // Import tiles.  This is similar to, but different from the BIQ version as tile contents may have changed in-game.
             int i = 0;
             foreach (QueryCiv3.Sav.TILE civ3Tile in civ3Save.Tile)
             {
@@ -68,27 +61,29 @@ namespace C7GameData
             return c7Save;
         }
 
-		/**
-		 * defaultBiqPath is used in case some sections (map, rules, player data) are not
-		 * present.
-		 */
-		static public C7SaveFormat ImportBiq(string biqPath, string defaultBiqPath)
+		private static void ImportCiv3Tiles(BiqData theBiq, C7SaveFormat c7Save)
 		{
-			C7SaveFormat c7Save = new C7SaveFormat();
-			c7Save.GameData = new GameData();
-			c7Save.GameData.map = new GameMap();
-			
-			byte[] biqBytes = QueryCiv3.Util.ReadFile(biqPath);
-			BiqData theBiq = new BiqData(biqBytes);
-			
 			foreach (TERR terrain in theBiq.Terr) {
 				TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
 				c7Save.GameData.terrainTypes.Add(c7TerrainType);
 			}
+		}
+
+		/**
+		 * defaultBiqPath is used in case some sections (map, rules, player data) are not
+		 * present.
+		 */
+		public static C7SaveFormat ImportBiq(string biqPath, string defaultBiqPath)
+		{
+			C7SaveFormat c7Save = new C7SaveFormat();
 			
-			// Import tiles
-			c7Save.GameData.map.numTilesTall = theBiq.Wmap[0].Height;
-			c7Save.GameData.map.numTilesWide = theBiq.Wmap[0].Width;
+			byte[] biqBytes = Util.ReadFile(biqPath);
+			BiqData theBiq = new BiqData(biqBytes);
+			
+			ImportCiv3Tiles(theBiq, c7Save);
+			SetMapDimensions(c7Save, theBiq);
+			
+			//Import tiles.  This is different from the SAV version as we have only BIQ TILE objects.
 			int i = 0;
 			foreach (QueryCiv3.Biq.TILE civ3Tile in theBiq.Tile)
 			{
@@ -113,10 +108,6 @@ namespace C7GameData
 				if (civ3Tile.PineForest) {
 					c7Tile.isPineForest = true;
 				}
-				c7Tile.riverNortheast = civ3Tile.RiverConnectionNortheast;
-				c7Tile.riverSoutheast = civ3Tile.RiverConnectionSoutheast;
-				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
-				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
 				c7Save.GameData.map.tiles.Add(c7Tile);
 				i++;
 			}
@@ -124,5 +115,10 @@ namespace C7GameData
 			// c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.Game[0].ScenarioSearchFolders;
 			return c7Save;
 		}
-    }
+		private static void SetMapDimensions(C7SaveFormat c7Save, BiqData theBiq)
+		{
+			c7Save.GameData.map.numTilesTall = theBiq.Wmap[0].Height;
+			c7Save.GameData.map.numTilesWide = theBiq.Wmap[0].Width;
+		}
+	}
 }
