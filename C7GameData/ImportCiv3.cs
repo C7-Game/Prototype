@@ -25,7 +25,7 @@ namespace C7GameData
     		SavData civ3Save = new SavData(Util.ReadFile(savePath), defaultBicBytes);
             BiqData theBiq = civ3Save.Bic;
 
-            ImportCiv3Tiles(theBiq, c7Save);
+            ImportCiv3TerrainTypes(theBiq, c7Save);
             SetMapDimensions(c7Save, theBiq);
 
             // Import tiles.  This is similar to, but different from the BIQ version as tile contents may have changed in-game.
@@ -61,14 +61,6 @@ namespace C7GameData
             return c7Save;
         }
 
-		private static void ImportCiv3Tiles(BiqData theBiq, C7SaveFormat c7Save)
-		{
-			foreach (TERR terrain in theBiq.Terr) {
-				TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
-				c7Save.GameData.terrainTypes.Add(c7TerrainType);
-			}
-		}
-
 		/**
 		 * defaultBiqPath is used in case some sections (map, rules, player data) are not
 		 * present.
@@ -80,7 +72,7 @@ namespace C7GameData
 			byte[] biqBytes = Util.ReadFile(biqPath);
 			BiqData theBiq = new BiqData(biqBytes);
 			
-			ImportCiv3Tiles(theBiq, c7Save);
+			ImportCiv3TerrainTypes(theBiq, c7Save);
 			SetMapDimensions(c7Save, theBiq);
 			
 			//Import tiles.  This is different from the SAV version as we have only BIQ TILE objects.
@@ -115,6 +107,15 @@ namespace C7GameData
 			// c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.Game[0].ScenarioSearchFolders;
 			return c7Save;
 		}
+
+		private static void ImportCiv3TerrainTypes(BiqData theBiq, C7SaveFormat c7Save)
+		{
+			foreach (TERR terrain in theBiq.Terr) {
+				TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
+				c7Save.GameData.terrainTypes.Add(c7TerrainType);
+			}
+		}
+
 		private static void SetMapDimensions(C7SaveFormat c7Save, BiqData theBiq)
 		{
 			c7Save.GameData.map.numTilesTall = theBiq.Wmap[0].Height;

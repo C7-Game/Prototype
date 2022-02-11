@@ -52,7 +52,7 @@ namespace QueryCiv3.Biq
 
         private fixed byte UnknownBuffer3[1];
         private fixed byte C3CTerrain[1];
-        public byte BaseTerrain => (byte)((C3CTerrain[0] & 0x0F) >> 4);
+        public byte BaseTerrain => (byte)(C3CTerrain[0] & 0x0F);
         public byte OverlayTerrain => (byte)((C3CTerrain[0] & 0xF0) >> 4);
 
         private fixed byte UnknownBuffer4[2];
