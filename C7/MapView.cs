@@ -49,8 +49,8 @@ public class TerrainLayer : LooseLayer {
 
 		public int CompareTo(TileToDraw other)
 		{
-			// "other" might be null, in which case we should return that this object is greater, according to an example on MSDN
-			return (other != null) ? this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other.tile.ExtraInfo.BaseTerrainFileID) : 1;
+			// "other" might be null, in which case we should return a positive value. CompareTo(null) will do this.
+			return this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other?.tile.ExtraInfo.BaseTerrainFileID);
 		}
 	}
 
