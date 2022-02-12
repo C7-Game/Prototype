@@ -23,6 +23,7 @@ namespace C7Engine.Pathing
 			HashSet<Tile> visitedTiles = new HashSet<Tile>();
 			visitedTiles.Add(start);
 			Queue<Tile> tilesToVisit = new Queue<Tile>();
+			distances[start] = 0;
 			
 			foreach(Tile tile in start.GetLandNeighbors()) {
 				distances[tile] = 1;
@@ -35,7 +36,7 @@ namespace C7Engine.Pathing
 				Tile current = tilesToVisit.Dequeue();
 				visitedTiles.Add(current);
 				foreach (Tile tile in current.GetLandNeighbors()) {
-					if (!visitedTiles.Contains(tile)) {
+					if (!distances.Keys.Contains(tile)) {
 						distances[tile] = distances[current] + 1;
 						predecessors[tile] = current;
 						tilesToVisit.Enqueue(tile);
@@ -48,7 +49,13 @@ namespace C7Engine.Pathing
 			return TilePath.NONE;
 		}
 
-		private static TilePath ConstructPath(Tile destination, Dictionary<Tile, Tile> predecessors)
+		/**
+		 * Should not be public.  Only public so we can test
+		 * it in isolation.
+		 *
+		 * In Java, I could work around this a few ways... not sure how in C#.
+		 */
+		public static TilePath ConstructPath(Tile destination, Dictionary<Tile, Tile> predecessors)
 		{
 			List<Tile> tilesInPath = new List<Tile>();
 			tilesInPath.Add(destination);
@@ -59,7 +66,7 @@ namespace C7Engine.Pathing
 			}
 			tilesInPath.Reverse();
 			Queue<Tile> path = new Queue<Tile>();
-			foreach (Tile t in tilesInPath)
+			foreach (Tile t in tilesInPath.Skip(1))
 			{
 				path.Enqueue(t);
 			}
