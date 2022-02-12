@@ -108,8 +108,15 @@ public class Game : Node2D
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
 				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSUA.unitGUID);
-				if (unit != null)
+				if (unit != null) {
+					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
+					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
+					// animations should be shown to the player.
+					if (mSUA.action == MapUnit.AnimatedAction.ATTACK1)
+						ensureLocationIsInView(unit.location);
+
 					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent);
+				}
 				break;
 			case MsgStartEffectAnimation mSEA:
 				int x, y;
@@ -205,6 +212,16 @@ public class Game : Node2D
 		return tr;
 	}
 
+	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
+	public void ensureLocationIsInView(Tile location)
+	{
+		if (location != Tile.NONE) {
+			var relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
+			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
+				mapView.centerCameraOnTile(location);
+		}
+	}
+
 	/**
 	 * Currently (11/14/2021), all unit selection goes through here.
 	 * Both code paths are in Game.cs for now, so it's local, but we may
@@ -215,13 +232,8 @@ public class Game : Node2D
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 
-		// If the newly selected unit's tile is not close to the center of the screen, then move the camera to it. Otherwise just trigger a
-		// redraw (not necessary in the first case since moving the map triggers a redraw automatically).
-		if (unit != MapUnit.NONE) {
-			var relativeScreenLocation = mapView.screenLocationOfTile(unit.location, true) / mapView.getVisibleAreaSize();
-			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
-				mapView.centerCameraOnTile(unit.location);
-		}
+		if (unit != MapUnit.NONE)
+			ensureLocationIsInView(unit.location);
 
 		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {
