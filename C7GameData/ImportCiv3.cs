@@ -37,8 +37,8 @@ namespace C7GameData
                     BaseTerrainFileID = civ3Tile.TextureFile,
                     BaseTerrainImageID = civ3Tile.TextureLocation,
                 };
-                int y = i / (civ3Save.Wrld.Width / 2);
-                int x = (i % (civ3Save.Wrld.Width / 2)) * 2 + (y % 2);
+                int x, y;
+                (x, y) = GetMapCoordinates(i, civ3Save.Wrld.Width);
                 Tile c7Tile = new Tile
                 {
                     xCoordinate = x,
@@ -84,8 +84,8 @@ namespace C7GameData
 					BaseTerrainFileID = civ3Tile.TextureFile,
 					BaseTerrainImageID = civ3Tile.TextureLocation,
 				};
-				int y = i / (theBiq.Wmap[0].Width / 2);
-				int x = (i % (theBiq.Wmap[0].Width / 2)) * 2 + (y % 2);
+				int x, y;
+				(x, y) = GetMapCoordinates(i, theBiq.Wmap[0].Width);
 				Tile c7Tile = new Tile
 				{
 					xCoordinate = x,
@@ -106,6 +106,13 @@ namespace C7GameData
 			// This probably doesn't belong here, but not sure where else to put it
 			// c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.Game[0].ScenarioSearchFolders;
 			return c7Save;
+		}
+
+		static (int, int) GetMapCoordinates(int tileIndex, int mapWidth)
+		{
+			int y = tileIndex / (mapWidth / 2);
+			int x = (tileIndex % (mapWidth / 2)) * 2 + (y % 2);
+			return (x, y);
 		}
 
 		private static void ImportCiv3TerrainTypes(BiqData theBiq, C7SaveFormat c7Save)
