@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
 
@@ -34,7 +35,15 @@ namespace C7Engine
 						UnitInteractions.disbandUnit(unit.guid);
 					}
 					else {
-						MoveSettlerTowardsDestination(unit, settlerAi);
+						if (settlerAi.pathToDestination == null) {
+							PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
+							settlerAi.pathToDestination = algorithm.PathFrom(unit.location, settlerAi.destination);
+						}
+						Tile nextTile = settlerAi.pathToDestination.Next();
+						Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
+						unit.location.unitsOnTile.Remove(unit);
+						nextTile.unitsOnTile.Add(unit);
+						unit.location = nextTile;
 					}
 				}
 				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
