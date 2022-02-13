@@ -9,6 +9,9 @@ namespace C7Engine.Pathing
 	 * Advantages: Simple.  Allows avoidance of obstacles such as water.
 	 * Disadvantages: Does not weigh the tiles.  Thus it will have a proclivity
 	 * to e.g. send units over the hills when they could take a road around them.
+	 *
+	 * Modifications: Use the predecessors structure to allow us to backtrack and
+	 * find the path used for the shortest route, not just the distance.
 	 */
 	public class BFSLandAlgorithm : PathingAlgorithm
 	{
@@ -20,8 +23,6 @@ namespace C7Engine.Pathing
 			//Keeps track of which tile (value) preceded a tile (key), so we can reconstruct
 			//the tiles once we know the shortest path.
 			Dictionary<Tile, Tile> predecessors = new Dictionary<Tile, Tile>();
-			HashSet<Tile> visitedTiles = new HashSet<Tile>();
-			visitedTiles.Add(start);
 			Queue<Tile> tilesToVisit = new Queue<Tile>();
 			distances[start] = 0;
 			
@@ -34,7 +35,6 @@ namespace C7Engine.Pathing
 			//The core BFS algorithm.
 			while (tilesToVisit.Count > 0) {
 				Tile current = tilesToVisit.Dequeue();
-				visitedTiles.Add(current);
 				foreach (Tile tile in current.GetLandNeighbors()) {
 					if (!distances.Keys.Contains(tile)) {
 						distances[tile] = distances[current] + 1;
