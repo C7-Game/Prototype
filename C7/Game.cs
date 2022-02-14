@@ -56,7 +56,7 @@ public class Game : Node2D
 			baseTerrainMap.Civ3Tiles = map.tiles;
 			baseTerrainMap.TerrainAsTileMap();
 
-			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
+			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
 			AddChild(mapView);
 			var unitAnimSoundPlayer = new AudioStreamPlayer();
 			AddChild(unitAnimSoundPlayer);
@@ -225,7 +225,7 @@ public class Game : Node2D
 
 	public async void ComputerSimulateTurn()
 	{
-		await ToSignal(GetTree().CreateTimer(1), "timeout");
+		await ToSignal(GetTree().CreateTimer(0.25f), "timeout");
 		OnComputerEndTurn();
 	}
 
@@ -470,7 +470,7 @@ public class Game : Node2D
 				MapUnit.AnimatedAction.BUILD,
 				(unitGUID, action) => {
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-					popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
+					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
 					return false;
 				});
 		}

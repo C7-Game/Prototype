@@ -20,16 +20,19 @@ namespace C7Engine
         public static MapUnit getNextSelectedUnit()
         {
             GameData gameData = EngineStorage.gameData;
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                //Eventually we'll have to check ownership,
-                //but we haven't added the concepts of players or civilizations yet.
-                if (unit.movementPointsRemaining > 0 && !unit.isFortified)
-                {
-                    if (!waitQueue.Contains(unit)) {
-                        return UnitWithAvailableActions(unit);
-                    }
-                }
+			foreach (Player player in gameData.players) {
+				//TODO: Should pass in a player GUID instead of checking for human
+				//This current limits us to one human player, although it's better
+				//than the old limit of one non-barbarian player.
+				if (player.isHuman) {
+					foreach (MapUnit unit in player.units) {
+						if (unit.movementPointsRemaining > 0 && !unit.isFortified) {
+							if (!waitQueue.Contains(unit)) {
+								return UnitWithAvailableActions(unit);
+							}
+						}
+					}
+				}
             }
             if (waitQueue.Count > 0) {
                 return waitQueue.Dequeue();
@@ -188,6 +191,12 @@ namespace C7Engine
                 EngineStorage.animTracker.endAnimation(toBeDeleted, false);
                 toBeDeleted.location.unitsOnTile.Remove(toBeDeleted);
                 gameData.mapUnits.Remove(toBeDeleted);
+				foreach(Player player in gameData.players)
+				{
+					if (player.units.Contains(toBeDeleted)) {
+						player.units.Remove(toBeDeleted);
+					}
+				}
             }
         }
 
