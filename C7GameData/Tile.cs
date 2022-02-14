@@ -83,6 +83,11 @@ namespace C7GameData
 		{
 			return !baseTerrainType.isWater();
 		}
+
+		public int distanceToOtherTile(Tile other)
+		{
+			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
+		}
 	}
 
 	public enum TileDirection {

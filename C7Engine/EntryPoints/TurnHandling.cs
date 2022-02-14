@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using C7GameData.AIData;
+
 namespace C7Engine
 {
     using C7GameData;
@@ -16,7 +20,7 @@ namespace C7Engine
                 if (result < 7) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
-                    newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
+                    newUnit.owner = gameData.players[0];
                     newUnit.unitType = gameData.unitPrototypes["Warrior"];
                     newUnit.hitPointsRemaining = 3;
                     newUnit.isFortified = true; //todo: hack for unit selection
@@ -28,7 +32,7 @@ namespace C7Engine
                 else if (tile.NeighborsCoast() && result < 10) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
-                    newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
+                    newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
                     newUnit.unitType = gameData.unitPrototypes["Galley"];
                     newUnit.hitPointsRemaining = 3;
                     newUnit.isFortified = true; //todo: hack for unit selection
@@ -42,7 +46,13 @@ namespace C7Engine
             //TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans, strategy, etc.)
             //For now, we only have a random AI, so that will be in a future commit
             BarbarianAI barbarianAI = new BarbarianAI();
-            barbarianAI.PlayTurn(gameData.players[1], gameData);
+            barbarianAI.PlayTurn(gameData.players[0], gameData);
+
+			//Non-Barbarian AIs
+			foreach (Player player in gameData.players)
+			{
+				PlayerAI.PlayTurn(player, gameData.rng);
+			}
 
             //City Production
             foreach (City city in gameData.cities)
@@ -57,6 +67,7 @@ namespace C7Engine
 
 						city.location.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
+						city.owner.AddUnit(newUnit);
 	                }
 					
 					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
