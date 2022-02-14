@@ -56,7 +56,7 @@ public class Game : Node2D
 			baseTerrainMap.Civ3Tiles = map.tiles;
 			baseTerrainMap.TerrainAsTileMap();
 
-			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, false, false);
+			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
 			AddChild(mapView);
 			var unitAnimSoundPlayer = new AudioStreamPlayer();
 			AddChild(unitAnimSoundPlayer);
