@@ -10,6 +10,7 @@ namespace C7GameData
 		public ResourceCategory Category { get; set; }
 		public int AppearanceRatio { get; set; }
 		public int DisappearanceRatio { get; set; }
+		public string Name { get; set; }
 		public string CivilopediaEntry { get; set; }
 		//public Technology Prerequisite { get; set; }	//Uncomment when we have technologies
 

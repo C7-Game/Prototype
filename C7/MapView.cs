@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using C7.Map;
 using Godot;
 using ConvertCiv3Media;
 using C7GameData;
@@ -997,6 +998,7 @@ public class MapView : Node2D {
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());
 		looseView.layers.Add(new HillsLayer());
+		looseView.layers.Add(new ResourceLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);
 		looseView.layers.Add(new BuildingLayer());
