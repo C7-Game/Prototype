@@ -24,6 +24,7 @@ namespace C7GameData
 		//efficient to perform calculations, whether you need to know which unit on a tile
 		//has the best defense, or which tile a unit is on when viewing the Military Advisor.
 		public List<MapUnit> unitsOnTile;
+		public Resource Resource { get; set; }
 
 		public Dictionary<TileDirection, Tile> neighbors {get; set;}
 
