@@ -11,10 +11,11 @@ namespace C7Engine
 
             Player owner = gameData.players.Find(player => player.guid == playerGuid);
 
-            City newCity = new City(x, y, owner, name);
+			Tile tileWithNewCity = MapInteractions.GetTileAt(x, y);
+			City newCity = new City(tileWithNewCity, owner, name);
+			newCity.SetItemBeingProduced(gameData.unitPrototypes["Warrior"]);
             gameData.cities.Add(newCity);
 
-            Tile tileWithNewCity = MapInteractions.GetTileAt(x, y);
             tileWithNewCity.cityAtTile = newCity;
         }
     }

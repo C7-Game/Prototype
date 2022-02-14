@@ -11,7 +11,7 @@ namespace C7GameData
         public List<TerrainType> terrainTypes = new List<TerrainType>();
 
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
-        List<UnitPrototype> unitPrototypes = new List<UnitPrototype>();
+        public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
         public List<City> cities = new List<City>();
 
         public GameData()
@@ -83,18 +83,13 @@ namespace C7GameData
             //That is not great, but let's overlook that for now, as for now all our terrain type
             //references will be via the map.
             
-            UnitPrototype warrior = new UnitPrototype();
-            warrior.name = "Warrior";
-            warrior.attack = 1;
-            warrior.defense = 1;
-            warrior.movement = 1;
-            warrior.iconIndex = 6;
-            
+            CreateDefaultUnitPrototypes();
+
             CreateStartingDummyUnits(humanPlayer);
             List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
             foreach (Tile barbCampLocation in barbarianCamps) {
                 if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-                    MapUnit barbWarrior = createDummyUnit(warrior, barbarianPlayer, barbCampLocation.xCoordinate, barbCampLocation.yCoordinate);
+                    MapUnit barbWarrior = createDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation.xCoordinate, barbCampLocation.yCoordinate);
                     barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
                     // whole procedure of generating a map should be part of the engine not the data module.
                     barbWarrior.facingDirection = TileDirection.SOUTHEAST;
@@ -108,43 +103,24 @@ namespace C7GameData
 
             return humanPlayer;
         }
+        private void CreateDefaultUnitPrototypes()
+        {
+			unitPrototypes = new Dictionary<string, UnitPrototype>()
+			{
+				{ "Warrior", new UnitPrototype { name = "Warrior", attack = 1, defense = 1, movement = 1, iconIndex =  6, shieldCost = 10 }},
+				{ "Settler", new UnitPrototype { name = "Settler", attack = 0, defense = 0, movement = 1, iconIndex =  0, shieldCost = 30, populationCost = 2 }},
+				{ "Worker",  new UnitPrototype { name = "Worker",  attack = 0, defense = 0, movement = 1, iconIndex =  1, shieldCost = 30, populationCost = 1 }},
+				{ "Chariot", new UnitPrototype { name = "Chariot", attack = 1, defense = 1, movement = 2, iconIndex = 10, shieldCost = 20 }},
+				{ "Galley",  new SeaUnit       { name = "Galley",  attack = 1, defense = 1, movement = 3, iconIndex = 29, shieldCost = 30 }},
+			};
+        }
 
         private void CreateStartingDummyUnits(Player humanPlayer)
         {
-            UnitPrototype settler = new UnitPrototype();
-            settler.name = "Settler";
-            settler.attack = 0;
-            settler.defense = 0;
-            settler.movement = 1;
-            settler.iconIndex = 0;
-            settler.canFoundCity = true;
-
-            UnitPrototype warrior = new UnitPrototype();
-            warrior.name = "Warrior";
-            warrior.attack = 1;
-            warrior.defense = 1;
-            warrior.movement = 1;
-            warrior.iconIndex = 6;
-
-            UnitPrototype worker = new UnitPrototype();
-            worker.name = "Worker";
-            worker.attack = 0;
-            worker.defense = 0;
-            worker.movement = 1;
-            worker.iconIndex = 1;
-            worker.canBuildRoads = true;
-
-            UnitPrototype chariot = new UnitPrototype();
-            chariot.name = "Chariot";
-            chariot.attack = 1;
-            chariot.defense = 1;
-            chariot.movement = 2;
-            chariot.iconIndex = 10;
-
-            createDummyUnit(settler, humanPlayer, 20, 26);
-            createDummyUnit(warrior, humanPlayer, 22, 26);
-            createDummyUnit(worker, humanPlayer, 24, 26);
-            createDummyUnit(chariot, humanPlayer, 26, 26);
+            createDummyUnit(unitPrototypes["Settler"], humanPlayer, 20, 26);
+            createDummyUnit(unitPrototypes["Warrior"], humanPlayer, 22, 26);
+            createDummyUnit(unitPrototypes["Worker"], humanPlayer, 24, 26);
+            createDummyUnit(unitPrototypes["Chariot"], humanPlayer, 22, 24);
         }
     }
 }
