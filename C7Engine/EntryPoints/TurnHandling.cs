@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Linq;
+using C7GameData.AIData;
+
 namespace C7Engine
 {
     using C7GameData;
@@ -16,15 +20,9 @@ namespace C7Engine
                 if (result < 7) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
-                    newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
-                    UnitPrototype newUnitPrototype = new UnitPrototype();
-                    newUnitPrototype.name = "Warrior";
-                    newUnitPrototype.attack = 1;
-                    newUnitPrototype.defense = 1;
-                    newUnitPrototype.movement = 1;
-                    newUnitPrototype.iconIndex = 6;
+                    newUnit.owner = gameData.players[0];
+                    newUnit.unitType = gameData.unitPrototypes["Warrior"];
                     newUnit.hitPointsRemaining = 3;
-                    newUnit.unitType = newUnitPrototype;
                     newUnit.isFortified = true; //todo: hack for unit selection
 
                     tile.unitsOnTile.Add(newUnit);
@@ -34,15 +32,9 @@ namespace C7Engine
                 else if (tile.NeighborsCoast() && result < 10) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
-                    newUnit.owner = gameData.players[1];    //todo: make this reliably point to the barbs
-                    SeaUnit newUnitPrototype = new SeaUnit();
-                    newUnitPrototype.name = "Galley";
-                    newUnitPrototype.attack = 1;
-                    newUnitPrototype.defense = 1;
-                    newUnitPrototype.movement = 3;
-                    newUnitPrototype.iconIndex = 29;
+                    newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
+                    newUnit.unitType = gameData.unitPrototypes["Galley"];
                     newUnit.hitPointsRemaining = 3;
-                    newUnit.unitType = newUnitPrototype;
                     newUnit.isFortified = true; //todo: hack for unit selection
 
                     tile.unitsOnTile.Add(newUnit);
@@ -54,47 +46,31 @@ namespace C7Engine
             //TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans, strategy, etc.)
             //For now, we only have a random AI, so that will be in a future commit
             BarbarianAI barbarianAI = new BarbarianAI();
-            barbarianAI.PlayTurn(gameData.players[1], gameData);
+            barbarianAI.PlayTurn(gameData.players[0], gameData);
+
+			//Non-Barbarian AIs
+			foreach (Player player in gameData.players)
+			{
+				PlayerAI.PlayTurn(player, gameData.rng);
+			}
 
             //City Production
             foreach (City city in gameData.cities)
             {
-                string producedItem = city.ComputeTurnProduction();
-                if (producedItem != "") {
-                    MapUnit newUnit = new MapUnit();
-                    //TODO: It's inconsistent that one of them stores Tile, the other stores X, Y coordinates
-                    newUnit.location = gameData.map.tileAt(city.xLocation, city.yLocation);
-                    newUnit.hitPointsRemaining = 3;
-                    newUnit.owner = gameData.players[0];
-                    //This should not be re-genned here
-                    UnitPrototype newUnitPrototype = new UnitPrototype();
+                IProducible producedItem = city.ComputeTurnProduction();
+                if (producedItem != null) {
+					if (producedItem is UnitPrototype prototype) {
+						MapUnit newUnit = prototype.GetInstance();
+						newUnit.owner = city.owner;
+						newUnit.location = city.location;
+						newUnit.facingDirection = TileDirection.SOUTHWEST;
 
-                    if (producedItem == "Warrior") {
-                        newUnitPrototype.name = "Warrior";
-                        newUnitPrototype.attack = 1;
-                        newUnitPrototype.defense = 1;
-                        newUnitPrototype.movement = 1;
-                        newUnitPrototype.iconIndex = 6;
-                        newUnit.unitType = newUnitPrototype;
-                    }
-                    else if (producedItem == "Chariot") {
-                        newUnitPrototype.name = "Chariot";
-                        newUnitPrototype.attack = 1;
-                        newUnitPrototype.defense = 1;
-                        newUnitPrototype.movement = 3;
-                        newUnitPrototype.iconIndex = 10;
-                        newUnit.unitType = newUnitPrototype;
-                    }
-                    else if (producedItem == "Settler") {
-                        newUnitPrototype.name = "Settler";
-                        newUnitPrototype.attack = 0;
-                        newUnitPrototype.defense = 0;
-                        newUnitPrototype.movement = 1;
-                        newUnitPrototype.iconIndex = 0;
-                        newUnit.unitType = newUnitPrototype;
-                    }
-                    newUnit.location.unitsOnTile.Add(newUnit);
-                    gameData.mapUnits.Add(newUnit);
+						city.location.unitsOnTile.Add(newUnit);
+						gameData.mapUnits.Add(newUnit);
+						city.owner.AddUnit(newUnit);
+	                }
+					
+					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
                 }
             }
             //Reset movement points available for all units

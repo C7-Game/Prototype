@@ -10,14 +10,12 @@ namespace C7Engine {
 				throw new System.Exception("Barbarian AI can only play barbarian players");
 			}
 
-			// Iterate by index & backwards so that we can remove items from the mapUnits list inside this for loop w/o crashing the
-			// program. This can happen when unit movement triggers combat which kills the unit. TODO: This is hopefully a temporary
-			// thing. I think a better long term solution is to do a foreach loop but keep a list of units to be deleted after the loop is
-			// finished. Problem is that has to work for combat triggered during the player's turn as well. Also right now we have zero HP
-			// units running around that we wouldn't want to delete.
-			for (int n = gameData.mapUnits.Count - 1; n >= 0; n--) {
-				MapUnit unit = gameData.mapUnits[n];
-				if (unit.owner == gameData.players[1]) {
+			// Copy unit list into temporary array so we can remove units while iterating.
+			// TODO: We also need to handle units spawned during the loop, e.g. leaders, armies, enslaved units. This is not so much an
+			// issue for the barbs but will be for similar loops elsewhere in the AI logic.
+			foreach(MapUnit unit in gameData.mapUnits.ToArray()) {
+				//TODO: Make it better fit the barbs and not be hard-coded to a magic number
+				if (unit.owner == gameData.players[0]) {
 					if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
 						//Move randomly
 						List<Tile> validTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();

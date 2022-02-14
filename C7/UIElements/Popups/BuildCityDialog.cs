@@ -4,9 +4,11 @@ public class BuildCityDialog : Popup
 {
 	
 	LineEdit cityName = new LineEdit();
+	private string defaultName = "";
 
-	public BuildCityDialog()
+	public BuildCityDialog(string defaultName)
 	{
+		this.defaultName = defaultName;
 		alignment = BoxContainer.AlignMode.End;
 		margins = new Margins(right: -10); // 10px margin from the right
 	}
@@ -45,7 +47,7 @@ public class BuildCityDialog : Popup
 
 		cityName.SizeFlagsHorizontal = 3;  //fill and expand
 		cityName.SizeFlagsStretchRatio = 1;
-		cityName.Text = "Hippo Regius";
+		cityName.Text = defaultName;
 		labelAndName.AddChild(cityName);
 
 		this.AddChild(labelAndName);

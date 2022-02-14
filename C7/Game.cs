@@ -289,7 +289,7 @@ public class Game : Node2D
 
 	public async void ComputerSimulateTurn()
 	{
-		await ToSignal(GetTree().CreateTimer(1), "timeout");
+		await ToSignal(GetTree().CreateTimer(0.25f), "timeout");
 		OnComputerEndTurn();
 	}
 
@@ -526,7 +526,7 @@ public class Game : Node2D
 		else if (buttonName.Equals("buildCity"))
 		{
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new BuildCityDialog(), PopupOverlay.PopupCategory.Advisor);
+			popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
 		}
 		else
 		{

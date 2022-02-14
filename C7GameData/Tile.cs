@@ -106,6 +106,11 @@ namespace C7GameData
 			else if (angle > -7.0/8.0 * Math.PI) return TileDirection.SOUTHWEST;
 			else                                 return TileDirection.WEST;
 		}
+
+		public int distanceTo(Tile other)
+		{
+			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
+		}
 	}
 
 	public enum TileDirection {
