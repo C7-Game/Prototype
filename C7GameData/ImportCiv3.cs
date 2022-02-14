@@ -37,6 +37,7 @@ namespace C7GameData
 				Resource resource = new Resource
 				{
 					Index = g,
+					Name = good.Name,
 					Icon = good.Icon,
 					FoodBonus = good.FoodBonus,
 					ShieldsBonus = good.ShieldsBonus,
