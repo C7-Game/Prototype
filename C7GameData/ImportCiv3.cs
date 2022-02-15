@@ -101,7 +101,7 @@ namespace C7GameData
                 if (civ3Tile.PineForest) {
                     c7Tile.isPineForest = true;
                 }
-                
+
                 c7Tile.Resource = resourcesByIndex[civ3Tile.ResourceID];
                 
                 c7Save.GameData.map.tiles.Add(c7Tile);
