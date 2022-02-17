@@ -12,7 +12,7 @@ namespace C7GameData
         // TODO : protect setters while still allowing JSON deserialization
         public int numTilesWide { get; set; }
         public int numTilesTall { get; set; }
-        bool wrapHorizontally, wrapVertically;
+        public bool wrapHorizontally, wrapVertically;
 
         // The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
         // This is kind of a temporary thing. The reason it works this way right now is because I'm just rearranging the generation code from
@@ -69,6 +69,11 @@ namespace C7GameData
             }
         }
 
+        public bool isRowAt(int y)
+        {
+            return wrapVertically || ((y >= 0) && (y < numTilesTall));
+        }
+
         public bool isTileAt(int x, int y)
         {
             bool evenRow = y%2 == 0;
@@ -80,14 +85,31 @@ namespace C7GameData
                 else
                     xInBounds = (x >= 1) && (x <= numTilesWide - 1);
             }
-            bool yInBounds = wrapVertically || ((y >= 0) && (y < numTilesTall));
-            return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
+            return xInBounds && isRowAt(y) && (evenRow ? (x%2 == 0) : (x%2 != 0));
+        }
+
+        public int wrapTileX(int x)
+        {
+            if (wrapHorizontally) {
+                int tr = x % numTilesWide;
+                return (tr >= 0) ? tr : tr + numTilesWide;
+            } else
+                return x;
+        }
+
+        public int wrapTileY(int y)
+        {
+            if (wrapVertically) {
+                int tr = y % numTilesTall;
+                return (tr >= 0) ? tr : tr + numTilesTall;
+            } else
+                return y;
         }
 
         public Tile tileAt(int x, int y)
         {
             if (isTileAt(x, y))
-                return tiles[tileCoordsToIndex(x, y)];
+                return tiles[tileCoordsToIndex(wrapTileX(x), wrapTileY(y))];
             else
                 return Tile.NONE; // TODO: Consider using empty tile object instead of null
         }
