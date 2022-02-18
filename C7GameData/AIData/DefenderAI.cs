@@ -18,5 +18,11 @@ namespace C7GameData.AIData
 		
 		public DefenderGoal goal;
 		public Tile destination;
+		
+		public override string ToString()
+		{
+			string cityName = destination.cityAtTile.name;
+			return goal + " " + cityName;
+		}
 	}
 }

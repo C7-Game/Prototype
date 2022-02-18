@@ -16,7 +16,7 @@ namespace C7Engine
             {
                 //7% chance of a new barbarian.  Probably should scale based on barbarian activity.
                 int result = gameData.rng.Next(100);
-                Console.WriteLine("Random barb result = " + result);
+                // Console.WriteLine("Random barb result = " + result);
                 if (result < 7) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;

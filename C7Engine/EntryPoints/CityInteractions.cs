@@ -4,7 +4,6 @@ namespace C7Engine
 
 	public class CityInteractions
 	{
-		//Eventually, this will need more info such as player
 		public static void BuildCity(int x, int y, string playerGuid, string name)
 		{
 			GameData gameData = EngineStorage.gameData;
@@ -13,6 +12,7 @@ namespace C7Engine
 			City newCity = new City(tileWithNewCity, owner, name);
 			newCity.SetItemBeingProduced(gameData.unitPrototypes["Warrior"]);
 			gameData.cities.Add(newCity);
+			owner.cities.Add(newCity);
 			tileWithNewCity.cityAtTile = newCity;
 		}
 	}

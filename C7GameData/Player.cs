@@ -17,6 +17,7 @@ public class Player
 	private int cityNameIndex = 0;
 	
 	public List<MapUnit> units = new List<MapUnit>();
+	public List<City> cities = new List<City>();
 
 	public Player(uint color)
 	{
