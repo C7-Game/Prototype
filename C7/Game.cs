@@ -326,7 +326,7 @@ public class Game : Node2D
 			{
 				var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
 				if (tile != null) {
-					GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.name);
+					GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.DisplayName);
 				} else
 					GD.Print("Didn't click on any tile");
 			}

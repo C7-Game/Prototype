@@ -62,7 +62,7 @@ namespace C7Engine
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
 			foreach (Tile t in candidates) {
 				//TODO: Look at whether we can place cities here.  Hard-coded for now.
-				if (t.baseTerrainType.key == "mountains") {
+				if (t.baseTerrainType.Key == "mountains") {
 					scores[t] = 0;
 					continue;
 				}
@@ -84,7 +84,7 @@ namespace C7Engine
 				//TODO: Also look at the next ring out, with lower weights.
 
 				//Prefer hills for defense, and coast for boats and such.
-				if (t.baseTerrainType.key == "hills") {
+				if (t.baseTerrainType.Key == "hills") {
 					score += 10;
 				}
 				if (t.NeighborsWater()) {

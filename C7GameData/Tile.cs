@@ -71,7 +71,7 @@ namespace C7GameData
 
 		public override string ToString()
 		{
-			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
+			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.DisplayName + " on " + baseTerrainType.DisplayName + ")";
 		}
 
 		public List<Tile> GetLandNeighbors() {
@@ -85,7 +85,7 @@ namespace C7GameData
 		 **/
 		public List<Tile> GetCoastNeighbors()
 		{
-			return neighbors.Values.Where(tile => tile.baseTerrainType.key == "coast").ToList();
+			return neighbors.Values.Where(tile => tile.baseTerrainType.Key == "coast").ToList();
 		}
 
 		public bool IsLand()

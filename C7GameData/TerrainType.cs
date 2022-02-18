@@ -10,9 +10,9 @@ namespace C7GameData
         //what they are; we'll use the key.  This allows adding custom terrain types in the future, including having
         //different custom terrains in Mod A than Mod B, while still allowing internationalized versions of their
         //names that don't break the scenario.  E.g. "ocean"
-        public string key {get; set;} = "";
+        public string Key {get; set;} = "";
         //The name is the display name.  E.g. "Ocean" in English scenarios, "Hochsee" in German scenarios.
-        public string name {get; set; } = "";
+        public string DisplayName {get; set; } = "";
         public int baseFoodProduction {get; set; }
         public int baseShieldProduction {get; set; }
         public int baseCommerceProduction {get; set; }
@@ -21,7 +21,7 @@ namespace C7GameData
         //some stuff about graphics would probably make sense, too
 
         public bool isHilly() {
-            if (key.Equals("mountains") || key.Equals("hills") || key.Equals("volcano")) {
+            if (Key.Equals("mountains") || Key.Equals("hills") || Key.Equals("volcano")) {
                 return true;
             }
             return false;
@@ -30,12 +30,12 @@ namespace C7GameData
 		//TODO: Once we have IDs, this should *not* rely on the display name.
 		//That will be after issue 58, which will be after PR 70.
 		public bool isWater() {
-			return key.Equals("coast") || key.Equals("sea") || key.Equals("ocean");
+			return Key.Equals("coast") || Key.Equals("sea") || Key.Equals("ocean");
 		}
 
         public override string ToString()
         {
-            return name + "(" + baseFoodProduction + ", " + baseShieldProduction + ", " + baseCommerceProduction + ")";
+            return DisplayName + "(" + baseFoodProduction + ", " + baseShieldProduction + ", " + baseCommerceProduction + ")";
         }
 
         public static TerrainType NONE = new TerrainType();
@@ -44,8 +44,8 @@ namespace C7GameData
         public static TerrainType ImportFromCiv3(int civ3Index, TERR civ3Terrain)
         {
             TerrainType c7Terrain = new TerrainType();
-            c7Terrain.key = civTerrainKeyLookup[civ3Index];
-            c7Terrain.name = civ3Terrain.Name;
+            c7Terrain.Key = civTerrainKeyLookup[civ3Index];
+            c7Terrain.DisplayName = civ3Terrain.Name;
             c7Terrain.baseFoodProduction = civ3Terrain.Food;
             c7Terrain.baseShieldProduction = civ3Terrain.Shields;
             c7Terrain.baseCommerceProduction = civ3Terrain.Commerce;
