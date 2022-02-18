@@ -10,6 +10,7 @@ public class MainMenu : Node2D
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
 	Util.Civ3FileDialog LoadDialog;
+	Util.Civ3FileDialog LoadScenarioDialog;
 	GlobalSingleton Global;
 
 	// Called when the node enters the scene tree for the first time.
@@ -23,7 +24,11 @@ public class MainMenu : Node2D
 		LoadDialog = new Util.Civ3FileDialog();
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
+		LoadScenarioDialog = new Util.Civ3FileDialog();
+		LoadScenarioDialog.RelPath = @"Conquests/Scenarios";
+		LoadScenarioDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
+		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadScenarioDialog);
 	}
 	
 	private void DisplayTitleScreen()
@@ -38,7 +43,7 @@ public class MainMenu : Node2D
 			AddButton("Quick Start", 195, "StartGame");
 			AddButton("Tutorial", 230, "StartGame");
 			AddButton("Load Game", 265, "LoadGame");
-			AddButton("Load Scenario", 300, "StartGame");
+			AddButton("Load Scenario", 300, "LoadScenario");
 			AddButton("Hall of Fame", 335, "HallOfFame");
 			AddButton("Preferences", 370, "Preferences");
 			AddButton("Audio Preferences", 405, "Preferences");
@@ -88,6 +93,13 @@ public class MainMenu : Node2D
 		PlayButtonPressedSound();
 		LoadDialog.Popup_();
 	}
+
+	public void LoadScenario()
+	{
+		GD.Print("Load scenario button pressed");
+		PlayButtonPressedSound();
+		LoadScenarioDialog.Popup_();
+	}
 	
 	public void showCredits()
 	{
@@ -118,11 +130,11 @@ public class MainMenu : Node2D
 		player.Stream = wav;
 		player.Play();
 	}
+
 	private void _on_FileDialog_file_selected(string path)
 	{
 		GD.Print("Loading " + path);
 		Global.LoadGamePath = path;
 		GetTree().ChangeScene("res://C7Game.tscn");
-
 	}
 }
