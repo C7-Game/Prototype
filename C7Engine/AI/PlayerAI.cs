@@ -14,6 +14,7 @@ namespace C7Engine
 			if (player.isHuman || player.isBarbarians) {
 				return;
 			}
+			Console.WriteLine("-> Begin " + player.civilization.cityNames[0] + " turn");
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray())
 			{
@@ -24,6 +25,13 @@ namespace C7Engine
 				//Now actually take actions
 				//TODO: Move these into an AI method
 				if (unit.currentAIBehavior is SettlerAI settlerAi) {
+					//The unit's destination may have become invalid due to a rival building a city there
+					if (IsInvalidCityLocation(settlerAi.destination)) {
+						Console.WriteLine("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination);
+						SetAIForUnit(unit, player);
+						//Make sure we're using the new settler AI going forward, including this turn
+						settlerAi = (SettlerAI)unit.currentAIBehavior;
+					}
 					if (settlerAi.goal == SettlerAI.SettlerGoal.JOIN_CITY && unit.location.cityAtTile != null) {
 						//TODO: Actually join the city.  Haven't added that action.
 						//For now, just get rid of the unit.  Sorry, bro.
@@ -35,12 +43,17 @@ namespace C7Engine
 						UnitInteractions.disbandUnit(unit.guid);
 					}
 					else {
+						//If the settler has no destination, then disband rather than crash later.
+						if (settlerAi.destination == Tile.NONE) {
+							Console.WriteLine("Disbanding settler " + unit.guid + " with no valid destination");
+							UnitInteractions.disbandUnit(unit.guid);
+							continue;
+						}
 						if (settlerAi.pathToDestination == null) {
 							PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
 							settlerAi.pathToDestination = algorithm.PathFrom(unit.location, settlerAi.destination);
 						}
 						Tile nextTile = settlerAi.pathToDestination.Next();
-						Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
 						unit.location.unitsOnTile.Remove(unit);
 						nextTile.unitsOnTile.Add(unit);
 						unit.location = nextTile;
@@ -85,8 +98,9 @@ namespace C7Engine
 				SettlerAI settlerAI = new SettlerAI();
 				settlerAI.goal = SettlerAI.SettlerGoal.BUILD_CITY;
 				//If it's the starting settler, have it settle in place.  Otherwise, use an AI to find a location.
-				if (unit.location.cityAtTile == null) {
+				if (player.cities.Count == 0 && unit.location.cityAtTile == null) {
 					settlerAI.destination = unit.location;
+					Console.WriteLine("No cities yet!  Set AI for unit to settler AI with destination of " + settlerAI.destination);
 				}
 				else {
 					settlerAI.destination = SettlerLocationAI.findSettlerLocation(unit.location, player.cities, player.units);
@@ -95,9 +109,12 @@ namespace C7Engine
 						//by another colonist.  Longer-term, the AI shouldn't be building settlers if that is the case,
 						//but right now we'll just spike the football to stop the clock and avoid building immediately next to another city.
 						settlerAI.goal = SettlerAI.SettlerGoal.JOIN_CITY;
+						Console.WriteLine("Set AI for unit to JOIN_CITY due to lack of locations to settle");
+					}
+					else {
+						Console.WriteLine("Set AI for unit to BUILD_CITY with destination of " + settlerAI.destination);
 					}
 				}
-				Console.WriteLine("Set AI for unit to settler AI with destination of " + settlerAI.destination);
 				unit.currentAIBehavior = settlerAI;
 			}
 			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
@@ -124,6 +141,22 @@ namespace C7Engine
 				}
 				unit.currentAIBehavior = ai;
 			}
+		}
+
+		private static bool IsInvalidCityLocation(Tile tile)
+		{
+			if (tile.cityAtTile != null) {
+				Console.WriteLine("Cannot build at " + tile + " due to city of " + tile.cityAtTile.name);
+				return true;
+			}
+			foreach (Tile neighbor in tile.neighbors.Values)
+			{
+				if (neighbor.cityAtTile != null) {
+					Console.WriteLine("Cannot build at " + tile + " due to nearby city of " + neighbor.cityAtTile.name);
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

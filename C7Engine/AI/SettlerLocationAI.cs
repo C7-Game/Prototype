@@ -24,14 +24,15 @@ namespace C7Engine
 
 			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
 			//Debugging: Print out scores
+			Console.WriteLine("Top city location candidates from " + start + ":");
 			Tile returnValue = null;
-			foreach (KeyValuePair<Tile, int> kvp in orderedScores)
+			foreach (KeyValuePair<Tile, int> kvp in orderedScores.Take(5))
 			{
 				if (returnValue == null) {
 					returnValue = kvp.Key;
 				}
 				if (kvp.Value > 0) {
-					Console.WriteLine("Tile " + kvp.Key + " scored " + kvp.Value);
+					Console.WriteLine("  Tile " + kvp.Key + " scored " + kvp.Value);
 				}
 			}
 			return returnValue;
