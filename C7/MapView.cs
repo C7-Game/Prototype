@@ -592,6 +592,28 @@ public class UnitLayer : LooseLayer {
 		looseView.mapView.game.updateAnimations(gameData);
 	}
 
+	// Returns which unit should be drawn from among a list of units. The list is assumed to be non-empty.
+	public MapUnit selectUnitToDisplay(LooseView looseView, List<MapUnit> units)
+	{
+		// From the list, pick out which units are (1) the strongest defender vs the currently selected unit, (2) the currently selected unit
+		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
+		MapUnit bestDefender = units[0],
+			selected = null,
+			doingInterestingAnimation = null;
+		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
+		foreach (var u in units) {
+			if (u == currentlySelectedUnit)
+				selected = u;
+			if (u.HasPriorityAsDefender(bestDefender, currentlySelectedUnit))
+				bestDefender = u;
+			if (looseView.mapView.game.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
+				doingInterestingAnimation = u;
+		}
+
+		// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
+		return selected != null ? selected : (doingInterestingAnimation != null ? doingInterestingAnimation : bestDefender);
+	}
+
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		// First draw animated effects. These will always appear over top of units regardless of draw order due to z-index.
@@ -606,18 +628,12 @@ public class UnitLayer : LooseLayer {
 
 		var white = Color.Color8(255, 255, 255);
 
-		// Find unit to draw. If the currently selected unit is on this tile, use that one. Otherwise, use the top defender.
-		MapUnit selectedUnitOnTile = null;
-		foreach (var u in tile.unitsOnTile)
-			if (u.guid == looseView.mapView.game.CurrentlySelectedUnit.guid)
-				selectedUnitOnTile = u;
-		var unit = (selectedUnitOnTile != null) ? selectedUnitOnTile : tile.findTopDefender(looseView.mapView.game.CurrentlySelectedUnit);
-
+		var unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
 		var appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
 		var animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
-		if ((selectedUnitOnTile != null) && (selectedUnitOnTile == unit))
+		if ((unit != MapUnit.NONE) && (unit == looseView.mapView.game.CurrentlySelectedUnit))
 			drawCursor(looseView, tileCenter + animOffset);
 
 		drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
