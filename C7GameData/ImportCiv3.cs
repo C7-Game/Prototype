@@ -26,7 +26,7 @@ namespace C7GameData
             BiqData theBiq = civ3Save.Bic;
 
             ImportCiv3TerrainTypes(theBiq, c7Save);
-            SetMapDimensions(c7Save, theBiq);
+            SetMapDimensions(theBiq, c7Save);
 
             // Import tiles.  This is similar to, but different from the BIQ version as tile contents may have changed in-game.
             int i = 0;
@@ -73,7 +73,7 @@ namespace C7GameData
 			BiqData theBiq = new BiqData(biqBytes);
 			
 			ImportCiv3TerrainTypes(theBiq, c7Save);
-			SetMapDimensions(c7Save, theBiq);
+			SetMapDimensions(theBiq, c7Save);
 			
 			//Import tiles.  This is different from the SAV version as we have only BIQ TILE objects.
 			int i = 0;
@@ -123,7 +123,7 @@ namespace C7GameData
 			}
 		}
 
-		private static void SetMapDimensions(C7SaveFormat c7Save, BiqData theBiq)
+		private static void SetMapDimensions(BiqData theBiq, C7SaveFormat c7Save)
 		{
 			c7Save.GameData.map.numTilesTall = theBiq.Wmap[0].Height;
 			c7Save.GameData.map.numTilesWide = theBiq.Wmap[0].Width;
