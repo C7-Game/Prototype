@@ -28,6 +28,9 @@ namespace C7Engine
 		public static IProducible GetNextItemToBeProduced(City city, IProducible lastProduced)
 		{
 			Dictionary<string, UnitPrototype> unitPrototypes = EngineStorage.gameData.unitPrototypes;
+			if (city.size >= 3) {
+				return unitPrototypes["Settler"];
+			}
 			if (lastProduced == unitPrototypes["Warrior"]) {
 				if (city.location.NeighborsCoast()) {
 					Random rng = new Random();
@@ -41,9 +44,6 @@ namespace C7Engine
 				else {
 					return unitPrototypes["Chariot"];
 				}
-			}
-			else if (lastProduced == unitPrototypes["Chariot"]) {
-				return unitPrototypes["Settler"];
 			}
 			else  {
 				return unitPrototypes["Warrior"];

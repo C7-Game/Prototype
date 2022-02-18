@@ -23,9 +23,9 @@ namespace C7GameData
 		//of memory for pointers), but I'm inclined to go with both since it makes it easy and
 		//efficient to perform calculations, whether you need to know which unit on a tile
 		//has the best defense, or which tile a unit is on when viewing the Military Advisor.
-		public List<MapUnit> unitsOnTile;
+		public List<MapUnit> unitsOnTile = new List<MapUnit>();
 
-		public Dictionary<TileDirection, Tile> neighbors {get; set;}
+		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();
 
 		//See discussion on page 4 of the "Babylon" thread (https://forums.civfanatics.com/threads/0-1-babylon-progress-thread.673959) about sub-terrain type and Civ3 properties.
 		//We may well move these properties somewhere, whether that's Civ3ExtraInfo, a Civ3Tile child class, a Dictionary property, or something else, in the future.
