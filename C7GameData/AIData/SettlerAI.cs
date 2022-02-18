@@ -25,6 +25,7 @@ namespace C7GameData.AIData
 		}
 		public SettlerGoal goal;
 		public Tile destination;
+		public TilePath pathToDestination;
 
 		public override string ToString()
 		{

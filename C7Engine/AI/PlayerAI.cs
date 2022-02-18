@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
 
@@ -33,7 +34,15 @@ namespace C7Engine
 						unit.buildCity(unit.owner.GetNextCityName());
 					}
 					else {
-						MoveSettlerTowardsDestination(unit, settlerAi);
+						if (settlerAi.pathToDestination == null) {
+							PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
+							settlerAi.pathToDestination = algorithm.PathFrom(unit.location, settlerAi.destination);
+						}
+						Tile nextTile = settlerAi.pathToDestination.Next();
+						Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
+						unit.location.unitsOnTile.Remove(unit);
+						nextTile.unitsOnTile.Add(unit);
+						unit.location = nextTile;
 					}
 				}
 				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
@@ -63,28 +72,6 @@ namespace C7Engine
 					}
 				}
 			}
-		}
-		
-		/**
-		 * Basic movement AI.  Ignores things such as roads, only works on land, ignores hazards such as barbarians.
-		 * Which means it's not amazing yet, but it does get things moving in the right direction.
-		 */
-		private static void MoveSettlerTowardsDestination(MapUnit unit, SettlerAI settlerAi)
-		{
-			Dictionary<Tile, int> distances = new Dictionary<Tile, int>();
-			foreach (Tile option in unit.location.GetLandNeighbors()) {
-				distances[option] = settlerAi.destination.distanceTo(option);
-			}
-			IOrderedEnumerable<KeyValuePair<Tile, int>> orderedScores = distances.OrderBy(t => t.Value);
-			Tile nextTile = null;
-			foreach (KeyValuePair<Tile, int> kvp in orderedScores) {
-				if (nextTile == null) {
-					nextTile = kvp.Key;
-				}
-				// Console.WriteLine("Settler could move to " + kvp.Key + " with distance value " + kvp.Value);
-			}
-			Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
-			unit.move(unit.location.directionTo(nextTile));
 		}
 
 		private static void SetAIForUnit(MapUnit unit, Player player) 

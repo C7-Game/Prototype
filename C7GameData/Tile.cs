@@ -107,6 +107,10 @@ namespace C7GameData
 			else                                 return TileDirection.WEST;
 		}
 
+		/**
+		 * Distance as the raven flies to another tile.
+		 * This is a rough metric only.
+		 */
 		public int distanceTo(Tile other)
 		{
 			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
