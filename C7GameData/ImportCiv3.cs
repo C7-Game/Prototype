@@ -117,9 +117,11 @@ namespace C7GameData
 
 		private static void ImportCiv3TerrainTypes(BiqData theBiq, C7SaveFormat c7Save)
 		{
+			int civ3Index = 0;
 			foreach (TERR terrain in theBiq.Terr) {
-				TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
+				TerrainType c7TerrainType = TerrainType.ImportFromCiv3(civ3Index, terrain);
 				c7Save.GameData.terrainTypes.Add(c7TerrainType);
+				civ3Index++;
 			}
 		}
 

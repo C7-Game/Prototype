@@ -29,7 +29,7 @@ namespace C7Engine
 		{
 			Dictionary<string, UnitPrototype> unitPrototypes = EngineStorage.gameData.unitPrototypes;
 			if (lastProduced == unitPrototypes["Warrior"]) {
-				if (city.location.NeighborsCoast()) {
+				if (city.location.NeighborsWater()) {
 					Random rng = new Random();
 					if (rng.Next(3) == 0) {
 						return unitPrototypes["Galley"];

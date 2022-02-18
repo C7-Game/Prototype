@@ -132,7 +132,7 @@ public class HillsLayer : LooseLayer {
 			int pcxIndex = getMountainIndex(tile);
 			int row = pcxIndex/4;
 			int column = pcxIndex % 4;
-			if (tile.overlayTerrainType.name == "Mountains") {
+			if (tile.overlayTerrainType.key == "mountains") {
 				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
 				ImageTexture mountainGraphics;
@@ -141,10 +141,10 @@ public class HillsLayer : LooseLayer {
 				}
 				else {
 					TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
-					if (dominantVegetation.name == "Forest") {
+					if (dominantVegetation.key == "forest") {
 						mountainGraphics = forestMountainTexture;
 					}
-					else if (dominantVegetation.name == "Jungle") {
+					else if (dominantVegetation.key == "jungle") {
 						mountainGraphics = jungleMountainTexture;
 					}
 					else {
@@ -153,15 +153,15 @@ public class HillsLayer : LooseLayer {
 				}
 				looseView.DrawTextureRectRegion(mountainGraphics, screenTarget, mountainRectangle);
 			}
-			else if (tile.overlayTerrainType.name == "Hills") {
+			else if (tile.overlayTerrainType.key == "hills") {
 				Rect2 hillsRectangle = new Rect2(column * hillsSize.x, row * hillsSize.y, hillsSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
 				ImageTexture hillGraphics;
 				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
-				if (dominantVegetation.name == "Forest") {
+				if (dominantVegetation.key == "forest") {
 					hillGraphics = forestHillsTexture;
 				}
-				else if (dominantVegetation.name == "Jungle") {
+				else if (dominantVegetation.key == "jungle") {
 					hillGraphics = jungleHillsTexture;
 				}
 				else {
@@ -169,15 +169,15 @@ public class HillsLayer : LooseLayer {
 				}
 				looseView.DrawTextureRectRegion(hillGraphics, screenTarget, hillsRectangle);
 			}
-			else if (tile.overlayTerrainType.name == "Volcano") {
+			else if (tile.overlayTerrainType.key == "volcano") {
 				Rect2 volcanoRectangle = new Rect2(column * volcanoSize.x, row * volcanoSize.y, volcanoSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * volcanoSize + new Vector2(0, -12), volcanoSize);
 				ImageTexture volcanoGraphics;
 				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
-				if (dominantVegetation.name == "Forest") {
+				if (dominantVegetation.key == "forest") {
 					volcanoGraphics = forestVolcanoTexture;
 				}
-				else if (dominantVegetation.name == "Jungle") {
+				else if (dominantVegetation.key == "jungle") {
 					volcanoGraphics = jungleVolcanoTexture;
 				}
 				else {
@@ -208,11 +208,11 @@ public class HillsLayer : LooseLayer {
 			if (type.isHilly()) {
 				hills++;
 			}
-			else if (type.name == "Forest") {
+			else if (type.key == "forest") {
 				forests++;
 				forest = type;
 			}
-			else if (type.name == "Jungle") {
+			else if (type.key == "jungle") {
 				jungles++;
 				jungle = type;
 			}
@@ -286,14 +286,14 @@ public class ForestLayer : LooseLayer {
 	}
 	
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
-		if (tile.overlayTerrainType.name == "Jungle") {
+		if (tile.overlayTerrainType.key == "jungle") {
 			//Randomly, but predictably, choose a large jungle graphic
 			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
 			//For the first pass, we're just always using large jungles.
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
-			if (tile.NeighborsCoast()) {
+			if (tile.NeighborsWater()) {
 				randomJungleColumn = tile.xCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			}
@@ -305,17 +305,17 @@ public class ForestLayer : LooseLayer {
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
 			looseView.DrawTextureRectRegion(jungleTexture, screenTarget, jungleRectangle);
 		}
-		if (tile.overlayTerrainType.name == "Forest") {
+		if (tile.overlayTerrainType.key == "forest") {
 			int forestRow = 0;
 			int forestColumn = 0;
 			ImageTexture forestTexture;
 			if (tile.isPineForest) {
 				forestRow = tile.yCoordinate % 2;
 				forestColumn = tile.xCoordinate % 6;
-				if (tile.baseTerrainType.name == "Grassland") {
+				if (tile.baseTerrainType.key == "grassland") {
 					forestTexture = pineForestTexture;
 				}
-				else if (tile.baseTerrainType.name == "Plains") {
+				else if (tile.baseTerrainType.key == "plains") {
 					forestTexture = pinePlainsTexture;
 				}
 				else { //Tundra
@@ -324,12 +324,12 @@ public class ForestLayer : LooseLayer {
 			}
 			else {
 				forestRow = tile.yCoordinate % 2;
-				if (tile.NeighborsCoast()) {
+				if (tile.NeighborsWater()) {
 					forestColumn = tile.xCoordinate % 5;
-					if (tile.baseTerrainType.name == "Grassland") {
+					if (tile.baseTerrainType.key == "grassland") {
 						forestTexture = smallForestTexture;
 					}
-					else if (tile.baseTerrainType.name == "Plains") {
+					else if (tile.baseTerrainType.key == "plains") {
 						forestTexture = smallPlainsForestTexture;
 					}
 					else {	//tundra
@@ -338,10 +338,10 @@ public class ForestLayer : LooseLayer {
 				}
 				else {
 					forestColumn = tile.xCoordinate % 4;
-					if (tile.baseTerrainType.name == "Grassland") {
+					if (tile.baseTerrainType.key == "grassland") {
 						forestTexture = largeForestTexture;
 					}
-					else if (tile.baseTerrainType.name == "Plains") {
+					else if (tile.baseTerrainType.key == "plains") {
 						forestTexture = largePlainsForestTexture;
 					}
 					else {	//tundra
@@ -371,11 +371,11 @@ public class MarshLayer : LooseLayer {
 	}
 
 	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter) {
-		if (tile.overlayTerrainType.name == "Marsh") {
+		if (tile.overlayTerrainType.key == "marsh") {
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomMarshColumn;
 			ImageTexture marshTexture;
-			if (tile.NeighborsCoast()) {
+			if (tile.NeighborsWater()) {
 				randomMarshColumn = tile.xCoordinate % 5;
 				marshTexture = smallMarshTexture;
 			}

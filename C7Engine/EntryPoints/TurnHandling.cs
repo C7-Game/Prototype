@@ -29,7 +29,7 @@ namespace C7Engine
                     gameData.mapUnits.Add(newUnit);
                     Console.WriteLine("New barbarian added at " + tile);
                 }
-                else if (tile.NeighborsCoast() && result < 10) {
+                else if (tile.NeighborsWater() && result < 10) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
                     newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
