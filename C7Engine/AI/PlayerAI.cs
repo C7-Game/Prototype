@@ -40,9 +40,7 @@ namespace C7Engine
 						}
 						Tile nextTile = settlerAi.pathToDestination.Next();
 						Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
-						unit.location.unitsOnTile.Remove(unit);
-						nextTile.unitsOnTile.Add(unit);
-						unit.location = nextTile;
+						unit.move(unit.location.directionTo(nextTile));
 					}
 				}
 				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
