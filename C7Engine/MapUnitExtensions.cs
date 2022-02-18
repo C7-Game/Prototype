@@ -87,11 +87,14 @@ public static class MapUnitExtensions {
 	public static void OnEnterTile(this MapUnit unit, Tile tile)
 	{
 		// Disperse barb camp
-		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians))
+		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
+			EngineStorage.gameData.map.barbarianCamps.Remove(tile);
 			tile.hasBarbarianCamp = false;
+		}
 
 		// Destroy enemy city on tile
 		if ((tile.cityAtTile != null) && (!unit.owner.IsAtPeaceWith(tile.cityAtTile.owner))) {
+			tile.cityAtTile.owner.cities.Remove(tile.cityAtTile);
 			EngineStorage.gameData.cities.Remove(tile.cityAtTile);
 			tile.cityAtTile = null;
 		}
