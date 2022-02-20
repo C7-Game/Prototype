@@ -69,7 +69,7 @@ namespace C7GameData
 		 * defaultBiqPath is used in case some sections (map, rules, player data) are not
 		 * present.
 		 */
-		static public C7SaveFormat ImportBiq(string biqPath, string defaultBiqPath)
+		public static C7SaveFormat ImportBiq(string biqPath, string defaultBiqPath)
 		{
 			C7SaveFormat c7Save = new C7SaveFormat();
 			
@@ -80,8 +80,6 @@ namespace C7GameData
 			SetMapDimensions(theBiq, c7Save);
 			
 			// Import tiles
-			c7Save.GameData.map.numTilesTall = theBiq.Wmap[0].Height;
-			c7Save.GameData.map.numTilesWide = theBiq.Wmap[0].Width;
 			int i = 0;
 			foreach (QueryCiv3.Biq.TILE civ3Tile in theBiq.Tile)
 			{

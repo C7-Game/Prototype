@@ -42,34 +42,6 @@ namespace C7GameData
             unitsOnTile = new List<MapUnit>();
         }
 
-        
-        public Tile(GameData c7data, int x, int y, QueryCiv3.Biq.TILE civ3Tile) {
-            unitsOnTile = new List<MapUnit>();
-            Civ3ExtraInfo extra = new Civ3ExtraInfo
-            {
-                BaseTerrainFileID = civ3Tile.TextureFile,
-                BaseTerrainImageID = civ3Tile.TextureLocation,
-            };
-            Tile c7Tile = new Tile
-            {
-                xCoordinate = x,
-                yCoordinate = y,
-                ExtraInfo = extra,
-                baseTerrainType = c7data.terrainTypes[civ3Tile.Terrain & 0x0f],
-                overlayTerrainType = c7data.terrainTypes[(civ3Tile.Terrain * 0xf0) >> 4],
-                riverNortheast = civ3Tile.RiverConnectionNortheast,
-                riverNorthwest = civ3Tile.RiverConnectionNorthwest,
-                riverSoutheast = civ3Tile.RiverConnectionSoutheast,
-                riverSouthwest = civ3Tile.RiverConnectionSouthwest,
-            };
-            if (civ3Tile.SnowCappedMountain) {
-                c7Tile.isSnowCapped = true;
-            }
-            if (civ3Tile.PineForest) {
-                c7Tile.isPineForest = true;
-            }
-        }
-
 	    public MapUnit findTopDefender()
 	    {
 		    if (unitsOnTile.Count > 0) {
