@@ -53,6 +53,10 @@ namespace C7GameData
                 if (civ3Tile.PineForest) {
                     c7Tile.isPineForest = true;
                 }
+                c7Tile.riverNortheast = civ3Tile.RiverNortheast;
+                c7Tile.riverSoutheast = civ3Tile.RiverSoutheast;
+                c7Tile.riverSouthwest = civ3Tile.RiverSouthwest;
+                c7Tile.riverNorthwest = civ3Tile.RiverNorthwest;
                 c7Save.GameData.map.tiles.Add(c7Tile);
                 i++;
             }
@@ -75,7 +79,7 @@ namespace C7GameData
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			
-			//Import tiles.  This is different from the SAV version as we have only BIQ TILE objects.
+			// Import tiles
 			int i = 0;
 			foreach (QueryCiv3.Biq.TILE civ3Tile in theBiq.Tile)
 			{
@@ -100,6 +104,10 @@ namespace C7GameData
 				if (civ3Tile.PineForest) {
 					c7Tile.isPineForest = true;
 				}
+				c7Tile.riverNortheast = civ3Tile.RiverConnectionNortheast;
+				c7Tile.riverSoutheast = civ3Tile.RiverConnectionSoutheast;
+				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
+				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
 				c7Save.GameData.map.tiles.Add(c7Tile);
 				i++;
 			}
@@ -107,7 +115,7 @@ namespace C7GameData
 			// c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.Game[0].ScenarioSearchFolders;
 			return c7Save;
 		}
-
+		
 		static (int, int) GetMapCoordinates(int tileIndex, int mapWidth)
 		{
 			int y = tileIndex / (mapWidth / 2);
@@ -128,5 +136,5 @@ namespace C7GameData
 			c7Save.GameData.map.numTilesTall = theBiq.Wmap[0].Height;
 			c7Save.GameData.map.numTilesWide = theBiq.Wmap[0].Width;
 		}
-	}
+    }
 }

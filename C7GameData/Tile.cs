@@ -32,24 +32,29 @@ namespace C7GameData
 		public bool isSnowCapped;
 		public bool isPineForest;
 
-		public Tile()
-		{
-			unitsOnTile = new List<MapUnit>();
-		}
+        public bool riverNortheast;
+        public bool riverSoutheast;
+        public bool riverSouthwest;
+        public bool riverNorthwest;
 
-		public MapUnit findTopDefender()
-		{
-			if (unitsOnTile.Count > 0) {
-				var tr = unitsOnTile[0];
-				foreach (var u in unitsOnTile)
-					if (u.unitType.defense * u.hitPointsRemaining > tr.unitType.defense * tr.hitPointsRemaining)
-						tr = u;
-				return tr;
-			} else
-				return MapUnit.NONE;
-		}
-		
-		public static Tile NONE = new Tile();
+        public Tile()
+        {
+            unitsOnTile = new List<MapUnit>();
+        }
+
+	    public MapUnit findTopDefender()
+	    {
+		    if (unitsOnTile.Count > 0) {
+			    var tr = unitsOnTile[0];
+			    foreach (var u in unitsOnTile)
+				    if (u.unitType.defense * u.hitPointsRemaining > tr.unitType.defense * tr.hitPointsRemaining)
+					    tr = u;
+			    return tr;
+		    } else
+			    return MapUnit.NONE;
+	    }
+        
+        public static Tile NONE = new Tile();
 
 		public bool NeighborsCoast() {
 			foreach (Tile neighbor in getDiagonalNeighbors()) {
