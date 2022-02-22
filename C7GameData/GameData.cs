@@ -129,8 +129,9 @@ namespace C7GameData
 			theNetherlands.cityNames.Add("Utrecht");
 			theNetherlands.cityNames.Add("Eindhoven");
 			theNetherlands.cityNames.Add("Groningen");
-			theNetherlands.cityNames.Add("Groningen");
+			theNetherlands.cityNames.Add("Arnhem");
 			theNetherlands.cityNames.Add("Tilburg");
+			theNetherlands.cityNames.Add("Maastricht");
 
             uint orange = 0xFFAB12FF;
             Player computerPlayerThree = new Player(theNetherlands, orange);
