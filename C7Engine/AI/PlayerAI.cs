@@ -84,6 +84,8 @@ namespace C7Engine
 						Console.WriteLine("Set AI for unit to JOIN_CITY due to lack of locations to settle");
 					}
 					else {
+						PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
+						settlerAiData.pathToDestination = algorithm.PathFrom(unit.location, settlerAiData.destination);
 						Console.WriteLine("Set AI for unit to BUILD_CITY with destination of " + settlerAiData.destination);
 					}
 				}

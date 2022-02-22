@@ -36,10 +36,6 @@ start:
 							UnitInteractions.disbandUnit(unit.guid);
 							return;
 						}
-						if (settlerAi.pathToDestination == null) {
-							PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
-							settlerAi.pathToDestination = algorithm.PathFrom(unit.location, settlerAi.destination);
-						}
 						try {
 							Tile nextTile = settlerAi.pathToDestination.Next();
 							unit.location.unitsOnTile.Remove(unit);
