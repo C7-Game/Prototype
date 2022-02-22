@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryCiv3", "..\QueryCiv3\Q
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blast", "..\Blast\Blast.csproj", "{C758B0EB-9F8F-45CF-9ACB-B04705CD7FEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EngineTests", "..\EngineTests\EngineTests.csproj", "{270876A6-0DC8-4150-B374-0BC9E4CC2113}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,14 @@ Global
 		{C758B0EB-9F8F-45CF-9ACB-B04705CD7FEC}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
 		{C758B0EB-9F8F-45CF-9ACB-B04705CD7FEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C758B0EB-9F8F-45CF-9ACB-B04705CD7FEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
