@@ -9,6 +9,10 @@ namespace QueryCiv3.Sav
         private fixed byte HeaderText1[4];
         public int Length1;
         public byte RiverInfo;
+        public bool RiverNortheast { get => Util.GetFlag(RiverInfo, 1); }
+        public bool RiverSoutheast { get => Util.GetFlag(RiverInfo, 3); }
+        public bool RiverSouthwest { get => Util.GetFlag(RiverInfo, 5); }
+        public bool RiverNorthwest { get => Util.GetFlag(RiverInfo, 7); }
         public byte Owner;
         private fixed byte UnknownBuffer[2];
         public int ResourceID;

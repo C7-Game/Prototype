@@ -32,6 +32,11 @@ namespace C7GameData
 		public bool isSnowCapped;
 		public bool isPineForest;
 
+		public bool riverNortheast;
+		public bool riverSoutheast;
+		public bool riverSouthwest;
+		public bool riverNorthwest;
+
 		public Tile()
 		{
 			unitsOnTile = new List<MapUnit>();
