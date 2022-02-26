@@ -1119,8 +1119,6 @@ public class MapView : Node2D {
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
 	// same after the zoom level is changed, and if center is screenSize/2, the tile in the center of the window won't change.
-	// This function does not adjust the zoom slider, so to keep the slider in sync with the actual zoom level, use AdjustZoomSlider. This
-	// function must be separate, though, so that we can change the zoom level inside that callback without entering an infinite loop.
 	public void setCameraZoom(float newScale, Vector2 center)
 	{
 		var v2NewZoom = new Vector2(newScale, newScale);
