@@ -399,7 +399,7 @@ public class RiverLayer : LooseLayer
 		riverTexture = Util.LoadTextureFromPCX("Art/Terrain/mtnRivers.pcx");
 	}
 
-	public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		//The "point" is the easternmost point of the tile for which we are drawing rivers.
 		//Which river graphics to used is calculated by evaluating the tiles that neighbor
