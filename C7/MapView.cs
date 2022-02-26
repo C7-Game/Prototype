@@ -13,6 +13,7 @@ public abstract class LooseLayer {
 	// drawObject draws the things this layer is supposed to draw that are associated with the given tile. Its parameters are:
 	//   looseView: The Node2D to actually draw to, e.g., use looseView.DrawCircle(...) to draw a circle. This object also contains a reference to
 	//     the MapView in case you need it.
+	//   gameData: A reference to the game data so each layer doesn't have to redundantly request access.
 	//   tile: The game tile whose contents are to be drawn. This function gets called for each tile in view of the camera and none out of
 	//     view. The same tile may be drawn multiple times at different locations due to edge wrapping.
 	//   tileCenter: The location to draw to. You should draw around this location without adjusting for the camera location or zoom since the
@@ -22,7 +23,7 @@ public abstract class LooseLayer {
 	public virtual void onBeginDraw(LooseView looseView, GameData gameData) {}
 	public virtual void onEndDraw(LooseView looseView, GameData gameData) {}
 
-	// The layer will be skipping during map drawing if visible is false
+	// The layer will be skipped during map drawing if visible is false
 	public bool visible = true;
 }
 
