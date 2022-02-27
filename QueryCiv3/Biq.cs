@@ -538,7 +538,7 @@ namespace QueryCiv3
                             }
                             break;
                         default:
-                            throw new Exception("An error occured while parsing the BIQ file because a header was not found where expected.");
+                            throw new Exception("An error occured while parsing the BIQ file because a header was not found where expected.  Instead, found " + header);
                             break;
                     }
                     offset += dataLength;

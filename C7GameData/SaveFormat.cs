@@ -18,7 +18,10 @@ namespace C7GameData
         public C7RulesFormat Rules;
         // This naming is probably bad form, but it makes sense to me to name it as such here
         public GameData GameData;
-        public C7SaveFormat(){}
+        public C7SaveFormat()
+        {
+	        GameData = new GameData();
+        }
         public C7SaveFormat(GameData gameData, C7RulesFormat rules = null)
         {
             this.GameData = gameData;

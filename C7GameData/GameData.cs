@@ -18,6 +18,7 @@ namespace C7GameData
 
         public GameData()
         {
+	        map = new GameMap();
 	        rng = new Random();
         }
 

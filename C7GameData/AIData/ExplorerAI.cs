@@ -11,5 +11,10 @@ namespace C7GameData.AIData
 			ON_A_BOAT
 		}
 		public ExplorationType type;
+		
+		public override string ToString()
+		{
+			return type + " exploration";
+		}
 	}
 }
