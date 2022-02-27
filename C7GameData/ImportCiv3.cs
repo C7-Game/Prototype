@@ -29,47 +29,10 @@ namespace C7GameData
             BiqData theBiq = civ3Save.Bic;
 
             ImportCiv3TerrainTypes(theBiq, c7Save);
+            Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
             SetMapDimensions(theBiq, c7Save);
-			//Import Civ3 resources
-			int g = 0;
-			Dictionary<int, Resource> resourcesByIndex = new Dictionary<int, Resource>(); //will we want to have this for reference later?  Maybe.
-			resourcesByIndex[-1] = Resource.NONE;
-			foreach (GOOD good in civ3Save.Bic.Good) {
-				Resource resource = new Resource
-				{
-					Index = g,
-					Name = good.Name,
-					Icon = good.Icon,
-					FoodBonus = good.FoodBonus,
-					ShieldsBonus = good.ShieldsBonus,
-					CommerceBonus = good.CommerceBonus,
-					AppearanceRatio = good.AppearanceRatio,
-					DisappearanceRatio = good.DisappearanceProbability,
-					CivilopediaEntry = good.CivilopediaEntry,
-				};
-				switch (good.Type) {
-					case 0:
-						resource.Category = ResourceCategory.BONUS;
-						break;
-					case 1:
-						resource.Category = ResourceCategory.LUXURY;
-						break;
-					case 2:
-						resource.Category = ResourceCategory.STRATEGIC;
-						break;
-					default:
-						Console.WriteLine("WARNING!  Unknown resource category for " + good);
-						resource.Category = ResourceCategory.NONE;
-						break;
-				}
-				//TODO: Technologies, once they exist
-				
-				c7Save.GameData.Resources.Add(resource);
-				resourcesByIndex[g] = resource;
-				g++;
-			}
-            
-            //Not dummy data.  Import Civ3 terrains.
+
+			//Not dummy data.  Import Civ3 terrains.
             foreach (TERR terrain in civ3Save.Bic.Terr) {
                 TerrainType c7TerrainType = TerrainType.ImportFromCiv3(terrain);
                 c7Save.GameData.terrainTypes.Add(c7TerrainType);
@@ -104,9 +67,7 @@ namespace C7GameData
                 c7Tile.riverSoutheast = civ3Tile.RiverSoutheast;
                 c7Tile.riverSouthwest = civ3Tile.RiverSouthwest;
                 c7Tile.riverNorthwest = civ3Tile.RiverNorthwest;
-
                 c7Tile.Resource = resourcesByIndex[civ3Tile.ResourceID];
-                
                 c7Save.GameData.map.tiles.Add(c7Tile);
                 i++;
             }
@@ -115,7 +76,7 @@ namespace C7GameData
             return c7Save;
         }
 
-		/**
+        /**
 		 * defaultBiqPath is used in case some sections (map, rules, player data) are not
 		 * present.
 		 */
@@ -127,6 +88,7 @@ namespace C7GameData
 			BiqData theBiq = new BiqData(biqBytes);
 			
 			ImportCiv3TerrainTypes(theBiq, c7Save);
+			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			
 			// Import tiles
@@ -158,6 +120,7 @@ namespace C7GameData
 				c7Tile.riverSoutheast = civ3Tile.RiverConnectionSoutheast;
 				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
 				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
+				c7Tile.Resource = resourcesByIndex[civ3Tile.Resource];
 				c7Save.GameData.map.tiles.Add(c7Tile);
 				i++;
 			}
@@ -171,6 +134,48 @@ namespace C7GameData
 			int y = tileIndex / (mapWidth / 2);
 			int x = (tileIndex % (mapWidth / 2)) * 2 + (y % 2);
 			return (x, y);
+		}
+
+		private static Dictionary<int, Resource> ImportCiv3Resources(BiqData biq, C7SaveFormat c7Save)
+		{
+			int g = 0;
+			Dictionary<int, Resource> resourcesByIndex = new Dictionary<int, Resource>(); //will we want to have this for reference later?  Maybe.
+			resourcesByIndex[-1] = Resource.NONE;
+			foreach (GOOD good in biq.Good) {
+				Resource resource = new Resource
+				{
+					Index = g,
+					Name = good.Name,
+					Icon = good.Icon,
+					FoodBonus = good.FoodBonus,
+					ShieldsBonus = good.ShieldsBonus,
+					CommerceBonus = good.CommerceBonus,
+					AppearanceRatio = good.AppearanceRatio,
+					DisappearanceRatio = good.DisappearanceProbability,
+					CivilopediaEntry = good.CivilopediaEntry,
+				};
+				switch (good.Type) {
+					case 0:
+						resource.Category = ResourceCategory.BONUS;
+						break;
+					case 1:
+						resource.Category = ResourceCategory.LUXURY;
+						break;
+					case 2:
+						resource.Category = ResourceCategory.STRATEGIC;
+						break;
+					default:
+						Console.WriteLine("WARNING!  Unknown resource category for " + good);
+						resource.Category = ResourceCategory.NONE;
+						break;
+				}
+				//TODO: Technologies, once they exist
+
+				c7Save.GameData.Resources.Add(resource);
+				resourcesByIndex[g] = resource;
+				g++;
+			}
+			return resourcesByIndex;
 		}
 
 		private static void ImportCiv3TerrainTypes(BiqData theBiq, C7SaveFormat c7Save)
