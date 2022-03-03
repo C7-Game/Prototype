@@ -246,6 +246,11 @@ public class Game : Node2D
 		}
 	}
 
+	public void setSelectedUnitByGUID(string guid)
+	{
+		GD.Print("From right click menu, Select unit w/ guid: " + guid);
+	}
+
 	private void _onEndTurnButtonPressed()
 	{
 		if (CurrentState == GameState.PlayerTurn)
@@ -394,6 +399,9 @@ public class Game : Node2D
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
+						if (tile.unitsOnTile.Count > 0)
+							RightClickMenu.OpenForTile(this, eventMouseButton.Position, tile);
+
 						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.name);
 						if (tile.unitsOnTile.Count > 0) {
 							foreach (MapUnit unit in tile.unitsOnTile) {
