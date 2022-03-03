@@ -1,11 +1,19 @@
 using Godot;
 using C7GameData;
+using C7Engine;
 
 public class RightClickMenu : VBoxContainer
 {
+	private Game game;
+
+	public RightClickMenu(Game game) : base()
+	{
+		this.game = game;
+	}
+
 	public static RightClickMenu OpenForTile(Game game, Vector2 position, Tile tile)
 	{
-		var rCM = new RightClickMenu();
+		var rCM = new RightClickMenu(game);
 
 		// Set theme for menu node. TODO: This should be made moddable. I noticed in the Godot docs something about loading themes from files
 		// but didn't look into how it works, but that's probably what we'll want to do.
@@ -30,13 +38,23 @@ public class RightClickMenu : VBoxContainer
 		foreach (MapUnit unit in tile.unitsOnTile) {
 			var button = new Button();
 			button.Text = unit.unitType.name;
-			button.Connect("pressed", game, "setSelectedUnitByGUID", new Godot.Collections.Array() {unit.guid});
+			button.Connect("pressed", rCM, "SelectUnit", new Godot.Collections.Array() {unit.guid});
 			rCM.AddChild(button);
 		}
 
 		rCM.RectPosition = position;
 		game.AddChild(rCM);
 		return rCM;
+	}
+
+	public void SelectUnit(string guid)
+	{
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
+			if (toSelect != null && toSelect.owner == game.controller)
+				game.setSelectedUnit(toSelect);
+		}
+		this.QueueFree(); // Closes and deletes the menu
 	}
 
 	public override void _Input(InputEvent @event)

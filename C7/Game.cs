@@ -19,7 +19,7 @@ public class Game : Node2D
 		ComputerTurn
 	}
 
-	Player controller; // Player that's controlling the UI.
+	public Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
 	public Civ3AnimData civ3AnimData;
@@ -244,11 +244,6 @@ public class Game : Node2D
 		else {
 			EmitSignal(nameof(NoMoreAutoselectableUnits));
 		}
-	}
-
-	public void setSelectedUnitByGUID(string guid)
-	{
-		GD.Print("From right click menu, Select unit w/ guid: " + guid);
 	}
 
 	private void _onEndTurnButtonPressed()
