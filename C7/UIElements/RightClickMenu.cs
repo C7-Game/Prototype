@@ -4,27 +4,11 @@ using C7Engine;
 
 public class RightClickMenu : VBoxContainer
 {
-	private Game game;
+	protected Game game;
 
-	public RightClickMenu(Game game) : base()
+	protected RightClickMenu(Game game, Vector2 position) : base()
 	{
 		this.game = game;
-	}
-
-	private static StyleBoxFlat GetMenuItemStyleBox(Color color)
-	{
-		var styleBox = new StyleBoxFlat();
-		styleBox.BgColor = color;
-		styleBox.ContentMarginLeft   = 4f;
-		styleBox.ContentMarginTop    = 2f;
-		styleBox.ContentMarginRight  = 4f;
-		styleBox.ContentMarginBottom = 2f;
-		return styleBox;
-	}
-
-	public static RightClickMenu OpenForTile(Game game, Vector2 position, Tile tile)
-	{
-		var rCM = new RightClickMenu(game);
 
 		// Set theme for menu node. TODO: This should be made moddable. I noticed in the Godot docs something about loading themes from files
 		// but didn't look into how it works, but that's probably what we'll want to do.
@@ -35,36 +19,33 @@ public class RightClickMenu : VBoxContainer
 		theme.SetColor("font_color_hover"  , "Button", black);
 		theme.SetColor("font_color_pressed", "Button", black);
 		theme.SetColor("font_color_focus"  , "Button", black);
-		theme.SetStylebox("normal" , "Button", GetMenuItemStyleBox(Color.Color8(255, 247, 222, 255)));
-		theme.SetStylebox("hover"  , "Button", GetMenuItemStyleBox(Color.Color8(255, 189, 107, 255)));
-		theme.SetStylebox("pressed", "Button", GetMenuItemStyleBox(Color.Color8(140, 200, 200, 255)));
-		rCM.Theme = theme;
+		theme.SetStylebox("normal" , "Button", GetItemStyleBox(Color.Color8(255, 247, 222, 255)));
+		theme.SetStylebox("hover"  , "Button", GetItemStyleBox(Color.Color8(255, 189, 107, 255)));
+		theme.SetStylebox("pressed", "Button", GetItemStyleBox(Color.Color8(140, 200, 200, 255)));
+		this.Theme = theme;
 
-		foreach (MapUnit unit in tile.unitsOnTile) {
-			var button = new Button();
-
-			string action = (unit.owner == game.controller) ?
-				(unit.isFortified ? "Wake" : "Activate") :
-				"Contact";
-			button.Text = $"{action} {unit.Describe()}";
-			button.Align = Button.TextAlign.Left;
-			button.Connect("pressed", rCM, "SelectUnit", new Godot.Collections.Array() {unit.guid});
-			rCM.AddChild(button);
-		}
-
-		rCM.RectPosition = position;
-		game.AddChild(rCM);
-		return rCM;
+		this.RectPosition = position;
+		game.AddChild(this);
 	}
 
-	public void SelectUnit(string guid)
+	private static StyleBoxFlat GetItemStyleBox(Color color)
 	{
-		using (var gameDataAccess = new UIGameDataAccess()) {
-			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
-			if (toSelect != null && toSelect.owner == game.controller)
-				game.setSelectedUnit(toSelect);
-		}
-		this.QueueFree(); // Closes and deletes the menu
+		var styleBox = new StyleBoxFlat();
+		styleBox.BgColor = color;
+		styleBox.ContentMarginLeft   = 4f;
+		styleBox.ContentMarginTop    = 2f;
+		styleBox.ContentMarginRight  = 4f;
+		styleBox.ContentMarginBottom = 2f;
+		return styleBox;
+	}
+
+	public Button AddItem(string text)
+	{
+		var button = new Button();
+		button.Text = text;
+		button.Align = Button.TextAlign.Left;
+		this.AddChild(button);
+		return button;
 	}
 
 	public override void _Input(InputEvent @event)
@@ -84,5 +65,28 @@ public class RightClickMenu : VBoxContainer
 		// proceed to the "gui input" phase where buttons actually respond to it.)
 		} else if (! ((@event is InputEventMouse) && mouseOverMenu))
 			this.AcceptEvent();
+	}
+}
+
+public class RightClickTileMenu : RightClickMenu
+{
+	public RightClickTileMenu(Game game, Vector2 position, Tile tile) : base(game, position)
+	{
+		foreach (MapUnit unit in tile.unitsOnTile) {
+			string action = (unit.owner == game.controller) ?
+				(unit.isFortified ? "Wake" : "Activate") :
+				"Contact";
+			AddItem($"{action} {unit.Describe()}").Connect("pressed", this, "SelectUnit", new Godot.Collections.Array() {unit.guid});
+		}
+	}
+
+	public void SelectUnit(string guid)
+	{
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
+			if (toSelect != null && toSelect.owner == game.controller)
+				game.setSelectedUnit(toSelect);
+		}
+		this.QueueFree(); // Closes and deletes the menu
 	}
 }
