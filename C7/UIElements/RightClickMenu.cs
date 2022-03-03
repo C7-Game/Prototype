@@ -106,7 +106,7 @@ public class RightClickChooseProductionMenu : RightClickMenu
 {
 	public RightClickChooseProductionMenu(Game game, City city) : base(game)
 	{
-		for (int n = 0; n < 3; n++)
-			AddItem($"production choice {n}");
+		foreach (IProducible option in city.ListProductionOptions())
+			AddItem(option.name);
 	}
 }

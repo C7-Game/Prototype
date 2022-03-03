@@ -38,6 +38,14 @@ namespace C7GameData
             return true;
         }
 
+        public bool CanBuildUnit(UnitPrototype proto)
+        {
+            if (proto is SeaUnit)
+                return location.NeighborsCoast();
+            else
+                return true;
+        }
+
         public int TurnsUntilGrowth() {
             int turnsRoundedDown = (foodNeededToGrow - foodStored) / foodGrowthPerTurn;
             if ((foodNeededToGrow - foodStored) % foodGrowthPerTurn != 0) {
