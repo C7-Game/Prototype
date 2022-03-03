@@ -11,6 +11,17 @@ public class RightClickMenu : VBoxContainer
 		this.game = game;
 	}
 
+	private static StyleBoxFlat GetMenuItemStyleBox(Color color)
+	{
+		var styleBox = new StyleBoxFlat();
+		styleBox.BgColor = color;
+		styleBox.ContentMarginLeft   = 4f;
+		styleBox.ContentMarginTop    = 2f;
+		styleBox.ContentMarginRight  = 4f;
+		styleBox.ContentMarginBottom = 2f;
+		return styleBox;
+	}
+
 	public static RightClickMenu OpenForTile(Game game, Vector2 position, Tile tile)
 	{
 		var rCM = new RightClickMenu(game);
@@ -24,20 +35,15 @@ public class RightClickMenu : VBoxContainer
 		theme.SetColor("font_color_hover"  , "Button", black);
 		theme.SetColor("font_color_pressed", "Button", black);
 		theme.SetColor("font_color_focus"  , "Button", black);
-		var normalStyle = new StyleBoxFlat();
-		normalStyle.BgColor = Color.Color8(255, 0, 0, 255);
-		theme.SetStylebox("normal", "Button", normalStyle);
-		var hoverStyle = new StyleBoxFlat();
-		hoverStyle.BgColor = Color.Color8(0, 255, 0, 255);
-		theme.SetStylebox("hover", "Button", hoverStyle);
-		var pressedStyle = new StyleBoxFlat();
-		pressedStyle.BgColor = Color.Color8(0, 0, 255, 255);
-		theme.SetStylebox("pressed", "Button", pressedStyle);
+		theme.SetStylebox("normal" , "Button", GetMenuItemStyleBox(Color.Color8(255, 247, 222, 255)));
+		theme.SetStylebox("hover"  , "Button", GetMenuItemStyleBox(Color.Color8(255, 189, 107, 255)));
+		theme.SetStylebox("pressed", "Button", GetMenuItemStyleBox(Color.Color8(140, 200, 200, 255)));
 		rCM.Theme = theme;
 
 		foreach (MapUnit unit in tile.unitsOnTile) {
 			var button = new Button();
 			button.Text = unit.unitType.name;
+			button.Align = Button.TextAlign.Left;
 			button.Connect("pressed", rCM, "SelectUnit", new Godot.Collections.Array() {unit.guid});
 			rCM.AddChild(button);
 		}
