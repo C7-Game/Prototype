@@ -394,7 +394,11 @@ public class Game : Node2D
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
-						if (tile.unitsOnTile.Count > 0)
+
+						bool shiftDown = Input.IsKeyPressed((int)Godot.KeyList.Shift);
+						if (shiftDown && tile.cityAtTile != null)
+							new RightClickChooseProductionMenu(this, tile.cityAtTile).Open(eventMouseButton.Position);
+						else if ((! shiftDown) && tile.unitsOnTile.Count > 0)
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
 
 						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.name);
