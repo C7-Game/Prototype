@@ -6,7 +6,7 @@ public class RightClickMenu : VBoxContainer
 {
 	protected Game game;
 
-	protected RightClickMenu(Game game, Vector2 position) : base()
+	protected RightClickMenu(Game game) : base()
 	{
 		this.game = game;
 
@@ -24,8 +24,19 @@ public class RightClickMenu : VBoxContainer
 		theme.SetStylebox("pressed", "Button", GetItemStyleBox(Color.Color8(140, 200, 200, 255)));
 		this.Theme = theme;
 
-		this.RectPosition = position;
+		this.Hide();
 		game.AddChild(this);
+	}
+
+	public void Open(Vector2 position)
+	{
+		this.RectPosition = position;
+		this.Show();
+	}
+
+	public void CloseAndDelete()
+	{
+		this.QueueFree();
 	}
 
 	private static StyleBoxFlat GetItemStyleBox(Color color)
@@ -55,8 +66,8 @@ public class RightClickMenu : VBoxContainer
 		     mouseClickedOutsideMenu = (@event is InputEventMouseButton mouseButtonEvent) && mouseButtonEvent.IsPressed() && ! mouseOverMenu;
 
 		if (escapeKeyWasPressed || mouseClickedOutsideMenu) {
-			this.QueueFree(); // Closes and deletes the menu
 			this.AcceptEvent(); // Prevents other controls from receiving this event
+			CloseAndDelete();
 
 		// Eat all events other than mouse events while the cursor is over the menu. We want the menu to grab all input while it's open but we
 		// must make sure not to block mouse events from reaching its child buttons. (This had me confused for a while since the Godot docs
@@ -70,7 +81,7 @@ public class RightClickMenu : VBoxContainer
 
 public class RightClickTileMenu : RightClickMenu
 {
-	public RightClickTileMenu(Game game, Vector2 position, Tile tile) : base(game, position)
+	public RightClickTileMenu(Game game, Tile tile) : base(game)
 	{
 		foreach (MapUnit unit in tile.unitsOnTile) {
 			string action = (unit.owner == game.controller) ?
@@ -87,6 +98,6 @@ public class RightClickTileMenu : RightClickMenu
 			if (toSelect != null && toSelect.owner == game.controller)
 				game.setSelectedUnit(toSelect);
 		}
-		this.QueueFree(); // Closes and deletes the menu
+		CloseAndDelete();
 	}
 }
