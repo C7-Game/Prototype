@@ -104,9 +104,18 @@ public class RightClickTileMenu : RightClickMenu
 
 public class RightClickChooseProductionMenu : RightClickMenu
 {
+	private string cityGUID;
+
 	public RightClickChooseProductionMenu(Game game, City city) : base(game)
 	{
+		cityGUID = city.guid;
 		foreach (IProducible option in city.ListProductionOptions())
-			AddItem(option.name);
+			AddItem(option.name).Connect("pressed", this, "ChooseProduction", new Godot.Collections.Array() {option.name});
+	}
+
+	public void ChooseProduction(string producibleName)
+	{
+		new MsgChooseProduction(cityGUID, producibleName).send();
+		CloseAndDelete();
 	}
 }

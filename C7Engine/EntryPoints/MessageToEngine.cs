@@ -111,6 +111,28 @@ public class MsgBuildCity : MessageToEngine {
 	}
 }
 
+public class MsgChooseProduction : MessageToEngine {
+	private string cityGUID;
+	private string producibleName;
+
+	public MsgChooseProduction(string cityGUID, string producibleName)
+	{
+		this.cityGUID = cityGUID;
+		this.producibleName = producibleName;
+	}
+
+	public override void process()
+	{
+		City city = EngineStorage.gameData.cities.Find(c => c.guid == cityGUID);
+		if (city != null)
+			foreach (IProducible producible in city.ListProductionOptions())
+				if (producible.name == producibleName) {
+					city.SetItemBeingProduced(producible);
+					break;
+				}
+	}
+}
+
 public class MsgEndTurn : MessageToEngine {
 	public override void process()
 	{
