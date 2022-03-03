@@ -42,7 +42,7 @@ public class RightClickMenu : VBoxContainer
 
 		foreach (MapUnit unit in tile.unitsOnTile) {
 			var button = new Button();
-			button.Text = unit.unitType.name;
+			button.Text = unit.Describe();
 			button.Align = Button.TextAlign.Left;
 			button.Connect("pressed", rCM, "SelectUnit", new Godot.Collections.Array() {unit.guid});
 			rCM.AddChild(button);

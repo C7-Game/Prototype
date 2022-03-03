@@ -65,6 +65,14 @@ public class MapUnit
 			return (unitType.defense * hitPointsRemaining) > (otherDefender.unitType.defense * otherDefender.hitPointsRemaining);
 	}
 
+	public string Describe()
+	{
+		UnitPrototype type = this.unitType;
+		string hPDesc = ((type.attack > 0) || (type.defense > 0)) ? $" ({hitPointsRemaining}/{maxHitPoints})" : "";
+		string attackDesc = (type.bombard > 0) ? $"{type.attack}({type.bombard})" : type.attack.ToString();
+		return $"Regular{hPDesc} {type.name} ({attackDesc}.{type.defense}.{movementPointsRemaining}/{type.movement})";
+	}
+
 	// TODO: The contents of this enum are copy-pasted from UnitAction in Civ3UnitSprite.cs. We should unify these so we don't have two different
 	// but virtually identical enums.
 	public enum AnimatedAction {
