@@ -54,12 +54,18 @@ namespace C7GameData
             return turnsRoundedDown;
         }
 
-        public int TurnsUntilProductionFinished() {
-            int turnsRoundedDown = (itemBeingProduced.shieldCost - shieldsStored) / shieldsPerTurn;
-            if ((itemBeingProduced.shieldCost - shieldsStored) % shieldsPerTurn != 0) {
+        public int TurnsToProduce(IProducible item)
+        {
+            int turnsRoundedDown = (item.shieldCost - shieldsStored) / shieldsPerTurn;
+            if ((item.shieldCost - shieldsStored) % shieldsPerTurn != 0) {
                 return turnsRoundedDown++;
             }
             return turnsRoundedDown;
+        }
+
+        public int TurnsUntilProductionFinished()
+        {
+            return TurnsToProduce(itemBeingProduced);
         }
 
         /**

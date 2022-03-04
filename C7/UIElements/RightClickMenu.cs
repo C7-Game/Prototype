@@ -126,7 +126,8 @@ public class RightClickChooseProductionMenu : RightClickMenu
 	{
 		cityGUID = city.guid;
 		foreach (IProducible option in city.ListProductionOptions()) {
-			AddItem(option.name, GetProducibleIcon(option))
+			int buildTime = city.TurnsToProduce(option);
+			AddItem($"{option.name} ({buildTime} turns)", GetProducibleIcon(option))
 				.Connect("pressed", this, "ChooseProduction", new Godot.Collections.Array() { option.name });
 		}
 	}
