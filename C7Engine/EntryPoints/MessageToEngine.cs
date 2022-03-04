@@ -21,13 +21,15 @@ public class MsgShutdownEngine : MessageToEngine {
 	}
 }
 
-public class MsgFortifyUnit : MessageToEngine
+public class MsgSetFortification : MessageToEngine
 {
 	private string unitGUID;
+	private bool fortifyElseWake;
 
-	public MsgFortifyUnit(string unitGUID)
+	public MsgSetFortification(string unitGUID, bool fortifyElseWake)
 	{
 		this.unitGUID = unitGUID;
+		this.fortifyElseWake = fortifyElseWake;
 	}
 
 	public override void process()
@@ -36,8 +38,12 @@ public class MsgFortifyUnit : MessageToEngine
 
 		// Simply do nothing if we weren't given a valid GUID. TODO: Maybe this is an error we need to handle? In an MP game, we should reject
 		// invalid actions at the server level but at the client level an invalid action received from the server indicates a desync.
-		if (unit != null)
-			unit.fortify();
+		if (unit != null) {
+			if (fortifyElseWake)
+				unit.fortify();
+			else
+				unit.wake();
+		}
 	}
 }
 

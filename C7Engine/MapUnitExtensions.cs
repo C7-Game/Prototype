@@ -21,6 +21,11 @@ public static class MapUnitExtensions {
 		unit.animate(MapUnit.AnimatedAction.FORTIFY, false);
 	}
 
+	public static void wake(this MapUnit unit)
+	{
+		unit.isFortified = false;
+	}
+
 	public static bool fight(this MapUnit unit, MapUnit defender)
 	{
 		// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
@@ -106,7 +111,7 @@ public static class MapUnitExtensions {
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
 		if ((newLoc != Tile.NONE) && newLoc.IsLand() && (unit.movementPointsRemaining > 0)) {
 			unit.facingDirection = dir;
-			unit.isFortified = false;
+			unit.wake();
 
 			// Trigger combat if the tile we're moving into has an enemy unit. Or if this unit can't fight, do nothing.
 			MapUnit defender = newLoc.findTopDefender(unit);

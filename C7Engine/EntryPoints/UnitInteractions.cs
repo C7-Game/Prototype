@@ -75,7 +75,7 @@ namespace C7Engine
 
         public static void fortifyUnit(string guid)
         {
-            new MsgFortifyUnit(guid).send();
+            new MsgSetFortification(guid, true).send();
         }
 
         public static void moveUnit(string guid, TileDirection dir)
