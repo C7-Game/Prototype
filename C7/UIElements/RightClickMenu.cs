@@ -33,8 +33,23 @@ public class RightClickMenu : VBoxContainer
 
 	public void Open(Vector2 position)
 	{
-		this.RectPosition = position;
+		// Must show the container first in order to update its RectSize
 		this.Show();
+
+		// Move "position" if the menu would extend past the right or bottom edges of the screen
+		Vector2 offScreen = position + this.RectSize - GetViewport().Size;
+		if (offScreen.x > 0) {
+			position.x -= offScreen.x;
+			if (position.x < 0)
+				position.x = 0;
+		}
+		if (offScreen.y > 0) {
+			position.y -= offScreen.y;
+			if (position.y < 0)
+				position.y = 0;
+		}
+
+		this.RectPosition = position;
 	}
 
 	public void CloseAndDelete()
