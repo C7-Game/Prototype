@@ -25,7 +25,10 @@ public class RightClickMenu : VBoxContainer
 		this.Theme = theme;
 
 		this.Hide();
-		game.AddChild(this);
+
+		// Add the menu as a child of "CanvasLayer" to ensure it's drawn overtop of the game map. "CanvasLayer" should have been named
+		// something like "UILayer" since it's the layer that contains all UI elements. "CanvasLayer" is actually its type.
+		game.GetNode("CanvasLayer").AddChild(this);
 	}
 
 	public void Open(Vector2 position)
