@@ -53,10 +53,12 @@ public class RightClickMenu : VBoxContainer
 		return styleBox;
 	}
 
-	public Button AddItem(string text)
+	public Button AddItem(string text, Texture icon = null)
 	{
 		var button = new Button();
 		button.Text = text;
+		if (icon != null)
+			button.Icon = icon;
 		button.Align = Button.TextAlign.Left;
 		this.AddChild(button);
 		return button;
@@ -109,11 +111,24 @@ public class RightClickChooseProductionMenu : RightClickMenu
 {
 	private string cityGUID;
 
+	public ImageTexture GetProducibleIcon(IProducible producible)
+	{
+		if (producible is UnitPrototype proto) {
+			const int iconWidth = 32, iconHeight = 32, iconsPerRow = 14;
+			int x = 1 + 33 * (proto.iconIndex % iconsPerRow),
+			    y = 1 + 33 * (proto.iconIndex / iconsPerRow);
+			return Util.LoadTextureFromPCX("Art/Units/units_32.pcx", x, y, iconWidth, iconHeight);
+		} else
+			return null;
+	}
+
 	public RightClickChooseProductionMenu(Game game, City city) : base(game)
 	{
 		cityGUID = city.guid;
-		foreach (IProducible option in city.ListProductionOptions())
-			AddItem(option.name).Connect("pressed", this, "ChooseProduction", new Godot.Collections.Array() {option.name});
+		foreach (IProducible option in city.ListProductionOptions()) {
+			AddItem(option.name, GetProducibleIcon(option))
+				.Connect("pressed", this, "ChooseProduction", new Godot.Collections.Array() { option.name });
+		}
 	}
 
 	public void ChooseProduction(string producibleName)
