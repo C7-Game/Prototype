@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace C7GameData
 
@@ -30,7 +31,7 @@ namespace C7GameData
 
             ImportCiv3TerrainTypes(theBiq, c7Save);
             Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
-            SetMapDimensions(theBiq, c7Save);
+            SetMapDimensions(civ3Save, theBiq, c7Save);
 
             // Import tiles.  This is similar to, but different from the BIQ version as tile contents may have changed in-game.
             int i = 0;
@@ -83,7 +84,7 @@ namespace C7GameData
 			
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
-			SetMapDimensions(theBiq, c7Save);
+			SetMapDimensions(null, theBiq, c7Save);
 			
 			// Import tiles
 			int i = 0;
@@ -182,10 +183,16 @@ namespace C7GameData
 			}
 		}
 
-		private static void SetMapDimensions(BiqData theBiq, C7SaveFormat c7Save)
+		private static void SetMapDimensions(SavData civ3Save, BiqData biq, C7SaveFormat c7Save)
 		{
-			c7Save.GameData.map.numTilesTall = theBiq.Wmap[0].Height;
-			c7Save.GameData.map.numTilesWide = theBiq.Wmap[0].Width;
+			if (biq != null && biq.Wmap != null && biq.Wmap.Length > 0) {
+				c7Save.GameData.map.numTilesTall = biq.Wmap[0].Height;
+				c7Save.GameData.map.numTilesWide = biq.Wmap[0].Width;
+			}
+			if (civ3Save != null && civ3Save.Wrld.Height > 0 && civ3Save.Wrld.Width > 0) {
+				c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Height;
+				c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Width;
+			}
 		}
     }
 }
