@@ -23,33 +23,39 @@ namespace C7GameData
 		//of memory for pointers), but I'm inclined to go with both since it makes it easy and
 		//efficient to perform calculations, whether you need to know which unit on a tile
 		//has the best defense, or which tile a unit is on when viewing the Military Advisor.
-		public List<MapUnit> unitsOnTile;
+		public List<MapUnit> unitsOnTile = new List<MapUnit>();
+		public Resource Resource { get; set; }
 
-		public Dictionary<TileDirection, Tile> neighbors {get; set;}
+		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();
 
 		//See discussion on page 4 of the "Babylon" thread (https://forums.civfanatics.com/threads/0-1-babylon-progress-thread.673959) about sub-terrain type and Civ3 properties.
 		//We may well move these properties somewhere, whether that's Civ3ExtraInfo, a Civ3Tile child class, a Dictionary property, or something else, in the future.
 		public bool isSnowCapped;
 		public bool isPineForest;
 
-		public Tile()
-		{
-			unitsOnTile = new List<MapUnit>();
-		}
+        public bool riverNortheast;
+        public bool riverSoutheast;
+        public bool riverSouthwest;
+        public bool riverNorthwest;
 
-		public MapUnit findTopDefender()
-		{
-			if (unitsOnTile.Count > 0) {
-				var tr = unitsOnTile[0];
-				foreach (var u in unitsOnTile)
-					if (u.unitType.defense * u.hitPointsRemaining > tr.unitType.defense * tr.hitPointsRemaining)
-						tr = u;
-				return tr;
-			} else
-				return MapUnit.NONE;
-		}
-		
-		public static Tile NONE = new Tile();
+        public Tile()
+        {
+            unitsOnTile = new List<MapUnit>();
+        }
+
+	    public MapUnit findTopDefender()
+	    {
+		    if (unitsOnTile.Count > 0) {
+			    var tr = unitsOnTile[0];
+			    foreach (var u in unitsOnTile)
+				    if (u.unitType.defense * u.hitPointsRemaining > tr.unitType.defense * tr.hitPointsRemaining)
+					    tr = u;
+			    return tr;
+		    } else
+			    return MapUnit.NONE;
+	    }
+        
+        public static Tile NONE = new Tile();
 
 		//This should be used when we want to check if land tiles are next to water tiles.
 		//Usually this is coast, but it could be Sea - see the "Deepwater Harbours" topics at CFC.
@@ -93,6 +99,10 @@ namespace C7GameData
 			return !baseTerrainType.isWater();
 		}
 
+		/**
+		 * Distance as the raven flies to another tile.
+		 * This is a rough metric only.
+		 */
 		public int distanceToOtherTile(Tile other)
 		{
 			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;

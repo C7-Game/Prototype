@@ -13,10 +13,11 @@ namespace QueryCiv3.Biq
         public int Length;
 
         private byte RiverConnections;
-        public bool RiverConnectionNorth { get => Util.GetFlag(RiverConnections, 0); }
-        public bool RiverConnectionWest  { get => Util.GetFlag(RiverConnections, 1); }
-        public bool RiverConnectionEast  { get => Util.GetFlag(RiverConnections, 2); }
-        public bool RiverConnectionSouth { get => Util.GetFlag(RiverConnections, 3); }
+        public bool RiverConnectionNortheast { get => Util.GetFlag(RiverConnections, 1); }
+        public bool RiverConnectionSoutheast { get => Util.GetFlag(RiverConnections, 3); }
+        public bool RiverConnectionSouthwest { get => Util.GetFlag(RiverConnections, 5); }
+        public bool RiverConnectionNorthwest { get => Util.GetFlag(RiverConnections, 7); }
+
 
         public byte Border;
         public int Resource;
@@ -52,7 +53,7 @@ namespace QueryCiv3.Biq
 
         private fixed byte UnknownBuffer3[1];
         private fixed byte C3CTerrain[1];
-        public byte BaseTerrain => (byte)(C3CTerrain[0] & 0x0F);
+        public byte BaseTerrain => (byte)((C3CTerrain[0] & 0x0F));
         public byte OverlayTerrain => (byte)((C3CTerrain[0] & 0xF0) >> 4);
 
         private fixed byte UnknownBuffer4[2];

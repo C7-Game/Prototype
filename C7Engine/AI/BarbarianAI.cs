@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 
 namespace C7Engine {
     using C7GameData;
@@ -16,11 +17,16 @@ namespace C7Engine {
                     if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
                         //Move randomly
                         List<Tile> validTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
+                        if (validTiles.Count == 0) {
+	                        //This can happen if a barbarian galley spawns next to a 1-tile lake, moves there, and doesn't have anywhere else to go.
+	                        Console.WriteLine("WARNING: No valid tiles for barbarian to move to");
+	                        continue;
+                        }
                         Tile newLocation = validTiles[gameData.rng.Next(validTiles.Count)];
                         //Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
                         //if it tries to move e.g. north from the north pole.  Hence, this check.
                         if (newLocation != Tile.NONE) {
-                            Console.WriteLine("Moving barbarian at " + unit.location + " to " + newLocation);
+                            //Console.WriteLine("Moving barbarian at " + unit.location + " to " + newLocation);
                             unit.location.unitsOnTile.Remove(unit);
                             newLocation.unitsOnTile.Add(unit);
                             unit.location = newLocation;
