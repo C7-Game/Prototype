@@ -64,6 +64,12 @@ public class RightClickMenu : VBoxContainer
 		return button;
 	}
 
+	public void RemoveAll()
+	{
+		foreach (Node child in this.GetChildren())
+			child.QueueFree();
+	}
+
 	public override void _Input(InputEvent @event)
 	{
 		bool mouseOverMenu = new Rect2(Vector2.Zero, this.RectSize).HasPoint(this.GetLocalMousePosition()),
@@ -88,9 +94,18 @@ public class RightClickTileMenu : RightClickMenu
 {
 	public RightClickTileMenu(Game game, Tile tile) : base(game)
 	{
+		ResetItems(tile);
+	}
+
+	// assumeUnfortified is a unit that will be considered unfortified regardless of what its isFortified field holds. It's used to work around
+	// the fact that unfortification is done asynchronously through a message to the engine.
+	public void ResetItems(Tile tile, MapUnit assumeUnfortified = null)
+	{
+		RemoveAll();
 		foreach (MapUnit unit in tile.unitsOnTile) {
+			bool isFortified = (unit != assumeUnfortified) && unit.isFortified;
 			string action = (unit.owner == game.controller) ?
-				(unit.isFortified ? "Wake" : "Activate") :
+				(isFortified ? "Wake" : "Activate") :
 				"Contact";
 			AddItem($"{action} {unit.Describe()}").Connect("pressed", this, "SelectUnit", new Godot.Collections.Array() {unit.guid});
 		}
@@ -103,9 +118,11 @@ public class RightClickTileMenu : RightClickMenu
 			if (toSelect != null && toSelect.owner == game.controller) {
 				game.setSelectedUnit(toSelect);
 				new MsgSetFortification(toSelect.guid, false).send();
+				ResetItems(toSelect.location, toSelect);
 			}
 		}
-		CloseAndDelete();
+		if (! Input.IsKeyPressed((int)Godot.KeyList.Shift))
+			CloseAndDelete();
 	}
 }
 
