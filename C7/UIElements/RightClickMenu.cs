@@ -100,8 +100,10 @@ public class RightClickTileMenu : RightClickMenu
 	{
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
-			if (toSelect != null && toSelect.owner == game.controller)
+			if (toSelect != null && toSelect.owner == game.controller) {
 				game.setSelectedUnit(toSelect);
+				new MsgSetFortification(toSelect.guid, false).send();
+			}
 		}
 		CloseAndDelete();
 	}
