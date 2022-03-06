@@ -31,6 +31,7 @@ window/size/height=768
 
 limit=false
 limits=false
+stret=false
 
 [gui]
 
