@@ -1,3 +1,5 @@
+using System;
+
 namespace C7Engine
 {
     using System.IO;
@@ -20,17 +22,22 @@ namespace C7Engine
             }
             else if (loadFilePath.EndsWith("BIQ", System.StringComparison.CurrentCultureIgnoreCase)) {
                 //Probably need an ImportBiq variant someday.  Maybe.
-                save = ImportCiv3.ImportSav(loadFilePath, defaultBicPath);
+                save = ImportCiv3.ImportBiq(loadFilePath, defaultBicPath);
             }
             else {
                 save = C7SaveFormat.Load(loadFilePath);
             }
             save.GameData.PerformPostLoadActions();
             EngineStorage.setGameData(save.GameData);
+			//If we are loading from JSON and it lacks an RNG, set one
+			//This should be a temporary hack until we have a more stable C7 default rule set.
+			if (save.GameData.rng == null) {
+				save.GameData.rng = new Random();
+			}
             // possibly do something with save.Rules here when it exists
             // and maybe consider if we have any need to keep a reference to the save object handy...probably not
 
-            var humanPlayer = save.GameData.createDummyGameData();
+            var humanPlayer = save.GameData.CreateDummyGameData();
             return humanPlayer;
         }
     }

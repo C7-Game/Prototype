@@ -20,3 +20,6 @@
 .gitignore text eol=lf
 .gitattributes text eol=lf
 LICENSE text eol=lf
+
+# Super-long text files
+C7/c7-static-map-save.json binary

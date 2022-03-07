@@ -12,7 +12,7 @@ namespace C7GameData
         // TODO : protect setters while still allowing JSON deserialization
         public int numTilesWide { get; set; }
         public int numTilesTall { get; set; }
-        bool wrapHorizontally, wrapVertically;
+        public bool wrapHorizontally, wrapVertically;
 
         // The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
         // This is kind of a temporary thing. The reason it works this way right now is because I'm just rearranging the generation code from
@@ -22,6 +22,7 @@ namespace C7GameData
 
         public List<TerrainType> terrainTypes = new List<TerrainType>();
         public List<Tile> tiles { get; set;}
+		public List<Tile> barbarianCamps = new List<Tile>();
 
         public GameMap()
         {
@@ -68,6 +69,11 @@ namespace C7GameData
             }
         }
 
+        public bool isRowAt(int y)
+        {
+            return wrapVertically || ((y >= 0) && (y < numTilesTall));
+        }
+
         public bool isTileAt(int x, int y)
         {
             bool evenRow = y%2 == 0;
@@ -79,14 +85,31 @@ namespace C7GameData
                 else
                     xInBounds = (x >= 1) && (x <= numTilesWide - 1);
             }
-            bool yInBounds = wrapVertically || ((y >= 0) && (y < numTilesTall));
-            return xInBounds && yInBounds && (evenRow ? (x%2 == 0) : (x%2 != 0));
+            return xInBounds && isRowAt(y) && (evenRow ? (x%2 == 0) : (x%2 != 0));
+        }
+
+        public int wrapTileX(int x)
+        {
+            if (wrapHorizontally) {
+                int tr = x % numTilesWide;
+                return (tr >= 0) ? tr : tr + numTilesWide;
+            } else
+                return x;
+        }
+
+        public int wrapTileY(int y)
+        {
+            if (wrapVertically) {
+                int tr = y % numTilesTall;
+                return (tr >= 0) ? tr : tr + numTilesTall;
+            } else
+                return y;
         }
 
         public Tile tileAt(int x, int y)
         {
             if (isTileAt(x, y))
-                return tiles[tileCoordsToIndex(x, y)];
+                return tiles[tileCoordsToIndex(wrapTileX(x), wrapTileY(y))];
             else
                 return Tile.NONE; // TODO: Consider using empty tile object instead of null
         }
@@ -141,7 +164,7 @@ namespace C7GameData
                 bool foundOne = false;
                 for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
                     var randTile = tiles[rng.Next(0, tiles.Count)];
-                    if (randTile.baseTerrainType.name == "Coast") // TODO: Write a proper check for if tile is water
+                    if (randTile.baseTerrainType.isWater())
                         continue;
                     int distToNearestOtherLoc = Int32.MaxValue;
                     foreach (var sL in tr) {
@@ -170,21 +193,21 @@ namespace C7GameData
         public static GameMap generateDummyGameMap(Random rng, TerrainNoiseMapGenerator terrainGen)
         {
             TerrainType grassland = new TerrainType();
-            grassland.name = "Grassland";
+            grassland.DisplayName = "Grassland";
             grassland.baseFoodProduction = 2;
             grassland.baseShieldProduction = 1; //with only one terrain type, it needs to be > 0
             grassland.baseCommerceProduction = 1;   //same as above
             grassland.movementCost = 1;
 
             TerrainType plains = new TerrainType();
-            plains.name = "Plains";
+            plains.DisplayName = "Plains";
             plains.baseFoodProduction = 1;
             plains.baseShieldProduction = 2;
             plains.baseCommerceProduction = 1;
             plains.movementCost = 1;
 
             TerrainType coast = new TerrainType();
-            coast.name = "Coast";
+            coast.DisplayName = "Coast";
             coast.baseFoodProduction = 2;
             coast.baseShieldProduction = 0;
             coast.baseCommerceProduction = 1;
@@ -194,24 +217,24 @@ namespace C7GameData
             dummyMap.numTilesTall = 80;
             dummyMap.numTilesWide = 80;
 
-	    // NOTE: The order of terrain types in this array must match the indices produced by terrainGen
-	    dummyMap.terrainTypes.Add(plains);
-	    dummyMap.terrainTypes.Add(grassland);
-	    dummyMap.terrainTypes.Add(coast);
+			// NOTE: The order of terrain types in this array must match the indices produced by terrainGen
+			dummyMap.terrainTypes.Add(plains);
+			dummyMap.terrainTypes.Add(grassland);
+			dummyMap.terrainTypes.Add(coast);
 
-	    dummyMap.terrainNoiseMap = terrainGen(rng.Next(), dummyMap.numTilesWide, dummyMap.numTilesTall);
+			dummyMap.terrainNoiseMap = terrainGen(rng.Next(), dummyMap.numTilesWide, dummyMap.numTilesTall);
 
-            for (int y = 0; y < dummyMap.numTilesTall; y++)
-		for (int x = y%2; x < dummyMap.numTilesWide; x += 2) {
-                    Tile newTile = new Tile();
-                    newTile.xCoordinate = x;
-                    newTile.yCoordinate = y;
-                    newTile.baseTerrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
-                    dummyMap.tiles.Add(newTile);
-                }
-
-            return dummyMap;
-        }
+			for (int y = 0; y < dummyMap.numTilesTall; y++) {
+				for (int x = y%2; x < dummyMap.numTilesWide; x += 2) {
+					Tile newTile = new Tile();
+					newTile.xCoordinate = x;
+					newTile.yCoordinate = y;
+					newTile.baseTerrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
+					dummyMap.tiles.Add(newTile);
+				}
+			}
+			return dummyMap;
+		}
 
         // STATUS 2021-11-26: This noise function is not currently referenced, but it is a very useful
         //  noisemap generator that we will likely use in the future once we start trying

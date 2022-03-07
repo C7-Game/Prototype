@@ -1,3 +1,5 @@
+using C7GameData.AIData;
+
 namespace C7GameData
 {
 
@@ -29,6 +31,7 @@ public class MapUnit
 	//This probably should not be serialized.  In .NET, we'd add the [ScriptIgnore] and using System.Web.Script.Serialization.
 	//But .NET Core doesn't support that.  So, we'll have to figure out something else.  Maybe a library somewhere.
 	public List<string> availableActions = new List<string>();
+	public UnitAI currentAIBehavior;
 
 	public MapUnit()
 	{

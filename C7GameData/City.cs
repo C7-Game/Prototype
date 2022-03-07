@@ -4,14 +4,12 @@ namespace C7GameData
     public class City
     {
         public string guid {get;}
-        public int xLocation {get;}
-        public int yLocation {get;}
+        public Tile location {get;}
         public string name;
         public int size = 1;
 
         //Temporary production code because production is fun.
-        public string itemBeingProduced = "Warrior";
-        public int shieldCost = 10;
+        public IProducible itemBeingProduced;
         public int shieldsStored = 0;
         public int shieldsPerTurn = 2;
 
@@ -21,13 +19,17 @@ namespace C7GameData
 
         public Player owner {get; set;}
 
-        public City(int x, int y, Player owner, string name)
+        public City(Tile location, Player owner, string name)
         {
             guid = Guid.NewGuid().ToString();
-            this.xLocation = x;
-            this.yLocation = y;
+            this.location = location;
             this.owner = owner;
             this.name = name;
+        }
+
+        public void SetItemBeingProduced(IProducible producible)
+        {
+            this.itemBeingProduced = producible;
         }
 
         public bool IsCapital()
@@ -45,19 +47,19 @@ namespace C7GameData
         }
 
         public int TurnsUntilProductionFinished() {
-            int turnsRoundedDown = (shieldCost - shieldsStored) / shieldsPerTurn;
-            if ((shieldCost - shieldsStored) % shieldsPerTurn != 0) {
+            int turnsRoundedDown = (itemBeingProduced.shieldCost - shieldsStored) / shieldsPerTurn;
+            if ((itemBeingProduced.shieldCost - shieldsStored) % shieldsPerTurn != 0) {
                 return turnsRoundedDown++;
             }
             return turnsRoundedDown;
         }
 
-        //Placeholder for now.  Don't be alarmed that it ignores things like the produce-next popup
-        //Probably don't want to return a string here.  Just doing things the wrong way to add behavior quickly so Babylon is more fun.
-        public string ComputeTurnProduction()
+        /**
+         * Computes turn production.  Adjusts population if need be.  If the production queue finishes,
+         * returns the item that is built.  Otherwise, returns null.
+         */
+        public IProducible ComputeTurnProduction()
         {
-            string itemProduced = "";
-
             foodStored+=foodGrowthPerTurn;
             if (foodStored >= foodNeededToGrow) {
                 size++;
@@ -65,25 +67,16 @@ namespace C7GameData
             }
 
             shieldsStored+=shieldsPerTurn;
-            if (shieldsStored >= shieldCost) {
-                itemProduced = itemBeingProduced;
-                shieldsStored = 0;
-                if (itemProduced == "Warrior") {
-                    itemBeingProduced = "Chariot";
-                    shieldCost = 20;
-                }
-                else if (itemProduced == "Chariot") {
-                    itemBeingProduced = "Settler";
-                    shieldCost = 30;
-                }
-                else if (itemProduced == "Settler") {
-                    size -= 2;
-                    itemBeingProduced = "Warrior";
-                    shieldCost = 10;
-                }
+            if (shieldsStored >= itemBeingProduced.shieldCost) {
+	            shieldsStored = 0;
+	            if (itemBeingProduced.populationCost > 0) {
+		            size -= itemBeingProduced.populationCost;
+	            }
+                return itemBeingProduced;
             }
 
-            return itemProduced;
+            return null;
         }
+        
     }
 }
