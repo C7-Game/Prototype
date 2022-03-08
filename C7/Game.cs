@@ -87,6 +87,18 @@ public class Game : Node2D
 		// Hide slideout bar on startup
 		_on_SlideToggle_toggled(false);
 
+		// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their starting
+		// settler.
+		if (controller.cities.Count > 0) {
+			City capital = controller.cities.Find(c => c.IsCapital());
+			if (capital != null)
+				mapView.centerCameraOnTile(capital.location);
+		} else {
+			MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
+			if (startingSettler != null)
+				mapView.centerCameraOnTile(startingSettler.location);
+		}
+
 		GD.Print("Now in game!");
 
 		loadTimer.Stop();
