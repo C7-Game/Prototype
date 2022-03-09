@@ -68,7 +68,8 @@ public class Game : Node2D
 			Player = GetNode<KinematicBody2D>("KinematicBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-			mapView.cameraZoom = (float)0.3;
+			mapView.cameraZoom = (float)1.0;
+			mapView.gridLayer.visible = false;
 			// If later recreating scene, the component may already exist, hence try/catch
 			try{
 				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
