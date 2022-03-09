@@ -1,6 +1,7 @@
 namespace C7GameData
 {
 	using System;
+	using System.Text.Json.Serialization;
 	using System.Collections.Generic;
 	using System.Linq;
 	public class Tile
@@ -24,6 +25,8 @@ namespace C7GameData
 		//efficient to perform calculations, whether you need to know which unit on a tile
 		//has the best defense, or which tile a unit is on when viewing the Military Advisor.
 		public List<MapUnit> unitsOnTile = new List<MapUnit>();
+		public string ResourceKey { get; set; }
+		[JsonIgnore]
 		public Resource Resource { get; set; }
 
 		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();

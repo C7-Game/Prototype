@@ -63,6 +63,7 @@ namespace C7GameData
                 c7Tile.riverSouthwest = civ3Tile.RiverSouthwest;
                 c7Tile.riverNorthwest = civ3Tile.RiverNorthwest;
                 c7Tile.Resource = resourcesByIndex[civ3Tile.ResourceID];
+				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.ResourceID].Key;
                 c7Save.GameData.map.tiles.Add(c7Tile);
                 i++;
             }
@@ -116,6 +117,7 @@ namespace C7GameData
 				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
 				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.Resource];
+				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.Resource].Key;
 				c7Save.GameData.map.tiles.Add(c7Tile);
 				i++;
 			}
@@ -139,6 +141,7 @@ namespace C7GameData
 			foreach (GOOD good in biq.Good) {
 				Resource resource = new Resource
 				{
+					Key = good.Name,
 					Index = g,
 					Name = good.Name,
 					Icon = good.Icon,
