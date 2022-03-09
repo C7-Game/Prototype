@@ -19,6 +19,10 @@ namespace C7GameData
 			Index = -1,
 			Category = ResourceCategory.NONE
 		};
+
+		public override string ToString() {
+			return $"Resource {Index} named {Name} of type {Category} with bonuses {FoodBonus}, {ShieldsBonus}, {CommerceBonus}";
+		}
 	}
 
 	public enum ResourceCategory
