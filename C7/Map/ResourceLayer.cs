@@ -9,7 +9,6 @@ namespace C7.Map
 		private static readonly Vector2 resourceSize = new Vector2(50, 50);
 		private int maxRow;
 		private ImageTexture resourceTexture;
-		private bool debugMessage = false;
 
 		public ResourceLayer()
 		{
