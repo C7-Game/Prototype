@@ -20,26 +20,16 @@ namespace C7.Map
 		{
 			Resource resource = tile.Resource;
 			if (resource != Resource.NONE) {
-				if (resource.Index == -1) {
-					// GD.Print("This should be Resource.NONE " + resource);
-					if (!debugMessage) {
-						GD.Print("Resource.NONE = " + Resource.NONE);
-						GD.Print("This is " + resource);
-						debugMessage = true;
-					}
+				int resourceIcon = tile.Resource.Icon;
+				int row = resourceIcon / 6;
+				int col = resourceIcon % 6;
+				if (row > maxRow) {
+					GD.Print("Resource icon for " + resource.Name + " is too high");
+					return;
 				}
-				else {
-					int resourceIcon = tile.Resource.Icon;
-					int row = resourceIcon / 6;
-					int col = resourceIcon % 6;
-					if (row > maxRow) {
-						GD.Print("Resource icon for " + resource.Name + " is too high");
-						return;
-					}
-					Rect2 resourceRectangle = new Rect2(col * resourceSize.x, row * resourceSize.y, resourceSize);
-					Rect2 screenTarget = new Rect2(tileCenter - 0.5f * resourceSize, resourceSize);
-					looseView.DrawTextureRectRegion(resourceTexture, screenTarget, resourceRectangle);
-				}
+				Rect2 resourceRectangle = new Rect2(col * resourceSize.x, row * resourceSize.y, resourceSize);
+				Rect2 screenTarget = new Rect2(tileCenter - 0.5f * resourceSize, resourceSize);
+				looseView.DrawTextureRectRegion(resourceTexture, screenTarget, resourceRectangle);
 			}
 		}
 	}
