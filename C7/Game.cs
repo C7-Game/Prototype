@@ -523,6 +523,7 @@ public class Game : Node2D
 		{
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+				GetNextAutoselectedUnit(gameDataAccess.gameData);
 			}
 		}
 		else if (buttonName.Equals("disband"))
