@@ -112009,7 +112009,7 @@
         }
       ],
       "relativeModPath": "",
-      "wrapHorizontally": false,
+      "wrapHorizontally": true,
       "wrapVertically": false,
       "terrainTypes": [],
       "barbarianCamps": []
