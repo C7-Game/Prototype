@@ -1,6 +1,7 @@
 namespace C7GameData
 {
 	using System;
+	using System.Text.Json.Serialization;
 	using System.Collections.Generic;
 	using System.Linq;
 	public class Tile
@@ -24,6 +25,9 @@ namespace C7GameData
 		//efficient to perform calculations, whether you need to know which unit on a tile
 		//has the best defense, or which tile a unit is on when viewing the Military Advisor.
 		public List<MapUnit> unitsOnTile = new List<MapUnit>();
+		public string ResourceKey { get; set; }
+		[JsonIgnore]
+		public Resource Resource { get; set; }
 
 		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();
 
@@ -56,9 +60,13 @@ namespace C7GameData
 		
 		public static Tile NONE = new Tile();
 
-		public bool NeighborsCoast() {
+		//This should be used when we want to check if land tiles are next to water tiles.
+		//Usually this is coast, but it could be Sea - see the "Deepwater Harbours" topics at CFC.
+		//Sometimes we care *specifically* about the Coast terrain, e.g. galleys can only move on that terrain, not Sea or Ocean
+		//Those cases should not use this method.
+		public bool NeighborsWater() {
 			foreach (Tile neighbor in getDiagonalNeighbors()) {
-				if (neighbor.baseTerrainType.name == "Coast") {
+				if (neighbor.baseTerrainType.isWater()) {
 					return true;
 				}
 			}
@@ -72,16 +80,21 @@ namespace C7GameData
 
 		public override string ToString()
 		{
-			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.name + " on " + baseTerrainType.name + ")";
+			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.DisplayName + " on " + baseTerrainType.DisplayName + ")";
 		}
 
 		public List<Tile> GetLandNeighbors() {
 			return neighbors.Values.Where(tile => !tile.baseTerrainType.isWater()).ToList();
 		}
 
+		/**
+		 * Returns neighbors of the "Coast" type, not including Sea or Ocean.  This is used e.g. for Galley movement.
+		 * Eventually, this should be refactored into a more general "get valid neighbors to move to" type of method,
+		 * which could work e.g. for units that can move anywhere except desert.
+		 **/
 		public List<Tile> GetCoastNeighbors()
 		{
-			return neighbors.Values.Where(tile => tile.baseTerrainType.name == "Coast").ToList();
+			return neighbors.Values.Where(tile => tile.baseTerrainType.Key == "coast").ToList();
 		}
 
 		public bool IsLand()

@@ -75,7 +75,8 @@ public class Game : Node2D
 			Player = GetNode<KinematicBody2D>("KinematicBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-			mapView.cameraZoom = (float)0.3;
+			mapView.cameraZoom = (float)1.0;
+			mapView.gridLayer.visible = false;
 			// If later recreating scene, the component may already exist, hence try/catch
 			try{
 				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
@@ -93,6 +94,18 @@ public class Game : Node2D
 
 		// Hide slideout bar on startup
 		_on_SlideToggle_toggled(false);
+
+		// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their starting
+		// settler.
+		if (controller.cities.Count > 0) {
+			City capital = controller.cities.Find(c => c.IsCapital());
+			if (capital != null)
+				mapView.centerCameraOnTile(capital.location);
+		} else {
+			MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
+			if (startingSettler != null)
+				mapView.centerCameraOnTile(startingSettler.location);
+		}
 
 		GD.Print("Now in game!");
 
@@ -394,7 +407,7 @@ public class Game : Node2D
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
-						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.name);
+						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.DisplayName);
 						if (tile.unitsOnTile.Count > 0) {
 							foreach (MapUnit unit in tile.unitsOnTile) {
 								GD.Print("  Unit on tile: " + unit);
@@ -457,9 +470,7 @@ public class Game : Node2D
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
 				}
 			}
-			// I key toggles the grid. This should be CTRL+G to match the original game but that key combination gets intercepted by the
-			// unit action handler.
-			else if (eventKey.Scancode == (int)Godot.KeyList.I)
+			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
 			{
 				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
 			}

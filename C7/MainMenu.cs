@@ -10,6 +10,8 @@ public class MainMenu : Node2D
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
 	Util.Civ3FileDialog LoadDialog;
+	Button SetCiv3Home;
+	FileDialog SetCiv3HomeDialog;
 	Util.Civ3FileDialog LoadScenarioDialog;
 	GlobalSingleton Global;
 
@@ -20,7 +22,6 @@ public class MainMenu : Node2D
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		Global.ResetLoadGamePath();
-		DisplayTitleScreen();
 		LoadDialog = new Util.Civ3FileDialog();
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
@@ -28,7 +29,12 @@ public class MainMenu : Node2D
 		LoadScenarioDialog.RelPath = @"Conquests/Scenarios";
 		LoadScenarioDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
+		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
+		SetCiv3HomeDialog = GetNode<FileDialog>("CanvasLayer/SetCiv3HomeDialog");
+		// For some reason this option isn't available in the scene UI
+		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadScenarioDialog);
+		DisplayTitleScreen();
 	}
 	
 	private void DisplayTitleScreen()
@@ -49,10 +55,13 @@ public class MainMenu : Node2D
 			AddButton("Audio Preferences", 405, "Preferences");
 			AddButton("Credits", 440, "showCredits");
 			AddButton("Exit", 475, "_on_Exit_pressed");
+
+			// Hide select home folder if valid path is present as proven by reaching this point in code
+			SetCiv3Home.Visible = false;
 		}
 		catch(Exception ex)
 		{
-			GD.Print("Could not set up the main menu");
+			GD.Print("Could not set up the main menu: ", ex);
 		}
 	}
 
@@ -136,5 +145,15 @@ public class MainMenu : Node2D
 		GD.Print("Loading " + path);
 		Global.LoadGamePath = path;
 		GetTree().ChangeScene("res://C7Game.tscn");
+	}
+	private void _on_SetCiv3Home_pressed()
+	{
+		SetCiv3HomeDialog.Popup_();
+	}
+	private void _on_SetCiv3HomeDialog_dir_selected(string path)
+	{
+		Util.Civ3Root = path;
+		// This function should only be reachable if DisplayTitleScreen failed on previous runs, so should be OK to run here
+		DisplayTitleScreen();
 	}
 }

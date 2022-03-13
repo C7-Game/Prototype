@@ -11,7 +11,7 @@ namespace C7GameData
         public GameMap map {get; set;}
         public List<Player> players = new List<Player>();
         public List<TerrainType> terrainTypes = new List<TerrainType>();
-
+        public List<Resource> Resources = new List<Resource>();
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
         public List<City> cities = new List<City>();
