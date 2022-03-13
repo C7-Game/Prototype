@@ -82,6 +82,8 @@ namespace C7Engine
             //at the same place in the order.  Confirmed this is what Civ3 does.
             UnitInteractions.ClearWaitQueue();
             gameData.turn++;
+
+	    new MsgStartTurn().send();
         }
 
         ///Eventually we'll have a game year or month or whatever, but for now this provides feedback on our progression

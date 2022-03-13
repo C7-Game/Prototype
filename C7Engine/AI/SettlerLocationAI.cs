@@ -123,7 +123,7 @@ namespace C7Engine
 				//TODO: Exclude locations that are too close to another civ.
 				
 				//Lower scores if they are far away
-				int distance = startTile.distanceToOtherTile(t);
+				int distance = startTile.distanceTo(t);
 				if (distance > 4) {
 					score -= distance * 2;
 				}

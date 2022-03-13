@@ -171,10 +171,11 @@ namespace C7GameData
         
 		private void CreateStartingDummyUnits(Player player, Tile location)
 		{
-			CreateDummyUnit(unitPrototypes["Settler"], player, location);
-			CreateDummyUnit(unitPrototypes["Warrior"], player, location);
-			CreateDummyUnit(unitPrototypes["Worker"],  player, location);
-			CreateDummyUnit(unitPrototypes["Chariot"], player, location);
+			CreateDummyUnit(unitPrototypes["Settler"],  player, location);
+			CreateDummyUnit(unitPrototypes["Warrior"],  player, location);
+			CreateDummyUnit(unitPrototypes["Worker"],   player, location);
+			CreateDummyUnit(unitPrototypes["Chariot"],  player, location);
+			CreateDummyUnit(unitPrototypes["Catapult"], player, location);
 		}
 
 		private MapUnit CreateDummyUnit(UnitPrototype proto, Player owner, Tile tile)
@@ -197,16 +198,18 @@ namespace C7GameData
 			} else
 				throw new System.Exception("Tried to add dummy unit at Tile.NONE");
 		}
-        private void CreateDefaultUnitPrototypes()
-        {
+
+		private void CreateDefaultUnitPrototypes()
+		{
 			unitPrototypes = new Dictionary<string, UnitPrototype>()
 			{
-				{ "Warrior", new UnitPrototype { name = "Warrior", attack = 1, defense = 1, movement = 1, iconIndex =  6, shieldCost = 10 }},
-				{ "Settler", new UnitPrototype { name = "Settler", attack = 0, defense = 0, movement = 1, iconIndex =  0, shieldCost = 30, populationCost = 2 }},
-				{ "Worker",  new UnitPrototype { name = "Worker",  attack = 0, defense = 0, movement = 1, iconIndex =  1, shieldCost = 30, populationCost = 1 }},
-				{ "Chariot", new UnitPrototype { name = "Chariot", attack = 1, defense = 1, movement = 2, iconIndex = 10, shieldCost = 20 }},
-				{ "Galley",  new SeaUnit       { name = "Galley",  attack = 1, defense = 1, movement = 3, iconIndex = 29, shieldCost = 30 }},
+				{ "Warrior",  new UnitPrototype { name = "Warrior",  attack = 1, defense = 1, bombard = 0, movement = 1, iconIndex =  6, shieldCost = 10 }},
+				{ "Settler",  new UnitPrototype { name = "Settler",  attack = 0, defense = 0, bombard = 0, movement = 1, iconIndex =  0, shieldCost = 30, populationCost = 2 }},
+				{ "Worker",   new UnitPrototype { name = "Worker",   attack = 0, defense = 0, bombard = 0, movement = 1, iconIndex =  1, shieldCost = 30, populationCost = 1 }},
+				{ "Chariot",  new UnitPrototype { name = "Chariot",  attack = 1, defense = 1, bombard = 0, movement = 2, iconIndex = 10, shieldCost = 20 }},
+				{ "Galley",   new SeaUnit       { name = "Galley",   attack = 1, defense = 1, bombard = 0, movement = 3, iconIndex = 29, shieldCost = 30 }},
+				{ "Catapult", new UnitPrototype { name = "Catapult", attack = 0, defense = 0, bombard = 4, movement = 1, iconIndex = 22, shieldCost = 20 }},
 			};
-        }
+		}
     }
 }

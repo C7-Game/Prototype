@@ -31,8 +31,7 @@ namespace C7Engine
 					}
 					else if (unit.location == settlerAi.destination) {
 						Console.WriteLine("Building city with " + unit);
-						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
-						UnitInteractions.disbandUnit(unit.guid);
+						unit.buildCity(unit.owner.GetNextCityName());
 					}
 					else {
 						if (settlerAi.pathToDestination == null) {
@@ -41,15 +40,13 @@ namespace C7Engine
 						}
 						Tile nextTile = settlerAi.pathToDestination.Next();
 						Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
-						unit.location.unitsOnTile.Remove(unit);
-						nextTile.unitsOnTile.Add(unit);
-						unit.location = nextTile;
+						unit.move(unit.location.directionTo(nextTile));
 					}
 				}
 				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
 					if (defenderAI.destination == unit.location) {
 						if (!unit.isFortified) {
-							UnitInteractions.fortifyUnit(unit.guid);
+							unit.fortify();
 							Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
 						}
 					}
@@ -69,9 +66,7 @@ namespace C7Engine
 					//if it tries to move e.g. north from the north pole.  Hence, this check.
 					if (newLocation != Tile.NONE) {
 						// Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
-						unit.location.unitsOnTile.Remove(unit);
-						newLocation.unitsOnTile.Add(unit);
-						unit.location = newLocation;
+						unit.move(unit.location.directionTo(newLocation));
 					}
 				}
 			}
