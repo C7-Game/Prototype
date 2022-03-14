@@ -46,7 +46,7 @@ public class Player
 		}
 		int suffix = (bonusLoops / 2) + 1;
 		if (suffix > 1) {
-			name = name + suffix; //e.g. for bonusLoops = 2, we'll have "Athens 2"
+			name = name + " " + suffix; //e.g. for bonusLoops = 2, we'll have "Athens 2"
 		}
 		cityNameIndex++;
 		return name;
