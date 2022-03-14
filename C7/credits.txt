@@ -1,0 +1,29 @@
+C7 0.1 "Babylon"
+c7-game.github.io
+
+An open source project by the
+Civilization modding community
+
+Made with Godot Engine
+godotengine.org/license
+
+Developers
+
+Caro-Kann
+Flintlock / maxpetul
+JimOfLeisure
+Lanzelot
+pcen
+Quintillus
+steviek
+WildWeazel
+
+Co-conspirators
+
+Blue Monkey
+Civinator
+Ozymandias
+Vuldacon
+
+C7 is not affiliated with civfanatics.com,
+Firaxis Games, or Take-Two Interactive Software.
