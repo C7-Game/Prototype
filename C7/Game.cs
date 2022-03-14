@@ -22,12 +22,19 @@ public class Game : Node2D
 	Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
-	public Civ3UnitAnim civ3UnitAnim;
+	public Civ3AnimData civ3AnimData;
 	public AnimationTracker animTracker;
 
 	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
+
+	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
 	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
+
+	// Normally if the currently selected unit (CSU) becomes fortified, we advance to the next autoselected unit. If this flag is set, we won't do
+	// that. This is useful so that the unit autoselector can be prevented from interfering with the player selecting fortified units.
+	public bool KeepCSUWhenFortified = false;
+
 	Control Toolbar;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
@@ -48,27 +55,28 @@ public class Game : Node2D
 	{
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
+			var animSoundPlayer = new AudioStreamPlayer();
+			AddChild(animSoundPlayer);
+			civ3AnimData = new Civ3AnimData(animSoundPlayer);
+			animTracker = new AnimationTracker(civ3AnimData);
+			EngineStorage.initialize(); // Spawns engine thread
+
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
 			Global.ResetLoadGamePath();
-			var map = MapInteractions.GetWholeMap();
-			GD.Print("RelativeModPath ", map.RelativeModPath);
-			Civ3Map baseTerrainMap = new Civ3Map(map.numTilesWide, map.numTilesTall, map.RelativeModPath);
-			baseTerrainMap.Civ3Tiles = map.tiles;
-			baseTerrainMap.TerrainAsTileMap();
 
-			mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
-			AddChild(mapView);
-			var unitAnimSoundPlayer = new AudioStreamPlayer();
-			AddChild(unitAnimSoundPlayer);
-			civ3UnitAnim = new Civ3UnitAnim(unitAnimSoundPlayer);
-			animTracker = new AnimationTracker(civ3UnitAnim);
-			EngineStorage.animTracker = animTracker;
+			using (var gameDataAccess = new UIGameDataAccess()) {
+				GameMap map = gameDataAccess.gameData.map;
+				GD.Print("RelativeModPath ", map.RelativeModPath);
+				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
+				AddChild(mapView);
+			}
 
 			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 			Player = GetNode<KinematicBody2D>("KinematicBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-			mapView.cameraZoom = (float)0.3;
+			mapView.cameraZoom = (float)1.0;
+			mapView.gridLayer.visible = false;
 			// If later recreating scene, the component may already exist, hence try/catch
 			try{
 				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
@@ -87,6 +95,18 @@ public class Game : Node2D
 		// Hide slideout bar on startup
 		_on_SlideToggle_toggled(false);
 
+		// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their starting
+		// settler.
+		if (controller.cities.Count > 0) {
+			City capital = controller.cities.Find(c => c.IsCapital());
+			if (capital != null)
+				mapView.centerCameraOnTile(capital.location);
+		} else {
+			MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
+			if (startingSettler != null)
+				mapView.centerCameraOnTile(startingSettler.location);
+		}
+
 		GD.Print("Now in game!");
 
 		loadTimer.Stop();
@@ -94,34 +114,86 @@ public class Game : Node2D
 		GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 	}
 
+	// Must only be called while holding the game data mutex
+	public void processEngineMessages(GameData gameData)
+	{
+		MessageToUI msg;
+		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
+			switch (msg) {
+			case MsgStartUnitAnimation mSUA:
+				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSUA.unitGUID);
+				if (unit != null) {
+					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
+					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
+					// animations should be shown to the player.
+					if (mSUA.action == MapUnit.AnimatedAction.ATTACK1)
+						ensureLocationIsInView(unit.location);
+
+					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent);
+				}
+				break;
+			case MsgStartEffectAnimation mSEA:
+				int x, y;
+				gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
+				Tile tile = gameData.map.tileAt(x, y);
+				if (tile != Tile.NONE)
+					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent);
+				break;
+			case MsgStartTurn mST:
+				//Simulating processing so the turn doesn't end too quickly
+				ComputerSimulateTurn();
+				GD.Print("Thinking...");
+				break;
+			}
+		}
+	}
+
+	// Instead of Game calling animTracker.update periodically (this used to happen in _Process), this method gets called as necessary to bring
+	// the animations up to date. Right now it's called from UnitLayer right before it draws the units on the map. This method also processes all
+	// waiting messages b/c some of them might pertain to animations. TODO: Consider processing only the animation messages here.
+	// Must only be called while holding the game data mutex
+	public void updateAnimations(GameData gameData)
+	{
+		processEngineMessages(gameData);
+		animTracker.update();
+	}
+
 	public override void _Process(float delta)
 	{
-		if (!errorOnLoad) {
-			switch (CurrentState)
-			{
+		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			GameData gameData = gameDataAccess.gameData;
+
+			processEngineMessages(gameData);
+
+			if (!errorOnLoad) {
+				switch (CurrentState)
+				{
 				case GameState.PreGame:
 					StartGame();
 					break;
 				case GameState.PlayerTurn:
-					animTracker.update();
+					// If the selected unit is unfortified, prepare to autoselect the next one if it becomes fortified
+					if ((CurrentlySelectedUnit != MapUnit.NONE) && (! CurrentlySelectedUnit.isFortified))
+						KeepCSUWhenFortified = false;
 
-					// Check if we're triggered to advance to the next autoselected unit by an animation completing.
-					// TODO: Since this is run every frame we could delete our other references to getNextAutoselectedUnit except maybe in
-					// cases where the unit is killed (or add that as a condition below). Though this is likely temporary anyway.
+					// Advance off the currently selected unit to the next one if it's out of moves or HP and not playing an
+					// animation we want to watch, or if it's fortified and we aren't set to keep fortified units selected.
 					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-						(CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-						(! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
-						GetNextAutoselectedUnit();
+						(((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
+						  ! animTracker.getUnitAppearance(CurrentlySelectedUnit).DeservesPlayerAttention()) ||
+						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
+						GetNextAutoselectedUnit(gameData);
 					break;
 				case GameState.ComputerTurn:
-					animTracker.update();
 					break;
-			}
-			//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
-			//without a manual cast to int.
-			//https://github.com/godotengine/godot/issues/16388
-			if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
-				EmitSignal("ShowSpecificAdvisor", "F1");
+				}
+				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
+				//without a manual cast to int.
+				//https://github.com/godotengine/godot/issues/16388
+				if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+					EmitSignal("ShowSpecificAdvisor", "F1");
+				}
 			}
 		}
 	}
@@ -154,6 +226,16 @@ public class Game : Node2D
 		return tr;
 	}
 
+	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
+	public void ensureLocationIsInView(Tile location)
+	{
+		if (location != Tile.NONE) {
+			var relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
+			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
+				mapView.centerCameraOnTile(location);
+		}
+	}
+
 	/**
 	 * Currently (11/14/2021), all unit selection goes through here.
 	 * Both code paths are in Game.cs for now, so it's local, but we may
@@ -162,14 +244,10 @@ public class Game : Node2D
 	public void setSelectedUnit(MapUnit unit)
 	{
 		this.CurrentlySelectedUnit = unit;
+		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 
-		// If the newly selected unit's tile is not close to the center of the screen, then move the camera to it. Otherwise just trigger a
-		// redraw (not necessary in the first case since moving the map triggers a redraw automatically).
-		if (unit != MapUnit.NONE) {
-			var relativeScreenLocation = mapView.screenLocationOfTile(unit.location, true) / mapView.getVisibleAreaSize();
-			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
-				mapView.centerCameraOnTile(unit.location);
-		}
+		if (unit != MapUnit.NONE)
+			ensureLocationIsInView(unit.location);
 
 		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {
@@ -200,7 +278,9 @@ public class Game : Node2D
 		EmitSignal(nameof(TurnStarted), turnNumber);
 		CurrentState = GameState.PlayerTurn;
 
-		GetNextAutoselectedUnit();
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			GetNextAutoselectedUnit(gameDataAccess.gameData);
+		}
 	}
 
 	private void OnPlayerEndTurn()
@@ -218,10 +298,7 @@ public class Game : Node2D
 		GD.Print("Starting computer turn");
 		CurrentState = GameState.ComputerTurn;
 		//Actual backend processing
-		TurnHandling.EndTurn();
-		//Simulating processing so the turn doesn't end too quickly
-		ComputerSimulateTurn();
-		GD.Print("Thinking...");
+		new MsgEndTurn().send();
 	}
 
 	public async void ComputerSimulateTurn()
@@ -297,12 +374,14 @@ public class Game : Node2D
 				if(eventMouseButton.IsPressed())
 				{
 					// Select unit on tile at mouse location
-					var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
-					if (tile != null) {
-						MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
-						//TODO: Better check for "current/human player"
-						if (to_select != null && to_select.owner.color == 0x4040FFFF)
-							setSelectedUnit(to_select);
+					using (var gameDataAccess = new UIGameDataAccess()) {
+						var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+						if (tile != null) {
+							MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+							//TODO: Better check for "current/human player"
+							if (to_select != null && to_select.owner.color == 0x4040FFFF)
+								setSelectedUnit(to_select);
+						}
 					}
 
 					OldPosition = eventMouseButton.Position;
@@ -325,17 +404,19 @@ public class Game : Node2D
 			}
 			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (! eventMouseButton.IsPressed()))
 			{
-				var tile = mapView.tileOnScreenAt(eventMouseButton.Position);
-				if (tile != null) {
-					GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.name);
-					if (tile.unitsOnTile.Count > 0) {
-						foreach (MapUnit unit in tile.unitsOnTile) {
-							GD.Print("  Unit on tile: " + unit);
-							GD.Print("  Strategy: " + unit.currentAIBehavior);
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+					if (tile != null) {
+						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.DisplayName);
+						if (tile.unitsOnTile.Count > 0) {
+							foreach (MapUnit unit in tile.unitsOnTile) {
+								GD.Print("  Unit on tile: " + unit);
+								GD.Print("  Strategy: " + unit.currentAIBehavior);
+							}
 						}
-					}
-				} else
-					GD.Print("Didn't click on any tile");
+					} else
+						GD.Print("Didn't click on any tile");
+				}
 			}
 		}
 		else if(@event is InputEventMouseMotion eventMouseMotion)
@@ -387,17 +468,9 @@ public class Game : Node2D
 					default: return; // Impossible
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
-					if ((CurrentlySelectedUnit.movementPointsRemaining <= 0) &&
-						(! animTracker.getActiveAnimation(CurrentlySelectedUnit).keepUnitSelected()))
-						GetNextAutoselectedUnit();
-					else {
-						setSelectedUnit(CurrentlySelectedUnit);
-					}
 				}
 			}
-			// I key toggles the grid. This should be CTRL+G to match the original game but that key combination gets intercepted by the
-			// unit action handler.
-			else if (eventKey.Scancode == (int)Godot.KeyList.I)
+			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
 			{
 				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
 			}
@@ -434,12 +507,11 @@ public class Game : Node2D
 			// Update the UI slider
 			slider.Value = newScale;
 		}
-
 	}
 
-	private void GetNextAutoselectedUnit()
+	private void GetNextAutoselectedUnit(GameData gameData)
 	{
-		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit());
+		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit(gameData));
 	}
 
 	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
@@ -453,17 +525,17 @@ public class Game : Node2D
 		if (buttonName.Equals("hold"))
 		{
 			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit();
 		}
 		else if (buttonName.Equals("fortify"))
 		{
 			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit(); // This skips the animation but if we don't do this the unit will stay selected
 		}
 		else if (buttonName.Equals("wait"))
 		{
-			UnitInteractions.waitUnit(CurrentlySelectedUnit.guid);
-			GetNextAutoselectedUnit();
+			using (var gameDataAccess = new UIGameDataAccess()) {
+				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+				GetNextAutoselectedUnit(gameDataAccess.gameData);
+			}
 		}
 		else if (buttonName.Equals("disband"))
 		{
@@ -472,14 +544,8 @@ public class Game : Node2D
 		}
 		else if (buttonName.Equals("buildCity"))
 		{
-			animTracker.startAnimation(
-				CurrentlySelectedUnit,
-				MapUnit.AnimatedAction.BUILD,
-				(unitGUID, action) => {
-					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
-					return false;
-				});
+			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+			popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
 		}
 		else
 		{
@@ -500,12 +566,12 @@ public class Game : Node2D
 		}
 	}
 	
+	// Called by the disband popup
 	private void OnUnitDisbanded()
 	{
 		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
-		GetNextAutoselectedUnit();
 	}
-	
+
 	/**
 	 * User quit.  We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
 	 **/
@@ -517,15 +583,6 @@ public class Game : Node2D
 	
 	private void OnBuildCity(string name)
 	{
-		GD.Print("The user decided to build the city of " + name);
-		Tile theTile = this.CurrentlySelectedUnit.location;
-		CityInteractions.BuildCity(theTile.xCoordinate, theTile.yCoordinate, controller.guid, name);
-
-		//Also dismantle the unit.  For now, I am considering that equivalent to
-		//disbanding.  Whether that makes sense long term, is debatable.
-		//I am only calling the UnitInteractions behavior (rather than OnUnitDisbanded),
-		//however, since the one here will likely play a sound someday.
-		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
-		GetNextAutoselectedUnit();
+		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();
 	}
 }

@@ -7,14 +7,18 @@ using ConvertCiv3Media;
 
 public class Util
 {
+	static public string Civ3Root = GetCiv3Path();
 	public class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 	// While instantiated it will return to the last-accessed folder when reopened
 	{
 		public string RelPath= "";
+		public Civ3FileDialog(FileDialog.ModeEnum mode = FileDialog.ModeEnum.OpenFile)
+		{
+			Mode = mode;
+		}
 		public override void _Ready()
 		{
-			Mode = ModeEnum.OpenFile;
 			Access = AccessEnum.Filesystem;
 			CurrentDir = Util.GetCiv3Path() + "/" + RelPath;
 			Resizable = true;
@@ -31,17 +35,18 @@ public class Util
 		if (path != null) return path;
 
 		// Look up in Windows registry if present
-		path = Civ3PathFromRegistry("");
-		if (path != "") return path;
+		path = Civ3PathFromRegistry();
+		if (path != null) return path;
 
 		// TODO: Maybe check an array of hard-coded paths during dev time?
 		return "/civ3/path/not/found";
 	}
 
-	static public string Civ3PathFromRegistry(string defaultPath = "D:/Civilization III")
+	static public string Civ3PathFromRegistry()
 	{
 		// Assuming 64-bit platform, get vanilla Civ3 install folder from registry
-		return (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", defaultPath);
+		// Return null if value not present or if key not found
+		return (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", null);
 	}
 
 	// Checks if a file exists ignoring case on the latter parts of its path. If the file is found, returns its full path re-capitalized as
@@ -83,7 +88,6 @@ public class Util
 	// Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
 	// Assumes Conquests/Complete
 	{
-		string Civ3Root = GetCiv3Path();
 		string [] TryPaths = new string [] {
 			relModPath,
 			// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios

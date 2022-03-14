@@ -30,7 +30,7 @@ namespace C7Engine
 				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
 					if (defenderAI.destination == unit.location) {
 						if (!unit.isFortified) {
-							UnitInteractions.fortifyUnit(unit.guid);
+							unit.fortify();
 							Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
 						}
 					}
@@ -54,9 +54,7 @@ namespace C7Engine
 					//if it tries to move e.g. north from the north pole.  Hence, this check.
 					if (newLocation != Tile.NONE) {
 						// Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
-						unit.location.unitsOnTile.Remove(unit);
-						newLocation.unitsOnTile.Add(unit);
-						unit.location = newLocation;
+						unit.move(unit.location.directionTo(newLocation));
 					}
 				}
 			}

@@ -134,6 +134,11 @@ namespace QueryCiv3.Biq
 
         public bool UpgradeUnit             { get => Util.GetFlag(Flags3[5], 0); }
         public bool Capture                 { get => Util.GetFlag(Flags3[5], 1); }
+        //Four unused bits
+        public bool Telepad                 { get => Util.GetFlag(Flags3[5], 6); }
+        public bool Teleportable            { get => Util.GetFlag(Flags3[5], 7); }
+        public bool StealthAttack           { get => Util.GetFlag(Flags3[6], 0); }
+        public bool Charm                   { get => Util.GetFlag(Flags3[6], 1); }
 
         public bool BuildColony             { get => Util.GetFlag(Flags3[8], 0); }
         public bool BuildCity               { get => Util.GetFlag(Flags3[8], 1); }

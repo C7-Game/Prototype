@@ -80,7 +80,7 @@ namespace C7Engine
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
 			foreach (Tile t in candidates) {
 				//TODO: Look at whether we can place cities here.  Hard-coded for now.
-				if (t.overlayTerrainType.name == "Mountains") {
+				if (t.overlayTerrainType.Key == "mountains") {
 					scores[t] = 0;
 					continue;
 				}
@@ -115,16 +115,16 @@ namespace C7Engine
 				//TODO: Also look at the next ring out, with lower weights.
 
 				//Prefer hills for defense, and coast for boats and such.
-				if (t.baseTerrainType.name == "Hills") {
+				if (t.baseTerrainType.Key == "hills") {
 					score += 10;
 				}
-				if (t.NeighborsCoast()) {
+				if (t.NeighborsWater()) {
 					score += 10;
 				}
 				//TODO: Exclude locations that are too close to another civ.
 				
 				//Lower scores if they are far away
-				int distance = startTile.distanceToOtherTile(t);
+				int distance = startTile.distanceTo(t);
 				if (distance > 4) {
 					score -= distance * 2;
 				}
