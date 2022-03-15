@@ -2,13 +2,21 @@ using Godot;
 
 public class Credits : Node2D
 {
-	private string creditsText;
+	private string creditsText = "Could not load credits file";
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		GD.Print("Now rolling the credits!");
-		creditsText = System.IO.File.ReadAllText("./credits.txt");
+		try
+		{
+			creditsText = System.IO.File.ReadAllText("./credits.txt");
+		}
+		catch(System.Exception ex)
+		{
+			GD.PrintErr("Failed to read from credits.txt!");
+			GD.PushError(ex.ToString());
+		}
 		ShowCredits();
 	}
 
