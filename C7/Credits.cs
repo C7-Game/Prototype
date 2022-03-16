@@ -29,11 +29,11 @@ public class Credits : Node2D
 		CreditsBackground.Texture = CreditsTexture;
 		AddChild(CreditsBackground);
 
-		Label creditsLabel = new Label();
-		creditsLabel.Text = creditsText;
-		creditsLabel.Align = Label.AlignEnum.Center;
+		RichTextLabel creditsLabel = new RichTextLabel();
 		creditsLabel.RectPosition = new Vector2(80, 120);
 		creditsLabel.RectSize = new Vector2(864, 528);
+		creditsLabel.BbcodeEnabled = true;
+		creditsLabel.BbcodeText = creditsText;
 		AddChild(creditsLabel);
 		
 		TextureButton GoBackButton = new TextureButton();
