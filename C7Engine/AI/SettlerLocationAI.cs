@@ -24,14 +24,15 @@ namespace C7Engine
 
 			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
 			//Debugging: Print out scores
+			Console.WriteLine("Top city location candidates from " + start + ":");
 			Tile returnValue = null;
-			foreach (KeyValuePair<Tile, int> kvp in orderedScores)
+			foreach (KeyValuePair<Tile, int> kvp in orderedScores.Take(5))
 			{
 				if (returnValue == null) {
 					returnValue = kvp.Key;
 				}
 				if (kvp.Value > 0) {
-					Console.WriteLine("Tile " + kvp.Key + " scored " + kvp.Value);
+					Console.WriteLine("  Tile " + kvp.Key + " scored " + kvp.Value);
 				}
 			}
 			return returnValue;
@@ -89,7 +90,7 @@ namespace C7Engine
 				}
 				foreach (MapUnit otherSettler in playerSettlers)
 				{
-					if (otherSettler.currentAIBehavior is SettlerAI otherSettlerAI) {
+					if (otherSettler.currentAIBehavior is SettlerAIData otherSettlerAI) {
 						if (otherSettlerAI.destination == t) {
 							scores[t] = 0;
 							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.
@@ -123,7 +124,7 @@ namespace C7Engine
 				//TODO: Exclude locations that are too close to another civ.
 				
 				//Lower scores if they are far away
-				int distance = startTile.distanceToOtherTile(t);
+				int distance = startTile.distanceTo(t);
 				if (distance > 4) {
 					score -= distance * 2;
 				}

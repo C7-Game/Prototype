@@ -16,7 +16,7 @@ namespace C7GameData.AIData
 	 * I'm also unsure of how much the logic of figuring out what to do should be in these
 	 * classes, versus higher-level ones.
 	 */
-	public class SettlerAI : UnitAI
+	public class SettlerAIData : UnitAI
 	{
 		public enum SettlerGoal
 		{

@@ -31,6 +31,15 @@ namespace C7GameData
         {
             string json = File.ReadAllText(path);
             C7SaveFormat save = JsonSerializer.Deserialize<C7SaveFormat>(json, JsonOptions);
+            //Inflate things that are stored by reference
+            foreach (Tile tile in save.GameData.map.tiles) {
+                if (tile.ResourceKey == "NONE") {
+                    tile.Resource = Resource.NONE;
+                }
+                else {
+                    tile.Resource = save.GameData.Resources.Find(r => r.Key == tile.ResourceKey);
+                }
+            }
             return save;
         }
         public static void Save(C7SaveFormat save, string path)

@@ -2,6 +2,7 @@ namespace C7GameData
 {
 	public class Resource
 	{
+		public string Key { get; set;}
 		public int Index { get; set; }	//used so we can wire up tiles to resources later
 		public int Icon { get; set; }
 		public int FoodBonus { get; set; }
@@ -16,9 +17,14 @@ namespace C7GameData
 
 		public static readonly Resource NONE = new Resource
 		{
+			Key = "NONE",
 			Index = -1,
 			Category = ResourceCategory.NONE
 		};
+
+		public override string ToString() {
+			return $"Resource {Index} named {Name} of type {Category} with bonuses {FoodBonus}, {ShieldsBonus}, {CommerceBonus}";
+		}
 	}
 
 	public enum ResourceCategory

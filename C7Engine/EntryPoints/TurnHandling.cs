@@ -11,6 +11,7 @@ namespace C7Engine
         public static void EndTurn()
         {
             GameData gameData = EngineStorage.gameData;
+            Console.WriteLine("\n*** Processing turn " + gameData.turn + " ***");
             //Barbarians.  First, generate new barbarian units.
             foreach (Tile tile in gameData.map.barbarianCamps)
             {
@@ -82,6 +83,8 @@ namespace C7Engine
             //at the same place in the order.  Confirmed this is what Civ3 does.
             UnitInteractions.ClearWaitQueue();
             gameData.turn++;
+
+	    new MsgStartTurn().send();
         }
 
         ///Eventually we'll have a game year or month or whatever, but for now this provides feedback on our progression

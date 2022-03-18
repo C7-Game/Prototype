@@ -15,7 +15,7 @@ namespace C7.Map
 			resourceTexture = Util.LoadTextureFromPCX("Art/resources.pcx");
 			maxRow = (resourceTexture.GetHeight() / 50) - 1;
 		}
-		public override void drawObject(LooseView looseView, Tile tile, Vector2 tileCenter)
+		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 		{
 			Resource resource = tile.Resource;
 			if (resource != Resource.NONE) {

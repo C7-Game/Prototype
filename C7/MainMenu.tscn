@@ -61,3 +61,28 @@ anchor_bottom = 1.0
 theme = ExtResource( 4 )
 expand = true
 stretch_mode = 1
+
+[node name="SetCiv3Home" type="Button" parent="CanvasLayer"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -84.5
+margin_top = -93.7225
+margin_right = 84.5
+margin_bottom = -73.7225
+text = "Select Civ3 Home Folder"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SetCiv3HomeDialog" type="FileDialog" parent="CanvasLayer"]
+margin_right = 550.0
+margin_bottom = 750.0
+window_title = "Open a File or Directory"
+resizable = true
+mode = 3
+access = 2
+
+[connection signal="pressed" from="CanvasLayer/SetCiv3Home" to="." method="_on_SetCiv3Home_pressed"]
+[connection signal="dir_selected" from="CanvasLayer/SetCiv3HomeDialog" to="." method="_on_SetCiv3HomeDialog_dir_selected"]

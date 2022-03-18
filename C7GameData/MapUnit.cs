@@ -48,6 +48,23 @@ public class MapUnit
 		}
 	}
 
+	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
+	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
+	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
+	// priority. Otherwise it's just whoever is stronger on defense.
+	public bool HasPriorityAsDefender(MapUnit otherDefender, MapUnit opponent)
+	{
+		Player opponentPlayer = opponent.owner;
+		bool weAreEnemy           = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(this.owner)          : false;
+		bool otherDefenderIsEnemy = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(otherDefender.owner) : false;
+		if (weAreEnemy && ! otherDefenderIsEnemy)
+			return true;
+		else if (otherDefenderIsEnemy && ! weAreEnemy)
+			return false;
+		else
+			return (unitType.defense * hitPointsRemaining) > (otherDefender.unitType.defense * otherDefender.hitPointsRemaining);
+	}
+
 	// TODO: The contents of this enum are copy-pasted from UnitAction in Civ3UnitSprite.cs. We should unify these so we don't have two different
 	// but virtually identical enums.
 	public enum AnimatedAction {
@@ -78,7 +95,7 @@ public class MapUnit
 		PLANT
 	}
 
-	public struct ActiveAnimation {
+	public struct Appearance {
 		public AnimatedAction action;
 		public TileDirection direction;
 		public float progress; // Varies 0 to 1
@@ -86,7 +103,7 @@ public class MapUnit
 
 		// When true, indicates that the animation is still playing (f.e. a unit is still running between tiles) so the UI shouldn't yet
 		// autoselect another unit.
-		public bool keepUnitSelected()
+		public bool DeservesPlayerAttention()
 		{
 			// TODO: Special rules for different animations. We don't need to see workers do their thing but we do want to watch units
 			// move. IMO we should also not show units fortifying even though I know the original game does.
