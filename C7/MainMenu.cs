@@ -53,6 +53,8 @@ public class MainMenu : Node2D
 		catch(Exception ex)
 		{
 			GD.Print("Could not set up the main menu");
+			GetNode<Label>("CanvasLayer/Label").Visible = true;
+			GetNode<ColorRect>("CanvasLayer/ColorRect").Visible = true;
 		}
 	}
 
