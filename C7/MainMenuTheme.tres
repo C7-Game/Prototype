@@ -16,7 +16,7 @@ expand_margin_top = 3.0
 expand_margin_bottom = 3.0
 
 [resource]
-Button/colors/font_color = Color( 0.878431, 0.878431, 0.878431, 1 )
+Button/colors/font_color = Color( 0.1, 0.1, 0.1, 1 )
 Button/colors/font_color_focus = Color( 0, 0.45098, 0.741176, 1 )
 Button/colors/font_color_hover = Color( 0.709804, 0.352941, 0, 1 )
 Button/colors/font_color_pressed = Color( 0, 0.45098, 0.741176, 1 )

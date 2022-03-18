@@ -74,14 +74,14 @@ public class MainMenu : Node2D
 		TextureButton newButton = new TextureButton();
 		newButton.TextureNormal = InactiveButton;
 		newButton.TextureHover = HoverButton;
-		newButton.SetPosition(new Vector2(835, verticalPosition));
+		newButton.SetPosition(new Vector2(40, verticalPosition));
 		MainMenuBackground.AddChild(newButton);
 		newButton.Connect("pressed", this, actionName);
 				
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
 
-		newButtonLabel.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
+		newButtonLabel.SetPosition(new Vector2(65, verticalPosition + BUTTON_LABEL_OFFSET));
 		MainMenuBackground.AddChild(newButtonLabel);
 		newButtonLabel.Connect("pressed", this, actionName);
 	}
