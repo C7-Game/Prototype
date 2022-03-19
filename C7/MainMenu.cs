@@ -61,14 +61,20 @@ public class MainMenu : Node2D
 		}
 		catch(Exception ex)
 		{
-			GD.Print("Could not set up the main menu: ", ex);
+			GD.Print("Could not set up the main menu", ex);
+			GetNode<Label>("CanvasLayer/Label").Visible = true;
+			GetNode<ColorRect>("CanvasLayer/ColorRect").Visible = true;
 		}
 	}
 
 	private void SetMainMenuBackground()
 	{
 		ImageTexture TitleScreenTexture = Util.LoadTextureFromPCX("Art/title.pcx");
-		MainMenuBackground = GetNode<TextureRect>("CanvasLayer/CenterContainer/MainMenuBackground");
+		Image backgroundImage = new Image();
+		backgroundImage.Load("res://Title_Screen.jpg");
+		TitleScreenTexture.CreateFromImage(backgroundImage);
+		MainMenuBackground = GetNode<TextureRect>("CanvasLayer/MainMenuBackground");
+		MainMenuBackground.StretchMode = TextureRect.StretchModeEnum.Scale;
 		MainMenuBackground.Texture = TitleScreenTexture;
 	}
 
@@ -77,14 +83,14 @@ public class MainMenu : Node2D
 		TextureButton newButton = new TextureButton();
 		newButton.TextureNormal = InactiveButton;
 		newButton.TextureHover = HoverButton;
-		newButton.SetPosition(new Vector2(835, verticalPosition));
+		newButton.SetPosition(new Vector2(40, verticalPosition));
 		MainMenuBackground.AddChild(newButton);
 		newButton.Connect("pressed", this, actionName);
 				
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
 
-		newButtonLabel.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
+		newButtonLabel.SetPosition(new Vector2(65, verticalPosition + BUTTON_LABEL_OFFSET));
 		MainMenuBackground.AddChild(newButtonLabel);
 		newButtonLabel.Connect("pressed", this, actionName);
 	}
