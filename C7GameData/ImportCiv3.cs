@@ -30,8 +30,8 @@ namespace C7GameData
 
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
-			SetMapDimensions(civ3Save, theBiq, c7Save);
-			SetWorldWrap(theBiq, c7Save);
+			SetMapDimensions(civ3Save, c7Save);
+			SetWorldWrap(civ3Save, c7Save);
 
 			// Import tiles.  This is similar to, but different from the BIQ version as tile contents may have changed in-game.
 			int i = 0;
@@ -85,7 +85,7 @@ namespace C7GameData
 			
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
-			SetMapDimensions(null, theBiq, c7Save);
+			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);
 
 			// Import tiles
@@ -187,22 +187,40 @@ namespace C7GameData
 			}
 		}
 
+		private static void SetWorldWrap(SavData civ3Save, C7SaveFormat c7Save)
+		{
+			if (civ3Save != null && civ3Save.Wrld.Height > 0 && civ3Save.Wrld.Width > 0)
+			{
+				c7Save.GameData.map.wrapHorizontally = civ3Save.Wrld.XWrapping;
+				c7Save.GameData.map.wrapVertically = civ3Save.Wrld.YWrapping;
+			}
+		}
+
 		private static void SetWorldWrap(BiqData biq, C7SaveFormat c7Save)
         {
-			c7Save.GameData.map.wrapHorizontally = biq.Wmap[0].XWrapping;
-			c7Save.GameData.map.wrapVertically = biq.Wmap[0].YWrapping;
-        }
 
-		private static void SetMapDimensions(SavData civ3Save, BiqData biq, C7SaveFormat c7Save)
-		{
-			if (biq != null && biq.Wmap != null && biq.Wmap.Length > 0) {
-				c7Save.GameData.map.numTilesTall = biq.Wmap[0].Height;
-				c7Save.GameData.map.numTilesWide = biq.Wmap[0].Width;
+			if (biq != null && biq.Wmap != null && biq.Wmap.Length > 0)
+			{
+				c7Save.GameData.map.wrapHorizontally = biq.Wmap[0].XWrapping;
+				c7Save.GameData.map.wrapVertically = biq.Wmap[0].YWrapping;
 			}
+		}
+
+		private static void SetMapDimensions(SavData civ3Save, C7SaveFormat c7Save)
+		{
 			if (civ3Save != null && civ3Save.Wrld.Height > 0 && civ3Save.Wrld.Width > 0) {
 				c7Save.GameData.map.numTilesTall = civ3Save.Wrld.Height;
 				c7Save.GameData.map.numTilesWide = civ3Save.Wrld.Width;
 			}
 		}
-    }
+
+		private static void SetMapDimensions(BiqData biq, C7SaveFormat c7Save)
+		{
+			if (biq != null && biq.Wmap != null && biq.Wmap.Length > 0)
+			{
+				c7Save.GameData.map.numTilesTall = biq.Wmap[0].Height;
+				c7Save.GameData.map.numTilesWide = biq.Wmap[0].Width;
+			}
+		}
+	}
 }

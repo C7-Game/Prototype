@@ -51,6 +51,8 @@ public class Game : Node2D
 	}
 	
 	// Called when the node enters the scene tree for the first time.
+	// The catch should always catch any error, as it's the general catch
+	// that gives an error if we fail to load for some reason.
 	public override void _Ready()
 	{
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
@@ -84,6 +86,30 @@ public class Game : Node2D
 			catch {
 				ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
 			}
+
+			// Hide slideout bar on startup
+			_on_SlideToggle_toggled(false);
+
+			// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their starting
+			// settler.
+			if (controller.cities.Count > 0)
+			{
+				City capital = controller.cities.Find(c => c.IsCapital());
+				if (capital != null)
+					mapView.centerCameraOnTile(capital.location);
+			}
+			else
+			{
+				MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
+				if (startingSettler != null)
+					mapView.centerCameraOnTile(startingSettler.location);
+			}
+
+			GD.Print("Now in game!");
+
+			loadTimer.Stop();
+			TimeSpan stopwatchElapsed = loadTimer.Elapsed;
+			GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 		}
 		catch(Exception ex) {
 			errorOnLoad = true;
@@ -91,27 +117,6 @@ public class Game : Node2D
 			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
 			GD.PrintErr(ex);
 		}
-
-		// Hide slideout bar on startup
-		_on_SlideToggle_toggled(false);
-
-		// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their starting
-		// settler.
-		if (controller.cities.Count > 0) {
-			City capital = controller.cities.Find(c => c.IsCapital());
-			if (capital != null)
-				mapView.centerCameraOnTile(capital.location);
-		} else {
-			MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
-			if (startingSettler != null)
-				mapView.centerCameraOnTile(startingSettler.location);
-		}
-
-		GD.Print("Now in game!");
-
-		loadTimer.Stop();
-		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-		GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 	}
 
 	// Must only be called while holding the game data mutex
