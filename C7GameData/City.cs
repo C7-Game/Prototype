@@ -41,7 +41,7 @@ namespace C7GameData
         public bool CanBuildUnit(UnitPrototype proto)
         {
             if (proto is SeaUnit)
-                return location.NeighborsCoast();
+                return location.NeighborsWater();
             else
                 return true;
         }
