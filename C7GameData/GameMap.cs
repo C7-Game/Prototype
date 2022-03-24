@@ -193,21 +193,21 @@ namespace C7GameData
         public static GameMap generateDummyGameMap(Random rng, TerrainNoiseMapGenerator terrainGen)
         {
             TerrainType grassland = new TerrainType();
-            grassland.name = "Grassland";
+            grassland.DisplayName = "Grassland";
             grassland.baseFoodProduction = 2;
             grassland.baseShieldProduction = 1; //with only one terrain type, it needs to be > 0
             grassland.baseCommerceProduction = 1;   //same as above
             grassland.movementCost = 1;
 
             TerrainType plains = new TerrainType();
-            plains.name = "Plains";
+            plains.DisplayName = "Plains";
             plains.baseFoodProduction = 1;
             plains.baseShieldProduction = 2;
             plains.baseCommerceProduction = 1;
             plains.movementCost = 1;
 
             TerrainType coast = new TerrainType();
-            coast.name = "Coast";
+            coast.DisplayName = "Coast";
             coast.baseFoodProduction = 2;
             coast.baseShieldProduction = 0;
             coast.baseCommerceProduction = 1;

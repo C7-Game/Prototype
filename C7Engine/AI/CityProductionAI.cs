@@ -32,7 +32,7 @@ namespace C7Engine
 				return unitPrototypes["Settler"];
 			}
 			if (lastProduced == unitPrototypes["Warrior"]) {
-				if (city.location.NeighborsCoast()) {
+				if (city.location.NeighborsWater()) {
 					Random rng = new Random();
 					if (rng.Next(3) == 0) {
 						return unitPrototypes["Galley"];

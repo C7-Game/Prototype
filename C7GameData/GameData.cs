@@ -11,7 +11,7 @@ namespace C7GameData
         public GameMap map {get; set;}
         public List<Player> players = new List<Player>();
         public List<TerrainType> terrainTypes = new List<TerrainType>();
-
+        public List<Resource> Resources = new List<Resource>();
         public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
         public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
         public List<City> cities = new List<City>();
@@ -120,7 +120,7 @@ namespace C7GameData
 
             uint teal = 0x40EEEEFF;
             Player computerPlayerTwo = new Player(america, teal);
-            // players.Add(computerPlayerTwo);
+            players.Add(computerPlayerTwo);
 
 			Civilization theNetherlands = new Civilization();
 			theNetherlands.cityNames.Add("Amsterdam");
@@ -129,12 +129,13 @@ namespace C7GameData
 			theNetherlands.cityNames.Add("Utrecht");
 			theNetherlands.cityNames.Add("Eindhoven");
 			theNetherlands.cityNames.Add("Groningen");
-			theNetherlands.cityNames.Add("Groningen");
+			theNetherlands.cityNames.Add("Arnhem");
 			theNetherlands.cityNames.Add("Tilburg");
+			theNetherlands.cityNames.Add("Maastricht");
 
             uint orange = 0xFFAB12FF;
             Player computerPlayerThree = new Player(theNetherlands, orange);
-            // players.Add(computerPlayerThree);
+            players.Add(computerPlayerThree);
 
 			List<Tile> startingLocations = map.generateStartingLocations(rng, 4, 10);
 

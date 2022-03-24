@@ -24,14 +24,15 @@ namespace C7Engine
 
 			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
 			//Debugging: Print out scores
+			Console.WriteLine("Top city location candidates from " + start + ":");
 			Tile returnValue = null;
-			foreach (KeyValuePair<Tile, int> kvp in orderedScores)
+			foreach (KeyValuePair<Tile, int> kvp in orderedScores.Take(5))
 			{
 				if (returnValue == null) {
 					returnValue = kvp.Key;
 				}
 				if (kvp.Value > 0) {
-					Console.WriteLine("Tile " + kvp.Key + " scored " + kvp.Value);
+					Console.WriteLine("  Tile " + kvp.Key + " scored " + kvp.Value);
 				}
 			}
 			return returnValue;
@@ -79,7 +80,7 @@ namespace C7Engine
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
 			foreach (Tile t in candidates) {
 				//TODO: Look at whether we can place cities here.  Hard-coded for now.
-				if (t.overlayTerrainType.name == "Mountains") {
+				if (t.overlayTerrainType.Key == "mountains") {
 					scores[t] = 0;
 					continue;
 				}
@@ -89,7 +90,7 @@ namespace C7Engine
 				}
 				foreach (MapUnit otherSettler in playerSettlers)
 				{
-					if (otherSettler.currentAIBehavior is SettlerAI otherSettlerAI) {
+					if (otherSettler.currentAIBehavior is SettlerAIData otherSettlerAI) {
 						if (otherSettlerAI.destination == t) {
 							scores[t] = 0;
 							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.
@@ -114,10 +115,10 @@ namespace C7Engine
 				//TODO: Also look at the next ring out, with lower weights.
 
 				//Prefer hills for defense, and coast for boats and such.
-				if (t.baseTerrainType.name == "Hills") {
+				if (t.baseTerrainType.Key == "hills") {
 					score += 10;
 				}
-				if (t.NeighborsCoast()) {
+				if (t.NeighborsWater()) {
 					score += 10;
 				}
 				//TODO: Exclude locations that are too close to another civ.
