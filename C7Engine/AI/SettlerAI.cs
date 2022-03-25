@@ -38,9 +38,7 @@ start:
 						}
 						try {
 							Tile nextTile = settlerAi.pathToDestination.Next();
-							unit.location.unitsOnTile.Remove(unit);
-							nextTile.unitsOnTile.Add(unit);
-							unit.location = nextTile;
+							unit.move(unit.location.directionTo(nextTile));
 						}
 						catch(Exception ex) {
 							Console.WriteLine("Could not get next part of path for unit " + settlerAi);
