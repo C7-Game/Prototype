@@ -248,6 +248,8 @@ public class Game : Node2D
 	 **/
 	public void setSelectedUnit(MapUnit unit)
 	{
+		unit = UnitInteractions.UnitWithAvailableActions(unit);
+
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 

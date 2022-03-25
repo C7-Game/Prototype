@@ -19,7 +19,7 @@ namespace C7Engine
                     foreach (MapUnit unit in player.units) {
                         if (unit.movementPointsRemaining > 0 && !unit.isFortified) {
                             if (!waitQueue.Contains(unit)) {
-                                return UnitWithAvailableActions(unit);
+                                return unit;
                             }
                         }
                     }
@@ -35,9 +35,12 @@ namespace C7Engine
          * Helper function to add the available actions to a unit
          * based on what terrain it is on.
          **/
-        private static MapUnit UnitWithAvailableActions(MapUnit unit)
+        public static MapUnit UnitWithAvailableActions(MapUnit unit)
         {
             unit.availableActions.Clear();
+
+            if (unit == MapUnit.NONE)
+                return unit;
 
             //This should have "real" code someday.  For now, I'll hard-code a few things based
             //on the unit type.  That will allow proving the end-to-end works, and we can
