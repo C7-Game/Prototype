@@ -76,21 +76,6 @@ namespace C7Engine
             return unit;
         }
 
-        public static void fortifyUnit(string guid)
-        {
-            new MsgSetFortification(guid, true).send();
-        }
-
-        public static void moveUnit(string guid, TileDirection dir)
-        {
-            new MsgMoveUnit(guid, dir).send();
-        }
-
-        public static void holdUnit(string guid)
-        {
-            new MsgSkipUnitTurn(guid).send();
-        }
-
         public static void waitUnit(GameData gameData, string guid)
         {
             foreach (MapUnit unit in gameData.mapUnits)
@@ -102,11 +87,6 @@ namespace C7Engine
                 }
             }
             Console.WriteLine("Failed to find a matching unit with guid " + guid);
-        }
-
-        public static void disbandUnit(string guid)
-        {
-            new MsgDisbandUnit(guid).send();
         }
 
         public static void ClearWaitQueue()

@@ -481,7 +481,7 @@ public class Game : Node2D
 					case 9: dir = TileDirection.NORTHEAST; break;
 					default: return; // Impossible
 					}
-					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
 				}
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
@@ -538,11 +538,11 @@ public class Game : Node2D
 		GD.Print("The " + buttonName + " button was pressed");
 		if (buttonName.Equals("hold"))
 		{
-			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
+			new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
 		}
 		else if (buttonName.Equals("fortify"))
 		{
-			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
+			new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
 		}
 		else if (buttonName.Equals("wait"))
 		{
@@ -583,7 +583,7 @@ public class Game : Node2D
 	// Called by the disband popup
 	private void OnUnitDisbanded()
 	{
-		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+		new MsgDisbandUnit(CurrentlySelectedUnit.guid).send();
 	}
 
 	/**

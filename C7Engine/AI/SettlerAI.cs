@@ -27,13 +27,13 @@ start:
 					if (unit.location == settlerAi.destination) {
 						Console.WriteLine("Building city with " + unit);
 						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
-						UnitInteractions.disbandUnit(unit.guid);
+						unit.disband();
 					}
 					else {
 						//If the settler has no destination, then disband rather than crash later.
 						if (settlerAi.destination == Tile.NONE) {
 							Console.WriteLine("Disbanding settler " + unit.guid + " with no valid destination");
-							UnitInteractions.disbandUnit(unit.guid);
+							unit.disband();
 							return;
 						}
 						try {
@@ -51,12 +51,12 @@ start:
 					if (unit.location.cityAtTile != null) {
 						//TODO: Actually join the city.  Haven't added that action.
 						//For now, just get rid of the unit.  Sorry, bro.
-						UnitInteractions.disbandUnit(unit.guid);
+						unit.disband();
 					}
 					else {
 						//TODO: Eventually, go to the city we're supposed to join
 						//For now, just disband
-						UnitInteractions.disbandUnit(unit.guid);
+						unit.disband();
 					}
 					break;
 				default:
