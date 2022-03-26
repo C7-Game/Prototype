@@ -9,30 +9,21 @@ namespace C7Engine
 
         private static Queue<MapUnit> waitQueue = new Queue<MapUnit>();
 
-        /**
-         * Returns all units.  Should be used sparingly.
-         **/
-        public static List<MapUnit> GetAllUnits()
+        public static MapUnit getNextSelectedUnit(GameData gameData)
         {
-            return EngineStorage.gameData.mapUnits;
-        }
-
-        public static MapUnit getNextSelectedUnit()
-        {
-            GameData gameData = EngineStorage.gameData;
-			foreach (Player player in gameData.players) {
-				//TODO: Should pass in a player GUID instead of checking for human
-				//This current limits us to one human player, although it's better
-				//than the old limit of one non-barbarian player.
-				if (player.isHuman) {
-					foreach (MapUnit unit in player.units) {
-						if (unit.movementPointsRemaining > 0 && !unit.isFortified) {
-							if (!waitQueue.Contains(unit)) {
-								return UnitWithAvailableActions(unit);
-							}
-						}
-					}
-				}
+            foreach (Player player in gameData.players) {
+                //TODO: Should pass in a player GUID instead of checking for human
+                //This current limits us to one human player, although it's better
+                //than the old limit of one non-barbarian player.
+                if (player.isHuman) {
+                    foreach (MapUnit unit in player.units) {
+                        if (unit.movementPointsRemaining > 0 && !unit.isFortified) {
+                            if (!waitQueue.Contains(unit)) {
+                                return UnitWithAvailableActions(unit);
+                            }
+                        }
+                    }
+                }
             }
             if (waitQueue.Count > 0) {
                 return waitQueue.Dequeue();
@@ -84,85 +75,21 @@ namespace C7Engine
 
         public static void fortifyUnit(string guid)
         {
-            GameData gameData = EngineStorage.gameData;
-            //This is inefficient, perhaps we'll have a map someday.  But with three units,
-            //we'll survive for now.
-            Console.WriteLine("Trying to fortify unit " + guid);
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    Console.WriteLine("Set unit " + guid + " of type " + unit.GetType().Name + " to fortified");
-                    unit.facingDirection = TileDirection.SOUTHEAST;
-                    unit.isFortified = true;
-                    EngineStorage.animTracker.startAnimation(unit, MapUnit.AnimatedAction.FORTIFY, null);
-                    return;
-                }
-            }
-            Console.WriteLine("Failed to find unit " + guid);
+            new MsgFortifyUnit(guid).send();
         }
 
-        // Moves a unit into a neighboring tile. direction = 1 for NE, 2 for E, 3 for SE, ..., 7 for NW, 8 for N. If direction is not in [1, 8],
-        // this function does nothing.
-        // TODO: This movement function is still pretty basic since it only works for neighboring tiles. I would call this function something like
-        // stepUnit except it's the only unit movement function we have right now so calling it moveUnit is fine. But later we might want a more
-        // powerful moveUnit function that can accept non-neighboring tiles and/or do things like rebase air units. Also direction should be an
-        // enum or something.
         public static void moveUnit(string guid, TileDirection dir)
         {
-            GameData gameData = EngineStorage.gameData;
-            //This is inefficient, perhaps we'll have a map someday.  But with three units,
-            //we'll survive for now.
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    (int dx, int dy) = dir.toCoordDiff();
-                    Tile newLoc = gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-                    if (newLoc != null && newLoc.IsLand()) {
-                        if (unit.movementPointsRemaining > 0) {
-                            if (!unit.location.unitsOnTile.Remove(unit))
-                                throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
-                            newLoc.unitsOnTile.Add(unit);
-                            unit.location = newLoc;
-                            unit.facingDirection = dir;
-                            unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
-                            unit.isFortified = false;
-                            EngineStorage.animTracker.startAnimation(unit, MapUnit.AnimatedAction.RUN, null);
-                        }
-                    }
-
-                    break;
-                }
-            }
+            new MsgMoveUnit(guid, dir).send();
         }
 
-        /**
-         * I'd like to enhance this so it's like Civ4, where the hold action takes
-         * the unit out of the rotation, but you can change your mind if need be.
-         * But for now it'll be like Civ3, where you're out of luck if you realize
-         * that unit was needed for something; that also simplifies things here.
-         **/
         public static void holdUnit(string guid)
         {
-            GameData gameData = EngineStorage.gameData;
-            //This is inefficient, perhaps we'll have a map someday.  But with three units,
-            //we'll survive for now.
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    Console.WriteLine("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; settings its movement to zero");
-                    unit.movementPointsRemaining = 0;
-                    return;
-                }
-            }
-            Console.WriteLine("Failed to find a matching unit with guid " + guid);
+            new MsgSkipUnitTurn(guid).send();
         }
 
-        public static void waitUnit(string guid)
+        public static void waitUnit(GameData gameData, string guid)
         {
-            GameData gameData = EngineStorage.gameData;
             foreach (MapUnit unit in gameData.mapUnits)
             {
                 if (unit.guid == guid)
@@ -176,28 +103,7 @@ namespace C7Engine
 
         public static void disbandUnit(string guid)
         {
-            GameData gameData = EngineStorage.gameData;
-            MapUnit toBeDeleted = null;
-            foreach (MapUnit unit in gameData.mapUnits)
-            {
-                if (unit.guid == guid)
-                {
-                    //Set a variable and break so we don't cause a ConcurrentModificationException
-                    toBeDeleted = unit;
-                    break;
-                }
-            }
-            if (toBeDeleted != null) {
-                EngineStorage.animTracker.endAnimation(toBeDeleted, false);
-                toBeDeleted.location.unitsOnTile.Remove(toBeDeleted);
-                gameData.mapUnits.Remove(toBeDeleted);
-				foreach(Player player in gameData.players)
-				{
-					if (player.units.Contains(toBeDeleted)) {
-						player.units.Remove(toBeDeleted);
-					}
-				}
-            }
+            new MsgDisbandUnit(guid).send();
         }
 
         public static void ClearWaitQueue()

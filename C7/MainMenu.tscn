@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://MainMenu.cs" type="Script" id=1]
 [ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
 [ext_resource path="res://MainMenuMusicPlayer.cs" type="Script" id=3]
+[ext_resource path="res://MainMenuTheme.tres" type="Theme" id=4]
 
 [node name="MainMenu" type="Node2D"]
 z_index = 1
@@ -13,6 +14,7 @@ script = ExtResource( 1 )
 layer = -1
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
@@ -23,6 +25,7 @@ __meta__ = {
 }
 
 [node name="Label" type="Label" parent="CanvasLayer"]
+visible = false
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -47,23 +50,39 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CenterContainer" type="CenterContainer" parent="CanvasLayer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="MainMenuBackground" type="TextureRect" parent="CanvasLayer/CenterContainer"]
-margin_left = 512.0
-margin_top = 384.0
-margin_right = 512.0
-margin_bottom = 384.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="MainMenuMusicPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
 script = ExtResource( 3 )
 
 [node name="SoundEffectPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
+
+[node name="MainMenuBackground" type="TextureRect" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 4 )
+expand = true
+stretch_mode = 1
+
+[node name="SetCiv3Home" type="Button" parent="CanvasLayer"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -84.5
+margin_top = -93.7225
+margin_right = 84.5
+margin_bottom = -73.7225
+text = "Select Civ3 Home Folder"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SetCiv3HomeDialog" type="FileDialog" parent="CanvasLayer"]
+margin_right = 550.0
+margin_bottom = 750.0
+window_title = "Open a File or Directory"
+resizable = true
+mode = 3
+access = 2
+
+[connection signal="pressed" from="CanvasLayer/SetCiv3Home" to="." method="_on_SetCiv3Home_pressed"]
+[connection signal="dir_selected" from="CanvasLayer/SetCiv3HomeDialog" to="." method="_on_SetCiv3HomeDialog_dir_selected"]

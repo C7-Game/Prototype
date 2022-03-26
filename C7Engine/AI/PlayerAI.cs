@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
 
@@ -13,29 +14,25 @@ namespace C7Engine
 			if (player.isHuman || player.isBarbarians) {
 				return;
 			}
+			Console.WriteLine("-> Begin " + player.civilization.cityNames[0] + " turn");
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray())
 			{
 				if (unit.currentAIBehavior == null) {
-					SetAIForUnit(unit);
+					SetAIForUnit(unit, player);
 				}
 				
 				//Now actually take actions
 				//TODO: Move these into an AI method
-				if (unit.currentAIBehavior is SettlerAI settlerAi) {
-					if (unit.location == settlerAi.destination) {
-						Console.WriteLine("Building city with " + unit);
-						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
-						UnitInteractions.disbandUnit(unit.guid);
-					}
-					else {
-						MoveSettlerTowardsDestination(unit, settlerAi);
-					}
+				if (unit.currentAIBehavior is SettlerAIData settlerAi) {
+					SettlerAI.PlaySettlerTurn(player, settlerAi, unit);
 				}
 				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
 					if (defenderAI.destination == unit.location) {
-						UnitInteractions.fortifyUnit(unit.guid);
-						Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
+						if (!unit.isFortified) {
+							unit.fortify();
+							Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
+						}
 					}
 					else {
 						//TODO: Move towards destination
@@ -43,66 +40,56 @@ namespace C7Engine
 					}
 				}
 				else if (unit.currentAIBehavior is ExplorerAI explorerAi) {
-					Console.Write("Moving explorer AI for " + unit);
+					// Console.Write("Moving explorer AI for " + unit);
 					//TODO: Distinguish between types of exploration
 					//TODO: Make sure ON_A_BOAT units stay on the boat
 					//Move randomly
 					List<Tile> possibleNewLocations = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
+					if (possibleNewLocations.Count == 0) {
+						Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
+						continue;
+					}
 					Tile newLocation = possibleNewLocations[rng.Next(possibleNewLocations.Count)];
 					//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
 					//if it tries to move e.g. north from the north pole.  Hence, this check.
 					if (newLocation != Tile.NONE) {
-						Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
-						unit.location.unitsOnTile.Remove(unit);
-						newLocation.unitsOnTile.Add(unit);
-						unit.location = newLocation;
+						// Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
+						unit.move(unit.location.directionTo(newLocation));
 					}
 				}
 			}
 		}
 		
-		/**
-		 * Basic movement AI.  Ignores things such as roads, only works on land, ignores hazards such as barbarians.
-		 * Which means it's not amazing yet, but it does get things moving in the right direction.
-		 */
-		private static void MoveSettlerTowardsDestination(MapUnit unit, SettlerAI settlerAi)
-		{
-			Dictionary<Tile, int> distances = new Dictionary<Tile, int>();
-			foreach (Tile option in unit.location.GetLandNeighbors()) {
-				distances[option] = settlerAi.destination.distanceToOtherTile(option);
-			}
-			IOrderedEnumerable<KeyValuePair<Tile, int>> orderedScores = distances.OrderBy(t => t.Value);
-			Tile nextTile = null;
-			foreach (KeyValuePair<Tile, int> kvp in orderedScores) {
-				if (nextTile == null) {
-					nextTile = kvp.Key;
-				}
-				Console.WriteLine("Settler could move to " + kvp.Key + " with distance value " + kvp.Value);
-			}
-			Console.WriteLine("Settler unit moving from " + unit.location + " to " + nextTile + " towards " + settlerAi.destination);
-			unit.location.unitsOnTile.Remove(unit);
-			nextTile.unitsOnTile.Add(unit);
-			unit.location = nextTile;
-		}
-
-		private static void SetAIForUnit(MapUnit unit) 
+		public static void SetAIForUnit(MapUnit unit, Player player) 
 		{
 			//figure out an AI behavior
 			//TODO: Use strategies, not names
 			if (unit.unitType.name == "Settler") {
-				SettlerAI settlerAI = new SettlerAI();
-				settlerAI.goal = SettlerAI.SettlerGoal.BUILD_CITY;
+				SettlerAIData settlerAiData = new SettlerAIData();
+				settlerAiData.goal = SettlerAIData.SettlerGoal.BUILD_CITY;
 				//If it's the starting settler, have it settle in place.  Otherwise, use an AI to find a location.
-				if (unit.location.cityAtTile == null) {
-					settlerAI.destination = unit.location;
+				if (player.cities.Count == 0 && unit.location.cityAtTile == null) {
+					settlerAiData.destination = unit.location;
+					Console.WriteLine("No cities yet!  Set AI for unit to settler AI with destination of " + settlerAiData.destination);
 				}
 				else {
-					settlerAI.destination = SettlerLocationAI.findSettlerLocation(unit.location);
+					settlerAiData.destination = SettlerLocationAI.findSettlerLocation(unit.location, player.cities, player.units);
+					if (settlerAiData.destination == Tile.NONE) {
+						//This is possible if all tiles within 4 tiles of a city are either not land, or already claimed
+						//by another colonist.  Longer-term, the AI shouldn't be building settlers if that is the case,
+						//but right now we'll just spike the football to stop the clock and avoid building immediately next to another city.
+						settlerAiData.goal = SettlerAIData.SettlerGoal.JOIN_CITY;
+						Console.WriteLine("Set AI for unit to JOIN_CITY due to lack of locations to settle");
+					}
+					else {
+						PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
+						settlerAiData.pathToDestination = algorithm.PathFrom(unit.location, settlerAiData.destination);
+						Console.WriteLine("Set AI for unit to BUILD_CITY with destination of " + settlerAiData.destination);
+					}
 				}
-				Console.WriteLine("Set AI for unit to settler AI with destination of " + settlerAI.destination);
-				unit.currentAIBehavior = settlerAI;
+				unit.currentAIBehavior = settlerAiData;
 			}
-			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count == 0) {
+			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
 				DefenderAI ai = new DefenderAI();
 				ai.goal = DefenderAI.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;

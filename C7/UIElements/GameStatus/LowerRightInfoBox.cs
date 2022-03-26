@@ -74,7 +74,7 @@ public class LowerRightInfoBox : TextureRect
 		//their width.
 		//Seems like there probably is an easier way, but I haven't found it yet.
 		Label civAndGovt = new Label();
-		civAndGovt.Text = "Rome - Despotism (5.5.0)";
+		civAndGovt.Text = "Babylon - Despotism (5.5.0)";
 		civAndGovt.Align = Label.AlignEnum.Center;
 		civAndGovt.SetPosition(new Vector2(0, 90));
 		civAndGovt.AnchorLeft = 0.5f;

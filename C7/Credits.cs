@@ -1,13 +1,22 @@
 using Godot;
-using ConvertCiv3Media;
 
 public class Credits : Node2D
 {
+	private string creditsText = "Could not load credits file";
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		GD.Print("Now rolling the credits!");
+		try
+		{
+			creditsText = System.IO.File.ReadAllText("./credits.txt");
+		}
+		catch(System.Exception ex)
+		{
+			GD.PrintErr("Failed to read from credits.txt!");
+			GD.PushError(ex.ToString());
+		}
 		ShowCredits();
 	}
 
@@ -20,10 +29,11 @@ public class Credits : Node2D
 		CreditsBackground.Texture = CreditsTexture;
 		AddChild(CreditsBackground);
 
-		//Todo: Either import Text/credits.txt and scroll it as done in-game, or have our own custom credits.
-		Label creditsLabel = new Label();
-		creditsLabel.Text = "Project Ringleader: WildWeazel";
-		creditsLabel.SetPosition(new Vector2(360, 120));
+		RichTextLabel creditsLabel = new RichTextLabel();
+		creditsLabel.RectPosition = new Vector2(80, 120);
+		creditsLabel.RectSize = new Vector2(864, 528);
+		creditsLabel.BbcodeEnabled = true;
+		creditsLabel.BbcodeText = creditsText;
 		AddChild(creditsLabel);
 		
 		TextureButton GoBackButton = new TextureButton();

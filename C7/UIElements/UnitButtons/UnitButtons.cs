@@ -108,7 +108,7 @@ public class UnitButtons : VBoxContainer
 				foreach (UnitControlButton button in buttonMap.Values)
 				{
 					if (button.Visible == true) {
-						if (eventKey.Scancode == button.shortcutKey) {
+						if (eventKey.Scancode == button.shortcutKey && !eventKey.Shift && !eventKey.Command && !eventKey.Control && !eventKey.Alt) {
 							this.onButtonPressed(button.key);
 							GetTree().SetInputAsHandled();
 						}

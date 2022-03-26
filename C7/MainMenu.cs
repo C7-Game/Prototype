@@ -10,6 +10,9 @@ public class MainMenu : Node2D
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
 	Util.Civ3FileDialog LoadDialog;
+	Button SetCiv3Home;
+	FileDialog SetCiv3HomeDialog;
+	Util.Civ3FileDialog LoadScenarioDialog;
 	GlobalSingleton Global;
 
 	// Called when the node enters the scene tree for the first time.
@@ -19,11 +22,19 @@ public class MainMenu : Node2D
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		Global.ResetLoadGamePath();
-		DisplayTitleScreen();
 		LoadDialog = new Util.Civ3FileDialog();
 		LoadDialog.RelPath = @"Conquests/Saves";
 		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
+		LoadScenarioDialog = new Util.Civ3FileDialog();
+		LoadScenarioDialog.RelPath = @"Conquests/Scenarios";
+		LoadScenarioDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
+		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
+		SetCiv3HomeDialog = GetNode<FileDialog>("CanvasLayer/SetCiv3HomeDialog");
+		// For some reason this option isn't available in the scene UI
+		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
+		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadScenarioDialog);
+		DisplayTitleScreen();
 	}
 	
 	private void DisplayTitleScreen()
@@ -38,23 +49,32 @@ public class MainMenu : Node2D
 			AddButton("Quick Start", 195, "StartGame");
 			AddButton("Tutorial", 230, "StartGame");
 			AddButton("Load Game", 265, "LoadGame");
-			AddButton("Load Scenario", 300, "StartGame");
+			AddButton("Load Scenario", 300, "LoadScenario");
 			AddButton("Hall of Fame", 335, "HallOfFame");
 			AddButton("Preferences", 370, "Preferences");
 			AddButton("Audio Preferences", 405, "Preferences");
 			AddButton("Credits", 440, "showCredits");
 			AddButton("Exit", 475, "_on_Exit_pressed");
+
+			// Hide select home folder if valid path is present as proven by reaching this point in code
+			SetCiv3Home.Visible = false;
 		}
 		catch(Exception ex)
 		{
-			GD.Print("Could not set up the main menu");
+			GD.Print("Could not set up the main menu", ex);
+			GetNode<Label>("CanvasLayer/Label").Visible = true;
+			GetNode<ColorRect>("CanvasLayer/ColorRect").Visible = true;
 		}
 	}
 
 	private void SetMainMenuBackground()
 	{
 		ImageTexture TitleScreenTexture = Util.LoadTextureFromPCX("Art/title.pcx");
-		MainMenuBackground = GetNode<TextureRect>("CanvasLayer/CenterContainer/MainMenuBackground");
+		Image backgroundImage = new Image();
+		backgroundImage.Load("res://Title_Screen.jpg");
+		TitleScreenTexture.CreateFromImage(backgroundImage);
+		MainMenuBackground = GetNode<TextureRect>("CanvasLayer/MainMenuBackground");
+		MainMenuBackground.StretchMode = TextureRect.StretchModeEnum.Scale;
 		MainMenuBackground.Texture = TitleScreenTexture;
 	}
 
@@ -63,14 +83,14 @@ public class MainMenu : Node2D
 		TextureButton newButton = new TextureButton();
 		newButton.TextureNormal = InactiveButton;
 		newButton.TextureHover = HoverButton;
-		newButton.SetPosition(new Vector2(835, verticalPosition));
+		newButton.SetPosition(new Vector2(40, verticalPosition));
 		MainMenuBackground.AddChild(newButton);
 		newButton.Connect("pressed", this, actionName);
 				
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
 
-		newButtonLabel.SetPosition(new Vector2(860, verticalPosition + BUTTON_LABEL_OFFSET));
+		newButtonLabel.SetPosition(new Vector2(65, verticalPosition + BUTTON_LABEL_OFFSET));
 		MainMenuBackground.AddChild(newButtonLabel);
 		newButtonLabel.Connect("pressed", this, actionName);
 	}
@@ -87,6 +107,13 @@ public class MainMenu : Node2D
 		GD.Print("Real Load button pressed");
 		PlayButtonPressedSound();
 		LoadDialog.Popup_();
+	}
+
+	public void LoadScenario()
+	{
+		GD.Print("Load scenario button pressed");
+		PlayButtonPressedSound();
+		LoadScenarioDialog.Popup_();
 	}
 	
 	public void showCredits()
@@ -118,11 +145,21 @@ public class MainMenu : Node2D
 		player.Stream = wav;
 		player.Play();
 	}
+
 	private void _on_FileDialog_file_selected(string path)
 	{
 		GD.Print("Loading " + path);
 		Global.LoadGamePath = path;
 		GetTree().ChangeScene("res://C7Game.tscn");
-
+	}
+	private void _on_SetCiv3Home_pressed()
+	{
+		SetCiv3HomeDialog.Popup_();
+	}
+	private void _on_SetCiv3HomeDialog_dir_selected(string path)
+	{
+		Util.Civ3Root = path;
+		// This function should only be reachable if DisplayTitleScreen failed on previous runs, so should be OK to run here
+		DisplayTitleScreen();
 	}
 }

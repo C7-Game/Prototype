@@ -17,6 +17,7 @@ public class Player
 	private int cityNameIndex = 0;
 	
 	public List<MapUnit> units = new List<MapUnit>();
+	public List<City> cities = new List<City>();
 
 	public Player(uint color)
 	{
@@ -45,13 +46,19 @@ public class Player
 		}
 		int suffix = (bonusLoops / 2) + 1;
 		if (suffix > 1) {
-			name = name + suffix; //e.g. for bonusLoops = 2, we'll have "Athens 2"
+			name = name + " " + suffix; //e.g. for bonusLoops = 2, we'll have "Athens 2"
 		}
 		cityNameIndex++;
 		return name;
 	}
 
 	public Player(){}
+
+	public bool IsAtPeaceWith(Player other)
+	{
+		// Right now it's a free-for-all but eventually we'll implement peace treaties and alliances
+		return other == this;
+	}
 }
 
 }

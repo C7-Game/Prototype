@@ -16,7 +16,7 @@ namespace C7GameData.AIData
 	 * I'm also unsure of how much the logic of figuring out what to do should be in these
 	 * classes, versus higher-level ones.
 	 */
-	public class SettlerAI : UnitAI
+	public class SettlerAIData : UnitAI
 	{
 		public enum SettlerGoal
 		{
@@ -25,5 +25,11 @@ namespace C7GameData.AIData
 		}
 		public SettlerGoal goal;
 		public Tile destination;
+		public TilePath pathToDestination;
+
+		public override string ToString()
+		{
+			return goal + " at " + destination;
+		}
 	}
 }

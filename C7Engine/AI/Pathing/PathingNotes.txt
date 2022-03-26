@@ -1,0 +1,118 @@
+Pathing is going to be a significant component of the game, and a significant part of whether it
+will run faster than Civ3 on equivalent map sizes (from an AI turn time standpoint in particular).
+
+The age-old question "what is the shortest path?" is relevant, and there are a lot of ways to solve
+that and a lot of considerations.  Some considerations:
+
+ - Land versus water routes.  Sometimes, the absolute shortest may be a combined approach,
+   but that also varies on e.g. where the transport boats are.
+ - Movement versus trade routes.  Trade routes can be along rivers.
+ - Obstacles, particularly rival units on a tile, which may affect whether it is traversable.
+ - Various other factors, such as terrain movement cost, road, whether the bridge technology
+   exists, etc.  These affect the weighting of the path's edges between tiles.
+ - Not all units can traverse all terrain - the "wheeled" flag, for example.  This also will
+   have to be considered.
+ - Due to changes in-game, what was the shortest path at the time an order was given may no
+   longer be the shortest, or even traversable, a turn or two later.  Enemy units, bombardment,
+   or completion of roads or bridge technologies may affect this.  Preferably, we'll be
+   able to update only affected routes rather than all of them every time one of those events
+   happen.
+     - We'll likely need to keep some meta-data about which paths traverse which tiles in
+       order to do this.  This may also need to include neighboring tiles, since a new road
+       on a neighboring tile may offer a considerably shorter route.
+ - Similarly to the above, by storing routes (including in saves), we should avoid having to
+   recalculate them as often.
+ - Civilization III has a somewhat odd property that you get free movement, regardless of cost,
+   with your last fraction of a movement point.  You can have 1/3 of a movement point left and
+   move onto a Mountain that costs 3 movement.  If there is grassland on either side of the
+   mountain, and also SE/SW of it, none roaded, a shortest-path algorithm would tell you
+   to go around it on grassland for a cost of 3, and for a Cavalry that makes sense.  But
+   for a warrior, the 3 + 1 of Mountain + Road is quicker than the 1 + 1 + 1 of the grassland
+   path, even though it "should" be slower.  I suspect this will produce some quirks in our
+   algorithms.
+
+All these factors will influence which algorithms make sense, as well as the tradeoffs of the
+various algorithms.  I have been brushing up on pathing algorithms in the book "Algorithms" by
+Sanjoy Dasgupta, Christos Papadimitriou, and Umesh Vazirani (McGraw Hill, 2008).  It has some
+advantages such as being readable to a non-academic audience, and already being on my bookshelf,
+although it omits the A* algorithm that I suspect may be one of the better options.  Still, it
+has good details on the options, including runtime efficiency; there are usually tradeoffs as
+to which algorithm makes the most sense.
+
+Some notes so far:
+
+ - The first algorithm I added for settlers was a greedy 
+   take-whichever-tile-gets-me-closer-as-the-crow-flies algorithm.  While in most cases this
+   got the unit where it was trying to go, sometimes it's necessary to go away from your target
+   first, for example due to water, and in those cases the unit got stuck.  A greedy
+   local-minimum option will not be general-purpose viable.
+ - Pondering options prior to reading, I considered a breadth-first-search where all neighbors
+   are considered, and they consider their neighbors, adding up the weights until they find a
+   way there, or hit a maximum search depth in tiles.  Then going back towards the start,
+   each tile would take the lowest-weight (influenced by terrain, roads, etc.) route to the
+   destination, and so on at each tile until you get to the start.  You wind up with the
+   lowest-weighted path, unless there are none without a major detour, which may indicate
+   there are none at all, and likely indicates that a boat is preferable.
+     - This "Quintillus" algorithm would avoid the pitfalls of the greedy algorithm, and give
+       the shortest path in nearly all cases, but would explore far more paths than it needs to.
+ - A simple Breadth-First-Search would not weigh the tiles, but would find the shortest route
+   assuming equal weight.  This may be quicker and simpler than the Quintillus algorithm,
+   but would give inferior results in cases where tile costs differed.  Still, it's an improvement
+   over the greedy algorithm.
+ - Dijkstra's Algorithm is one of the good candidates, as it effectively considers tile weights
+   in its calculations and is fairly efficient.  It would find the shortest paths from the start
+   tile to all tiles considered, and we could end it once it found the shortest path to our
+   desired destination, or let it calculate the paths to all reachable destinations.
+   There are several implementations which affect efficiency:
+    - An array-based priority queue.  Faster if the number of edges |E| is at least the square of
+      the number of vertices |V|, and may be if |E| is at least |V^2|/log(|V|).  I doubt this
+      will ever be the case for us, based on some quick calculations.  But it's simple.
+    - A binary heap, which is also a 2-ary heap.  Can use an ordered array to back it.
+    - A d-ary heap.  Optimally, d is set to the average degree of the depth, i.e. |E|/|V| for
+      E = edges, V = vertices.  For a sparse graph, this may be a binary heap, but for C7,
+      most land tiles will have many vertices; |E|/|V| is likely somewhere around 6 or 7.
+      We could use a calculation of that to use the optimal value of d.
+    - Fancier types of heaps.  Fibonacci heaps, others we can discover through Wikipedia.
+      These may offer faster performance but are likelier more complex.  I've read that
+      some of them are also memory-intensive, which may have a practical impact on their
+      efficiency that isn't present in theory.
+   We could add a few of these and then some guidelines as to which to use when.  Due to
+   the free movement quirk, we may be affected more by the "decreasekey" operation that
+   decreases an edges weight than most algorithms; this favors the array-based priority queue,
+   which might otherwise lose.  But mainly, we have enough complexity that saying "this is
+   the best choice" right now is likely not doable, and we'll have to evaluate things both
+   from a theoretical efficiency standpoint and through actual testing.
+ - Floyd-Warshall is another algorithm, which is discussed on pages 172-173 as a good choice
+   for the "All-pairs shortest paths" option, which gives the shortest path between all pairs
+   of vertices.  This could be useful, but as often as something affects the paths (new roads,
+   etc.), I'm not sure that calculating this and having the shortest paths available for
+   reference will be quicker than one-off calculating.  Perhaps with good metadata we will
+   be able to calculate it once and update only the parts needed.  I'm putting this in the
+   "definitely worth considering and exploring more, not sure it will work out" bucket.
+ - A* pathing.  Is an extension of Dijkstra, so I suggest we implement Dijkstra first.  Usually
+   faster, at the cost of memory.  Supposed to be optimal in many, but not all, situations.
+   
+ As for implementation, I propose a common LandPath class, which will include a list of tiles
+ to traverse in order, and a destination, which extends a base Path class of the same sort.  A
+ SeaPath and perhaps AirPath can also exist, and once we get far enough along we can have a
+ CombinedPath class that includes segments that may be any type of Path.  These will store the
+ path and can be saved.
+ 
+ Meanwhile, we can implement different algorithms for choosing the shortest path, all of which
+ produce the shared Path objects.  This will allow us to iterate and experiment with algorithms
+ while still having a commonly-consumable path object for movement.
+ 
+ I wouldn't be surprised if we wind up with a proliferation of implementations, and would somewhat
+ encourage it.  Even as we add features, it may be worth temporarily having extended classes,
+ e.g. we might keep a Dijkstra-without-roads as a base to compare a Dijkstra-with-roads implementation
+ to.  The ones not incorporating all features won't last forever, but we might want to keep some variants
+ such as ones that add extra weight to edges that are near enemy lands.  An AI at war may use
+ these variants for civilian units, or an AI preparing for war may prefer them so as not to tip
+ the hat to its soon-to-be-enemy.
+ 
+ I've also started to realize why Civ V/VI struggle so much with their unit AI... with 1 UPT,
+ they are constantly invalidating paths their units planned to take, and the existing literature
+ doesn't focus on such extreme bottleneck scenarios.  Add on to that the impact of units arriving
+ in non-optimal order, and the designers gave the programmers a problem for which they couldn't
+ turn to a similar solution.
+ 

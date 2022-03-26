@@ -11,12 +11,13 @@ namespace C7Engine
         public static void EndTurn()
         {
             GameData gameData = EngineStorage.gameData;
+            Console.WriteLine("\n*** Processing turn " + gameData.turn + " ***");
             //Barbarians.  First, generate new barbarian units.
             foreach (Tile tile in gameData.map.barbarianCamps)
             {
                 //7% chance of a new barbarian.  Probably should scale based on barbarian activity.
                 int result = gameData.rng.Next(100);
-                Console.WriteLine("Random barb result = " + result);
+                // Console.WriteLine("Random barb result = " + result);
                 if (result < 7) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
@@ -29,7 +30,7 @@ namespace C7Engine
                     gameData.mapUnits.Add(newUnit);
                     Console.WriteLine("New barbarian added at " + tile);
                 }
-                else if (tile.NeighborsCoast() && result < 10) {
+                else if (tile.NeighborsWater() && result < 10) {
                     MapUnit newUnit = new MapUnit();
                     newUnit.location = tile;
                     newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
@@ -82,6 +83,8 @@ namespace C7Engine
             //at the same place in the order.  Confirmed this is what Civ3 does.
             UnitInteractions.ClearWaitQueue();
             gameData.turn++;
+
+	    new MsgStartTurn().send();
         }
 
         ///Eventually we'll have a game year or month or whatever, but for now this provides feedback on our progression

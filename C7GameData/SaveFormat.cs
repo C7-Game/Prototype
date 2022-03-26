@@ -18,7 +18,10 @@ namespace C7GameData
         public C7RulesFormat Rules;
         // This naming is probably bad form, but it makes sense to me to name it as such here
         public GameData GameData;
-        public C7SaveFormat(){}
+        public C7SaveFormat()
+        {
+	        GameData = new GameData();
+        }
         public C7SaveFormat(GameData gameData, C7RulesFormat rules = null)
         {
             this.GameData = gameData;
@@ -28,6 +31,15 @@ namespace C7GameData
         {
             string json = File.ReadAllText(path);
             C7SaveFormat save = JsonSerializer.Deserialize<C7SaveFormat>(json, JsonOptions);
+            //Inflate things that are stored by reference
+            foreach (Tile tile in save.GameData.map.tiles) {
+                if (tile.ResourceKey == "NONE") {
+                    tile.Resource = Resource.NONE;
+                }
+                else {
+                    tile.Resource = save.GameData.Resources.Find(r => r.Key == tile.ResourceKey);
+                }
+            }
             return save;
         }
         public static void Save(C7SaveFormat save, string path)

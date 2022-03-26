@@ -1,91 +1,101 @@
 
-// The purpose of the AnimationTracker is to store the state of all ongoing animations in a module separate from the rest of the UI. It doesn't do
-// anything with the animations, it simply keeps record of them while they're playing then calls a callback function when they're done. So it's
-// basically just a stopwatch. Its update function must be called regularly so it can follow the passage of time, right now this is done in the Game
-// class's _Process method. There is one instance of AnimationTracker and it is located in Game. TODO: Consider moving it to MapView.
-
-// The callbacks are hopefully temporary. I don't like using them since they obscure control flow as they get called at some later time potentially by
-// a different thread. The threading issue doesn't matter at the moment since everything important runs on one thread but this could change if we want
-// to have separate UI and engine threads (as I believe we should).
-
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Linq;
 using C7GameData;
-using C7Engine; // for IAnimationControl, OnAnimationCompleted
+using C7Engine;
 
-public class AnimationTracker : IAnimationControl {
-	public static readonly OnAnimationCompleted doNothing = (unitGUID, action) => { return true; };
+public class AnimationTracker {
+	private Civ3AnimData civ3AnimData;
 
-	private Civ3UnitAnim civ3UnitAnim;
-
-	public AnimationTracker(Civ3UnitAnim civ3UnitAnim)
+	public AnimationTracker(Civ3AnimData civ3AnimData)
 	{
-		this.civ3UnitAnim = civ3UnitAnim;
+		this.civ3AnimData = civ3AnimData;
 	}
 
 	public struct ActiveAnimation {
 		public long startTimeMS, endTimeMS;
-		public MapUnit.AnimatedAction action;
-		public OnAnimationCompleted callback;
+		public AutoResetEvent completionEvent;
+		public Civ3Anim anim;
 	}
 
-	private Dictionary<string, ActiveAnimation> activeAnims    = new Dictionary<string, ActiveAnimation>();
-	private Dictionary<string, ActiveAnimation> completedAnims = new Dictionary<string, ActiveAnimation>();
+	private Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
 
 	public long getCurrentTimeMS()
 	{
 		return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 	}
 
-	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, OnAnimationCompleted callback)
+	private string getTileID(Tile tile)
 	{
-		long currentTimeMS = getCurrentTimeMS();
-		long animDurationMS = (long)(1000.0 * civ3UnitAnim.getDuration(unit.unitType.name, action));
-
-		ActiveAnimation aa;
-		if (activeAnims.TryGetValue(unit.guid, out aa)) {
-			// If there's already an animation playing for this unit, end it first before replacing it
-			aa.callback(unit.guid, aa.action);
-		}
-		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, action = action, callback = callback ?? doNothing };
-
-		civ3UnitAnim.playSound(unit.unitType.name, action);
-
-		activeAnims[unit.guid] = aa;
-		completedAnims.Remove(unit.guid);
+		// Generate a string to ID this tile that won't conflict with the unit GUIDs. TODO: Eventually we'll implement a common way of ID'ing
+		// all game objects. Use that here instead.
+		return String.Format("Tile.{0}.{1}", tile.xCoordinate, tile.yCoordinate);
 	}
 
-	public void endAnimation(MapUnit unit, bool triggerCallback = true)
+	private void startAnimation(string id, Civ3Anim anim, AutoResetEvent completionEvent)
+	{
+		long currentTimeMS = getCurrentTimeMS();
+		long animDurationMS = (long)(1000.0 * anim.getDuration());
+
+		ActiveAnimation aa;
+		if (activeAnims.TryGetValue(id, out aa)) {
+			// If there's already an animation playing for this unit, end it first before replacing it
+			// TODO: Consider instead queueing up the new animation until after the first one is completed
+			if (aa.completionEvent != null)
+				aa.completionEvent.Set();
+		}
+		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, completionEvent = completionEvent, anim = anim };
+
+		anim.playSound();
+
+		activeAnims[id] = aa;
+	}
+
+	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent)
+	{
+		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType.name, action), completionEvent);
+	}
+
+	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent)
+	{
+		startAnimation(getTileID(tile), civ3AnimData.forEffect(effect), completionEvent);
+	}
+
+	public void endAnimation(MapUnit unit)
 	{
 		ActiveAnimation aa;
-		if (triggerCallback && activeAnims.TryGetValue(unit.guid, out aa)) {
-			var forget = aa.callback(unit.guid, aa.action);
-			if (! forget)
-				completedAnims[unit.guid] = aa;
+		if (activeAnims.TryGetValue(unit.guid, out aa)) {
+			if (aa.completionEvent != null)
+				aa.completionEvent.Set();
 			activeAnims.Remove(unit.guid);
-		} else {
-			activeAnims   .Remove(unit.guid);
-			completedAnims.Remove(unit.guid);
 		}
 	}
 
 	public bool hasCurrentAction(MapUnit unit)
 	{
-		return activeAnims.ContainsKey(unit.guid) || completedAnims.ContainsKey(unit.guid);
+		return activeAnims.ContainsKey(unit.guid);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(MapUnit unit)
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(string id)
 	{
-		ActiveAnimation aa;
-		if (! activeAnims.TryGetValue(unit.guid, out aa))
-			aa = completedAnims[unit.guid];
-
+		ActiveAnimation aa = activeAnims[id];
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
 		var repCount = (double)(getCurrentTimeMS() - aa.startTimeMS) / durationMS;
-		return (aa.action, repCount);
+		return (aa.anim.action, repCount);
+	}
+
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(MapUnit unit)
+	{
+		return getCurrentActionAndRepetitionCount(unit.guid);
+	}
+
+	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(Tile tile)
+	{
+		return getCurrentActionAndRepetitionCount(getTileID(tile));
 	}
 
 	public void update()
@@ -93,17 +103,16 @@ public class AnimationTracker : IAnimationControl {
 		long currentTimeMS = getCurrentTimeMS();
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
-			var (unitGUID, aa) = (guidAAPair.Key, guidAAPair.Value);
-			var forget = aa.callback(unitGUID, aa.action);
-			if (! forget)
-				completedAnims[unitGUID] = aa;
-			keysToRemove.Add(unitGUID);
+			var (id, aa) = (guidAAPair.Key, guidAAPair.Value);
+			if (aa.completionEvent != null)
+				aa.completionEvent.Set();
+			keysToRemove.Add(id);
 		}
 		foreach (var key in keysToRemove)
 			activeAnims.Remove(key);
 	}
 
-	public MapUnit.ActiveAnimation getActiveAnimation(MapUnit unit)
+	public MapUnit.Appearance getUnitAppearance(MapUnit unit)
 	{
 		if (hasCurrentAction(unit)) {
 			var (action, repCount) = getCurrentActionAndRepetitionCount(unit);
@@ -128,20 +137,29 @@ public class AnimationTracker : IAnimationControl {
 				offsetY = -1 * dY * (1f - progress);
 			}
 
-			return new MapUnit.ActiveAnimation {
+			return new MapUnit.Appearance {
 				action = action,
-					direction = unit.facingDirection,
-					progress = progress,
-					offsetX = offsetX,
-					offsetY = offsetY
-					};
+				direction = unit.facingDirection,
+				progress = progress,
+				offsetX = offsetX,
+				offsetY = offsetY
+				};
 		} else
-			return new MapUnit.ActiveAnimation {
+			return new MapUnit.Appearance {
 				action = unit.isFortified ? MapUnit.AnimatedAction.FORTIFY : MapUnit.AnimatedAction.DEFAULT,
-					direction = unit.facingDirection,
-					progress = 1f,
-					offsetX = 0f,
-					offsetY = 0f
-					};
+				direction = unit.facingDirection,
+				progress = 1f,
+				offsetX = 0f,
+				offsetY = 0f
+				};
+	}
+
+	public Civ3Anim getTileEffect(Tile tile)
+	{
+		ActiveAnimation aa;
+		if (activeAnims.TryGetValue(getTileID(tile), out aa))
+			return aa.anim;
+		else
+			return null;
 	}
 }
