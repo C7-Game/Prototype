@@ -145,7 +145,7 @@ public class RightClickChooseProductionMenu : RightClickMenu
 {
 	private string cityGUID;
 
-	public ImageTexture GetProducibleIcon(IProducible producible)
+	private ImageTexture GetProducibleIcon(IProducible producible)
 	{
 		if (producible is UnitPrototype proto) {
 			const int iconWidth = 32, iconHeight = 32, iconsPerRow = 14;
