@@ -21,13 +21,15 @@ public class MsgShutdownEngine : MessageToEngine {
 	}
 }
 
-public class MsgFortifyUnit : MessageToEngine
+public class MsgSetFortification : MessageToEngine
 {
 	private string unitGUID;
+	private bool fortifyElseWake;
 
-	public MsgFortifyUnit(string unitGUID)
+	public MsgSetFortification(string unitGUID, bool fortifyElseWake)
 	{
 		this.unitGUID = unitGUID;
+		this.fortifyElseWake = fortifyElseWake;
 	}
 
 	public override void process()
@@ -36,8 +38,12 @@ public class MsgFortifyUnit : MessageToEngine
 
 		// Simply do nothing if we weren't given a valid GUID. TODO: Maybe this is an error we need to handle? In an MP game, we should reject
 		// invalid actions at the server level but at the client level an invalid action received from the server indicates a desync.
-		if (unit != null)
-			unit.fortify();
+		if (unit != null) {
+			if (fortifyElseWake)
+				unit.fortify();
+			else
+				unit.wake();
+		}
 	}
 }
 
@@ -108,6 +114,28 @@ public class MsgBuildCity : MessageToEngine {
 		MapUnit unit = EngineStorage.gameData.mapUnits.Find(u => u.guid == unitGUID);
 		if (unit != null)
 			unit.buildCity(cityName);
+	}
+}
+
+public class MsgChooseProduction : MessageToEngine {
+	private string cityGUID;
+	private string producibleName;
+
+	public MsgChooseProduction(string cityGUID, string producibleName)
+	{
+		this.cityGUID = cityGUID;
+		this.producibleName = producibleName;
+	}
+
+	public override void process()
+	{
+		City city = EngineStorage.gameData.cities.Find(c => c.guid == cityGUID);
+		if (city != null)
+			foreach (IProducible producible in city.ListProductionOptions())
+				if (producible.name == producibleName) {
+					city.SetItemBeingProduced(producible);
+					break;
+				}
 	}
 }
 

@@ -38,6 +38,14 @@ namespace C7GameData
             return true;
         }
 
+        public bool CanBuildUnit(UnitPrototype proto)
+        {
+            if (proto is SeaUnit)
+                return location.NeighborsWater();
+            else
+                return true;
+        }
+
         public int TurnsUntilGrowth() {
             int turnsRoundedDown = (foodNeededToGrow - foodStored) / foodGrowthPerTurn;
             if ((foodNeededToGrow - foodStored) % foodGrowthPerTurn != 0) {
@@ -46,12 +54,18 @@ namespace C7GameData
             return turnsRoundedDown;
         }
 
-        public int TurnsUntilProductionFinished() {
-            int turnsRoundedDown = (itemBeingProduced.shieldCost - shieldsStored) / shieldsPerTurn;
-            if ((itemBeingProduced.shieldCost - shieldsStored) % shieldsPerTurn != 0) {
+        public int TurnsToProduce(IProducible item)
+        {
+            int turnsRoundedDown = (item.shieldCost - shieldsStored) / shieldsPerTurn;
+            if ((item.shieldCost - shieldsStored) % shieldsPerTurn != 0) {
                 return turnsRoundedDown++;
             }
             return turnsRoundedDown;
+        }
+
+        public int TurnsUntilProductionFinished()
+        {
+            return TurnsToProduce(itemBeingProduced);
         }
 
         /**

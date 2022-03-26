@@ -19,7 +19,7 @@ public class Game : Node2D
 		ComputerTurn
 	}
 
-	Player controller; // Player that's controlling the UI.
+	public Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
 	public Civ3AnimData civ3AnimData;
@@ -412,7 +412,14 @@ public class Game : Node2D
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
+						bool shiftDown = Input.IsKeyPressed((int)Godot.KeyList.Shift);
+						if (shiftDown && tile.cityAtTile?.owner == controller)
+							new RightClickChooseProductionMenu(this, tile.cityAtTile).Open(eventMouseButton.Position);
+						else if ((! shiftDown) && tile.unitsOnTile.Count > 0)
+							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
+
 						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.DisplayName);
+
 						if (tile.unitsOnTile.Count > 0) {
 							foreach (MapUnit unit in tile.unitsOnTile) {
 								GD.Print("  Unit on tile: " + unit);
