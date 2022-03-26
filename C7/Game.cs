@@ -413,7 +413,7 @@ public class Game : Node2D
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
 						bool shiftDown = Input.IsKeyPressed((int)Godot.KeyList.Shift);
-						if (shiftDown && tile.cityAtTile != null && tile.cityAtTile.owner == controller)
+						if (shiftDown && tile.cityAtTile?.owner == controller)
 							new RightClickChooseProductionMenu(this, tile.cityAtTile).Open(eventMouseButton.Position);
 						else if ((! shiftDown) && tile.unitsOnTile.Count > 0)
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
