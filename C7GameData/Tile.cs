@@ -13,7 +13,11 @@ namespace C7GameData
 		public Civ3ExtraInfo ExtraInfo;
 		public int xCoordinate;
 		public int yCoordinate;
+		public string baseTerrainTypeKey { get; set; }
+		[JsonIgnore]
 		public TerrainType baseTerrainType = TerrainType.NONE;
+		public string overlayTerrainTypeKey { get; set; }
+		[JsonIgnore]
 		public TerrainType overlayTerrainType = TerrainType.NONE;
 		public City cityAtTile;
 		public bool hasBarbarianCamp = false;

@@ -39,6 +39,7 @@ project.lock.json
 *.user
 *.userosscache
 *.sln.docstates
+C7.ini
 
 # Build results
 [Dd]ebug/

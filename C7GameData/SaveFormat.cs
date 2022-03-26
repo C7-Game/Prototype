@@ -39,6 +39,8 @@ namespace C7GameData
                 else {
                     tile.Resource = save.GameData.Resources.Find(r => r.Key == tile.ResourceKey);
                 }
+                tile.baseTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.baseTerrainTypeKey);
+                tile.overlayTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.overlayTerrainTypeKey);
             }
             return save;
         }
