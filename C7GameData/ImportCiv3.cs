@@ -51,7 +51,7 @@ namespace C7GameData
 					ExtraInfo = extra,
 					baseTerrainType = c7Save.GameData.terrainTypes[civ3Tile.BaseTerrain],
 					overlayTerrainType = c7Save.GameData.terrainTypes[civ3Tile.OverlayTerrain],
-				};                
+				};
 				if (civ3Tile.BonusShield) {
                     c7Tile.isBonusShield = true;
                 }
@@ -110,6 +110,9 @@ namespace C7GameData
 					baseTerrainType = c7Save.GameData.terrainTypes[civ3Tile.BaseTerrain],
 					overlayTerrainType = c7Save.GameData.terrainTypes[civ3Tile.OverlayTerrain],
 				};
+				if (civ3Tile.BonusShield) {
+                    c7Tile.isBonusShield = true;
+                }
 				if (civ3Tile.SnowCappedMountain) {
 					c7Tile.isSnowCapped = true;
 				}
