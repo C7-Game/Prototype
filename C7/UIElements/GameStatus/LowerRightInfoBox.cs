@@ -138,13 +138,14 @@ public class LowerRightInfoBox : TextureRect
 		
 	}
 
-	public void UpdateUnitInfo(MapUnit NewUnit)
+	public void UpdateUnitInfo(MapUnit NewUnit, TerrainType terrain)
 	{
-		lblUnitSelected.Visible = true;
-		attackDefenseMovement.Visible = true;
+		terrainType.Text = terrain.DisplayName;
 		terrainType.Visible = true;
 		lblUnitSelected.Text = NewUnit.unitType.name;
+		lblUnitSelected.Visible = true;
 		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.movementPointsRemaining + "/" + NewUnit.unitType.movement;
+		attackDefenseMovement.Visible = true;
 	}
 
 	///This is going to evolve a lot over time.  Probably this info box will need to keep some local state.

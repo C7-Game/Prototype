@@ -22,7 +22,7 @@ public class GameStatus : MarginContainer
 	{
 		MapUnit newUnit = wrappedMapUnit.GetValue<MapUnit>();
 		GD.Print("Selected unit: " + newUnit + " at " + newUnit.location);
-		LowerRightInfoBox.UpdateUnitInfo(newUnit);
+		LowerRightInfoBox.UpdateUnitInfo(newUnit, newUnit.location.overlayTerrainType);
 	}
 	
 	private void OnTurnEnded()
