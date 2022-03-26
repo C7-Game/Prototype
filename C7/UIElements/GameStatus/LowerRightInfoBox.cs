@@ -144,7 +144,13 @@ public class LowerRightInfoBox : TextureRect
 		terrainType.Visible = true;
 		lblUnitSelected.Text = NewUnit.unitType.name;
 		lblUnitSelected.Visible = true;
-		attackDefenseMovement.Text = NewUnit.unitType.attack + "." + NewUnit.unitType.defense + " " + NewUnit.movementPointsRemaining + "/" + NewUnit.unitType.movement;
+		string movementPointsRemaining = NewUnit.movementPointsRemaining > 0 ? "" + NewUnit.movementPointsRemaining : "0";
+		string bombardText = "";
+		if (NewUnit.unitType.bombard > 0)
+        {
+			bombardText = $"({NewUnit.unitType.bombard})";
+        }
+		attackDefenseMovement.Text = $"{NewUnit.unitType.attack}{bombardText}.{NewUnit.unitType.defense} {movementPointsRemaining}/{NewUnit.unitType.movement}";
 		attackDefenseMovement.Visible = true;
 	}
 
