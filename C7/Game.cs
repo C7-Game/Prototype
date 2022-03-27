@@ -134,7 +134,7 @@ public class Game : Node2D
 					if (mSUA.action == MapUnit.AnimatedAction.ATTACK1)
 						ensureLocationIsInView(unit.location);
 
-					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent);
+					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent, mSUA.ending);
 				}
 				break;
 			case MsgStartEffectAnimation mSEA:
@@ -142,7 +142,7 @@ public class Game : Node2D
 				gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
 				Tile tile = gameData.map.tileAt(x, y);
 				if (tile != Tile.NONE)
-					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent);
+					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
 				break;
 			case MsgStartTurn mST:
 				//Simulating processing so the turn doesn't end too quickly

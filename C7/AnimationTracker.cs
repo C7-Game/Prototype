@@ -17,6 +17,7 @@ public class AnimationTracker {
 	public struct ActiveAnimation {
 		public long startTimeMS, endTimeMS;
 		public AutoResetEvent completionEvent;
+		public AnimationEnding ending;
 		public Civ3Anim anim;
 	}
 
@@ -34,7 +35,7 @@ public class AnimationTracker {
 		return String.Format("Tile.{0}.{1}", tile.xCoordinate, tile.yCoordinate);
 	}
 
-	private void startAnimation(string id, Civ3Anim anim, AutoResetEvent completionEvent)
+	private void startAnimation(string id, Civ3Anim anim, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
 		long currentTimeMS = getCurrentTimeMS();
 		long animDurationMS = (long)(1000.0 * anim.getDuration());
@@ -46,21 +47,22 @@ public class AnimationTracker {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
 		}
-		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, completionEvent = completionEvent, anim = anim };
+		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, completionEvent = completionEvent,
+			ending = ending, anim = anim };
 
 		anim.playSound();
 
 		activeAnims[id] = aa;
 	}
 
-	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent)
+	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
-		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType.name, action), completionEvent);
+		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType.name, action), completionEvent, ending);
 	}
 
-	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent)
+	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
-		startAnimation(getTileID(tile), civ3AnimData.forEffect(effect), completionEvent);
+		startAnimation(getTileID(tile), civ3AnimData.forEffect(effect), completionEvent, ending);
 	}
 
 	public void endAnimation(MapUnit unit)
@@ -78,24 +80,31 @@ public class AnimationTracker {
 		return activeAnims.ContainsKey(unit.guid);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(string id)
+	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(string id)
 	{
 		ActiveAnimation aa = activeAnims[id];
+
 		var durationMS = (double)(aa.endTimeMS - aa.startTimeMS);
 		if (durationMS <= 0.0)
 			durationMS = 1.0;
-		var repCount = (double)(getCurrentTimeMS() - aa.startTimeMS) / durationMS;
-		return (aa.anim.action, repCount);
+
+		var progress = (double)(getCurrentTimeMS() - aa.startTimeMS) / durationMS;
+		if (aa.ending == AnimationEnding.Repeat)
+			progress = progress - Math.Floor(progress);
+		else if (progress > 1.0)
+			progress = 1.0;
+
+		return (aa.anim.action, (float)progress);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(MapUnit unit)
+	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(MapUnit unit)
 	{
-		return getCurrentActionAndRepetitionCount(unit.guid);
+		return getCurrentActionAndProgress(unit.guid);
 	}
 
-	public (MapUnit.AnimatedAction, double) getCurrentActionAndRepetitionCount(Tile tile)
+	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(Tile tile)
 	{
-		return getCurrentActionAndRepetitionCount(getTileID(tile));
+		return getCurrentActionAndProgress(getTileID(tile));
 	}
 
 	public void update()
@@ -104,9 +113,12 @@ public class AnimationTracker {
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (id, aa) = (guidAAPair.Key, guidAAPair.Value);
-			if (aa.completionEvent != null)
+			if (aa.completionEvent != null) {
 				aa.completionEvent.Set();
-			keysToRemove.Add(id);
+				aa.completionEvent = null; // So event is only triggered once
+			}
+			if (aa.ending == AnimationEnding.Stop)
+				keysToRemove.Add(id);
 		}
 		foreach (var key in keysToRemove)
 			activeAnims.Remove(key);
@@ -115,20 +127,7 @@ public class AnimationTracker {
 	public MapUnit.Appearance getUnitAppearance(MapUnit unit)
 	{
 		if (hasCurrentAction(unit)) {
-			var (action, repCount) = getCurrentActionAndRepetitionCount(unit);
-
-			var isNonRepeatingAction =
-				(action == MapUnit.AnimatedAction.RUN) ||
-				(action == MapUnit.AnimatedAction.DEATH) ||
-				(action == MapUnit.AnimatedAction.FORTIFY) ||
-				(action == MapUnit.AnimatedAction.VICTORY) ||
-				(action == MapUnit.AnimatedAction.BUILD);
-
-			float progress;
-			if (isNonRepeatingAction)
-				progress = (repCount <= 1.0) ? (float)repCount : 1f;
-			else
-				progress = (float)(repCount - Math.Floor(repCount));
+			var (action, progress) = getCurrentActionAndProgress(unit);
 
 			float offsetX = 0, offsetY = 0;
 			if (action == MapUnit.AnimatedAction.RUN) {
