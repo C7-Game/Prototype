@@ -463,7 +463,7 @@ public class Game : Node2D
 				}
 			}
 			else if ((eventKey.Scancode >= (int)Godot.KeyList.Kp1) && (eventKey.Scancode <= (int)Godot.KeyList.Kp9))
-			{
+			{ // Move units with the numpad keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
@@ -477,6 +477,25 @@ public class Game : Node2D
 					case 7: dir = TileDirection.NORTHWEST; break;
 					case 8: dir = TileDirection.NORTH;     break;
 					case 9: dir = TileDirection.NORTHEAST; break;
+					default: return; // Impossible
+					}
+					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+				}
+			}
+			else if ((eventKey.Scancode >= (int)Godot.KeyList.Home) && (eventKey.Scancode <= (int)Godot.KeyList.Pagedown))
+			{ // Move units with the arrow and fn keys
+				if (CurrentlySelectedUnit != MapUnit.NONE)
+				{
+					TileDirection dir;
+					switch (eventKey.Scancode) {
+					case (int)Godot.KeyList.Home:     dir = TileDirection.NORTHWEST; break; // fn-left arrow
+					case (int)Godot.KeyList.End:      dir = TileDirection.SOUTHWEST; break; // fn-right arrow
+					case (int)Godot.KeyList.Left:     dir = TileDirection.WEST;      break;
+					case (int)Godot.KeyList.Up:       dir = TileDirection.NORTH;     break;
+					case (int)Godot.KeyList.Right:    dir = TileDirection.EAST;      break;
+					case (int)Godot.KeyList.Down:     dir = TileDirection.SOUTH;     break;
+					case (int)Godot.KeyList.Pageup:   dir = TileDirection.NORTHEAST; break; // fn-up arrow
+					case (int)Godot.KeyList.Pagedown: dir = TileDirection.SOUTHEAST; break; // fn-down arrow
 					default: return; // Impossible
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
