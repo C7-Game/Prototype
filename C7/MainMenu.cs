@@ -1,11 +1,13 @@
 using Godot;
-using ConvertCiv3Media;
 using System;
+using Serilog;
 
 public class MainMenu : Node2D
 {
+	static ILogger log = LogManager.ForContext<MainMenu>();
+
 	readonly int BUTTON_LABEL_OFFSET = 4;
-	
+
 	ImageTexture InactiveButton;
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
@@ -18,7 +20,8 @@ public class MainMenu : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		GD.Print("Hello world!");
+		log.Debug("enter MainMenu._Ready");
+
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		Global.ResetLoadGamePath();
@@ -61,7 +64,7 @@ public class MainMenu : Node2D
 		}
 		catch(Exception ex)
 		{
-			GD.Print("Could not set up the main menu", ex);
+			log.Error(ex, "Could not set up the main menu");
 			GetNode<Label>("CanvasLayer/Label").Visible = true;
 			GetNode<ColorRect>("CanvasLayer/ColorRect").Visible = true;
 		}
@@ -97,28 +100,28 @@ public class MainMenu : Node2D
 
 	public void StartGame()
 	{
-		GD.Print("Load button pressed");
+		log.Information("start game button pressed");
 		PlayButtonPressedSound();
 		GetTree().ChangeScene("res://C7Game.tscn");
 	}
 	
 	public void LoadGame()
 	{
-		GD.Print("Real Load button pressed");
+		log.Information("load game button pressed");
 		PlayButtonPressedSound();
 		LoadDialog.Popup_();
 	}
 
 	public void LoadScenario()
 	{
-		GD.Print("Load scenario button pressed");
+		log.Information("load scenario button pressed");
 		PlayButtonPressedSound();
 		LoadScenarioDialog.Popup_();
 	}
 	
 	public void showCredits()
 	{
-		GD.Print("Credits button pressed");
+		log.Information("credits button pressed");
 		GetTree().ChangeScene("res://Credits.tscn");
 	}
 
@@ -148,14 +151,16 @@ public class MainMenu : Node2D
 
 	private void _on_FileDialog_file_selected(string path)
 	{
-		GD.Print("Loading " + path);
+		log.Information("loading {path}", path);
 		Global.LoadGamePath = path;
 		GetTree().ChangeScene("res://C7Game.tscn");
 	}
+
 	private void _on_SetCiv3Home_pressed()
 	{
 		SetCiv3HomeDialog.Popup_();
 	}
+
 	private void _on_SetCiv3HomeDialog_dir_selected(string path)
 	{
 		Util.Civ3Root = path;

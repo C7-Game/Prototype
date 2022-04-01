@@ -1,9 +1,12 @@
 using Godot;
 using System;
 using C7Engine;
+using Serilog;
 
 public class MainMenuMusicPlayer : AudioStreamPlayer
 {
+	static ILogger log = LogManager.ForContext<MainMenuMusicPlayer>();
+
 	private bool musicEnabled = true;
 
 	// Called when the node enters the scene tree for the first time.
@@ -14,7 +17,7 @@ public class MainMenuMusicPlayer : AudioStreamPlayer
 		try {
 			string mp3Path = Util.Civ3MediaPath("Sounds/Menu/Menu1.mp3");
 			File mp3File = new File();
-			mp3File.Open(mp3Path, Godot.File.ModeFlags.Read);
+			mp3File.Open(mp3Path, File.ModeFlags.Read);
 
 			AudioStreamMP3 mp3 = new AudioStreamMP3();
 			long fileSize = (long)mp3File.GetLen();	//might blow up if it's > 2 GB, oh well
@@ -30,14 +33,14 @@ public class MainMenuMusicPlayer : AudioStreamPlayer
 			}
 
 			if (musicEnabled) {
-				GD.Print("Setting volume to " + volume + "%, which is " + targetVolumeOffset + " decibel offset");
-				int busIndex = AudioServer.GetBusIndex(this.Bus);
+				log.Debug("setting volume to {volume}, which is {offset} decibel offset", volume, targetVolumeOffset);
+				int busIndex = AudioServer.GetBusIndex(Bus);
 				AudioServer.SetBusVolumeDb(busIndex, targetVolumeOffset);
-				this.Play();
+				Play();
 			}
 		}
 		catch(ApplicationException ex) {
-			GD.PrintErr("Could not load mp3 for main menu music");
+			log.Error(ex, "could not load mp3 for main menu music");
 		}
 	}
 
