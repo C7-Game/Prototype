@@ -18,6 +18,7 @@ public class Player
 	
 	public List<MapUnit> units = new List<MapUnit>();
 	public List<City> cities = new List<City>();
+	public TileKnowledge tileKnowledge = new TileKnowledge();
 
 	public Player(uint color)
 	{

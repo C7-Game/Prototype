@@ -57,6 +57,7 @@ namespace C7Engine
 						unit.move(unit.location.directionTo(newLocation));
 					}
 				}
+				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
 		}
 		
