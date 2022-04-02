@@ -12,7 +12,7 @@ public class Game : Node2D
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
 	[Signal] public delegate void NoMoreAutoselectableUnits();
-	
+
 	enum GameState {
 		PreGame,
 		PlayerTurn,
@@ -49,7 +49,7 @@ public class Game : Node2D
 	{
 		loadTimer.Start();
 	}
-	
+
 	// Called when the node enters the scene tree for the first time.
 	// The catch should always catch any error, as it's the general catch
 	// that gives an error if we fail to load for some reason.
@@ -327,7 +327,7 @@ public class Game : Node2D
 		// GetTree().Quit();
 
 		// ChangeScene deletes the current scene and frees its memory, so this is quitting to main menu
-		GetTree().ChangeScene("res://MainMenu.tscn");    
+		GetTree().ChangeScene("res://MainMenu.tscn");
 	}
 
 	public void _on_Zoom_value_changed(float value)
@@ -598,7 +598,7 @@ public class Game : Node2D
 			GetNode<AnimationPlayer>("CanvasLayer/SlideOutBar/AnimationPlayer").Play("SlideOutAnimation");
 		}
 	}
-	
+
 	// Called by the disband popup
 	private void OnUnitDisbanded()
 	{
@@ -613,7 +613,7 @@ public class Game : Node2D
 		GD.Print("Goodbye!");
 		GetTree().Quit();
 	}
-	
+
 	private void OnBuildCity(string name)
 	{
 		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();
