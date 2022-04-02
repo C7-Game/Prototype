@@ -49,7 +49,25 @@ namespace C7Engine
 						Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
 						continue;
 					}
-					Tile newLocation = possibleNewLocations[rng.Next(possibleNewLocations.Count)];
+					//Technically, this should be the *estimated* new tiles revealed.  If a mountain blocks visibility,
+					//we won't know that till we move there.
+					Dictionary<Tile, int> numNewTilesRevealed = new Dictionary<Tile, int>();
+					foreach (Tile t in possibleNewLocations) {
+						//Calculate whether it, and its neighbors are in known tiles.
+						int discoverableTiles = 0;
+						if (!player.tileKnowledge.isTileKnown(t)) {
+							discoverableTiles++;
+						}
+						foreach (Tile n in t.neighbors.Values) {
+							if (!player.tileKnowledge.isTileKnown(n)) {
+								discoverableTiles++;
+							}
+						}
+						numNewTilesRevealed[t] = discoverableTiles;
+					}
+					IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = numNewTilesRevealed.OrderByDescending(t => t.Value);
+					Tile newLocation = orderedScores.First().Key;
+
 					//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
 					//if it tries to move e.g. north from the north pole.  Hence, this check.
 					if (newLocation != Tile.NONE) {

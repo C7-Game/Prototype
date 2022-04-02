@@ -13,5 +13,9 @@ namespace C7GameData
 				knownTiles.Add(t);
 			}
 		}
+
+		public bool isTileKnown(Tile t) {
+			return knownTiles.Contains(t);
+		}
 	}
 }
