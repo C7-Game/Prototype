@@ -39,41 +39,8 @@ namespace C7Engine
 						Console.WriteLine("Moving defender towards " + defenderAI.destination);
 					}
 				}
-				else if (unit.currentAIBehavior is ExplorerAI explorerAi) {
-					// Console.Write("Moving explorer AI for " + unit);
-					//TODO: Distinguish between types of exploration
-					//TODO: Make sure ON_A_BOAT units stay on the boat
-					//Move randomly
-					List<Tile> possibleNewLocations = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
-					if (possibleNewLocations.Count == 0) {
-						Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
-						continue;
-					}
-					//Technically, this should be the *estimated* new tiles revealed.  If a mountain blocks visibility,
-					//we won't know that till we move there.
-					Dictionary<Tile, int> numNewTilesRevealed = new Dictionary<Tile, int>();
-					foreach (Tile t in possibleNewLocations) {
-						//Calculate whether it, and its neighbors are in known tiles.
-						int discoverableTiles = 0;
-						if (!player.tileKnowledge.isTileKnown(t)) {
-							discoverableTiles++;
-						}
-						foreach (Tile n in t.neighbors.Values) {
-							if (!player.tileKnowledge.isTileKnown(n)) {
-								discoverableTiles++;
-							}
-						}
-						numNewTilesRevealed[t] = discoverableTiles;
-					}
-					IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = numNewTilesRevealed.OrderByDescending(t => t.Value);
-					Tile newLocation = orderedScores.First().Key;
-
-					//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
-					//if it tries to move e.g. north from the north pole.  Hence, this check.
-					if (newLocation != Tile.NONE) {
-						// Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
-						unit.move(unit.location.directionTo(newLocation));
-					}
+				else if (unit.currentAIBehavior is ExplorerAIData explorerAi) {
+					ExplorerAI.PlayExplorerTurn(player, explorerAi, unit);
 				}
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
@@ -116,18 +83,18 @@ namespace C7Engine
 				unit.currentAIBehavior = ai;
 			}
 			else {
-				ExplorerAI ai = new ExplorerAI();
+				ExplorerAIData ai = new ExplorerAIData();
 				if (unit.unitType is SeaUnit) {
-					ai.type = ExplorerAI.ExplorationType.COASTLINE;
+					ai.type = ExplorerAIData.ExplorationType.COASTLINE;
 					Console.WriteLine("Set coastline exploration AI for " + unit);
 				}
 				else if (unit.location.unitsOnTile.Exists((x) => x.unitType is SeaUnit)) {
-					ai.type = ExplorerAI.ExplorationType.ON_A_BOAT;
+					ai.type = ExplorerAIData.ExplorationType.ON_A_BOAT;
 					//TODO: Actually put the unit on the boat
 					Console.WriteLine("Set ON_A_BOAT exploration AI for " + unit);
 				}
 				else {
-					ai.type = ExplorerAI.ExplorationType.RANDOM;
+					ai.type = ExplorerAIData.ExplorationType.RANDOM;
 					Console.WriteLine("Set random exploration AI for " + unit);
 				}
 				unit.currentAIBehavior = ai;
