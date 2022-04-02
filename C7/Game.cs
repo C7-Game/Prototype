@@ -480,6 +480,8 @@ public class Game : Node2D
 					default: return; // Impossible
 					}
 					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
+
 				}
 			}
 			else if ((eventKey.Scancode >= (int)Godot.KeyList.Home) && (eventKey.Scancode <= (int)Godot.KeyList.Pagedown))
