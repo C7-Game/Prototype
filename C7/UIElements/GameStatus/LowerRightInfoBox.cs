@@ -147,9 +147,9 @@ public class LowerRightInfoBox : TextureRect
 		string movementPointsRemaining = NewUnit.movementPointsRemaining > 0 ? "" + NewUnit.movementPointsRemaining : "0";
 		string bombardText = "";
 		if (NewUnit.unitType.bombard > 0)
-        {
+		{
 			bombardText = $"({NewUnit.unitType.bombard})";
-        }
+		}
 		attackDefenseMovement.Text = $"{NewUnit.unitType.attack}{bombardText}.{NewUnit.unitType.defense} {movementPointsRemaining}/{NewUnit.unitType.movement}";
 		attackDefenseMovement.Visible = true;
 	}
