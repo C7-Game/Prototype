@@ -17,5 +17,18 @@ namespace C7GameData
 		public bool isTileKnown(Tile t) {
 			return knownTiles.Contains(t);
 		}
+
+		/**
+		 * Returns a copy of the list of known tiles.
+		 * This prevents external modifications.
+		 **/
+		public List<Tile> AllKnownTiles()
+		{
+			List<Tile> list = new List<Tile>();
+			foreach (Tile t in knownTiles) {
+				list.Add(t);
+			}
+			return list;
+		}
 	}
 }
