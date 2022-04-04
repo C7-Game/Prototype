@@ -11,67 +11,85 @@ namespace C7Engine
 	{
 		public static async void PlayExplorerTurn(Player player, ExplorerAIData explorerData, MapUnit unit)
 		{
-			// Console.Write("Moving explorer AI for " + unit);
-			if (explorerData.path != null && explorerData.path.PathLength() > 0) {
-				Tile next = explorerData.path.Next();
-				foreach (KeyValuePair<TileDirection, Tile> neighbor in unit.location.neighbors) {
-					if (neighbor.Value == next) {
-						unit.move(neighbor.Key);
-						return;
+			if (MovingToNewExplorationArea(explorerData)) {
+				MoveToNextTileOnPath(explorerData, unit);
+			}
+			else {
+				bool foundNeighboringTileToExplore = ExploreNeighboringTile(player, unit);
+
+				if (!foundNeighboringTileToExplore) {
+					//Find the nearest tile that will allow us to continue exploring.
+					//We prefer nearest because the one that allows the most discovery might be pretty far away
+					bool foundNewPath = FindPathToNewExplorationArea(player, explorerData, unit);
+					if (foundNewPath) {
+						MoveToNextTileOnPath(explorerData, unit);
 					}
 				}
 			}
+		}
 
+		private static void MoveToNextTileOnPath(ExplorerAIData explorerData, MapUnit unit) {
+			Tile next = explorerData.path.Next();
+			foreach (KeyValuePair<TileDirection, Tile> neighbor in unit.location.neighbors) {
+				if (neighbor.Value == next) {
+					unit.move(neighbor.Key);
+					return;
+				}
+			}
+		}
+
+		private static bool ExploreNeighboringTile(Player player, MapUnit unit) {
 			List<Tile> validNeighboringTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
-			if (validNeighboringTiles.Count == 0)
-			{
+			if (validNeighboringTiles.Count == 0) {
 				Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
-				return;
+				return false;
 			}
 			KeyValuePair<Tile, int> topScoringTile = FindTopScoringTile(player, validNeighboringTiles);
 			Tile newLocation = topScoringTile.Key;
 
-			//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
-			//if it tries to move e.g. north from the north pole.  Hence, this check.
-			if (newLocation != Tile.NONE && topScoringTile.Value > 0)
-			{
-				// Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
+			if (newLocation != Tile.NONE && topScoringTile.Value > 0) {
 				unit.move(unit.location.directionTo(newLocation));
 			}
-			else if (newLocation != Tile.NONE)
+			return true;
+		}
+
+		private static bool MovingToNewExplorationArea(ExplorerAIData explorerData) {
+			return explorerData.path != null && explorerData.path.PathLength() > 0;
+		}
+
+		private static bool FindPathToNewExplorationArea(Player player, ExplorerAIData explorerData, MapUnit unit) {
+			List<Tile> validExplorerTiles = new List<Tile>();
+			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
+					.Where(t => unit.canTraverseTile(t) && numUnknownNeighboringTiles(player, t) > 0))
 			{
-				//Find the nearest tile that will allow us to continue exploring.
-				//We prefer nearest because the one that allows the most discovery might be pretty far away
-				List<Tile> validExplorerTiles = new List<Tile>();
-				foreach (Tile t in player.tileKnowledge.AllKnownTiles()
-						.Where(t => unit.canTraverseTile(t) && numUnknownNeighboringTiles(player, t) > 0))
-				{
-					validExplorerTiles.Add(t);
-				}
+				validExplorerTiles.Add(t);
+			}
 
-				if (validExplorerTiles.Count == 0) {
-					//TODO: Change unit AI behavior to something else e.g. defender
-					return;
-				}
+			if (validExplorerTiles.Count == 0) {
+				//Nowhere to explore.
+				//TODO: Change unit AI behavior to something else e.g. defender
+				return false;
+			}
 
-				int lowestDistance = int.MaxValue;
-				Tile nearestTile = Tile.NONE;
-				TilePath chosenPath = null;
+			int lowestDistance = int.MaxValue;
+			TilePath chosenPath = null;
 
-				PathingAlgorithm algo = PathingAlgorithmChooser.GetAlgorithm();
-				foreach (Tile t in validExplorerTiles) {
-					TilePath path = algo.PathFrom(unit.location, t);
-					if (path.PathLength() < lowestDistance) {
-						lowestDistance = path.PathLength();
-						nearestTile = t;
-						chosenPath = path;
-					}
-				}
-
-				if (nearestTile != Tile.NONE) {
-					explorerData.path = chosenPath;
+			PathingAlgorithm algo = PathingAlgorithmChooser.GetAlgorithm();
+			foreach (Tile t in validExplorerTiles) {
+				TilePath path = algo.PathFrom(unit.location, t);
+				if (path.PathLength() < lowestDistance) {
+					lowestDistance = path.PathLength();
+					chosenPath = path;
 				}
 			}
+
+			if (chosenPath == null) {
+				//This could happen if there is e.g. a land tile that we could explore from, but on a different landmass.
+				//Later, we might recruit a boat to take us there, but for now it's a fail state.
+				return false;
+			}
+			explorerData.path = chosenPath;
+			return true;
 		}
 
 		private static KeyValuePair<Tile, int> FindTopScoringTile(Player player, List<Tile> possibleNewLocations)
