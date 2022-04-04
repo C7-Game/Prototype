@@ -12,6 +12,16 @@ namespace C7Engine
 		public static async void PlayExplorerTurn(Player player, ExplorerAIData explorerData, MapUnit unit)
 		{
 			// Console.Write("Moving explorer AI for " + unit);
+			if (explorerData.path != null && explorerData.path.PathLength() > 0) {
+				Tile next = explorerData.path.Next();
+				foreach (KeyValuePair<TileDirection, Tile> neighbor in unit.location.neighbors) {
+					if (neighbor.Value == next) {
+						unit.move(neighbor.Key);
+						return;
+					}
+				}
+			}
+
 			List<Tile> validNeighboringTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 			if (validNeighboringTiles.Count == 0)
 			{
@@ -58,6 +68,9 @@ namespace C7Engine
 					}
 				}
 
+				if (nearestTile != Tile.NONE) {
+					explorerData.path = chosenPath;
+				}
 			}
 		}
 
