@@ -84,6 +84,11 @@ namespace C7Engine
 			UnitInteractions.ClearWaitQueue();
 			gameData.turn++;
 
+			foreach (MapUnit mapUnit in gameData.mapUnits) {
+				if (mapUnit.path?.Length() > 0) {
+					mapUnit.moveAlongPath();
+				}
+			}
 			new MsgStartTurn().send();
 		}
 

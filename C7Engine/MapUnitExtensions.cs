@@ -1,6 +1,7 @@
 namespace C7Engine
 {
 
+using System;
 using Pathing;
 using C7GameData;
 
@@ -108,7 +109,7 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static void move(this MapUnit unit, TileDirection dir)
+	public static void move(this MapUnit unit, TileDirection dir, bool wait = false)
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
@@ -144,25 +145,23 @@ public static class MapUnitExtensions {
 			unit.location = newLoc;
 			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
 			unit.OnEnterTile(newLoc);
-			unit.animate(MapUnit.AnimatedAction.RUN, false);
+			unit.animate(MapUnit.AnimatedAction.RUN, wait);
 		}
 	}
 
-	private static void moveAlongPath(this MapUnit unit)
+	public static void moveAlongPath(this MapUnit unit)
 	{
 		while (unit.movementPointsRemaining > 0 && unit.path?.Length() > 0) {
 			var dir = unit.location.directionTo(unit.path.Next());
-			unit.move(dir);
+			unit.move(dir, true); //TODO: don't wait on last move animation?
 		}
 	}
 
-	public static void beginMoveTo(this MapUnit unit, Tile dest)
+	public static void setUnitPath(this MapUnit unit, Tile dest)
 	{
-		System.Console.WriteLine("beginning move from " + unit.location + " to " + dest);
-
 		unit.path = PathingAlgorithmChooser.GetAlgorithm().PathFrom(unit.location, dest);
 		if (unit.path == TilePath.NONE) {
-			System.Console.WriteLine("PATH IS NONE!");
+			System.Console.WriteLine("Cannot move unit to " + dest + ", path is NONE!");
 		}
 		unit.moveAlongPath();
 	}

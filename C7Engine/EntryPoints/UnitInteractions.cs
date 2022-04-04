@@ -88,9 +88,9 @@ namespace C7Engine
 			new MsgMoveUnit(guid, dir).send();
 		}
 
-		public static void beginUnitMoveTo(string guid, Tile dest)
+		public static void setUnitPath(string guid, Tile dest)
 		{
-			new MsgBeginUnitMoveTo(guid, dest).send();
+			new MsgSetUnitPath(guid, dest).send();
 		}
 
 		public static void holdUnit(string guid)

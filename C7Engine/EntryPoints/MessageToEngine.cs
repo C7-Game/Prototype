@@ -64,12 +64,12 @@ namespace C7Engine
 		}
 	}
 
-	public class MsgBeginUnitMoveTo : MessageToEngine
+	public class MsgSetUnitPath : MessageToEngine
 	{
 		private string unitGUID;
 		private Tile dest;
 
-		public MsgBeginUnitMoveTo(string unitGUID, Tile dest)
+		public MsgSetUnitPath(string unitGUID, Tile dest)
 		{
 			this.unitGUID = unitGUID;
 			this.dest = dest;
@@ -78,7 +78,7 @@ namespace C7Engine
 		public override void process()
 		{
 			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
-			unit?.beginMoveTo(dest);
+			unit?.setUnitPath(dest);
 		}
 	}
 

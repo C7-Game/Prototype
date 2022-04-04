@@ -30,7 +30,7 @@ public class Game : Node2D
 
 	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
 	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
-	private bool isUnitGoTo = false;
+	private bool inUnitGoToMode = false;
 
 	// Normally if the currently selected unit (CSU) becomes fortified, we advance to the next autoselected unit. If this flag is set, we won't do
 	// that. This is useful so that the unit autoselector can be prevented from interfering with the player selecting fortified units.
@@ -381,15 +381,14 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				if(eventMouseButton.IsPressed())
 				{
-					if (isUnitGoTo) {
-						isUnitGoTo = false;
+					if (inUnitGoToMode) {
+						setGoToMode(false);
 						using (var gameDataAccess = new UIGameDataAccess()) {
 							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 							if (tile != null) {
-								UnitInteractions.beginUnitMoveTo(CurrentlySelectedUnit.guid, tile);
+								UnitInteractions.setUnitPath(CurrentlySelectedUnit.guid, tile);
 							}
 						}
-						GD.Print("UNIT SHOULD GO HERE");
 					}
 					else
 					{
@@ -423,8 +422,9 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
 			}
-			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (! eventMouseButton.IsPressed()))
+			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (!eventMouseButton.IsPressed()))
 			{
+				setGoToMode(false);
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
@@ -521,13 +521,15 @@ public class Game : Node2D
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
 			{
-				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
+				mapView.gridLayer.visible = !mapView.gridLayer.visible;
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
-				GD.Print("Got request for escape/quit");
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-				popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
+				if (!inUnitGoToMode) {
+					GD.Print("Got request for escape/quit");
+					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+					popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
+				}
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Z)
 			{
@@ -542,6 +544,11 @@ public class Game : Node2D
 					slider.Value = 0.5f;
 				}
 			}
+
+			// always turn off go to mode unless G key is pressed
+			// do this after processing esc key
+			setGoToMode(eventKey.Scancode == (int)Godot.KeyList.G);
+
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
 		{
@@ -563,6 +570,11 @@ public class Game : Node2D
 		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit(gameData));
 	}
 
+	private void setGoToMode(bool isOn)
+	{
+		inUnitGoToMode = isOn;
+	}
+
 	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
 	///the keyboard shortcuts should wind up here.
 	///Eventually, we should quite possibly put this somewhere other than Game.cs, or at
@@ -570,6 +582,10 @@ public class Game : Node2D
 	///more things going on before figuring out what the 'right' thing is, though.
 	private void UnitButtonPressed(string buttonName)
 	{
+		// this will detoggle goTo when clicking unit buttons
+		// other than goTo
+		setGoToMode(buttonName == "goTo");
+
 		GD.Print("The " + buttonName + " button was pressed");
 		switch (buttonName) {
 			case "hold":
@@ -602,7 +618,6 @@ public class Game : Node2D
 				break;
 
 			case "goTo":
-				isUnitGoTo = true;
 				break;
 
 			default:
