@@ -9,7 +9,7 @@ namespace C7Engine
 {
 	public class ExplorerAI
 	{
-		public static async void PlayExplorerTurn(Player player, ExplorerAIData explorerData, MapUnit unit)
+		public static void PlayExplorerTurn(Player player, ExplorerAIData explorerData, MapUnit unit)
 		{
 			if (MovingToNewExplorationArea(explorerData)) {
 				MoveToNextTileOnPath(explorerData, unit);
@@ -49,8 +49,9 @@ namespace C7Engine
 
 			if (newLocation != Tile.NONE && topScoringTile.Value > 0) {
 				unit.move(unit.location.directionTo(newLocation));
+				return true;
 			}
-			return true;
+			return false;
 		}
 
 		private static bool MovingToNewExplorationArea(ExplorerAIData explorerData) {
