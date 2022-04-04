@@ -30,6 +30,7 @@ public class Game : Node2D
 
 	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
 	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
+	private bool isUnitGoTo = false;
 
 	// Normally if the currently selected unit (CSU) becomes fortified, we advance to the next autoselected unit. If this flag is set, we won't do
 	// that. This is useful so that the unit autoselector can be prevented from interfering with the player selecting fortified units.
@@ -126,7 +127,7 @@ public class Game : Node2D
 		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
-				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSUA.unitGUID);
+				MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
 				if (unit != null) {
 					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
@@ -380,19 +381,32 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				if(eventMouseButton.IsPressed())
 				{
-					// Select unit on tile at mouse location
-					using (var gameDataAccess = new UIGameDataAccess()) {
-						var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
-						if (tile != null) {
-							MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
-							//TODO: Better check for "current/human player"
-							if (to_select != null && to_select.owner.color == 0x4040FFFF)
-								setSelectedUnit(to_select);
+					if (isUnitGoTo) {
+						isUnitGoTo = false;
+						using (var gameDataAccess = new UIGameDataAccess()) {
+							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							if (tile != null) {
+								UnitInteractions.beginUnitMoveTo(CurrentlySelectedUnit.guid, tile);
+							}
 						}
+						GD.Print("UNIT SHOULD GO HERE");
 					}
+					else
+					{
+						// Select unit on tile at mouse location
+						using (var gameDataAccess = new UIGameDataAccess()) {
+							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							if (tile != null) {
+								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+								//TODO: Better check for "current/human player"
+								if (to_select != null && to_select.owner.color == 0x4040FFFF)
+									setSelectedUnit(to_select);
+							}
+						}
 
-					OldPosition = eventMouseButton.Position;
-					IsMovingCamera = true;
+						OldPosition = eventMouseButton.Position;
+						IsMovingCamera = true;
+					}
 				}
 				else
 				{
@@ -557,35 +571,44 @@ public class Game : Node2D
 	private void UnitButtonPressed(string buttonName)
 	{
 		GD.Print("The " + buttonName + " button was pressed");
-		if (buttonName.Equals("hold"))
-		{
-			new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
-		}
-		else if (buttonName.Equals("fortify"))
-		{
-			new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
-		}
-		else if (buttonName.Equals("wait"))
-		{
-			using (var gameDataAccess = new UIGameDataAccess()) {
-				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
-				GetNextAutoselectedUnit(gameDataAccess.gameData);
+		switch (buttonName) {
+			case "hold":
+				new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
+				break;
+
+			case "fortify":
+				new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
+				break;
+
+			case "wait":
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+					GetNextAutoselectedUnit(gameDataAccess.gameData);
+				}
+				break;
+
+			case "disband":
+			{
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
 			}
-		}
-		else if (buttonName.Equals("disband"))
-		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
-		}
-		else if (buttonName.Equals("buildCity"))
-		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
-		}
-		else
-		{
-			//A nice sanity check if I use a different name here than where I created it...
-			GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+				break;
+
+			case "buildCity":
+			{
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
+			}
+				break;
+
+			case "goTo":
+				isUnitGoTo = true;
+				break;
+
+			default:
+				//A nice sanity check if I use a different name here than where I created it...
+				GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+				break;
 		}
 	}
 

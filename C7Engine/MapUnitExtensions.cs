@@ -1,6 +1,7 @@
 namespace C7Engine
 {
 
+using Pathing;
 using C7GameData;
 
 //We should document why we're putting things in the extensions methods.  We discussed it a month or so ago, but I forget why at this point.
@@ -120,7 +121,7 @@ public static class MapUnitExtensions {
 			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
 				if (unit.unitType.attack > 0) {
 					bool unitWonCombat = unit.fight(defender);
-					if (! unitWonCombat)
+					if (!unitWonCombat)
 						return;
 
 					// If there are still more enemy units on the destination tile we can't actually move into it
@@ -132,8 +133,9 @@ public static class MapUnitExtensions {
 				} else if (unit.unitType.bombard > 0) {
 					unit.bombard(newLoc);
 					return;
-				} else
+				} else {
 					return;
+				}
 			}
 
 			if (!unit.location.unitsOnTile.Remove(unit))
@@ -144,6 +146,25 @@ public static class MapUnitExtensions {
 			unit.OnEnterTile(newLoc);
 			unit.animate(MapUnit.AnimatedAction.RUN, false);
 		}
+	}
+
+	private static void moveAlongPath(this MapUnit unit)
+	{
+		while (unit.movementPointsRemaining > 0 && unit.path?.Length() > 0) {
+			var dir = unit.location.directionTo(unit.path.Next());
+			unit.move(dir);
+		}
+	}
+
+	public static void beginMoveTo(this MapUnit unit, Tile dest)
+	{
+		System.Console.WriteLine("beginning move from " + unit.location + " to " + dest);
+
+		unit.path = PathingAlgorithmChooser.GetAlgorithm().PathFrom(unit.location, dest);
+		if (unit.path == TilePath.NONE) {
+			System.Console.WriteLine("PATH IS NONE!");
+		}
+		unit.moveAlongPath();
 	}
 
 	public static void skipTurn(this MapUnit unit)

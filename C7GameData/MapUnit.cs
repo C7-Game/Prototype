@@ -15,6 +15,7 @@ public class MapUnit
 	public UnitPrototype unitType {get; set;}
 	public Player owner {get; set;}
 	public Tile location {get; set;}
+	public TilePath path {get; set;}
 
 	public int movementPointsRemaining {get; set;}
 	public int hitPointsRemaining {get; set;}

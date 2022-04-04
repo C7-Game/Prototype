@@ -20,6 +20,11 @@ namespace C7GameData
 			rng = new Random();
 		}
 
+		public MapUnit GetUnit(string guid)
+		{
+			return mapUnits.Find(u => u.guid == guid);
+		}
+
 		/**
 		 * This is intended as a place to set up post-load actions on the save, regardless of
 		 * whether it is loaded from a legacy Civ3 file or a C7 native file.
