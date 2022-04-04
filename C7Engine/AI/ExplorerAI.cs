@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using C7GameData;
 using C7GameData.AIData;
+using C7Engine.Pathing;
 
 namespace C7Engine
 {
 	public class ExplorerAI
 	{
-		public static void PlayExplorerTurn(Player player, ExplorerAIData explorerData, MapUnit unit)
+		public static async void PlayExplorerTurn(Player player, ExplorerAIData explorerData, MapUnit unit)
 		{
 			// Console.Write("Moving explorer AI for " + unit);
 			List<Tile> validNeighboringTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
@@ -29,10 +30,32 @@ namespace C7Engine
 			}
 			else if (newLocation != Tile.NONE)
 			{
-				List<Tile> tilesOfCorrectType = new List<Tile>();
-				foreach (Tile t in player.tileKnowledge.AllKnownTiles().Where(t => unit.canTraverseTile(t)))
+				//Find the nearest tile that will allow us to continue exploring.
+				//We prefer nearest because the one that allows the most discovery might be pretty far away
+				List<Tile> validExplorerTiles = new List<Tile>();
+				foreach (Tile t in player.tileKnowledge.AllKnownTiles()
+						.Where(t => unit.canTraverseTile(t) && numUnknownNeighboringTiles(player, t) > 0))
 				{
-					tilesOfCorrectType.Add(t);
+					validExplorerTiles.Add(t);
+				}
+
+				if (validExplorerTiles.Count == 0) {
+					//TODO: Change unit AI behavior to something else e.g. defender
+					return;
+				}
+
+				int lowestDistance = int.MaxValue;
+				Tile nearestTile = Tile.NONE;
+				TilePath chosenPath = null;
+
+				PathingAlgorithm algo = PathingAlgorithmChooser.GetAlgorithm();
+				foreach (Tile t in validExplorerTiles) {
+					TilePath path = algo.PathFrom(unit.location, t);
+					if (path.PathLength() < lowestDistance) {
+						lowestDistance = path.PathLength();
+						nearestTile = t;
+						chosenPath = path;
+					}
 				}
 
 			}
@@ -45,23 +68,27 @@ namespace C7Engine
 			Dictionary<Tile, int> numNewTilesRevealed = new Dictionary<Tile, int>();
 			foreach (Tile t in possibleNewLocations)
 			{
-				//Calculate whether it, and its neighbors are in known tiles.
-				int discoverableTiles = 0;
-				if (!player.tileKnowledge.isTileKnown(t))
-				{
-					discoverableTiles++;
-				}
-				foreach (Tile n in t.neighbors.Values)
-				{
-					if (!player.tileKnowledge.isTileKnown(n))
-					{
-						discoverableTiles++;
-					}
-				}
-				numNewTilesRevealed[t] = discoverableTiles;
+				numNewTilesRevealed[t] = numUnknownNeighboringTiles(player, t);
 			}
 			IOrderedEnumerable<KeyValuePair<Tile, int>> orderedScores = numNewTilesRevealed.OrderByDescending(t => t.Value);
 			return orderedScores.First();
+		}
+
+		private static int numUnknownNeighboringTiles(Player player, Tile t) {
+			//Calculate whether it, and its neighbors are in known tiles.
+			int discoverableTiles = 0;
+			if (!player.tileKnowledge.isTileKnown(t))
+			{
+				discoverableTiles++;
+			}
+			foreach (Tile n in t.neighbors.Values)
+			{
+				if (!player.tileKnowledge.isTileKnown(n))
+				{
+					discoverableTiles++;
+				}
+			}
+			return discoverableTiles;
 		}
 	}
 }
