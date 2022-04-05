@@ -61,7 +61,7 @@ namespace C7Engine
 		private static bool FindPathToNewExplorationArea(Player player, ExplorerAIData explorerData, MapUnit unit) {
 			List<Tile> validExplorerTiles = new List<Tile>();
 			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
-					.Where(t => unit.canTraverseTile(t) && numUnknownNeighboringTiles(player, t) > 0))
+					.Where(t => unit.canTraverseTile(t) && t.cityAtTile == null && numUnknownNeighboringTiles(player, t) > 0))
 			{
 				validExplorerTiles.Add(t);
 			}
@@ -107,6 +107,11 @@ namespace C7Engine
 		}
 
 		private static int numUnknownNeighboringTiles(Player player, Tile t) {
+			//Do not try to explore a tile with a city.  If we own it, we know all tiles.
+			//If someone else does, that would be war, which is not a scout's job.
+			if (t.cityAtTile != null) {
+				return 0;
+			}
 			//Calculate whether it, and its neighbors are in known tiles.
 			int discoverableTiles = 0;
 			if (!player.tileKnowledge.isTileKnown(t))
