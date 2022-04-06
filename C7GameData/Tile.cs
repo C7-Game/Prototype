@@ -33,6 +33,7 @@ namespace C7GameData
 		[JsonIgnore]
 		public Resource Resource { get; set; }
 
+		[JsonIgnore]
 		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();
 
 		//See discussion on page 4 of the "Babylon" thread (https://forums.civfanatics.com/threads/0-1-babylon-progress-thread.673959) about sub-terrain type and Civ3 properties.
@@ -62,7 +63,7 @@ namespace C7GameData
 			} else
 				return MapUnit.NONE;
 		}
-		
+
 		public static Tile NONE = new Tile();
 
 		//This should be used when we want to check if land tiles are next to water tiles.

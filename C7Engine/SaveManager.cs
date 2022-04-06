@@ -34,9 +34,9 @@
 		}
 
 		// Load and initialize a save
-		public static C7SaveFormat LoadSave(string path, string bicPath)
+		public static C7SaveFormat LoadSave(string path, string bicPath = "")
 		{
-			C7SaveFormat save = null;
+			C7SaveFormat save;
 			switch (getFileFormat(path))
 			{
 				case SaveFileFormat.Sav:
