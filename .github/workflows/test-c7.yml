@@ -6,13 +6,32 @@ jobs:
   Run-EngineTests:
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/dotnet/sdk:6.0
+      image: barichello/godot-ci:mono-3.4
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         lfs: false
+
+    -name: Add Microsoft Key
+      run: >
+        wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb;
+        dpkg -i packages-microsoft-prod.deb;
+        rm packages-microsoft-prod.deb;
+
+    -name: Install .NET SDK
+      run: >
+        apt-get install -y gpg;
+        wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg;
+        mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/;
+        wget https://packages.microsoft.com/config/ubuntu/20.04/prod.list;
+        mv prod.list /etc/apt/sources.list.d/microsoft-prod.list;
+        chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg;
+        chown root:root /etc/apt/sources.list.d/microsoft-prod.list;
+        apt-get update;
+        apt-get install -y apt-transport-https &&  apt-get update && apt-get install -y dotnet-sdk-6.0;
+
     - name: Run Tests
       run: |
         ./do test
