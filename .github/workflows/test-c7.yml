@@ -15,13 +15,13 @@ jobs:
         lfs: false
 
     -name: Add Microsoft Key
-      run: >
+      run: |
         wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb;
         dpkg -i packages-microsoft-prod.deb;
         rm packages-microsoft-prod.deb;
 
     -name: Install .NET SDK
-      run: >
+      run: |
         apt-get install -y gpg;
         wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg;
         mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/;
