@@ -7,14 +7,16 @@ namespace C7GameData
 	settings to use camel case instead, unless there is reason not to.
 */
 {
+	using System;
 	using System.IO;
 	using System.IO.Compression;
 	using System.Text.Json;
 
-	public enum SaveFileFormat
+	public enum SaveCompression
 	{
-		Plain,
+		None,
 		Zip,
+		Invalid,
 	}
 
 	public class C7SaveFormat
@@ -38,10 +40,38 @@ namespace C7GameData
 			Rules = rules;
 		}
 
-		public static C7SaveFormat Load(string path, SaveFileFormat format = SaveFileFormat.Plain)
+		public bool PostLoadProcess()
 		{
+			GameData.PerformPostLoadActions();
+
+			//If we are loading from JSON and it lacks an RNG, set one
+			//This should be a temporary hack until we have a more stable C7 default rule set.
+			if (GameData.rng == null) {
+				GameData.rng = new Random();
+			}
+
+			return true;
+		}
+
+		static SaveCompression getCompression(string path)
+		{
+			var ext = Path.GetExtension(path);
+			if (ext.Equals(".JSON", StringComparison.CurrentCultureIgnoreCase))
+			{
+				return SaveCompression.None;
+			}
+			else if (ext.Equals(".ZIP", StringComparison.CurrentCultureIgnoreCase))
+			{
+				return SaveCompression.Zip;
+			}
+			return SaveCompression.Invalid;
+		}
+
+		public static C7SaveFormat Load(string path)
+		{
+			SaveCompression format = getCompression(path);
 			C7SaveFormat save = null;
-			if (format == SaveFileFormat.Plain)
+			if (format == SaveCompression.None)
 			{
 				save = JsonSerializer.Deserialize<C7SaveFormat>(File.ReadAllText(path), JsonOptions);
 			}
@@ -74,10 +104,11 @@ namespace C7GameData
 			return save;
 		}
 
-		public static void Save(C7SaveFormat save, string path, SaveFileFormat format = SaveFileFormat.Plain)
+		public static void Save(C7SaveFormat save, string path)
 		{
+			SaveCompression format = getCompression(path);
 			byte[] json = JsonSerializer.SerializeToUtf8Bytes(save, JsonOptions);
-			if (format == SaveFileFormat.Zip)
+			if (format == SaveCompression.Zip)
 			{
 				using (var zipStream = new MemoryStream())
 				{
