@@ -14,6 +14,10 @@ jobs:
       with:
         lfs: true
 
+    - name: Add dotnet To Path
+      run: |
+        export PATH=$PATH:/usr/share/dotnet
+
     - name: Run Tests
       run: |
         ./do test
