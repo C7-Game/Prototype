@@ -12,7 +12,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        lfs: true
+        lfs: false
     - name: Run Tests
       run: |
         ./do test
