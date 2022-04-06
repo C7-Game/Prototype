@@ -90,7 +90,7 @@ namespace C7Engine
 				}
 				foreach (MapUnit otherSettler in playerSettlers)
 				{
-					if (otherSettler.currentAIBehavior is SettlerAIData otherSettlerAI) {
+					if (otherSettler.currentAIData is SettlerAIData otherSettlerAI) {
 						if (otherSettlerAI.destination == t) {
 							scores[t] = 0;
 							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.

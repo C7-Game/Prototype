@@ -1,6 +1,6 @@
 namespace C7GameData.AIData
 {
-	public class DefenderAI : UnitAI
+	public class DefenderAIData : UnitAIData
 	{
 		//I've been a bit expansive in possible goals here, perhaps some of them should be
 		//in other types of AIs.  But all of them are things I might do with a defensive unit in Civ.

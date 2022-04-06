@@ -423,7 +423,7 @@ public class Game : Node2D
 						if (tile.unitsOnTile.Count > 0) {
 							foreach (MapUnit unit in tile.unitsOnTile) {
 								GD.Print("  Unit on tile: " + unit);
-								GD.Print("  Strategy: " + unit.currentAIBehavior);
+								GD.Print("  Strategy: " + unit.currentAIData);
 							}
 						}
 					} else

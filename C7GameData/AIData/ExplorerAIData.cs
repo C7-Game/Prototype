@@ -1,6 +1,6 @@
 namespace C7GameData.AIData
 {
-	public class ExplorerAIData : UnitAI
+	public class ExplorerAIData : UnitAIData
 	{
 		public enum ExplorationType
 		{

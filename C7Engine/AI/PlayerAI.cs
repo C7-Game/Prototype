@@ -18,16 +18,16 @@ namespace C7Engine
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray())
 			{
-				if (unit.currentAIBehavior == null) {
+				if (unit.currentAIData == null) {
 					SetAIForUnit(unit, player);
 				}
 				
 				//Now actually take actions
 				//TODO: Move these into an AI method
-				if (unit.currentAIBehavior is SettlerAIData settlerAi) {
+				if (unit.currentAIData is SettlerAIData settlerAi) {
 					SettlerAI.PlaySettlerTurn(player, settlerAi, unit);
 				}
-				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
+				else if (unit.currentAIData is DefenderAIData defenderAI) {
 					if (defenderAI.destination == unit.location) {
 						if (!unit.isFortified) {
 							unit.fortify();
@@ -39,7 +39,7 @@ namespace C7Engine
 						Console.WriteLine("Moving defender towards " + defenderAI.destination);
 					}
 				}
-				else if (unit.currentAIBehavior is ExplorerAIData explorerAi) {
+				else if (unit.currentAIData is ExplorerAIData explorerAi) {
 					ExplorerAI.PlayExplorerTurn(player, explorerAi, unit);
 				}
 				player.tileKnowledge.AddTilesToKnown(unit.location);
@@ -73,14 +73,14 @@ namespace C7Engine
 						Console.WriteLine("Set AI for unit to BUILD_CITY with destination of " + settlerAiData.destination);
 					}
 				}
-				unit.currentAIBehavior = settlerAiData;
+				unit.currentAIData = settlerAiData;
 			}
 			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
-				DefenderAI ai = new DefenderAI();
-				ai.goal = DefenderAI.DefenderGoal.DEFEND_CITY;
+				DefenderAIData ai = new DefenderAIData();
+				ai.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;
 				Console.WriteLine("Set defender AI for " + unit + " with destination of " + ai.destination);
-				unit.currentAIBehavior = ai;
+				unit.currentAIData = ai;
 			}
 			else {
 				ExplorerAIData ai = new ExplorerAIData();
@@ -97,7 +97,7 @@ namespace C7Engine
 					ai.type = ExplorerAIData.ExplorationType.RANDOM;
 					Console.WriteLine("Set random exploration AI for " + unit);
 				}
-				unit.currentAIBehavior = ai;
+				unit.currentAIData = ai;
 			}
 		}
 	}
