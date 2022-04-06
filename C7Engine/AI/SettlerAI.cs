@@ -5,14 +5,17 @@ using C7GameData.AIData;
 
 namespace C7Engine
 {
-	public class SettlerAI
+	public class SettlerAI : UnitAI
 	{
-		public static void PlaySettlerTurn(Player player, SettlerAIData settlerAi, MapUnit unit)
+		public bool PlayTurn(Player player, MapUnit unit)
 		{
-start:
-			switch (settlerAi.goal) {
+			SettlerAIData settlerAi = (SettlerAIData)unit.currentAIData;
+		start:
+			switch (settlerAi.goal)
+			{
 				case SettlerAIData.SettlerGoal.BUILD_CITY:
-					if (IsInvalidCityLocation(settlerAi.destination)) {
+					if (IsInvalidCityLocation(settlerAi.destination))
+					{
 						Console.WriteLine("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination);
 						PlayerAI.SetAIForUnit(unit, player);
 						//Make sure we're using the new settler AI going forward, including this turn
@@ -24,36 +27,43 @@ start:
 						//very well become a Defender or Attacker if there's no exploration left, for example.
 						goto start;
 					}
-					if (unit.location == settlerAi.destination) {
+					if (unit.location == settlerAi.destination)
+					{
 						Console.WriteLine("Building city with " + unit);
 						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
 						UnitInteractions.disbandUnit(unit.guid);
 					}
-					else {
+					else
+					{
 						//If the settler has no destination, then disband rather than crash later.
-						if (settlerAi.destination == Tile.NONE) {
+						if (settlerAi.destination == Tile.NONE)
+						{
 							Console.WriteLine("Disbanding settler " + unit.guid + " with no valid destination");
 							UnitInteractions.disbandUnit(unit.guid);
-							return;
+							return false;
 						}
-						try {
+						try
+						{
 							Tile nextTile = settlerAi.pathToDestination.Next();
 							unit.location.unitsOnTile.Remove(unit);
 							nextTile.unitsOnTile.Add(unit);
 							unit.location = nextTile;
 						}
-						catch(Exception ex) {
+						catch (Exception ex)
+						{
 							Console.WriteLine("Could not get next part of path for unit " + settlerAi);
 						}
 					}
 					break;
 				case SettlerAIData.SettlerGoal.JOIN_CITY:
-					if (unit.location.cityAtTile != null) {
+					if (unit.location.cityAtTile != null)
+					{
 						//TODO: Actually join the city.  Haven't added that action.
 						//For now, just get rid of the unit.  Sorry, bro.
 						UnitInteractions.disbandUnit(unit.guid);
 					}
-					else {
+					else
+					{
 						//TODO: Eventually, go to the city we're supposed to join
 						//For now, just disband
 						UnitInteractions.disbandUnit(unit.guid);
@@ -63,6 +73,7 @@ start:
 					Console.WriteLine("Unknown strategy of " + settlerAi.goal + " for unit");
 					break;
 			}
+			return true;
 		}
 
 		private static bool IsInvalidCityLocation(Tile tile)

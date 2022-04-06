@@ -7,12 +7,14 @@ using C7Engine.Pathing;
 
 namespace C7Engine
 {
-	public class ExplorerAI
+	public class ExplorerAI : UnitAI
 	{
-		public static void PlayExplorerTurn(Player player, ExplorerAIData explorerData, MapUnit unit)
+		public bool PlayTurn(Player player, MapUnit unit)
 		{
+			ExplorerAIData explorerData = (ExplorerAIData)unit.currentAIData;
 			if (MovingToNewExplorationArea(explorerData)) {
 				MoveToNextTileOnPath(explorerData, unit);
+				return true;
 			}
 			else {
 				bool foundNeighboringTileToExplore = ExploreNeighboringTile(player, unit);
@@ -23,9 +25,11 @@ namespace C7Engine
 					bool foundNewPath = FindPathToNewExplorationArea(player, explorerData, unit);
 					if (foundNewPath) {
 						MoveToNextTileOnPath(explorerData, unit);
+						return true;
 					}
 				}
 			}
+			return false;
 		}
 
 		private static void MoveToNextTileOnPath(ExplorerAIData explorerData, MapUnit unit) {
