@@ -286,16 +286,10 @@ public class Game : Node2D
 		{
 			GD.Print("Ending player turn");
 			EmitSignal(nameof(TurnEnded));
-			OnComputerStartTurn();
+			GD.Print("Starting computer turn");
+			CurrentState = GameState.ComputerTurn;
+			new MsgEndTurn().send(); // Triggers actual backend processing
 		}
-	}
-
-	private void OnComputerStartTurn()
-	{
-		GD.Print("Starting computer turn");
-		CurrentState = GameState.ComputerTurn;
-		//Actual backend processing
-		new MsgEndTurn().send();
 	}
 
 	public async void ComputerSimulateTurn()
