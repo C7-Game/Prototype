@@ -19,7 +19,7 @@ on:
         default: true
 
 env:
-  GODOT_VERSION: 3.4
+  GODOT_VERSION: 3.4.4
   EXPORT_NAME: C7
 
 jobs:
