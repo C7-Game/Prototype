@@ -13,33 +13,36 @@ namespace C7Engine
 		{
 			ExplorerAIData explorerData = (ExplorerAIData)unit.currentAIData;
 			if (MovingToNewExplorationArea(explorerData)) {
-				MoveToNextTileOnPath(explorerData, unit);
-				return true;
+				return MoveToNextTileOnPath(explorerData, unit);
 			}
 			else {
 				bool foundNeighboringTileToExplore = ExploreNeighboringTile(player, unit);
+				if (foundNeighboringTileToExplore) {
+					return true;
+				}
 
-				if (!foundNeighboringTileToExplore) {
-					//Find the nearest tile that will allow us to continue exploring.
-					//We prefer nearest because the one that allows the most discovery might be pretty far away
-					bool foundNewPath = FindPathToNewExplorationArea(player, explorerData, unit);
-					if (foundNewPath) {
-						MoveToNextTileOnPath(explorerData, unit);
-						return true;
-					}
+				//Find the nearest tile that will allow us to continue exploring.
+				//We prefer nearest because the one that allows the most discovery might be pretty far away
+				bool foundNewPath = FindPathToNewExplorationArea(player, explorerData, unit);
+				if (foundNewPath) {
+					MoveToNextTileOnPath(explorerData, unit);
+					return true;
 				}
 			}
 			return false;
 		}
 
-		private static void MoveToNextTileOnPath(ExplorerAIData explorerData, MapUnit unit) {
+		private static bool MoveToNextTileOnPath(ExplorerAIData explorerData, MapUnit unit) {
 			Tile next = explorerData.path.Next();
 			foreach (KeyValuePair<TileDirection, Tile> neighbor in unit.location.neighbors) {
 				if (neighbor.Value == next) {
 					unit.move(neighbor.Key);
-					return;
+					return true;
 				}
 			}
+			//In the future, it might no longer be possible to go to the correct neighbor, perhaps
+			//due to another civ's units having moved there.  Thus, this method can return false.
+			return false;
 		}
 
 		private static bool ExploreNeighboringTile(Player player, MapUnit unit) {

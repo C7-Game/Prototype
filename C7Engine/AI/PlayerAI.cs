@@ -18,13 +18,29 @@ namespace C7Engine
 			Console.WriteLine("-> Begin " + player.civilization.cityNames[0] + " turn");
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
-				if (unit.currentAIData == null) {
-					SetAIForUnit(unit, player);
+				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.
+				//It may fail due to conditions having changed since that goal was assigned; in that case it will
+				//get a new task to try to complete.
+				
+				bool unitDone = false;
+				int attempts = 0;
+				int maxAttempts = 2;	//safety valve so we don't freeze the UI if SetAIForUnit returns something that fails
+				while (!unitDone) {
+					if (unit.currentAIData == null || attempts > 0) {
+						SetAIForUnit(unit, player);
+					}
+					
+					UnitAI artificialIntelligence = getAIForUnitStrategy(unit.currentAIData);
+					unitDone = artificialIntelligence.PlayTurn(player, unit);
+					
+					attempts++;
+					if (!unitDone && attempts >= maxAttempts) {
+						//TODO: Serilog.  WARN level.
+						Console.WriteLine($"Hit max AI attempts of {maxAttempts} for unit {unit} at {unit.location} without succeeding.  This indicates SetAIForUnit returned an impossible task, and should be debugged.");
+						break;
+					}
 				}
 
-				UnitAI artificalIntelligence = getAIForUnitStrategy(unit.currentAIData);
-				artificalIntelligence.PlayTurn(player, unit);
-				
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
 		}

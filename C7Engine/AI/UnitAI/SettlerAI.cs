@@ -24,6 +24,7 @@ start:
 					}
 					if (unit.location == settlerAi.destination) {
 						Console.WriteLine("Building city with " + unit);
+						//TODO: This should use a message, and the message handler should cause the disbanding to happen.
 						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
 						unit.disband();
 					}
@@ -39,7 +40,7 @@ start:
 							unit.move(unit.location.directionTo(nextTile));
 						}
 						catch (Exception ex) {
-							Console.WriteLine("Could not get next part of path for unit " + settlerAi);
+							Console.WriteLine("Could not get next part of path for unit " + settlerAi + ", " + ex.Message);
 						}
 					}
 					break;
