@@ -12,7 +12,7 @@ public class Game : Node2D
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
 	[Signal] public delegate void NoMoreAutoselectableUnits();
-	
+
 	enum GameState {
 		PreGame,
 		PlayerTurn,
@@ -49,7 +49,7 @@ public class Game : Node2D
 	{
 		loadTimer.Start();
 	}
-	
+
 	// Called when the node enters the scene tree for the first time.
 	// The catch should always catch any error, as it's the general catch
 	// that gives an error if we fail to load for some reason.
@@ -329,7 +329,7 @@ public class Game : Node2D
 		// GetTree().Quit();
 
 		// ChangeScene deletes the current scene and frees its memory, so this is quitting to main menu
-		GetTree().ChangeScene("res://MainMenu.tscn");    
+		GetTree().ChangeScene("res://MainMenu.tscn");
 	}
 
 	public void _on_Zoom_value_changed(float value)
@@ -415,7 +415,7 @@ public class Game : Node2D
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
 						bool shiftDown = Input.IsKeyPressed((int)Godot.KeyList.Shift);
-						if (shiftDown && tile.cityAtTile != null && tile.cityAtTile.owner == controller)
+						if (shiftDown && tile.cityAtTile?.owner == controller)
 							new RightClickChooseProductionMenu(this, tile.cityAtTile).Open(eventMouseButton.Position);
 						else if ((! shiftDown) && tile.unitsOnTile.Count > 0)
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
@@ -465,7 +465,7 @@ public class Game : Node2D
 				}
 			}
 			else if ((eventKey.Scancode >= (int)Godot.KeyList.Kp1) && (eventKey.Scancode <= (int)Godot.KeyList.Kp9))
-			{
+			{ // Move units with the numpad keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
@@ -482,6 +482,27 @@ public class Game : Node2D
 					default: return; // Impossible
 					}
 					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
+					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
+				}
+			}
+			else if ((eventKey.Scancode >= (int)Godot.KeyList.Home) && (eventKey.Scancode <= (int)Godot.KeyList.Pagedown))
+			{ // Move units with the arrow and fn keys
+				if (CurrentlySelectedUnit != MapUnit.NONE)
+				{
+					TileDirection dir;
+					switch (eventKey.Scancode) {
+					case (int)Godot.KeyList.Home:     dir = TileDirection.NORTHWEST; break; // fn-left arrow
+					case (int)Godot.KeyList.End:      dir = TileDirection.SOUTHWEST; break; // fn-right arrow
+					case (int)Godot.KeyList.Left:     dir = TileDirection.WEST;      break;
+					case (int)Godot.KeyList.Up:       dir = TileDirection.NORTH;     break;
+					case (int)Godot.KeyList.Right:    dir = TileDirection.EAST;      break;
+					case (int)Godot.KeyList.Down:     dir = TileDirection.SOUTH;     break;
+					case (int)Godot.KeyList.Pageup:   dir = TileDirection.NORTHEAST; break; // fn-up arrow
+					case (int)Godot.KeyList.Pagedown: dir = TileDirection.SOUTHEAST; break; // fn-down arrow
+					default: return; // Impossible
+					}
+					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
+					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
@@ -579,7 +600,7 @@ public class Game : Node2D
 			GetNode<AnimationPlayer>("CanvasLayer/SlideOutBar/AnimationPlayer").Play("SlideOutAnimation");
 		}
 	}
-	
+
 	// Called by the disband popup
 	private void OnUnitDisbanded()
 	{
@@ -594,7 +615,7 @@ public class Game : Node2D
 		GD.Print("Goodbye!");
 		GetTree().Quit();
 	}
-	
+
 	private void OnBuildCity(string name)
 	{
 		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();

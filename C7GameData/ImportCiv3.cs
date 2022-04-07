@@ -49,9 +49,14 @@ namespace C7GameData
 					xCoordinate = x,
 					yCoordinate = y,
 					ExtraInfo = extra,
+					baseTerrainTypeKey = c7Save.GameData.terrainTypes[civ3Tile.BaseTerrain].Key,
 					baseTerrainType = c7Save.GameData.terrainTypes[civ3Tile.BaseTerrain],
+					overlayTerrainTypeKey = c7Save.GameData.terrainTypes[civ3Tile.OverlayTerrain].Key,
 					overlayTerrainType = c7Save.GameData.terrainTypes[civ3Tile.OverlayTerrain],
 				};
+				if (civ3Tile.BonusShield) {
+					c7Tile.isBonusShield = true;
+				}
 				if (civ3Tile.SnowCapped) {
 					c7Tile.isSnowCapped = true;
 				}
@@ -104,9 +109,14 @@ namespace C7GameData
 					xCoordinate = x,
 					yCoordinate = y,
 					ExtraInfo = extra,
+					baseTerrainTypeKey = c7Save.GameData.terrainTypes[civ3Tile.BaseTerrain].Key,
 					baseTerrainType = c7Save.GameData.terrainTypes[civ3Tile.BaseTerrain],
+					overlayTerrainTypeKey = c7Save.GameData.terrainTypes[civ3Tile.OverlayTerrain].Key,
 					overlayTerrainType = c7Save.GameData.terrainTypes[civ3Tile.OverlayTerrain],
 				};
+				if (civ3Tile.BonusGrassland) {
+					c7Tile.isBonusShield = true;
+				}
 				if (civ3Tile.SnowCappedMountain) {
 					c7Tile.isSnowCapped = true;
 				}
