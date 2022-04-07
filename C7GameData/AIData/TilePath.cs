@@ -20,6 +20,12 @@ namespace C7GameData
 			return path.Dequeue();
 		}
 
+		//TODO: Once we have roads, we should return the calculated cost, not just the length.
+		//This will require Dijkstra or another fancier pathing algorithm
+		public int PathLength() {
+			return path.Count;
+		}
+
 		//Indicates no path was found to the requested destination.
 		public static TilePath NONE = new TilePath();
 	}

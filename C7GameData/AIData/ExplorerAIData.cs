@@ -1,6 +1,6 @@
 namespace C7GameData.AIData
 {
-	public class ExplorerAI : UnitAI
+	public class ExplorerAIData : UnitAIData
 	{
 		public enum ExplorationType
 		{
@@ -11,6 +11,7 @@ namespace C7GameData.AIData
 			ON_A_BOAT
 		}
 		public ExplorationType type;
+        public TilePath path;
 		
 		public override string ToString()
 		{

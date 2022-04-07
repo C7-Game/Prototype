@@ -18,16 +18,16 @@ namespace C7Engine
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray())
 			{
-				if (unit.currentAIBehavior == null) {
+				if (unit.currentAIData == null) {
 					SetAIForUnit(unit, player);
 				}
 				
 				//Now actually take actions
 				//TODO: Move these into an AI method
-				if (unit.currentAIBehavior is SettlerAIData settlerAi) {
+				if (unit.currentAIData is SettlerAIData settlerAi) {
 					SettlerAI.PlaySettlerTurn(player, settlerAi, unit);
 				}
-				else if (unit.currentAIBehavior is DefenderAI defenderAI) {
+				else if (unit.currentAIData is DefenderAIData defenderAI) {
 					if (defenderAI.destination == unit.location) {
 						if (!unit.isFortified) {
 							unit.fortify();
@@ -39,24 +39,10 @@ namespace C7Engine
 						Console.WriteLine("Moving defender towards " + defenderAI.destination);
 					}
 				}
-				else if (unit.currentAIBehavior is ExplorerAI explorerAi) {
-					// Console.Write("Moving explorer AI for " + unit);
-					//TODO: Distinguish between types of exploration
-					//TODO: Make sure ON_A_BOAT units stay on the boat
-					//Move randomly
-					List<Tile> possibleNewLocations = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
-					if (possibleNewLocations.Count == 0) {
-						Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
-						continue;
-					}
-					Tile newLocation = possibleNewLocations[rng.Next(possibleNewLocations.Count)];
-					//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
-					//if it tries to move e.g. north from the north pole.  Hence, this check.
-					if (newLocation != Tile.NONE) {
-						// Console.WriteLine("Moving unit at " + unit.location + " to " + newLocation);
-						unit.move(unit.location.directionTo(newLocation));
-					}
+				else if (unit.currentAIData is ExplorerAIData explorerAi) {
+					ExplorerAI.PlayExplorerTurn(player, explorerAi, unit);
 				}
+				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
 		}
 		
@@ -87,31 +73,31 @@ namespace C7Engine
 						Console.WriteLine("Set AI for unit to BUILD_CITY with destination of " + settlerAiData.destination);
 					}
 				}
-				unit.currentAIBehavior = settlerAiData;
+				unit.currentAIData = settlerAiData;
 			}
 			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
-				DefenderAI ai = new DefenderAI();
-				ai.goal = DefenderAI.DefenderGoal.DEFEND_CITY;
+				DefenderAIData ai = new DefenderAIData();
+				ai.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;
 				Console.WriteLine("Set defender AI for " + unit + " with destination of " + ai.destination);
-				unit.currentAIBehavior = ai;
+				unit.currentAIData = ai;
 			}
 			else {
-				ExplorerAI ai = new ExplorerAI();
+				ExplorerAIData ai = new ExplorerAIData();
 				if (unit.unitType is SeaUnit) {
-					ai.type = ExplorerAI.ExplorationType.COASTLINE;
+					ai.type = ExplorerAIData.ExplorationType.COASTLINE;
 					Console.WriteLine("Set coastline exploration AI for " + unit);
 				}
 				else if (unit.location.unitsOnTile.Exists((x) => x.unitType is SeaUnit)) {
-					ai.type = ExplorerAI.ExplorationType.ON_A_BOAT;
+					ai.type = ExplorerAIData.ExplorationType.ON_A_BOAT;
 					//TODO: Actually put the unit on the boat
 					Console.WriteLine("Set ON_A_BOAT exploration AI for " + unit);
 				}
 				else {
-					ai.type = ExplorerAI.ExplorationType.RANDOM;
+					ai.type = ExplorerAIData.ExplorationType.RANDOM;
 					Console.WriteLine("Set random exploration AI for " + unit);
 				}
-				unit.currentAIBehavior = ai;
+				unit.currentAIData = ai;
 			}
 		}
 	}

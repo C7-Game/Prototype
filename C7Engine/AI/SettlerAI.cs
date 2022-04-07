@@ -16,7 +16,7 @@ start:
 						Console.WriteLine("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination);
 						PlayerAI.SetAIForUnit(unit, player);
 						//Make sure we're using the new settler AI going forward, including this turn
-						settlerAi = (SettlerAIData)unit.currentAIBehavior;
+						settlerAi = (SettlerAIData)unit.currentAIData;
 						//Re-process since the unit's goal may have changed.
 						//TODO: In theory in the future, it might even have a non-settler AI.  Maybe we should instead return false,
 						//and have the PlayerAI re-kick the unit based on a possibly different AI class?

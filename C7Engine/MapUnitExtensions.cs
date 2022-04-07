@@ -3,6 +3,8 @@ namespace C7Engine
 
 using C7GameData;
 
+//We should document why we're putting things in the extensions methods.  We discussed it a month or so ago, but I forget why at this point.
+//Coming from an OO background, I'm wondering why these aren't on the MapUnit class... data access?  Modding?  Some other benefit?
 public static class MapUnitExtensions {
 	public static void animate(this MapUnit unit, MapUnit.AnimatedAction action, bool wait, AnimationEnding ending = AnimationEnding.Stop)
 	{
@@ -185,6 +187,18 @@ public static class MapUnitExtensions {
 		// obviously don't want to do here.
 		unit.disband();
 	}
-}
-
+	
+	public static bool canTraverseTile(this MapUnit unit, Tile t) {
+		//TODO: Unit prototypes should have info about terrain classes (#148), and we shouldn't rely on names
+		if (unit.unitType.name == "Galley" && !t.IsLand())
+		{
+			return true;
+		}
+		else if (t.IsLand())
+		{
+			return true;
+		}
+		return false;
+	}
+	}
 }
