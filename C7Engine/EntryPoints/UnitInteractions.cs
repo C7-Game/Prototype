@@ -17,7 +17,7 @@ namespace C7Engine
 				//than the old limit of one non-barbarian player.
 				if (player.isHuman) {
 					foreach (MapUnit unit in player.units) {
-						if (unit.movementPointsRemaining > 0 && !unit.isFortified) {
+						if (unit.movementPointsRemaining > 0 && !unit.IsBusy()) {
 							if (!waitQueue.Contains(unit)) {
 								return UnitWithAvailableActions(unit);
 							}

@@ -251,6 +251,11 @@ public class Game : Node2D
 	{
 		unit = UnitInteractions.UnitWithAvailableActions(unit);
 
+		if ((unit.path?.PathLength() ?? -1) > 0) {
+			GD.Print("cancelling path for " + unit);
+			unit.path = TilePath.NONE;
+		}
+
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 

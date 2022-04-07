@@ -11,6 +11,16 @@ namespace C7Engine
 		public static void EndTurn()
 		{
 			GameData gameData = EngineStorage.gameData;
+
+			foreach (Player player in gameData.players) {
+				foreach (MapUnit unit in player.units) {
+					Console.WriteLine(unit + ", path length: " + unit.path.PathLength());
+					if (unit.path?.PathLength() > 0) {
+						unit.moveAlongPath();
+					}
+				}
+			}
+
 			Console.WriteLine("\n*** Processing turn " + gameData.turn + " ***");
 			//Barbarians.  First, generate new barbarian units.
 			foreach (Tile tile in gameData.map.barbarianCamps)
@@ -84,11 +94,6 @@ namespace C7Engine
 			UnitInteractions.ClearWaitQueue();
 			gameData.turn++;
 
-			foreach (MapUnit mapUnit in gameData.mapUnits) {
-				if (mapUnit.path?.PathLength() > 0) {
-					mapUnit.moveAlongPath();
-				}
-			}
 			new MsgStartTurn().send();
 		}
 

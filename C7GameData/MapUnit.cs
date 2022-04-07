@@ -39,6 +39,10 @@ public class MapUnit
 		guid = Guid.NewGuid().ToString();
 	}
 
+	public bool IsBusy() {
+		return isFortified || (path != null && path.PathLength() > 0);
+	}
+
 	public override string ToString()
 	{
 		if (this != MapUnit.NONE) {
