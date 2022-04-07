@@ -79,13 +79,6 @@ public class Game : Node2D
 			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
 			mapView.cameraZoom = (float)1.0;
 			mapView.gridLayer.visible = false;
-			// If later recreating scene, the component may already exist, hence try/catch
-			try{
-				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
-			}
-			catch {
-				ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
-			}
 
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
@@ -206,9 +199,6 @@ public class Game : Node2D
 	private void StartGame()
 	{
 		GD.Print("Game starting");
-		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
-		// Connect(nameof(TurnStarted), turnCntCpnt, "OnTurnStarted");
-		// Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
 		OnPlayerStartTurn();
 	}
 
