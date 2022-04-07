@@ -72,7 +72,7 @@ jobs:
   Export-C7-Linux:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-3.4
+      image: barichello/godot-ci:mono-3.4.4
     steps:
     - name: Optionally set DEBUG_BUILD
       if: github.event.inputs.debug-build == 'true'
@@ -121,7 +121,7 @@ jobs:
   Export-C7-Mac:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-3.4
+      image: barichello/godot-ci:mono-3.4.4
     steps:
     - name: Optionally set DEBUG_BUILD
       if: github.event.inputs.debug-build == 'true'
