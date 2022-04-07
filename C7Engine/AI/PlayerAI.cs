@@ -4,6 +4,7 @@ using System.Linq;
 using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
+using C7Engine.AI;
 
 namespace C7Engine
 {
@@ -16,32 +17,14 @@ namespace C7Engine
 			}
 			Console.WriteLine("-> Begin " + player.civilization.cityNames[0] + " turn");
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
-			foreach (MapUnit unit in player.units.ToArray())
-			{
+			foreach (MapUnit unit in player.units.ToArray()) {
 				if (unit.currentAIData == null) {
 					SetAIForUnit(unit, player);
 				}
+
+				UnitAI artificalIntelligence = getAIForUnitStrategy(unit.currentAIData);
+				artificalIntelligence.PlayTurn(player, unit);
 				
-				//Now actually take actions
-				//TODO: Move these into an AI method
-				if (unit.currentAIData is SettlerAIData settlerAi) {
-					SettlerAI.PlaySettlerTurn(player, settlerAi, unit);
-				}
-				else if (unit.currentAIData is DefenderAIData defenderAI) {
-					if (defenderAI.destination == unit.location) {
-						if (!unit.isFortified) {
-							unit.fortify();
-							Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
-						}
-					}
-					else {
-						//TODO: Move towards destination
-						Console.WriteLine("Moving defender towards " + defenderAI.destination);
-					}
-				}
-				else if (unit.currentAIData is ExplorerAIData explorerAi) {
-					ExplorerAI.PlayExplorerTurn(player, explorerAi, unit);
-				}
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
 		}
@@ -99,6 +82,33 @@ namespace C7Engine
 				}
 				unit.currentAIData = ai;
 			}
+		}
+
+		/**
+		 * Medium-term solution to the problem of getting instances of the AI classes for polymorphic
+		 * methods.
+		 * 
+		 * Only the data will be stored on save, so only the data is guaranteed to be on the unit.
+		 * There are several options - attach an instance whenever we need one, for example.
+		 * But the AI implementations should be singletons that behave differently based on the
+		 * data (and perhaps probability), so multiple instances doesn't really make sense.
+		 * 
+		 * I fully expect this to evolve; at some point it might grab a Lua AI instead of a C# one
+		 * too, for example, and one AIData class might be able to call up multiple types of AIs.
+		 * It also likely will become mod-supporting someday, but we can't add everything on day one.
+		 **/
+		public static UnitAI getAIForUnitStrategy(UnitAIData aiData)
+		{
+			if (aiData is SettlerAIData sai) {
+				return new SettlerAI();
+			}
+			else if (aiData is DefenderAIData dai) {
+				return new DefenderAI();
+			}
+			else if (aiData is ExplorerAIData eai) {
+				return new ExplorerAI();
+			}
+			throw new Exception("AI data not recognized");
 		}
 	}
 }

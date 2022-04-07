@@ -3,12 +3,10 @@ using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
 
-namespace C7Engine
-{
-	public class SettlerAI
-	{
-		public static void PlaySettlerTurn(Player player, SettlerAIData settlerAi, MapUnit unit)
-		{
+namespace C7Engine {
+	public class SettlerAI : UnitAI {
+		public bool PlayTurn(Player player, MapUnit unit) {
+			SettlerAIData settlerAi = (SettlerAIData)unit.currentAIData;
 start:
 			switch (settlerAi.goal) {
 				case SettlerAIData.SettlerGoal.BUILD_CITY:
@@ -34,13 +32,13 @@ start:
 						if (settlerAi.destination == Tile.NONE) {
 							Console.WriteLine("Disbanding settler " + unit.guid + " with no valid destination");
 							unit.disband();
-							return;
+							return false;
 						}
 						try {
 							Tile nextTile = settlerAi.pathToDestination.Next();
 							unit.move(unit.location.directionTo(nextTile));
 						}
-						catch(Exception ex) {
+						catch (Exception ex) {
 							Console.WriteLine("Could not get next part of path for unit " + settlerAi);
 						}
 					}
@@ -61,16 +59,15 @@ start:
 					Console.WriteLine("Unknown strategy of " + settlerAi.goal + " for unit");
 					break;
 			}
+			return true;
 		}
 
-		private static bool IsInvalidCityLocation(Tile tile)
-		{
+		private static bool IsInvalidCityLocation(Tile tile) {
 			if (tile.cityAtTile != null) {
 				Console.WriteLine("Cannot build at " + tile + " due to city of " + tile.cityAtTile.name);
 				return true;
 			}
-			foreach (Tile neighbor in tile.neighbors.Values)
-			{
+			foreach (Tile neighbor in tile.neighbors.Values) {
 				if (neighbor.cityAtTile != null) {
 					Console.WriteLine("Cannot build at " + tile + " due to nearby city of " + neighbor.cityAtTile.name);
 					return true;
