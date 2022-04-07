@@ -39,6 +39,10 @@ namespace C7Engine
 		{
 			unit.availableActions.Clear();
 
+			if (unit == MapUnit.NONE) {
+				return unit;
+			}
+
 			//This should have "real" code someday.  For now, I'll hard-code a few things based
 			//on the unit type.  That will allow proving the end-to-end works, and we can
 			//add real support as we add more mechanics.  Probably some of it early, some of it...
@@ -78,26 +82,6 @@ namespace C7Engine
 			waitQueue.Clear();
 		}
 
-		public static void fortifyUnit(string guid)
-		{
-			new MsgSetFortification(guid, true).send();
-		}
-
-		public static void moveUnit(string guid, TileDirection dir)
-		{
-			new MsgMoveUnit(guid, dir).send();
-		}
-
-		public static void setUnitPath(string guid, Tile dest)
-		{
-			new MsgSetUnitPath(guid, dest).send();
-		}
-
-		public static void holdUnit(string guid)
-		{
-			new MsgSkipUnitTurn(guid).send();
-		}
-
 		public static void waitUnit(GameData gameData, string guid)
 		{
 			foreach (MapUnit unit in gameData.mapUnits)
@@ -110,11 +94,5 @@ namespace C7Engine
 			}
 			Console.WriteLine("Failed to find a matching unit with guid " + guid);
 		}
-
-		public static void disbandUnit(string guid)
-		{
-			new MsgDisbandUnit(guid).send();
-		}
-
 	}
 }

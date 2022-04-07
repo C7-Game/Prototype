@@ -386,7 +386,7 @@ public class Game : Node2D
 						using (var gameDataAccess = new UIGameDataAccess()) {
 							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 							if (tile != null) {
-								UnitInteractions.setUnitPath(CurrentlySelectedUnit.guid, tile);
+								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
 							}
 						}
 					}
