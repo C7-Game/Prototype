@@ -85,7 +85,7 @@ namespace C7Engine
 			gameData.turn++;
 
 			foreach (MapUnit mapUnit in gameData.mapUnits) {
-				if (mapUnit.path?.Length() > 0) {
+				if (mapUnit.path?.PathLength() > 0) {
 					mapUnit.moveAlongPath();
 				}
 			}

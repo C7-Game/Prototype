@@ -35,7 +35,7 @@ namespace C7Engine
 		 * Helper function to add the available actions to a unit
 		 * based on what terrain it is on.
 		 **/
-		private static MapUnit UnitWithAvailableActions(MapUnit unit)
+		public static MapUnit UnitWithAvailableActions(MapUnit unit)
 		{
 			unit.availableActions.Clear();
 

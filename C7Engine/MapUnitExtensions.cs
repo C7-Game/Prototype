@@ -151,7 +151,7 @@ public static class MapUnitExtensions {
 
 	public static void moveAlongPath(this MapUnit unit)
 	{
-		while (unit.movementPointsRemaining > 0 && unit.path?.Length() > 0) {
+		while (unit.movementPointsRemaining > 0 && unit.path?.PathLength() > 0) {
 			var dir = unit.location.directionTo(unit.path.Next());
 			unit.move(dir, true); //TODO: don't wait on last move animation?
 		}
@@ -207,7 +207,7 @@ public static class MapUnitExtensions {
 		// obviously don't want to do here.
 		unit.disband();
 	}
-	
+
 	public static bool canTraverseTile(this MapUnit unit, Tile t) {
 		//TODO: Unit prototypes should have info about terrain classes (#148), and we shouldn't rely on names
 		if (unit.unitType.name == "Galley" && !t.IsLand())
