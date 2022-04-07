@@ -51,7 +51,7 @@ namespace C7Engine
 				Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
 				return false;
 			}
-			KeyValuePair<Tile, int> topScoringTile = FindTopScoringTile(player, validNeighboringTiles);
+			KeyValuePair<Tile, int> topScoringTile = FindTopScoringTileForExploration(player, validNeighboringTiles);
 			Tile newLocation = topScoringTile.Key;
 
 			if (newLocation != Tile.NONE && topScoringTile.Value > 0) {
@@ -100,7 +100,7 @@ namespace C7Engine
 			return true;
 		}
 
-		private static KeyValuePair<Tile, int> FindTopScoringTile(Player player, List<Tile> possibleNewLocations)
+		public static KeyValuePair<Tile, int> FindTopScoringTileForExploration(Player player, List<Tile> possibleNewLocations)
 		{
 			//Technically, this should be the *estimated* new tiles revealed.  If a mountain blocks visibility,
 			//we won't know that till we move there.

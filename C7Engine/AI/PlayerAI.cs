@@ -82,21 +82,51 @@ namespace C7Engine
 				unit.currentAIData = ai;
 			}
 			else {
-				ExplorerAIData ai = new ExplorerAIData();
+
 				if (unit.unitType is SeaUnit) {
+					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.COASTLINE;
+					unit.currentAIData = ai;
 					Console.WriteLine("Set coastline exploration AI for " + unit);
 				}
 				else if (unit.location.unitsOnTile.Exists((x) => x.unitType is SeaUnit)) {
+					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.ON_A_BOAT;
+					unit.currentAIData = ai;
 					//TODO: Actually put the unit on the boat
 					Console.WriteLine("Set ON_A_BOAT exploration AI for " + unit);
 				}
 				else {
-					ai.type = ExplorerAIData.ExplorationType.RANDOM;
-					Console.WriteLine("Set random exploration AI for " + unit);
+					//Isn't a Settler.  If there's a city at the location, it's defended.  No boats involved.  What's our priority?
+					//If there is land to explore, we'll try to explore it.
+					//Long-term TODO: Should only send tiles on this landmass.
+					KeyValuePair<Tile, int> tileToExplore = ExplorerAI.FindTopScoringTileForExploration(player, player.tileKnowledge.AllKnownTiles());
+					if (tileToExplore.Value > 0) {
+						ExplorerAIData ai = new ExplorerAIData();
+						ai.type = ExplorerAIData.ExplorationType.RANDOM;
+						unit.currentAIData = ai;
+						Console.WriteLine("Set random exploration AI for " + unit);
+					}
+					else {
+						//Nowhere to explore.  What to do now?
+						//Priority 1: Adequate defense of cities.
+						//Future Priority 1: Escorting Settlers
+						//Priority 2: Clearing out barbs
+						//Priority 3: Defending chokepoints
+						//Priority 4: ???
+						//Priority 5: Profit!
+						//(Realistically, as we evolve there will be a lot of options, such as defending borders from barbs, preparing attackers on other civs, defending
+						//resources.  I expect we'll have some sort of arbiter that decides between competing priorities, with each being given a score as to how important
+						//they are, including a weight by how far away the task is.  But this will evolve gradually over a long time)
+						
+						//As of today (4/7/2022), let's tackle just one of those - adequate defense of cities.  The AI is really good at losing cities to barbs right now,
+						//and that's a problem.
+						
+						//Find all cities that have the fewest defenders.  Go to the nearest of those.
+						//N.B. the Defender AI will need to be enhanced to send units places.  This might also be where the "go to" sub-AI can be extracted out.
+						//But that will be in my next commit.
+					}
 				}
-				unit.currentAIData = ai;
 			}
 		}
 
