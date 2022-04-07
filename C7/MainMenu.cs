@@ -1,11 +1,12 @@
 using Godot;
 using ConvertCiv3Media;
+using C7GameData;
 using System;
 
 public class MainMenu : Node2D
 {
 	readonly int BUTTON_LABEL_OFFSET = 4;
-	
+
 	ImageTexture InactiveButton;
 	ImageTexture HoverButton;
 	TextureRect MainMenuBackground;
@@ -36,12 +37,12 @@ public class MainMenu : Node2D
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadScenarioDialog);
 		DisplayTitleScreen();
 	}
-	
+
 	private void DisplayTitleScreen()
-	{	
+	{
 		try {
 			SetMainMenuBackground();
-			
+
 			InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
 			HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
 
@@ -86,7 +87,7 @@ public class MainMenu : Node2D
 		newButton.SetPosition(new Vector2(40, verticalPosition));
 		MainMenuBackground.AddChild(newButton);
 		newButton.Connect("pressed", this, actionName);
-				
+
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
 
@@ -101,7 +102,7 @@ public class MainMenu : Node2D
 		PlayButtonPressedSound();
 		GetTree().ChangeScene("res://C7Game.tscn");
 	}
-	
+
 	public void LoadGame()
 	{
 		GD.Print("Real Load button pressed");
@@ -115,7 +116,7 @@ public class MainMenu : Node2D
 		PlayButtonPressedSound();
 		LoadScenarioDialog.Popup_();
 	}
-	
+
 	public void showCredits()
 	{
 		GD.Print("Credits button pressed");
@@ -132,7 +133,7 @@ public class MainMenu : Node2D
 
 		PlayButtonPressedSound();
 	}
-	
+
 	public void _on_Exit_pressed()
 	{
 		GetTree().Quit();
@@ -152,6 +153,7 @@ public class MainMenu : Node2D
 		Global.LoadGamePath = path;
 		GetTree().ChangeScene("res://C7Game.tscn");
 	}
+
 	private void _on_SetCiv3Home_pressed()
 	{
 		SetCiv3HomeDialog.Popup_();

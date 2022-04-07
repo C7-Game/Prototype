@@ -12,7 +12,7 @@ public class Game : Node2D
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
 	[Signal] public delegate void NoMoreAutoselectableUnits();
-	
+
 	enum GameState {
 		PreGame,
 		PlayerTurn,
@@ -49,7 +49,7 @@ public class Game : Node2D
 	{
 		loadTimer.Start();
 	}
-	
+
 	// Called when the node enters the scene tree for the first time.
 	// The catch should always catch any error, as it's the general catch
 	// that gives an error if we fail to load for some reason.
@@ -134,7 +134,7 @@ public class Game : Node2D
 					if (mSUA.action == MapUnit.AnimatedAction.ATTACK1)
 						ensureLocationIsInView(unit.location);
 
-					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent);
+					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent, mSUA.ending);
 				}
 				break;
 			case MsgStartEffectAnimation mSEA:
@@ -142,7 +142,7 @@ public class Game : Node2D
 				gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
 				Tile tile = gameData.map.tileAt(x, y);
 				if (tile != Tile.NONE)
-					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent);
+					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
 				break;
 			case MsgStartTurn mST:
 				//Simulating processing so the turn doesn't end too quickly
@@ -248,6 +248,8 @@ public class Game : Node2D
 	 **/
 	public void setSelectedUnit(MapUnit unit)
 	{
+		unit = UnitInteractions.UnitWithAvailableActions(unit);
+
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 
@@ -327,7 +329,7 @@ public class Game : Node2D
 		// GetTree().Quit();
 
 		// ChangeScene deletes the current scene and frees its memory, so this is quitting to main menu
-		GetTree().ChangeScene("res://MainMenu.tscn");    
+		GetTree().ChangeScene("res://MainMenu.tscn");
 	}
 
 	public void _on_Zoom_value_changed(float value)
@@ -479,9 +481,8 @@ public class Game : Node2D
 					case 9: dir = TileDirection.NORTHEAST; break;
 					default: return; // Impossible
 					}
-					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
 					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
-
 				}
 			}
 			else if ((eventKey.Scancode >= (int)Godot.KeyList.Home) && (eventKey.Scancode <= (int)Godot.KeyList.Pagedown))
@@ -500,7 +501,8 @@ public class Game : Node2D
 					case (int)Godot.KeyList.Pagedown: dir = TileDirection.SOUTHEAST; break; // fn-down arrow
 					default: return; // Impossible
 					}
-					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
+					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
@@ -557,11 +559,11 @@ public class Game : Node2D
 		GD.Print("The " + buttonName + " button was pressed");
 		if (buttonName.Equals("hold"))
 		{
-			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
+			new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
 		}
 		else if (buttonName.Equals("fortify"))
 		{
-			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
+			new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
 		}
 		else if (buttonName.Equals("wait"))
 		{
@@ -598,11 +600,11 @@ public class Game : Node2D
 			GetNode<AnimationPlayer>("CanvasLayer/SlideOutBar/AnimationPlayer").Play("SlideOutAnimation");
 		}
 	}
-	
+
 	// Called by the disband popup
 	private void OnUnitDisbanded()
 	{
-		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+		new MsgDisbandUnit(CurrentlySelectedUnit.guid).send();
 	}
 
 	/**
@@ -613,7 +615,7 @@ public class Game : Node2D
 		GD.Print("Goodbye!");
 		GetTree().Quit();
 	}
-	
+
 	private void OnBuildCity(string name)
 	{
 		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();

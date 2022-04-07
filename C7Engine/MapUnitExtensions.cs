@@ -6,9 +6,9 @@ using C7GameData;
 //We should document why we're putting things in the extensions methods.  We discussed it a month or so ago, but I forget why at this point.
 //Coming from an OO background, I'm wondering why these aren't on the MapUnit class... data access?  Modding?  Some other benefit?
 public static class MapUnitExtensions {
-	public static void animate(this MapUnit unit, MapUnit.AnimatedAction action, bool wait)
+	public static void animate(this MapUnit unit, MapUnit.AnimatedAction action, bool wait, AnimationEnding ending = AnimationEnding.Stop)
 	{
-		new MsgStartUnitAnimation(unit, action, wait ? EngineStorage.uiEvent : null).send();
+		new MsgStartUnitAnimation(unit, action, wait ? EngineStorage.uiEvent : null, ending).send();
 		if (wait) {
 			EngineStorage.gameDataMutex.ReleaseMutex();
 			EngineStorage.uiEvent.WaitOne();
@@ -79,9 +79,9 @@ public static class MapUnitExtensions {
 		unit.movementPointsRemaining -= 1;
 		if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
 			target.hitPointsRemaining -= 1;
-			new MsgStartEffectAnimation(tile, AnimatedEffect.Hit3, null).send();
+			new MsgStartEffectAnimation(tile, AnimatedEffect.Hit3, null, AnimationEnding.Stop).send();
 		} else
-			new MsgStartEffectAnimation(tile, AnimatedEffect.Miss, null).send();
+			new MsgStartEffectAnimation(tile, AnimatedEffect.Miss, null, AnimationEnding.Stop).send();
 
 		if (target.hitPointsRemaining <= 0) {
 			target.animate(MapUnit.AnimatedAction.DEATH, true);
