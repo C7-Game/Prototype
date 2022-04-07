@@ -3,7 +3,7 @@ name: Run C7 Tests
 on: [push]
 
 jobs:
-  Run-EngineTests:
+  Run-Tests:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/dotnet/sdk:6.0
