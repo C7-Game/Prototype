@@ -19,7 +19,7 @@ namespace C7Engine
                     foreach (MapUnit unit in player.units) {
                         if (unit.movementPointsRemaining > 0 && !unit.isFortified) {
                             if (!waitQueue.Contains(unit)) {
-                                return UnitWithAvailableActions(unit);
+                                return unit;
                             }
                         }
                     }
@@ -35,9 +35,12 @@ namespace C7Engine
          * Helper function to add the available actions to a unit
          * based on what terrain it is on.
          **/
-        private static MapUnit UnitWithAvailableActions(MapUnit unit)
+        public static MapUnit UnitWithAvailableActions(MapUnit unit)
         {
             unit.availableActions.Clear();
+
+            if (unit == MapUnit.NONE)
+                return unit;
 
             //This should have "real" code someday.  For now, I'll hard-code a few things based
             //on the unit type.  That will allow proving the end-to-end works, and we can
@@ -73,21 +76,6 @@ namespace C7Engine
             return unit;
         }
 
-        public static void fortifyUnit(string guid)
-        {
-            new MsgSetFortification(guid, true).send();
-        }
-
-        public static void moveUnit(string guid, TileDirection dir)
-        {
-            new MsgMoveUnit(guid, dir).send();
-        }
-
-        public static void holdUnit(string guid)
-        {
-            new MsgSkipUnitTurn(guid).send();
-        }
-
         public static void waitUnit(GameData gameData, string guid)
         {
             foreach (MapUnit unit in gameData.mapUnits)
@@ -99,11 +87,6 @@ namespace C7Engine
                 }
             }
             Console.WriteLine("Failed to find a matching unit with guid " + guid);
-        }
-
-        public static void disbandUnit(string guid)
-        {
-            new MsgDisbandUnit(guid).send();
         }
 
         public static void ClearWaitQueue()

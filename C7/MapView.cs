@@ -589,11 +589,10 @@ public class UnitLayer : LooseLayer {
 		inst.meshInst.ZIndex = unitAnimZIndex;
 	}
 
-	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, double repCount, Vector2 tileCenter)
+	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, float progress, Vector2 tileCenter)
 	{
 		var flicSheet = anim.getFlicSheet();
 		var inst = getBlankAnimationInstance(looseView);
-		float progress = repCount > 1.0 ? 1f : (float)repCount; // TODO: We want some effects to loop
 		setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
 		inst.shaderMat.SetShaderParam("civColor", new Vector3(1, 1, 1));
 		inst.meshInst.Position = tileCenter;
@@ -666,8 +665,8 @@ public class UnitLayer : LooseLayer {
 		// First draw animated effects. These will always appear over top of units regardless of draw order due to z-index.
 		Civ3Anim tileEffect = looseView.mapView.game.animTracker.getTileEffect(tile);
 		if (tileEffect != null) {
-			(_, double repCount) = looseView.mapView.game.animTracker.getCurrentActionAndRepetitionCount(tile);
-			drawEffectAnimFrame(looseView, tileEffect, repCount, tileCenter);
+			(_, float progress) = looseView.mapView.game.animTracker.getCurrentActionAndProgress(tile);
+			drawEffectAnimFrame(looseView, tileEffect, progress, tileCenter);
 		}
 
 		if (tile.unitsOnTile.Count == 0)
