@@ -18,7 +18,7 @@ namespace C7Engine
 				candidates.UnionWith(moreCandidates);
 			}
 			Dictionary<Tile, int> scores = AssignTileScores(start, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
-			if (scores.Values.Max() <= 0) {
+			if (scores.Count == 0 || scores.Values.Max() <= 0) {
 				return Tile.NONE;	//nowhere to settle
 			}
 

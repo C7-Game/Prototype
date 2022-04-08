@@ -60,6 +60,39 @@ namespace C7GameData
 			barbarianPlayer.isBarbarians = true;
 			players.Add(barbarianPlayer);
 
+			Civilization carthage = new Civilization();
+			carthage.cityNames.Add("Carthage");
+			carthage.cityNames.Add("Utica");
+			carthage.cityNames.Add("Hadrumetum");
+			carthage.cityNames.Add("Hippo");
+			carthage.cityNames.Add("Kerkouane");
+			carthage.cityNames.Add("Lilybaeum");
+			carthage.cityNames.Add("Motya");
+			carthage.cityNames.Add("Thignica");
+			carthage.cityNames.Add("Zama");
+			carthage.cityNames.Add("Thabraca");
+			carthage.cityNames.Add("Panormus");
+			uint grey = 0xA0A0A0FF;
+			Player carthagePlayer = new Player(carthage, grey);
+			carthagePlayer.isHuman = true;
+			players.Add(carthagePlayer);
+
+			Civilization rome = new Civilization();
+			rome.cityNames.Add("Rome");
+			rome.cityNames.Add("Neapolis");
+			rome.cityNames.Add("Capua");
+			rome.cityNames.Add("Tarentum");
+			rome.cityNames.Add("Croton");
+			rome.cityNames.Add("Placentia on the Trebia");
+			rome.cityNames.Add("Cortona/Lake Trasimene");
+			rome.cityNames.Add("Cannae");
+			rome.cityNames.Add("Rhegium");
+			rome.cityNames.Add("Pompeii");
+			rome.cityNames.Add("Arettium");
+			uint romanRed = 0xE00000FF;
+			Player romePlayer = new Player(rome, romanRed);
+			players.Add(romePlayer);
+
 			Civilization babylon = new Civilization();
 			babylon.cityNames.Add("Babylon");
 			babylon.cityNames.Add("Kish");
@@ -78,9 +111,9 @@ namespace C7GameData
 			babylon.cityNames.Add("Nineveh");
 
 			uint blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-			Player humanPlayer = new Player(babylon, blue);
-			humanPlayer.isHuman = true;
-			players.Add(humanPlayer);
+			Player babylonPlayer = new Player(babylon, blue);
+			babylonPlayer.isHuman = false;
+			players.Add(babylonPlayer);
 
 			Civilization greece = new Civilization();
 			greece.cityNames.Add("Athens");
@@ -135,7 +168,7 @@ namespace C7GameData
 			Player computerPlayerThree = new Player(theNetherlands, orange);
 			players.Add(computerPlayerThree);
 
-			List<Tile> startingLocations = map.generateStartingLocations(rng, 4, 10);
+			List<Tile> startingLocations = map.generateStartingLocations(rng, players.Count, 10);
 
 			int i = 0;
 			foreach (Player player in players)
@@ -165,7 +198,7 @@ namespace C7GameData
 
 			//Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
 
-			return humanPlayer;
+			return carthagePlayer;
 		}
 
 		private void CreateStartingDummyUnits(Player player, Tile location)
