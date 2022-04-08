@@ -59,13 +59,13 @@ public class RightClickMenu : VBoxContainer
 
 	private static StyleBoxFlat GetItemStyleBox(Color color)
 	{
-		var styleBox = new StyleBoxFlat();
-		styleBox.BgColor = color;
-		styleBox.ContentMarginLeft   = 4f;
-		styleBox.ContentMarginTop    = 2f;
-		styleBox.ContentMarginRight  = 4f;
-		styleBox.ContentMarginBottom = 2f;
-		return styleBox;
+		return new StyleBoxFlat() {
+			BgColor = color,
+			ContentMarginLeft   = 4f,
+			ContentMarginTop    = 2f,
+			ContentMarginRight  = 4f,
+			ContentMarginBottom = 2f
+		};
 	}
 
 	public Button AddItem(string text, Texture icon = null)
@@ -87,9 +87,9 @@ public class RightClickMenu : VBoxContainer
 
 	public override void _Input(InputEvent @event)
 	{
-		bool mouseOverMenu = new Rect2(Vector2.Zero, this.RectSize).HasPoint(this.GetLocalMousePosition()),
-		     escapeKeyWasPressed = (@event is InputEventKey keyEvent) && keyEvent.Pressed && keyEvent.Scancode == (int)Godot.KeyList.Escape,
-		     mouseClickedOutsideMenu = (@event is InputEventMouseButton mouseButtonEvent) && mouseButtonEvent.IsPressed() && ! mouseOverMenu;
+		bool mouseOverMenu = new Rect2(Vector2.Zero, this.RectSize).HasPoint(this.GetLocalMousePosition());
+		bool escapeKeyWasPressed = (@event is InputEventKey keyEvent) && keyEvent.Pressed && keyEvent.Scancode == (int)Godot.KeyList.Escape;
+		bool mouseClickedOutsideMenu = (@event is InputEventMouseButton mouseButtonEvent) && mouseButtonEvent.IsPressed() && !mouseOverMenu;
 
 		if (escapeKeyWasPressed || mouseClickedOutsideMenu) {
 			this.AcceptEvent(); // Prevents other controls from receiving this event
@@ -100,34 +100,42 @@ public class RightClickMenu : VBoxContainer
 		// say that events reach children before their parents, but the catch is that there are three phases of input processing. The "input"
 		// phase, this function, then "gui input", and finally "unhandled input". If a control eats an event during the "input" phase it won't
 		// proceed to the "gui input" phase where buttons actually respond to it.)
-		} else if (! ((@event is InputEventMouse) && mouseOverMenu))
+		} else if (!((@event is InputEventMouse) && mouseOverMenu)) {
 			this.AcceptEvent();
+		}
 	}
 }
 
 public class RightClickTileMenu : RightClickMenu
 {
-	public RightClickTileMenu(Game game, Tile tile) : base(game)
-	{
+	public RightClickTileMenu(Game game, Tile tile) : base(game) {
 		ResetItems(tile);
 	}
 
 	// assumeUnfortified is a unit that will be considered unfortified regardless of what its isFortified field holds. It's used to work around
 	// the fact that unfortification is done asynchronously through a message to the engine.
-	public void ResetItems(Tile tile, MapUnit assumeUnfortified = null)
-	{
+	public void ResetItems(Tile tile, MapUnit assumeUnfortified = null) {
 		RemoveAll();
+		int fortifiedCount = 0;
 		foreach (MapUnit unit in tile.unitsOnTile) {
 			bool isFortified = (unit != assumeUnfortified) && unit.isFortified;
+			fortifiedCount += isFortified ? 1 : 0;
 			string action = (unit.owner == game.controller) ?
-				(isFortified ? "Wake" : "Activate") :
-				"Contact";
+			                (isFortified ? "Wake" : "Activate") :
+			                "Contact";
 			AddItem($"{action} {unit.Describe()}").Connect("pressed", this, "SelectUnit", new Godot.Collections.Array() {unit.guid});
+		}
+		int unfortifiedCount = tile.unitsOnTile.Count - fortifiedCount;
+
+		if (fortifiedCount > 0) {
+			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, false});
+		}
+		if (unfortifiedCount > 0) {
+			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, true});
 		}
 	}
 
-	public void SelectUnit(string guid)
-	{
+	public void SelectUnit(string guid) {
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
 			if (toSelect != null && toSelect.owner == game.controller) {
@@ -136,9 +144,24 @@ public class RightClickTileMenu : RightClickMenu
 				ResetItems(toSelect.location, toSelect);
 			}
 		}
-		if (! Input.IsKeyPressed((int)Godot.KeyList.Shift))
+		if (!Input.IsKeyPressed((int)KeyList.Shift)) {
 			CloseAndDelete();
+		}
 	}
+
+	public void ForAll(int tileX, int tileY, bool fortify) {
+		using (var gameDataAccess = new UIGameDataAccess()) {
+			Tile tile = gameDataAccess.gameData.map.tileAt(tileX, tileY);
+			foreach (MapUnit unit in tile.unitsOnTile) {
+				new MsgSetFortification(unit.guid, fortify).send();
+			}
+			ResetItems(tile);
+		}
+		if (!Input.IsKeyPressed((int)KeyList.Shift)) {
+			CloseAndDelete();
+		}
+	}
+
 }
 
 public class RightClickChooseProductionMenu : RightClickMenu
