@@ -67,18 +67,20 @@ namespace C7Engine
 	public class MsgSetUnitPath : MessageToEngine
 	{
 		private string unitGUID;
-		private Tile dest;
+		private int destX;
+		private int destY;
 
-		public MsgSetUnitPath(string unitGUID, Tile dest)
+		public MsgSetUnitPath(string unitGUID, Tile tile)
 		{
 			this.unitGUID = unitGUID;
-			this.dest = dest;
+			this.destX = tile.xCoordinate;
+			this.destY = tile.yCoordinate;
 		}
 
 		public override void process()
 		{
 			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
-			unit?.setUnitPath(dest);
+			unit?.setUnitPath(EngineStorage.gameData.map.tileAt(destX, destY));
 		}
 	}
 
