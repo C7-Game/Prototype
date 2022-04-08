@@ -122,12 +122,49 @@ namespace C7Engine
 						//As of today (4/7/2022), let's tackle just one of those - adequate defense of cities.  The AI is really good at losing cities to barbs right now,
 						//and that's a problem.
 						
-						//Find all cities that have the fewest defenders.  Go to the nearest of those.
-						//N.B. the Defender AI will need to be enhanced to send units places.  This might also be where the "go to" sub-AI can be extracted out.
-						//But that will be in my next commit.
+						City nearestCityToDefend = FindNearbyCityToDefend(unit, player);
+
+						DefenderAIData newUnitAIData = new DefenderAIData();
+						newUnitAIData.destination = nearestCityToDefend.location;
+						newUnitAIData.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
+						Console.WriteLine($"Unit {unit} tasked with defending {nearestCityToDefend.name}");
+						unit.currentAIData = newUnitAIData;
 					}
 				}
 			}
+		}
+		
+		/**
+		 * Finds a nearby city that could use extra defenders.  Currently, that is a city that is tied
+		 * for the fewest units present, and among those, it's the closest.
+		 *
+		 * This is not a brilliant method, with many flaws such as not considering units already en route to defend,
+		 * whether the city needs more defenders, or if the units present are defenders.
+		 *
+		 * However, in the spirit of incrementalism, sending units to defend is still better than not sending them to defend.
+		 */
+		private static City FindNearbyCityToDefend(MapUnit unit, Player player)
+		{
+			int minDefenders = int.MaxValue;
+			//TODO: Just being there doesn't mean a unit is a defender.
+			List<City> citiesWithFewestDefenders = new List<City>();
+			foreach (City c in player.cities) {
+				if (c.location.unitsOnTile.Count < minDefenders) {
+					minDefenders = c.location.unitsOnTile.Count;
+					citiesWithFewestDefenders.Clear();
+					citiesWithFewestDefenders.Add(c);
+				}
+			}
+			City nearestCityToDefend = City.NONE;
+			int closestCityDistance = int.MaxValue;
+			foreach (City c in citiesWithFewestDefenders) {
+				int distanceToCity = c.location.distanceTo(unit.location);
+				if (distanceToCity < closestCityDistance) {
+					nearestCityToDefend = c;
+					closestCityDistance = distanceToCity;
+				}
+			}
+			return nearestCityToDefend;
 		}
 
 		/**
