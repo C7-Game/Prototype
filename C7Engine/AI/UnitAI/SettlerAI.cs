@@ -40,6 +40,10 @@ start:
 							unit.move(unit.location.directionTo(nextTile));
 						}
 						catch (Exception ex) {
+							//This occurs when on the previous turn, a settler tries to move to the next location on its path, but cannot, due to another
+							//civilization's unit (or a barbarian unit) being on that tile.
+							//TODO: #213 - If the path cannot be completed, we should create a different path instead.
+							//But to do that, the pathing algorithm will need to be enhanced to be aware of when rival units are in the way.
 							Console.WriteLine("Could not get next part of path for unit " + settlerAi + ", " + ex.Message);
 						}
 					}

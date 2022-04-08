@@ -100,7 +100,7 @@ namespace C7Engine
 					//Isn't a Settler.  If there's a city at the location, it's defended.  No boats involved.  What's our priority?
 					//If there is land to explore, we'll try to explore it.
 					//Long-term TODO: Should only send tiles on this landmass.
-					KeyValuePair<Tile, int> tileToExplore = ExplorerAI.FindTopScoringTileForExploration(player, player.tileKnowledge.AllKnownTiles());
+					KeyValuePair<Tile, int> tileToExplore = ExplorerAI.FindTopScoringTileForExploration(player, player.tileKnowledge.AllKnownTiles().Where(t => t.IsLand()));
 					if (tileToExplore.Value > 0) {
 						ExplorerAIData ai = new ExplorerAIData();
 						ai.type = ExplorerAIData.ExplorationType.RANDOM;
@@ -127,6 +127,10 @@ namespace C7Engine
 						DefenderAIData newUnitAIData = new DefenderAIData();
 						newUnitAIData.destination = nearestCityToDefend.location;
 						newUnitAIData.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
+						
+						PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
+						newUnitAIData.pathToDestination = algorithm.PathFrom(unit.location, newUnitAIData.destination);
+						
 						Console.WriteLine($"Unit {unit} tasked with defending {nearestCityToDefend.name}");
 						unit.currentAIData = newUnitAIData;
 					}

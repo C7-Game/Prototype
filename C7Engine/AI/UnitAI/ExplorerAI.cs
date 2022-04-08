@@ -100,7 +100,7 @@ namespace C7Engine
 			return true;
 		}
 
-		public static KeyValuePair<Tile, int> FindTopScoringTileForExploration(Player player, List<Tile> possibleNewLocations)
+		public static KeyValuePair<Tile, int> FindTopScoringTileForExploration(Player player, IEnumerable<Tile> possibleNewLocations)
 		{
 			//Technically, this should be the *estimated* new tiles revealed.  If a mountain blocks visibility,
 			//we won't know that till we move there.
