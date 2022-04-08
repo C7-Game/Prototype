@@ -12,9 +12,9 @@ namespace C7Engine
 		{
 			GameData gameData = EngineStorage.gameData;
 
-			foreach (Player player in gameData.players) {
+			foreach (Player player in gameData.GetHumanPlayers()) {
 				foreach (MapUnit unit in player.units) {
-					Console.WriteLine(unit + ", path length: " + unit.path.PathLength());
+					Console.WriteLine($"{unit}, path length: {unit.path?.PathLength() ?? 0}");
 					if (unit.path?.PathLength() > 0) {
 						unit.moveAlongPath();
 					}

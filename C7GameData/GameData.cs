@@ -20,6 +20,10 @@ namespace C7GameData
 			rng = new Random();
 		}
 
+		public List<Player> GetHumanPlayers() {
+			return players.FindAll(p => p.isHuman);
+		}
+
 		public MapUnit GetUnit(string guid)
 		{
 			return mapUnits.Find(u => u.guid == guid);

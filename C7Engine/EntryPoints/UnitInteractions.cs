@@ -19,7 +19,7 @@ namespace C7Engine
 					foreach (MapUnit unit in player.units) {
 						if (unit.movementPointsRemaining > 0 && !unit.IsBusy()) {
 							if (!waitQueue.Contains(unit)) {
-								return UnitWithAvailableActions(unit);
+								return unit;
 							}
 						}
 					}
