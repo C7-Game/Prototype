@@ -113,6 +113,20 @@ public class RightClickTileMenu : RightClickMenu
 		ResetItems(tile);
 	}
 
+	private bool isUnitFortified(MapUnit unit, Dictionary<string, bool> uiStates) {
+		if (uiStates is null || !uiStates.ContainsKey(unit.guid)) {
+			return unit.isFortified;
+		}
+		return uiStates[unit.guid];
+	}
+
+	private string getUnitAction(MapUnit unit, bool isFortified) {
+		if (unit.owner == game.controller) {
+			return isFortified ? "Wake" : "Activate";
+		}
+		return "Contact";
+	}
+
 	// uiUpdatedUnitStates maps unit guid to a boolean that is true if they were fortified
 	// and false if they were selected in the previous action. This is to update the UI
 	// since the actions update the engine asynchronously and otherwise the UI may not
@@ -120,24 +134,10 @@ public class RightClickTileMenu : RightClickMenu
 	public void ResetItems(Tile tile, Dictionary<string, bool> uiUpdatedUnitStates = null) {
 		RemoveAll();
 
-		bool isUnitFortified(MapUnit unit) {
-			if (uiUpdatedUnitStates is null || !uiUpdatedUnitStates.ContainsKey(unit.guid)) {
-				return unit.isFortified;
-			}
-			return uiUpdatedUnitStates[unit.guid];
-		}
-
-		string getUnitAction(MapUnit unit, bool isFortified) {
-			if (unit.owner == game.controller) {
-				return isFortified ? "Wake" : "Activate";
-			}
-			return "Contact";
-		}
-
 		int fortifiedCount = 0;
 		foreach (MapUnit unit in tile.unitsOnTile) {
 
-			bool isFortified = isUnitFortified(unit);
+			bool isFortified = isUnitFortified(unit, uiUpdatedUnitStates);
 			fortifiedCount += isFortified ? 1 : 0;
 			string action = getUnitAction(unit, isFortified);
 
