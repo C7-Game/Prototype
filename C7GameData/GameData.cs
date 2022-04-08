@@ -38,13 +38,7 @@ namespace C7GameData
 		public void PerformPostLoadActions()
 		{
 			//Let each tile know who its neighbors are.  It needs to know this so its graphics can be selected appropriately.
-			foreach (Tile tile in map.tiles) {
-				Dictionary<TileDirection, Tile> neighbors = new Dictionary<TileDirection, Tile>();
-				foreach (TileDirection direction in Enum.GetValues(typeof(TileDirection))) {
-					neighbors[direction] = map.tileNeighbor(tile, direction);
-				}
-				tile.neighbors = neighbors;
-			}
+			map.computeNeighbors();
 		}
 
 		/**
