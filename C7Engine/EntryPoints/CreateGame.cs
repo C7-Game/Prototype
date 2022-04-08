@@ -12,9 +12,11 @@ namespace C7Engine
 		 **/
 		public static Player createGame(string loadFilePath, string defaultBicPath)
 		{
+			EngineStorage.createThread();
+
 			C7SaveFormat save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
 
-			EngineStorage.setGameData(save.GameData);
+			EngineStorage.gameData = save.GameData;
 
 			// possibly do something with save.Rules here when it exists
 			// and maybe consider if we have any need to keep a reference to the save object handy...probably not

@@ -61,9 +61,8 @@ public class Game : Node2D
 			AddChild(animSoundPlayer);
 			civ3AnimData = new Civ3AnimData(animSoundPlayer);
 			animTracker = new AnimationTracker(civ3AnimData);
-			EngineStorage.initialize(); // Spawns engine thread
 
-			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
+			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
 			Global.ResetLoadGamePath();
 
 			using (var gameDataAccess = new UIGameDataAccess()) {

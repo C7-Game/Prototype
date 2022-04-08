@@ -19,7 +19,7 @@ namespace C7Engine
 		public static Mutex gameDataMutex = new Mutex();
 		internal static GameData gameData {get; set;}
 
-		private static Thread engineThread;
+		private static Thread engineThread = null;
 		internal static AutoResetEvent uiEvent = new AutoResetEvent(false); // Used to block engineThread while waiting for the UI, f.e. while
 										   // an animation plays.
 
@@ -46,26 +46,11 @@ namespace C7Engine
 			}
 		}
 
-		// The UI must call this function to set up the engine. Right now all it does is spawn the engine thread. There is no deinitialize
-		// function b/c the way to deinit the engine is to pass it a ShutdownEngine message.
-		// TODO: This initialize function and the thread, message queue, and AutoResetEvent should be moved somewhere other than
-		// EngineStorage. I'm just dropping them here for now since this is the closest thing we have to a root Engine class.
-		public static void initialize()
+		internal static void createThread()
 		{
-			// TODO: If engineThread is already created and running, stop it first
+			// TODO: What if engineThread is not null, i.e. if the thread has already been created? Should we join() it? Does it matter?
 			engineThread = new Thread(processActions);
 			engineThread.Start();
-		}
-
-		/**
-		 * Updates the game data pointer to a new set of game data.
-		 * This may be a randomly generated map, or data loaded from a scenario
-		 * or from a save file.
-		 * The engine will no longer have a reference to the old game data.
-		 **/
-		public static void setGameData(GameData newGameData)
-		{
-			gameData = newGameData;
 		}
 	}
 
