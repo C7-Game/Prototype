@@ -56,6 +56,11 @@ namespace C7Engine.Pathing
 					}
 				}
 				closest = getNextClosest();
+				// TODO: this is fastest if recomputing Dijkstra's for each unit
+				// and ignoring that units may path from the same starting tile
+				if (closest.Key == destination) {
+					break;
+				}
 			}
 
 			return ConstructPath(destination, predecessors);
