@@ -20,6 +20,8 @@ namespace C7GameData
         public Player owner {get; set;}
         public List<CityResident> residents = new List<CityResident>();
 
+        public static City NONE = new City(Tile.NONE, null, "Dummy City");
+
         public City(Tile location, Player owner, string name)
         {
             guid = Guid.NewGuid().ToString();

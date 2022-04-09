@@ -18,13 +18,29 @@ namespace C7Engine
 			Console.WriteLine("-> Begin " + player.civilization.cityNames[0] + " turn");
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
-				if (unit.currentAIData == null) {
-					SetAIForUnit(unit, player);
+				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.
+				//It may fail due to conditions having changed since that goal was assigned; in that case it will
+				//get a new task to try to complete.
+				
+				bool unitDone = false;
+				int attempts = 0;
+				int maxAttempts = 2;	//safety valve so we don't freeze the UI if SetAIForUnit returns something that fails
+				while (!unitDone) {
+					if (unit.currentAIData == null || attempts > 0) {
+						SetAIForUnit(unit, player);
+					}
+					
+					UnitAI artificialIntelligence = getAIForUnitStrategy(unit.currentAIData);
+					unitDone = artificialIntelligence.PlayTurn(player, unit);
+					
+					attempts++;
+					if (!unitDone && attempts >= maxAttempts) {
+						//TODO: Serilog.  WARN level.
+						Console.WriteLine($"Hit max AI attempts of {maxAttempts} for unit {unit} at {unit.location} without succeeding.  This indicates SetAIForUnit returned an impossible task, and should be debugged.");
+						break;
+					}
 				}
 
-				UnitAI artificalIntelligence = getAIForUnitStrategy(unit.currentAIData);
-				artificalIntelligence.PlayTurn(player, unit);
-				
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
 		}
@@ -66,22 +82,93 @@ namespace C7Engine
 				unit.currentAIData = ai;
 			}
 			else {
-				ExplorerAIData ai = new ExplorerAIData();
+
 				if (unit.unitType is SeaUnit) {
+					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.COASTLINE;
+					unit.currentAIData = ai;
 					Console.WriteLine("Set coastline exploration AI for " + unit);
 				}
 				else if (unit.location.unitsOnTile.Exists((x) => x.unitType is SeaUnit)) {
+					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.ON_A_BOAT;
+					unit.currentAIData = ai;
 					//TODO: Actually put the unit on the boat
 					Console.WriteLine("Set ON_A_BOAT exploration AI for " + unit);
 				}
 				else {
-					ai.type = ExplorerAIData.ExplorationType.RANDOM;
-					Console.WriteLine("Set random exploration AI for " + unit);
+					//Isn't a Settler.  If there's a city at the location, it's defended.  No boats involved.  What's our priority?
+					//If there is land to explore, we'll try to explore it.
+					//Long-term TODO: Should only send tiles on this landmass.
+					KeyValuePair<Tile, int> tileToExplore = ExplorerAI.FindTopScoringTileForExploration(player, player.tileKnowledge.AllKnownTiles().Where(t => t.IsLand()));
+					if (tileToExplore.Value > 0) {
+						ExplorerAIData ai = new ExplorerAIData();
+						ai.type = ExplorerAIData.ExplorationType.RANDOM;
+						unit.currentAIData = ai;
+						Console.WriteLine("Set random exploration AI for " + unit);
+					}
+					else {
+						//Nowhere to explore.  What to do now?
+						//Priority 1: Adequate defense of cities.
+						//Future Priority 1: Escorting Settlers
+						//Priority 2: Clearing out barbs
+						//Priority 3: Defending chokepoints
+						//Priority 4: ???
+						//Priority 5: Profit!
+						//(Realistically, as we evolve there will be a lot of options, such as defending borders from barbs, preparing attackers on other civs, defending
+						//resources.  I expect we'll have some sort of arbiter that decides between competing priorities, with each being given a score as to how important
+						//they are, including a weight by how far away the task is.  But this will evolve gradually over a long time)
+						
+						//As of today (4/7/2022), let's tackle just one of those - adequate defense of cities.  The AI is really good at losing cities to barbs right now,
+						//and that's a problem.
+						
+						City nearestCityToDefend = FindNearbyCityToDefend(unit, player);
+
+						DefenderAIData newUnitAIData = new DefenderAIData();
+						newUnitAIData.destination = nearestCityToDefend.location;
+						newUnitAIData.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
+						
+						PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
+						newUnitAIData.pathToDestination = algorithm.PathFrom(unit.location, newUnitAIData.destination);
+						
+						Console.WriteLine($"Unit {unit} tasked with defending {nearestCityToDefend.name}");
+						unit.currentAIData = newUnitAIData;
+					}
 				}
-				unit.currentAIData = ai;
 			}
+		}
+		
+		/**
+		 * Finds a nearby city that could use extra defenders.  Currently, that is a city that is tied
+		 * for the fewest units present, and among those, it's the closest.
+		 *
+		 * This is not a brilliant method, with many flaws such as not considering units already en route to defend,
+		 * whether the city needs more defenders, or if the units present are defenders.
+		 *
+		 * However, in the spirit of incrementalism, sending units to defend is still better than not sending them to defend.
+		 */
+		private static City FindNearbyCityToDefend(MapUnit unit, Player player)
+		{
+			int minDefenders = int.MaxValue;
+			//TODO: Just being there doesn't mean a unit is a defender.
+			List<City> citiesWithFewestDefenders = new List<City>();
+			foreach (City c in player.cities) {
+				if (c.location.unitsOnTile.Count < minDefenders) {
+					minDefenders = c.location.unitsOnTile.Count;
+					citiesWithFewestDefenders.Clear();
+					citiesWithFewestDefenders.Add(c);
+				}
+			}
+			City nearestCityToDefend = City.NONE;
+			int closestCityDistance = int.MaxValue;
+			foreach (City c in citiesWithFewestDefenders) {
+				int distanceToCity = c.location.distanceTo(unit.location);
+				if (distanceToCity < closestCityDistance) {
+					nearestCityToDefend = c;
+					closestCityDistance = distanceToCity;
+				}
+			}
+			return nearestCityToDefend;
 		}
 
 		/**
