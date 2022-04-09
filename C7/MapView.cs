@@ -876,7 +876,9 @@ public class CityLayer : LooseLayer {
 		Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
 		looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
 
-		String cityNameAndGrowth = city.name + " : " + city.TurnsUntilGrowth();
+		int turnsUntilGrowth = city.TurnsUntilGrowth();
+		string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue ? "- -" : "" + turnsUntilGrowth;
+		String cityNameAndGrowth = $"{city.name} : {turnsUntilGrowthText}";
 		String productionDescription = city.itemBeingProduced.name + " : " + city.TurnsUntilProductionFinished();
 
 		int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;

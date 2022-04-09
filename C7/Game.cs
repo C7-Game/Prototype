@@ -391,6 +391,11 @@ public class Game : Node2D
 
 						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.DisplayName);
 
+						if (tile.cityAtTile != null) {
+							City city = tile.cityAtTile;
+							GD.Print($"  {city.name}, production {city.shieldsStored} of {city.itemBeingProduced.shieldCost}");
+						}
+
 						if (tile.unitsOnTile.Count > 0) {
 							foreach (MapUnit unit in tile.unitsOnTile) {
 								GD.Print("  Unit on tile: " + unit);
