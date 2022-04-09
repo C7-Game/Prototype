@@ -1,5 +1,5 @@
 [color=black][center]
-[b]C7 0.1 "Babylon"[/b]
+[b]C7 0.2 "Carthage" Preview 1[/b]
 [url]c7-game.github.io[/url]
 
 [b]An open source project by the
@@ -9,6 +9,7 @@ made with Godot Engine[/b]
 
 [b]Developers[/b]
 
+Armageddon1
 Caro-Kann
 Flintlock / maxpetul
 JimOfLeisure
