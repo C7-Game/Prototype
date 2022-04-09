@@ -1,7 +1,6 @@
 using C7GameData;
 using Xunit;
 
-
 public class UnitTest1
 {
 	[Fact]
