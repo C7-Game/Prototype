@@ -12,6 +12,7 @@ public class Player
 	//TODO: Refactor front-end so it sends player GUID with requests.
 	//We should allow multiple humans, this is a temporary measure.
 	public bool isHuman = false;
+	public bool hasPlayedThisTurn = false;
 
 	public Civilization civilization;
 	private int cityNameIndex = 0;
@@ -59,6 +60,12 @@ public class Player
 	{
 		// Right now it's a free-for-all but eventually we'll implement peace treaties and alliances
 		return other == this;
+	}
+
+	public bool SitsOutFirstTurn()
+	{
+		// TODO: Scenarios can also specify that certain players sit out the first turn. E.g. WW2 in the Pacific
+		return ! isBarbarians;
 	}
 }
 

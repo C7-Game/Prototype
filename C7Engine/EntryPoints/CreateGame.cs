@@ -22,6 +22,8 @@ namespace C7Engine
 			// and maybe consider if we have any need to keep a reference to the save object handy...probably not
 
 			var humanPlayer = save.GameData.CreateDummyGameData();
+			EngineStorage.uiControllerID = humanPlayer.guid;
+			TurnHandling.advanceTurn();
 			return humanPlayer;
 		}
 	}

@@ -142,7 +142,8 @@ public class MsgChooseProduction : MessageToEngine {
 public class MsgEndTurn : MessageToEngine {
 	public override void process()
 	{
-		TurnHandling.EndTurn();
+		EngineStorage.gameData.players.Find(p => p.guid == EngineStorage.uiControllerID).hasPlayedThisTurn = true;
+		TurnHandling.advanceTurn();
 	}
 }
 

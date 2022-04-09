@@ -70,32 +70,30 @@ public class Game : Node2D
 				GD.Print("RelativeModPath ", map.RelativeModPath);
 				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
 				AddChild(mapView);
+
+				mapView.cameraZoom = (float)1.0;
+				mapView.gridLayer.visible = false;
+
+				// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their
+				// starting settler.
+				if (controller.cities.Count > 0) {
+					City capital = controller.cities.Find(c => c.IsCapital());
+					if (capital != null)
+						mapView.centerCameraOnTile(capital.location);
+				} else {
+					MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
+					if (startingSettler != null)
+						mapView.centerCameraOnTile(startingSettler.location);
+				}
 			}
 
 			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 			Player = GetNode<KinematicBody2D>("KinematicBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-			mapView.cameraZoom = (float)1.0;
-			mapView.gridLayer.visible = false;
 
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
-
-			// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their starting
-			// settler.
-			if (controller.cities.Count > 0)
-			{
-				City capital = controller.cities.Find(c => c.IsCapital());
-				if (capital != null)
-					mapView.centerCameraOnTile(capital.location);
-			}
-			else
-			{
-				MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
-				if (startingSettler != null)
-					mapView.centerCameraOnTile(startingSettler.location);
-			}
 
 			GD.Print("Now in game!");
 
@@ -137,9 +135,7 @@ public class Game : Node2D
 					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
 				break;
 			case MsgStartTurn mST:
-				//Simulating processing so the turn doesn't end too quickly
-				ComputerSimulateTurn();
-				GD.Print("Thinking...");
+				OnPlayerStartTurn();
 				break;
 			}
 		}
@@ -164,12 +160,7 @@ public class Game : Node2D
 			processEngineMessages(gameData);
 
 			if (!errorOnLoad) {
-				switch (CurrentState)
-				{
-				case GameState.PreGame:
-					StartGame();
-					break;
-				case GameState.PlayerTurn:
+				if (CurrentState == GameState.PlayerTurn) {
 					// If the selected unit is unfortified, prepare to autoselect the next one if it becomes fortified
 					if ((CurrentlySelectedUnit != MapUnit.NONE) && (! CurrentlySelectedUnit.isFortified))
 						KeepCSUWhenFortified = false;
@@ -181,9 +172,6 @@ public class Game : Node2D
 						  ! animTracker.getUnitAppearance(CurrentlySelectedUnit).DeservesPlayerAttention()) ||
 						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
-					break;
-				case GameState.ComputerTurn:
-					break;
 				}
 				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
 				//without a manual cast to int.
@@ -193,12 +181,6 @@ public class Game : Node2D
 				}
 			}
 		}
-	}
-
-	private void StartGame()
-	{
-		GD.Print("Game starting");
-		OnPlayerStartTurn();
 	}
 
 	// This is the terrain generator that used to be part of TerrainAsTileMap. Now it gets passed to and called from generateDummyGameMap so that
@@ -288,21 +270,6 @@ public class Game : Node2D
 			GD.Print("Starting computer turn");
 			CurrentState = GameState.ComputerTurn;
 			new MsgEndTurn().send(); // Triggers actual backend processing
-		}
-	}
-
-	public async void ComputerSimulateTurn()
-	{
-		await ToSignal(GetTree().CreateTimer(0.25f), "timeout");
-		OnComputerEndTurn();
-	}
-
-	private void OnComputerEndTurn()
-	{
-		if (CurrentState == GameState.ComputerTurn)
-		{
-			GD.Print("Ending computer turn");
-			OnPlayerStartTurn();
 		}
 	}
 
