@@ -83,8 +83,11 @@ namespace C7Engine
 				}
 				else if (newSize < initialSize) {
 					int diff = initialSize - newSize;
-					//Remove two residents.  Eventually, this will be prioritized by nationality, and ensure it doesn't cause a food shortage
-					city.residents.RemoveRange(0, diff);
+					//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
+					for (int i = 1; i <= diff; i++) {
+						city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
+						city.residents.RemoveAt(city.residents.Count - i);
+					}
 				}
             }
             //Reset movement points available for all units

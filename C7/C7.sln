@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildDevSave", "..\_Console
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSStub", "VSStub\VSStub.csproj", "{D420363F-5260-42D6-883A-BC1D970B39D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C7GameDataTests", "C7GameDataTests\C7GameDataTests.csproj", "{8053F185-AA52-4876-8CF4-D08907FCA61A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,14 @@ Global
 		{D420363F-5260-42D6-883A-BC1D970B39D9}.ExportRelease|Any CPU.Build.0 = Release|Any CPU
 		{D420363F-5260-42D6-883A-BC1D970B39D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D420363F-5260-42D6-883A-BC1D970B39D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8053F185-AA52-4876-8CF4-D08907FCA61A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
