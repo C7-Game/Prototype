@@ -30,6 +30,7 @@ public class Game : Node2D
 
 	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
 	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
+	private bool inUnitGoToMode = false;
 
 	// Normally if the currently selected unit (CSU) becomes fortified, we advance to the next autoselected unit. If this flag is set, we won't do
 	// that. This is useful so that the unit autoselector can be prevented from interfering with the player selecting fortified units.
@@ -126,7 +127,7 @@ public class Game : Node2D
 		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
-				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSUA.unitGUID);
+				MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
 				if (unit != null) {
 					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
@@ -249,6 +250,11 @@ public class Game : Node2D
 	public void setSelectedUnit(MapUnit unit)
 	{
 		unit = UnitInteractions.UnitWithAvailableActions(unit);
+
+		if ((unit.path?.PathLength() ?? -1) > 0) {
+			GD.Print("cancelling path for " + unit);
+			unit.path = TilePath.NONE;
+		}
 
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
@@ -380,19 +386,31 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				if(eventMouseButton.IsPressed())
 				{
-					// Select unit on tile at mouse location
-					using (var gameDataAccess = new UIGameDataAccess()) {
-						var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
-						if (tile != null) {
-							MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
-							//TODO: Better check for "current/human player"
-							if (to_select != null && to_select.owner.color == 0x4040FFFF)
-								setSelectedUnit(to_select);
+					if (inUnitGoToMode) {
+						setGoToMode(false);
+						using (var gameDataAccess = new UIGameDataAccess()) {
+							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							if (tile != null) {
+								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
+							}
 						}
 					}
+					else
+					{
+						// Select unit on tile at mouse location
+						using (var gameDataAccess = new UIGameDataAccess()) {
+							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							if (tile != null) {
+								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+								//TODO: Better check for "current/human player"
+								if (to_select != null && to_select.owner.color == 0x4040FFFF)
+									setSelectedUnit(to_select);
+							}
+						}
 
-					OldPosition = eventMouseButton.Position;
-					IsMovingCamera = true;
+						OldPosition = eventMouseButton.Position;
+						IsMovingCamera = true;
+					}
 				}
 				else
 				{
@@ -409,8 +427,9 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
 			}
-			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (! eventMouseButton.IsPressed()))
+			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (!eventMouseButton.IsPressed()))
 			{
+				setGoToMode(false);
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
@@ -512,13 +531,15 @@ public class Game : Node2D
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
 			{
-				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
+				mapView.gridLayer.visible = !mapView.gridLayer.visible;
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
 			{
-				GD.Print("Got request for escape/quit");
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-				popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
+				if (!inUnitGoToMode) {
+					GD.Print("Got request for escape/quit");
+					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+					popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
+				}
 			}
 			else if (eventKey.Scancode == (int)Godot.KeyList.Z)
 			{
@@ -533,6 +554,11 @@ public class Game : Node2D
 					slider.Value = 0.5f;
 				}
 			}
+
+			// always turn off go to mode unless G key is pressed
+			// do this after processing esc key
+			setGoToMode(eventKey.Scancode == (int)Godot.KeyList.G);
+
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
 		{
@@ -554,6 +580,11 @@ public class Game : Node2D
 		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit(gameData));
 	}
 
+	private void setGoToMode(bool isOn)
+	{
+		inUnitGoToMode = isOn;
+	}
+
 	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
 	///the keyboard shortcuts should wind up here.
 	///Eventually, we should quite possibly put this somewhere other than Game.cs, or at
@@ -561,36 +592,48 @@ public class Game : Node2D
 	///more things going on before figuring out what the 'right' thing is, though.
 	private void UnitButtonPressed(string buttonName)
 	{
+		// this will detoggle goTo when clicking unit buttons
+		// other than goTo
+		setGoToMode(buttonName == "goTo");
+
 		GD.Print("The " + buttonName + " button was pressed");
-		if (buttonName.Equals("hold"))
-		{
-			new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
-		}
-		else if (buttonName.Equals("fortify"))
-		{
-			new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
-		}
-		else if (buttonName.Equals("wait"))
-		{
-			using (var gameDataAccess = new UIGameDataAccess()) {
-				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
-				GetNextAutoselectedUnit(gameDataAccess.gameData);
+		switch (buttonName) {
+			case "hold":
+				new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
+				break;
+
+			case "fortify":
+				new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
+				break;
+
+			case "wait":
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+					GetNextAutoselectedUnit(gameDataAccess.gameData);
+				}
+				break;
+
+			case "disband":
+			{
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
 			}
-		}
-		else if (buttonName.Equals("disband"))
-		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
-		}
-		else if (buttonName.Equals("buildCity"))
-		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
-		}
-		else
-		{
-			//A nice sanity check if I use a different name here than where I created it...
-			GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+				break;
+
+			case "buildCity":
+			{
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
+			}
+				break;
+
+			case "goTo":
+				break;
+
+			default:
+				//A nice sanity check if I use a different name here than where I created it...
+				GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+				break;
 		}
 	}
 
