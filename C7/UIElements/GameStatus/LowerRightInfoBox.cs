@@ -15,7 +15,7 @@ public class LowerRightInfoBox : TextureRect
 	Label attackDefenseMovement = new Label();
 	Label terrainType = new Label();
 	Label yearAndGold = new Label();
-	
+
 	Timer blinkingTimer = new Timer();
 	Boolean timerStarted = false;	//This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
 
@@ -54,27 +54,27 @@ public class LowerRightInfoBox : TextureRect
 		lblUnitSelected.AnchorRight = 1.0f;
 		lblUnitSelected.MarginRight = -35;
 		boxRightRectangle.AddChild(lblUnitSelected);
-		
+
 		attackDefenseMovement.Text = "0.0. 1/1";
 		attackDefenseMovement.Align = Label.AlignEnum.Right;
 		attackDefenseMovement.SetPosition(new Vector2(0, 35));
 		attackDefenseMovement.AnchorRight = 1.0f;
 		attackDefenseMovement.MarginRight = -35;
 		boxRightRectangle.AddChild(attackDefenseMovement);
-		
+
 		terrainType.Text = "Grassland";
 		terrainType.Align = Label.AlignEnum.Right;
 		terrainType.SetPosition(new Vector2(0, 50));
 		terrainType.AnchorRight = 1.0f;
 		terrainType.MarginRight = -35;
 		boxRightRectangle.AddChild(terrainType);
-		
+
 		//For the centered labels, we anchor them center, with equal weight on each side.
 		//Then, when they are visible, we add a left margin that's negative and equal to half
 		//their width.
 		//Seems like there probably is an easier way, but I haven't found it yet.
 		Label civAndGovt = new Label();
-		civAndGovt.Text = "Babylon - Despotism (5.5.0)";
+		civAndGovt.Text = "Carthage - Despotism (5.5.0)";
 		civAndGovt.Align = Label.AlignEnum.Center;
 		civAndGovt.SetPosition(new Vector2(0, 90));
 		civAndGovt.AnchorLeft = 0.5f;
@@ -89,7 +89,7 @@ public class LowerRightInfoBox : TextureRect
 		yearAndGold.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(yearAndGold);
 		yearAndGold.MarginLeft = -1 * (yearAndGold.RectSize.x/2.0f);
-		
+
 		//Setup up, but do not start, the timer.
 		blinkingTimer.OneShot = false;
 		blinkingTimer.WaitTime = 0.6f;
@@ -103,7 +103,7 @@ public class LowerRightInfoBox : TextureRect
 		terrainType.Visible = false;
 
 		toggleEndTurnButton();
-		
+
 		if (!timerStarted) {
 			blinkingTimer.Start();
 			GD.Print("Started a timer for blinking");
@@ -135,7 +135,6 @@ public class LowerRightInfoBox : TextureRect
 	private void turnEnded() {
 		GD.Print("Emitting the blinky button pressed signal");
 		GetParent().EmitSignal("BlinkyEndTurnButtonPressed");
-		
 	}
 
 	public void UpdateUnitInfo(MapUnit NewUnit, TerrainType terrain)
@@ -164,6 +163,6 @@ public class LowerRightInfoBox : TextureRect
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
 //  public override void _Process(float delta)
 //  {
-//      
+//
 //  }
 }

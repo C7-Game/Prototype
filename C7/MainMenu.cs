@@ -16,6 +16,9 @@ public class MainMenu : Node2D
 	Util.Civ3FileDialog LoadScenarioDialog;
 	GlobalSingleton Global;
 
+	readonly int MENU_OFFSET_FROM_TOP = 180;
+	readonly int MENU_OFFSET_FROM_LEFT = 180;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -46,16 +49,16 @@ public class MainMenu : Node2D
 			InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20);
 			HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20);
 
-			AddButton("New Game", 160, "StartGame");
-			AddButton("Quick Start", 195, "StartGame");
-			AddButton("Tutorial", 230, "StartGame");
-			AddButton("Load Game", 265, "LoadGame");
-			AddButton("Load Scenario", 300, "LoadScenario");
-			AddButton("Hall of Fame", 335, "HallOfFame");
-			AddButton("Preferences", 370, "Preferences");
-			AddButton("Audio Preferences", 405, "Preferences");
-			AddButton("Credits", 440, "showCredits");
-			AddButton("Exit", 475, "_on_Exit_pressed");
+			AddButton("New Game", 0, "StartGame");
+			AddButton("Quick Start", 35, "StartGame");
+			AddButton("Tutorial", 70, "StartGame");
+			AddButton("Load Game", 105, "LoadGame");
+			AddButton("Load Scenario", 140, "LoadScenario");
+			AddButton("Hall of Fame", 175, "HallOfFame");
+			AddButton("Preferences", 210, "Preferences");
+			AddButton("Audio Preferences", 245, "Preferences");
+			AddButton("Credits", 280, "showCredits");
+			AddButton("Exit", 315, "_on_Exit_pressed");
 
 			// Hide select home folder if valid path is present as proven by reaching this point in code
 			SetCiv3Home.Visible = false;
@@ -81,14 +84,14 @@ public class MainMenu : Node2D
 		TextureButton newButton = new TextureButton();
 		newButton.TextureNormal = InactiveButton;
 		newButton.TextureHover = HoverButton;
-		newButton.SetPosition(new Vector2(40, verticalPosition));
+		newButton.SetPosition(new Vector2(MENU_OFFSET_FROM_LEFT, MENU_OFFSET_FROM_TOP + verticalPosition));
 		MainMenuBackground.AddChild(newButton);
 		newButton.Connect("pressed", this, actionName);
 
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
 
-		newButtonLabel.SetPosition(new Vector2(65, verticalPosition + BUTTON_LABEL_OFFSET));
+		newButtonLabel.SetPosition(new Vector2(MENU_OFFSET_FROM_LEFT + 25, MENU_OFFSET_FROM_TOP + verticalPosition + BUTTON_LABEL_OFFSET));
 		MainMenuBackground.AddChild(newButtonLabel);
 		newButtonLabel.Connect("pressed", this, actionName);
 	}

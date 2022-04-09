@@ -1,6 +1,8 @@
 namespace C7Engine
 {
 
+using System;
+using Pathing;
 using C7GameData;
 
 //We should document why we're putting things in the extensions methods.  We discussed it a month or so ago, but I forget why at this point.
@@ -107,7 +109,7 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static void move(this MapUnit unit, TileDirection dir)
+	public static void move(this MapUnit unit, TileDirection dir, bool wait = false)
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
@@ -120,7 +122,7 @@ public static class MapUnitExtensions {
 			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
 				if (unit.unitType.attack > 0) {
 					bool unitWonCombat = unit.fight(defender);
-					if (! unitWonCombat)
+					if (!unitWonCombat)
 						return;
 
 					// If there are still more enemy units on the destination tile we can't actually move into it
@@ -132,8 +134,9 @@ public static class MapUnitExtensions {
 				} else if (unit.unitType.bombard > 0) {
 					unit.bombard(newLoc);
 					return;
-				} else
+				} else {
 					return;
+				}
 			}
 
 			if (!unit.location.unitsOnTile.Remove(unit))
@@ -142,8 +145,25 @@ public static class MapUnitExtensions {
 			unit.location = newLoc;
 			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
 			unit.OnEnterTile(newLoc);
-			unit.animate(MapUnit.AnimatedAction.RUN, false);
+			unit.animate(MapUnit.AnimatedAction.RUN, wait);
 		}
+	}
+
+	public static void moveAlongPath(this MapUnit unit)
+	{
+		while (unit.movementPointsRemaining > 0 && unit.path?.PathLength() > 0) {
+			var dir = unit.location.directionTo(unit.path.Next());
+			unit.move(dir, true); //TODO: don't wait on last move animation?
+		}
+	}
+
+	public static void setUnitPath(this MapUnit unit, Tile dest)
+	{
+		unit.path = PathingAlgorithmChooser.GetAlgorithm().PathFrom(unit.location, dest);
+		if (unit.path == TilePath.NONE) {
+			System.Console.WriteLine("Cannot move unit to " + dest + ", path is NONE!");
+		}
+		unit.moveAlongPath();
 	}
 
 	public static void skipTurn(this MapUnit unit)
@@ -187,7 +207,7 @@ public static class MapUnitExtensions {
 		// obviously don't want to do here.
 		unit.disband();
 	}
-	
+
 	public static bool canTraverseTile(this MapUnit unit, Tile t) {
 		//TODO: Unit prototypes should have info about terrain classes (#148), and we shouldn't rely on names
 		if (unit.unitType.name == "Galley" && !t.IsLand())

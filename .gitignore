@@ -7,6 +7,7 @@ logs/
 # re-ignoring it so manual exports don't mess with the to-be-finely-honed settings; can manually add if needs updating
 export_presets.cfg
 mono_crash.*.json
+mono_crash.*.blob
 
 # Exports folder ignores
 C7/Exports

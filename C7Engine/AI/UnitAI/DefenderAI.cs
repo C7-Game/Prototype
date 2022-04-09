@@ -13,8 +13,10 @@ namespace C7Engine.AI {
 				}
 			}
 			else {
-				//TODO: Move towards destination
 				Console.WriteLine("Moving defender towards " + defenderAI.destination);
+				
+				Tile nextTile = defenderAI.pathToDestination.Next();
+				unit.move(unit.location.directionTo(nextTile));
 			}
 			return true;
 		}

@@ -15,6 +15,8 @@ An installation of Sid Meier's Civilzation III Complete (or Conquests) is requir
 
 Find the project interesting enough you'd like to contribute?  See the [Contributing Page](https://github.com/C7-Game/Prototype/wiki/Contributing) on our Wiki for more information!
 
+To set up a working development environment, check out [the docs](./doc/dev_environment.md).
+
 At the moment, additional developer bandwidth is probably the most-needed asset, but all sorts of help (art, writing, project management, sheep-herding) could be useful.
 
 ## What is those subfolders?
