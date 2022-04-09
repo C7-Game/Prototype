@@ -64,7 +64,7 @@ namespace C7GameData
         {
             int turnsRoundedDown = (item.shieldCost - shieldsStored) / CurrentProductionYield();
             if ((item.shieldCost - shieldsStored) % CurrentProductionYield() != 0) {
-                return turnsRoundedDown++;
+                return turnsRoundedDown + 1;
             }
             return turnsRoundedDown;
         }

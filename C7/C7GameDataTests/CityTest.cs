@@ -24,6 +24,7 @@ public class UnitTest1
 		maverick.tileWorked = workedTile;
 		city.residents.Add(maverick);
 
-		Assert.Equal(1, city.TurnsUntilProductionFinished());
+		int turnsUntilFinished = city.TurnsUntilProductionFinished();
+		Assert.Equal(1, turnsUntilFinished);
 	}
 }
