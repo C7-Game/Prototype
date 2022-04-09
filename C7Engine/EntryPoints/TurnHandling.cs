@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using C7Engine.AI;
 using C7GameData.AIData;
 
 namespace C7Engine
@@ -56,8 +57,8 @@ namespace C7Engine
 			}
 
             //City Production
-            foreach (City city in gameData.cities)
-            {
+	        foreach (City city in gameData.cities) {
+				int initialSize = city.size;
                 IProducible producedItem = city.ComputeTurnProduction();
                 if (producedItem != null) {
 					if (producedItem is UnitPrototype prototype) {
@@ -73,6 +74,18 @@ namespace C7Engine
 					
 					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
                 }
+
+				int newSize = city.size;
+				if (newSize > initialSize) {
+					CityResident newResident = new CityResident();
+					newResident.nationality = city.owner.civilization;
+					CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
+				}
+				else if (newSize < initialSize) {
+					int diff = initialSize - newSize;
+					//Remove two residents.  Eventually, this will be prioritized by nationality, and ensure it doesn't cause a food shortage
+					city.residents.RemoveRange(0, diff);
+				}
             }
             //Reset movement points available for all units
             foreach (MapUnit mapUnit in gameData.mapUnits)
