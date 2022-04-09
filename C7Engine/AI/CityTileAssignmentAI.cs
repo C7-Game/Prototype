@@ -25,11 +25,13 @@ namespace C7Engine.AI
 			double maxScore = 0;
 			Tile preferredTile = Tile.NONE;
 			foreach (Tile t in cityCenter.neighbors.Values) {
-				double score = CalculateTileYieldScore(t, targetTileFoodAmount);
-				Console.WriteLine($"Tile {t} scored {score}");
-				if (score > maxScore) {
-					maxScore = score;
-					preferredTile = t;
+				if (t.personWorkingTile == null) {
+					double score = CalculateTileYieldScore(t, targetTileFoodAmount);
+					Console.WriteLine($"Tile {t} scored {score}");
+					if (score > maxScore) {
+						maxScore = score;
+						preferredTile = t;
+					}
 				}
 			}
 			
