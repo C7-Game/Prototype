@@ -125,6 +125,28 @@ public class Util
 		textureCache[relPath] = texture;
 		return texture;
 	}
+
+	//Send this function a path (e.g. Title_Screen.jpg) and it will 
+	//load it up and convert it in both debug and release modes.
+	//Note: We probably will need variants of this for other file types, too.
+	static public ImageTexture LoadTextureFromC7JPG(string relPath) {
+		Image backgroundImage = new Image();
+		if (OS.IsDebugBuild()) {
+			//This loads it from the local resource folder in debug mode.
+			//Doesn't work in release mode, which according to https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
+			//is due to a design issue in Godot's import pipeline
+			backgroundImage.Load("res://" + relPath);
+		}
+		else {
+			//This loads it from the folder where the executable is in release mode.
+			//Doesn't work in debug mode because the executable will be where Godot is installed,
+			//not where our project is located.
+			backgroundImage.Load(OS.GetExecutablePath().GetBaseDir().PlusFile(relPath));
+		}
+		ImageTexture texture = new ImageTexture();
+		texture.CreateFromImage(backgroundImage);
+		return texture;
+	}
 	
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
 	//Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
