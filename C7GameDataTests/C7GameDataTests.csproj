@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\C7GameData\C7GameData.csproj" />
+      <ProjectReference Include="..\C7GameData\C7GameData.csproj" />
     </ItemGroup>
 
 </Project>
