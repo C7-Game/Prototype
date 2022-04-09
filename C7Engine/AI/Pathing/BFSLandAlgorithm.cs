@@ -18,6 +18,10 @@ namespace C7Engine.Pathing
 		//N.B. This should really be static, but we can't put a static method on interfaces, so it isn't.
 		public TilePath PathFrom(Tile start, Tile destination)
 		{
+			if (start == destination) {
+				return TilePath.EmptyPath(destination);
+			}
+
 			//Distance from start to a given tile
 			Dictionary<Tile, int> distances = new Dictionary<Tile, int>();
 			//Keeps track of which tile (value) preceded a tile (key), so we can reconstruct
@@ -25,16 +29,20 @@ namespace C7Engine.Pathing
 			Dictionary<Tile, Tile> predecessors = new Dictionary<Tile, Tile>();
 			Queue<Tile> tilesToVisit = new Queue<Tile>();
 			distances[start] = 0;
-			
+
 			foreach(Tile tile in start.GetLandNeighbors()) {
 				distances[tile] = 1;
 				predecessors[tile] = start;
 				tilesToVisit.Enqueue(tile);
 			}
-			
+
 			//The core BFS algorithm.
 			while (tilesToVisit.Count > 0) {
 				Tile current = tilesToVisit.Dequeue();
+				if (current == destination) {
+					return ConstructPath(current, predecessors);
+				}
+
 				foreach (Tile tile in current.GetLandNeighbors()) {
 					if (!distances.Keys.Contains(tile)) {
 						distances[tile] = distances[current] + 1;
