@@ -143,7 +143,7 @@ public class MsgEndTurn : MessageToEngine {
 	public override void process()
 	{
 		EngineStorage.gameData.players.Find(p => p.guid == EngineStorage.uiControllerID).hasPlayedThisTurn = true;
-		TurnHandling.advanceTurn();
+		TurnHandling.AdvanceTurn();
 	}
 }
 

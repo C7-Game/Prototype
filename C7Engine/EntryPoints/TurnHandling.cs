@@ -8,10 +8,26 @@ namespace C7Engine
 	using System;
 	public class TurnHandling
 	{
-		internal static void advanceTurn()
+		internal static void OnBeginTurn()
 		{
 			GameData gameData = EngineStorage.gameData;
-			while (true) {
+			Console.WriteLine("\n*** Beginning turn " + gameData.turn + " ***");
+
+			//Reset movement points available for all units
+			foreach (MapUnit mapUnit in gameData.mapUnits)
+			{
+				mapUnit.movementPointsRemaining = mapUnit.unitType.movement;
+			}
+
+			foreach (Player player in gameData.players)
+				player.hasPlayedThisTurn = false;
+		}
+
+		// Implements the game loop. This method is called when the game is started and when the player signals that they're done moving.
+		internal static void AdvanceTurn()
+		{
+			GameData gameData = EngineStorage.gameData;
+			while (true) { // Loop ends with a function return once we reach the UI controller during the movement phase
 				bool firstTurn = GetTurnNumber() == 0;
 
 				// Movement phase
@@ -34,6 +50,10 @@ namespace C7Engine
 							player.hasPlayedThisTurn = true;
 					}
 				}
+
+				//Clear all wait queue, so if a player ended the turn without handling all waited units, they are selected
+				//at the same place in the order.  Confirmed this is what Civ3 does.
+				UnitInteractions.ClearWaitQueue();
 
 				// Production phase BEGIN
 
@@ -92,20 +112,8 @@ namespace C7Engine
 
 				// END Production phase
 
-				//Reset movement points available for all units
-				foreach (MapUnit mapUnit in gameData.mapUnits)
-				{
-					mapUnit.movementPointsRemaining = mapUnit.unitType.movement;
-				}
-
-				//Clear all wait queue, so if a player ended the turn without handling all waited units, they are selected
-				//at the same place in the order.  Confirmed this is what Civ3 does.
-				UnitInteractions.ClearWaitQueue();
-
-				foreach (Player player in gameData.players)
-					player.hasPlayedThisTurn = false;
-
 				gameData.turn++;
+				OnBeginTurn();
 			}
 		}
 

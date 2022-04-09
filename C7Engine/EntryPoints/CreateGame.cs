@@ -23,7 +23,8 @@ namespace C7Engine
 
 			var humanPlayer = save.GameData.CreateDummyGameData();
 			EngineStorage.uiControllerID = humanPlayer.guid;
-			TurnHandling.advanceTurn();
+			TurnHandling.OnBeginTurn(); // Call for the first turn
+			TurnHandling.AdvanceTurn();
 			return humanPlayer;
 		}
 	}
