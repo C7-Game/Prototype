@@ -65,7 +65,7 @@ public class Player
 	public bool SitsOutFirstTurn()
 	{
 		// TODO: Scenarios can also specify that certain players sit out the first turn. E.g. WW2 in the Pacific
-		return ! isBarbarians;
+		return isBarbarians;
 	}
 }
 

@@ -13,9 +13,9 @@ namespace C7Engine
 		public static Player createGame(string loadFilePath, string defaultBicPath)
 		{
 			EngineStorage.createThread();
+			EngineStorage.gameDataMutex.WaitOne();
 
 			C7SaveFormat save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
-
 			EngineStorage.gameData = save.GameData;
 
 			// possibly do something with save.Rules here when it exists
@@ -25,6 +25,8 @@ namespace C7Engine
 			EngineStorage.uiControllerID = humanPlayer.guid;
 			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();
+
+			EngineStorage.gameDataMutex.ReleaseMutex();
 			return humanPlayer;
 		}
 	}
