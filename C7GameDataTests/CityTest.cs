@@ -1,7 +1,7 @@
 using C7GameData;
 using Xunit;
 
-public class UnitTest1
+public class CityTest
 {
 	[Fact]
 	public void CityWith2ProductionPerTurn_ShouldReturn1TurnIf9_of_10ProductionDone()
