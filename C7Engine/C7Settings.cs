@@ -5,7 +5,7 @@ namespace C7Engine
 {
 	using IniParser;
 	using IniParser.Model;
-	
+
 	public class C7Settings {
 		private const string SETTINGS_FILE_NAME = "C7.ini";
 		public static IniData settings;

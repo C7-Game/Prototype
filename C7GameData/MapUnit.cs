@@ -15,6 +15,7 @@ public class MapUnit
 	public UnitPrototype unitType {get; set;}
 	public Player owner {get; set;}
 	public Tile location {get; set;}
+	public TilePath path {get; set;}
 
 	public int movementPointsRemaining {get; set;}
 	public int hitPointsRemaining {get; set;}
@@ -36,6 +37,10 @@ public class MapUnit
 	public MapUnit()
 	{
 		guid = Guid.NewGuid().ToString();
+	}
+
+	public bool IsBusy() {
+		return isFortified || (path != null && path.PathLength() > 0);
 	}
 
 	public override string ToString()
