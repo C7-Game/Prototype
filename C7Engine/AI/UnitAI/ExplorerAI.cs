@@ -13,33 +13,36 @@ namespace C7Engine
 		{
 			ExplorerAIData explorerData = (ExplorerAIData)unit.currentAIData;
 			if (MovingToNewExplorationArea(explorerData)) {
-				MoveToNextTileOnPath(explorerData, unit);
-				return true;
+				return MoveToNextTileOnPath(explorerData, unit);
 			}
 			else {
 				bool foundNeighboringTileToExplore = ExploreNeighboringTile(player, unit);
+				if (foundNeighboringTileToExplore) {
+					return true;
+				}
 
-				if (!foundNeighboringTileToExplore) {
-					//Find the nearest tile that will allow us to continue exploring.
-					//We prefer nearest because the one that allows the most discovery might be pretty far away
-					bool foundNewPath = FindPathToNewExplorationArea(player, explorerData, unit);
-					if (foundNewPath) {
-						MoveToNextTileOnPath(explorerData, unit);
-						return true;
-					}
+				//Find the nearest tile that will allow us to continue exploring.
+				//We prefer nearest because the one that allows the most discovery might be pretty far away
+				bool foundNewPath = FindPathToNewExplorationArea(player, explorerData, unit);
+				if (foundNewPath) {
+					MoveToNextTileOnPath(explorerData, unit);
+					return true;
 				}
 			}
 			return false;
 		}
 
-		private static void MoveToNextTileOnPath(ExplorerAIData explorerData, MapUnit unit) {
+		private static bool MoveToNextTileOnPath(ExplorerAIData explorerData, MapUnit unit) {
 			Tile next = explorerData.path.Next();
 			foreach (KeyValuePair<TileDirection, Tile> neighbor in unit.location.neighbors) {
 				if (neighbor.Value == next) {
 					unit.move(neighbor.Key);
-					return;
+					return true;
 				}
 			}
+			//In the future, it might no longer be possible to go to the correct neighbor, perhaps
+			//due to another civ's units having moved there.  Thus, this method can return false.
+			return false;
 		}
 
 		private static bool ExploreNeighboringTile(Player player, MapUnit unit) {
@@ -48,7 +51,7 @@ namespace C7Engine
 				Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
 				return false;
 			}
-			KeyValuePair<Tile, int> topScoringTile = FindTopScoringTile(player, validNeighboringTiles);
+			KeyValuePair<Tile, int> topScoringTile = FindTopScoringTileForExploration(player, validNeighboringTiles);
 			Tile newLocation = topScoringTile.Key;
 
 			if (newLocation != Tile.NONE && topScoringTile.Value > 0) {
@@ -97,7 +100,7 @@ namespace C7Engine
 			return true;
 		}
 
-		private static KeyValuePair<Tile, int> FindTopScoringTile(Player player, List<Tile> possibleNewLocations)
+		public static KeyValuePair<Tile, int> FindTopScoringTileForExploration(Player player, IEnumerable<Tile> possibleNewLocations)
 		{
 			//Technically, this should be the *estimated* new tiles revealed.  If a mountain blocks visibility,
 			//we won't know that till we move there.
