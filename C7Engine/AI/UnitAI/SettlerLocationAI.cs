@@ -9,6 +9,12 @@ namespace C7Engine
 {
 	public class SettlerLocationAI
 	{
+		//Eventually, there should be different weights based on whether the AI already
+		//has the resource or not (more important to secure ones that they don't have).
+		//But since we don't have trade networks yet, for now there's only one value.
+		static int STRATEGIC_RESOURCE_BONUS = 20;
+		static int LUXURY_RESOURCE_BONUS = 15;
+
 		//Figures out where to plant Settlers
 		public static Tile findSettlerLocation(Tile start, List<City> playerCities, List<MapUnit> playerUnits)
 		{
@@ -101,16 +107,11 @@ namespace C7Engine
 						}
 					}
 				}
-				int score = 0;
-				score = score + t.overlayTerrainType.baseFoodProduction * 5;
-				score = score + t.overlayTerrainType.baseShieldProduction * 3;
-				score = score + t.overlayTerrainType.baseCommerceProduction * 2;
+				int score = GetTileYieldScore(t);
 				//For simplicity's sake, I'm only going to look at immediate neighbors here, but
 				//a lot more things should be considered over time.
 				foreach (Tile nt in t.neighbors.Values) {
-					score = score + nt.overlayTerrainType.baseFoodProduction * 5;
-					score = score + nt.overlayTerrainType.baseShieldProduction * 3;
-					score = score + nt.overlayTerrainType.baseCommerceProduction * 2;
+					score += GetTileYieldScore(nt);
 				}
 				//TODO: Also look at the next ring out, with lower weights.
 
@@ -135,6 +136,19 @@ namespace C7Engine
 nextcandidate: ;
 			}
 			return scores;
+		}
+		private static int GetTileYieldScore(Tile t)
+		{
+			int score = t.foodYield() * 5;
+			score += t.productionYield() * 3;
+			score += t.commerceYield() * 2;
+			if (t.Resource.Category == ResourceCategory.STRATEGIC) {
+				score += STRATEGIC_RESOURCE_BONUS;
+			}
+			else if (t.Resource.Category == ResourceCategory.LUXURY) {
+				score += LUXURY_RESOURCE_BONUS;
+			}
+			return score;
 		}
 	}
 }

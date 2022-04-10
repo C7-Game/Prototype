@@ -142,17 +142,29 @@ namespace C7GameData
 
 		public int foodYield()
 		{
-			return overlayTerrainType.baseFoodProduction;
+			int yield = overlayTerrainType.baseFoodProduction;
+			if (this.Resource != Resource.NONE) {
+				yield += this.Resource.FoodBonus;
+			}
+			return yield;
 		}
 
 		public int productionYield()
 		{
-			return overlayTerrainType.baseShieldProduction;
+			int yield = overlayTerrainType.baseShieldProduction;
+			if (this.Resource != Resource.NONE) {
+				yield += this.Resource.ShieldsBonus;
+			}
+			return yield;
 		}
 
 		public int commerceYield()
 		{
-			return overlayTerrainType.baseCommerceProduction;
+			int yield = overlayTerrainType.baseCommerceProduction;
+			if (this.Resource != Resource.NONE) {
+				yield += this.Resource.CommerceBonus;
+			}
+			return yield;
 		}
 	}
 
