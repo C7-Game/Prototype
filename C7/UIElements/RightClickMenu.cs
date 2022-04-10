@@ -135,20 +135,21 @@ public class RightClickTileMenu : RightClickMenu
 		RemoveAll();
 
 		int fortifiedCount = 0;
-		foreach (MapUnit unit in tile.unitsOnTile) {
+		List<MapUnit> units = tile.unitsOnTile.FindAll(unit => unit.owner.guid == game.controller.guid);
 
+		foreach (MapUnit unit in units) {
 			bool isFortified = isUnitFortified(unit, uiUpdatedUnitStates);
 			fortifiedCount += isFortified ? 1 : 0;
 			string action = getUnitAction(unit, isFortified);
 
 			AddItem($"{action} {unit.Describe()}").Connect("pressed", this, "SelectUnit", new Godot.Collections.Array() {unit.guid});
 		}
-		int unfortifiedCount = tile.unitsOnTile.Count - fortifiedCount;
+		int unfortifiedCount = units.Count - fortifiedCount;
 
-		if (fortifiedCount > 0) {
+		if (fortifiedCount > 1) {
 			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, false});
 		}
-		if (unfortifiedCount > 0) {
+		if (unfortifiedCount > 1) {
 			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, true});
 		}
 	}
