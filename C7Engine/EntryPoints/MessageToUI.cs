@@ -1,5 +1,6 @@
 namespace C7Engine
 {
+	using System;
 	using System.Threading;
 	using C7GameData;
 
@@ -11,7 +12,7 @@ namespace C7Engine
 	}
 
 	public class MsgStartUnitAnimation : MessageToUI {
-		public string unitGUID;
+		public Guid unitGUID;
 		public MapUnit.AnimatedAction action;
 		public AutoResetEvent completionEvent;
 		public AnimationEnding ending;

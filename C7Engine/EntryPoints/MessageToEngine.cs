@@ -22,10 +22,10 @@ namespace C7Engine
 
 	public class MsgSetFortification : MessageToEngine
 	{
-		private string unitGUID;
+		private Guid unitGUID;
 		private bool fortifyElseWake;
 
-		public MsgSetFortification(string unitGUID, bool fortifyElseWake)
+		public MsgSetFortification(Guid unitGUID, bool fortifyElseWake)
 		{
 			this.unitGUID = unitGUID;
 			this.fortifyElseWake = fortifyElseWake;
@@ -48,10 +48,10 @@ namespace C7Engine
 
 	public class MsgMoveUnit : MessageToEngine
 	{
-		private string unitGUID;
+		private Guid unitGUID;
 		private TileDirection dir;
 
-		public MsgMoveUnit(string unitGUID, TileDirection dir)
+		public MsgMoveUnit(Guid unitGUID, TileDirection dir)
 		{
 			this.unitGUID = unitGUID;
 			this.dir = dir;
@@ -66,11 +66,11 @@ namespace C7Engine
 
 	public class MsgSetUnitPath : MessageToEngine
 	{
-		private string unitGUID;
+		private Guid unitGUID;
 		private int destX;
 		private int destY;
 
-		public MsgSetUnitPath(string unitGUID, Tile tile)
+		public MsgSetUnitPath(Guid unitGUID, Tile tile)
 		{
 			this.unitGUID = unitGUID;
 			this.destX = tile.xCoordinate;
@@ -86,9 +86,9 @@ namespace C7Engine
 
 	public class MsgSkipUnitTurn : MessageToEngine
 	{
-		private string unitGUID;
+		private Guid unitGUID;
 
-		public MsgSkipUnitTurn(string unitGUID)
+		public MsgSkipUnitTurn(Guid unitGUID)
 		{
 			this.unitGUID = unitGUID;
 		}
@@ -101,9 +101,9 @@ namespace C7Engine
 	}
 
 	public class MsgDisbandUnit : MessageToEngine {
-		private string unitGUID;
+		private Guid unitGUID;
 
-		public MsgDisbandUnit(string unitGUID)
+		public MsgDisbandUnit(Guid unitGUID)
 		{
 			this.unitGUID = unitGUID;
 		}
@@ -116,10 +116,10 @@ namespace C7Engine
 	}
 
 	public class MsgBuildCity : MessageToEngine {
-		private string unitGUID;
+		private Guid unitGUID;
 		private string cityName;
 
-		public MsgBuildCity(string unitGUID, string cityName)
+		public MsgBuildCity(Guid unitGUID, string cityName)
 		{
 			this.unitGUID = unitGUID;
 			this.cityName = cityName;
@@ -133,10 +133,10 @@ namespace C7Engine
 	}
 
 	public class MsgChooseProduction : MessageToEngine {
-		private string cityGUID;
+		private Guid cityGUID;
 		private string producibleName;
 
-		public MsgChooseProduction(string cityGUID, string producibleName)
+		public MsgChooseProduction(Guid cityGUID, string producibleName)
 		{
 			this.cityGUID = cityGUID;
 			this.producibleName = producibleName;
@@ -144,7 +144,7 @@ namespace C7Engine
 
 		public override void process()
 		{
-			City city = EngineStorage.gameData.cities.Find(c => c.guid == cityGUID);
+			City city = EngineStorage.gameData.GetCity(cityGUID);
 			if (city != null) {
 				foreach (IProducible producible in city.ListProductionOptions()) {
 					if (producible.name == producibleName) {
