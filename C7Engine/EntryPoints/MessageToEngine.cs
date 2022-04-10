@@ -159,8 +159,17 @@ namespace C7Engine
 	public class MsgEndTurn : MessageToEngine {
 		public override void process()
 		{
-			TurnHandling.EndTurn();
+			Player controller = EngineStorage.gameData.players.Find(p => p.guid == EngineStorage.uiControllerID);
+
+			foreach (MapUnit unit in controller.units) {
+				Console.WriteLine($"{unit}, path length: {unit.path?.PathLength() ?? 0}");
+				if (unit.path?.PathLength() > 0) {
+					unit.moveAlongPath();
+				}
+			}
+
+			controller.hasPlayedThisTurn = true;
+			TurnHandling.AdvanceTurn();
 		}
 	}
-
 }
