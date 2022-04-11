@@ -9,8 +9,9 @@ using System.Collections.Generic;
 /**
  * A unit on the map.  Not to be confused with a unit prototype.
  **/
-public class MapUnit : Unique
+public class MapUnit
 {
+	public string guid  {get;}
 	public UnitPrototype unitType {get; set;}
 	public Player owner {get; set;}
 	public Tile location {get; set;}
@@ -33,6 +34,11 @@ public class MapUnit : Unique
 	public List<string> availableActions = new List<string>();
 	public UnitAIData currentAIData;
 
+	public MapUnit()
+	{
+		guid = Guid.NewGuid().ToString();
+	}
+
 	public bool IsBusy() {
 		return isFortified || (path != null && path.PathLength() > 0);
 	}
@@ -40,7 +46,7 @@ public class MapUnit : Unique
 	public override string ToString()
 	{
 		if (this != MapUnit.NONE) {
-			return $"{unitType.name} with {movementPointsRemaining} movement points and {hitPointsRemaining} hit points, guid = {guid}";
+			return unitType.name + " with " + movementPointsRemaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
 		}
 		else {
 			return "This is the NONE unit";

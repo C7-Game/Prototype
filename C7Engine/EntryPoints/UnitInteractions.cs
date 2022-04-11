@@ -82,9 +82,12 @@ namespace C7Engine
 			waitQueue.Clear();
 		}
 
-		public static void waitUnit(GameData gameData, Guid guid) {
-			foreach (MapUnit unit in gameData.mapUnits) {
-				if (unit.guid == guid) {
+		public static void waitUnit(GameData gameData, string guid)
+		{
+			foreach (MapUnit unit in gameData.mapUnits)
+			{
+				if (unit.guid == guid)
+				{
 					Console.WriteLine("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; adding it to the wait queue");
 					waitQueue.Enqueue(unit);
 				}
