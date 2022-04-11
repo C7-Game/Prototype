@@ -18,7 +18,7 @@ namespace C7Engine
 	{
 		public static Mutex gameDataMutex = new Mutex();
 		internal static GameData gameData {get; set;}
-		public static string uiControllerID;
+		public static Guid uiControllerID;
 
 		private static Thread engineThread = null;
 		internal static AutoResetEvent uiEvent = new AutoResetEvent(false); // Used to block engineThread while waiting for the UI, f.e. while

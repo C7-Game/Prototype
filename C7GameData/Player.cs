@@ -4,7 +4,6 @@ namespace C7GameData
 {
 	public class Player : Unique
 	{
-		public string guid {get; set;}
 		public int color { get; set; }
 		public bool isBarbarians = false;
 		//TODO: Refactor front-end so it sends player GUID with requests.
