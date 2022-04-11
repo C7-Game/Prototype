@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 using C7GameData;
@@ -114,7 +113,7 @@ public class RightClickTileMenu : RightClickMenu
 		ResetItems(tile);
 	}
 
-	private bool isUnitFortified(MapUnit unit, Dictionary<Guid, bool> uiStates) {
+	private bool isUnitFortified(MapUnit unit, Dictionary<string, bool> uiStates) {
 		if (uiStates is null || !uiStates.ContainsKey(unit.guid)) {
 			return unit.isFortified;
 		}
@@ -132,7 +131,7 @@ public class RightClickTileMenu : RightClickMenu
 	// and false if they were selected in the previous action. This is to update the UI
 	// since the actions update the engine asynchronously and otherwise the UI may not
 	// reflect these changes immediately.
-	public void ResetItems(Tile tile, Dictionary<Guid, bool> uiUpdatedUnitStates = null) {
+	public void ResetItems(Tile tile, Dictionary<string, bool> uiUpdatedUnitStates = null) {
 		RemoveAll();
 
 		int fortifiedCount = 0;
@@ -155,13 +154,13 @@ public class RightClickTileMenu : RightClickMenu
 		}
 	}
 
-	public void SelectUnit(Guid guid) {
+	public void SelectUnit(string guid) {
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
 			if (toSelect != null && toSelect.owner == game.controller) {
 				game.setSelectedUnit(toSelect);
 				new MsgSetFortification(toSelect.guid, false).send();
-				ResetItems(toSelect.location, new Dictionary<Guid, bool>() {{toSelect.guid, false}});
+				ResetItems(toSelect.location, new Dictionary<string, bool>() {{toSelect.guid, false}});
 			}
 		}
 		if (!Input.IsKeyPressed((int)KeyList.Shift)) {
@@ -173,7 +172,7 @@ public class RightClickTileMenu : RightClickMenu
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			bool hasSelectedUnit = false;
 			Tile tile = gameDataAccess.gameData.map.tileAt(tileX, tileY);
-			Dictionary<Guid, bool> modified = new Dictionary<Guid, bool>();
+			Dictionary<string, bool> modified = new Dictionary<string, bool>();
 			foreach (MapUnit unit in tile.unitsOnTile) {
 				if (unit.isFortified != isFortify) {
 					modified[unit.guid] = isFortify;
@@ -195,7 +194,7 @@ public class RightClickTileMenu : RightClickMenu
 
 public class RightClickChooseProductionMenu : RightClickMenu
 {
-	private Guid cityGUID;
+	private string cityGUID;
 
 	private ImageTexture GetProducibleIcon(IProducible producible)
 	{
