@@ -93,8 +93,8 @@ namespace C7Engine
 				}
 
 				//City Production
-				foreach (City city in gameData.cities)
-				{
+				foreach (City city in gameData.cities) {
+					int initialSize = city.size;
 					IProducible producedItem = city.ComputeTurnProduction();
 					if (producedItem != null) {
 						if (producedItem is UnitPrototype prototype) {
@@ -102,14 +102,28 @@ namespace C7Engine
 							newUnit.owner = city.owner;
 							newUnit.location = city.location;
 							newUnit.facingDirection = TileDirection.SOUTHWEST;
-
 							city.location.unitsOnTile.Add(newUnit);
 							gameData.mapUnits.Add(newUnit);
 							city.owner.AddUnit(newUnit);
 						}
+
 						city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
 					}
-				}
+
+					int newSize = city.size;
+					if (newSize > initialSize) {
+						CityResident newResident = new CityResident();
+						newResident.nationality = city.owner.civilization;
+						CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
+					}
+					else if (newSize < initialSize) {
+						int diff = initialSize - newSize;
+						//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
+						for (int i = 1; i <= diff; i++) {
+							city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
+							city.residents.RemoveAt(city.residents.Count - i);
+						}
+					}
 
 				// END Production phase
 
