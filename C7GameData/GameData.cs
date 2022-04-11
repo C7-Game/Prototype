@@ -20,20 +20,13 @@ namespace C7GameData
 			rng = new Random();
 		}
 
-		public Player GetPlayer(Guid guid) {
-			return players.Find(p => p.guid == guid);
-		}
-
 		public List<Player> GetHumanPlayers() {
 			return players.FindAll(p => p.isHuman);
 		}
 
-		public MapUnit GetUnit(Guid guid) {
+		public MapUnit GetUnit(string guid)
+		{
 			return mapUnits.Find(u => u.guid == guid);
-		}
-
-		public City GetCity(Guid guid) {
-			return cities.Find(c => c.guid == guid);
 		}
 
 		/**

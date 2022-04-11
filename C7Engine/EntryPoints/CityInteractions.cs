@@ -2,15 +2,14 @@ using C7Engine.AI;
 
 namespace C7Engine
 {
-	using System;
 	using C7GameData;
 
 	public class CityInteractions
 	{
-		public static void BuildCity(int x, int y, Guid playerGuid, string name)
+		public static void BuildCity(int x, int y, string playerGuid, string name)
 		{
 			GameData gameData = EngineStorage.gameData;
-			Player owner = gameData.GetPlayer(playerGuid);
+			Player owner = gameData.players.Find(player => player.guid == playerGuid);
 			Tile tileWithNewCity = gameData.map.tileAt(x, y);
 			City newCity = new City(tileWithNewCity, owner, name);
 			CityResident firstResident = new CityResident();
