@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using C7GameData;
@@ -113,7 +114,7 @@ public class RightClickTileMenu : RightClickMenu
 		ResetItems(tile);
 	}
 
-	private bool isUnitFortified(MapUnit unit, Dictionary<string, bool> uiStates) {
+	private bool isUnitFortified(MapUnit unit, Dictionary<Guid, bool> uiStates) {
 		if (uiStates is null || !uiStates.ContainsKey(unit.guid)) {
 			return unit.isFortified;
 		}
@@ -131,35 +132,36 @@ public class RightClickTileMenu : RightClickMenu
 	// and false if they were selected in the previous action. This is to update the UI
 	// since the actions update the engine asynchronously and otherwise the UI may not
 	// reflect these changes immediately.
-	public void ResetItems(Tile tile, Dictionary<string, bool> uiUpdatedUnitStates = null) {
+	public void ResetItems(Tile tile, Dictionary<Guid, bool> uiUpdatedUnitStates = null) {
 		RemoveAll();
 
 		int fortifiedCount = 0;
-		foreach (MapUnit unit in tile.unitsOnTile) {
+		List<MapUnit> units = tile.unitsOnTile.FindAll(unit => unit.owner.guid == game.controller.guid);
 
+		foreach (MapUnit unit in units) {
 			bool isFortified = isUnitFortified(unit, uiUpdatedUnitStates);
 			fortifiedCount += isFortified ? 1 : 0;
 			string action = getUnitAction(unit, isFortified);
 
 			AddItem($"{action} {unit.Describe()}").Connect("pressed", this, "SelectUnit", new Godot.Collections.Array() {unit.guid});
 		}
-		int unfortifiedCount = tile.unitsOnTile.Count - fortifiedCount;
+		int unfortifiedCount = units.Count - fortifiedCount;
 
-		if (fortifiedCount > 0) {
+		if (fortifiedCount > 1) {
 			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, false});
 		}
-		if (unfortifiedCount > 0) {
+		if (unfortifiedCount > 1) {
 			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, true});
 		}
 	}
 
-	public void SelectUnit(string guid) {
+	public void SelectUnit(Guid guid) {
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
 			if (toSelect != null && toSelect.owner == game.controller) {
 				game.setSelectedUnit(toSelect);
 				new MsgSetFortification(toSelect.guid, false).send();
-				ResetItems(toSelect.location, new Dictionary<string, bool>() {{toSelect.guid, false}});
+				ResetItems(toSelect.location, new Dictionary<Guid, bool>() {{toSelect.guid, false}});
 			}
 		}
 		if (!Input.IsKeyPressed((int)KeyList.Shift)) {
@@ -171,7 +173,7 @@ public class RightClickTileMenu : RightClickMenu
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			bool hasSelectedUnit = false;
 			Tile tile = gameDataAccess.gameData.map.tileAt(tileX, tileY);
-			Dictionary<string, bool> modified = new Dictionary<string, bool>();
+			Dictionary<Guid, bool> modified = new Dictionary<Guid, bool>();
 			foreach (MapUnit unit in tile.unitsOnTile) {
 				if (unit.isFortified != isFortify) {
 					modified[unit.guid] = isFortify;
@@ -193,7 +195,7 @@ public class RightClickTileMenu : RightClickMenu
 
 public class RightClickChooseProductionMenu : RightClickMenu
 {
-	private string cityGUID;
+	private Guid cityGUID;
 
 	private ImageTexture GetProducibleIcon(IProducible producible)
 	{

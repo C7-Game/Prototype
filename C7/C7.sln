@@ -22,6 +22,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSStub", "VSStub\VSStub.csproj", "{D420363F-5260-42D6-883A-BC1D970B39D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C7GameDataTests", "..\C7GameDataTests\C7GameDataTests.csproj", "{8053F185-AA52-4876-8CF4-D08907FCA61A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8C955B11-CC6A-4BED-BE2A-89DB985A3A18}"
+	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

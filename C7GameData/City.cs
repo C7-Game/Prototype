@@ -3,9 +3,9 @@ using System.Collections.Generic;
 namespace C7GameData
 {
     using System;
-    public class City
+
+    public class City : Unique
     {
-        public string guid {get;}
         public Tile location {get;}
         public string name;
         public int size = 1;
@@ -24,7 +24,6 @@ namespace C7GameData
 
         public City(Tile location, Player owner, string name)
         {
-            guid = Guid.NewGuid().ToString();
             this.location = location;
             this.owner = owner;
             this.name = name;

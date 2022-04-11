@@ -7,7 +7,7 @@ using IniParser.Model;
 namespace ConvertCiv3Media
 {
     // Under construction
-    
+
     // The order of direction animations in unit FLC files
     public enum Direction {
         SW,
@@ -50,7 +50,7 @@ namespace ConvertCiv3Media
         // *** Oh, they don't exist in other INI's Animation sections!
         // PauseROAD,
         // PauseMINE,
-        // PauseIRRIGATE      
+        // PauseIRRIGATE
 
     }
     // will probably make these to-override methods in Civ3UnitSprite instead
