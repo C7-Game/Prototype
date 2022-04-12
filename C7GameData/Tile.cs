@@ -20,6 +20,7 @@ namespace C7GameData
 		[JsonIgnore]
 		public TerrainType overlayTerrainType = TerrainType.NONE;
 		public City cityAtTile;
+		public CityResident personWorkingTile = null;	//allows us to see if another city is working this tile
 		public bool hasBarbarianCamp = false;
 
 		//One thing to decide is do we want to have a tile have a list of units on it,
@@ -137,6 +138,21 @@ namespace C7GameData
 		public int distanceTo(Tile other)
 		{
 			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
+		}
+
+		public int foodYield()
+		{
+			return overlayTerrainType.baseFoodProduction;
+		}
+
+		public int productionYield()
+		{
+			return overlayTerrainType.baseShieldProduction;
+		}
+
+		public int commerceYield()
+		{
+			return overlayTerrainType.baseCommerceProduction;
 		}
 	}
 
