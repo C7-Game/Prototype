@@ -5,7 +5,7 @@ namespace C7Engine.AI
 {
 	public class CityTileAssignmentAI
 	{
-		public static int DESIRED_FOOD_SURPLUS_PER_TURN = 2;
+		public static int DesiredFoodSurplusPerTurn = 2;
 		private static readonly int FOOD_PER_CITIZEN = 2;	//eventually will be configured by rules
 
 		
@@ -17,7 +17,7 @@ namespace C7Engine.AI
 		{
 			int foodYield = city.CurrentFoodYield();
 
-			int desiredFoodRate = city.size * FOOD_PER_CITIZEN + DESIRED_FOOD_SURPLUS_PER_TURN;
+			int desiredFoodRate = city.size * FOOD_PER_CITIZEN + DesiredFoodSurplusPerTurn;
 			int targetTileFoodAmount = desiredFoodRate - foodYield;
 			
 			Tile cityCenter = city.location;
