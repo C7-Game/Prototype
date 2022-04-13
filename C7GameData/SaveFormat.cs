@@ -32,9 +32,10 @@ namespace C7GameData
 		public C7SaveFormat()
 		{
 			GameData = new GameData();
+			Rules = new C7RulesFormat();
 		}
 
-		public C7SaveFormat(GameData gameData, C7RulesFormat rules = null)
+		public C7SaveFormat(GameData gameData, C7RulesFormat rules)
 		{
 			GameData = gameData;
 			Rules = rules;

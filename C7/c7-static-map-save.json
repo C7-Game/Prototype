@@ -1,6 +1,29 @@
 {
   "version": "v0.0early-prototype",
-  "rules": null,
+  "rules": {
+      "experienceLevels": [
+	  {
+	      "name": "Conscript",
+	      "baseHitPoints": 2,
+	      "retreatChance": 0.34
+	  },
+	  {
+	      "name": "Regular",
+	      "baseHitPoints": 3,
+	      "retreatChance": 0.50
+	  },
+	  {
+	      "name": "Veteran",
+	      "baseHitPoints": 4,
+	      "retreatChance": 0.58
+	  },
+	  {
+	      "name": "Elite",
+	      "baseHitPoints": 5,
+	      "retreatChance": 0.66
+	  }
+      ]
+  },
   "gameData": {
     "turn": 0,
     "map": {

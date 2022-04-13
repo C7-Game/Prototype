@@ -1,5 +1,6 @@
 namespace C7Engine
 {
+	using System;
 	using C7GameData;
 
 	public class CreateGame
@@ -17,9 +18,8 @@ namespace C7Engine
 
 			C7SaveFormat save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
 			EngineStorage.gameData = save.GameData;
-
-			// possibly do something with save.Rules here when it exists
-			// and maybe consider if we have any need to keep a reference to the save object handy...probably not
+			EngineStorage.rules = save.Rules;
+			// Consider if we have any need to keep a reference to the save object handy...probably not
 
 			var humanPlayer = save.GameData.CreateDummyGameData();
 			EngineStorage.uiControllerID = humanPlayer.guid;

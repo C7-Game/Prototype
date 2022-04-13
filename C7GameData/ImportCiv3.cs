@@ -29,6 +29,7 @@ namespace C7GameData
 			BiqData theBiq = civ3Save.Bic;
 
 			ImportCiv3TerrainTypes(theBiq, c7Save);
+			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
 			SetMapDimensions(civ3Save, c7Save);
 			SetWorldWrap(civ3Save, c7Save);
@@ -89,6 +90,7 @@ namespace C7GameData
 			BiqData theBiq = new BiqData(biqBytes);
 			
 			ImportCiv3TerrainTypes(theBiq, c7Save);
+			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);
@@ -195,6 +197,14 @@ namespace C7GameData
 				c7Save.GameData.terrainTypes.Add(c7TerrainType);
 				civ3Index++;
 			}
+		}
+
+		private static void ImportCiv3ExperienceLevels(BiqData theBiq, C7SaveFormat c7Save)
+		{
+			if (theBiq.Expr.Length != 4)
+				throw new Exception("BIQ data must include four experience levels.");
+			foreach (EXPR expr in theBiq.Expr)
+				c7Save.Rules.experienceLevels.Add(ExperienceLevel.ImportFromCiv3(expr));
 		}
 
 		private static void SetWorldWrap(SavData civ3Save, C7SaveFormat c7Save)
