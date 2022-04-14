@@ -8,7 +8,7 @@ namespace C7GameData
 		private Tile destination; //stored in case we need to re-calculate
 		private Queue<Tile> path;
 
-		private TilePath() {
+		public TilePath() {
 			destination = Tile.NONE;
 			path = new Queue<Tile>();
 		}
