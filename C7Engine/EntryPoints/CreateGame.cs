@@ -21,7 +21,7 @@ namespace C7Engine
 			EngineStorage.rules = save.Rules;
 			// Consider if we have any need to keep a reference to the save object handy...probably not
 
-			var humanPlayer = save.GameData.CreateDummyGameData();
+			var humanPlayer = save.GameData.CreateDummyGameData(EngineStorage.rules);
 			EngineStorage.uiControllerID = humanPlayer.guid;
 			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();

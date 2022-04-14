@@ -216,6 +216,11 @@ namespace C7GameData
 				ExperienceLevel level = ExperienceLevel.ImportFromCiv3(key, expr);
 				c7Save.Rules.experienceLevels.Add(level);
 				levelsByKey.Add(key, level);
+
+				if (levelsByKey.Count == 2) {
+					c7Save.Rules.defaultExperienceLevelKey = key;
+					c7Save.Rules.defaultExperienceLevel = level;
+				}
 			}
 		}
 

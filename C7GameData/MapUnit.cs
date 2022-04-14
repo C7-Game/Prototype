@@ -5,6 +5,7 @@ namespace C7GameData
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 /**
  * A unit on the map.  Not to be confused with a unit prototype.
@@ -17,11 +18,15 @@ public class MapUnit
 	public Tile location {get; set;}
 	public TilePath path {get; set;}
 
+	public string experienceLevelKey;
+	[JsonIgnore]
+	public ExperienceLevel experienceLevel {get; set;}
+
 	public int movementPointsRemaining {get; set;}
 	public int hitPointsRemaining {get; set;}
 	public int maxHitPoints {
 		get {
-			return 3; // Eventually we'll add HP from experience and the type's inherent bonus
+			return experienceLevel.baseHitPoints; // TODO: Include bonus HP from unit type
 		}
 	}
 	public bool isFortified {get; set;}
