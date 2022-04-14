@@ -358,29 +358,25 @@ public class Game : Node2D
 			if(eventMouseButton.ButtonIndex == (int)ButtonList.Left)
 			{
 				GetTree().SetInputAsHandled();
-				if(eventMouseButton.IsPressed())
-				{
+				if(eventMouseButton.IsPressed()) {
 					if (inUnitGoToMode) {
 						setGoToMode(false);
-						using (var gameDataAccess = new UIGameDataAccess()) {
-							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+						using (UIGameDataAccess gameDataAccess = new UIGameDataAccess()) {
+							Tile tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 							if (tile != null) {
 								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
 							}
 						}
-					}
-					else
-					{
+					} else {
 						// Select unit on tile at mouse location
-						using (var gameDataAccess = new UIGameDataAccess()) {
-							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+						using (UIGameDataAccess gameDataAccess = new UIGameDataAccess()) {
+							Tile tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 							if (tile != null) {
-								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
-								if (to_select != null && to_select.owner == controller)
-									setSelectedUnit(to_select);
+								MapUnit toSelect = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
+								if (toSelect != null && toSelect.owner == controller)
+									setSelectedUnit(toSelect);
 							}
 						}
-
 						OldPosition = eventMouseButton.Position;
 						IsMovingCamera = true;
 					}

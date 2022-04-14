@@ -16,9 +16,12 @@ namespace C7GameData
 		public string baseTerrainTypeKey { get; set; }
 		[JsonIgnore]
 		public TerrainType baseTerrainType = TerrainType.NONE;
+
 		public string overlayTerrainTypeKey { get; set; }
+
 		[JsonIgnore]
 		public TerrainType overlayTerrainType = TerrainType.NONE;
+
 		public City cityAtTile;
 		[JsonIgnore]
 		public bool HasCity => cityAtTile != null && cityAtTile != City.NONE;
@@ -33,9 +36,11 @@ namespace C7GameData
 		//has the best defense, or which tile a unit is on when viewing the Military Advisor.
 		public List<MapUnit> unitsOnTile = new List<MapUnit>();
 		public string ResourceKey { get; set; }
+
 		[JsonIgnore]
 		public Resource Resource { get; set; }
 
+		[JsonIgnore]
 		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();
 
 		//See discussion on page 4 of the "Babylon" thread (https://forums.civfanatics.com/threads/0-1-babylon-progress-thread.673959) about sub-terrain type and Civ3 properties.

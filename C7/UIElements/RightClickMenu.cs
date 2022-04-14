@@ -156,7 +156,7 @@ public class RightClickTileMenu : RightClickMenu
 
 	public void SelectUnit(string guid) {
 		using (var gameDataAccess = new UIGameDataAccess()) {
-			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
+			MapUnit toSelect = gameDataAccess.gameData.GetUnit(guid);
 			if (toSelect != null && toSelect.owner == game.controller) {
 				game.setSelectedUnit(toSelect);
 				new MsgSetFortification(toSelect.guid, false).send();

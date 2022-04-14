@@ -17,10 +17,32 @@ namespace C7Engine
 			EngineStorage.gameDataMutex.WaitOne();
 
 			C7SaveFormat save = SaveManager.Load(loadFilePath, defaultBicPath);
-			EngineStorage.gameData = save.GameData;
-			// Consider if we have any need to keep a reference to the save object handy...probably not
 
-			Player humanPlayer = save.GameData.CreateDummyGameData();
+			Player humanPlayer = null;
+			if (save.GameData.players.Count == 0) {
+				Console.WriteLine("creating dummy data...");
+				humanPlayer = save.GameData.CreateDummyGameData();
+			} else {
+				Console.WriteLine("loading player from save data...");
+				humanPlayer = save.GameData.players.Find(p => p.isHuman);
+			}
+			if (humanPlayer == null) {
+				Console.WriteLine("null player!");
+			}
+			foreach (MapUnit unit in humanPlayer.units) {
+				Console.WriteLine(unit);
+			}
+
+
+
+			EngineStorage.gameData = save.GameData;
+			Console.WriteLine("mapUnits length: " + EngineStorage.gameData.mapUnits.Count);
+			foreach (MapUnit unit in save.GameData.mapUnits) {
+				Console.WriteLine("Unit GUID: " + unit.guid);
+			}
+			Console.WriteLine("End unit iteration");
+
+
 			EngineStorage.uiControllerID = humanPlayer.guid;
 			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();

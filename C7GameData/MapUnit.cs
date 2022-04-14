@@ -47,6 +47,7 @@ public class MapUnit
 
 	[JsonIgnore]
 	public List<string> availableActions = new List<string>();
+
 	public UnitAIData currentAIData;
 
 	public MapUnit()
@@ -60,8 +61,8 @@ public class MapUnit
 
 	public override string ToString()
 	{
-		if (this != MapUnit.NONE) {
-			return this.owner + " " + unitType.name + " with " + movementPoints.remaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
+		if (this != NONE) {
+			return owner + " " + unitType.name + " with " + movementPoints.remaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
 		}
 		else {
 			return "This is the NONE unit";

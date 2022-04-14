@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace C7GameData
 {
+
 	public class TilePath
 	{
 		private Tile destination; //stored in case we need to re-calculate

@@ -14,6 +14,7 @@ namespace C7GameData
 	using System.IO;
 	using System.IO.Compression;
 	using System.Text.Json;
+	using System.Text.Json.Serialization;
 
 	public enum SaveCompression
 	{
@@ -152,6 +153,8 @@ namespace C7GameData
 				WriteIndented = true,
 				// By default it only serializes getters, this makes it serialize fields, too
 				IncludeFields = true,
+
+				ReferenceHandler = ReferenceHandler.Preserve,
 			};
 		}
 
