@@ -203,8 +203,20 @@ namespace C7GameData
 		{
 			if (theBiq.Expr.Length != 4)
 				throw new Exception("BIQ data must include four experience levels.");
-			foreach (EXPR expr in theBiq.Expr)
-				c7Save.Rules.experienceLevels.Add(ExperienceLevel.ImportFromCiv3(expr));
+
+			Dictionary<string, ExperienceLevel> levelsByKey = new Dictionary<string, ExperienceLevel>();
+
+			foreach (EXPR expr in theBiq.Expr) {
+				// Generate a unique key for this level based on its name. If multiple levels have the same name, append apostrophes
+				// to the end until the key is unique.
+				string key = expr.Name;
+				while (levelsByKey.ContainsKey(key))
+					key += "'";
+
+				ExperienceLevel level = ExperienceLevel.ImportFromCiv3(key, expr);
+				c7Save.Rules.experienceLevels.Add(level);
+				levelsByKey.Add(key, level);
+			}
 		}
 
 		private static void SetWorldWrap(SavData civ3Save, C7SaveFormat c7Save)

@@ -6,11 +6,15 @@ namespace C7GameData
 */
 {
 	using System.Collections.Generic;
+	using System.Text.Json.Serialization;
 
 	public class C7RulesFormat {
 		public string Version { get; set; }
 
 		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();
+		public string defaultExperienceLevelKey;
+		[JsonIgnore]
+		public ExperienceLevel defaultExperienceLevel;
 
 		public C7RulesFormat() {
 			Version = "v0.0early-prototype";
