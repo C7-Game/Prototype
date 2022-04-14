@@ -458,6 +458,10 @@ public class Game : Node2D
 					log.Debug("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
 				}
 			}
+			else if (eventKeyDown.Scancode == (int)KeyList.S && eventKeyDown.Control)
+			{
+				OnSaveGame();
+			}
 			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Space)
 			{
 				log.Verbose("Space pressed");
@@ -684,4 +688,12 @@ public class Game : Node2D
 	{
 		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();
 	}
+
+	private void OnSaveGame()
+	{
+		GD.Print("Saving Game...");
+		string saveGamePath = Global.LoadGamePath;
+		new MsgSaveGame(saveGamePath).send();
+	}
+
 }

@@ -24,6 +24,18 @@ namespace C7Engine
 		}
 	}
 
+	public class MsgSaveGame : MessageToEngine {
+		private string path;
+
+		public MsgSaveGame(string path) {
+			this.path = path;
+		}
+
+		public override void process() {
+			SaveManager.Save(path);
+		}
+	}
+
 	public class MsgSetFortification : MessageToEngine
 	{
 		private string unitGUID;

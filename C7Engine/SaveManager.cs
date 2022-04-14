@@ -1,5 +1,4 @@
-﻿namespace C7Engine
-{
+﻿namespace C7Engine {
 	using System.IO;
 	using C7GameData;
 
@@ -12,33 +11,24 @@
 
 	// The engine performs all save file creating, reading, and updating
 	// via the SaveManager
-	public static class SaveManager
-	{
-		private static SaveFileFormat getFileFormat(string path)
-		{
-			var ext = Path.GetExtension(path);
-			if (ext.Equals(".SAV", System.StringComparison.CurrentCultureIgnoreCase))
-			{
+	public static class SaveManager {
+		private static SaveFileFormat getFileFormat(string path) {
+			string ext = Path.GetExtension(path);
+			if (ext.Equals(".SAV", System.StringComparison.CurrentCultureIgnoreCase)) {
 				return SaveFileFormat.Sav;
-			}
-			else if (ext.Equals(".BIQ", System.StringComparison.CurrentCultureIgnoreCase))
-			{
+			} else if (ext.Equals(".BIQ", System.StringComparison.CurrentCultureIgnoreCase)) {
 				return SaveFileFormat.Biq;
-			}
-			else if (ext.Equals(".JSON", System.StringComparison.CurrentCultureIgnoreCase)
-			         || ext.Equals(".ZIP", System.StringComparison.CurrentCultureIgnoreCase))
-			{
+			} else if (ext.Equals(".JSON", System.StringComparison.CurrentCultureIgnoreCase)
+			           || ext.Equals(".ZIP", System.StringComparison.CurrentCultureIgnoreCase)) {
 				return SaveFileFormat.C7;
 			}
 			return SaveFileFormat.Invalid;
 		}
 
 		// Load and initialize a save
-		public static C7SaveFormat LoadSave(string path, string bicPath)
-		{
-			C7SaveFormat save = null;
-			switch (getFileFormat(path))
-			{
+		public static C7SaveFormat Load(string path, string bicPath) {
+			C7SaveFormat save;
+			switch (getFileFormat(path)) {
 				case SaveFileFormat.Sav:
 					save = ImportCiv3.ImportSav(path, bicPath);
 					break;
@@ -51,11 +41,15 @@
 				default:
 					throw new FileLoadException("invalid save format");
 			}
-			if (save.PostLoadProcess())
-			{
+			if (save.PostLoadProcess()) {
 				return save;
 			}
 			throw new FileLoadException("could not process save file");
+		}
+
+		public static void Save(string path) {
+			C7SaveFormat save = new C7SaveFormat(EngineStorage.gameData);
+			C7SaveFormat.Save(save, path);
 		}
 
 	}
