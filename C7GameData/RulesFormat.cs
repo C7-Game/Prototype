@@ -16,8 +16,21 @@ namespace C7GameData
 		[JsonIgnore]
 		public ExperienceLevel defaultExperienceLevel;
 
+		// TODO: Make sure these numbers are correct
+		public double promotionChanceAfterDefending = 1.0/16;
+		public double promotionChanceAfterAttacking = 1.0/8;
+
 		public C7RulesFormat() {
 			Version = "v0.0early-prototype";
+		}
+
+		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel)
+		{
+			int n = experienceLevels.IndexOf(experienceLevel);
+			if (n + 1 < experienceLevels.Count)
+				return experienceLevels[n + 1];
+			else
+				return null;
 		}
 	}
 }

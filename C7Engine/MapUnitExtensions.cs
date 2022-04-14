@@ -30,6 +30,21 @@ public static class MapUnitExtensions {
 		unit.isFortified = false;
 	}
 
+	public static void RollToPromote(this MapUnit unit, bool wasAttacking, bool waitForAnimation)
+	{
+		C7RulesFormat rules = EngineStorage.rules;
+		double promotionOdds = wasAttacking ? rules.promotionChanceAfterAttacking : rules.promotionChanceAfterDefending;
+		if (EngineStorage.gameData.rng.NextDouble() < promotionOdds) {
+			ExperienceLevel nextLevel = rules.GetExperienceLevelAfter(unit.experienceLevel);
+			if (nextLevel != null) {
+				unit.experienceLevelKey = nextLevel.key;
+				unit.experienceLevel = nextLevel;
+				unit.hitPointsRemaining++;
+				unit.animate(MapUnit.AnimatedAction.VICTORY, waitForAnimation);
+			}
+		}
+	}
+
 	public static bool fight(this MapUnit unit, MapUnit defender)
 	{
 		// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
@@ -54,8 +69,12 @@ public static class MapUnitExtensions {
 				unit.hitPointsRemaining -= 1;
 		}
 
+		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : unit,
+			winner = (defender == loser) ? unit : defender;
+
+		winner.RollToPromote(winner == unit, false);
+
 		// Play death animation
-		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : unit;
 		loser.animate(MapUnit.AnimatedAction.DEATH, true);
 		loser.disband();
 
@@ -86,6 +105,7 @@ public static class MapUnitExtensions {
 			new MsgStartEffectAnimation(tile, AnimatedEffect.Miss, null, AnimationEnding.Stop).send();
 
 		if (target.hitPointsRemaining <= 0) {
+			unit.RollToPromote(true, false);
 			target.animate(MapUnit.AnimatedAction.DEATH, true);
 			target.disband();
 		}
