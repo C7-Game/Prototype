@@ -8,7 +8,14 @@ namespace C7GameData
 	using System.Collections.Generic;
 	using System.Text.Json.Serialization;
 
-	public class C7RulesFormat {
+	public struct StrengthBonus
+	{
+		public string description;
+		public double amount; // e.g. 0.25 = +25% strength
+	}
+
+	public class C7RulesFormat
+	{
 		public string Version { get; set; }
 
 		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();

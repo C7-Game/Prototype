@@ -51,8 +51,8 @@ public static class MapUnitExtensions {
 		var defenderOriginalDirection = defender.facingDirection;
 		defender.facingDirection = unit.facingDirection.reversed();
 
-		int attackerStrength = unit.unitType.attack;
-		int defenderStrength = defender.unitType.defense;
+		double attackerStrength = unit    .StrengthVersus(defender, true , false, unit.facingDirection),
+		       defenderStrength = defender.StrengthVersus(unit    , false, false, unit.facingDirection);
 
 		if (attackerStrength + defenderStrength == 0)
 			return false;

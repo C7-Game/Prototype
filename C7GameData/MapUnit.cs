@@ -58,6 +58,25 @@ public class MapUnit
 		}
 	}
 
+	public IEnumerable<StrengthBonus> ListStrengthBonusesVersus(MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
+	{
+		if (! attacking) { // Defending against attack from opponent
+			if (isFortified)
+				yield return new StrengthBonus { description = "Fortification", amount = 0.25 };
+		}
+	}
+
+	public double StrengthVersus(MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
+	{
+		double bonusFactor = 1.0;
+		foreach (StrengthBonus bonus in ListStrengthBonusesVersus(opponent, attacking, bombard, attackDirection))
+			bonusFactor += bonus.amount;
+		if (bonusFactor > 0.0) {
+			return bonusFactor * (attacking ? unitType.attack : unitType.defense);
+		} else
+			return 0.0;
+	}
+
 	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
 	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
 	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
@@ -71,8 +90,11 @@ public class MapUnit
 			return true;
 		else if (otherDefenderIsEnemy && ! weAreEnemy)
 			return false;
-		else
-			return (unitType.defense * hitPointsRemaining) > (otherDefender.unitType.defense * otherDefender.hitPointsRemaining);
+		else {
+			double ourTotalStrength   =               StrengthVersus(opponent, false, false, null) *               hitPointsRemaining,
+			       theirTotalStrength = otherDefender.StrengthVersus(opponent, false, false, null) * otherDefender.hitPointsRemaining;
+			return ourTotalStrength > theirTotalStrength;
+		}
 	}
 
 	public string Describe()
