@@ -30,6 +30,7 @@ namespace C7GameData
 
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			ImportCiv3ExperienceLevels(theBiq, c7Save);
+			ImportCiv3DefensiveBonuses(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
 			SetMapDimensions(civ3Save, c7Save);
 			SetWorldWrap(civ3Save, c7Save);
@@ -91,6 +92,7 @@ namespace C7GameData
 			
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			ImportCiv3ExperienceLevels(theBiq, c7Save);
+			ImportCiv3DefensiveBonuses(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);
@@ -222,6 +224,30 @@ namespace C7GameData
 					c7Save.Rules.defaultExperienceLevel = level;
 				}
 			}
+		}
+
+		private static void ImportCiv3DefensiveBonuses(BiqData theBiq, C7SaveFormat c7Save)
+		{
+			c7Save.Rules.fortificationBonus = new StrengthBonus {
+				description = "Fortified",
+				amount = theBiq.Rule[0].FortificationsDefensiveBonus / 100.0
+			};
+			c7Save.Rules.riverCrossingBonus = new StrengthBonus {
+				description = "Behind river",
+				amount = theBiq.Rule[0].RiverDefensiveBonus / 100.0
+			};
+			c7Save.Rules.cityLevel1DefenseBonus = new StrengthBonus {
+				description = "Town",
+				amount = theBiq.Rule[0].TownDefenseBonus / 100.0
+			};
+			c7Save.Rules.cityLevel2DefenseBonus = new StrengthBonus {
+				description = "City",
+				amount = theBiq.Rule[0].CityDefenseBonus / 100.0
+			};
+			c7Save.Rules.cityLevel3DefenseBonus = new StrengthBonus {
+				description = "Metropolis",
+				amount = theBiq.Rule[0].MetropolisDefenseBonus / 100.0
+			};
 		}
 
 		private static void SetWorldWrap(SavData civ3Save, C7SaveFormat c7Save)

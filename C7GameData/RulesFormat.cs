@@ -37,6 +37,12 @@ namespace C7GameData
 		public double promotionChanceAfterDefending = 1.0/16;
 		public double promotionChanceAfterAttacking = 1.0/8;
 
+		public StrengthBonus fortificationBonus;
+		public StrengthBonus riverCrossingBonus;
+		public StrengthBonus cityLevel1DefenseBonus;
+		public StrengthBonus cityLevel2DefenseBonus;
+		public StrengthBonus cityLevel3DefenseBonus;
+
 		public C7RulesFormat() {
 			Version = "v0.0early-prototype";
 		}

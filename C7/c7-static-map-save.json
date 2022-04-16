@@ -27,7 +27,28 @@
 	      "retreatChance": 0.66
 	  }
       ],
-      "defaultExperienceLevelKey": "regular"
+      "defaultExperienceLevelKey": "regular",
+
+      "fortificationBonus": {
+	  "description": "Fortified",
+	  "amount": 0.25
+      },
+      "riverCrossingBonus": {
+	  "description": "Behind river",
+	  "amount": 0.25
+      },
+      "cityLevel1DefenseBonus": {
+	  "description": "Town",
+	  "amount": 0.00
+      },
+      "cityLevel2DefenseBonus": {
+	  "description": "City",
+	  "amount": 0.50
+      },
+      "cityLevel3DefenseBonus": {
+	  "description": "Metropolis",
+	  "amount": 1.00
+      }
   },
   "gameData": {
     "turn": 0,
