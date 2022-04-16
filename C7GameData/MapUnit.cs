@@ -58,45 +58,6 @@ public class MapUnit
 		}
 	}
 
-	public IEnumerable<StrengthBonus> ListStrengthBonusesVersus(MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
-	{
-		if (! attacking) { // Defending against attack from opponent
-			if (isFortified)
-				yield return new StrengthBonus { description = "Fortification", amount = 0.25 };
-		}
-	}
-
-	public double AttackStrengthVersus(MapUnit opponent, bool bombard, TileDirection? attackDirection)
-	{
-		double multiplier = StrengthBonus.ListToMultiplier(ListStrengthBonusesVersus(opponent, true, bombard, attackDirection));
-		return multiplier * (bombard ? unitType.bombard : unitType.attack);
-	}
-
-	public double DefenseStrengthVersus(MapUnit opponent, bool bombard, TileDirection? attackDirection)
-	{
-		return unitType.defense * StrengthBonus.ListToMultiplier(ListStrengthBonusesVersus(opponent, false, bombard, attackDirection));
-	}
-
-	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
-	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
-	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
-	// priority. Otherwise it's just whoever is stronger on defense.
-	public bool HasPriorityAsDefender(MapUnit otherDefender, MapUnit opponent)
-	{
-		Player opponentPlayer = opponent.owner;
-		bool weAreEnemy           = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(this.owner)          : false;
-		bool otherDefenderIsEnemy = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(otherDefender.owner) : false;
-		if (weAreEnemy && ! otherDefenderIsEnemy)
-			return true;
-		else if (otherDefenderIsEnemy && ! weAreEnemy)
-			return false;
-		else {
-			double ourTotalStrength   =               DefenseStrengthVersus(opponent, false, null) *               hitPointsRemaining,
-			       theirTotalStrength = otherDefender.DefenseStrengthVersus(opponent, false, null) * otherDefender.hitPointsRemaining;
-			return ourTotalStrength > theirTotalStrength;
-		}
-	}
-
 	public string Describe()
 	{
 		UnitPrototype type = this.unitType;

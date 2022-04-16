@@ -2,6 +2,7 @@ namespace C7Engine
 {
 
 using System;
+using System.Collections.Generic;
 using Pathing;
 using C7GameData;
 
@@ -29,6 +30,46 @@ public static class MapUnitExtensions {
 	{
 		unit.isFortified = false;
 	}
+
+	public static IEnumerable<StrengthBonus> ListStrengthBonusesVersus(this MapUnit unit, MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
+	{
+		if (! attacking) { // Defending against attack from opponent
+			if (unit.isFortified)
+				yield return new StrengthBonus { description = "Fortification", amount = 0.25 };
+		}
+	}
+
+	public static double AttackStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
+	{
+		double multiplier = StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, true, bombard, attackDirection));
+		return multiplier * (bombard ? unit.unitType.bombard : unit.unitType.attack);
+	}
+
+	public static double DefenseStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
+	{
+		return unit.unitType.defense * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, false, bombard, attackDirection));
+	}
+
+	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
+	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
+	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
+	// priority. Otherwise it's just whoever is stronger on defense.
+	public static bool HasPriorityAsDefender(this MapUnit unit, MapUnit otherDefender, MapUnit opponent)
+	{
+		Player opponentPlayer = opponent.owner;
+		bool weAreEnemy           = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(unit.owner)          : false;
+		bool otherDefenderIsEnemy = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(otherDefender.owner) : false;
+		if (weAreEnemy && ! otherDefenderIsEnemy)
+			return true;
+		else if (otherDefenderIsEnemy && ! weAreEnemy)
+			return false;
+		else {
+			double ourTotalStrength   = unit         .DefenseStrengthVersus(opponent, false, null) * unit         .hitPointsRemaining,
+			       theirTotalStrength = otherDefender.DefenseStrengthVersus(opponent, false, null) * otherDefender.hitPointsRemaining;
+			return ourTotalStrength > theirTotalStrength;
+		}
+	}
+
 
 	public static void RollToPromote(this MapUnit unit, bool wasAttacking, bool waitForAnimation)
 	{
@@ -85,7 +126,7 @@ public static class MapUnitExtensions {
 
 	public static void bombard(this MapUnit unit, Tile tile)
 	{
-		MapUnit target = tile.findTopDefender(unit);
+		MapUnit target = tile.FindTopDefender(unit);
 		if ((unit.unitType.bombard == 0) || (target == MapUnit.NONE))
 			return; // Do nothing if we don't have a unit to attack. TODO: Attack city or tile improv if possible
 
@@ -140,7 +181,7 @@ public static class MapUnitExtensions {
 			unit.wake();
 
 			// Trigger combat if the tile we're moving into has an enemy unit. Or if this unit can't fight, do nothing.
-			MapUnit defender = newLoc.findTopDefender(unit);
+			MapUnit defender = newLoc.FindTopDefender(unit);
 			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
 				if (unit.unitType.attack > 0) {
 					bool unitWonCombat = unit.fight(defender);
@@ -148,7 +189,7 @@ public static class MapUnitExtensions {
 						return;
 
 					// If there are still more enemy units on the destination tile we can't actually move into it
-					defender = newLoc.findTopDefender(unit);
+					defender = newLoc.FindTopDefender(unit);
 					if ((defender != MapUnit.NONE) && (! unit.owner.IsAtPeaceWith(defender.owner))) {
 						unit.movementPointsRemaining -= 1;
 						return;

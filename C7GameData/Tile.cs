@@ -52,18 +52,6 @@ namespace C7GameData
 			unitsOnTile = new List<MapUnit>();
 		}
 
-		public MapUnit findTopDefender(MapUnit opponent)
-		{
-			if (unitsOnTile.Count > 0) {
-				var tr = unitsOnTile[0];
-				foreach (var u in unitsOnTile)
-					if (u.HasPriorityAsDefender(tr, opponent))
-						tr = u;
-				return tr;
-			} else
-				return MapUnit.NONE;
-		}
-		
 		public static Tile NONE = new Tile();
 
 		//This should be used when we want to check if land tiles are next to water tiles.
