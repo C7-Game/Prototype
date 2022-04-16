@@ -51,13 +51,12 @@ public static class MapUnitExtensions {
 		var defenderOriginalDirection = defender.facingDirection;
 		defender.facingDirection = unit.facingDirection.reversed();
 
-		double attackerStrength = unit    .StrengthVersus(defender, true , false, unit.facingDirection),
-		       defenderStrength = defender.StrengthVersus(unit    , false, false, unit.facingDirection);
+		double attackerStrength = unit    .AttackStrengthVersus (defender, false, unit.facingDirection),
+		       defenderStrength = defender.DefenseStrengthVersus(unit    , false, unit.facingDirection);
 
-		if (attackerStrength + defenderStrength == 0)
+		double attackerOdds = attackerStrength / (attackerStrength + defenderStrength);
+		if (Double.IsNaN(attackerOdds))
 			return false;
-
-		double attackerOdds = (double)attackerStrength / (attackerStrength + defenderStrength);
 
 		// Do combat rounds
 		while ((unit.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
@@ -93,8 +92,11 @@ public static class MapUnitExtensions {
 		var unitOriginalOrientation = unit.facingDirection;
 		unit.facingDirection = unit.location.directionTo(tile);
 
-		int defenderStrength = target.unitType.defense;
-		double attackerOdds = defenderStrength > 0 ? (double)unit.unitType.bombard / (unit.unitType.bombard + defenderStrength) : 1.0;
+		double bombardStrength  = unit  .AttackStrengthVersus (target, true, unit.facingDirection);
+		double defenderStrength = target.DefenseStrengthVersus(unit  , true, unit.facingDirection);
+		double attackerOdds = bombardStrength / (bombardStrength + defenderStrength);
+		if (Double.IsNaN(attackerOdds))
+			return;
 
 		unit.animate(MapUnit.AnimatedAction.ATTACK1, true);
 		unit.movementPointsRemaining -= 1;

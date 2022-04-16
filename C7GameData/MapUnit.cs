@@ -66,15 +66,15 @@ public class MapUnit
 		}
 	}
 
-	public double StrengthVersus(MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
+	public double AttackStrengthVersus(MapUnit opponent, bool bombard, TileDirection? attackDirection)
 	{
-		double bonusFactor = 1.0;
-		foreach (StrengthBonus bonus in ListStrengthBonusesVersus(opponent, attacking, bombard, attackDirection))
-			bonusFactor += bonus.amount;
-		if (bonusFactor > 0.0) {
-			return bonusFactor * (attacking ? unitType.attack : unitType.defense);
-		} else
-			return 0.0;
+		double multiplier = StrengthBonus.ListToMultiplier(ListStrengthBonusesVersus(opponent, true, bombard, attackDirection));
+		return multiplier * (bombard ? unitType.bombard : unitType.attack);
+	}
+
+	public double DefenseStrengthVersus(MapUnit opponent, bool bombard, TileDirection? attackDirection)
+	{
+		return unitType.defense * StrengthBonus.ListToMultiplier(ListStrengthBonusesVersus(opponent, false, bombard, attackDirection));
 	}
 
 	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
@@ -91,8 +91,8 @@ public class MapUnit
 		else if (otherDefenderIsEnemy && ! weAreEnemy)
 			return false;
 		else {
-			double ourTotalStrength   =               StrengthVersus(opponent, false, false, null) *               hitPointsRemaining,
-			       theirTotalStrength = otherDefender.StrengthVersus(opponent, false, false, null) * otherDefender.hitPointsRemaining;
+			double ourTotalStrength   =               DefenseStrengthVersus(opponent, false, null) *               hitPointsRemaining,
+			       theirTotalStrength = otherDefender.DefenseStrengthVersus(opponent, false, null) * otherDefender.hitPointsRemaining;
 			return ourTotalStrength > theirTotalStrength;
 		}
 	}
