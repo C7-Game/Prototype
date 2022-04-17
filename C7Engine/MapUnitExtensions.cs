@@ -33,9 +33,18 @@ public static class MapUnitExtensions {
 
 	public static IEnumerable<StrengthBonus> ListStrengthBonusesVersus(this MapUnit unit, MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
 	{
+		C7RulesFormat rules = EngineStorage.rules;
+
 		if (! attacking) { // Defending against attack from opponent
 			if (unit.isFortified)
-				yield return new StrengthBonus { description = "Fortification", amount = 0.25 };
+				yield return rules.fortificationBonus;
+
+			if ((! bombard) && (attackDirection is TileDirection dir) && unit.location.HasRiverCrossing(dir.reversed()))
+				yield return rules.riverCrossingBonus;
+
+			// TODO: Bonus should vary depending on city level. First we must load the thresholds for level 2/3 into the scenario data.
+			if (unit.location.cityAtTile != null)
+				yield return rules.cityLevel2DefenseBonus;
 		}
 	}
 

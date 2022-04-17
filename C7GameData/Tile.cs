@@ -91,6 +91,21 @@ namespace C7GameData
 			return neighbors.Values.Where(tile => tile.baseTerrainType.Key == "coast").ToList();
 		}
 
+		public bool HasRiverCrossing(TileDirection dir)
+		{
+			switch (dir) {
+			case TileDirection.NORTH:     return (riverNortheast && riverNorthwest) || (neighbors[TileDirection.NORTH].riverSoutheast && neighbors[TileDirection.NORTH].riverSouthwest);
+			case TileDirection.NORTHEAST: return riverNortheast;
+			case TileDirection.EAST:      return (riverNortheast && riverSoutheast) || (neighbors[TileDirection.EAST ].riverSouthwest && neighbors[TileDirection.EAST ].riverNorthwest);
+			case TileDirection.SOUTHEAST: return riverSoutheast;
+			case TileDirection.SOUTH:     return (riverSoutheast && riverSouthwest) || (neighbors[TileDirection.SOUTH].riverNorthwest && neighbors[TileDirection.SOUTH].riverNortheast);
+			case TileDirection.SOUTHWEST: return riverSouthwest;
+			case TileDirection.WEST:      return (riverSouthwest && riverNorthwest) || (neighbors[TileDirection.WEST ].riverNortheast && neighbors[TileDirection.WEST ].riverSoutheast);
+			case TileDirection.NORTHWEST: return riverNorthwest;
+			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
+		}
+
 		public bool IsLand()
 		{
 			return !baseTerrainType.isWater();
