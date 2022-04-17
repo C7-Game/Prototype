@@ -23,7 +23,7 @@ namespace EngineTests
 			predecessors[tileFour] = tileThree;
 			predecessors[tileThree] = tileTwo;
 			predecessors[tileTwo] = start;
-			TilePath path = BFSLandAlgorithm.ConstructPath(destination, predecessors);
+			TilePath path = new BFSLandAlgorithm().ConstructPath(destination, predecessors);
 
 			Assert.Equal(tileTwo, path.Next());
 			Assert.Equal(tileThree, path.Next());
