@@ -110,7 +110,12 @@ namespace QueryCiv3.Biq
 
         public PRTORACE AvailableTo; // Binary flag for each civ 0-31
         private fixed byte Flags2[8];
+
         public int Type; // 0: land, 1: sea, 2: air
+        public static readonly int TYPE_LAND = 0;
+        public static readonly int TYPE_SEA = 1;
+        public static readonly int TYPE_AIR = 2;
+
         public int OtherStrategy;
         public int HPBonus;
 

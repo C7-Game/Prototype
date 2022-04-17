@@ -195,7 +195,7 @@ namespace C7GameData
 			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
 			foreach (PRTO prto in theBiq.Prto) {
 				if (allowedUnits.Contains(prto.Name)) {
-					UnitPrototype prototype = new UnitPrototype();
+					UnitPrototype prototype = prto.Type == PRTO.TYPE_SEA ? new SeaUnit() : new UnitPrototype();
 					prototype.name = prto.Name;
 					prototype.attack = prto.Attack;
 					prototype.defense = prto.Defense;
