@@ -53,17 +53,18 @@ namespace C7GameData
 			if (FoodGrowthPerTurn() == 0) {
 				return int.MaxValue;
 			}
-            int turnsRoundedDown = (foodNeededToGrow - foodStored) / FoodGrowthPerTurn();
-            if ((foodNeededToGrow - foodStored) % FoodGrowthPerTurn() != 0) {
-                return turnsRoundedDown++;
+			int additionalFoodNeeded = foodNeededToGrow - foodStored;
+            int turnsRoundedDown = additionalFoodNeeded / FoodGrowthPerTurn();
+            if (additionalFoodNeeded % FoodGrowthPerTurn() != 0) {
+                return turnsRoundedDown + 1;
             }
             return turnsRoundedDown;
         }
 
-        public int TurnsToProduce(IProducible item)
-        {
-            int turnsRoundedDown = (item.shieldCost - shieldsStored) / CurrentProductionYield();
-            if ((item.shieldCost - shieldsStored) % CurrentProductionYield() != 0) {
+        public int TurnsToProduce(IProducible item) {
+	        int additionalProductionNeeded = (item.shieldCost - shieldsStored);
+            int turnsRoundedDown = additionalProductionNeeded / CurrentProductionYield();
+            if (additionalProductionNeeded % CurrentProductionYield() != 0) {
                 return turnsRoundedDown + 1;
             }
             return turnsRoundedDown;
@@ -128,6 +129,6 @@ namespace C7GameData
 		{
 			return CurrentFoodYield() - size * 2;
 		}
-        
+
     }
 }

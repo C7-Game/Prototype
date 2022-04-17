@@ -50,6 +50,7 @@ namespace C7GameData
 		public Tile()
 		{
 			unitsOnTile = new List<MapUnit>();
+			Resource = Resource.NONE;
 		}
 
 		public MapUnit findTopDefender(MapUnit opponent)
@@ -63,7 +64,7 @@ namespace C7GameData
 			} else
 				return MapUnit.NONE;
 		}
-		
+
 		public static Tile NONE = new Tile();
 
 		//This should be used when we want to check if land tiles are next to water tiles.
