@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace C7Engine
 {
 	using C7GameData;
@@ -34,6 +36,11 @@ namespace C7Engine
 		/**
 		 * Helper function to add the available actions to a unit
 		 * based on what terrain it is on.
+		 *
+		 * TODO: It's kind of janky that the actions are being added to the unit.  They live on the unit prototype, and can be made available
+		 * or unavailable based on game circumstances, e.g. technology or unit location.
+		 * We probably *should* be returning just a list of the actions.  However, we're passing the result around via Godot signals, so
+		 * I'm going to save that for a separate commit.
 		 **/
 		public static MapUnit UnitWithAvailableActions(MapUnit unit)
 		{
@@ -43,36 +50,17 @@ namespace C7Engine
 				return unit;
 			}
 
-			//This should have "real" code someday.  For now, I'll hard-code a few things based
-			//on the unit type.  That will allow proving the end-to-end works, and we can
-			//add real support as we add more mechanics.  Probably some of it early, some of it...
-			//not so early.
-			//For now, we'll add 'all' the basic actions (e.g. vanilla, non-automated ones), though this is not necessarily right.
-			string[] basicActions = { "hold", "wait", "fortify", "disband", "goTo"};
-			unit.availableActions.AddRange(basicActions);
-
-			string unitType = unit.unitType.name;
-			if (unitType.Equals("Warrior")) {
-				unit.availableActions.Add("pillage");
-			}
-			else if (unitType.Equals("Settler")) {
-				unit.availableActions.Add("buildCity");
-			}
-			else if (unitType.Equals("Worker")) {
-				unit.availableActions.Add("road");
-				unit.availableActions.Add("mine");
-				unit.availableActions.Add("irrigate");
-			}
-			else if (unit.unitType.Equals("Chariot")) {
-				unit.availableActions.Add("pillage");
-			}
-			else {
-				//It must be a catapult
-				unit.availableActions.Add("bombard");
+			// Eventually, we should look this up somewhere to see what all actions we have (and mods might add more)
+			// For now, this is still an improvement over the last iteration.
+			string[] implementedActions = { "hold", "wait", "fortify", "disband", "goTo", "buildCity", "bombard"};
+			foreach (string action in implementedActions) {
+				if (unit.unitType.actions.Contains(action)) {
+					unit.availableActions.Add(action);
+				}
 			}
 
-			//Always add an advanced action b/c we don't have code to make the buttons show up at the right spot if they're all hidden yet
-			unit.availableActions.Add("rename");
+			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.
+			// unit.availableActions.Add("rename");
 
 			return unit;
 		}
