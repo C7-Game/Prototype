@@ -103,8 +103,19 @@ public static class MapUnitExtensions {
 		var defenderOriginalDirection = defender.facingDirection;
 		defender.facingDirection = unit.facingDirection.reversed();
 
-		double attackerStrength = unit    .AttackStrengthVersus (defender, false, unit.facingDirection),
-		       defenderStrength = defender.DefenseStrengthVersus(unit    , false, unit.facingDirection);
+		IEnumerable<StrengthBonus> attackBonuses  = unit    .ListStrengthBonusesVersus(defender, true , false, unit.facingDirection),
+		                           defenseBonuses = defender.ListStrengthBonusesVersus(unit    , false, false, unit.facingDirection);
+
+		double attackerStrength = unit    .unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
+		       defenderStrength = defender.unitType.defense * StrengthBonus.ListToMultiplier(defenseBonuses);
+
+		Console.WriteLine($"Combat log: {unit.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
+		Console.WriteLine($"\tAttacker: {unit.unitType.name}, base strength {unit.unitType.attack}");
+		foreach (StrengthBonus bonus in attackBonuses)
+			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
+		Console.WriteLine($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.defense}");
+		foreach (StrengthBonus bonus in defenseBonuses)
+			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
 
 		double attackerOdds = attackerStrength / (attackerStrength + defenderStrength);
 		if (Double.IsNaN(attackerOdds))
