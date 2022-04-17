@@ -91,16 +91,38 @@ namespace C7GameData
 			return neighbors.Values.Where(tile => tile.baseTerrainType.Key == "coast").ToList();
 		}
 
+		// Returns whether or not there's a river crossing at the asterisk (*), looking forward from the carat (^), given the presence of
+		// rivers along the four labeled tile edges:
+		//        \     /
+		// farLeft \   /  farRight
+		//          \ /
+		//           *
+		//          / \
+		// nearLeft/   \  nearRight
+		//        /  ^  \
+		private bool FacingCrossingAtVertex(bool nearLeft, bool nearRight, bool farLeft, bool farRight)
+		{
+			return (nearLeft && nearRight) || (farLeft && farRight) || (nearLeft && farRight) || (farLeft && nearRight);
+		}
+
 		public bool HasRiverCrossing(TileDirection dir)
 		{
 			switch (dir) {
-			case TileDirection.NORTH:     return (riverNortheast && riverNorthwest) || (neighbors[TileDirection.NORTH].riverSoutheast && neighbors[TileDirection.NORTH].riverSouthwest);
+			case TileDirection.NORTH:
+				Tile north = neighbors[TileDirection.NORTH];
+				return FacingCrossingAtVertex(riverNorthwest, riverNortheast, north.riverSouthwest, north.riverSoutheast);
 			case TileDirection.NORTHEAST: return riverNortheast;
-			case TileDirection.EAST:      return (riverNortheast && riverSoutheast) || (neighbors[TileDirection.EAST ].riverSouthwest && neighbors[TileDirection.EAST ].riverNorthwest);
+			case TileDirection.EAST:
+				Tile east = neighbors[TileDirection.EAST];
+				return FacingCrossingAtVertex(riverNortheast, riverSoutheast, east.riverNorthwest, east.riverSouthwest);
 			case TileDirection.SOUTHEAST: return riverSoutheast;
-			case TileDirection.SOUTH:     return (riverSoutheast && riverSouthwest) || (neighbors[TileDirection.SOUTH].riverNorthwest && neighbors[TileDirection.SOUTH].riverNortheast);
+			case TileDirection.SOUTH:
+				Tile south = neighbors[TileDirection.SOUTH];
+				return FacingCrossingAtVertex(riverSoutheast, riverSouthwest, south.riverNortheast, south.riverNorthwest);
 			case TileDirection.SOUTHWEST: return riverSouthwest;
-			case TileDirection.WEST:      return (riverSouthwest && riverNorthwest) || (neighbors[TileDirection.WEST ].riverNortheast && neighbors[TileDirection.WEST ].riverSoutheast);
+			case TileDirection.WEST:
+				Tile west = neighbors[TileDirection.WEST];
+				return FacingCrossingAtVertex(riverSouthwest, riverNorthwest, west.riverSoutheast, west.riverNortheast);
 			case TileDirection.NORTHWEST: return riverNorthwest;
 			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
 			}
