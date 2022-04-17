@@ -11,12 +11,22 @@ namespace C7Engine.AI {
 					unit.fortify();
 					Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
 				}
-			}
-			else {
+			} else {
 				Console.WriteLine("Moving defender towards " + defenderAI.destination);
-				
+
 				Tile nextTile = defenderAI.pathToDestination.Next();
-				unit.move(unit.location.directionTo(nextTile));
+				if (nextTile != Tile.NONE) {
+					unit.move(unit.location.directionTo(nextTile));
+				} else {
+					//Got a crash due to trying to move to (or less likely from) Tile.NONE.
+					//However, from the logs, the destination was [15, 55], so somehow the path
+					//included Tile.NONE.  The unit was an AI (Roman) unit; due to the crash I can't get more info
+					//One possibility is it was blocked in its path the previous turn; could this happen if multiple
+					//units were on a tile it was moving to, and it defeated one, but still couldn't move?  That would
+					//likely affect its pathing.  Put a breakpoint here while debugging!
+					//This should be a higher severity Serilog error
+					Console.WriteLine("ERROR: Unit pathed via Tile.NONE");
+				}
 			}
 			return true;
 		}
