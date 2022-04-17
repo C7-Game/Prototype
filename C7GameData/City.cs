@@ -112,7 +112,7 @@ namespace C7GameData
 		{
 			int yield = 1;	//city center min yield
 			foreach (CityResident r in residents) {
-				yield += r.tileWorked.productionYield();
+				yield += r.tileWorked.productionYield(owner);
 			}
 			return yield;
 		}
@@ -120,7 +120,7 @@ namespace C7GameData
 		{
 			int yield = 3;	//city center min yield
 			foreach (CityResident r in residents) {
-				yield += r.tileWorked.commerceYield();
+				yield += r.tileWorked.commerceYield(owner);
 			}
 			return yield;
 		}

@@ -35,7 +35,8 @@ namespace C7Engine.AI
 				}
 			}
 
-			Console.WriteLine($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {preferredTile.foodYield(city.owner)}/{preferredTile.productionYield()}/{preferredTile.commerceYield()}");
+			string yield = $"{preferredTile.foodYield(city.owner)}/{preferredTile.productionYield(city.owner)}/{preferredTile.commerceYield(city.owner)}";
+			Console.WriteLine($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {yield}");
 
 			newResident.tileWorked = preferredTile;
 			preferredTile.personWorkingTile = newResident;
@@ -45,7 +46,7 @@ namespace C7Engine.AI
 
 		public static double CalculateTileYieldScore(Tile t, int targetFoodAmount, Player player)
 		{
-			int score = t.foodYield(player) * foodPriorityRate + t.productionYield() * productionPriorityRate + t.commerceYield() * commercePriorityRate;
+			int score = t.foodYield(player) * foodPriorityRate + t.productionYield(player) * productionPriorityRate + t.commerceYield(player) * commercePriorityRate;
 			int penalty = (targetFoodAmount - t.foodYield(player));
 			if (penalty <= 0) {
 				return score;

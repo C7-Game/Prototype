@@ -141,8 +141,8 @@ nextcandidate: ;
 		private static int GetTileYieldScore(Tile t, Player owner)
 		{
 			int score = t.foodYield(owner) * 5;
-			score += t.productionYield() * 3;
-			score += t.commerceYield() * 2;
+			score += t.productionYield(owner) * 3;
+			score += t.commerceYield(owner) * 2;
 			if (t.Resource.Category == ResourceCategory.STRATEGIC) {
 				score += STRATEGIC_RESOURCE_BONUS;
 			}
