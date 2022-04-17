@@ -167,6 +167,11 @@ namespace C7GameData
 			}
 			return yield;
 		}
+
+		//Convenience method for printing the yield
+		public string YieldString(Player player) {
+			return $"{foodYield(player)}/{productionYield(player)}/{commerceYield(player)})";
+		}
 	}
 
 	public enum TileDirection {
