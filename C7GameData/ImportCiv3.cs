@@ -63,9 +63,13 @@ namespace C7GameData
 				if (civ3Tile.PineForest) {
 					c7Tile.isPineForest = true;
 				}
+				c7Tile.riverNorth = civ3Tile.RiverNorth;
 				c7Tile.riverNortheast = civ3Tile.RiverNortheast;
+				c7Tile.riverEast = civ3Tile.RiverEast;
 				c7Tile.riverSoutheast = civ3Tile.RiverSoutheast;
+				c7Tile.riverSouth = civ3Tile.RiverSouth;
 				c7Tile.riverSouthwest = civ3Tile.RiverSouthwest;
+				c7Tile.riverWest = civ3Tile.RiverWest;
 				c7Tile.riverNorthwest = civ3Tile.RiverNorthwest;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.ResourceID];
 				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.ResourceID].Key;
@@ -84,10 +88,10 @@ namespace C7GameData
 		public static C7SaveFormat ImportBiq(string biqPath, string defaultBiqPath)
 		{
 			C7SaveFormat c7Save = new C7SaveFormat();
-			
+
 			byte[] biqBytes = Util.ReadFile(biqPath);
 			BiqData theBiq = new BiqData(biqBytes);
-			
+
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
@@ -123,9 +127,13 @@ namespace C7GameData
 				if (civ3Tile.PineForest) {
 					c7Tile.isPineForest = true;
 				}
+				c7Tile.riverNorth = civ3Tile.RiverNorth;
 				c7Tile.riverNortheast = civ3Tile.RiverConnectionNortheast;
+				c7Tile.riverEast = civ3Tile.RiverEast;
 				c7Tile.riverSoutheast = civ3Tile.RiverConnectionSoutheast;
+				c7Tile.riverSouth = civ3Tile.RiverSouth;
 				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
+				c7Tile.riverWest = civ3Tile.RiverWest;
 				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.Resource];
 				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.Resource].Key;
@@ -136,7 +144,7 @@ namespace C7GameData
 			// c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.Game[0].ScenarioSearchFolders;
 			return c7Save;
 		}
-		
+
 		static (int, int) GetMapCoordinates(int tileIndex, int mapWidth)
 		{
 			int y = tileIndex / (mapWidth / 2);

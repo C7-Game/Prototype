@@ -13,9 +13,13 @@ namespace QueryCiv3.Biq
         public int Length;
 
         private byte RiverConnections;
+        public bool RiverConnectionNorth     { get => Util.GetFlag(RiverConnections, 0); }
         public bool RiverConnectionNortheast { get => Util.GetFlag(RiverConnections, 1); }
+        public bool RiverConnectionEast      { get => Util.GetFlag(RiverConnections, 2); }
         public bool RiverConnectionSoutheast { get => Util.GetFlag(RiverConnections, 3); }
+        public bool RiverConnectionSouth     { get => Util.GetFlag(RiverConnections, 4); }
         public bool RiverConnectionSouthwest { get => Util.GetFlag(RiverConnections, 5); }
+        public bool RiverConnectionWest      { get => Util.GetFlag(RiverConnections, 6); }
         public bool RiverConnectionNorthwest { get => Util.GetFlag(RiverConnections, 7); }
 
 
