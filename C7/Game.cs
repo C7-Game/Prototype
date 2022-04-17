@@ -156,6 +156,11 @@ public class Game : Node2D
 			case MsgStartTurn mST:
 				OnPlayerStartTurn();
 				break;
+
+			case MsgFinishedSave mFS:
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.CloseCurrentPopup();
+				break;
 			}
 		}
 	}

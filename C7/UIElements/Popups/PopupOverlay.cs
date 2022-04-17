@@ -30,6 +30,12 @@ public class PopupOverlay : HBoxContainer
 		base._Ready();
 	}
 
+	public void CloseCurrentPopup() {
+		GD.Print("Closing popup");
+		RemoveChild(currentChild);
+		Hide();
+	}
+
 	private void OnHidePopup()
 	{
 		log.Debug("Hiding popup");

@@ -50,6 +50,7 @@
 		public static void Save(string path) {
 			C7SaveFormat save = new C7SaveFormat(EngineStorage.gameData);
 			C7SaveFormat.Save(save, path);
+			new MsgFinishedSave().send();
 		}
 
 	}

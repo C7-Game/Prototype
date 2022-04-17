@@ -42,4 +42,6 @@ namespace C7Engine
 
 	public class MsgStartTurn : MessageToUI {}
 
+	public class MsgFinishedSave : MessageToUI {}
+
 }
