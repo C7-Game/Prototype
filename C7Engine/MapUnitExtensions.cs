@@ -39,6 +39,8 @@ public static class MapUnitExtensions {
 			if (unit.isFortified)
 				yield return rules.fortificationBonus;
 
+			yield return unit.location.overlayTerrainType.defenseBonus;
+
 			if ((! bombard) && (attackDirection is TileDirection dir) && unit.location.HasRiverCrossing(dir.reversed()))
 				yield return rules.riverCrossingBonus;
 
