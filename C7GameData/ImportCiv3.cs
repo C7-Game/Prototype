@@ -207,6 +207,9 @@ namespace C7GameData
 					if (prto.BuildCity) {
 						prototype.actions.Add("buildCity");
 					}
+					if (prto.Bombard) {
+						prototype.actions.Add("bombard");
+					}
 					if (prto.SkipTurn) {
 						prototype.actions.Add("hold");
 					}
