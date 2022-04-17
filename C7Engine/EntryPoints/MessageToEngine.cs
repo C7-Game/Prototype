@@ -53,14 +53,10 @@ namespace C7Engine
 
 			// Simply do nothing if we weren't given a valid GUID. TODO: Maybe this is an error we need to handle? In an MP game, we should reject
 			// invalid actions at the server level but at the client level an invalid action received from the server indicates a desync.
-			if (unit != null) {
-				if (fortifyElseWake)
-					unit.fortify();
-				else
-					unit.wake();
-			} else {
-				Console.WriteLine("INVALID UNIT BAD: " + unitGUID);
-			}
+			if (fortifyElseWake)
+				unit?.fortify();
+			else
+				unit?.wake();
 		}
 	}
 

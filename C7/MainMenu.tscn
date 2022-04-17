@@ -79,7 +79,6 @@ __meta__ = {
 [node name="SetCiv3HomeDialog" type="FileDialog" parent="CanvasLayer"]
 margin_right = 550.0
 margin_bottom = 750.0
-rect_min_size = Vector2( 400, 140 )
 window_title = "Open a File or Directory"
 resizable = true
 mode = 3

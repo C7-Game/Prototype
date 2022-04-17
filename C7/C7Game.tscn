@@ -96,7 +96,7 @@ __meta__ = {
 
 [node name="DownButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
 margin_right = 79.0
-margin_bottom = 34.0
+margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "Down"
 __meta__ = {
@@ -104,9 +104,9 @@ __meta__ = {
 }
 
 [node name="RightButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-margin_top = 38.0
+margin_top = 44.0
 margin_right = 79.0
-margin_bottom = 72.0
+margin_bottom = 84.0
 custom_fonts/font = ExtResource( 2 )
 text = "Right"
 __meta__ = {
@@ -114,9 +114,9 @@ __meta__ = {
 }
 
 [node name="LeftButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-margin_top = 76.0
+margin_top = 88.0
 margin_right = 79.0
-margin_bottom = 110.0
+margin_bottom = 128.0
 custom_fonts/font = ExtResource( 2 )
 text = "Left"
 __meta__ = {
@@ -124,9 +124,9 @@ __meta__ = {
 }
 
 [node name="UpButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-margin_top = 114.0
+margin_top = 132.0
 margin_right = 79.0
-margin_bottom = 148.0
+margin_bottom = 172.0
 custom_fonts/font = ExtResource( 2 )
 text = "Up"
 __meta__ = {
@@ -134,17 +134,17 @@ __meta__ = {
 }
 
 [node name="Label" type="Label" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-margin_top = 152.0
+margin_top = 176.0
 margin_right = 79.0
-margin_bottom = 186.0
+margin_bottom = 210.0
 custom_fonts/font = ExtResource( 2 )
 text = "Zoom"
 align = 1
 
 [node name="Zoom" type="VSlider" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-margin_top = 190.0
+margin_top = 214.0
 margin_right = 79.0
-margin_bottom = 450.0
+margin_bottom = 444.0
 size_flags_horizontal = 1
 size_flags_vertical = 3
 min_value = 0.1
@@ -153,7 +153,7 @@ step = 0.1
 value = 1.0
 
 [node name="QuitButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-margin_top = 454.0
+margin_top = 448.0
 margin_right = 79.0
 margin_bottom = 488.0
 custom_fonts/font = ExtResource( 2 )
@@ -169,6 +169,9 @@ anims/SlideOutAnimation = SubResource( 1 )
 [node name="ToolBar" type="Control" parent="CanvasLayer"]
 anchor_right = 1.0
 mouse_filter = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/ToolBar"]
 anchor_right = 1.0
@@ -205,7 +208,7 @@ script = ExtResource( 6 )
 
 [node name="UiBarEndTurnButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
 margin_left = 12.0
-margin_right = 114.0
+margin_right = 126.0
 margin_bottom = 40.0
 custom_fonts/font = ExtResource( 2 )
 text = "End Turn"
