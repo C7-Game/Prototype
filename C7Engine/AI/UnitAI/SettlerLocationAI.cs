@@ -16,14 +16,15 @@ namespace C7Engine
 		static int LUXURY_RESOURCE_BONUS = 15;
 
 		//Figures out where to plant Settlers
-		public static Tile findSettlerLocation(Tile start, List<City> playerCities, List<MapUnit> playerUnits)
-		{
+		public static Tile findSettlerLocation(Tile start, Player player) {
+			List<City> playerCities = player.cities;
+			List<MapUnit> playerUnits = player.units;
 			HashSet<Tile> candidates = GetCandidateTiles(start);
 			foreach (City city in playerCities) {
 				HashSet<Tile> moreCandidates = GetCandidateTiles(city.location);
 				candidates.UnionWith(moreCandidates);
 			}
-			Dictionary<Tile, int> scores = AssignTileScores(start, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
+			Dictionary<Tile, int> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
 			if (scores.Count == 0 || scores.Values.Max() <= 0) {
 				return Tile.NONE;	//nowhere to settle
 			}
@@ -80,7 +81,7 @@ namespace C7Engine
 			candidates.UnionWith(ringFour);
 			return candidates;
 		}
-		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, HashSet<Tile> candidates, List<MapUnit> playerSettlers)
+		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, HashSet<Tile> candidates, List<MapUnit> playerSettlers)
 		{
 
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
@@ -107,11 +108,11 @@ namespace C7Engine
 						}
 					}
 				}
-				int score = GetTileYieldScore(t);
+				int score = GetTileYieldScore(t, player);
 				//For simplicity's sake, I'm only going to look at immediate neighbors here, but
 				//a lot more things should be considered over time.
 				foreach (Tile nt in t.neighbors.Values) {
-					score += GetTileYieldScore(nt);
+					score += GetTileYieldScore(nt, player);
 				}
 				//TODO: Also look at the next ring out, with lower weights.
 
@@ -123,23 +124,23 @@ namespace C7Engine
 					score += 10;
 				}
 				//TODO: Exclude locations that are too close to another civ.
-				
+
 				//Lower scores if they are far away
 				int distance = startTile.distanceTo(t);
 				if (distance > 4) {
 					score -= distance * 2;
 				}
-				
+
 				//TODO: Remove locations that we already have another Settler moving towards
-				
+
 				scores[t] = score;
 nextcandidate: ;
 			}
 			return scores;
 		}
-		private static int GetTileYieldScore(Tile t)
+		private static int GetTileYieldScore(Tile t, Player owner)
 		{
-			int score = t.foodYield() * 5;
+			int score = t.foodYield(owner) * 5;
 			score += t.productionYield() * 3;
 			score += t.commerceYield() * 2;
 			if (t.Resource.Category == ResourceCategory.STRATEGIC) {

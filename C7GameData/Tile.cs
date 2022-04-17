@@ -141,7 +141,7 @@ namespace C7GameData
 			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
 		}
 
-		public int foodYield()
+		public int foodYield(Player player)
 		{
 			int yield = overlayTerrainType.baseFoodProduction;
 			if (this.Resource != Resource.NONE) {
