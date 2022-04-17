@@ -13,11 +13,33 @@ namespace C7Engine.Pathing
 	 * Notes: - Edge weight is defined by the movement cost of the 2nd node:
 	 *          w(u, v) = movement_cost(v)
 	 */
-	public class DijkstrasLandAlgorithm : PathingAlgorithm
-	{
-		//N.B. This should really be static, but we can't put a static method on interfaces, so it isn't.
-		public TilePath PathFrom(Tile start, Tile destination)
-		{
+	public class DijkstrasLandAlgorithm : PathingAlgorithm {
+
+		// Returns the next closest vertex in the graph, and updates the visited set to include
+		// the returned vertex
+		private KeyValuePair<Tile, int> getNextClosest(Dictionary<Tile, int> dist, HashSet<Tile> visited) {
+			// TODO: pick a different data structure to avoid O(n) search
+			KeyValuePair<Tile, int> next = new KeyValuePair<Tile, int>(Tile.NONE, int.MaxValue);
+			foreach (KeyValuePair<Tile, int> pair in dist) {
+				if (pair.Value < next.Value && !visited.Contains(pair.Key)) {
+					next = pair;
+				}
+			}
+			visited.Add(next.Key);
+			return next;
+		}
+
+		// Updates the shortest distance to a vertex. Returns true if the distance parameter
+		// is shorter than the shortest known distance and dist is updated, and false otherwise.
+		private bool updateShortestDistance(Tile tile, int distance, Dictionary<Tile, int> dist) {
+			if (!dist.ContainsKey(tile) || dist[tile] > distance) {
+				dist[tile] = distance;
+				return true;
+			}
+			return false;
+		}
+
+		public override TilePath PathFrom(Tile start, Tile destination) {
 			// shortest distance from start to each tile on the continent
 			Dictionary<Tile, int> dist = new Dictionary<Tile, int>();
 			Dictionary<Tile, Tile> predecessors = new Dictionary<Tile, Tile>();
@@ -25,63 +47,21 @@ namespace C7Engine.Pathing
 
 			dist[start] = 0;
 
-			bool updateShortestDistance(Tile tile, int distance) {
-				if (!dist.ContainsKey(tile)) {
-					dist[tile] = distance;
-					return true;
-				} else if (dist[tile] > distance) {
-					dist[tile] = distance;
-					return true;
-				}
-				return false;
-			}
-
-			// TODO not O(n) search
-			KeyValuePair<Tile, int> getNextClosest() {
-				KeyValuePair<Tile, int> next = new KeyValuePair<Tile, int>(Tile.NONE, int.MaxValue);
-				foreach (KeyValuePair<Tile, int> pair in dist) {
-					if (pair.Value < next.Value && !visited.Contains(pair.Key)) {
-						next = pair;
-					}
-				}
-				visited.Add(next.Key);
-				return next;
-			}
-
-			KeyValuePair<Tile, int> closest = getNextClosest();
+			KeyValuePair<Tile, int> closest = getNextClosest(dist, visited);
 			while (closest.Key != Tile.NONE) {
 				foreach (Tile tile in closest.Key.GetLandNeighbors()) {
-					if (!visited.Contains(tile) && updateShortestDistance(tile, closest.Value + tile.MovementCost())) {
+					if (!visited.Contains(tile) && updateShortestDistance(tile, closest.Value + tile.MovementCost(), dist)) {
 						predecessors[tile] = closest.Key;
 					}
 				}
-				closest = getNextClosest();
+				closest = getNextClosest(dist, visited);
 				// TODO: this is fastest if recomputing Dijkstra's for each unit
 				// and ignoring that units may path from the same starting tile
 				if (closest.Key == destination) {
 					break;
 				}
 			}
-
 			return ConstructPath(destination, predecessors);
-		}
-
-		// Should not be public
-		public static TilePath ConstructPath(Tile destination, Dictionary<Tile, Tile> predecessors)
-		{
-			List<Tile> tilesInPath = new List<Tile>() {destination};
-			Tile tile = destination;
-			while (predecessors.ContainsKey(tile)) {
-				tile = predecessors[tile];
-				tilesInPath.Add(tile);
-			}
-			tilesInPath.Reverse();
-			Queue<Tile> path = new Queue<Tile>();
-			foreach (Tile t in tilesInPath.Skip(1))
-			{
-				path.Enqueue(t);
-			}
-			return new TilePath(destination, path);
 		}
 	}
 }
