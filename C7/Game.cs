@@ -389,7 +389,8 @@ public class Game : Node2D
 						else if ((! shiftDown) && tile.unitsOnTile.Count > 0)
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
 
-						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.DisplayName);
+						string yield = tile.YieldString(controller);
+						GD.Print($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
 
 						if (tile.cityAtTile != null) {
 							City city = tile.cityAtTile;
