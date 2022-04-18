@@ -7,18 +7,19 @@ namespace C7GameData
 		private Tile destination; //stored in case we need to re-calculate
 		private Queue<Tile> path;
 
-		private TilePath() {}
+		private TilePath() {
+			destination = Tile.NONE;
+			path = new Queue<Tile>();
+		}
 
-		public TilePath(Tile destination, Queue<Tile> path)
-		{
+		public TilePath(Tile destination, Queue<Tile> path) {
 			this.destination = destination;
 			this.path = path;
 		}
 
 		// The next tile in the path, or Tile.NONE if there
 		// are no remaining tiles, or the path is invalid
-		public Tile Next()
-		{
+		public Tile Next() {
 			return PathLength() > 0 ? path.Dequeue() : Tile.NONE;
 		}
 
@@ -32,8 +33,7 @@ namespace C7GameData
 		public static TilePath NONE = new TilePath();
 
 		// A valid path of length 0
-		public static TilePath EmptyPath(Tile destination)
-		{
+		public static TilePath EmptyPath(Tile destination) {
 			return new TilePath(destination, new Queue<Tile>());
 		}
 

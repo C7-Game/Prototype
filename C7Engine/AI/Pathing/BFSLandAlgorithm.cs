@@ -16,7 +16,7 @@ namespace C7Engine.Pathing
 	public class BFSLandAlgorithm : PathingAlgorithm
 	{
 		//N.B. This should really be static, but we can't put a static method on interfaces, so it isn't.
-		public TilePath PathFrom(Tile start, Tile destination)
+		public override TilePath PathFrom(Tile start, Tile destination)
 		{
 			if (start == destination) {
 				return TilePath.EmptyPath(destination);
@@ -55,30 +55,6 @@ namespace C7Engine.Pathing
 				}
 			}
 			return TilePath.NONE;
-		}
-
-		/**
-		 * Should not be public.  Only public so we can test
-		 * it in isolation.
-		 *
-		 * In Java, I could work around this a few ways... not sure how in C#.
-		 */
-		public static TilePath ConstructPath(Tile destination, Dictionary<Tile, Tile> predecessors)
-		{
-			List<Tile> tilesInPath = new List<Tile>();
-			tilesInPath.Add(destination);
-			Tile tile = destination;
-			while (predecessors.ContainsKey(tile)) {
-				tile = predecessors[tile];
-				tilesInPath.Add(tile);
-			}
-			tilesInPath.Reverse();
-			Queue<Tile> path = new Queue<Tile>();
-			foreach (Tile t in tilesInPath.Skip(1))
-			{
-				path.Enqueue(t);
-			}
-			return new TilePath(destination, path);
 		}
 	}
 }
