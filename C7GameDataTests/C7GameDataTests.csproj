@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <Nullable>enable</Nullable>
-
+		<LangVersion>8.0</LangVersion>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
