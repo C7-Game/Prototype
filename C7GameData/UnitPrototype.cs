@@ -17,7 +17,10 @@ namespace C7GameData
 		public int movement {get; set;}
 		public int iconIndex {get; set;}
 
+		public HashSet<string> categories = new HashSet<string>();
+
 		public HashSet<string> actions = new HashSet<string>();
+
 		public HashSet<string> attributes = new HashSet<string>();
 
 		public override string ToString()

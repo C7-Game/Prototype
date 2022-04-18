@@ -195,7 +195,16 @@ namespace C7GameData
 			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
 			foreach (PRTO prto in theBiq.Prto) {
 				if (allowedUnits.Contains(prto.Name)) {
-					UnitPrototype prototype = prto.Type == PRTO.TYPE_SEA ? new SeaUnit() : new UnitPrototype();
+					UnitPrototype prototype = new UnitPrototype();
+					if (prto.Type == PRTO.TYPE_SEA) {
+						prototype.categories.Add("Sea");
+					}
+					else if (prto.Type == PRTO.TYPE_LAND) {
+						prototype.categories.Add("Land");
+					}
+					else if (prto.Type == PRTO.TYPE_AIR) {
+						prototype.categories.Add("Air");
+					}
 					prototype.name = prto.Name;
 					prototype.attack = prto.Attack;
 					prototype.defense = prto.Defense;

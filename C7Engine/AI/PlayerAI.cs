@@ -21,7 +21,7 @@ namespace C7Engine
 				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.
 				//It may fail due to conditions having changed since that goal was assigned; in that case it will
 				//get a new task to try to complete.
-				
+
 				bool unitDone = false;
 				int attempts = 0;
 				int maxAttempts = 2;	//safety valve so we don't freeze the UI if SetAIForUnit returns something that fails
@@ -29,10 +29,10 @@ namespace C7Engine
 					if (unit.currentAIData == null || attempts > 0) {
 						SetAIForUnit(unit, player);
 					}
-					
+
 					UnitAI artificialIntelligence = getAIForUnitStrategy(unit.currentAIData);
 					unitDone = artificialIntelligence.PlayTurn(player, unit);
-					
+
 					attempts++;
 					if (!unitDone && attempts >= maxAttempts) {
 						//TODO: Serilog.  WARN level.
@@ -44,8 +44,8 @@ namespace C7Engine
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
 		}
-		
-		public static void SetAIForUnit(MapUnit unit, Player player) 
+
+		public static void SetAIForUnit(MapUnit unit, Player player)
 		{
 			//figure out an AI behavior
 			//TODO: Use strategies, not names
@@ -83,13 +83,13 @@ namespace C7Engine
 			}
 			else {
 
-				if (unit.unitType is SeaUnit) {
+				if (unit.unitType.categories.Contains("Sea")) {
 					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.COASTLINE;
 					unit.currentAIData = ai;
 					Console.WriteLine("Set coastline exploration AI for " + unit);
 				}
-				else if (unit.location.unitsOnTile.Exists((x) => x.unitType is SeaUnit)) {
+				else if (unit.location.unitsOnTile.Exists((x) => x.unitType.categories.Contains("Sea"))) {
 					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.ON_A_BOAT;
 					unit.currentAIData = ai;
@@ -118,26 +118,26 @@ namespace C7Engine
 						//(Realistically, as we evolve there will be a lot of options, such as defending borders from barbs, preparing attackers on other civs, defending
 						//resources.  I expect we'll have some sort of arbiter that decides between competing priorities, with each being given a score as to how important
 						//they are, including a weight by how far away the task is.  But this will evolve gradually over a long time)
-						
+
 						//As of today (4/7/2022), let's tackle just one of those - adequate defense of cities.  The AI is really good at losing cities to barbs right now,
 						//and that's a problem.
-						
+
 						City nearestCityToDefend = FindNearbyCityToDefend(unit, player);
 
 						DefenderAIData newUnitAIData = new DefenderAIData();
 						newUnitAIData.destination = nearestCityToDefend.location;
 						newUnitAIData.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
-						
+
 						PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
 						newUnitAIData.pathToDestination = algorithm.PathFrom(unit.location, newUnitAIData.destination);
-						
+
 						Console.WriteLine($"Unit {unit} tasked with defending {nearestCityToDefend.name}");
 						unit.currentAIData = newUnitAIData;
 					}
 				}
 			}
 		}
-		
+
 		/**
 		 * Finds a nearby city that could use extra defenders.  Currently, that is a city that is tied
 		 * for the fewest units present, and among those, it's the closest.
@@ -174,12 +174,12 @@ namespace C7Engine
 		/**
 		 * Medium-term solution to the problem of getting instances of the AI classes for polymorphic
 		 * methods.
-		 * 
+		 *
 		 * Only the data will be stored on save, so only the data is guaranteed to be on the unit.
 		 * There are several options - attach an instance whenever we need one, for example.
 		 * But the AI implementations should be singletons that behave differently based on the
 		 * data (and perhaps probability), so multiple instances doesn't really make sense.
-		 * 
+		 *
 		 * I fully expect this to evolve; at some point it might grab a Lua AI instead of a C# one
 		 * too, for example, and one AIData class might be able to call up multiple types of AIs.
 		 * It also likely will become mod-supporting someday, but we can't add everything on day one.

@@ -19,7 +19,7 @@ namespace C7Engine {
 				if (unit.owner == gameData.players[0]) {
 					if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
 						//Move randomly
-						List<Tile> validTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
+						List<Tile> validTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 						if (validTiles.Count == 0) {
 							//This can happen if a barbarian galley spawns next to a 1-tile lake, moves there, and doesn't have anywhere else to go.
 							Console.WriteLine("WARNING: No valid tiles for barbarian to move to");
