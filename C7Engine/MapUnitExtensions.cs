@@ -97,6 +97,11 @@ public static class MapUnitExtensions {
 		}
 	}
 
+	public static double ChanceToRetreat(this MapUnit unit, MapUnit opponent, bool isAttacking)
+	{
+		return 1.0;
+	}
+
 	public static CombatResult fight(this MapUnit attacker, MapUnit defender)
 	{
 		// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
@@ -117,33 +122,47 @@ public static class MapUnitExtensions {
 		foreach (StrengthBonus bonus in defenseBonuses)
 			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
 
+		CombatResult result = CombatResult.Impossible;
+
 		double attackerOdds = attackerStrength / (attackerStrength + defenderStrength);
 		if (Double.IsNaN(attackerOdds))
-			return CombatResult.Impossible;
+			return result;
 
 		// Do combat rounds
-		while ((attacker.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
+		while (true) {
 			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
 			attacker.animate(MapUnit.AnimatedAction.ATTACK1, true );
-			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds)
+			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
 				defender.hitPointsRemaining -= 1;
-			else
+				if (defender.hitPointsRemaining <= 0) {
+					result = CombatResult.DefenderKilled;
+					break;
+				}
+			} else {
+				if ((attacker.hitPointsRemaining == 1) &&
+				    EngineStorage.gameData.rng.NextDouble() < attacker.ChanceToRetreat(defender, true)) {
+					result = CombatResult.AttackerRetreated;
+					break;
+				}
 				attacker.hitPointsRemaining -= 1;
+				if (attacker.hitPointsRemaining <= 0) {
+					result = CombatResult.AttackerKilled;
+					break;
+				}
+			}
 		}
 
-		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : attacker,
-			winner = (defender == loser) ? attacker : defender;
+		if ((result == CombatResult.AttackerKilled) || (result == CombatResult.DefenderKilled)) {
+			var (dead, alive) = (result == CombatResult.AttackerKilled) ? (attacker, defender) : (defender, attacker);
+			alive.RollToPromote(alive == attacker, false);
+			dead.animate(MapUnit.AnimatedAction.DEATH, true);
+			dead.disband();
+		}
 
-		winner.RollToPromote(winner == attacker, false);
-
-		// Play death animation
-		loser.animate(MapUnit.AnimatedAction.DEATH, true);
-		loser.disband();
-
-		if (defender != loser)
+		if (result.DefenderWon())
 			defender.facingDirection = defenderOriginalDirection;
 
-		return (winner == attacker) ? CombatResult.DefenderKilled : CombatResult.AttackerKilled;
+		return result;
 	}
 
 	public static void bombard(this MapUnit unit, Tile tile)
