@@ -222,11 +222,11 @@ public static class MapUnitExtensions {
 		// Keep land units on land and sea units on water
 		if ((unit.unitType is SeaUnit) && tile.IsLand())
 			return false;
-		if ((! unit.unitType is SeaUnit) && tile.IsWater())
+		if ((! (unit.unitType is SeaUnit)) && ! tile.IsLand())
 			return false;
 
 		// Check for enemy units on tile
-		MapUnit defender = newLoc.FindTopDefender(unit);
+		MapUnit defender = tile.FindTopDefender(unit);
 		if ((defender != MapUnit.NONE) && ! unit.owner.IsAtPeaceWith(defender.owner))
 			return allowCombat;
 
