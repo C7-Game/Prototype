@@ -97,7 +97,7 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static bool fight(this MapUnit unit, MapUnit defender)
+	public static CombatResult fight(this MapUnit unit, MapUnit defender)
 	{
 		// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
 		var defenderOriginalDirection = defender.facingDirection;
@@ -119,7 +119,7 @@ public static class MapUnitExtensions {
 
 		double attackerOdds = attackerStrength / (attackerStrength + defenderStrength);
 		if (Double.IsNaN(attackerOdds))
-			return false;
+			return CombatResult.Impossible;
 
 		// Do combat rounds
 		while ((unit.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
@@ -143,7 +143,7 @@ public static class MapUnitExtensions {
 		if (defender != loser)
 			defender.facingDirection = defenderOriginalDirection;
 
-		return unit != loser;
+		return (unit != loser) ? CombatResult.DefenderKilled : CombatResult.AttackerKilled;
 	}
 
 	public static void bombard(this MapUnit unit, Tile tile)
@@ -245,8 +245,8 @@ public static class MapUnitExtensions {
 			MapUnit defender = newLoc.FindTopDefender(unit);
 			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
 				if (unit.unitType.attack > 0) {
-					bool unitWonCombat = unit.fight(defender);
-					if (!unitWonCombat)
+					CombatResult combatResult = unit.fight(defender);
+					if (! combatResult.AttackerWon())
 						return;
 
 					// If there are still more enemy units on the destination tile we can't actually move into it
