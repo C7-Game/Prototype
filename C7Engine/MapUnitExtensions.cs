@@ -217,11 +217,27 @@ public static class MapUnitExtensions {
 		}
 	}
 
+	public static bool CanEnterTile(this MapUnit unit, Tile tile, bool allowCombat)
+	{
+		// Keep land units on land and sea units on water
+		if ((unit.unitType is SeaUnit) && tile.IsLand())
+			return false;
+		if ((! unit.unitType is SeaUnit) && tile.IsWater())
+			return false;
+
+		// Check for enemy units on tile
+		MapUnit defender = newLoc.FindTopDefender(unit);
+		if ((defender != MapUnit.NONE) && ! unit.owner.IsAtPeaceWith(defender.owner))
+			return allowCombat;
+
+		return true;
+	}
+
 	public static void move(this MapUnit unit, TileDirection dir, bool wait = false)
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-		if ((newLoc != Tile.NONE) && newLoc.IsLand() && (unit.movementPointsRemaining > 0)) {
+		if ((newLoc != Tile.NONE) && unit.CanEnterTile(newLoc, true) && (unit.movementPointsRemaining > 0)) {
 			unit.facingDirection = dir;
 			unit.wake();
 
