@@ -97,9 +97,9 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static double ChanceToRetreat(this MapUnit unit, MapUnit opponent, bool isAttacking)
+	public static double RetreatChance(this MapUnit unit, MapUnit opponent, bool isAttacking)
 	{
-		return 1.0;
+		return ((unit.unitType.movement > 1) && (opponent.unitType.movement <= 1)) ? unit.experienceLevel.retreatChance : 0.0;
 	}
 
 	public static CombatResult fight(this MapUnit attacker, MapUnit defender)
@@ -138,7 +138,7 @@ public static class MapUnitExtensions {
 			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
 				if (defenderEligibleToRetreat &&
 				    defender.hitPointsRemaining == 1 &&
-				    EngineStorage.gameData.rng.NextDouble() < defender.ChanceToRetreat(attacker, false)) {
+				    EngineStorage.gameData.rng.NextDouble() < defender.RetreatChance(attacker, false)) {
 					Tile retreatDestination = defender.location.neighbors[attacker.facingDirection];
 					if ((retreatDestination != Tile.NONE) && defender.CanEnterTile(retreatDestination, false)) {
 						defender.move(attacker.facingDirection, true);
@@ -153,7 +153,7 @@ public static class MapUnitExtensions {
 				}
 			} else {
 				if (attacker.hitPointsRemaining == 1 &&
-				    EngineStorage.gameData.rng.NextDouble() < attacker.ChanceToRetreat(defender, true)) {
+				    EngineStorage.gameData.rng.NextDouble() < attacker.RetreatChance(defender, true)) {
 					result = CombatResult.AttackerRetreated;
 					break;
 				}
