@@ -97,20 +97,20 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static CombatResult fight(this MapUnit unit, MapUnit defender)
+	public static CombatResult fight(this MapUnit attacker, MapUnit defender)
 	{
 		// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
 		var defenderOriginalDirection = defender.facingDirection;
-		defender.facingDirection = unit.facingDirection.reversed();
+		defender.facingDirection = attacker.facingDirection.reversed();
 
-		IEnumerable<StrengthBonus> attackBonuses  = unit    .ListStrengthBonusesVersus(defender, true , false, unit.facingDirection),
-		                           defenseBonuses = defender.ListStrengthBonusesVersus(unit    , false, false, unit.facingDirection);
+		IEnumerable<StrengthBonus> attackBonuses  = attacker.ListStrengthBonusesVersus(defender, true , false, attacker.facingDirection),
+		                           defenseBonuses = defender.ListStrengthBonusesVersus(attacker, false, false, attacker.facingDirection);
 
-		double attackerStrength = unit    .unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
+		double attackerStrength = attacker.unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
 		       defenderStrength = defender.unitType.defense * StrengthBonus.ListToMultiplier(defenseBonuses);
 
-		Console.WriteLine($"Combat log: {unit.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
-		Console.WriteLine($"\tAttacker: {unit.unitType.name}, base strength {unit.unitType.attack}");
+		Console.WriteLine($"Combat log: {attacker.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
+		Console.WriteLine($"\tAttacker: {attacker.unitType.name}, base strength {attacker.unitType.attack}");
 		foreach (StrengthBonus bonus in attackBonuses)
 			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
 		Console.WriteLine($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.defense}");
@@ -122,19 +122,19 @@ public static class MapUnitExtensions {
 			return CombatResult.Impossible;
 
 		// Do combat rounds
-		while ((unit.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
+		while ((attacker.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
 			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
-			unit    .animate(MapUnit.AnimatedAction.ATTACK1, true );
+			attacker.animate(MapUnit.AnimatedAction.ATTACK1, true );
 			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds)
 				defender.hitPointsRemaining -= 1;
 			else
-				unit.hitPointsRemaining -= 1;
+				attacker.hitPointsRemaining -= 1;
 		}
 
-		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : unit,
-			winner = (defender == loser) ? unit : defender;
+		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : attacker,
+			winner = (defender == loser) ? attacker : defender;
 
-		winner.RollToPromote(winner == unit, false);
+		winner.RollToPromote(winner == attacker, false);
 
 		// Play death animation
 		loser.animate(MapUnit.AnimatedAction.DEATH, true);
@@ -143,7 +143,7 @@ public static class MapUnitExtensions {
 		if (defender != loser)
 			defender.facingDirection = defenderOriginalDirection;
 
-		return (unit != loser) ? CombatResult.DefenderKilled : CombatResult.AttackerKilled;
+		return (winner == attacker) ? CombatResult.DefenderKilled : CombatResult.AttackerKilled;
 	}
 
 	public static void bombard(this MapUnit unit, Tile tile)
