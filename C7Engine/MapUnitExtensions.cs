@@ -128,18 +128,31 @@ public static class MapUnitExtensions {
 		if (Double.IsNaN(attackerOdds))
 			return result;
 
+		// TODO: Check these rules are accurate and that we're not missing any.
+		bool defenderEligibleToRetreat = defender.hitPointsRemaining > 1 && ! defender.location.HasCity;
+
 		// Do combat rounds
 		while (true) {
 			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
 			attacker.animate(MapUnit.AnimatedAction.ATTACK1, true );
 			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
+				if (defenderEligibleToRetreat &&
+				    defender.hitPointsRemaining == 1 &&
+				    EngineStorage.gameData.rng.NextDouble() < defender.ChanceToRetreat(attacker, false)) {
+					Tile retreatDestination = defender.location.neighbors[attacker.facingDirection];
+					if ((retreatDestination != Tile.NONE) && defender.CanEnterTile(retreatDestination, false)) {
+						defender.move(attacker.facingDirection, true);
+						result = CombatResult.DefenderRetreated;
+						break;
+					}
+				}
 				defender.hitPointsRemaining -= 1;
 				if (defender.hitPointsRemaining <= 0) {
 					result = CombatResult.DefenderKilled;
 					break;
 				}
 			} else {
-				if ((attacker.hitPointsRemaining == 1) &&
+				if (attacker.hitPointsRemaining == 1 &&
 				    EngineStorage.gameData.rng.NextDouble() < attacker.ChanceToRetreat(defender, true)) {
 					result = CombatResult.AttackerRetreated;
 					break;

@@ -20,6 +20,8 @@ namespace C7GameData
 		[JsonIgnore]
 		public TerrainType overlayTerrainType = TerrainType.NONE;
 		public City cityAtTile;
+		[JsonIgnore]
+		public bool HasCity => cityAtTile != null && cityAtTile != City.NONE;
 		public CityResident personWorkingTile = null;	//allows us to see if another city is working this tile
 		public bool hasBarbarianCamp = false;
 
