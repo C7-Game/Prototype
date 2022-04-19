@@ -16,7 +16,7 @@ public class Player
 
 	public Civilization civilization;
 	private int cityNameIndex = 0;
-	
+
 	public List<MapUnit> units = new List<MapUnit>();
 	public List<City> cities = new List<City>();
 	public TileKnowledge tileKnowledge = new TileKnowledge();
@@ -66,6 +66,14 @@ public class Player
 	{
 		// TODO: Scenarios can also specify that certain players sit out the first turn. E.g. WW2 in the Pacific
 		return isBarbarians;
+	}
+
+	// Once we have technologies, not all resources will be known at the start.
+	// Eventually, perhaps there will be other gates around resource access as well
+	// For now, just always return true, but have this method so we have that structure
+	// in place.
+	public bool KnowsAboutResource(Resource resource) {
+		return true;
 	}
 }
 

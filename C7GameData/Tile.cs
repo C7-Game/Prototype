@@ -50,9 +50,21 @@ namespace C7GameData
 		public Tile()
 		{
 			unitsOnTile = new List<MapUnit>();
+			Resource = Resource.NONE;
 		}
 
-		public static Tile NONE = new Tile();
+		// TODO: this should be either an extension in C7Engine, or otherwise
+		// calculated somewhere else, but it's not obvious to someone unfamiliar
+		// with the save format that it's the overaly terrain that has actual
+		// movement cost
+		public int MovementCost() {
+			return overlayTerrainType.movementCost;
+		}
+
+		public static Tile NONE = new Tile() {
+			xCoordinate = -1,
+			yCoordinate = -1,
+		};
 
 		//This should be used when we want to check if land tiles are next to water tiles.
 		//Usually this is coast, but it could be Sea - see the "Deepwater Harbours" topics at CFC.
@@ -78,7 +90,7 @@ namespace C7GameData
 		}
 
 		public List<Tile> GetLandNeighbors() {
-			return neighbors.Values.Where(tile => !tile.baseTerrainType.isWater()).ToList();
+			return neighbors.Values.Where(tile => tile != NONE && !tile.baseTerrainType.isWater()).ToList();
 		}
 
 		/**
@@ -165,19 +177,36 @@ namespace C7GameData
 			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
 		}
 
-		public int foodYield()
+		public int foodYield(Player player)
 		{
-			return overlayTerrainType.baseFoodProduction;
+			int yield = overlayTerrainType.baseFoodProduction;
+			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+				yield += this.Resource.FoodBonus;
+			}
+			return yield;
 		}
 
-		public int productionYield()
+		public int productionYield(Player player)
 		{
-			return overlayTerrainType.baseShieldProduction;
+			int yield = overlayTerrainType.baseShieldProduction;
+			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+				yield += this.Resource.ShieldsBonus;
+			}
+			return yield;
 		}
 
-		public int commerceYield()
+		public int commerceYield(Player player)
 		{
-			return overlayTerrainType.baseCommerceProduction;
+			int yield = overlayTerrainType.baseCommerceProduction;
+			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+				yield += this.Resource.CommerceBonus;
+			}
+			return yield;
+		}
+
+		//Convenience method for printing the yield
+		public string YieldString(Player player) {
+			return $"{foodYield(player)}/{productionYield(player)}/{commerceYield(player)})";
 		}
 	}
 

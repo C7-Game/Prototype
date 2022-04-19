@@ -8,25 +8,25 @@ namespace C7Engine.AI
 		public static int DesiredFoodSurplusPerTurn = 2;
 		private static readonly int FOOD_PER_CITIZEN = 2;	//eventually will be configured by rules
 
-		
+
 		private static int foodPriorityRate = 40;
 		private static int productionPriorityRate = 50;
 		private static int commercePriorityRate = 30;
-		
+
 		public static void AssignNewCitizenToTile(City city, CityResident newResident)
 		{
 			int foodYield = city.CurrentFoodYield();
 
 			int desiredFoodRate = city.size * FOOD_PER_CITIZEN + DesiredFoodSurplusPerTurn;
 			int targetTileFoodAmount = desiredFoodRate - foodYield;
-			
+
 			Tile cityCenter = city.location;
 
 			double maxScore = 0;
 			Tile preferredTile = Tile.NONE;
 			foreach (Tile t in cityCenter.neighbors.Values) {
 				if (t.personWorkingTile == null) {
-					double score = CalculateTileYieldScore(t, targetTileFoodAmount);
+					double score = CalculateTileYieldScore(t, targetTileFoodAmount, city.owner);
 					Console.WriteLine($"Tile {t} scored {score}");
 					if (score > maxScore) {
 						maxScore = score;
@@ -34,19 +34,20 @@ namespace C7Engine.AI
 					}
 				}
 			}
-			
-			Console.WriteLine($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {preferredTile.foodYield()}/{preferredTile.productionYield()}/{preferredTile.commerceYield()}");
+
+			string yield = city.location.YieldString(city.owner);
+			Console.WriteLine($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {yield}");
 
 			newResident.tileWorked = preferredTile;
 			preferredTile.personWorkingTile = newResident;
-			
+
 			city.residents.Add(newResident);
 		}
 
-		public static double CalculateTileYieldScore(Tile t, int targetFoodAmount)
+		public static double CalculateTileYieldScore(Tile t, int targetFoodAmount, Player player)
 		{
-			int score = t.foodYield() * foodPriorityRate + t.productionYield() * productionPriorityRate + t.commerceYield() * commercePriorityRate;
-			int penalty = (targetFoodAmount - t.foodYield());
+			int score = t.foodYield(player) * foodPriorityRate + t.productionYield(player) * productionPriorityRate + t.commerceYield(player) * commercePriorityRate;
+			int penalty = (targetFoodAmount - t.foodYield(player));
 			if (penalty <= 0) {
 				return score;
 			}

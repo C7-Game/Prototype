@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
 using C7Engine.AI;
-using C7GameData.AIData;
 
 namespace C7Engine
 {
@@ -15,13 +12,13 @@ namespace C7Engine
 			Console.WriteLine("\n*** Beginning turn " + gameData.turn + " ***");
 
 			//Reset movement points available for all units
-			foreach (MapUnit mapUnit in gameData.mapUnits)
-			{
+			foreach (MapUnit mapUnit in gameData.mapUnits) {
 				mapUnit.movementPointsRemaining = mapUnit.unitType.movement;
 			}
 
-			foreach (Player player in gameData.players)
+			foreach (Player player in gameData.players) {
 				player.hasPlayedThisTurn = false;
+			}
 		}
 
 		// Implements the game loop. This method is called when the game is started and when the player signals that they're done moving.
@@ -47,8 +44,9 @@ namespace C7Engine
 						} else if (! player.isHuman) {
 							PlayerAI.PlayTurn(player, gameData.rng);
 							player.hasPlayedThisTurn = true;
-						} else
+						} else {
 							player.hasPlayedThisTurn = true;
+						}
 					}
 				}
 
