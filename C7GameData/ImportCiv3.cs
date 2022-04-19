@@ -31,6 +31,8 @@ namespace C7GameData
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			ImportCiv3DefensiveBonuses(theBiq, c7Save);
+			c7Save.Rules.healRateInField = 1;
+			c7Save.Rules.healRateInCity = 2;
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
 			SetMapDimensions(civ3Save, c7Save);
 			SetWorldWrap(civ3Save, c7Save);
@@ -93,6 +95,8 @@ namespace C7GameData
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			ImportCiv3DefensiveBonuses(theBiq, c7Save);
+			c7Save.Rules.healRateInField = 1;
+			c7Save.Rules.healRateInCity = 2;
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);

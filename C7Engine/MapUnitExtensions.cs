@@ -178,6 +178,29 @@ public static class MapUnitExtensions {
 		unit.facingDirection = unitOriginalOrientation;
 	}
 
+	public static int HealRateAt(this MapUnit unit, Tile location)
+	{
+		C7RulesFormat rules = EngineStorage.rules;
+		City city = location.cityAtTile;
+		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
+		return inFriendlyCity ? rules.healRateInCity : rules.healRateInField;
+		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (can they
+		// heal outside of port? I don't think so, but I might be getting confused with another civ game).
+	}
+
+	public static void OnBeginTurn(this MapUnit unit)
+	{
+		int maxMP = unit.unitType.movement;
+		if (unit.movementPointsRemaining >= maxMP) {
+			int maxHP = unit.maxHitPoints;
+			if (unit.hitPointsRemaining < maxHP)
+				unit.hitPointsRemaining += unit.HealRateAt(unit.location);
+			if (unit.hitPointsRemaining > maxHP)
+				unit.hitPointsRemaining = maxHP;
+		}
+		unit.movementPointsRemaining = maxMP;
+	}
+
 	public static void OnEnterTile(this MapUnit unit, Tile tile)
 	{
 		// Disperse barb camp

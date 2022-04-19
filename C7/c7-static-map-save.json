@@ -48,7 +48,10 @@
       "cityLevel3DefenseBonus": {
 	  "description": "Metropolis",
 	  "amount": 1.00
-      }
+      },
+
+      "healRateInField": 1,
+      "healRateInCity": 2
   },
   "gameData": {
     "turn": 0,
