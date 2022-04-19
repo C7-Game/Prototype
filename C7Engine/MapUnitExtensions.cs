@@ -278,12 +278,21 @@ public static class MapUnitExtensions {
 			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
 				if (unit.unitType.attack > 0) {
 					CombatResult combatResult = unit.fight(defender);
-					if (! combatResult.AttackerWon())
+					// If we were killed then of course there's nothing more to do. If the combat couldn't happen for whatever
+					// reason, just give up on trying to move.
+					if (combatResult == CombatResult.AttackerKilled || combatResult == CombatResult.Impossible)
 						return;
 
-					// If there are still more enemy units on the destination tile we can't actually move into it
-					defender = newLoc.FindTopDefender(unit);
-					if ((defender != MapUnit.NONE) && (! unit.owner.IsAtPeaceWith(defender.owner))) {
+					// If the enemy was defeated, check if there is another enemy on the tile. If so we can't complete the move
+					// but still pay one movement point for the combat.
+					else if (combatResult == CombatResult.DefenderKilled || combatResult == CombatResult.DefenderRetreated) {
+						if (!unit.CanEnterTile(newLoc, false)) {
+							unit.movementPointsRemaining -= 1;
+							return;
+						}
+
+					// Similarly if we retreated, pay one MP for the combat but don't move.
+					} else if (combatResult == CombatResult.AttackerRetreated) {
 						unit.movementPointsRemaining -= 1;
 						return;
 					}
