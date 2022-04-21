@@ -8,6 +8,7 @@ namespace C7GameData
 */
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.IO.Compression;
 	using System.Text.Json;
@@ -32,9 +33,10 @@ namespace C7GameData
 		public C7SaveFormat()
 		{
 			GameData = new GameData();
+			Rules = new C7RulesFormat();
 		}
 
-		public C7SaveFormat(GameData gameData, C7RulesFormat rules = null)
+		public C7SaveFormat(GameData gameData, C7RulesFormat rules)
 		{
 			GameData = gameData;
 			Rules = rules;
@@ -87,7 +89,7 @@ namespace C7GameData
 				}
 			}
 
-			// Inflate things that are stored by reference
+			// Inflate things that are stored by reference, first tiles
 			foreach (Tile tile in save.GameData.map.tiles)
 			{
 				if (tile.ResourceKey == "NONE")
@@ -101,6 +103,15 @@ namespace C7GameData
 				tile.baseTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.baseTerrainTypeKey);
 				tile.overlayTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.overlayTerrainTypeKey);
 			}
+
+			// Inflate experience levels
+			var levelsByKey = new Dictionary<string, ExperienceLevel>();
+			foreach (ExperienceLevel eL in save.Rules.experienceLevels)
+				levelsByKey.Add(eL.key, eL);
+			save.Rules.defaultExperienceLevel = levelsByKey[save.Rules.defaultExperienceLevelKey];
+			foreach (MapUnit unit in save.GameData.mapUnits)
+				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
+
 			return save;
 		}
 

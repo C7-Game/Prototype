@@ -69,6 +69,8 @@ namespace C7Engine
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];
 						newUnit.unitType = gameData.unitPrototypes["Warrior"];
+						newUnit.experienceLevelKey = EngineStorage.rules.defaultExperienceLevelKey;
+						newUnit.experienceLevel = EngineStorage.rules.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;
 						newUnit.isFortified = true; //todo: hack for unit selection
 
@@ -81,6 +83,8 @@ namespace C7Engine
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
 						newUnit.unitType = gameData.unitPrototypes["Galley"];
+						newUnit.experienceLevelKey = EngineStorage.rules.defaultExperienceLevelKey;
+						newUnit.experienceLevel = EngineStorage.rules.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;
 						newUnit.isFortified = true; //todo: hack for unit selection
 
@@ -100,6 +104,8 @@ namespace C7Engine
 							MapUnit newUnit = prototype.GetInstance();
 							newUnit.owner = city.owner;
 							newUnit.location = city.location;
+							newUnit.experienceLevelKey = EngineStorage.rules.defaultExperienceLevelKey;
+							newUnit.experienceLevel = EngineStorage.rules.defaultExperienceLevel;
 							newUnit.facingDirection = TileDirection.SOUTHWEST;
 
 							city.location.unitsOnTile.Add(newUnit);

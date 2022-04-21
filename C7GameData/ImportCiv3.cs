@@ -29,6 +29,7 @@ namespace C7GameData
 			BiqData theBiq = civ3Save.Bic;
 
 			ImportCiv3TerrainTypes(theBiq, c7Save);
+			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
 			SetMapDimensions(civ3Save, c7Save);
 			SetWorldWrap(civ3Save, c7Save);
@@ -89,6 +90,7 @@ namespace C7GameData
 			BiqData theBiq = new BiqData(biqBytes);
 			
 			ImportCiv3TerrainTypes(theBiq, c7Save);
+			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);
@@ -194,6 +196,31 @@ namespace C7GameData
 				TerrainType c7TerrainType = TerrainType.ImportFromCiv3(civ3Index, terrain);
 				c7Save.GameData.terrainTypes.Add(c7TerrainType);
 				civ3Index++;
+			}
+		}
+
+		private static void ImportCiv3ExperienceLevels(BiqData theBiq, C7SaveFormat c7Save)
+		{
+			if (theBiq.Expr.Length != 4)
+				throw new Exception("BIQ data must include four experience levels.");
+
+			Dictionary<string, ExperienceLevel> levelsByKey = new Dictionary<string, ExperienceLevel>();
+
+			foreach (EXPR expr in theBiq.Expr) {
+				// Generate a unique key for this level based on its name. If multiple levels have the same name, append apostrophes
+				// to the end until the key is unique.
+				string key = expr.Name;
+				while (levelsByKey.ContainsKey(key))
+					key += "'";
+
+				ExperienceLevel level = ExperienceLevel.ImportFromCiv3(key, expr);
+				c7Save.Rules.experienceLevels.Add(level);
+				levelsByKey.Add(key, level);
+
+				if (levelsByKey.Count == 2) {
+					c7Save.Rules.defaultExperienceLevelKey = key;
+					c7Save.Rules.defaultExperienceLevel = level;
+				}
 			}
 		}
 
