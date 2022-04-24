@@ -3,6 +3,7 @@ namespace C7Engine
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Pathing;
 using C7GameData;
 
@@ -59,6 +60,12 @@ public static class MapUnitExtensions {
 	public static double DefenseStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
 	{
 		return unit.unitType.defense * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, false, bombard, attackDirection));
+	}
+
+	// This method also determines whether or not a unit can perform defensive bombard. If it cannot, the method returns 0.
+	public static double DefensiveBombardStrengthVersus(this MapUnit unit, MapUnit attacker)
+	{
+		return (! unit.hasExhaustedDefensiveBombard) ? unit.unitType.bombard : 0;
 	}
 
 	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
@@ -127,6 +134,32 @@ public static class MapUnitExtensions {
 		double attackerOdds = attackerStrength / (attackerStrength + defenderStrength);
 		if (Double.IsNaN(attackerOdds))
 			return result;
+
+		// Defensive bombard
+		MapUnit defensiveBombarder = MapUnit.NONE;
+		double defensiveBombarderStrength = 0.0;
+		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender)) {
+			double strength = candidate.DefensiveBombardStrengthVersus(attacker);
+			if (strength > defensiveBombarderStrength) {
+				defensiveBombarder = candidate;
+				defensiveBombarderStrength = strength;
+			}
+		}
+		if (defensiveBombarder != MapUnit.NONE &&
+		    attacker.hitPointsRemaining > 1) { // TODO: Can defensive bombard kill? What does the original game do in this case?
+			var dBOriginalDirection = defensiveBombarder.facingDirection;
+			defensiveBombarder.facingDirection = defender.facingDirection;
+
+			defensiveBombarder.animate(MapUnit.AnimatedAction.ATTACK1, true);
+
+			// dADB = defense Against Defensive Bombard
+			double dADB = attacker.DefenseStrengthVersus(defensiveBombarder, true, defensiveBombarder.facingDirection);
+			if (EngineStorage.gameData.rng.NextDouble() < defensiveBombarderStrength / (defensiveBombarderStrength + dADB))
+				attacker.hitPointsRemaining -= 1;
+
+			defensiveBombarder.hasExhaustedDefensiveBombard = true;
+			defensiveBombarder.facingDirection = dBOriginalDirection;
+		}
 
 		// TODO: Check these rules are accurate and that we're not missing any.
 		bool defenderEligibleToRetreat = defender.hitPointsRemaining > 1 && ! defender.location.HasCity;
@@ -231,6 +264,7 @@ public static class MapUnitExtensions {
 				unit.hitPointsRemaining = maxHP;
 		}
 		unit.movementPointsRemaining = maxMP;
+		unit.hasExhaustedDefensiveBombard = false;
 	}
 
 	public static void OnEnterTile(this MapUnit unit, Tile tile)

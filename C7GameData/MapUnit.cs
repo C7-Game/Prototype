@@ -31,6 +31,7 @@ public class MapUnit
 	}
 	public bool isFortified {get; set;}
 	//sentry, etc. will come later.  For now, let's just have a couple things so we can cycle through units that aren't fortified.
+	public bool hasExhaustedDefensiveBombard;
 
 	public TileDirection facingDirection;
 
