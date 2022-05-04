@@ -6,25 +6,29 @@
 	      "key": "conscript",
 	      "displayName": "Conscript",
 	      "baseHitPoints": 2,
-	      "retreatChance": 0.34
+	      "retreatChance": 0.34,
+	      "promotionChance": 0.50
 	  },
 	  {
 	      "key": "regular",
 	      "displayName": "Regular",
 	      "baseHitPoints": 3,
-	      "retreatChance": 0.50
+	      "retreatChance": 0.50,
+	      "promotionChance": 0.25
 	  },
 	  {
 	      "key": "veteran",
 	      "displayName": "Veteran",
 	      "baseHitPoints": 4,
-	      "retreatChance": 0.58
+	      "retreatChance": 0.58,
+	      "promotionChance": 0.125
 	  },
 	  {
 	      "key": "elite",
 	      "displayName": "Elite",
 	      "baseHitPoints": 5,
-	      "retreatChance": 0.66
+	      "retreatChance": 0.66,
+	      "promotionChance": 0.0
 	  }
       ],
       "defaultExperienceLevelKey": "regular",
