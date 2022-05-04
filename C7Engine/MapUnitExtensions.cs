@@ -32,17 +32,17 @@ public static class MapUnitExtensions {
 		unit.isFortified = false;
 	}
 
-	public static IEnumerable<StrengthBonus> ListStrengthBonusesVersus(this MapUnit unit, MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
+	public static IEnumerable<StrengthBonus> ListStrengthBonusesVersus(this MapUnit unit, MapUnit opponent, CombatRole role, TileDirection? attackDirection)
 	{
 		C7RulesFormat rules = EngineStorage.rules;
 
-		if (! attacking) { // Defending against attack from opponent
+		if (role.Defending()) {
 			if (unit.isFortified)
 				yield return rules.fortificationBonus;
 
 			yield return unit.location.overlayTerrainType.defenseBonus;
 
-			if ((! bombard) && (attackDirection is TileDirection dir) && unit.location.HasRiverCrossing(dir.reversed()))
+			if ((! role.Bombarding()) && (attackDirection is TileDirection dir) && unit.location.HasRiverCrossing(dir.reversed()))
 				yield return rules.riverCrossingBonus;
 
 			// TODO: Bonus should vary depending on city level. First we must load the thresholds for level 2/3 into the scenario data.
@@ -51,15 +51,22 @@ public static class MapUnitExtensions {
 		}
 	}
 
+	public static double StrengthVersus(this MapUnit unit, MapUnit opponent, CombatRole role, TileDirection? attackDirection)
+	{
+		return unit.unitType.BaseStrength(role) * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
+	}
+
 	public static double AttackStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
 	{
-		double multiplier = StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, true, bombard, attackDirection));
+		CombatRole role = bombard ? CombatRole.Bombard : CombatRole.Attack;
+		double multiplier = StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
 		return multiplier * (bombard ? unit.unitType.bombard : unit.unitType.attack);
 	}
 
 	public static double DefenseStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
 	{
-		return unit.unitType.defense * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, false, bombard, attackDirection));
+		CombatRole role = bombard ? CombatRole.BombardDefense : CombatRole.Defense;
+		return unit.unitType.defense * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
 	}
 
 	// This method also determines whether or not a unit can perform defensive bombard. If it cannot, the method returns 0.
@@ -120,8 +127,8 @@ public static class MapUnitExtensions {
 		var defenderOriginalDirection = defender.facingDirection;
 		defender.facingDirection = attacker.facingDirection.reversed();
 
-		IEnumerable<StrengthBonus> attackBonuses  = attacker.ListStrengthBonusesVersus(defender, true , false, attacker.facingDirection),
-		                           defenseBonuses = defender.ListStrengthBonusesVersus(attacker, false, false, attacker.facingDirection);
+		IEnumerable<StrengthBonus> attackBonuses  = attacker.ListStrengthBonusesVersus(defender, CombatRole.Attack , attacker.facingDirection),
+		                           defenseBonuses = defender.ListStrengthBonusesVersus(attacker, CombatRole.Defense, attacker.facingDirection);
 
 		double attackerStrength = attacker.unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
 		       defenderStrength = defender.unitType.defense * StrengthBonus.ListToMultiplier(defenseBonuses);

@@ -12,6 +12,21 @@ namespace C7GameData
 	}
 
 	public static class CombatRoleExtensions {
+		public static bool Attacking(this CombatRole cR)
+		{
+			return cR == CombatRole.Attack || cR == CombatRole.Bombard || cR == CombatRole.DefensiveBombard;
+		}
+
+		public static bool Defending(this CombatRole cR)
+		{
+			return !cR.Attacking();
+		}
+
+		public static bool Bombarding(this CombatRole cR)
+		{
+			return cR == CombatRole.Bombard || cR == CombatRole.DefensiveBombard;
+		}
+
 		public static CombatRole Reversed(this CombatRole cR)
 		{
 			switch (cR) {
