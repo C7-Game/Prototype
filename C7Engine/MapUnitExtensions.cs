@@ -56,25 +56,6 @@ public static class MapUnitExtensions {
 		return unit.unitType.BaseStrength(role) * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
 	}
 
-	public static double AttackStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
-	{
-		CombatRole role = bombard ? CombatRole.Bombard : CombatRole.Attack;
-		double multiplier = StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
-		return multiplier * (bombard ? unit.unitType.bombard : unit.unitType.attack);
-	}
-
-	public static double DefenseStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
-	{
-		CombatRole role = bombard ? CombatRole.BombardDefense : CombatRole.Defense;
-		return unit.unitType.defense * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
-	}
-
-	// This method also determines whether or not a unit can perform defensive bombard. If it cannot, the method returns 0.
-	public static double DefensiveBombardStrengthVersus(this MapUnit unit, MapUnit attacker)
-	{
-		return (! unit.hasExhaustedDefensiveBombard) ? unit.unitType.bombard : 0;
-	}
-
 	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
 	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
 	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
@@ -89,8 +70,8 @@ public static class MapUnitExtensions {
 		else if (otherDefenderIsEnemy && ! weAreEnemy)
 			return false;
 		else {
-			double ourTotalStrength   = unit         .DefenseStrengthVersus(opponent, false, null) * unit         .hitPointsRemaining,
-			       theirTotalStrength = otherDefender.DefenseStrengthVersus(opponent, false, null) * otherDefender.hitPointsRemaining;
+			double ourTotalStrength   = unit         .StrengthVersus(opponent, CombatRole.Defense, null) * unit         .hitPointsRemaining,
+			       theirTotalStrength = otherDefender.StrengthVersus(opponent, CombatRole.Defense, null) * otherDefender.hitPointsRemaining;
 			return ourTotalStrength > theirTotalStrength;
 		}
 	}
@@ -134,10 +115,10 @@ public static class MapUnitExtensions {
 		       defenderStrength = defender.unitType.defense * StrengthBonus.ListToMultiplier(defenseBonuses);
 
 		Console.WriteLine($"Combat log: {attacker.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
-		Console.WriteLine($"\tAttacker: {attacker.unitType.name}, base strength {attacker.unitType.attack}");
+		Console.WriteLine($"\tAttacker: {attacker.unitType.name}, base strength {attacker.unitType.BaseStrength(CombatRole.Attack)}");
 		foreach (StrengthBonus bonus in attackBonuses)
 			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
-		Console.WriteLine($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.defense}");
+		Console.WriteLine($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.BaseStrength(CombatRole.Defense)}");
 		foreach (StrengthBonus bonus in defenseBonuses)
 			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
 
@@ -150,8 +131,8 @@ public static class MapUnitExtensions {
 		// Defensive bombard
 		MapUnit defensiveBombarder = MapUnit.NONE;
 		double defensiveBombarderStrength = 0.0;
-		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender)) {
-			double strength = candidate.DefensiveBombardStrengthVersus(attacker);
+		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender && ! u.hasExhaustedDefensiveBombard)) {
+			double strength = candidate.StrengthVersus(attacker, CombatRole.DefensiveBombard, attacker.facingDirection.reversed());
 			if (strength > defensiveBombarderStrength) {
 				defensiveBombarder = candidate;
 				defensiveBombarderStrength = strength;
@@ -165,7 +146,7 @@ public static class MapUnitExtensions {
 			defensiveBombarder.animate(MapUnit.AnimatedAction.ATTACK1, true);
 
 			// dADB = defense Against Defensive Bombard
-			double dADB = attacker.DefenseStrengthVersus(defensiveBombarder, true, defensiveBombarder.facingDirection);
+			double dADB = attacker.StrengthVersus(defensiveBombarder, CombatRole.DefensiveBombardDefense, defensiveBombarder.facingDirection);
 			if (EngineStorage.gameData.rng.NextDouble() < defensiveBombarderStrength / (defensiveBombarderStrength + dADB))
 				attacker.hitPointsRemaining -= 1;
 
@@ -232,8 +213,8 @@ public static class MapUnitExtensions {
 		var unitOriginalOrientation = unit.facingDirection;
 		unit.facingDirection = unit.location.directionTo(tile);
 
-		double bombardStrength  = unit  .AttackStrengthVersus (target, true, unit.facingDirection);
-		double defenderStrength = target.DefenseStrengthVersus(unit  , true, unit.facingDirection);
+		double bombardStrength  = unit  .StrengthVersus(target, CombatRole.Bombard       , unit.facingDirection);
+		double defenderStrength = target.StrengthVersus(unit  , CombatRole.BombardDefense, unit.facingDirection);
 		double attackerOdds = bombardStrength / (bombardStrength + defenderStrength);
 		if (Double.IsNaN(attackerOdds))
 			return;
