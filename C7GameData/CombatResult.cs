@@ -19,5 +19,4 @@ namespace C7GameData
 			return (cR == CombatResult.AttackerKilled) || (cR == CombatResult.AttackerRetreated);
 		}
 	}
-
 }
