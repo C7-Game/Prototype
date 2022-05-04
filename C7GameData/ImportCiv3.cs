@@ -219,7 +219,7 @@ namespace C7GameData
 				while (levelsByKey.ContainsKey(key))
 					key += "'";
 
-				ExperienceLevel level = ExperienceLevel.ImportFromCiv3(key, expr);
+				ExperienceLevel level = ExperienceLevel.ImportFromCiv3(key, expr, levelsByKey.Count);
 				c7Save.Rules.experienceLevels.Add(level);
 				levelsByKey.Add(key, level);
 

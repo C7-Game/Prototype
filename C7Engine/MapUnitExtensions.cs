@@ -89,11 +89,16 @@ public static class MapUnitExtensions {
 	}
 
 
-	public static void RollToPromote(this MapUnit unit, bool wasAttacking, bool waitForAnimation)
+	public static void RollToPromote(this MapUnit unit, MapUnit opponent, bool waitForAnimation)
 	{
 		C7RulesFormat rules = EngineStorage.rules;
-		double promotionOdds = wasAttacking ? rules.promotionChanceAfterAttacking : rules.promotionChanceAfterDefending;
-		if (EngineStorage.gameData.rng.NextDouble() < promotionOdds) {
+
+		double promotionChance = unit.experienceLevel.promotionChance;
+		if (opponent.owner.isBarbarians)
+			promotionChance /= 2.0;
+		// TODO: Double promotionChance if unit is owned by a militaristic civ
+
+		if (EngineStorage.gameData.rng.NextDouble() < promotionChance) {
 			ExperienceLevel nextLevel = rules.GetExperienceLevelAfter(unit.experienceLevel);
 			if (nextLevel != null) {
 				unit.experienceLevelKey = nextLevel.key;
@@ -200,7 +205,7 @@ public static class MapUnitExtensions {
 
 		if ((result == CombatResult.AttackerKilled) || (result == CombatResult.DefenderKilled)) {
 			var (dead, alive) = (result == CombatResult.AttackerKilled) ? (attacker, defender) : (defender, attacker);
-			alive.RollToPromote(alive == attacker, false);
+			alive.RollToPromote(dead, false);
 			dead.animate(MapUnit.AnimatedAction.DEATH, true);
 			dead.disband();
 		}
@@ -235,7 +240,7 @@ public static class MapUnitExtensions {
 			new MsgStartEffectAnimation(tile, AnimatedEffect.Miss, null, AnimationEnding.Stop).send();
 
 		if (target.hitPointsRemaining <= 0) {
-			unit.RollToPromote(true, false);
+			unit.RollToPromote(target, false);
 			target.animate(MapUnit.AnimatedAction.DEATH, true);
 			target.disband();
 		}
