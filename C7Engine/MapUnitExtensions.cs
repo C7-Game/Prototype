@@ -134,7 +134,7 @@ public static class MapUnitExtensions {
 		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : unit,
 			winner = (defender == loser) ? unit : defender;
 
-		winner.RollToPromote(winner == unit, false);
+		winner.RollToPromote(winner != defender, false);
 
 		// Play death animation
 		loser.animate(MapUnit.AnimatedAction.DEATH, true);
