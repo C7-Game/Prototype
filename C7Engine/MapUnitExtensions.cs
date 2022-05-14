@@ -241,7 +241,7 @@ public static class MapUnitExtensions {
 		C7RulesFormat rules = EngineStorage.rules;
 		City city = location.cityAtTile;
 		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
-		return inFriendlyCity ? rules.healRateInCity : rules.healRateInField;
+		return inFriendlyCity ? rules.healRateInCity : rules.healRateInNeutralField;
 		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (can they
 		// heal outside of port? I don't think so, but I might be getting confused with another civ game).
 	}

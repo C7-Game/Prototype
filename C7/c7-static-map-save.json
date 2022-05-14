@@ -54,7 +54,9 @@
 	  "amount": 1.00
       },
 
-      "healRateInField": 1,
+      "healRateInFriendlyField": 1,
+      "healRateInNeutralField": 1,
+      "healRateInHostileField": 0,
       "healRateInCity": 2
   },
   "gameData": {
