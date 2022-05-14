@@ -131,7 +131,7 @@ public static class MapUnitExtensions {
 		// Defensive bombard
 		MapUnit defensiveBombarder = MapUnit.NONE;
 		double defensiveBombarderStrength = 0.0;
-		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender && ! u.hasExhaustedDefensiveBombard)) {
+		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender && u.defensiveBombardsRemaining > 0)) {
 			double strength = candidate.StrengthVersus(attacker, CombatRole.DefensiveBombard, attacker.facingDirection.reversed());
 			if (strength > defensiveBombarderStrength) {
 				defensiveBombarder = candidate;
@@ -150,7 +150,7 @@ public static class MapUnitExtensions {
 			if (EngineStorage.gameData.rng.NextDouble() < defensiveBombarderStrength / (defensiveBombarderStrength + dADB))
 				attacker.hitPointsRemaining -= 1;
 
-			defensiveBombarder.hasExhaustedDefensiveBombard = true;
+			defensiveBombarder.defensiveBombardsRemaining -= 1;
 			defensiveBombarder.facingDirection = dBOriginalDirection;
 		}
 
@@ -257,7 +257,7 @@ public static class MapUnitExtensions {
 				unit.hitPointsRemaining = maxHP;
 		}
 		unit.movementPointsRemaining = maxMP;
-		unit.hasExhaustedDefensiveBombard = false;
+		unit.defensiveBombardsRemaining = 1;
 	}
 
 	public static void OnEnterTile(this MapUnit unit, Tile tile)
