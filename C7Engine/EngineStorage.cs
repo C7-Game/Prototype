@@ -20,6 +20,7 @@ namespace C7Engine
 		internal static GameData gameData {get; set;}
 		internal static C7RulesFormat rules {get; set;}
 		public static string uiControllerID;
+		internal static bool animationsEnabled = true;
 
 		private static Thread engineThread = null;
 		internal static AutoResetEvent uiEvent = new AutoResetEvent(false); // Used to block engineThread while waiting for the UI, f.e. while

@@ -8,6 +8,7 @@ using C7Engine;
 
 public class AnimationTracker {
 	private Civ3AnimData civ3AnimData;
+	public bool endAllImmediately = false; // If true, update() ends all running animations regardless of time remaining.
 
 	public AnimationTracker(Civ3AnimData civ3AnimData)
 	{
@@ -109,7 +110,7 @@ public class AnimationTracker {
 
 	public void update()
 	{
-		long currentTimeMS = getCurrentTimeMS();
+		long currentTimeMS = (! endAllImmediately) ? getCurrentTimeMS() : long.MaxValue;
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (id, aa) = (guidAAPair.Key, guidAAPair.Value);

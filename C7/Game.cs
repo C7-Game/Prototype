@@ -213,6 +213,12 @@ public class Game : Node2D
 		}
 	}
 
+	public void SetAnimationsEnabled(bool enabled)
+	{
+		new MsgSetAnimationsEnabled(enabled).send();
+		animTracker.endAllImmediately = ! enabled;
+	}
+
 	/**
 	 * Currently (11/14/2021), all unit selection goes through here.
 	 * Both code paths are in Game.cs for now, so it's local, but we may
@@ -417,9 +423,9 @@ public class Game : Node2D
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
-		else if (@event is InputEventKey eventKey && eventKey.Pressed)
+		else if (@event is InputEventKey eventKeyDown && eventKeyDown.Pressed)
 		{
-			if (eventKey.Scancode == (int)Godot.KeyList.Enter)
+			if (eventKeyDown.Scancode == (int)Godot.KeyList.Enter)
 			{
 				GD.Print("Enter pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
@@ -431,7 +437,7 @@ public class Game : Node2D
 					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
 				}
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.Space)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Space)
 			{
 				GD.Print("Space pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
@@ -439,12 +445,12 @@ public class Game : Node2D
 					this.OnPlayerEndTurn();
 				}
 			}
-			else if ((eventKey.Scancode >= (int)Godot.KeyList.Kp1) && (eventKey.Scancode <= (int)Godot.KeyList.Kp9))
+			else if ((eventKeyDown.Scancode >= (int)Godot.KeyList.Kp1) && (eventKeyDown.Scancode <= (int)Godot.KeyList.Kp9))
 			{ // Move units with the numpad keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
-					switch (eventKey.Scancode - (int)Godot.KeyList.Kp0) {
+					switch (eventKeyDown.Scancode - (int)Godot.KeyList.Kp0) {
 					case 1: dir = TileDirection.SOUTHWEST; break;
 					case 2: dir = TileDirection.SOUTH;     break;
 					case 3: dir = TileDirection.SOUTHEAST; break;
@@ -460,12 +466,12 @@ public class Game : Node2D
 					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
-			else if ((eventKey.Scancode >= (int)Godot.KeyList.Home) && (eventKey.Scancode <= (int)Godot.KeyList.Pagedown))
+			else if ((eventKeyDown.Scancode >= (int)Godot.KeyList.Home) && (eventKeyDown.Scancode <= (int)Godot.KeyList.Pagedown))
 			{ // Move units with the arrow and fn keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
-					switch (eventKey.Scancode) {
+					switch (eventKeyDown.Scancode) {
 					case (int)Godot.KeyList.Home:     dir = TileDirection.NORTHWEST; break; // fn-left arrow
 					case (int)Godot.KeyList.End:      dir = TileDirection.SOUTHWEST; break; // fn-right arrow
 					case (int)Godot.KeyList.Left:     dir = TileDirection.WEST;      break;
@@ -480,11 +486,11 @@ public class Game : Node2D
 					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.G && eventKeyDown.Control)
 			{
 				mapView.gridLayer.visible = !mapView.gridLayer.visible;
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Escape)
 			{
 				if (!inUnitGoToMode) {
 					GD.Print("Got request for escape/quit");
@@ -492,7 +498,7 @@ public class Game : Node2D
 					popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 				}
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.Z)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Z)
 			{
 				if (mapView.cameraZoom != 1) {
 					mapView.setCameraZoomFromMiddle(1.0f);
@@ -505,11 +511,21 @@ public class Game : Node2D
 					slider.Value = 0.5f;
 				}
 			}
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Shift && ! eventKeyDown.Echo)
+			{
+				SetAnimationsEnabled(false);
+			}
 
 			// always turn off go to mode unless G key is pressed
 			// do this after processing esc key
-			setGoToMode(eventKey.Scancode == (int)Godot.KeyList.G);
-
+			setGoToMode(eventKeyDown.Scancode == (int)Godot.KeyList.G);
+		}
+		else if (@event is InputEventKey eventKeyUp && ! eventKeyUp.Pressed)
+		{
+			if (eventKeyUp.Scancode == (int)Godot.KeyList.Shift)
+			{
+				SetAnimationsEnabled(true);
+			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
 		{
