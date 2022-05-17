@@ -42,9 +42,13 @@ namespace C7GameData
 		public bool isSnowCapped;
 		public bool isPineForest;
 
+		public bool riverNorth;
 		public bool riverNortheast;
+		public bool riverEast;
 		public bool riverSoutheast;
+		public bool riverSouth;
 		public bool riverSouthwest;
+		public bool riverWest;
 		public bool riverNorthwest;
 
 		public Tile()
@@ -201,7 +205,14 @@ namespace C7GameData
 			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
 				yield += this.Resource.CommerceBonus;
 			}
+			if (BordersRiver()) {
+				yield += 1;
+			}
 			return yield;
+		}
+
+		private bool BordersRiver() {
+			return riverNorth || riverNortheast || riverEast || riverSoutheast || riverSouth || riverSouthwest || riverWest || riverNorthwest;
 		}
 
 		//Convenience method for printing the yield

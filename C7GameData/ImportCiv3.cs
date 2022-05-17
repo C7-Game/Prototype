@@ -66,9 +66,13 @@ namespace C7GameData
 				if (civ3Tile.PineForest) {
 					c7Tile.isPineForest = true;
 				}
+				c7Tile.riverNorth = civ3Tile.RiverNorth;
 				c7Tile.riverNortheast = civ3Tile.RiverNortheast;
+				c7Tile.riverEast = civ3Tile.RiverEast;
 				c7Tile.riverSoutheast = civ3Tile.RiverSoutheast;
+				c7Tile.riverSouth = civ3Tile.RiverSouth;
 				c7Tile.riverSouthwest = civ3Tile.RiverSouthwest;
+				c7Tile.riverWest = civ3Tile.RiverWest;
 				c7Tile.riverNorthwest = civ3Tile.RiverNorthwest;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.ResourceID];
 				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.ResourceID].Key;
@@ -129,9 +133,13 @@ namespace C7GameData
 				if (civ3Tile.PineForest) {
 					c7Tile.isPineForest = true;
 				}
+				c7Tile.riverNorth = civ3Tile.RiverNorth;
 				c7Tile.riverNortheast = civ3Tile.RiverConnectionNortheast;
+				c7Tile.riverEast = civ3Tile.RiverEast;
 				c7Tile.riverSoutheast = civ3Tile.RiverConnectionSoutheast;
+				c7Tile.riverSouth = civ3Tile.RiverSouth;
 				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
+				c7Tile.riverWest = civ3Tile.RiverWest;
 				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.Resource];
 				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.Resource].Key;
