@@ -46,7 +46,7 @@ namespace C7Engine
 		}
 
 		private static bool ExploreNeighboringTile(Player player, MapUnit unit) {
-			List<Tile> validNeighboringTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
+			List<Tile> validNeighboringTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 			if (validNeighboringTiles.Count == 0) {
 				Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
 				return false;

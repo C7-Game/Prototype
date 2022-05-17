@@ -83,6 +83,8 @@ window_title = "Open a File or Directory"
 resizable = true
 mode = 3
 access = 2
+current_dir = "/Development/Civ Related Projects/Prototype/C7"
+current_path = "/Development/Civ Related Projects/Prototype/C7/"
 
 [connection signal="pressed" from="CanvasLayer/SetCiv3Home" to="." method="_on_SetCiv3Home_pressed"]
 [connection signal="dir_selected" from="CanvasLayer/SetCiv3HomeDialog" to="." method="_on_SetCiv3HomeDialog_dir_selected"]

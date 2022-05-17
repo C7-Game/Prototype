@@ -28,6 +28,7 @@ namespace C7GameData
 			SavData civ3Save = new SavData(Util.ReadFile(savePath), defaultBicBytes);
 			BiqData theBiq = civ3Save.Bic;
 
+			ImportUnitPrototypes(theBiq, c7Save);
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			ImportCiv3DefensiveBonuses(theBiq, c7Save);
@@ -86,10 +87,11 @@ namespace C7GameData
 		public static C7SaveFormat ImportBiq(string biqPath, string defaultBiqPath)
 		{
 			C7SaveFormat c7Save = new C7SaveFormat();
-			
+
 			byte[] biqBytes = Util.ReadFile(biqPath);
 			BiqData theBiq = new BiqData(biqBytes);
-			
+
+			ImportUnitPrototypes(theBiq, c7Save);
 			ImportCiv3TerrainTypes(theBiq, c7Save);
 			ImportCiv3ExperienceLevels(theBiq, c7Save);
 			ImportCiv3DefensiveBonuses(theBiq, c7Save);
@@ -140,7 +142,7 @@ namespace C7GameData
 			// c7Save.GameData.map.RelativeModPath = civ3Save.MediaBic.Game[0].ScenarioSearchFolders;
 			return c7Save;
 		}
-		
+
 		static (int, int) GetMapCoordinates(int tileIndex, int mapWidth)
 		{
 			int y = tileIndex / (mapWidth / 2);
@@ -189,6 +191,56 @@ namespace C7GameData
 				g++;
 			}
 			return resourcesByIndex;
+		}
+
+		private static void ImportUnitPrototypes(BiqData theBiq, C7SaveFormat c7SaveFormat) {
+			//Temporary limiter so you can't build everything out of the gate
+			//Once we have technology, we will remove this
+			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
+			foreach (PRTO prto in theBiq.Prto) {
+				if (allowedUnits.Contains(prto.Name)) {
+					UnitPrototype prototype = new UnitPrototype();
+					if (prto.Type == PRTO.TYPE_SEA) {
+						prototype.categories.Add("Sea");
+					}
+					else if (prto.Type == PRTO.TYPE_LAND) {
+						prototype.categories.Add("Land");
+					}
+					else if (prto.Type == PRTO.TYPE_AIR) {
+						prototype.categories.Add("Air");
+					}
+					prototype.name = prto.Name;
+					prototype.attack = prto.Attack;
+					prototype.defense = prto.Defense;
+					prototype.movement = prto.Movement;
+					prototype.shieldCost = prto.ShieldCost;
+					prototype.populationCost = prto.PopulationCost;
+					prototype.bombard = prto.BombardStrength;
+					prototype.iconIndex = prto.IconIndex;
+					if (prto.BuildCity) {
+						prototype.actions.Add("buildCity");
+					}
+					if (prto.Bombard) {
+						prototype.actions.Add("bombard");
+					}
+					if (prto.SkipTurn) {
+						prototype.actions.Add("hold");
+					}
+					if (prto.Wait) {
+						prototype.actions.Add("wait");
+					}
+					if (prto.Fortify) {
+						prototype.actions.Add("fortify");
+					}
+					if (prto.Disband) {
+						prototype.actions.Add("disband");
+					}
+					if (prto.GoTo) {
+						prototype.actions.Add("goTo");
+					}
+					c7SaveFormat.GameData.unitPrototypes.Add(prototype.name, prototype);
+				}
+			}
 		}
 
 		private static void ImportCiv3TerrainTypes(BiqData theBiq, C7SaveFormat c7Save)
