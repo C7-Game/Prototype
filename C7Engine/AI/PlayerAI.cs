@@ -100,12 +100,26 @@ namespace C7Engine
 					//Isn't a Settler.  If there's a city at the location, it's defended.  No boats involved.  What's our priority?
 					//If there is land to explore, we'll try to explore it.
 					//Long-term TODO: Should only send tiles on this landmass.
-					KeyValuePair<Tile, int> tileToExplore = ExplorerAI.FindTopScoringTileForExploration(player, player.tileKnowledge.AllKnownTiles().Where(t => t.IsLand()));
+					KeyValuePair<Tile, float> tileToExplore = ExplorerAI.FindTopScoringTileForExploration(player, player.tileKnowledge.AllKnownTiles().Where(t => t.IsLand()), ExplorerAIData.ExplorationType.RANDOM);
 					if (tileToExplore.Value > 0) {
 						ExplorerAIData ai = new ExplorerAIData();
-						ai.type = ExplorerAIData.ExplorationType.RANDOM;
+						//What type of exploration should we do?
+						int nearbyExplorers = 0;
+						foreach (MapUnit mapUnit in player.units)
+						{
+							if (mapUnit.currentAIData is ExplorerAIData explorerAI) {
+								if (explorerAI.type == ExplorerAIData.ExplorationType.NEAR_CITIES) {
+									nearbyExplorers++;
+								}
+							}
+						}
+						if (nearbyExplorers < (player.cities.Count + 1)) {
+							ai.type = ExplorerAIData.ExplorationType.NEAR_CITIES;
+						} else {
+							ai.type = ExplorerAIData.ExplorationType.RANDOM;
+						}
 						unit.currentAIData = ai;
-						Console.WriteLine("Set random exploration AI for " + unit);
+						Console.WriteLine($"Set {ai.type} exploration AI for {unit}");
 					}
 					else {
 						//Nowhere to explore.  What to do now?
