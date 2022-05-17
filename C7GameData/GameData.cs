@@ -38,13 +38,7 @@ namespace C7GameData
 		public void PerformPostLoadActions()
 		{
 			//Let each tile know who its neighbors are.  It needs to know this so its graphics can be selected appropriately.
-			foreach (Tile tile in map.tiles) {
-				Dictionary<TileDirection, Tile> neighbors = new Dictionary<TileDirection, Tile>();
-				foreach (TileDirection direction in Enum.GetValues(typeof(TileDirection))) {
-					neighbors[direction] = map.tileNeighbor(tile, direction);
-				}
-				tile.neighbors = neighbors;
-			}
+			map.computeNeighbors();
 		}
 
 		/**
@@ -58,11 +52,9 @@ namespace C7GameData
 		 *
 		 * Returns the human player so the caller (which is the UI) can store it.
 		 **/
-		public Player CreateDummyGameData()
+		public Player CreateDummyGameData(C7RulesFormat rules)
 		{
 			this.turn = 0;
-
-			CreateDefaultUnitPrototypes();
 
 			uint white = 0xFFFFFFFF;
 			Player barbarianPlayer = new Player(white);
@@ -185,7 +177,7 @@ namespace C7GameData
 				if (player.isBarbarians) {
 					continue;
 				}
-				CreateStartingDummyUnits(player, startingLocations[i]);
+				CreateStartingDummyUnits(rules, player, startingLocations[i]);
 				i++;
 			}
 
@@ -195,7 +187,7 @@ namespace C7GameData
 			List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
 			foreach (Tile barbCampLocation in barbarianCamps) {
 				if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-					MapUnit barbWarrior = CreateDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);
+					MapUnit barbWarrior = CreateDummyUnit(rules, unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);
 					barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
 					// whole procedure of generating a map should be part of the engine not the data module.
 					barbWarrior.facingDirection = TileDirection.SOUTHEAST;
@@ -210,16 +202,16 @@ namespace C7GameData
 			return carthagePlayer;
 		}
 
-		private void CreateStartingDummyUnits(Player player, Tile location)
+		private void CreateStartingDummyUnits(C7RulesFormat rules, Player player, Tile location)
 		{
-			CreateDummyUnit(unitPrototypes["Settler"],  player, location);
-			CreateDummyUnit(unitPrototypes["Warrior"],  player, location);
-			CreateDummyUnit(unitPrototypes["Worker"],   player, location);
-			CreateDummyUnit(unitPrototypes["Chariot"],  player, location);
-			CreateDummyUnit(unitPrototypes["Catapult"], player, location);
+			CreateDummyUnit(rules, unitPrototypes["Settler"],  player, location);
+			CreateDummyUnit(rules, unitPrototypes["Warrior"],  player, location);
+			CreateDummyUnit(rules, unitPrototypes["Worker"],   player, location);
+			CreateDummyUnit(rules, unitPrototypes["Chariot"],  player, location);
+			CreateDummyUnit(rules, unitPrototypes["Catapult"], player, location);
 		}
 
-		private MapUnit CreateDummyUnit(UnitPrototype proto, Player owner, Tile tile)
+		private MapUnit CreateDummyUnit(C7RulesFormat rules, UnitPrototype proto, Player owner, Tile tile)
 		{
 			//TODO: The fact that we have to check for this makes me wonder why...
 			if (tile != Tile.NONE) {
@@ -228,6 +220,8 @@ namespace C7GameData
 				unit.unitType = proto;
 				unit.owner = owner;
 				unit.location = tile;
+				unit.experienceLevelKey = rules.defaultExperienceLevel.key;
+				unit.experienceLevel = rules.defaultExperienceLevel;
 				unit.facingDirection = TileDirection.SOUTHWEST;
 				unit.movementPointsRemaining = proto.movement;
 				unit.hitPointsRemaining = 3;
@@ -238,19 +232,6 @@ namespace C7GameData
 				return unit;
 			} else
 				throw new System.Exception("Tried to add dummy unit at Tile.NONE");
-		}
-
-		private void CreateDefaultUnitPrototypes()
-		{
-			unitPrototypes = new Dictionary<string, UnitPrototype>()
-			{
-				{ "Warrior",  new UnitPrototype { name = "Warrior",  attack = 1, defense = 1, bombard = 0, movement = 1, iconIndex =  6, shieldCost = 10 }},
-				{ "Settler",  new UnitPrototype { name = "Settler",  attack = 0, defense = 0, bombard = 0, movement = 1, iconIndex =  0, shieldCost = 30, populationCost = 2 }},
-				{ "Worker",   new UnitPrototype { name = "Worker",   attack = 0, defense = 0, bombard = 0, movement = 1, iconIndex =  1, shieldCost = 30, populationCost = 1 }},
-				{ "Chariot",  new UnitPrototype { name = "Chariot",  attack = 1, defense = 1, bombard = 0, movement = 2, iconIndex = 10, shieldCost = 20 }},
-				{ "Galley",   new SeaUnit       { name = "Galley",   attack = 1, defense = 1, bombard = 0, movement = 3, iconIndex = 29, shieldCost = 30 }},
-				{ "Catapult", new UnitPrototype { name = "Catapult", attack = 0, defense = 0, bombard = 4, movement = 1, iconIndex = 22, shieldCost = 20 }},
-			};
 		}
 	}
 }

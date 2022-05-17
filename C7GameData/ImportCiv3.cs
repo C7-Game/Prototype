@@ -28,7 +28,10 @@ namespace C7GameData
 			SavData civ3Save = new SavData(Util.ReadFile(savePath), defaultBicBytes);
 			BiqData theBiq = civ3Save.Bic;
 
+			ImportUnitPrototypes(theBiq, c7Save);
 			ImportCiv3TerrainTypes(theBiq, c7Save);
+			ImportCiv3ExperienceLevels(theBiq, c7Save);
+			ImportCiv3DefensiveBonuses(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
 			SetMapDimensions(civ3Save, c7Save);
 			SetWorldWrap(civ3Save, c7Save);
@@ -92,7 +95,10 @@ namespace C7GameData
 			byte[] biqBytes = Util.ReadFile(biqPath);
 			BiqData theBiq = new BiqData(biqBytes);
 
+			ImportUnitPrototypes(theBiq, c7Save);
 			ImportCiv3TerrainTypes(theBiq, c7Save);
+			ImportCiv3ExperienceLevels(theBiq, c7Save);
+			ImportCiv3DefensiveBonuses(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);
@@ -195,6 +201,56 @@ namespace C7GameData
 			return resourcesByIndex;
 		}
 
+		private static void ImportUnitPrototypes(BiqData theBiq, C7SaveFormat c7SaveFormat) {
+			//Temporary limiter so you can't build everything out of the gate
+			//Once we have technology, we will remove this
+			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
+			foreach (PRTO prto in theBiq.Prto) {
+				if (allowedUnits.Contains(prto.Name)) {
+					UnitPrototype prototype = new UnitPrototype();
+					if (prto.Type == PRTO.TYPE_SEA) {
+						prototype.categories.Add("Sea");
+					}
+					else if (prto.Type == PRTO.TYPE_LAND) {
+						prototype.categories.Add("Land");
+					}
+					else if (prto.Type == PRTO.TYPE_AIR) {
+						prototype.categories.Add("Air");
+					}
+					prototype.name = prto.Name;
+					prototype.attack = prto.Attack;
+					prototype.defense = prto.Defense;
+					prototype.movement = prto.Movement;
+					prototype.shieldCost = prto.ShieldCost;
+					prototype.populationCost = prto.PopulationCost;
+					prototype.bombard = prto.BombardStrength;
+					prototype.iconIndex = prto.IconIndex;
+					if (prto.BuildCity) {
+						prototype.actions.Add("buildCity");
+					}
+					if (prto.Bombard) {
+						prototype.actions.Add("bombard");
+					}
+					if (prto.SkipTurn) {
+						prototype.actions.Add("hold");
+					}
+					if (prto.Wait) {
+						prototype.actions.Add("wait");
+					}
+					if (prto.Fortify) {
+						prototype.actions.Add("fortify");
+					}
+					if (prto.Disband) {
+						prototype.actions.Add("disband");
+					}
+					if (prto.GoTo) {
+						prototype.actions.Add("goTo");
+					}
+					c7SaveFormat.GameData.unitPrototypes.Add(prototype.name, prototype);
+				}
+			}
+		}
+
 		private static void ImportCiv3TerrainTypes(BiqData theBiq, C7SaveFormat c7Save)
 		{
 			int civ3Index = 0;
@@ -203,6 +259,55 @@ namespace C7GameData
 				c7Save.GameData.terrainTypes.Add(c7TerrainType);
 				civ3Index++;
 			}
+		}
+
+		private static void ImportCiv3ExperienceLevels(BiqData theBiq, C7SaveFormat c7Save)
+		{
+			if (theBiq.Expr.Length != 4)
+				throw new Exception("BIQ data must include four experience levels.");
+
+			Dictionary<string, ExperienceLevel> levelsByKey = new Dictionary<string, ExperienceLevel>();
+
+			foreach (EXPR expr in theBiq.Expr) {
+				// Generate a unique key for this level based on its name. If multiple levels have the same name, append apostrophes
+				// to the end until the key is unique.
+				string key = expr.Name;
+				while (levelsByKey.ContainsKey(key))
+					key += "'";
+
+				ExperienceLevel level = ExperienceLevel.ImportFromCiv3(key, expr, levelsByKey.Count);
+				c7Save.Rules.experienceLevels.Add(level);
+				levelsByKey.Add(key, level);
+
+				if (levelsByKey.Count == 2) {
+					c7Save.Rules.defaultExperienceLevelKey = key;
+					c7Save.Rules.defaultExperienceLevel = level;
+				}
+			}
+		}
+
+		private static void ImportCiv3DefensiveBonuses(BiqData theBiq, C7SaveFormat c7Save)
+		{
+			c7Save.Rules.fortificationBonus = new StrengthBonus {
+				description = "Fortified",
+				amount = theBiq.Rule[0].FortificationsDefensiveBonus / 100.0
+			};
+			c7Save.Rules.riverCrossingBonus = new StrengthBonus {
+				description = "Behind river",
+				amount = theBiq.Rule[0].RiverDefensiveBonus / 100.0
+			};
+			c7Save.Rules.cityLevel1DefenseBonus = new StrengthBonus {
+				description = "Town",
+				amount = theBiq.Rule[0].TownDefenseBonus / 100.0
+			};
+			c7Save.Rules.cityLevel2DefenseBonus = new StrengthBonus {
+				description = "City",
+				amount = theBiq.Rule[0].CityDefenseBonus / 100.0
+			};
+			c7Save.Rules.cityLevel3DefenseBonus = new StrengthBonus {
+				description = "Metropolis",
+				amount = theBiq.Rule[0].MetropolisDefenseBonus / 100.0
+			};
 		}
 
 		private static void SetWorldWrap(SavData civ3Save, C7SaveFormat c7Save)

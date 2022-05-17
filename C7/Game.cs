@@ -82,7 +82,7 @@ public class Game : Node2D
 					if (capital != null)
 						mapView.centerCameraOnTile(capital.location);
 				} else {
-					MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
+					MapUnit startingSettler = controller.units.Find(u => u.unitType.actions.Contains("buildCity"));
 					if (startingSettler != null)
 						mapView.centerCameraOnTile(startingSettler.location);
 				}

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using C7GameData.AIData;
 
 namespace C7GameData
@@ -5,6 +6,7 @@ namespace C7GameData
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 /**
  * A unit on the map.  Not to be confused with a unit prototype.
@@ -17,11 +19,15 @@ public class MapUnit
 	public Tile location {get; set;}
 	public TilePath path {get; set;}
 
+	public string experienceLevelKey;
+	[JsonIgnore]
+	public ExperienceLevel experienceLevel {get; set;}
+
 	public int movementPointsRemaining {get; set;}
 	public int hitPointsRemaining {get; set;}
 	public int maxHitPoints {
 		get {
-			return 3; // Eventually we'll add HP from experience and the type's inherent bonus
+			return experienceLevel.baseHitPoints; // TODO: Include bonus HP from unit type
 		}
 	}
 	public bool isFortified {get; set;}
@@ -29,8 +35,7 @@ public class MapUnit
 
 	public TileDirection facingDirection;
 
-	//This probably should not be serialized.  In .NET, we'd add the [ScriptIgnore] and using System.Web.Script.Serialization.
-	//But .NET Core doesn't support that.  So, we'll have to figure out something else.  Maybe a library somewhere.
+	[JsonIgnore]
 	public List<string> availableActions = new List<string>();
 	public UnitAIData currentAIData;
 
@@ -53,29 +58,12 @@ public class MapUnit
 		}
 	}
 
-	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
-	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
-	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
-	// priority. Otherwise it's just whoever is stronger on defense.
-	public bool HasPriorityAsDefender(MapUnit otherDefender, MapUnit opponent)
-	{
-		Player opponentPlayer = opponent.owner;
-		bool weAreEnemy           = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(this.owner)          : false;
-		bool otherDefenderIsEnemy = (opponentPlayer != null) ? ! opponentPlayer.IsAtPeaceWith(otherDefender.owner) : false;
-		if (weAreEnemy && ! otherDefenderIsEnemy)
-			return true;
-		else if (otherDefenderIsEnemy && ! weAreEnemy)
-			return false;
-		else
-			return (unitType.defense * hitPointsRemaining) > (otherDefender.unitType.defense * otherDefender.hitPointsRemaining);
-	}
-
 	public string Describe()
 	{
 		UnitPrototype type = this.unitType;
 		string hPDesc = ((type.attack > 0) || (type.defense > 0)) ? $" ({hitPointsRemaining}/{maxHitPoints})" : "";
 		string attackDesc = (type.bombard > 0) ? $"{type.attack}({type.bombard})" : type.attack.ToString();
-		return $"Regular{hPDesc} {type.name} ({attackDesc}.{type.defense}.{movementPointsRemaining}/{type.movement})";
+		return $"{experienceLevel.displayName}{hPDesc} {type.name} ({attackDesc}.{type.defense}.{movementPointsRemaining}/{type.movement})";
 	}
 
 	// TODO: The contents of this enum are copy-pasted from UnitAction in Civ3UnitSprite.cs. We should unify these so we don't have two different

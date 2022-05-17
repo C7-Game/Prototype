@@ -83,13 +83,13 @@ namespace C7Engine
 			}
 			else {
 
-				if (unit.unitType is SeaUnit) {
+				if (unit.unitType.categories.Contains("Sea")) {
 					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.COASTLINE;
 					unit.currentAIData = ai;
 					Console.WriteLine("Set coastline exploration AI for " + unit);
 				}
-				else if (unit.location.unitsOnTile.Exists((x) => x.unitType is SeaUnit)) {
+				else if (unit.location.unitsOnTile.Exists((x) => x.unitType.categories.Contains("Sea"))) {
 					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.ON_A_BOAT;
 					unit.currentAIData = ai;

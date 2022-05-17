@@ -57,19 +57,18 @@ namespace C7GameData
 			Resource = Resource.NONE;
 		}
 
-		public MapUnit findTopDefender(MapUnit opponent)
-		{
-			if (unitsOnTile.Count > 0) {
-				var tr = unitsOnTile[0];
-				foreach (var u in unitsOnTile)
-					if (u.HasPriorityAsDefender(tr, opponent))
-						tr = u;
-				return tr;
-			} else
-				return MapUnit.NONE;
+		// TODO: this should be either an extension in C7Engine, or otherwise
+		// calculated somewhere else, but it's not obvious to someone unfamiliar
+		// with the save format that it's the overaly terrain that has actual
+		// movement cost
+		public int MovementCost() {
+			return overlayTerrainType.movementCost;
 		}
 
-		public static Tile NONE = new Tile();
+		public static Tile NONE = new Tile() {
+			xCoordinate = -1,
+			yCoordinate = -1,
+		};
 
 		//This should be used when we want to check if land tiles are next to water tiles.
 		//Usually this is coast, but it could be Sea - see the "Deepwater Harbours" topics at CFC.
@@ -95,7 +94,7 @@ namespace C7GameData
 		}
 
 		public List<Tile> GetLandNeighbors() {
-			return neighbors.Values.Where(tile => !tile.baseTerrainType.isWater()).ToList();
+			return neighbors.Values.Where(tile => tile != NONE && !tile.baseTerrainType.isWater()).ToList();
 		}
 
 		/**
@@ -106,6 +105,43 @@ namespace C7GameData
 		public List<Tile> GetCoastNeighbors()
 		{
 			return neighbors.Values.Where(tile => tile.baseTerrainType.Key == "coast").ToList();
+		}
+
+		// Returns whether or not there's a river crossing at the asterisk (*), looking forward from the carat (^), given the presence of
+		// rivers along the four labeled tile edges:
+		//        \     /
+		// farLeft \   /  farRight
+		//          \ /
+		//           *
+		//          / \
+		// nearLeft/   \  nearRight
+		//        /  ^  \
+		private bool FacingCrossingAtVertex(bool nearLeft, bool nearRight, bool farLeft, bool farRight)
+		{
+			return (nearLeft && nearRight) || (farLeft && farRight) || (nearLeft && farRight) || (farLeft && nearRight);
+		}
+
+		public bool HasRiverCrossing(TileDirection dir)
+		{
+			switch (dir) {
+			case TileDirection.NORTH:
+				Tile north = neighbors[TileDirection.NORTH];
+				return FacingCrossingAtVertex(riverNorthwest, riverNortheast, north.riverSouthwest, north.riverSoutheast);
+			case TileDirection.NORTHEAST: return riverNortheast;
+			case TileDirection.EAST:
+				Tile east = neighbors[TileDirection.EAST];
+				return FacingCrossingAtVertex(riverNortheast, riverSoutheast, east.riverNorthwest, east.riverSouthwest);
+			case TileDirection.SOUTHEAST: return riverSoutheast;
+			case TileDirection.SOUTH:
+				Tile south = neighbors[TileDirection.SOUTH];
+				return FacingCrossingAtVertex(riverSoutheast, riverSouthwest, south.riverNortheast, south.riverNorthwest);
+			case TileDirection.SOUTHWEST: return riverSouthwest;
+			case TileDirection.WEST:
+				Tile west = neighbors[TileDirection.WEST];
+				return FacingCrossingAtVertex(riverSouthwest, riverNorthwest, west.riverSoutheast, west.riverNortheast);
+			case TileDirection.NORTHWEST: return riverNorthwest;
+			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
 		}
 
 		public bool IsLand()

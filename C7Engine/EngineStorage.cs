@@ -18,6 +18,7 @@ namespace C7Engine
 	{
 		public static Mutex gameDataMutex = new Mutex();
 		internal static GameData gameData {get; set;}
+		internal static C7RulesFormat rules {get; set;}
 		public static string uiControllerID;
 
 		private static Thread engineThread = null;
@@ -69,6 +70,12 @@ namespace C7Engine
 		public GameData gameData {
 			get {
 				return EngineStorage.gameData;
+			}
+		}
+
+		public C7RulesFormat rules {
+			get {
+				return EngineStorage.rules;
 			}
 		}
 	}
