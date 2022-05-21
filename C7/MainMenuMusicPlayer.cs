@@ -5,13 +5,14 @@ using Serilog;
 
 public class MainMenuMusicPlayer : AudioStreamPlayer
 {
-	static ILogger log = LogManager.ForContext<MainMenuMusicPlayer>();
+	private ILogger log;
 
 	private bool musicEnabled = true;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		log = LogManager.ForContext<MainMenuMusicPlayer>();
 		//Figured out how to load the mp3 from this post: https://godotengine.org/qa/30210/how-do-load-resource-works
 
 		try {

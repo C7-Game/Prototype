@@ -4,7 +4,7 @@ using Serilog;
 
 public class MainMenu : Node2D
 {
-	static ILogger log = LogManager.ForContext<MainMenu>();
+	private ILogger log;
 
 	readonly int BUTTON_LABEL_OFFSET = 4;
 
@@ -23,6 +23,8 @@ public class MainMenu : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		log = LogManager.ForContext<MainMenu>();
+		GD.Print("MainMenu got logger: " + log);
 		log.Debug("enter MainMenu._Ready");
 
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame
@@ -138,7 +140,7 @@ public class MainMenu : Node2D
 
 	public void _on_Exit_pressed()
 	{
-		GetTree().Quit();
+		GetTree().Notification(MainLoop.NotificationWmQuitRequest);
 	}
 
 	private void PlayButtonPressedSound()
