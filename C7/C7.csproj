@@ -12,4 +12,9 @@
   <ItemGroup>
     <ProjectReference Include="..\C7Engine\C7Engine.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+    <PackageReference Include="Serilog.Expressions" Version="3.3.0" />
+  </ItemGroup>
 </Project>
