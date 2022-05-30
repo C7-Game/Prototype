@@ -6,15 +6,18 @@ namespace C7GameData.AIData {
 		private readonly int TEMP_GAME_LENGTH = 540;
 		private readonly int EARLY_GAME_CUTOFF = 25;	//what percentage of the game is early game, which should give expansion a boost?
 
-		public float GetWeight(Player player) {
+		public Dictionary<float, Dictionary<string, string>> GetWeight(Player player) {
+			Dictionary<float, Dictionary<string, string>> returnValue = new Dictionary<float, Dictionary<string, string>>();
 			if (player.cities.Count < 2) {
-				return 1000;
+				returnValue[1000] = new Dictionary<string, string>();
+				return returnValue;
 			} else {
 				int score = CalculateAvailableLandScore(player);
 
 				score = ApplyEarlyGameMultiplier(score);
 				score = ApplyNationTraitMultiplier(score, player);
-				return score;
+				returnValue[score] = new Dictionary<string, string>();
+				return returnValue;
 			}
 		}
 		private static int CalculateAvailableLandScore(Player player)

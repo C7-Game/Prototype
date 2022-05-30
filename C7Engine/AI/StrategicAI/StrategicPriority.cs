@@ -49,8 +49,8 @@ namespace C7GameData.AIData {
 		 * on the highest score, or potentially with a weighted/randomized factor thrown in.  This is one of the aspects that will require tuning.  I don't want it
 		 * to be super-predictable that a Scientific AI always chooses Space Race, but a Scientific AI should choose Space Race more often than a non-Scientific AI.
 		 */
-		public float GetWeight(Player player) {
-			return 0.0f;
+		public Dictionary<float, Dictionary<string, string>> GetWeightAndMetadata(Player player) {
+			return new Dictionary<float, Dictionary<string, string>>();
 		}
 
 		/// <summary>
@@ -65,6 +65,7 @@ namespace C7GameData.AIData {
 		public static List<Type> GetAllStrategicPriorityTypes() {
 			List<Type> priorities = new List<Type>();
 			priorities.Add(typeof(ExpansionPriority));
+			priorities.Add(typeof(ExplorationPriority));
 			return priorities;
 		}
 	}

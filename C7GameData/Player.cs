@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using C7GameData.AIData;
 
 namespace C7GameData
 {
@@ -20,6 +21,8 @@ public class Player
 	public List<MapUnit> units = new List<MapUnit>();
 	public List<City> cities = new List<City>();
 	public TileKnowledge tileKnowledge = new TileKnowledge();
+
+	public StrategicPriorities StrategicPriorities = new StrategicPriorities();
 
 	public Player(uint color)
 	{
