@@ -37,12 +37,18 @@ namespace C7GameData.AIData {
 								Dictionary<string, string> properties = new Dictionary<string, string>();
 								properties["opponent"] = nation.guid;
 								returnValue[50] = properties;
+								this.calculatedWeight = 50;
+								this.properties = properties;
 								return returnValue;
+							} else {
+								opponentCount--;	//guarantees we'll eventually get an opponent selected
 							}
 						}
 					}
 				}
 			}
+
+			this.calculatedWeight = 0;
 			return returnValue;
 		}
 

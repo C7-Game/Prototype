@@ -10,6 +10,7 @@ namespace C7GameData.AIData {
 			Dictionary<float, Dictionary<string, string>> returnValue = new Dictionary<float, Dictionary<string, string>>();
 			if (player.cities.Count < 2) {
 				returnValue[1000] = new Dictionary<string, string>();
+				this.calculatedWeight = 1000;
 				return returnValue;
 			} else {
 				int score = CalculateAvailableLandScore(player);
@@ -17,6 +18,7 @@ namespace C7GameData.AIData {
 				score = ApplyEarlyGameMultiplier(score);
 				score = ApplyNationTraitMultiplier(score, player);
 				returnValue[score] = new Dictionary<string, string>();
+				this.calculatedWeight = score;
 				return returnValue;
 			}
 		}

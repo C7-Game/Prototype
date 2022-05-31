@@ -13,6 +13,7 @@ namespace C7GameData.AIData {
 			int gameTurn = EngineStorage.gameData.turn;
 			int percentOfGameFinished = (gameTurn * 100) / TEMP_GAME_LENGTH;
 			returnValue[100 - 2 * percentOfGameFinished] = new Dictionary<string, string>();
+			this.calculatedWeight = 100 - 2 * percentOfGameFinished;
 			return returnValue;
 		}
 	}

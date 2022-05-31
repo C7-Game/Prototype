@@ -15,6 +15,9 @@ namespace C7Engine
 			if (player.isHuman || player.isBarbarians) {
 				return;
 			}
+			//Temporary!  Should not be every turn, should store results, etc.
+			StrategicPriority priority = StrategicPriorityArbitrator.Arbitrate(player);
+
 			Console.WriteLine("-> Begin " + player.civilization.cityNames[0] + " turn");
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {

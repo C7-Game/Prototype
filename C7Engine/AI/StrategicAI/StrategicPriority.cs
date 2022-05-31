@@ -35,6 +35,8 @@ namespace C7GameData.AIData {
 	 *    capture the 20K city before it reaches 20K".
 	 */
 	public abstract class StrategicPriority {
+		protected float calculatedWeight;
+		protected Dictionary<string, string> properties;
 
 		/**
 		 * Returns a weight for how important this strategic priority is for the player.
@@ -67,6 +69,10 @@ namespace C7GameData.AIData {
 			priorities.Add(typeof(ExpansionPriority));
 			priorities.Add(typeof(ExplorationPriority));
 			return priorities;
+		}
+
+		public float GetCalculatedWeight() {
+			return calculatedWeight;
 		}
 	}
 }
