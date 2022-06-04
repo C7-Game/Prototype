@@ -26,25 +26,49 @@ namespace C7Engine.AI {
 			List<StrategicPriority> possiblePriorities = new List<StrategicPriority>();
 
 			foreach (Type priorityType in priorityTypes) {
-				//Need to create an instance
 				ConstructorInfo constructor = priorityType.GetConstructor(Type.EmptyTypes);
-				object instance = constructor.Invoke(Array.Empty<object>());
-				StrategicPriority priority = (StrategicPriority)instance;
-				priority.CalculateWeightAndMetadata(player);
-
-				//We need to store these somewhere for each type.  Do we want to store it based on the instance?
-				possiblePriorities.Add(priority);
+				if (constructor != null) {
+					object instance = constructor.Invoke(Array.Empty<object>());
+					StrategicPriority priority = (StrategicPriority)instance;
+					priority.CalculateWeightAndMetadata(player);
+					possiblePriorities.Add(priority);
+				} else {
+					Console.WriteLine($"Zero-argument constructor for priority {priorityType} not found; skipping that priority type");
+				}
 			}
 
-			//Now we've got all the data, it's time to choose between the options
-			PrioritizationType weighting = PrioritizationType.WEIGHTED_QUADRATIC;
-			//We need to construct ranges and stuff
+			return ChooseStrategicPriority(possiblePriorities, PrioritizationType.WEIGHTED_LINEAR);
+		}
+		private static StrategicPriority ChooseStrategicPriority(List<StrategicPriority> possiblePriorities, PrioritizationType weighting) {
+			if (weighting == PrioritizationType.ALWAYS_CHOOSE_HIGHEST_SCORE) {
+				return FindTopScoringPriority(possiblePriorities);
+			} else {
+				return WeightedPriority(possiblePriorities, weighting);
+			}
+		}
+
+		private static StrategicPriority FindTopScoringPriority(List<StrategicPriority> possiblePriorities) {
+			float max = possiblePriorities[0].GetCalculatedWeight();
+			StrategicPriority topScore = possiblePriorities[0];
+			foreach (StrategicPriority priority in possiblePriorities) {
+				if (priority.GetCalculatedWeight() > max) {
+					max = priority.GetCalculatedWeight();
+					topScore = priority;
+				}
+			}
+			Console.WriteLine($"Chose priority {topScore} with score {max}");
+			return topScore;
+		}
+
+		private static StrategicPriority WeightedPriority(List<StrategicPriority> possiblePriorities, PrioritizationType weighting) {
 			double sumOfAllWeights = 0.0;
 			List<double> cutoffs = new List<double>();
 			foreach (StrategicPriority possiblePriority in possiblePriorities) {
-				double weightedWeight = possiblePriority.GetCalculatedWeight() * possiblePriority.GetCalculatedWeight();
+				double baseWeight = possiblePriority.GetCalculatedWeight();
+				double adjustedWeight = AdjustWeightByFactor(baseWeight, weighting);
+
 				double oldCutoff = sumOfAllWeights;
-				sumOfAllWeights += weightedWeight;
+				sumOfAllWeights += adjustedWeight;
 
 				Console.WriteLine($"Priority {possiblePriority} has range of {oldCutoff} to {sumOfAllWeights}");
 
@@ -60,11 +84,17 @@ namespace C7Engine.AI {
 					Console.WriteLine($"Chose priority {possiblePriorities[idx]}");
 					return possiblePriorities[idx];
 				}
-
 				idx++;
 			}
-			//should never get here
-			return possiblePriorities[0];
+			return new WarPriority();	//TODO: Fallback
+		}
+
+		private static double AdjustWeightByFactor(double baseWeight, PrioritizationType weighting) {
+			if (weighting == PrioritizationType.WEIGHTED_QUADRATIC) {
+				return baseWeight * baseWeight;
+			} else {
+				return baseWeight;
+			}
 		}
 	}
 }
