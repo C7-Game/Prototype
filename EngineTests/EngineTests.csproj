@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\C7Engine\C7Engine.csproj" />
+    <ProjectReference Include="..\C7GameData\C7GameData.csproj" />
   </ItemGroup>
 
   <ItemGroup>
