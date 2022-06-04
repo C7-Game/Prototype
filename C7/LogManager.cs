@@ -18,11 +18,9 @@ public class LogManager : Node
 		//		Exception: exception
 		// Example: 22:25:32.528 [DBG] MainMenu: enter MainMenu._Ready
 		ExpressionTemplate consoleTemplate = new ExpressionTemplate(
-			"{@t:HH:mm:ss.fff} [{@l:u3}]{#if SourceContext is not null} {SourceContext}:{#end} {@m:lj}\n{#if @x is not null}\tException: {@x}{#end}",
-			theme: TemplateTheme.Code);
+			"{@t:HH:mm:ss.fff} [{@l:u3}]{#if SourceContext is not null} {SourceContext}:{#end} {@m:lj}{#if @x is not null}\tException: {@x}{#end}");
 
 		Log.Logger = new LoggerConfiguration()
-			.WriteTo.Console(formatter: consoleTemplate)
 			.WriteTo.GodotSink(formatter: consoleTemplate)
 			.MinimumLevel.Debug()
 			.CreateLogger();
