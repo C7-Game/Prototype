@@ -30,10 +30,7 @@ namespace C7Engine.AI {
 				ConstructorInfo constructor = priorityType.GetConstructor(Type.EmptyTypes);
 				object instance = constructor.Invoke(Array.Empty<object>());
 				StrategicPriority priority = (StrategicPriority)instance;
-
-				MethodInfo GetWeightAndMetadata = priorityType.GetMethod("GetWeight", new Type[] { typeof(Player)});
-				//TODO: This doesn't return a type anymore, or shouldn't anyway
-				Object result = GetWeightAndMetadata.Invoke(priority, new object[] {player});
+				priority.CalculateWeightAndMetadata(player);
 
 				//We need to store these somewhere for each type.  Do we want to store it based on the instance?
 				possiblePriorities.Add(priority);

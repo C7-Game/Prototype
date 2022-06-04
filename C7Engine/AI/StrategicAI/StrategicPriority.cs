@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using C7Engine.AI.StrategicAI;
 
 namespace C7GameData.AIData {
 	/**
@@ -51,9 +52,7 @@ namespace C7GameData.AIData {
 		 * on the highest score, or potentially with a weighted/randomized factor thrown in.  This is one of the aspects that will require tuning.  I don't want it
 		 * to be super-predictable that a Scientific AI always chooses Space Race, but a Scientific AI should choose Space Race more often than a non-Scientific AI.
 		 */
-		public Dictionary<float, Dictionary<string, string>> GetWeightAndMetadata(Player player) {
-			return new Dictionary<float, Dictionary<string, string>>();
-		}
+		public abstract void CalculateWeightAndMetadata(Player player);
 
 		/// <summary>
 		/// Returns a list of all strategic priorities registered in the game.

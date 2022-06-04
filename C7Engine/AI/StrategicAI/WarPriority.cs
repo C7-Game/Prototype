@@ -17,13 +17,12 @@ namespace C7GameData.AIData {
 		/// </summary>
 		/// <param name="player"></param>
 		/// <returns></returns>
-		public Dictionary<float, Dictionary<string, string>> GetWeight(Player player) {
-			Dictionary<float, Dictionary<string, string>> returnValue = new Dictionary<float, Dictionary<string, string>>();
+		public override void CalculateWeightAndMetadata(Player player) {
 			if (player.cities.Count < 2) {
-				returnValue[0] = new Dictionary<string, string>();
+				this.calculatedWeight = 0;
 			} else {
 				int landScore = CalculateAvailableLandScore(player);
-				if (landScore == 0) {
+				if (landScore == 0) {	//nowhere else to expand
 					//Figure out who to fight.  This should obviously be more sophisticated and should favor reachable opponents.
 					//However, we don't yet store info on who's been discovered, so for now we'll choose someone randomly
 					Random random = new Random();
@@ -34,12 +33,8 @@ namespace C7GameData.AIData {
 							int rnd = random.Next(opponentCount);
 							if (rnd == 0) {
 								//Let's fight this nation!
-								Dictionary<string, string> properties = new Dictionary<string, string>();
 								properties["opponent"] = nation.guid;
-								returnValue[50] = properties;
-								this.calculatedWeight = 50;
-								this.properties = properties;
-								return returnValue;
+								calculatedWeight = 50;
 							} else {
 								opponentCount--;	//guarantees we'll eventually get an opponent selected
 							}
@@ -47,9 +42,6 @@ namespace C7GameData.AIData {
 					}
 				}
 			}
-
-			this.calculatedWeight = 0;
-			return returnValue;
 		}
 
 		private static int CalculateAvailableLandScore(Player player)
