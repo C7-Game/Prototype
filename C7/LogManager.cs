@@ -1,13 +1,6 @@
 using Godot;
 using Serilog;
 using Serilog.Templates;
-using Serilog.Templates.Themes;
-using Serilog.Core;
-using Serilog.Events;
-using Serilog.Configuration;
-using Serilog.Formatting;
-using System;
-using System.IO;
 
 public class LogManager : Node
 {
