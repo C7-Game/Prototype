@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using C7GameData;
 using C7GameData.AIData;
 
@@ -37,7 +38,9 @@ namespace C7Engine.AI.StrategicAI {
 	 *    capture the 20K city before it reaches 20K".
 	 */
 	public abstract class StrategicPriority {
+		[JsonIgnore]
 		protected float calculatedWeight;
+
 		protected string key;
 		protected StrategicPriorityData data;
 
@@ -55,22 +58,6 @@ namespace C7Engine.AI.StrategicAI {
 		 * to be super-predictable that a Scientific AI always chooses Space Race, but a Scientific AI should choose Space Race more often than a non-Scientific AI.
 		 */
 		public abstract void CalculateWeightAndMetadata(Player player);
-
-		/// <summary>
-		/// Returns a list of all strategic priorities registered in the game.
-		///
-		/// This returns the type, so you can create an instance and then call methods on them.
-		/// This follows what appears to be the C# equivalent of using Java class objects, useful for things like making annotation processors.
-		/// In this case, I'm intentionally following that paradigm because by doing so, this method can be enhanced to look for additional
-		/// types registered by mods, or simply stored in different components (DLLs/JARs/whatever the .NET equivalent is).
-		/// </summary>
-		/// <returns></returns>
-		public static List<Type> GetAllStrategicPriorityTypes() {
-			List<Type> priorities = new List<Type>();
-			priorities.Add(typeof(ExpansionPriority));
-			priorities.Add(typeof(ExplorationPriority));
-			return priorities;
-		}
 
 		public float GetCalculatedWeight() {
 			return calculatedWeight;

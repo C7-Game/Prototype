@@ -23,7 +23,7 @@ namespace C7Engine.AI {
 		/// <param name="player">The player whose priorities are being arbitrated.</param>
 		/// <returns>The chosen priority.</returns>
 		public static StrategicPriority Arbitrate(Player player) {
-			List<Type> priorityTypes = StrategicPriority.GetAllStrategicPriorityTypes();
+			List<Type> priorityTypes = PriorityAggregator.GetAllStrategicPriorityTypes();
 			List<StrategicPriority> possiblePriorities = new List<StrategicPriority>();
 
 			foreach (Type priorityType in priorityTypes) {
