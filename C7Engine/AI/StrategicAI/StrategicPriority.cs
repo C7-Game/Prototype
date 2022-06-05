@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using C7Engine.AI.StrategicAI;
+using C7GameData;
+using C7GameData.AIData;
 
-namespace C7GameData.AIData {
+namespace C7Engine.AI.StrategicAI {
 	/**
 	 * This is a prototype interface.  The idea is that there may be many strategic priorities, and the AI should decide on a few.
 	 * I could see this going a lot of different ways.  Some general thoughts/ideas:
@@ -37,7 +38,8 @@ namespace C7GameData.AIData {
 	 */
 	public abstract class StrategicPriority {
 		protected float calculatedWeight;
-		protected Dictionary<string, string> properties;
+		protected string key;
+		protected StrategicPriorityData data;
 
 		/**
 		 * Returns a weight for how important this strategic priority is for the player.

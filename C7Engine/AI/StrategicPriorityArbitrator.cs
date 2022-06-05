@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using C7Engine.AI.StrategicAI;
 using C7GameData;
 using C7GameData.AIData;
 

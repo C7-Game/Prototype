@@ -5,6 +5,7 @@ using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
 using C7Engine.AI;
+using C7Engine.AI.StrategicAI;
 
 namespace C7Engine
 {

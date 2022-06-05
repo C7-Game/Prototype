@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using C7Engine;
+using C7Engine.AI.StrategicAI;
 
 namespace C7GameData.AIData {
 	/// <summary>
@@ -10,6 +11,11 @@ namespace C7GameData.AIData {
 	/// case of a priority that will store data.
 	/// </summary>
 	public class WarPriority : StrategicPriority {
+
+		public WarPriority() {
+			key = "WarPriority";
+			this.data.priorityKey = "WarPriority";
+		}
 
 		/// <summary>
 		/// For now, we're simply going to say if we've run out of room for expansion, we'll fight someone.
@@ -33,7 +39,7 @@ namespace C7GameData.AIData {
 							int rnd = random.Next(opponentCount);
 							if (rnd == 0) {
 								//Let's fight this nation!
-								properties["opponent"] = nation.guid;
+								data.properties["opponent"] = nation.guid;
 								calculatedWeight = 50;
 							} else {
 								opponentCount--;	//guarantees we'll eventually get an opponent selected

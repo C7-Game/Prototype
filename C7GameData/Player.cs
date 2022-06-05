@@ -22,7 +22,9 @@ public class Player
 	public List<City> cities = new List<City>();
 	public TileKnowledge tileKnowledge = new TileKnowledge();
 
-	public StrategicPriorities StrategicPriorities = new StrategicPriorities();
+	//Ordered list of priority data.  First is most important.
+	public List<StrategicPriorityData> strategicPriorityData = new List<StrategicPriorityData>();
+	private int turnsUntilPriorityReevaluation;
 
 	public Player(uint color)
 	{

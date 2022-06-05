@@ -1,10 +1,16 @@
 using System.Collections.Generic;
 using C7Engine;
+using C7Engine.AI.StrategicAI;
 
 namespace C7GameData.AIData {
 	public class ExpansionPriority : StrategicPriority {
 		private readonly int TEMP_GAME_LENGTH = 540;
 		private readonly int EARLY_GAME_CUTOFF = 25;	//what percentage of the game is early game, which should give expansion a boost?
+
+		public ExpansionPriority() {
+			key = "Expansion";
+			this.data.priorityKey = "Expansion";
+		}
 
 		public override void CalculateWeightAndMetadata(Player player) {
 			if (player.cities.Count < 2) {
