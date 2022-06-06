@@ -21,9 +21,11 @@ namespace C7Engine
 
 			if (player.turnsUntilPriorityReevaluation == 0) {
 				Console.WriteLine("Re-evaluating strategic priorities for " + player);
-				StrategicPriority priority = StrategicPriorityArbitrator.Arbitrate(player);
+				List<StrategicPriority> priorities = StrategicPriorityArbitrator.Arbitrate(player);
 				player.strategicPriorityData.Clear();
-				player.strategicPriorityData.Add(priority);
+				foreach (StrategicPriority priority in priorities) {
+					player.strategicPriorityData.Add(priority);
+				}
 				player.turnsUntilPriorityReevaluation = 15 + new Random().Next(10);
 				Console.WriteLine(player.turnsUntilPriorityReevaluation + " turns until next re-evaluation");
 			} else {

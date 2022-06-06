@@ -22,7 +22,7 @@ namespace C7Engine.AI {
 		/// </summary>
 		/// <param name="player">The player whose priorities are being arbitrated.</param>
 		/// <returns>The chosen priority.</returns>
-		public static StrategicPriority Arbitrate(Player player) {
+		public static List<StrategicPriority> Arbitrate(Player player) {
 			List<Type> priorityTypes = PriorityAggregator.GetAllStrategicPriorityTypes();
 			List<StrategicPriority> possiblePriorities = new List<StrategicPriority>();
 
@@ -38,7 +38,45 @@ namespace C7Engine.AI {
 				}
 			}
 
-			return ChooseStrategicPriority(possiblePriorities, PrioritizationType.WEIGHTED_LINEAR);
+			int numberOfPriorities = CalculateNumberOfPriorities(possiblePriorities);
+
+			List<StrategicPriority> priorities = new List<StrategicPriority>();
+			for (int i = 0; i < numberOfPriorities; i++) {
+				StrategicPriority topPriority = ChooseStrategicPriority(possiblePriorities, PrioritizationType.WEIGHTED_LINEAR);
+				priorities.Add(topPriority);
+				possiblePriorities.Remove(topPriority);
+			}
+			return priorities;
+		}
+
+		/// <summary>
+		/// Figures out how many priorities the AI will choose.
+		/// The idea is that if there are a bunch of things all about equally important, it should try to balance between
+		/// them a bit.  If there's one overwhelming priority, it should disregard less important concerns.
+		/// </summary>
+		/// <param name="possiblePriorities"></param>
+		/// <returns></returns>
+		private static int CalculateNumberOfPriorities(List<StrategicPriority> possiblePriorities) {
+			int count = 1;
+			possiblePriorities.Sort((a, b) => {
+				return a.GetCalculatedWeight() - b.GetCalculatedWeight() > 0 ? 1 : -1;
+			});
+			float previousWeight = possiblePriorities[0].GetCalculatedWeight();
+			for (int idx = 1; idx < possiblePriorities.Count; idx++) {
+				float nextWeight = possiblePriorities[idx].GetCalculatedWeight();
+				if (nextWeight < previousWeight / 3) {
+					break;
+				}
+				count++;
+				previousWeight = nextWeight;
+			}
+			if (count < 2) {
+				return 2;
+			}
+			if (count > 4) {
+				return 4;
+			}
+			return count;
 		}
 		private static StrategicPriority ChooseStrategicPriority(List<StrategicPriority> possiblePriorities, PrioritizationType weighting) {
 			if (weighting == PrioritizationType.ALWAYS_CHOOSE_HIGHEST_SCORE) {

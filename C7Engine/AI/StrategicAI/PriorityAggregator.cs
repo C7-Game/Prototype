@@ -22,6 +22,7 @@ namespace C7Engine.AI.StrategicAI {
 			List<Type> priorities = new List<Type>();
 			priorities.Add(typeof(ExpansionPriority));
 			priorities.Add(typeof(ExplorationPriority));
+			priorities.Add(typeof(WarPriority));
 			return priorities;
 		}
 	}
