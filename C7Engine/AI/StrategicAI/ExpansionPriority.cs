@@ -9,7 +9,6 @@ namespace C7GameData.AIData {
 
 		public ExpansionPriority() {
 			key = "Expansion";
-			this.data.priorityKey = "Expansion";
 		}
 
 		public override void CalculateWeightAndMetadata(Player player) {
@@ -27,7 +26,7 @@ namespace C7GameData.AIData {
 		{
 			//Figure out if there's land to settle, and how much
 			Dictionary<Tile, int> possibleLocations = SettlerLocationAI.GetPossibleNewCityLocations(player.cities[0].location, player);
-			int score = possibleLocations.Count * 10;
+			int score = possibleLocations.Count * 5;
 			foreach (int i in possibleLocations.Values) {
 				score += i / 10;
 			}

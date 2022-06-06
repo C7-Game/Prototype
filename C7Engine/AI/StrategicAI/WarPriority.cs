@@ -14,7 +14,6 @@ namespace C7GameData.AIData {
 
 		public WarPriority() {
 			key = "WarPriority";
-			this.data.priorityKey = "WarPriority";
 		}
 
 		/// <summary>
@@ -39,7 +38,7 @@ namespace C7GameData.AIData {
 							int rnd = random.Next(opponentCount);
 							if (rnd == 0) {
 								//Let's fight this nation!
-								data.properties["opponent"] = nation.guid;
+								properties["opponent"] = nation.guid;
 								calculatedWeight = 50;
 							} else {
 								opponentCount--;	//guarantees we'll eventually get an opponent selected

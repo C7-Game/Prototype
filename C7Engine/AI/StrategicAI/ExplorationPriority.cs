@@ -7,7 +7,6 @@ namespace C7Engine.AI.StrategicAI {
 
 		public ExplorationPriority() {
 			key = "Exploration";
-			this.data.priorityKey = "Exploration";
 		}
 
 		public override void CalculateWeightAndMetadata(Player player) {

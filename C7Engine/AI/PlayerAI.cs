@@ -16,10 +16,20 @@ namespace C7Engine
 			if (player.isHuman || player.isBarbarians) {
 				return;
 			}
-			//Temporary!  Should not be every turn, should store results, etc.
-			StrategicPriority priority = StrategicPriorityArbitrator.Arbitrate(player);
 
-			Console.WriteLine("-> Begin " + player.civilization.cityNames[0] + " turn");
+			Console.WriteLine("\n---> Begin " + player.civilization.cityNames[0] + " turn");
+
+			if (player.turnsUntilPriorityReevaluation == 0) {
+				Console.WriteLine("Re-evaluating strategic priorities for " + player);
+				StrategicPriority priority = StrategicPriorityArbitrator.Arbitrate(player);
+				player.strategicPriorityData.Clear();
+				player.strategicPriorityData.Add(priority);
+				player.turnsUntilPriorityReevaluation = 15 + new Random().Next(10);
+				Console.WriteLine(player.turnsUntilPriorityReevaluation + " turns until next re-evaluation");
+			} else {
+				player.turnsUntilPriorityReevaluation--;
+			}
+
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
 				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.

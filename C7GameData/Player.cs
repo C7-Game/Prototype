@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using C7Engine.AI.StrategicAI;
 using C7GameData.AIData;
 
 namespace C7GameData
@@ -23,8 +25,8 @@ public class Player
 	public TileKnowledge tileKnowledge = new TileKnowledge();
 
 	//Ordered list of priority data.  First is most important.
-	public List<StrategicPriorityData> strategicPriorityData = new List<StrategicPriorityData>();
-	private int turnsUntilPriorityReevaluation;
+	public List<StrategicPriority> strategicPriorityData = new List<StrategicPriority>();
+	public int turnsUntilPriorityReevaluation = 0;
 
 	public Player(uint color)
 	{
@@ -79,6 +81,10 @@ public class Player
 	// in place.
 	public bool KnowsAboutResource(Resource resource) {
 		return true;
+	}
+
+	public override string ToString() {
+		return civilization.cityNames.First();
 	}
 }
 

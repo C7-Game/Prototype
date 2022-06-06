@@ -42,7 +42,7 @@ namespace C7Engine.AI.StrategicAI {
 		protected float calculatedWeight;
 
 		protected string key;
-		protected StrategicPriorityData data;
+		protected Dictionary<string, string> properties = new Dictionary<string, string>();
 
 		/**
 		 * Returns a weight for how important this strategic priority is for the player.
