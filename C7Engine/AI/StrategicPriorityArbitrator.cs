@@ -13,15 +13,14 @@ namespace C7Engine.AI {
 	 */
 	public class StrategicPriorityArbitrator {
 
+		private static readonly int MIN_PRIORITIES = 2;
+		private static readonly int MAX_PRIORITIES = 4;
+
 		/// <summary>
-		/// N.B. I want to have this support primary/secondary/tertiary priorities.  That will require more params, so
-		/// it doesn't choose the same priority as primary/secondary/tertiary.
-		///
-		/// However, right now there's enough complexity that I want to stop and check that it's working for one.  I will
-		/// improve it in a future commit.
+		/// Returns an ordered list of AI priorities, with the first item being the top priority.
 		/// </summary>
 		/// <param name="player">The player whose priorities are being arbitrated.</param>
-		/// <returns>The chosen priority.</returns>
+		/// <returns>The chosen priorities, in order.</returns>
 		public static List<StrategicPriority> Arbitrate(Player player) {
 			List<Type> priorityTypes = PriorityAggregator.GetAllStrategicPriorityTypes();
 			List<StrategicPriority> possiblePriorities = new List<StrategicPriority>();
@@ -70,11 +69,11 @@ namespace C7Engine.AI {
 				count++;
 				previousWeight = nextWeight;
 			}
-			if (count < 2) {
-				return 2;
+			if (count < MIN_PRIORITIES) {
+				return MIN_PRIORITIES;
 			}
-			if (count > 4) {
-				return 4;
+			if (count > MAX_PRIORITIES) {
+				return MAX_PRIORITIES;
 			}
 			return count;
 		}
@@ -82,7 +81,7 @@ namespace C7Engine.AI {
 			if (weighting == PrioritizationType.ALWAYS_CHOOSE_HIGHEST_SCORE) {
 				return FindTopScoringPriority(possiblePriorities);
 			} else {
-				return WeightedPriority(possiblePriorities, weighting);
+				return ChooseWeightedPriority(possiblePriorities, weighting);
 			}
 		}
 
@@ -99,7 +98,7 @@ namespace C7Engine.AI {
 			return topScore;
 		}
 
-		private static StrategicPriority WeightedPriority(List<StrategicPriority> possiblePriorities, PrioritizationType weighting) {
+		private static StrategicPriority ChooseWeightedPriority(List<StrategicPriority> possiblePriorities, PrioritizationType weighting) {
 			double sumOfAllWeights = 0.0;
 			List<double> cutoffs = new List<double>();
 			foreach (StrategicPriority possiblePriority in possiblePriorities) {

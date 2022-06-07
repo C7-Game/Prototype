@@ -6,6 +6,8 @@ namespace C7GameData.AIData {
 	public class ExpansionPriority : StrategicPriority {
 		private readonly int TEMP_GAME_LENGTH = 540;
 		private readonly int EARLY_GAME_CUTOFF = 25;	//what percentage of the game is early game, which should give expansion a boost?
+		private static readonly int POSSIBLE_CITY_LOCATION_SCORE = 2;	//how much weight to give to each possible city location
+		private static readonly int TILE_SCORE_DIVIDER;	//how much to divide each location's tile score by
 
 		public ExpansionPriority() {
 			key = "Expansion";
@@ -26,9 +28,9 @@ namespace C7GameData.AIData {
 		{
 			//Figure out if there's land to settle, and how much
 			Dictionary<Tile, int> possibleLocations = SettlerLocationAI.GetPossibleNewCityLocations(player.cities[0].location, player);
-			int score = possibleLocations.Count * 5;
+			int score = possibleLocations.Count * POSSIBLE_CITY_LOCATION_SCORE;
 			foreach (int i in possibleLocations.Values) {
-				score += i / 10;
+				score += i / TILE_SCORE_DIVIDER;
 			}
 			return score;
 		}
@@ -38,8 +40,8 @@ namespace C7GameData.AIData {
 			//TODO: We haven't implemented the part for "how many turns does the game have?" yet.  So this is hard-coded.
 			int gameTurn = EngineStorage.gameData.turn;
 			int percentOfGameFinished = (gameTurn * 100) / TEMP_GAME_LENGTH;
-			if (percentOfGameFinished < 25) {
-				score = score * (25 - percentOfGameFinished) / 5;
+			if (percentOfGameFinished < EARLY_GAME_CUTOFF) {
+				score = score * (EARLY_GAME_CUTOFF - percentOfGameFinished) / 5;
 			}
 			return score;
 		}
