@@ -62,5 +62,21 @@ namespace C7Engine.AI.StrategicAI {
 		public float GetCalculatedWeight() {
 			return calculatedWeight;
 		}
+
+		/// <summary>
+		/// How much more or less likely a unit is to be produced based on this strategy.
+		/// This will be weighted by the priority's rank (top priority = full effect)
+		/// A value of 0.0 indicates no change to the prioritization.
+		/// A value of 1.0 means a 100% bonus (twice as likely to build); 4.0 means five times as likely to build.
+		/// A value of -1.0 means 100% less likely to build (will never build).
+		/// </summary>
+		/// <param name="producible"></param>
+		/// <returns></returns>
+		public virtual float GetProductionItemPreference(IProducible producible) {
+			if (producible is UnitPrototype prototype) {
+				return 0.0f;
+			}
+			return 0.0f;
+		}
 	}
 }

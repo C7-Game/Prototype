@@ -24,6 +24,21 @@ namespace C7GameData.AIData {
 				this.calculatedWeight = score;
 			}
 		}
+
+		/// <summary>
+		/// This priority will prefer units that can build cities.
+		/// </summary>
+		/// <param name="producible"></param>
+		/// <returns></returns>
+		public override float GetProductionItemPreference(IProducible producible) {
+			if (producible is UnitPrototype prototype) {
+				if (prototype.actions.Contains("buildCity")) {
+					return 4.0f;
+				}
+			}
+			return 0.0f;
+		}
+
 		private static int CalculateAvailableLandScore(Player player)
 		{
 			//Figure out if there's land to settle, and how much

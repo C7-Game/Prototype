@@ -17,5 +17,20 @@ namespace C7Engine.AI.StrategicAI {
 
 			this.calculatedWeight = 100 - 2 * percentOfGameFinished;
 		}
+
+		/// <summary>
+		/// This priority prefers fast units.
+		/// Eventually it will also consider things being inexpensive, and consider land versus sea.
+		/// </summary>
+		/// <param name="producible"></param>
+		/// <returns></returns>
+		public override float GetProductionItemPreference(IProducible producible) {
+			if (producible is UnitPrototype prototype) {
+				if (prototype.movement > 1) {
+					return 1.0f * (prototype.movement - 1);
+				}
+			}
+			return 0.0f;
+		}
 	}
 }
