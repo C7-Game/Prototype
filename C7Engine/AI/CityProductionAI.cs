@@ -37,6 +37,9 @@ namespace C7Engine
 
 			Console.WriteLine($"Choosing what to produce next in {city.name}");
 
+			List<IProducible> prototypes = new List<IProducible>();
+			List<float> weights = new List<float>();
+
 			foreach (UnitPrototype unitPrototype in unitPrototypes) {
 				float baseScore = GetItemScore(unitPrototype);
 				//TODO: Debug statements
@@ -50,19 +53,13 @@ namespace C7Engine
 				float popAdjustedScore = AdjustScoreByPopCost(city, unitPrototype, baseScore);
 				float priorityAdjustedScore = AdjustScoreByPriorities(priorities, unitPrototype, popAdjustedScore);
 
-				//TEMP: Always choosing first
-				//TODO: Add weighting
-				if (priorityAdjustedScore > highestScore) {
-					highestScore = priorityAdjustedScore;
-					highestScoring = unitPrototype;
-					Console.WriteLine($" {unitPrototype.name} with score {priorityAdjustedScore} is currently the highest scoring");
-				} else {
-					Console.WriteLine($" {unitPrototype.name} with score {priorityAdjustedScore} is not the highest scoring");
-				}
+				Console.WriteLine($" {unitPrototype.name} scores {priorityAdjustedScore}");
+				prototypes.Add(unitPrototype);
+				weights.Add(priorityAdjustedScore);
 			}
 
-			Console.WriteLine($"  Choosing {highestScoring.name} with score {highestScore}\n");
-			return highestScoring;
+			IProducible chosen = ChooseWeightedPriority(prototypes, weights, PrioritizationType.WEIGHTED_QUADRATIC);
+			return chosen;
 		}
 
 		/// <summary>
@@ -88,6 +85,49 @@ namespace C7Engine
 				return baseScore;
 			}
 			return 0.0f;
+		}
+
+		private static IProducible ChooseWeightedPriority(List<IProducible> items, List<float> weights, PrioritizationType weighting) {
+			double sumOfAllWeights = 0.0;
+			List<double> cutoffs = new List<double>();
+			int i = 0;
+			foreach (float f in weights) {
+				double baseWeight = f;
+				double adjustedWeight = AdjustWeightByFactor(baseWeight, weighting);
+				if (f <= 0) {
+					adjustedWeight = 0;
+				}
+
+				double oldCutoff = sumOfAllWeights;
+				sumOfAllWeights += adjustedWeight;
+
+				Console.WriteLine($"Item {items[i]} has range of {oldCutoff} to {sumOfAllWeights}");
+
+				cutoffs.Add(sumOfAllWeights);
+				i++;
+			}
+
+			Random random = new Random();
+			double randomDouble = sumOfAllWeights * random.NextDouble();
+			Console.WriteLine($"Random number in range 0 to {sumOfAllWeights} is {randomDouble}");
+			int idx = 0;
+			foreach (double cutoff in cutoffs) {
+				if (randomDouble < cutoff) {
+					Console.WriteLine($"Chose item {items[idx]}");
+					return items[idx];
+				}
+				idx++;
+			}
+			return items[0];	//TODO: Fallback
+		}
+
+		//TODO: Duplicated with StrategicPriorityArbitrator.  Should be common.
+		private static double AdjustWeightByFactor(double baseWeight, PrioritizationType weighting) {
+			if (weighting == PrioritizationType.WEIGHTED_QUADRATIC) {
+				return baseWeight * baseWeight;
+			} else {
+				return baseWeight;
+			}
 		}
 
 		public static float AdjustScoreByPopCost(City city, UnitPrototype unitPrototype, float baseScore) {
