@@ -64,6 +64,16 @@ namespace C7Engine.AI.StrategicAI {
 		}
 
 		/// <summary>
+		/// Allows the priority to add a flat adjuster to the likelihood of building this item.
+		/// This can be used to offset weights in the base adjuster, or simply as an alternative to the weight-based method.
+		/// </summary>
+		/// <param name="producible"></param>
+		/// <returns></returns>
+		public virtual float GetProductionItemFlatAdjuster(IProducible producible) {
+			return 0.0f;
+		}
+
+		/// <summary>
 		/// How much more or less likely a unit is to be produced based on this strategy.
 		/// This will be weighted by the priority's rank (top priority = full effect)
 		/// A value of 0.0 indicates no change to the prioritization.
@@ -72,7 +82,7 @@ namespace C7Engine.AI.StrategicAI {
 		/// </summary>
 		/// <param name="producible"></param>
 		/// <returns></returns>
-		public virtual float GetProductionItemPreference(IProducible producible) {
+		public virtual float GetProductionItemPreferenceWeight(IProducible producible) {
 			if (producible is UnitPrototype prototype) {
 				return 0.0f;
 			}

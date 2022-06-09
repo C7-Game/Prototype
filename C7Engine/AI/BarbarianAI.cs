@@ -29,7 +29,8 @@ namespace C7Engine {
 						//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
 						//if it tries to move e.g. north from the north pole.  Hence, this check.
 						if (newLocation != Tile.NONE) {
-							Console.WriteLine("Moving barbarian at " + unit.location + " to " + newLocation);
+							//This should be a low-level log
+							// Console.WriteLine("Moving barbarian at " + unit.location + " to " + newLocation);
 							unit.move(unit.location.directionTo(newLocation));
 						}
 					}

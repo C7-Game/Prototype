@@ -24,13 +24,17 @@ namespace C7Engine.AI.StrategicAI {
 		/// </summary>
 		/// <param name="producible"></param>
 		/// <returns></returns>
-		public override float GetProductionItemPreference(IProducible producible) {
+		public override float GetProductionItemPreferenceWeight(IProducible producible) {
 			if (producible is UnitPrototype prototype) {
 				if (prototype.movement > 1) {
 					return 1.0f * (prototype.movement - 1);
 				}
 			}
 			return 0.0f;
+		}
+
+		public override string ToString() {
+			return "ExplorationPriority";
 		}
 	}
 }

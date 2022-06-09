@@ -39,7 +39,13 @@ namespace C7Engine
 
 			foreach (UnitPrototype unitPrototype in unitPrototypes) {
 				float baseScore = GetItemScore(unitPrototype);
+				//TODO: Debug statements
+				// Console.WriteLine($"  Base score for {unitPrototype} is {baseScore}");
 				// There may eventually be some additive adjusters (or that may play into the previous)
+				float flatAdjuster = GetPriorityFlatAdjusters(priorities, unitPrototype, baseScore);
+				baseScore = baseScore + flatAdjuster;
+				//TODO: Debug statements
+				// Console.WriteLine($"  Flat-adjusted score for {unitPrototype} is {baseScore}");
 				// Below here are multiplicative adjusters
 				float popAdjustedScore = AdjustScoreByPopCost(city, unitPrototype, baseScore);
 				float priorityAdjustedScore = AdjustScoreByPriorities(priorities, unitPrototype, popAdjustedScore);
@@ -49,13 +55,13 @@ namespace C7Engine
 				if (priorityAdjustedScore > highestScore) {
 					highestScore = priorityAdjustedScore;
 					highestScoring = unitPrototype;
-					Console.WriteLine($"  {unitPrototype.name} with score {priorityAdjustedScore} is currently the highest scoring");
+					Console.WriteLine($" {unitPrototype.name} with score {priorityAdjustedScore} is currently the highest scoring");
 				} else {
-					Console.WriteLine($"  {unitPrototype.name} with score {priorityAdjustedScore} is not the highest scoring");
+					Console.WriteLine($" {unitPrototype.name} with score {priorityAdjustedScore} is not the highest scoring");
 				}
 			}
 
-			Console.WriteLine($"  Choosing {highestScoring.name} with score {highestScore}");
+			Console.WriteLine($"  Choosing {highestScoring.name} with score {highestScore}\n");
 			return highestScoring;
 		}
 
@@ -111,11 +117,25 @@ namespace C7Engine
 			return baseScore;
 		}
 
+		public static float GetPriorityFlatAdjusters(List<StrategicPriority> priorities, UnitPrototype prototype, float baseScore) {
+			// How much emphasis the top priority adds.
+			float totalAdjusters = 0.0f;
+			float priorityMultiplier = 1.0f;
+			foreach (StrategicPriority priority in priorities) {
+				float adjuster = priority.GetProductionItemFlatAdjuster(prototype);
+				// Low-level log, we don't have proper logs yet so it's commented out
+				// Console.WriteLine($"  Got adjuster of {adjuster} from {priority}; adjusting by ${adjuster * priorityMultiplier}");
+				totalAdjusters += (adjuster * priorityMultiplier);
+				priorityMultiplier /= 2;
+			}
+			return totalAdjusters;
+		}
+
 		public static float AdjustScoreByPriorities(List<StrategicPriority> priorities, UnitPrototype prototype, float baseScore) {
 			// How much emphasis the top priority adds.
 			float priorityMultiplier = 1.0f;
 			foreach (StrategicPriority priority in priorities) {
-				float adjuster = priority.GetProductionItemPreference(prototype);
+				float adjuster = priority.GetProductionItemPreferenceWeight(prototype);
 				baseScore = baseScore + (adjuster * priorityMultiplier) * baseScore;
 				priorityMultiplier /= 2;
 			}
