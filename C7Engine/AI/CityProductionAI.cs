@@ -43,17 +43,24 @@ namespace C7Engine
 			foreach (UnitPrototype unitPrototype in unitPrototypes) {
 				float baseScore = GetItemScore(unitPrototype);
 				//TODO: Debug statements
-				// Console.WriteLine($"  Base score for {unitPrototype} is {baseScore}");
+				Console.WriteLine($" Base score for {unitPrototype} is {baseScore}");
 				// There may eventually be some additive adjusters (or that may play into the previous)
 				float flatAdjuster = GetPriorityFlatAdjusters(priorities, unitPrototype, baseScore);
 				baseScore = baseScore + flatAdjuster;
 				//TODO: Debug statements
 				// Console.WriteLine($"  Flat-adjusted score for {unitPrototype} is {baseScore}");
+
+
+				//Exclude naval units from land-only cities
+				if (unitPrototype.categories.Contains("Sea") && !city.location.NeighborsWater()) {
+					baseScore = 0.0f;
+				}
+
 				// Below here are multiplicative adjusters
 				float popAdjustedScore = AdjustScoreByPopCost(city, unitPrototype, baseScore);
 				float priorityAdjustedScore = AdjustScoreByPriorities(priorities, unitPrototype, popAdjustedScore);
 
-				Console.WriteLine($" {unitPrototype.name} scores {priorityAdjustedScore}");
+				Console.WriteLine($" {unitPrototype.name} adjusted-scores {priorityAdjustedScore}");
 				prototypes.Add(unitPrototype);
 				weights.Add(priorityAdjustedScore);
 			}
