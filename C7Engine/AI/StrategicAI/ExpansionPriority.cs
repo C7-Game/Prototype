@@ -8,7 +8,7 @@ namespace C7GameData.AIData {
 		private readonly int TEMP_GAME_LENGTH = 540;
 		private readonly int EARLY_GAME_CUTOFF = 25;	//what percentage of the game is early game, which should give expansion a boost?
 		private static readonly int POSSIBLE_CITY_LOCATION_SCORE = 2;	//how much weight to give to each possible city location
-		private static readonly int TILE_SCORE_DIVIDER;	//how much to divide each location's tile score by
+		private static readonly int TILE_SCORE_DIVIDER = 1;	//how much to divide each location's tile score by
 
 		private static readonly int SETTLER_FLAT_APPEAL = 30;			//the base "flat" appeal of settler-type units
 		private static readonly float SETTLER_WEIGHTED_APPEAL = 4.0f;	//the multiplier effect on settler-type units
