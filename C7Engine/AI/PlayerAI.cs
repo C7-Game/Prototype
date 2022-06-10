@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using C7Engine.Pathing;
 using C7GameData;
@@ -20,6 +21,8 @@ namespace C7Engine
 			log.Information("-> Begin " + player.civilization.cityNames[0] + " turn");
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
+				Stopwatch loadTimer = new Stopwatch();
+				loadTimer.Start();
 				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.
 				//It may fail due to conditions having changed since that goal was assigned; in that case it will
 				//get a new task to try to complete.
@@ -41,6 +44,9 @@ namespace C7Engine
 						break;
 					}
 				}
+
+				TimeSpan stopwatchElapsed = loadTimer.Elapsed;
+				Console.WriteLine($"Unit processing time for {unit.unitType.name}: {Convert.ToInt32(stopwatchElapsed.TotalMilliseconds)} ms");
 
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}

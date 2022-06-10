@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using C7GameData;
 using C7GameData.AIData;
@@ -13,6 +14,8 @@ namespace C7Engine
 
 		public bool PlayTurn(Player player, MapUnit unit)
 		{
+			Stopwatch watch = new Stopwatch();
+			watch.Start();
 			ExplorerAIData explorerData = (ExplorerAIData)unit.currentAIData;
 			if (MovingToNewExplorationArea(explorerData)) {
 				return MoveToNextTileOnPath(explorerData, unit);
@@ -20,16 +23,34 @@ namespace C7Engine
 			else {
 				bool foundNeighboringTileToExplore = ExploreNeighboringTile(player, unit, explorerData);
 				if (foundNeighboringTileToExplore) {
+					if (unit.unitType.name.Contains("Galley")) {
+						Console.WriteLine($"Explore neighboring time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+					}
 					return true;
+				}
+
+				if (unit.unitType.name.Contains("Galley")) {
+					Console.WriteLine($"Pre found new path time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
 				}
 
 				//Find the nearest tile that will allow us to continue exploring.
 				//We prefer nearest because the one that allows the most discovery might be pretty far away
 				bool foundNewPath = FindPathToNewExplorationArea(player, explorerData, unit);
+
+				if (unit.unitType.name.Contains("Galley")) {
+					Console.WriteLine($"Found new path time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+				}
 				if (foundNewPath) {
 					MoveToNextTileOnPath(explorerData, unit);
+
+					if (unit.unitType.name.Contains("Galley")) {
+						Console.WriteLine($"Moved to new path time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+					}
 					return true;
 				}
+			}
+			if (unit.unitType.name.Contains("Galley")) {
+				Console.WriteLine($"Final time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
 			}
 			return false;
 		}
