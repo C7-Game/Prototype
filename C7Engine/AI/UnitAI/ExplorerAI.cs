@@ -90,11 +90,17 @@ namespace C7Engine
 		}
 
 		private static bool FindPathToNewExplorationArea(Player player, ExplorerAIData explorerData, MapUnit unit) {
+			Stopwatch watch = new Stopwatch();
+			watch.Start();
 			List<Tile> validExplorerTiles = new List<Tile>();
 			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
 					.Where(t => unit.CanEnterTile(t, false) && t.cityAtTile == null && numUnknownNeighboringTiles(player, t) > 0))
 			{
 				validExplorerTiles.Add(t);
+			}
+
+			if (unit.unitType.name.Contains("Galley")) {
+				Console.WriteLine($"Valid explorer tile time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
 			}
 
 			if (validExplorerTiles.Count == 0) {
@@ -106,6 +112,11 @@ namespace C7Engine
 			int lowestDistance = int.MaxValue;
 			TilePath chosenPath = null;
 
+
+			if (unit.unitType.name.Contains("Galley")) {
+				Console.WriteLine($"Pre algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+			}
+
 			PathingAlgorithm algo = PathingAlgorithmChooser.GetAlgorithm();
 			foreach (Tile t in validExplorerTiles) {
 				TilePath path = algo.PathFrom(unit.location, t);
@@ -113,6 +124,16 @@ namespace C7Engine
 					lowestDistance = path.PathLength();
 					chosenPath = path;
 				}
+
+				if (unit.unitType.name.Contains("Galley")) {
+					Console.WriteLine($"Algo time for {t} = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+				}
+			}
+
+			if (unit.unitType.name.Contains("Galley")) {
+				Console.WriteLine($"Post algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+				Console.WriteLine($"Chosen path is {chosenPath}");
+				Console.WriteLine("Debugging hopefully is useful");
 			}
 
 			if (chosenPath == null) {
