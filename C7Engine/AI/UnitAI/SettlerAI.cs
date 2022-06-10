@@ -15,7 +15,7 @@ start:
 			switch (settlerAi.goal) {
 				case SettlerAIData.SettlerGoal.BUILD_CITY:
 					if (IsInvalidCityLocation(settlerAi.destination)) {
-						log.Information("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination);
+						log.Information("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination + " as target location is no longer valid");
 						PlayerAI.SetAIForUnit(unit, player);
 						//Make sure we're using the new settler AI going forward, including this turn
 						settlerAi = (SettlerAIData)unit.currentAIData;
@@ -53,7 +53,7 @@ start:
 					}
 					break;
 				case SettlerAIData.SettlerGoal.JOIN_CITY:
-					if (unit.location.cityAtTile != null) {
+					if (unit.location.HasCity()) {
 						//TODO: Actually join the city.  Haven't added that action.
 						//For now, just get rid of the unit.  Sorry, bro.
 						unit.disband();

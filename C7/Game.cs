@@ -398,7 +398,7 @@ public class Game : Node2D
 						string yield = tile.YieldString(controller);
 						GD.Print($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
 
-						if (tile.cityAtTile != null) {
+						if (tile.HasCity()) {
 							City city = tile.cityAtTile;
 							GD.Print($"  {city.name}, production {city.shieldsStored} of {city.itemBeingProduced.shieldCost}");
 						}

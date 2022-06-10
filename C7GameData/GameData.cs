@@ -204,6 +204,10 @@ namespace C7GameData
 					continue;
 				}
 				CreateStartingDummyUnits(player, startingLocations[i]);
+				player.tileKnowledge.AddTilesToKnown(startingLocations[i]);
+				foreach (Tile t in startingLocations[i].neighbors.Values) {
+					player.tileKnowledge.AddTilesToKnown(t);
+				}
 				i++;
 			}
 

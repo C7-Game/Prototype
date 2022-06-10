@@ -199,6 +199,10 @@ namespace C7GameData
 		public string YieldString(Player player) {
 			return $"{foodYield(player)}/{productionYield(player)}/{commerceYield(player)})";
 		}
+
+		public bool HasCity() {
+			return cityAtTile != City.NONE && cityAtTile != null;
+		}
 	}
 
 	public enum TileDirection {

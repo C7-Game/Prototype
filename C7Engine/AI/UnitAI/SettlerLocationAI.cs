@@ -18,14 +18,9 @@ namespace C7Engine
 		static int LUXURY_RESOURCE_BONUS = 15;
 
 		//Figures out where to plant Settlers
-		public static Tile findSettlerLocation(Tile start, Player player) {
-			List<City> playerCities = player.cities;
+		public static Tile FindSettlerLocation(Tile start, Player player) {
 			List<MapUnit> playerUnits = player.units;
-			HashSet<Tile> candidates = GetCandidateTiles(start);
-			foreach (City city in playerCities) {
-				HashSet<Tile> moreCandidates = GetCandidateTiles(city.location);
-				candidates.UnionWith(moreCandidates);
-			}
+			IEnumerable<Tile> candidates = player.tileKnowledge.AllKnownTiles().Where(t => !IsInvalidCityLocation(t));
 			Dictionary<Tile, int> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
 			if (scores.Count == 0 || scores.Values.Max() <= 0) {
 				return Tile.NONE;	//nowhere to settle
@@ -45,44 +40,8 @@ namespace C7Engine
 			}
 			return returnValue;
 		}
-		private static HashSet<Tile> GetCandidateTiles(Tile start)
-		{
 
-			//First approach: Swing out from the start tile, searching for valid locations.
-			//This is not going to be amazing at first, don't take this as the One True Way.
-			//ringOne = direct neighbors of start tile.  Not valid.
-			HashSet<Tile> ringOne = new HashSet<Tile>(start.GetLandNeighbors());
-			//Ring two is outside the city, but only settled in CxC fashion, which we aren't teaching to
-			//the AI here.
-			HashSet<Tile> ringTwo = new HashSet<Tile>();
-			foreach (Tile t in ringOne) {
-				HashSet<Tile> tiles = new HashSet<Tile>(t.GetLandNeighbors());
-				ringTwo.UnionWith(tiles);
-			}
-			ringTwo.ExceptWith(ringOne);
-			ringTwo.Remove(start); //start probably got added in as a neighbor of ring 1.
-			//Ring three is CxxC style city planning.  Potentially valid.
-			HashSet<Tile> ringThree = new HashSet<Tile>();
-			foreach (Tile t in ringTwo) {
-				ringThree.UnionWith(new HashSet<Tile>(t.GetLandNeighbors()));
-			}
-			ringThree.ExceptWith(ringTwo);
-			ringThree.ExceptWith(ringOne);
-			//Ring four is CxxxC style city planning.  Also potentially valid.
-			HashSet<Tile> ringFour = new HashSet<Tile>();
-			foreach (Tile t in ringThree) {
-				ringFour.UnionWith(new HashSet<Tile>(t.GetLandNeighbors()));
-			}
-			ringFour.ExceptWith(ringThree);
-			ringFour.ExceptWith(ringTwo);
-
-			//Okay, we've got our rings.  Now let's try to evaluate them.
-			HashSet<Tile> candidates = new HashSet<Tile>();
-			candidates.UnionWith(ringThree);
-			candidates.UnionWith(ringFour);
-			return candidates;
-		}
-		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, HashSet<Tile> candidates, List<MapUnit> playerSettlers)
+		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, IEnumerable<Tile> candidates, List<MapUnit> playerSettlers)
 		{
 
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
@@ -92,7 +51,7 @@ namespace C7Engine
 					scores[t] = 0;
 					continue;
 				}
-				if (t.cityAtTile != null || t.GetLandNeighbors().Exists(n => n.cityAtTile != null)) {
+				if (t.HasCity() || t.GetLandNeighbors().Exists(n => n.HasCity())) {
 					scores[t] = 0;
 					continue;
 				}
@@ -103,9 +62,15 @@ namespace C7Engine
 							scores[t] = 0;
 							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.
 						}
-						if (otherSettlerAI.destination.GetLandNeighbors().Exists(n => n == t)) {
+						if (otherSettlerAI.destination.GetLandNeighbors().Exists(innerRingTile => innerRingTile == t)) {
 							scores[t] = 0;
 							goto nextcandidate;
+						}
+						foreach (Tile innerRingTile in otherSettlerAI.destination.GetLandNeighbors()) {
+							if (innerRingTile.GetLandNeighbors().Exists(outerRingTile => outerRingTile == t)) {
+								scores[t] = 0;
+								goto nextcandidate;
+							}
 						}
 					}
 				}
@@ -151,6 +116,23 @@ nextcandidate: ;
 				score += LUXURY_RESOURCE_BONUS;
 			}
 			return score;
+		}
+
+		public static bool IsInvalidCityLocation(Tile tile) {
+			if (tile.HasCity()) {
+				return true;
+			}
+			foreach (Tile neighbor in tile.neighbors.Values) {
+				if (neighbor.HasCity()) {
+					return true;
+				}
+				foreach (Tile neighborOfNeighbor in tile.neighbors.Values) {
+					if (neighborOfNeighbor.HasCity()) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 	}
 }

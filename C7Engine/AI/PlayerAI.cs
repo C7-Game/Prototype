@@ -59,7 +59,7 @@ namespace C7Engine
 					log.Information("No cities yet!  Set AI for unit to settler AI with destination of " + settlerAiData.destination);
 				}
 				else {
-					settlerAiData.destination = SettlerLocationAI.findSettlerLocation(unit.location, player);
+					settlerAiData.destination = SettlerLocationAI.FindSettlerLocation(unit.location, player);
 					if (settlerAiData.destination == Tile.NONE) {
 						//This is possible if all tiles within 4 tiles of a city are either not land, or already claimed
 						//by another colonist.  Longer-term, the AI shouldn't be building settlers if that is the case,
@@ -75,7 +75,7 @@ namespace C7Engine
 				}
 				unit.currentAIData = settlerAiData;
 			}
-			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
+			else if (unit.location.HasCity() && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
 				DefenderAIData ai = new DefenderAIData();
 				ai.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;
