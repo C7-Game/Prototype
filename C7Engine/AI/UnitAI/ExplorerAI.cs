@@ -69,7 +69,7 @@ namespace C7Engine
 		private static bool FindPathToNewExplorationArea(Player player, ExplorerAIData explorerData, MapUnit unit) {
 			List<Tile> validExplorerTiles = new List<Tile>();
 			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
-					.Where(t => unit.canTraverseTile(t) && t.cityAtTile == null && numUnknownNeighboringTiles(player, t) > 0))
+					.Where(t => unit.CanEnterTile(t, false) && t.cityAtTile == null && numUnknownNeighboringTiles(player, t) > 0))
 			{
 				validExplorerTiles.Add(t);
 			}

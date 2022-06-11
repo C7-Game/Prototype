@@ -288,10 +288,14 @@ public static class MapUnitExtensions {
 		else if (unit.unitType.categories.Contains("Land") && ! tile.IsLand())
 			return false;
 
-		// Check for enemy units on tile
-		MapUnit defender = tile.FindTopDefender(unit);
-		if ((defender != MapUnit.NONE) && ! unit.owner.IsAtPeaceWith(defender.owner))
-			return allowCombat;
+		// Check for units belonging to other civs
+		foreach (MapUnit other in tile.unitsOnTile)
+			if (other.owner != unit.owner) {
+				if (! other.owner.IsAtPeaceWith(unit.owner))
+					return allowCombat;
+				else
+					return false;
+			}
 
 		return true;
 	}
@@ -404,17 +408,5 @@ public static class MapUnitExtensions {
 		unit.disband();
 	}
 
-	public static bool canTraverseTile(this MapUnit unit, Tile t) {
-		//TODO: Unit prototypes should have info about terrain classes (#148), and we shouldn't rely on names
-		if (unit.unitType.name == "Galley" && !t.IsLand())
-		{
-			return true;
-		}
-		else if (t.IsLand())
-		{
-			return true;
-		}
-		return false;
-	}
 	}
 }
