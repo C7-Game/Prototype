@@ -109,38 +109,16 @@ namespace C7GameData
 			return neighbors.Values.Where(tile => tile.baseTerrainType.Key == "coast").ToList();
 		}
 
-		// Returns whether or not there's a river crossing at the asterisk (*), looking forward from the carat (^), given the presence of
-		// rivers along the four labeled tile edges:
-		//        \     /
-		// farLeft \   /  farRight
-		//          \ /
-		//           *
-		//          / \
-		// nearLeft/   \  nearRight
-		//        /  ^  \
-		private bool FacingCrossingAtVertex(bool nearLeft, bool nearRight, bool farLeft, bool farRight)
-		{
-			return (nearLeft && nearRight) || (farLeft && farRight) || (nearLeft && farRight) || (farLeft && nearRight);
-		}
-
 		public bool HasRiverCrossing(TileDirection dir)
 		{
 			switch (dir) {
-			case TileDirection.NORTH:
-				Tile north = neighbors[TileDirection.NORTH];
-				return FacingCrossingAtVertex(riverNorthwest, riverNortheast, north.riverSouthwest, north.riverSoutheast);
+			case TileDirection.NORTH:     return riverNorth;
 			case TileDirection.NORTHEAST: return riverNortheast;
-			case TileDirection.EAST:
-				Tile east = neighbors[TileDirection.EAST];
-				return FacingCrossingAtVertex(riverNortheast, riverSoutheast, east.riverNorthwest, east.riverSouthwest);
+			case TileDirection.EAST:      return riverEast;
 			case TileDirection.SOUTHEAST: return riverSoutheast;
-			case TileDirection.SOUTH:
-				Tile south = neighbors[TileDirection.SOUTH];
-				return FacingCrossingAtVertex(riverSoutheast, riverSouthwest, south.riverNortheast, south.riverNorthwest);
+			case TileDirection.SOUTH:     return riverSouth;
 			case TileDirection.SOUTHWEST: return riverSouthwest;
-			case TileDirection.WEST:
-				Tile west = neighbors[TileDirection.WEST];
-				return FacingCrossingAtVertex(riverSouthwest, riverNorthwest, west.riverSoutheast, west.riverNortheast);
+			case TileDirection.WEST:      return riverWest;
 			case TileDirection.NORTHWEST: return riverNorthwest;
 			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
 			}
