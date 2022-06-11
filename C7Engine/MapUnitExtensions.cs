@@ -133,7 +133,7 @@ public static class MapUnitExtensions {
 		// Defensive bombard
 		MapUnit defensiveBombarder = MapUnit.NONE;
 		double defensiveBombarderStrength = 0.0;
-		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender && u.defensiveBombardsRemaining > 0)) {
+		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender && ! u.owner.IsAtPeaceWith(attacker.owner) && u.defensiveBombardsRemaining > 0)) {
 			double strength = candidate.StrengthVersus(attacker, CombatRole.DefensiveBombard, attacker.facingDirection.reversed());
 			if (strength > defensiveBombarderStrength) {
 				defensiveBombarder = candidate;
