@@ -140,8 +140,9 @@ public static class MapUnitExtensions {
 				defensiveBombarderStrength = strength;
 			}
 		}
-		if (defensiveBombarder != MapUnit.NONE &&
-		    attacker.hitPointsRemaining > 1) { // TODO: Can defensive bombard kill? What does the original game do in this case?
+		// In the original game, defensive bombard does not trigger against attackers with 1 HP. See:
+		// https://github.com/C7-Game/Prototype/pull/250#discussion_r893051111
+		if (defensiveBombarder != MapUnit.NONE && attacker.hitPointsRemaining > 1) {
 			var dBOriginalDirection = defensiveBombarder.facingDirection;
 			defensiveBombarder.facingDirection = defender.facingDirection;
 
@@ -156,7 +157,6 @@ public static class MapUnitExtensions {
 			defensiveBombarder.facingDirection = dBOriginalDirection;
 		}
 
-		// TODO: Check these rules are accurate and that we're not missing any.
 		bool defenderEligibleToRetreat = defender.hitPointsRemaining > 1 && ! defender.location.HasCity;
 
 		// Do combat rounds
@@ -167,6 +167,8 @@ public static class MapUnitExtensions {
 				if (defenderEligibleToRetreat &&
 				    defender.hitPointsRemaining == 1 &&
 				    EngineStorage.gameData.rng.NextDouble() < defender.RetreatChance(attacker, false)) {
+					// TODO: Defender retreat behavior requires some more work. There's an issue for it here:
+					// https://github.com/C7-Game/Prototype/issues/274
 					Tile retreatDestination = defender.location.neighbors[attacker.facingDirection];
 					if ((retreatDestination != Tile.NONE) && defender.CanEnterTile(retreatDestination, false)) {
 						defender.move(attacker.facingDirection, true);
@@ -244,8 +246,8 @@ public static class MapUnitExtensions {
 		City city = location.cityAtTile;
 		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
 		return inFriendlyCity ? rules.healRateInCity : rules.healRateInNeutralField;
-		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (can they
-		// heal outside of port? I don't think so, but I might be getting confused with another civ game).
+		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (they
+		// shouldn't be able to heal outside of port).
 	}
 
 	public static void OnBeginTurn(this MapUnit unit)
