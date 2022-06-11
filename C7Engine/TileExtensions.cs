@@ -14,5 +14,17 @@ namespace C7Engine
 			} else
 				return MapUnit.NONE;
 		}
+
+		public static void Animate(this Tile tile, AnimatedEffect effect, bool wait)
+		{
+			if (EngineStorage.animationsEnabled) {
+				new MsgStartEffectAnimation(tile, effect, wait ? EngineStorage.uiEvent : null, AnimationEnding.Stop).send();
+				if (wait) {
+					EngineStorage.gameDataMutex.ReleaseMutex();
+					EngineStorage.uiEvent.WaitOne();
+					EngineStorage.gameDataMutex.WaitOne();
+				}
+			}
+		}
 	}
 }

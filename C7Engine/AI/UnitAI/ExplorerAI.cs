@@ -16,7 +16,7 @@ namespace C7Engine
 				return MoveToNextTileOnPath(explorerData, unit);
 			}
 			else {
-				bool foundNeighboringTileToExplore = ExploreNeighboringTile(player, unit);
+				bool foundNeighboringTileToExplore = ExploreNeighboringTile(player, unit, explorerData);
 				if (foundNeighboringTileToExplore) {
 					return true;
 				}
@@ -45,13 +45,14 @@ namespace C7Engine
 			return false;
 		}
 
-		private static bool ExploreNeighboringTile(Player player, MapUnit unit) {
-			List<Tile> validNeighboringTiles = unit.unitType is SeaUnit ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
+		private static bool ExploreNeighboringTile(Player player, MapUnit unit, ExplorerAIData aiData) {
+			List<Tile> validNeighboringTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 			if (validNeighboringTiles.Count == 0) {
 				Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
 				return false;
 			}
-			KeyValuePair<Tile, int> topScoringTile = FindTopScoringTileForExploration(player, validNeighboringTiles);
+			//Console.WriteLine($"Exploring for unit {unit}"); //debugging print
+			KeyValuePair<Tile, float> topScoringTile = FindTopScoringTileForExploration(player, validNeighboringTiles, aiData.type);
 			Tile newLocation = topScoringTile.Key;
 
 			if (newLocation != Tile.NONE && topScoringTile.Value > 0) {
@@ -100,16 +101,34 @@ namespace C7Engine
 			return true;
 		}
 
-		public static KeyValuePair<Tile, int> FindTopScoringTileForExploration(Player player, IEnumerable<Tile> possibleNewLocations)
+		public static KeyValuePair<Tile, float> FindTopScoringTileForExploration(Player player, IEnumerable<Tile> possibleNewLocations, ExplorerAIData.ExplorationType type)
 		{
 			//Technically, this should be the *estimated* new tiles revealed.  If a mountain blocks visibility,
 			//we won't know that till we move there.
-			Dictionary<Tile, int> numNewTilesRevealed = new Dictionary<Tile, int>();
-			foreach (Tile t in possibleNewLocations)
-			{
-				numNewTilesRevealed[t] = numUnknownNeighboringTiles(player, t);
+			Dictionary<Tile, float> explorationScore = new Dictionary<Tile, float>();
+			foreach (Tile t in possibleNewLocations) {
+				int baseScore = numUnknownNeighboringTiles(player, t);
+				if (baseScore == 0) {
+					explorationScore[t] = 0;
+				}
+				else if (type == ExplorerAIData.ExplorationType.NEAR_CITIES) {
+					if (baseScore == 0) {
+						explorationScore[t] = 0;
+					}
+					int distanceToNearestCity = int.MaxValue;
+					foreach (City c in player.cities) {
+						int distance = t.distanceTo(c.location);
+						if (distance < distanceToNearestCity) {
+							distanceToNearestCity = distance;
+						}
+					}
+					explorationScore[t] = 100 - 4 * distanceToNearestCity * distanceToNearestCity + baseScore;
+					// Console.WriteLine($"Exploration score for {t}: {explorationScore[t]}"); //debugging print
+				} else {
+					explorationScore[t] = baseScore;
+				}
 			}
-			IOrderedEnumerable<KeyValuePair<Tile, int>> orderedScores = numNewTilesRevealed.OrderByDescending(t => t.Value);
+			IOrderedEnumerable<KeyValuePair<Tile, float>> orderedScores = explorationScore.OrderByDescending(t => t.Value);
 			return orderedScores.First();
 		}
 

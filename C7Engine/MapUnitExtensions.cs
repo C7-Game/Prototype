@@ -12,11 +12,13 @@ using C7GameData;
 public static class MapUnitExtensions {
 	public static void animate(this MapUnit unit, MapUnit.AnimatedAction action, bool wait, AnimationEnding ending = AnimationEnding.Stop)
 	{
-		new MsgStartUnitAnimation(unit, action, wait ? EngineStorage.uiEvent : null, ending).send();
-		if (wait) {
-			EngineStorage.gameDataMutex.ReleaseMutex();
-			EngineStorage.uiEvent.WaitOne();
-			EngineStorage.gameDataMutex.WaitOne();
+		if (EngineStorage.animationsEnabled) {
+			new MsgStartUnitAnimation(unit, action, wait ? EngineStorage.uiEvent : null, ending).send();
+			if (wait) {
+				EngineStorage.gameDataMutex.ReleaseMutex();
+				EngineStorage.uiEvent.WaitOne();
+				EngineStorage.gameDataMutex.WaitOne();
+			}
 		}
 	}
 
@@ -223,9 +225,9 @@ public static class MapUnitExtensions {
 		unit.movementPointsRemaining -= 1;
 		if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
 			target.hitPointsRemaining -= 1;
-			new MsgStartEffectAnimation(tile, AnimatedEffect.Hit3, null, AnimationEnding.Stop).send();
+			tile.Animate(AnimatedEffect.Hit3, false);
 		} else
-			new MsgStartEffectAnimation(tile, AnimatedEffect.Miss, null, AnimationEnding.Stop).send();
+			tile.Animate(AnimatedEffect.Miss, false);
 
 		if (target.hitPointsRemaining <= 0) {
 			unit.RollToPromote(target, false);
@@ -279,9 +281,9 @@ public static class MapUnitExtensions {
 	public static bool CanEnterTile(this MapUnit unit, Tile tile, bool allowCombat)
 	{
 		// Keep land units on land and sea units on water
-		if ((unit.unitType is SeaUnit) && tile.IsLand())
+		if (unit.unitType.categories.Contains("Sea") && tile.IsLand())
 			return false;
-		if ((! (unit.unitType is SeaUnit)) && ! tile.IsLand())
+		else if (unit.unitType.categories.Contains("Land") && ! tile.IsLand())
 			return false;
 
 		// Check for enemy units on tile

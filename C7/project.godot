@@ -22,6 +22,7 @@ config/icon="res://icon.png"
 [autoload]
 
 GlobalSingleton="*res://GlobalSingleton.cs"
+LogManager="*res://LogManager.cs"
 
 [display]
 

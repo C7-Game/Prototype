@@ -5,6 +5,7 @@ namespace C7GameData.AIData
 		public enum ExplorationType
 		{
 			RANDOM,
+			NEAR_CITIES,
 			COASTLINE,
 			DIRECTIONAL,
 			SCOUT_RIVAL,
@@ -12,7 +13,7 @@ namespace C7GameData.AIData
 		}
 		public ExplorationType type;
         public TilePath path;
-		
+
 		public override string ToString()
 		{
 			return type + " exploration";

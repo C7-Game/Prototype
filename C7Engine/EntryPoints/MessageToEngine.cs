@@ -172,4 +172,18 @@ namespace C7Engine
 			TurnHandling.AdvanceTurn();
 		}
 	}
+
+	public class MsgSetAnimationsEnabled : MessageToEngine {
+		private bool enabled;
+
+		public MsgSetAnimationsEnabled(bool enabled)
+		{
+			this.enabled = enabled;
+		}
+
+		public override void process()
+		{
+			EngineStorage.animationsEnabled = enabled;
+		}
+	}
 }

@@ -13,7 +13,7 @@ namespace C7Engine
 	 */
 	public class CityProductionAI
 	{
-		
+
 		/**
 		 * Gets the next item to be produced in a given city.
 		 * Not a final API; it probably has the wrong parameters.  The last item in this city shouldn't
