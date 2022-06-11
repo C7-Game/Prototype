@@ -11,10 +11,8 @@ namespace C7Engine
 			GameData gameData = EngineStorage.gameData;
 			Console.WriteLine("\n*** Beginning turn " + gameData.turn + " ***");
 
-			//Reset movement points available for all units
-			foreach (MapUnit mapUnit in gameData.mapUnits) {
-				mapUnit.movementPointsRemaining = mapUnit.unitType.movement;
-			}
+			foreach (MapUnit mapUnit in gameData.mapUnits)
+				mapUnit.OnBeginTurn();
 
 			foreach (Player player in gameData.players) {
 				player.hasPlayedThisTurn = false;

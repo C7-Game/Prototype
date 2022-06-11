@@ -3,6 +3,7 @@ namespace C7Engine
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Pathing;
 using C7GameData;
 
@@ -33,17 +34,17 @@ public static class MapUnitExtensions {
 		unit.isFortified = false;
 	}
 
-	public static IEnumerable<StrengthBonus> ListStrengthBonusesVersus(this MapUnit unit, MapUnit opponent, bool attacking, bool bombard, TileDirection? attackDirection)
+	public static IEnumerable<StrengthBonus> ListStrengthBonusesVersus(this MapUnit unit, MapUnit opponent, CombatRole role, TileDirection? attackDirection)
 	{
 		C7RulesFormat rules = EngineStorage.rules;
 
-		if (! attacking) { // Defending against attack from opponent
+		if (role.Defending()) {
 			if (unit.isFortified)
 				yield return rules.fortificationBonus;
 
 			yield return unit.location.overlayTerrainType.defenseBonus;
 
-			if ((! bombard) && (attackDirection is TileDirection dir) && unit.location.HasRiverCrossing(dir.reversed()))
+			if ((! role.Bombarding()) && (attackDirection is TileDirection dir) && unit.location.HasRiverCrossing(dir.reversed()))
 				yield return rules.riverCrossingBonus;
 
 			// TODO: Bonus should vary depending on city level. First we must load the thresholds for level 2/3 into the scenario data.
@@ -52,15 +53,9 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static double AttackStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
+	public static double StrengthVersus(this MapUnit unit, MapUnit opponent, CombatRole role, TileDirection? attackDirection)
 	{
-		double multiplier = StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, true, bombard, attackDirection));
-		return multiplier * (bombard ? unit.unitType.bombard : unit.unitType.attack);
-	}
-
-	public static double DefenseStrengthVersus(this MapUnit unit, MapUnit opponent, bool bombard, TileDirection? attackDirection)
-	{
-		return unit.unitType.defense * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, false, bombard, attackDirection));
+		return unit.unitType.BaseStrength(role) * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
 	}
 
 	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
@@ -77,8 +72,8 @@ public static class MapUnitExtensions {
 		else if (otherDefenderIsEnemy && ! weAreEnemy)
 			return false;
 		else {
-			double ourTotalStrength   = unit         .DefenseStrengthVersus(opponent, false, null) * unit         .hitPointsRemaining,
-			       theirTotalStrength = otherDefender.DefenseStrengthVersus(opponent, false, null) * otherDefender.hitPointsRemaining;
+			double ourTotalStrength   = unit         .StrengthVersus(opponent, CombatRole.Defense, null) * unit         .hitPointsRemaining,
+			       theirTotalStrength = otherDefender.StrengthVersus(opponent, CombatRole.Defense, null) * otherDefender.hitPointsRemaining;
 			return ourTotalStrength > theirTotalStrength;
 		}
 	}
@@ -104,53 +99,113 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static bool fight(this MapUnit unit, MapUnit defender)
+	public static double RetreatChance(this MapUnit unit, MapUnit opponent, bool isAttacking)
+	{
+		return ((unit.unitType.movement > 1) && (opponent.unitType.movement <= 1)) ? unit.experienceLevel.retreatChance : 0.0;
+	}
+
+	public static CombatResult fight(this MapUnit attacker, MapUnit defender)
 	{
 		// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
 		var defenderOriginalDirection = defender.facingDirection;
-		defender.facingDirection = unit.facingDirection.reversed();
+		defender.facingDirection = attacker.facingDirection.reversed();
 
-		IEnumerable<StrengthBonus> attackBonuses  = unit    .ListStrengthBonusesVersus(defender, true , false, unit.facingDirection),
-		                           defenseBonuses = defender.ListStrengthBonusesVersus(unit    , false, false, unit.facingDirection);
+		IEnumerable<StrengthBonus> attackBonuses  = attacker.ListStrengthBonusesVersus(defender, CombatRole.Attack , attacker.facingDirection),
+		                           defenseBonuses = defender.ListStrengthBonusesVersus(attacker, CombatRole.Defense, attacker.facingDirection);
 
-		double attackerStrength = unit    .unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
+		double attackerStrength = attacker.unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
 		       defenderStrength = defender.unitType.defense * StrengthBonus.ListToMultiplier(defenseBonuses);
 
-		Console.WriteLine($"Combat log: {unit.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
-		Console.WriteLine($"\tAttacker: {unit.unitType.name}, base strength {unit.unitType.attack}");
+		Console.WriteLine($"Combat log: {attacker.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
+		Console.WriteLine($"\tAttacker: {attacker.unitType.name}, base strength {attacker.unitType.BaseStrength(CombatRole.Attack)}");
 		foreach (StrengthBonus bonus in attackBonuses)
 			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
-		Console.WriteLine($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.defense}");
+		Console.WriteLine($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.BaseStrength(CombatRole.Defense)}");
 		foreach (StrengthBonus bonus in defenseBonuses)
 			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
 
+		CombatResult result = CombatResult.Impossible;
+
 		double attackerOdds = attackerStrength / (attackerStrength + defenderStrength);
 		if (Double.IsNaN(attackerOdds))
-			return false;
+			return result;
 
-		// Do combat rounds
-		while ((unit.hitPointsRemaining > 0) && (defender.hitPointsRemaining > 0)) {
-			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
-			unit    .animate(MapUnit.AnimatedAction.ATTACK1, true );
-			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds)
-				defender.hitPointsRemaining -= 1;
-			else
-				unit.hitPointsRemaining -= 1;
+		// Defensive bombard
+		MapUnit defensiveBombarder = MapUnit.NONE;
+		double defensiveBombarderStrength = 0.0;
+		foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender && ! u.owner.IsAtPeaceWith(attacker.owner) && u.defensiveBombardsRemaining > 0)) {
+			double strength = candidate.StrengthVersus(attacker, CombatRole.DefensiveBombard, attacker.facingDirection.reversed());
+			if (strength > defensiveBombarderStrength) {
+				defensiveBombarder = candidate;
+				defensiveBombarderStrength = strength;
+			}
+		}
+		// In the original game, defensive bombard does not trigger against attackers with 1 HP. See:
+		// https://github.com/C7-Game/Prototype/pull/250#discussion_r893051111
+		if (defensiveBombarder != MapUnit.NONE && attacker.hitPointsRemaining > 1) {
+			var dBOriginalDirection = defensiveBombarder.facingDirection;
+			defensiveBombarder.facingDirection = defender.facingDirection;
+
+			defensiveBombarder.animate(MapUnit.AnimatedAction.ATTACK1, true);
+
+			// dADB = defense Against Defensive Bombard
+			double dADB = attacker.StrengthVersus(defensiveBombarder, CombatRole.DefensiveBombardDefense, defensiveBombarder.facingDirection);
+			if (EngineStorage.gameData.rng.NextDouble() < defensiveBombarderStrength / (defensiveBombarderStrength + dADB))
+				attacker.hitPointsRemaining -= 1;
+
+			defensiveBombarder.defensiveBombardsRemaining -= 1;
+			defensiveBombarder.facingDirection = dBOriginalDirection;
 		}
 
-		MapUnit loser = (defender.hitPointsRemaining <= 0) ? defender : unit,
-			winner = (defender == loser) ? unit : defender;
+		bool defenderEligibleToRetreat = defender.hitPointsRemaining > 1 && ! defender.location.HasCity;
 
-		winner.RollToPromote(loser, false);
+		// Do combat rounds
+		while (true) {
+			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
+			attacker.animate(MapUnit.AnimatedAction.ATTACK1, true );
+			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
+				if (defenderEligibleToRetreat &&
+				    defender.hitPointsRemaining == 1 &&
+				    EngineStorage.gameData.rng.NextDouble() < defender.RetreatChance(attacker, false)) {
+					// TODO: Defender retreat behavior requires some more work. There's an issue for it here:
+					// https://github.com/C7-Game/Prototype/issues/274
+					Tile retreatDestination = defender.location.neighbors[attacker.facingDirection];
+					if ((retreatDestination != Tile.NONE) && defender.CanEnterTile(retreatDestination, false)) {
+						defender.move(attacker.facingDirection, true);
+						result = CombatResult.DefenderRetreated;
+						break;
+					}
+				}
+				defender.hitPointsRemaining -= 1;
+				if (defender.hitPointsRemaining <= 0) {
+					result = CombatResult.DefenderKilled;
+					break;
+				}
+			} else {
+				if (attacker.hitPointsRemaining == 1 &&
+				    EngineStorage.gameData.rng.NextDouble() < attacker.RetreatChance(defender, true)) {
+					result = CombatResult.AttackerRetreated;
+					break;
+				}
+				attacker.hitPointsRemaining -= 1;
+				if (attacker.hitPointsRemaining <= 0) {
+					result = CombatResult.AttackerKilled;
+					break;
+				}
+			}
+		}
 
-		// Play death animation
-		loser.animate(MapUnit.AnimatedAction.DEATH, true);
-		loser.disband();
+		if ((result == CombatResult.AttackerKilled) || (result == CombatResult.DefenderKilled)) {
+			var (dead, alive) = (result == CombatResult.AttackerKilled) ? (attacker, defender) : (defender, attacker);
+			alive.RollToPromote(dead, false);
+			dead.animate(MapUnit.AnimatedAction.DEATH, true);
+			dead.disband();
+		}
 
-		if (defender != loser)
+		if (result.DefenderWon())
 			defender.facingDirection = defenderOriginalDirection;
 
-		return unit != loser;
+		return result;
 	}
 
 	public static void bombard(this MapUnit unit, Tile tile)
@@ -162,8 +217,8 @@ public static class MapUnitExtensions {
 		var unitOriginalOrientation = unit.facingDirection;
 		unit.facingDirection = unit.location.directionTo(tile);
 
-		double bombardStrength  = unit  .AttackStrengthVersus (target, true, unit.facingDirection);
-		double defenderStrength = target.DefenseStrengthVersus(unit  , true, unit.facingDirection);
+		double bombardStrength  = unit  .StrengthVersus(target, CombatRole.Bombard       , unit.facingDirection);
+		double defenderStrength = target.StrengthVersus(unit  , CombatRole.BombardDefense, unit.facingDirection);
 		double attackerOdds = bombardStrength / (bombardStrength + defenderStrength);
 		if (Double.IsNaN(attackerOdds))
 			return;
@@ -185,6 +240,30 @@ public static class MapUnitExtensions {
 		unit.facingDirection = unitOriginalOrientation;
 	}
 
+	public static int HealRateAt(this MapUnit unit, Tile location)
+	{
+		C7RulesFormat rules = EngineStorage.rules;
+		City city = location.cityAtTile;
+		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
+		return inFriendlyCity ? rules.healRateInCity : rules.healRateInNeutralField;
+		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (they
+		// shouldn't be able to heal outside of port).
+	}
+
+	public static void OnBeginTurn(this MapUnit unit)
+	{
+		int maxMP = unit.unitType.movement;
+		if (unit.movementPointsRemaining >= maxMP) {
+			int maxHP = unit.maxHitPoints;
+			if (unit.hitPointsRemaining < maxHP)
+				unit.hitPointsRemaining += unit.HealRateAt(unit.location);
+			if (unit.hitPointsRemaining > maxHP)
+				unit.hitPointsRemaining = maxHP;
+		}
+		unit.movementPointsRemaining = maxMP;
+		unit.defensiveBombardsRemaining = 1;
+	}
+
 	public static void OnEnterTile(this MapUnit unit, Tile tile)
 	{
 		// Disperse barb camp
@@ -201,11 +280,31 @@ public static class MapUnitExtensions {
 		}
 	}
 
+	public static bool CanEnterTile(this MapUnit unit, Tile tile, bool allowCombat)
+	{
+		// Keep land units on land and sea units on water
+		if (unit.unitType.categories.Contains("Sea") && tile.IsLand())
+			return false;
+		else if (unit.unitType.categories.Contains("Land") && ! tile.IsLand())
+			return false;
+
+		// Check for units belonging to other civs
+		foreach (MapUnit other in tile.unitsOnTile)
+			if (other.owner != unit.owner) {
+				if (! other.owner.IsAtPeaceWith(unit.owner))
+					return allowCombat;
+				else
+					return false;
+			}
+
+		return true;
+	}
+
 	public static void move(this MapUnit unit, TileDirection dir, bool wait = false)
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-		if ((newLoc != Tile.NONE) && newLoc.IsLand() && (unit.movementPointsRemaining > 0)) {
+		if ((newLoc != Tile.NONE) && unit.CanEnterTile(newLoc, true) && (unit.movementPointsRemaining > 0)) {
 			unit.facingDirection = dir;
 			unit.wake();
 
@@ -213,13 +312,22 @@ public static class MapUnitExtensions {
 			MapUnit defender = newLoc.FindTopDefender(unit);
 			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
 				if (unit.unitType.attack > 0) {
-					bool unitWonCombat = unit.fight(defender);
-					if (!unitWonCombat)
+					CombatResult combatResult = unit.fight(defender);
+					// If we were killed then of course there's nothing more to do. If the combat couldn't happen for whatever
+					// reason, just give up on trying to move.
+					if (combatResult == CombatResult.AttackerKilled || combatResult == CombatResult.Impossible)
 						return;
 
-					// If there are still more enemy units on the destination tile we can't actually move into it
-					defender = newLoc.FindTopDefender(unit);
-					if ((defender != MapUnit.NONE) && (! unit.owner.IsAtPeaceWith(defender.owner))) {
+					// If the enemy was defeated, check if there is another enemy on the tile. If so we can't complete the move
+					// but still pay one movement point for the combat.
+					else if (combatResult == CombatResult.DefenderKilled || combatResult == CombatResult.DefenderRetreated) {
+						if (!unit.CanEnterTile(newLoc, false)) {
+							unit.movementPointsRemaining -= 1;
+							return;
+						}
+
+					// Similarly if we retreated, pay one MP for the combat but don't move.
+					} else if (combatResult == CombatResult.AttackerRetreated) {
 						unit.movementPointsRemaining -= 1;
 						return;
 					}
@@ -300,17 +408,5 @@ public static class MapUnitExtensions {
 		unit.disband();
 	}
 
-	public static bool canTraverseTile(this MapUnit unit, Tile t) {
-		//TODO: Unit prototypes should have info about terrain classes (#148), and we shouldn't rely on names
-		if (unit.unitType.name == "Galley" && !t.IsLand())
-		{
-			return true;
-		}
-		else if (t.IsLand())
-		{
-			return true;
-		}
-		return false;
-	}
 	}
 }

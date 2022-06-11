@@ -43,6 +43,11 @@ namespace C7GameData
 		public StrengthBonus cityLevel2DefenseBonus;
 		public StrengthBonus cityLevel3DefenseBonus;
 
+		public int healRateInFriendlyField;
+		public int healRateInNeutralField;
+		public int healRateInHostileField;
+		public int healRateInCity;
+
 		public C7RulesFormat() {
 			Version = "v0.0early-prototype";
 		}
