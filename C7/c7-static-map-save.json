@@ -1,7 +1,5 @@
 {
   "version": "v0.0early-prototype",
-  "rules": {
-  },
   "gameData": {
     "turn": 0,
     "map": {
