@@ -51,6 +51,11 @@ public class Game : Node2D
 		loadTimer.Start();
 	}
 
+	private void InitializeGameComponents()
+	{
+		ComponentManager.Instance.AddComponent<CalendarComponent>(new CalendarComponent());
+	}
+
 	// Called when the node enters the scene tree for the first time.
 	// The catch should always catch any error, as it's the general catch
 	// that gives an error if we fail to load for some reason.
@@ -87,6 +92,8 @@ public class Game : Node2D
 						mapView.centerCameraOnTile(startingSettler.location);
 				}
 			}
+
+			InitializeGameComponents();
 
 			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 			Player = GetNode<KinematicBody2D>("KinematicBody2D");

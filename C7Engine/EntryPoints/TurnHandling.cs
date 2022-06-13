@@ -6,6 +6,7 @@ namespace C7Engine
 	using System;
 	public class TurnHandling
 	{
+		public static event EventHandler TurnEnded;
 		internal static void OnBeginTurn()
 		{
 			GameData gameData = EngineStorage.gameData;
@@ -131,7 +132,8 @@ namespace C7Engine
 
 				// END Production phase
 
-				gameData.turn++;
+				//gameData.turn++;
+				TurnEnded?.Invoke(null, null);
 				OnBeginTurn();
 			}
 		}
