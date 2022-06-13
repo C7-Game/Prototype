@@ -8,11 +8,7 @@ namespace C7Engine {
 
 	public class BarbarianAI {
 
-		private ILogger log;
-
-		public BarbarianAI() {
-			log = Log.ForContext<BarbarianAI>();
-		}
+		private ILogger log = Log.ForContext<BarbarianAI>();
 
 		public void PlayTurn(Player player, GameData gameData) {
 			if (!player.isBarbarians) {

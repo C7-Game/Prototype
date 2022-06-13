@@ -16,11 +16,7 @@ namespace C7Engine
 	}
 
 	public class MsgShutdownEngine : MessageToEngine {
-		private ILogger log;
-
-		public MsgShutdownEngine() {
-			log = Log.ForContext<MsgShutdownEngine>();
-		}
+		private ILogger log = Log.ForContext<MsgShutdownEngine>();
 
 		public override void process()
 		{
@@ -166,11 +162,7 @@ namespace C7Engine
 
 	public class MsgEndTurn : MessageToEngine {
 
-		private ILogger log;
-
-		public MsgEndTurn() {
-			log = Log.ForContext<MsgEndTurn>();
-		}
+		private ILogger log = Log.ForContext<MsgEndTurn>();
 
 		public override void process()
 		{
