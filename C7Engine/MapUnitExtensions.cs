@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace C7Engine
 {
 
@@ -10,6 +12,9 @@ using C7GameData;
 //We should document why we're putting things in the extensions methods.  We discussed it a month or so ago, but I forget why at this point.
 //Coming from an OO background, I'm wondering why these aren't on the MapUnit class... data access?  Modding?  Some other benefit?
 public static class MapUnitExtensions {
+
+	private static ILogger log = Log.ForContext<MapUnit>();
+
 	public static void animate(this MapUnit unit, MapUnit.AnimatedAction action, bool wait, AnimationEnding ending = AnimationEnding.Stop)
 	{
 		if (EngineStorage.animationsEnabled) {
@@ -116,13 +121,13 @@ public static class MapUnitExtensions {
 		double attackerStrength = attacker.unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
 		       defenderStrength = defender.unitType.defense * StrengthBonus.ListToMultiplier(defenseBonuses);
 
-		Console.WriteLine($"Combat log: {attacker.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
-		Console.WriteLine($"\tAttacker: {attacker.unitType.name}, base strength {attacker.unitType.BaseStrength(CombatRole.Attack)}");
+		log.Information($"Combat log: {attacker.unitType.name} ({attackerStrength}) attacking {defender.unitType.name} ({defenderStrength})");
+		log.Information($"\tAttacker: {attacker.unitType.name}, base strength {attacker.unitType.BaseStrength(CombatRole.Attack)}");
 		foreach (StrengthBonus bonus in attackBonuses)
-			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
-		Console.WriteLine($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.BaseStrength(CombatRole.Defense)}");
+			log.Information($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
+		log.Information($"\tDefender: {defender.unitType.name}, base strength {defender.unitType.BaseStrength(CombatRole.Defense)}");
 		foreach (StrengthBonus bonus in defenseBonuses)
-			Console.WriteLine($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
+			log.Information($"\t\t+{100.0*bonus.amount}%\t{bonus.description}");
 
 		CombatResult result = CombatResult.Impossible;
 
@@ -361,7 +366,7 @@ public static class MapUnitExtensions {
 	{
 		unit.path = PathingAlgorithmChooser.GetAlgorithm().PathFrom(unit.location, dest);
 		if (unit.path == TilePath.NONE) {
-			System.Console.WriteLine("Cannot move unit to " + dest + ", path is NONE!");
+			log.Warning("Cannot move unit to " + dest + ", path is NONE!");
 		}
 		unit.moveAlongPath();
 	}

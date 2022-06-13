@@ -15,7 +15,7 @@ public class LogManager : Node
 
 		Log.Logger = new LoggerConfiguration()
 			.WriteTo.GodotSink(formatter: consoleTemplate)
-			.MinimumLevel.Debug()
+			.MinimumLevel.Information()
 			.CreateLogger();
 
 		GD.Print("Hello logger!");

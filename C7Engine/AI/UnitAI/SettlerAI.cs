@@ -2,16 +2,20 @@ using System;
 using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
+using Serilog;
 
 namespace C7Engine {
 	public class SettlerAI : UnitAI {
+
+		private ILogger log = Log.ForContext<SettlerAI>();
+
 		public bool PlayTurn(Player player, MapUnit unit) {
 			SettlerAIData settlerAi = (SettlerAIData)unit.currentAIData;
 start:
 			switch (settlerAi.goal) {
 				case SettlerAIData.SettlerGoal.BUILD_CITY:
 					if (IsInvalidCityLocation(settlerAi.destination)) {
-						Console.WriteLine("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination);
+						log.Information("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination);
 						PlayerAI.SetAIForUnit(unit, player);
 						//Make sure we're using the new settler AI going forward, including this turn
 						settlerAi = (SettlerAIData)unit.currentAIData;
@@ -23,7 +27,7 @@ start:
 						goto start;
 					}
 					if (unit.location == settlerAi.destination) {
-						Console.WriteLine("Building city with " + unit);
+						log.Information("Building city with " + unit);
 						//TODO: This should use a message, and the message handler should cause the disbanding to happen.
 						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
 						unit.disband();
@@ -31,7 +35,7 @@ start:
 					else {
 						//If the settler has no destination, then disband rather than crash later.
 						if (settlerAi.destination == Tile.NONE) {
-							Console.WriteLine("Disbanding settler " + unit.guid + " with no valid destination");
+							log.Information("Disbanding settler " + unit.guid + " with no valid destination");
 							unit.disband();
 							return false;
 						}
@@ -44,7 +48,7 @@ start:
 							//civilization's unit (or a barbarian unit) being on that tile.
 							//TODO: #213 - If the path cannot be completed, we should create a different path instead.
 							//But to do that, the pathing algorithm will need to be enhanced to be aware of when rival units are in the way.
-							Console.WriteLine("Could not get next part of path for unit " + settlerAi + ", " + ex.Message);
+							log.Warning("#213 - Could not get next part of path for unit " + settlerAi + ", " + ex.Message);
 						}
 					}
 					break;
@@ -61,7 +65,7 @@ start:
 					}
 					break;
 				default:
-					Console.WriteLine("Unknown strategy of " + settlerAi.goal + " for unit");
+					log.Warning("Unknown strategy of " + settlerAi.goal + " for unit");
 					break;
 			}
 			return true;
@@ -69,12 +73,12 @@ start:
 
 		private static bool IsInvalidCityLocation(Tile tile) {
 			if (tile.cityAtTile != null) {
-				Console.WriteLine("Cannot build at " + tile + " due to city of " + tile.cityAtTile.name);
+				Log.ForContext<SettlerAI>().Debug("Cannot build at " + tile + " due to city of " + tile.cityAtTile.name);
 				return true;
 			}
 			foreach (Tile neighbor in tile.neighbors.Values) {
 				if (neighbor.cityAtTile != null) {
-					Console.WriteLine("Cannot build at " + tile + " due to nearby city of " + neighbor.cityAtTile.name);
+					Log.ForContext<SettlerAI>().Debug("Cannot build at " + tile + " due to nearby city of " + neighbor.cityAtTile.name);
 					return true;
 				}
 			}
