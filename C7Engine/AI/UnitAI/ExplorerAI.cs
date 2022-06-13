@@ -126,7 +126,7 @@ namespace C7Engine
 				}
 
 				if (unit.unitType.name.Contains("Galley")) {
-					Console.WriteLine($"Algo time for {t} = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+					log.Debug($"Algo time for {t} = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
 				}
 			}
 

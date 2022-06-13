@@ -46,7 +46,7 @@ namespace C7Engine
 				}
 
 				TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-				Console.WriteLine($"Unit processing time for {unit.unitType.name}: {Convert.ToInt32(stopwatchElapsed.TotalMilliseconds)} ms");
+				log.Information($"Unit processing time for {unit.unitType.name}: {Convert.ToInt32(stopwatchElapsed.TotalMilliseconds)} ms");
 
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}
