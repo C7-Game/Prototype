@@ -23,11 +23,17 @@ namespace C7Engine
 
 			var humanPlayer = save.GameData.CreateDummyGameData(EngineStorage.rules);
 			EngineStorage.uiControllerID = humanPlayer.guid;
+			InitializeGameComponents();
 			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();
 
 			EngineStorage.gameDataMutex.ReleaseMutex();
 			return humanPlayer;
+		}
+
+		private static void InitializeGameComponents()
+		{
+			ComponentManager.Instance.AddComponent<CalendarComponent>(new CalendarComponent(EngineStorage.gameData));
 		}
 	}
 }

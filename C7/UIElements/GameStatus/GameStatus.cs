@@ -1,5 +1,5 @@
 using Godot;
-using System;
+using C7Engine;
 using C7GameData;
 
 public class GameStatus : MarginContainer
@@ -17,6 +17,11 @@ public class GameStatus : MarginContainer
 		MarginTop = -(137 + 1);
 		AddChild(LowerRightInfoBox);
 	}
+
+	public void RegisterEvents()
+	{
+		ComponentManager.Instance.GetComponent<CalendarComponent>().TurnStarted += (obj, args) => LowerRightInfoBox.SetTurn(args.Turn.TurnDate);
+	}
 	
 	public void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
@@ -33,7 +38,7 @@ public class GameStatus : MarginContainer
 	private void OnTurnStarted(int turnNumber)
 	{		
 		//Oh hai, we do need this handler here!
-		LowerRightInfoBox.SetTurn(turnNumber);
+		//LowerRightInfoBox.SetTurn(turnNumber);
 	}
 	
 	private void OnNoMoreAutoselectableUnits()

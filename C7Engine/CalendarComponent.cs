@@ -1,4 +1,5 @@
 using System;
+using C7GameData;
 
 namespace C7Engine
 {
@@ -28,21 +29,23 @@ namespace C7Engine
     {
         public event EventHandler<TurnEventArgs> TurnStarted;
         public GameTurn CurrentTurn { get; private set; }
+        private GameData _gameData;
         //TODO add interace for turn settings
 
-        public CalendarComponent()
+        public CalendarComponent(GameData gameData)
         {
-            CurrentTurn = GetGameTurn(EngineStorage.gameData.turn);
+            _gameData = gameData;
+            CurrentTurn = GetGameTurn(_gameData.turn);
             TurnHandling.TurnEnded += (obj, args) => AdvanceTurn();
             Console.WriteLine("Initialized CalendarComponent at turn " + CurrentTurn.TurnNumber);
         }
 
         private void AdvanceTurn()
         {
-            Console.WriteLine("Ending turn " + CurrentTurn.TurnNumber);
             int nextTurnNumber = CurrentTurn.TurnNumber + 1;
+            _gameData.turn = nextTurnNumber;
             CurrentTurn = GetGameTurn(nextTurnNumber);
-            EngineStorage.gameData.turn = nextTurnNumber;
+
             Console.WriteLine("Date is now " + CurrentTurn.TurnDate);
             TurnStarted?.Invoke(this, new TurnEventArgs(CurrentTurn));
         }

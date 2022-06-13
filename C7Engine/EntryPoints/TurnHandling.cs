@@ -131,8 +131,6 @@ namespace C7Engine
 				}
 
 				// END Production phase
-
-				//gameData.turn++;
 				TurnEnded?.Invoke(null, null);
 				OnBeginTurn();
 			}

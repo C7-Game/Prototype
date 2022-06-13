@@ -155,9 +155,9 @@ public class LowerRightInfoBox : TextureRect
 
 	///This is going to evolve a lot over time.  Probably this info box will need to keep some local state.
 	///But for now it'll show the changing turn number, providing some interactivity
-	public void SetTurn(int turnNumber)
+	public void SetTurn(string turn)
 	{
-		yearAndGold.Text = "Turn " + turnNumber + "  10 Gold (+0 per turn)";
+		yearAndGold.Text = turn + "  10 Gold (+0 per turn)";
 	}
 
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
