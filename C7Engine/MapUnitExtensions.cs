@@ -36,20 +36,20 @@ public static class MapUnitExtensions {
 
 	public static IEnumerable<StrengthBonus> ListStrengthBonusesVersus(this MapUnit unit, MapUnit opponent, CombatRole role, TileDirection? attackDirection)
 	{
-		C7RulesFormat rules = EngineStorage.rules;
+		GameData gD = EngineStorage.gameData;
 
 		if (role.Defending()) {
 			if (unit.isFortified)
-				yield return rules.fortificationBonus;
+				yield return gD.fortificationBonus;
 
 			yield return unit.location.overlayTerrainType.defenseBonus;
 
 			if ((! role.Bombarding()) && (attackDirection is TileDirection dir) && unit.location.HasRiverCrossing(dir.reversed()))
-				yield return rules.riverCrossingBonus;
+				yield return gD.riverCrossingBonus;
 
 			// TODO: Bonus should vary depending on city level. First we must load the thresholds for level 2/3 into the scenario data.
 			if (unit.location.cityAtTile != null)
-				yield return rules.cityLevel2DefenseBonus;
+				yield return gD.cityLevel2DefenseBonus;
 		}
 	}
 
@@ -81,15 +81,13 @@ public static class MapUnitExtensions {
 
 	public static void RollToPromote(this MapUnit unit, MapUnit opponent, bool waitForAnimation)
 	{
-		C7RulesFormat rules = EngineStorage.rules;
-
 		double promotionChance = unit.experienceLevel.promotionChance;
 		if (opponent.owner.isBarbarians)
 			promotionChance /= 2.0;
 		// TODO: Double promotionChance if unit is owned by a militaristic civ
 
 		if (EngineStorage.gameData.rng.NextDouble() < promotionChance) {
-			ExperienceLevel nextLevel = rules.GetExperienceLevelAfter(unit.experienceLevel);
+			ExperienceLevel nextLevel = EngineStorage.gameData.GetExperienceLevelAfter(unit.experienceLevel);
 			if (nextLevel != null) {
 				unit.experienceLevelKey = nextLevel.key;
 				unit.experienceLevel = nextLevel;
@@ -242,10 +240,10 @@ public static class MapUnitExtensions {
 
 	public static int HealRateAt(this MapUnit unit, Tile location)
 	{
-		C7RulesFormat rules = EngineStorage.rules;
+		GameData gD = EngineStorage.gameData;
 		City city = location.cityAtTile;
 		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
-		return inFriendlyCity ? rules.healRateInCity : rules.healRateInNeutralField;
+		return inFriendlyCity ? gD.healRateInCity : gD.healRateInNeutralField;
 		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (they
 		// shouldn't be able to heal outside of port).
 	}

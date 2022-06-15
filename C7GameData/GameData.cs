@@ -2,6 +2,7 @@ namespace C7GameData
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Text.Json.Serialization;
 	public class GameData
 	{
 		public int turn {get; set;}
@@ -13,6 +14,22 @@ namespace C7GameData
 		public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
 		public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
 		public List<City> cities = new List<City>();
+
+		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();
+		public string defaultExperienceLevelKey;
+		[JsonIgnore]
+		public ExperienceLevel defaultExperienceLevel;
+
+		public StrengthBonus fortificationBonus;
+		public StrengthBonus riverCrossingBonus;
+		public StrengthBonus cityLevel1DefenseBonus;
+		public StrengthBonus cityLevel2DefenseBonus;
+		public StrengthBonus cityLevel3DefenseBonus;
+
+		public int healRateInFriendlyField;
+		public int healRateInNeutralField;
+		public int healRateInHostileField;
+		public int healRateInCity;
 
 		public GameData()
 		{
@@ -27,6 +44,15 @@ namespace C7GameData
 		public MapUnit GetUnit(string guid)
 		{
 			return mapUnits.Find(u => u.guid == guid);
+		}
+
+		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel)
+		{
+			int n = experienceLevels.IndexOf(experienceLevel);
+			if (n + 1 < experienceLevels.Count)
+				return experienceLevels[n + 1];
+			else
+				return null;
 		}
 
 		/**
@@ -52,7 +78,7 @@ namespace C7GameData
 		 *
 		 * Returns the human player so the caller (which is the UI) can store it.
 		 **/
-		public Player CreateDummyGameData(C7RulesFormat rules)
+		public Player CreateDummyGameData()
 		{
 			this.turn = 0;
 
@@ -177,7 +203,7 @@ namespace C7GameData
 				if (player.isBarbarians) {
 					continue;
 				}
-				CreateStartingDummyUnits(rules, player, startingLocations[i]);
+				CreateStartingDummyUnits(player, startingLocations[i]);
 				i++;
 			}
 
@@ -187,7 +213,7 @@ namespace C7GameData
 			List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
 			foreach (Tile barbCampLocation in barbarianCamps) {
 				if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-					MapUnit barbWarrior = CreateDummyUnit(rules, unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);
+					MapUnit barbWarrior = CreateDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);
 					barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
 					// whole procedure of generating a map should be part of the engine not the data module.
 					barbWarrior.facingDirection = TileDirection.SOUTHEAST;
@@ -202,16 +228,16 @@ namespace C7GameData
 			return carthagePlayer;
 		}
 
-		private void CreateStartingDummyUnits(C7RulesFormat rules, Player player, Tile location)
+		private void CreateStartingDummyUnits(Player player, Tile location)
 		{
-			CreateDummyUnit(rules, unitPrototypes["Settler"],  player, location);
-			CreateDummyUnit(rules, unitPrototypes["Warrior"],  player, location);
-			CreateDummyUnit(rules, unitPrototypes["Worker"],   player, location);
-			CreateDummyUnit(rules, unitPrototypes["Chariot"],  player, location);
-			CreateDummyUnit(rules, unitPrototypes["Catapult"], player, location);
+			CreateDummyUnit(unitPrototypes["Settler"],  player, location);
+			CreateDummyUnit(unitPrototypes["Warrior"],  player, location);
+			CreateDummyUnit(unitPrototypes["Worker"],   player, location);
+			CreateDummyUnit(unitPrototypes["Chariot"],  player, location);
+			CreateDummyUnit(unitPrototypes["Catapult"], player, location);
 		}
 
-		private MapUnit CreateDummyUnit(C7RulesFormat rules, UnitPrototype proto, Player owner, Tile tile)
+		private MapUnit CreateDummyUnit(UnitPrototype proto, Player owner, Tile tile)
 		{
 			//TODO: The fact that we have to check for this makes me wonder why...
 			if (tile != Tile.NONE) {
@@ -220,8 +246,8 @@ namespace C7GameData
 				unit.unitType = proto;
 				unit.owner = owner;
 				unit.location = tile;
-				unit.experienceLevelKey = rules.defaultExperienceLevel.key;
-				unit.experienceLevel = rules.defaultExperienceLevel;
+				unit.experienceLevelKey = defaultExperienceLevelKey;
+				unit.experienceLevel = defaultExperienceLevel;
 				unit.facingDirection = TileDirection.SOUTHWEST;
 				unit.movementPointsRemaining = proto.movement;
 				unit.hitPointsRemaining = 3;

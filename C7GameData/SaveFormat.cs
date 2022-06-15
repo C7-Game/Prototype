@@ -24,22 +24,17 @@ namespace C7GameData
 	{
 		public string Version = "v0.0early-prototype";
 
-		// Rules is intended to be the analog to a BIC/X/Q
-		public C7RulesFormat Rules;
-
 		// This naming is probably bad form, but it makes sense to me to name it as such here
 		public GameData GameData;
 
 		public C7SaveFormat()
 		{
 			GameData = new GameData();
-			Rules = new C7RulesFormat();
 		}
 
-		public C7SaveFormat(GameData gameData, C7RulesFormat rules)
+		public C7SaveFormat(GameData gameData)
 		{
 			GameData = gameData;
-			Rules = rules;
 		}
 
 		public bool PostLoadProcess()
@@ -106,9 +101,9 @@ namespace C7GameData
 
 			// Inflate experience levels
 			var levelsByKey = new Dictionary<string, ExperienceLevel>();
-			foreach (ExperienceLevel eL in save.Rules.experienceLevels)
+			foreach (ExperienceLevel eL in save.GameData.experienceLevels)
 				levelsByKey.Add(eL.key, eL);
-			save.Rules.defaultExperienceLevel = levelsByKey[save.Rules.defaultExperienceLevelKey];
+			save.GameData.defaultExperienceLevel = levelsByKey[save.GameData.defaultExperienceLevelKey];
 			foreach (MapUnit unit in save.GameData.mapUnits)
 				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
 
