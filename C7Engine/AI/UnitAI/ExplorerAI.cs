@@ -132,6 +132,8 @@ namespace C7Engine.AI.UnitAI
 			}
 
 			log.Information($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+			Console.WriteLine($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+			Console.WriteLine($"Chosen path is {chosenPath}");
 			log.Information($"Chosen path is {chosenPath}");
 
 			if (chosenPath == null) {
