@@ -51,7 +51,7 @@ namespace C7Engine
 					scores[t] = 0;
 					continue;
 				}
-				if (t.HasCity() || t.GetLandNeighbors().Exists(n => n.HasCity())) {
+				if (t.HasCity || t.GetLandNeighbors().Exists(n => n.HasCity)) {
 					scores[t] = 0;
 					continue;
 				}
@@ -119,15 +119,15 @@ nextcandidate: ;
 		}
 
 		public static bool IsInvalidCityLocation(Tile tile) {
-			if (tile.HasCity()) {
+			if (tile.HasCity) {
 				return true;
 			}
 			foreach (Tile neighbor in tile.neighbors.Values) {
-				if (neighbor.HasCity()) {
+				if (neighbor.HasCity) {
 					return true;
 				}
 				foreach (Tile neighborOfNeighbor in tile.neighbors.Values) {
-					if (neighborOfNeighbor.HasCity()) {
+					if (neighborOfNeighbor.HasCity) {
 						return true;
 					}
 				}

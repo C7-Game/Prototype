@@ -53,7 +53,7 @@ start:
 					}
 					break;
 				case SettlerAIData.SettlerGoal.JOIN_CITY:
-					if (unit.location.HasCity()) {
+					if (unit.location.HasCity) {
 						//TODO: Actually join the city.  Haven't added that action.
 						//For now, just get rid of the unit.  Sorry, bro.
 						unit.disband();

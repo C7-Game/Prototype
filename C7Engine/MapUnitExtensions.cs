@@ -53,7 +53,7 @@ public static class MapUnitExtensions {
 				yield return gD.riverCrossingBonus;
 
 			// TODO: Bonus should vary depending on city level. First we must load the thresholds for level 2/3 into the scenario data.
-			if (unit.location.HasCity())
+			if (unit.location.HasCity)
 				yield return gD.cityLevel2DefenseBonus;
 		}
 	}
@@ -276,7 +276,7 @@ public static class MapUnitExtensions {
 		}
 
 		// Destroy enemy city on tile
-		if ((tile.HasCity()) && (!unit.owner.IsAtPeaceWith(tile.cityAtTile.owner))) {
+		if ((tile.HasCity) && (!unit.owner.IsAtPeaceWith(tile.cityAtTile.owner))) {
 			tile.cityAtTile.owner.cities.Remove(tile.cityAtTile);
 			EngineStorage.gameData.cities.Remove(tile.cityAtTile);
 			tile.cityAtTile = null;

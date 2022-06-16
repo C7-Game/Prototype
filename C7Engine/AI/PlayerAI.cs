@@ -81,7 +81,7 @@ namespace C7Engine
 				}
 				unit.currentAIData = settlerAiData;
 			}
-			else if (unit.location.HasCity() && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
+			else if (unit.location.HasCity && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
 				DefenderAIData ai = new DefenderAIData();
 				ai.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;

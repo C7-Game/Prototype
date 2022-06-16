@@ -179,7 +179,7 @@ namespace C7Engine
 		private static int numUnknownNeighboringTiles(Player player, Tile t) {
 			//Do not try to explore a tile with a city.  If we own it, we know all tiles.
 			//If someone else does, that would be war, which is not a scout's job.
-			if (t.HasCity()) {
+			if (t.HasCity) {
 				return 0;
 			}
 			//Calculate whether it, and its neighbors are in known tiles.
