@@ -1,18 +1,22 @@
 ﻿using System;
 using C7GameData;
 using C7GameData.AIData;
+using Serilog;
 
 namespace C7Engine.AI {
 	class DefenderAI : UnitAI {
+
+		private ILogger log = Log.ForContext<DefenderAI>();
+
 		public bool PlayTurn(Player player, MapUnit unit) {
 			DefenderAIData defenderAI = (DefenderAIData)unit.currentAIData;
 			if (defenderAI.destination == unit.location) {
 				if (!unit.isFortified) {
 					unit.fortify();
-					Console.WriteLine("Fortifying " + unit + " at " + defenderAI.destination);
+					log.Information("Fortifying " + unit + " at " + defenderAI.destination);
 				}
 			} else {
-				Console.WriteLine("Moving defender towards " + defenderAI.destination);
+				log.Debug("Moving defender towards " + defenderAI.destination);
 
 				Tile nextTile = defenderAI.pathToDestination.Next();
 				if (nextTile != Tile.NONE) {
@@ -25,7 +29,7 @@ namespace C7Engine.AI {
 					//units were on a tile it was moving to, and it defeated one, but still couldn't move?  That would
 					//likely affect its pathing.  Put a breakpoint here while debugging!
 					//This should be a higher severity Serilog error
-					Console.WriteLine("ERROR: Unit pathed via Tile.NONE");
+					log.Error("ERROR: Unit pathed via Tile.NONE");
 				}
 			}
 			return true;

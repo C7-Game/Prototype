@@ -13,8 +13,17 @@ public class LogManager : Node
 		ExpressionTemplate consoleTemplate = new ExpressionTemplate(
 			"{@t:HH:mm:ss.fff} [{@l:u3}]{#if SourceContext is not null} {SourceContext}:{#end} {@m:lj}{#if @x is not null}\tException: {@x}{#end}");
 
+		// You can filter this several ways with the expression in Filter.ByIncludingOnly
+		//   "SourceContext like 'C7Engine.AI.%'"	<-- filters on the source context, i.e. namespace + class name.  In this case, only shows messages from the C7Engine.AI namespace.
+		//   "@m like '%citizen%'"					<-- filters on the message, in this case only returning messages containing the phrase 'citizen'
+		//   "@l = 'Information'"					<-- filters on the level.
+		// Filtering on the level can be used in conjunction with other filters, e.g.:
+		//   "@l = 'Information' OR SourceContext like 'C7Engine.AI.%'"
+		// Includes all logs of an 'Information' level regardless of namespace, and all logs of
+		// the C7Engine.AI namespace regardless of log level.
 		Log.Logger = new LoggerConfiguration()
 			.WriteTo.GodotSink(formatter: consoleTemplate)
+			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information')")	//suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
 			.MinimumLevel.Debug()
 			.CreateLogger();
 

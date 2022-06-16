@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace C7Engine
 {
 	using System;
@@ -14,9 +16,11 @@ namespace C7Engine
 	}
 
 	public class MsgShutdownEngine : MessageToEngine {
+		private ILogger log = Log.ForContext<MsgShutdownEngine>();
+
 		public override void process()
 		{
-			Console.WriteLine("Engine received shutdown message.");
+			log.Information("Engine received shutdown message.");
 		}
 	}
 
@@ -157,12 +161,15 @@ namespace C7Engine
 	}
 
 	public class MsgEndTurn : MessageToEngine {
+
+		private ILogger log = Log.ForContext<MsgEndTurn>();
+
 		public override void process()
 		{
 			Player controller = EngineStorage.gameData.players.Find(p => p.guid == EngineStorage.uiControllerID);
 
 			foreach (MapUnit unit in controller.units) {
-				Console.WriteLine($"{unit}, path length: {unit.path?.PathLength() ?? 0}");
+				log.Debug($"{unit}, path length: {unit.path?.PathLength() ?? 0}");
 				if (unit.path?.PathLength() > 0) {
 					unit.moveAlongPath();
 				}

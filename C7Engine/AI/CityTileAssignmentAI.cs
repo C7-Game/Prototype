@@ -1,5 +1,6 @@
 using System;
 using C7GameData;
+using Serilog;
 
 namespace C7Engine.AI
 {
@@ -12,6 +13,8 @@ namespace C7Engine.AI
 		private static int foodPriorityRate = 40;
 		private static int productionPriorityRate = 50;
 		private static int commercePriorityRate = 30;
+
+		private static ILogger log = Log.ForContext<CityTileAssignmentAI>();
 
 		public static void AssignNewCitizenToTile(City city, CityResident newResident)
 		{
@@ -27,7 +30,7 @@ namespace C7Engine.AI
 			foreach (Tile t in cityCenter.neighbors.Values) {
 				if (t.personWorkingTile == null) {
 					double score = CalculateTileYieldScore(t, targetTileFoodAmount, city.owner);
-					Console.WriteLine($"Tile {t} scored {score}");
+					log.Debug($"Tile {t} scored {score}");
 					if (score > maxScore) {
 						maxScore = score;
 						preferredTile = t;
@@ -36,7 +39,7 @@ namespace C7Engine.AI
 			}
 
 			string yield = city.location.YieldString(city.owner);
-			Console.WriteLine($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {yield}");
+			log.Information($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {yield}");
 
 			newResident.tileWorked = preferredTile;
 			preferredTile.personWorkingTile = newResident;

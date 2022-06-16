@@ -1,11 +1,15 @@
 using System.Collections.Generic;
 using System.IO;
+using Serilog;
 
 namespace C7Engine {
 	using C7GameData;
 	using System;
 
 	public class BarbarianAI {
+
+		private ILogger log = Log.ForContext<BarbarianAI>();
+
 		public void PlayTurn(Player player, GameData gameData) {
 			if (!player.isBarbarians) {
 				throw new System.Exception("Barbarian AI can only play barbarian players");
@@ -22,14 +26,14 @@ namespace C7Engine {
 						List<Tile> validTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 						if (validTiles.Count == 0) {
 							//This can happen if a barbarian galley spawns next to a 1-tile lake, moves there, and doesn't have anywhere else to go.
-							Console.WriteLine("WARNING: No valid tiles for barbarian to move to");
+							log.Warning("WARNING: No valid tiles for barbarian to move to");
 							continue;
 						}
 						Tile newLocation = validTiles[gameData.rng.Next(validTiles.Count)];
 						//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
 						//if it tries to move e.g. north from the north pole.  Hence, this check.
 						if (newLocation != Tile.NONE) {
-							Console.WriteLine("Moving barbarian at " + unit.location + " to " + newLocation);
+							log.Debug("Moving barbarian at " + unit.location + " to " + newLocation);
 							unit.move(unit.location.directionTo(newLocation));
 						}
 					}

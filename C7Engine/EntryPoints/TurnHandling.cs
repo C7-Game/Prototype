@@ -1,15 +1,17 @@
 using C7Engine.AI;
+using Serilog;
 
 namespace C7Engine
 {
 	using C7GameData;
 	using System;
-	public class TurnHandling
-	{
+	public class TurnHandling {
+		private static ILogger log = Log.ForContext<TurnHandling>();
+
 		internal static void OnBeginTurn()
 		{
 			GameData gameData = EngineStorage.gameData;
-			Console.WriteLine("\n*** Beginning turn " + gameData.turn + " ***");
+			log.Information("\n*** Beginning turn " + gameData.turn + " ***");
 
 			foreach (MapUnit mapUnit in gameData.mapUnits)
 				mapUnit.OnBeginTurn();
@@ -54,14 +56,14 @@ namespace C7Engine
 
 				// Production phase BEGIN
 
-				Console.WriteLine("\n*** Processing production for turn " + gameData.turn + " ***");
+				log.Information("\n*** Processing production for turn " + gameData.turn + " ***");
 
 				//Generate new barbarian units.
 				foreach (Tile tile in gameData.map.barbarianCamps)
 				{
 					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
 					int result = gameData.rng.Next(100);
-					// Console.WriteLine("Random barb result = " + result);
+					log.Verbose("Random barb result = " + result);
 					if (result < 7) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
@@ -74,7 +76,7 @@ namespace C7Engine
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
-						Console.WriteLine("New barbarian added at " + tile);
+						log.Debug("New barbarian added at " + tile);
 					}
 					else if (tile.NeighborsWater() && result < 10) {
 						MapUnit newUnit = new MapUnit();
@@ -88,7 +90,7 @@ namespace C7Engine
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
-						Console.WriteLine("New barbarian galley added at " + tile);
+						log.Debug("New barbarian galley added at " + tile);
 					}
 				}
 
