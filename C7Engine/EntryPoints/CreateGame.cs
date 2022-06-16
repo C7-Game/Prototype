@@ -2,6 +2,7 @@ namespace C7Engine
 {
 	using System;
 	using C7GameData;
+	using C7Engine.Components;
 
 	public class CreateGame
 	{
@@ -33,7 +34,9 @@ namespace C7Engine
 
 		private static void InitializeGameComponents()
 		{
-			ComponentManager.Instance.AddComponent<CalendarComponent>(new CalendarComponent(EngineStorage.gameData));
+			ComponentManager.Instance
+				.AddComponent<CalendarComponent>(new CalendarComponent(EngineStorage.gameData))
+				.InitializeComponents();
 		}
 	}
 }

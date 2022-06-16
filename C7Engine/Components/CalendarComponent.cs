@@ -1,7 +1,7 @@
 using System;
 using C7GameData;
 
-namespace C7Engine
+namespace C7Engine.Components
 {
     public class TurnEventArgs : EventArgs
     {
@@ -36,6 +36,10 @@ namespace C7Engine
         {
             _gameData = gameData;
             CurrentTurn = GetGameTurn(_gameData.turn);
+        }
+
+        public void Initialize()
+        {
             TurnHandling.TurnEnded += (obj, args) => AdvanceTurn();
             Console.WriteLine("Initialized CalendarComponent at turn " + CurrentTurn.TurnNumber);
         }

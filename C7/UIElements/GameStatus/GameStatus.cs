@@ -1,5 +1,5 @@
 using Godot;
-using C7Engine;
+using C7Engine.Components;
 using C7GameData;
 
 public class GameStatus : MarginContainer
