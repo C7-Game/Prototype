@@ -37,5 +37,8 @@ namespace C7GameData
 			return new TilePath(destination, new Queue<Tile>());
 		}
 
+		public override string ToString() {
+			return "Path of length " + path.Count + " to " + destination;
+		}
 	}
 }

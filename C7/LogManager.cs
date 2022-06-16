@@ -23,7 +23,7 @@ public class LogManager : Node
 		// the C7Engine.AI namespace regardless of log level.
 		Log.Logger = new LoggerConfiguration()
 			.WriteTo.GodotSink(formatter: consoleTemplate)
-			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information')")	//suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
+			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information') OR SourceContext like 'C7Engine.AI.UnitAI%'")	//suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
 			.MinimumLevel.Debug()
 			.CreateLogger();
 

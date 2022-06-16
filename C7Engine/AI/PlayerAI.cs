@@ -6,6 +6,7 @@ using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
 using C7Engine.AI;
+using C7Engine.AI.UnitAI;
 using Serilog;
 
 namespace C7Engine
@@ -46,7 +47,7 @@ namespace C7Engine
 				}
 
 				TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-				log.Information($"Unit processing time for {unit.unitType.name}: {Convert.ToInt32(stopwatchElapsed.TotalMilliseconds)} ms");
+				log.Debug($"Unit processing time for {unit.unitType.name}: {Convert.ToInt32(stopwatchElapsed.TotalMilliseconds)} ms");
 
 				player.tileKnowledge.AddTilesToKnown(unit.location);
 			}

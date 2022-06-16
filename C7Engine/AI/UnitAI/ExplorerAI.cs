@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.AIData;
-using C7Engine.Pathing;
 using Serilog;
 
-namespace C7Engine
+namespace C7Engine.AI.UnitAI
 {
-	public class ExplorerAI : UnitAI {
+	public class ExplorerAI : C7Engine.UnitAI {
 		private static ILogger log = Log.ForContext<ExplorerAI>();
 
 		public bool PlayTurn(Player player, MapUnit unit)
@@ -112,29 +112,26 @@ namespace C7Engine
 			int lowestDistance = int.MaxValue;
 			TilePath chosenPath = null;
 
-
-			if (unit.unitType.name.Contains("Galley")) {
-				Console.WriteLine($"Pre algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
-			}
-
 			PathingAlgorithm algo = PathingAlgorithmChooser.GetAlgorithm();
 			foreach (Tile t in validExplorerTiles) {
+				long millis = watch.ElapsedMilliseconds;
 				TilePath path = algo.PathFrom(unit.location, t);
 				if (path.PathLength() < lowestDistance) {
 					lowestDistance = path.PathLength();
 					chosenPath = path;
 				}
 
-				if (unit.unitType.name.Contains("Galley")) {
+				long endMillis = watch.ElapsedMilliseconds - millis;
+
+				if (endMillis < 5) {
 					log.Debug($"Algo time for {t} = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+				} else {
+					log.Warning($"Algo time for {t} = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
 				}
 			}
 
-			if (unit.unitType.name.Contains("Galley")) {
-				Console.WriteLine($"Post algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
-				Console.WriteLine($"Chosen path is {chosenPath}");
-				Console.WriteLine("Debugging hopefully is useful");
-			}
+			log.Information($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+			log.Information($"Chosen path is {chosenPath}");
 
 			if (chosenPath == null) {
 				//This could happen if there is e.g. a land tile that we could explore from, but on a different landmass.

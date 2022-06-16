@@ -169,29 +169,31 @@ namespace C7GameData
 
 		public List<Tile> generateStartingLocations(Random rng, int num, int minDistBetween)
 		{
-			var tr = new List<Tile>();
+			var chosenLocations = new List<Tile>();
+			rng = new Random(123);
 			for (int n = 0; n < num; n++) {
 				bool foundOne = false;
 				for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
-					var randTile = tiles[rng.Next(0, tiles.Count)];
+					int next = rng.Next(0, tiles.Count);
+					Tile randTile = tiles[rng.Next(0, tiles.Count)];
 					if (randTile.baseTerrainType.isWater())
 						continue;
 					int distToNearestOtherLoc = Int32.MaxValue;
-					foreach (var sL in tr) {
+					foreach (Tile startLocation in chosenLocations) {
 						// TODO: This distance calculation is just a placeholder. Eventually we'll need to write an proper
 						// function to find the distance between two tiles. This placeholder is not even very accurate, e.g. it
 						// would say that a tile and its east neighbor are at distance 2.
-						int dist = Math.Abs(sL.xCoordinate - randTile.xCoordinate) + Math.Abs(sL.yCoordinate - randTile.yCoordinate);
+						int dist = Math.Abs(startLocation.xCoordinate - randTile.xCoordinate) + Math.Abs(startLocation.yCoordinate - randTile.yCoordinate);
 						if (dist < distToNearestOtherLoc)
 							distToNearestOtherLoc = dist;
 					}
 					if (distToNearestOtherLoc >= minDistBetween) {
-						tr.Add(randTile);
+						chosenLocations.Add(randTile);
 						foundOne = true;
 					}
 				}
 			}
-			return tr;
+			return chosenLocations;
 		}
 
 		/**
