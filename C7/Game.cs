@@ -92,6 +92,7 @@ public class Game : Node2D
 			Player = GetNode<KinematicBody2D>("KinematicBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
+			GetNode<GameStatus>("CanvasLayer/GameStatus").RegisterEvents();
 
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
