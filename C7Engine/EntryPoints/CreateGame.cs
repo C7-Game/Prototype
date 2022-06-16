@@ -36,6 +36,7 @@ namespace C7Engine
 		{
 			ComponentManager.Instance
 				.AddComponent<CalendarComponent>(new CalendarComponent(EngineStorage.gameData))
+				.AddComponent<AutosaveComponent>(new AutosaveComponent(EngineStorage.gameData))
 				.InitializeComponents();
 		}
 	}
