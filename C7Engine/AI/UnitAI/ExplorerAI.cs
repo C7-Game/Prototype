@@ -123,11 +123,12 @@ namespace C7Engine.AI.UnitAI
 
 				long endMillis = watch.ElapsedMilliseconds - millis;
 
-				if (endMillis < 5) {
-					log.Debug($"Algo time for {t} = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
-				} else {
-					log.Warning($"Algo time for {t} = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
-				}
+				// if (endMillis < 5) {
+				// 	log.Debug("Algo time for {Tile} = {Time} ms", t, 5);
+				// } else {
+				// 	log.Warning("Algo time for {Tile} = {Time} ms", t, 5);
+				// }
+				log.Warning("Logging stuff");
 			}
 
 			log.Information($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
