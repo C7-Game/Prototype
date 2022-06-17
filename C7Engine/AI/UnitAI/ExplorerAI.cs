@@ -99,6 +99,12 @@ namespace C7Engine.AI.UnitAI
 				validExplorerTiles.Add(t);
 			}
 
+			int CrowFliesDistance(Tile x, Tile y) {
+				return x.distanceTo(unit.location) - y.distanceTo(unit.location);
+			};
+
+			validExplorerTiles.Sort(CrowFliesDistance);
+
 			if (unit.unitType.name.Contains("Galley")) {
 				Console.WriteLine($"Valid explorer tile time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
 			}
@@ -113,7 +119,13 @@ namespace C7Engine.AI.UnitAI
 			TilePath chosenPath = null;
 
 			PathingAlgorithm algo = PathingAlgorithmChooser.GetAlgorithm();
+			log.Information("Starting from " + unit.location + " with " + unit.unitType);
 			foreach (Tile t in validExplorerTiles) {
+				if (t.distanceTo(unit.location) > lowestDistance) {
+					//Impossible to be shorter, skip it
+					continue;
+				}
+
 				long millis = watch.ElapsedMilliseconds;
 				TilePath path = algo.PathFrom(unit.location, t);
 				if (path.PathLength() < lowestDistance) {
@@ -129,6 +141,10 @@ namespace C7Engine.AI.UnitAI
 				// 	log.Warning("Algo time for {Tile} = {Time} ms", t, 5);
 				// }
 				// log.Warning("Logging stuff");
+
+				if (lowestDistance == 1) {
+					break;
+				}
 			}
 
 			log.Information($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
