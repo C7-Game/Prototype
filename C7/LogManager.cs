@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Godot;
 using Serilog;
 using Serilog.Templates;
@@ -23,7 +25,9 @@ public class LogManager : Node
 		// the C7Engine.AI namespace regardless of log level.
 		Log.Logger = new LoggerConfiguration()
 			// .WriteTo.GodotSink(formatter: consoleTemplate)
-			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information') OR SourceContext like 'C7Engine.AI.UnitAI%'")	//suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
+			.WriteTo.File("log.txt", buffered: true, flushToDiskInterval: TimeSpan.FromMilliseconds(1000),
+			              outputTemplate: "[{Level:u3}] {Timestamp:HH:mm:ss} {SourceContext}: {Message:lj} {NewLine}{Exception}")
+			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information')")	//suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
 			.MinimumLevel.Debug()
 			.CreateLogger();
 

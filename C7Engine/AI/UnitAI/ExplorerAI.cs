@@ -124,16 +124,16 @@ namespace C7Engine.AI.UnitAI
 				long endMillis = watch.ElapsedMilliseconds - millis;
 
 				// if (endMillis < 5) {
-				// 	log.Debug("Algo time for {Tile} = {Time} ms", t, 5);
+					log.Information("Algo time for {Tile} = {Time} ms", t, endMillis);
 				// } else {
 				// 	log.Warning("Algo time for {Tile} = {Time} ms", t, 5);
 				// }
-				log.Warning("Logging stuff");
+				// log.Warning("Logging stuff");
 			}
 
 			log.Information($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
-			Console.WriteLine($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
-			Console.WriteLine($"Chosen path is {chosenPath}");
+			// Console.WriteLine($"Total algo time = {Convert.ToInt32(watch.Elapsed.TotalMilliseconds)} ms");
+			// Console.WriteLine($"Chosen path is {chosenPath}");
 			log.Information($"Chosen path is {chosenPath}");
 
 			if (chosenPath == null) {
