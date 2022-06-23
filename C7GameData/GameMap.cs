@@ -170,6 +170,7 @@ namespace C7GameData
 		public List<Tile> generateStartingLocations(Random rng, int num, int minDistBetween)
 		{
 			var tr = new List<Tile>();
+			rng = new Random(123);
 			for (int n = 0; n < num; n++) {
 				bool foundOne = false;
 				for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
