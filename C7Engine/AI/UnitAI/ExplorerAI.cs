@@ -120,7 +120,12 @@ namespace C7Engine
 				}
 			}
 
-			log.Debug($"Explorer pathing took " + watch.ElapsedMilliseconds + " milliseconds");
+			long totalPathingTime = watch.ElapsedMilliseconds;
+			if (totalPathingTime >= 100) {
+				log.Warning($"Explorer pathing took " + totalPathingTime + " milliseconds from " + unit.location + " with " + unit.unitType);
+			} else {
+				log.Debug($"Explorer pathing took " + totalPathingTime + " milliseconds");
+			}
 
 			if (chosenPath == null) {
 				//This could happen if there is e.g. a land tile that we could explore from, but on a different landmass.
