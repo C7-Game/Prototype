@@ -1,59 +1,5 @@
 {
   "version": "v0.0early-prototype",
-  "rules": {
-      "experienceLevels": [
-	  {
-	      "key": "conscript",
-	      "displayName": "Conscript",
-	      "baseHitPoints": 2,
-	      "retreatChance": 0.34,
-	      "promotionChance": 0.50
-	  },
-	  {
-	      "key": "regular",
-	      "displayName": "Regular",
-	      "baseHitPoints": 3,
-	      "retreatChance": 0.50,
-	      "promotionChance": 0.25
-	  },
-	  {
-	      "key": "veteran",
-	      "displayName": "Veteran",
-	      "baseHitPoints": 4,
-	      "retreatChance": 0.58,
-	      "promotionChance": 0.125
-	  },
-	  {
-	      "key": "elite",
-	      "displayName": "Elite",
-	      "baseHitPoints": 5,
-	      "retreatChance": 0.66,
-	      "promotionChance": 0.0
-	  }
-      ],
-      "defaultExperienceLevelKey": "regular",
-
-      "fortificationBonus": {
-	  "description": "Fortified",
-	  "amount": 0.25
-      },
-      "riverCrossingBonus": {
-	  "description": "Behind river",
-	  "amount": 0.25
-      },
-      "cityLevel1DefenseBonus": {
-	  "description": "Town",
-	  "amount": 0.00
-      },
-      "cityLevel2DefenseBonus": {
-	  "description": "City",
-	  "amount": 0.50
-      },
-      "cityLevel3DefenseBonus": {
-	  "description": "Metropolis",
-	  "amount": 1.00
-      }
-  },
   "gameData": {
     "turn": 0,
     "map": {
@@ -87110,6 +87056,63 @@
         "attributes": []
       }
     },
-    "cities": []
+    "cities": [],
+    "experienceLevels": [
+      {
+        "key": "conscript",
+        "displayName": "Conscript",
+        "baseHitPoints": 2,
+        "retreatChance": 0.34,
+        "promotionChance": 0.50
+      },
+      {
+        "key": "regular",
+        "displayName": "Regular",
+        "baseHitPoints": 3,
+        "retreatChance": 0.50,
+        "promotionChance": 0.25
+      },
+      {
+        "key": "veteran",
+        "displayName": "Veteran",
+        "baseHitPoints": 4,
+        "retreatChance": 0.58,
+        "promotionChance": 0.125
+      },
+      {
+        "key": "elite",
+        "displayName": "Elite",
+        "baseHitPoints": 5,
+        "retreatChance": 0.66,
+        "promotionChance": 0.0
+      }
+    ],
+    "defaultExperienceLevelKey": "regular",
+
+    "fortificationBonus": {
+      "description": "Fortified",
+      "amount": 0.25
+    },
+    "riverCrossingBonus": {
+      "description": "Behind river",
+      "amount": 0.25
+    },
+    "cityLevel1DefenseBonus": {
+      "description": "Town",
+      "amount": 0.00
+    },
+    "cityLevel2DefenseBonus": {
+      "description": "City",
+      "amount": 0.50
+    },
+    "cityLevel3DefenseBonus": {
+      "description": "Metropolis",
+      "amount": 1.00
+    },
+
+    "healRateInFriendlyField": 1,
+    "healRateInNeutralField": 1,
+    "healRateInHostileField": 0,
+    "healRateInCity": 2
   }
 }

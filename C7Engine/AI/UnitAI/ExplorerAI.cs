@@ -4,11 +4,13 @@ using System.Linq;
 using C7GameData;
 using C7GameData.AIData;
 using C7Engine.Pathing;
+using Serilog;
 
 namespace C7Engine
 {
-	public class ExplorerAI : UnitAI
-	{
+	public class ExplorerAI : UnitAI {
+		private static ILogger log = Log.ForContext<ExplorerAI>();
+
 		public bool PlayTurn(Player player, MapUnit unit)
 		{
 			ExplorerAIData explorerData = (ExplorerAIData)unit.currentAIData;
@@ -48,10 +50,10 @@ namespace C7Engine
 		private static bool ExploreNeighboringTile(Player player, MapUnit unit, ExplorerAIData aiData) {
 			List<Tile> validNeighboringTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 			if (validNeighboringTiles.Count == 0) {
-				Console.WriteLine("No valid locations for unit " + unit + " at location " + unit.location);
+				log.Information("No valid exploration locations for unit " + unit + " at location " + unit.location);
 				return false;
 			}
-			//Console.WriteLine($"Exploring for unit {unit}"); //debugging print
+			log.Debug($"Exploring for unit {unit}");
 			KeyValuePair<Tile, float> topScoringTile = FindTopScoringTileForExploration(player, validNeighboringTiles, aiData.type);
 			Tile newLocation = topScoringTile.Key;
 
@@ -69,7 +71,7 @@ namespace C7Engine
 		private static bool FindPathToNewExplorationArea(Player player, ExplorerAIData explorerData, MapUnit unit) {
 			List<Tile> validExplorerTiles = new List<Tile>();
 			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
-					.Where(t => unit.canTraverseTile(t) && t.cityAtTile == null && numUnknownNeighboringTiles(player, t) > 0))
+					.Where(t => unit.CanEnterTile(t, false) && t.cityAtTile == null && numUnknownNeighboringTiles(player, t) > 0))
 			{
 				validExplorerTiles.Add(t);
 			}
@@ -123,7 +125,7 @@ namespace C7Engine
 						}
 					}
 					explorationScore[t] = 100 - 4 * distanceToNearestCity * distanceToNearestCity + baseScore;
-					// Console.WriteLine($"Exploration score for {t}: {explorationScore[t]}"); //debugging print
+					log.Verbose($"Exploration score for {t}: {explorationScore[t]}");
 				} else {
 					explorationScore[t] = baseScore;
 				}

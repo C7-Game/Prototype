@@ -1,4 +1,5 @@
 using System.Linq;
+using Serilog;
 
 namespace C7Engine
 {
@@ -10,6 +11,7 @@ namespace C7Engine
 	{
 
 		private static Queue<MapUnit> waitQueue = new Queue<MapUnit>();
+		private static ILogger log = Log.ForContext<UnitInteractions>();
 
 		public static MapUnit getNextSelectedUnit(GameData gameData)
 		{
@@ -76,11 +78,11 @@ namespace C7Engine
 			{
 				if (unit.guid == guid)
 				{
-					Console.WriteLine("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; adding it to the wait queue");
+					log.Verbose("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; adding it to the wait queue");
 					waitQueue.Enqueue(unit);
 				}
 			}
-			Console.WriteLine("Failed to find a matching unit with guid " + guid);
+			log.Warning("Failed to find a matching unit with guid " + guid);
 		}
 	}
 }
