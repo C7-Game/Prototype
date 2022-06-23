@@ -6,18 +6,19 @@ using C7GameData;
 using C7GameData.AIData;
 using C7Engine.AI;
 using C7Engine.AI.StrategicAI;
+using Serilog;
 
 namespace C7Engine
 {
-	public class PlayerAI
-	{
+	public class PlayerAI {
+		private static ILogger log = Log.ForContext<PlayerAI>();
+
 		public static void PlayTurn(Player player, Random rng)
 		{
 			if (player.isHuman || player.isBarbarians) {
 				return;
 			}
-
-			Console.WriteLine("\n---> Begin " + player.civilization.cityNames[0] + " turn");
+			log.Information("-> Begin " + player.civilization.cityNames[0] + " turn");
 
 			if (player.turnsUntilPriorityReevaluation == 0) {
 				Console.WriteLine("Re-evaluating strategic priorities for " + player);
@@ -31,7 +32,7 @@ namespace C7Engine
 			} else {
 				player.turnsUntilPriorityReevaluation--;
 			}
-
+      
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
 				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.
@@ -51,8 +52,7 @@ namespace C7Engine
 
 					attempts++;
 					if (!unitDone && attempts >= maxAttempts) {
-						//TODO: Serilog.  WARN level.
-						Console.WriteLine($"Hit max AI attempts of {maxAttempts} for unit {unit} at {unit.location} without succeeding.  This indicates SetAIForUnit returned an impossible task, and should be debugged.");
+						log.Warning($"Hit max AI attempts of {maxAttempts} for unit {unit} at {unit.location} without succeeding.  This indicates SetAIForUnit returned an impossible task, and should be debugged.");
 						break;
 					}
 				}
@@ -71,7 +71,7 @@ namespace C7Engine
 				//If it's the starting settler, have it settle in place.  Otherwise, use an AI to find a location.
 				if (player.cities.Count == 0 && unit.location.cityAtTile == null) {
 					settlerAiData.destination = unit.location;
-					Console.WriteLine("No cities yet!  Set AI for unit to settler AI with destination of " + settlerAiData.destination);
+					log.Information("No cities yet!  Set AI for unit to settler AI with destination of " + settlerAiData.destination);
 				}
 				else {
 					settlerAiData.destination = SettlerLocationAI.findSettlerLocation(unit.location, player);
@@ -80,12 +80,12 @@ namespace C7Engine
 						//by another colonist.  Longer-term, the AI shouldn't be building settlers if that is the case,
 						//but right now we'll just spike the football to stop the clock and avoid building immediately next to another city.
 						settlerAiData.goal = SettlerAIData.SettlerGoal.JOIN_CITY;
-						Console.WriteLine("Set AI for unit to JOIN_CITY due to lack of locations to settle");
+						log.Information("Set AI for unit to JOIN_CITY due to lack of locations to settle");
 					}
 					else {
 						PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
 						settlerAiData.pathToDestination = algorithm.PathFrom(unit.location, settlerAiData.destination);
-						Console.WriteLine("Set AI for unit to BUILD_CITY with destination of " + settlerAiData.destination);
+						log.Information("Set AI for unit to BUILD_CITY with destination of " + settlerAiData.destination);
 					}
 				}
 				unit.currentAIData = settlerAiData;
@@ -94,7 +94,7 @@ namespace C7Engine
 				DefenderAIData ai = new DefenderAIData();
 				ai.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;
-				Console.WriteLine("Set defender AI for " + unit + " with destination of " + ai.destination);
+				log.Information("Set defender AI for " + unit + " with destination of " + ai.destination);
 				unit.currentAIData = ai;
 			}
 			else {
@@ -103,14 +103,14 @@ namespace C7Engine
 					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.COASTLINE;
 					unit.currentAIData = ai;
-					Console.WriteLine("Set coastline exploration AI for " + unit);
+					log.Information("Set coastline exploration AI for " + unit);
 				}
 				else if (unit.location.unitsOnTile.Exists((x) => x.unitType.categories.Contains("Sea"))) {
 					ExplorerAIData ai = new ExplorerAIData();
 					ai.type = ExplorerAIData.ExplorationType.ON_A_BOAT;
 					unit.currentAIData = ai;
 					//TODO: Actually put the unit on the boat
-					Console.WriteLine("Set ON_A_BOAT exploration AI for " + unit);
+					log.Information("Set ON_A_BOAT exploration AI for " + unit);
 				}
 				else {
 					//Isn't a Settler.  If there's a city at the location, it's defended.  No boats involved.  What's our priority?
@@ -135,7 +135,7 @@ namespace C7Engine
 							ai.type = ExplorerAIData.ExplorationType.RANDOM;
 						}
 						unit.currentAIData = ai;
-						Console.WriteLine($"Set {ai.type} exploration AI for {unit}");
+						log.Information($"Set {ai.type} exploration AI for {unit}");
 					}
 					else {
 						//Nowhere to explore.  What to do now?
@@ -161,7 +161,7 @@ namespace C7Engine
 						PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
 						newUnitAIData.pathToDestination = algorithm.PathFrom(unit.location, newUnitAIData.destination);
 
-						Console.WriteLine($"Unit {unit} tasked with defending {nearestCityToDefend.name}");
+						log.Information($"Unit {unit} tasked with defending {nearestCityToDefend.name}");
 						unit.currentAIData = newUnitAIData;
 					}
 				}

@@ -1,20 +1,20 @@
 using C7Engine.AI;
+using Serilog;
 
 namespace C7Engine
 {
 	using C7GameData;
 	using System;
-	public class TurnHandling
-	{
+	public class TurnHandling {
+		private static ILogger log = Log.ForContext<TurnHandling>();
+
 		internal static void OnBeginTurn()
 		{
 			GameData gameData = EngineStorage.gameData;
-			Console.WriteLine("\n*** Beginning turn " + gameData.turn + " ***");
+			log.Information("\n*** Beginning turn " + gameData.turn + " ***");
 
-			//Reset movement points available for all units
-			foreach (MapUnit mapUnit in gameData.mapUnits) {
-				mapUnit.movementPointsRemaining = mapUnit.unitType.movement;
-			}
+			foreach (MapUnit mapUnit in gameData.mapUnits)
+				mapUnit.OnBeginTurn();
 
 			foreach (Player player in gameData.players) {
 				player.hasPlayedThisTurn = false;
@@ -56,41 +56,41 @@ namespace C7Engine
 
 				// Production phase BEGIN
 
-				Console.WriteLine("\n*** Processing production for turn " + gameData.turn + " ***");
+				log.Information("\n*** Processing production for turn " + gameData.turn + " ***");
 
 				//Generate new barbarian units.
 				foreach (Tile tile in gameData.map.barbarianCamps)
 				{
 					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
 					int result = gameData.rng.Next(100);
-					// Console.WriteLine("Random barb result = " + result);
+					log.Verbose("Random barb result = " + result);
 					if (result < 7) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];
 						newUnit.unitType = gameData.unitPrototypes["Warrior"];
-						newUnit.experienceLevelKey = EngineStorage.rules.defaultExperienceLevelKey;
-						newUnit.experienceLevel = EngineStorage.rules.defaultExperienceLevel;
+						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+						newUnit.experienceLevel = gameData.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;
 						newUnit.isFortified = true; //todo: hack for unit selection
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
-						Console.WriteLine("New barbarian added at " + tile);
+						log.Debug("New barbarian added at " + tile);
 					}
 					else if (tile.NeighborsWater() && result < 10) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
 						newUnit.unitType = gameData.unitPrototypes["Galley"];
-						newUnit.experienceLevelKey = EngineStorage.rules.defaultExperienceLevelKey;
-						newUnit.experienceLevel = EngineStorage.rules.defaultExperienceLevel;
+						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+						newUnit.experienceLevel = gameData.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;
 						newUnit.isFortified = true; //todo: hack for unit selection
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
-						Console.WriteLine("New barbarian galley added at " + tile);
+						log.Debug("New barbarian galley added at " + tile);
 					}
 				}
 
@@ -104,8 +104,8 @@ namespace C7Engine
 							MapUnit newUnit = prototype.GetInstance();
 							newUnit.owner = city.owner;
 							newUnit.location = city.location;
-							newUnit.experienceLevelKey = EngineStorage.rules.defaultExperienceLevelKey;
-							newUnit.experienceLevel = EngineStorage.rules.defaultExperienceLevel;
+							newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+							newUnit.experienceLevel = gameData.defaultExperienceLevel;
 							newUnit.facingDirection = TileDirection.SOUTHWEST;
 
 							city.location.unitsOnTile.Add(newUnit);

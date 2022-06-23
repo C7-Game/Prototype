@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 namespace C7GameData
 {
+	using System;
+
 	/**
 	 * The prototype for a unit, which defines the characteristics of a unit.
 	 * For example, a Spearman might have 1 attack, 2 defense, and 1 movement.
@@ -26,6 +28,19 @@ namespace C7GameData
 		public override string ToString()
 		{
 			return $"{name} ({attack}/{defense}/{movement})";
+		}
+
+		public double BaseStrength(CombatRole role)
+		{
+			switch (role) {
+			case CombatRole.Attack:                  return attack;
+			case CombatRole.Defense:                 return defense;
+			case CombatRole.Bombard:                 return bombard;
+			case CombatRole.BombardDefense:          return defense;
+			case CombatRole.DefensiveBombard:        return bombard;
+			case CombatRole.DefensiveBombardDefense: return defense;
+			default: throw new ArgumentOutOfRangeException("Invalid CombatRole");
+			}
 		}
 
 		public MapUnit GetInstance()

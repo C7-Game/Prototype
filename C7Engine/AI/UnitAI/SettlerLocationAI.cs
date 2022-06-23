@@ -4,11 +4,13 @@ using System.Collections.ObjectModel;
 using C7GameData;
 using System.Linq;
 using C7GameData.AIData;
+using Serilog;
 
 namespace C7Engine
 {
-	public class SettlerLocationAI
-	{
+	public class SettlerLocationAI {
+		private static ILogger log = Log.ForContext<SettlerLocationAI>();
+
 		//Eventually, there should be different weights based on whether the AI already
 		//has the resource or not (more important to secure ones that they don't have).
 		//But since we don't have trade networks yet, for now there's only one value.
@@ -23,8 +25,7 @@ namespace C7Engine
 			}
 
 			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
-			//Debugging: Print out scores
-			Console.WriteLine("Top city location candidates from " + start + ":");
+			log.Debug("Top city location candidates from " + start + ":");
 			Tile returnValue = null;
 			foreach (KeyValuePair<Tile, int> kvp in orderedScores.Take(5))
 			{
@@ -32,7 +33,7 @@ namespace C7Engine
 					returnValue = kvp.Key;
 				}
 				if (kvp.Value > 0) {
-					Console.WriteLine("  Tile " + kvp.Key + " scored " + kvp.Value);
+					log.Debug("  Tile " + kvp.Key + " scored " + kvp.Value);
 				}
 			}
 			return returnValue;
