@@ -54,7 +54,7 @@ namespace C7Engine
 				log.Information("No valid exploration locations for unit " + unit + " at location " + unit.location);
 				return false;
 			}
-			// log.Verbose($"Exploring for unit {unit}");
+			log.Verbose($"Exploring for unit {unit}");
 			KeyValuePair<Tile, float> topScoringTile = FindTopScoringTileForExploration(player, validNeighboringTiles, aiData.type);
 			Tile newLocation = topScoringTile.Key;
 
