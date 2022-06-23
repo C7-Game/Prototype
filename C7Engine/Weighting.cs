@@ -17,9 +17,19 @@
 	/// At 9 vs 1, it's 90/10 versus 98.8% for quadratic.  So it does work as intended - if the AI is pretty sure, it
 	/// is much more likely to go with what it thinks is best; if it's only sort of sure, it's may second guess itself.
 	/// </summary>
-	public enum PrioritizationType {
+	public enum Weighting {
 		ALWAYS_CHOOSE_HIGHEST_SCORE,
 		WEIGHTED_QUADRATIC,
 		WEIGHTED_LINEAR,
+	}
+
+	public static class WeightAdjuster {
+		public static double AdjustWeightByFactor(double baseWeight, Weighting weighting) {
+			if (weighting == Weighting.WEIGHTED_QUADRATIC) {
+				return baseWeight * baseWeight;
+			} else {
+				return baseWeight;
+			}
+		}
 	}
 }

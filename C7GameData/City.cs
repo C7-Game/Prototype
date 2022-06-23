@@ -130,5 +130,8 @@ namespace C7GameData
 			return CurrentFoodYield() - size * 2;
 		}
 
+		public override string ToString() {
+			return $"name ({size})";
+		}
     }
 }

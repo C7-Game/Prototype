@@ -1,13 +1,20 @@
+using System;
 using System.Collections.Generic;
 using C7Engine;
 using C7Engine.AI.StrategicAI;
+using Serilog;
 
 namespace C7GameData.AIData {
 	public class ExpansionPriority : StrategicPriority {
 		private readonly int TEMP_GAME_LENGTH = 540;
 		private readonly int EARLY_GAME_CUTOFF = 25;	//what percentage of the game is early game, which should give expansion a boost?
 		private static readonly int POSSIBLE_CITY_LOCATION_SCORE = 2;	//how much weight to give to each possible city location
-		private static readonly int TILE_SCORE_DIVIDER;	//how much to divide each location's tile score by
+		private static readonly int TILE_SCORE_DIVIDER = 1;	//how much to divide each location's tile score by
+
+		private static readonly int SETTLER_FLAT_APPEAL = 30;			//the base "flat" appeal of settler-type units
+		private static readonly float SETTLER_WEIGHTED_APPEAL = 4.0f;	//the multiplier effect on settler-type units
+
+		private ILogger log = Log.ForContext<ExpansionPriority>();
 
 		public ExpansionPriority() {
 			key = "Expansion";
@@ -24,6 +31,37 @@ namespace C7GameData.AIData {
 				this.calculatedWeight = score;
 			}
 		}
+
+		public override float GetProductionItemFlatAdjuster(IProducible producible) {
+			if (producible is UnitPrototype prototype) {
+				if (prototype.actions.Contains("buildCity")) {
+					//Offset the shield cost and pop cost maluses, and add a flat 30 value to be equivalent to an early-game unit
+					int adjustment = prototype.shieldCost + 10 * prototype.populationCost + SETTLER_FLAT_APPEAL;
+					log.Debug($"ExpansionPriority adjusting {producible} by {adjustment}");
+					return adjustment;
+				}
+			}
+			return 0.0f;
+		}
+
+		/// <summary>
+		/// This priority will prefer units that can build cities.
+		/// </summary>
+		/// <param name="producible"></param>
+		/// <returns></returns>
+		public override float GetProductionItemPreferenceWeight(IProducible producible) {
+			if (producible is UnitPrototype prototype) {
+				if (prototype.actions.Contains("buildCity")) {
+					return SETTLER_WEIGHTED_APPEAL;
+				}
+			}
+			return 0.0f;
+		}
+
+		public override string ToString() {
+			return "ExpansionPriority";
+		}
+
 		private static int CalculateAvailableLandScore(Player player)
 		{
 			//Figure out if there's land to settle, and how much
