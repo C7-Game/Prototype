@@ -19,14 +19,7 @@ namespace C7Engine
 
 		//Figures out where to plant Settlers
 		public static Tile findSettlerLocation(Tile start, Player player) {
-			List<City> playerCities = player.cities;
-			List<MapUnit> playerUnits = player.units;
-			HashSet<Tile> candidates = GetCandidateTiles(start);
-			foreach (City city in playerCities) {
-				HashSet<Tile> moreCandidates = GetCandidateTiles(city.location);
-				candidates.UnionWith(moreCandidates);
-			}
-			Dictionary<Tile, int> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
+			Dictionary<Tile, int> scores = GetPossibleNewCityLocations(start, player);
 			if (scores.Count == 0 || scores.Values.Max() <= 0) {
 				return Tile.NONE;	//nowhere to settle
 			}
@@ -44,6 +37,24 @@ namespace C7Engine
 				}
 			}
 			return returnValue;
+		}
+
+		/// <summary>
+		/// Returns possible city locations, and scores for them, for a given player and factoring in distance from a given start tile.
+		/// </summary>
+		/// <param name="start">The tile where a hypothetical unit would be starting from.  It will prefer closer tiles, all else equal.</param>
+		/// <param name="player">The player who might be considering building a new city.</param>
+		/// <returns>A map of viable tile locations, to their score.</returns>
+		public static Dictionary<Tile, int> GetPossibleNewCityLocations(Tile start, Player player)
+		{
+
+			List<City> playerCities = player.cities;
+			List<MapUnit> playerUnits = player.units;
+			HashSet<Tile> candidates = GetCandidateTiles(start);
+			foreach (HashSet<Tile> moreCandidates in playerCities.Select(city => GetCandidateTiles(city.location))) {
+				candidates.UnionWith(moreCandidates);
+			}
+			return AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
 		}
 		private static HashSet<Tile> GetCandidateTiles(Tile start)
 		{
@@ -82,29 +93,28 @@ namespace C7Engine
 			candidates.UnionWith(ringFour);
 			return candidates;
 		}
+
+		/**
+		 * Returns a Dictionary of tiles and scores, containing only tiles whose settler score is greater than zero.
+		 */
 		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, HashSet<Tile> candidates, List<MapUnit> playerSettlers)
 		{
-
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
 			foreach (Tile t in candidates) {
-				//TODO: Look at whether we can place cities here.  Hard-coded for now.
+				//TODO: #120: Look at whether we can place cities here.  Hard-coded for now.
 				if (t.overlayTerrainType.Key == "mountains") {
-					scores[t] = 0;
 					continue;
 				}
 				if (t.cityAtTile != null || t.GetLandNeighbors().Exists(n => n.cityAtTile != null)) {
-					scores[t] = 0;
 					continue;
 				}
 				foreach (MapUnit otherSettler in playerSettlers)
 				{
 					if (otherSettler.currentAIData is SettlerAIData otherSettlerAI) {
 						if (otherSettlerAI.destination == t) {
-							scores[t] = 0;
 							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.
 						}
 						if (otherSettlerAI.destination.GetLandNeighbors().Exists(n => n == t)) {
-							scores[t] = 0;
 							goto nextcandidate;
 						}
 					}
@@ -127,14 +137,21 @@ namespace C7Engine
 				//TODO: Exclude locations that are too close to another civ.
 
 				//Lower scores if they are far away
+				int preDistanceScore = score;
 				int distance = startTile.distanceTo(t);
 				if (distance > 4) {
 					score -= distance * 2;
 				}
+				//Distance can never lower score beyond 1; the AI will always try to settle those worthless tundras.
+				//(This could actually be modified in the future, but for now is also a safety rail)
+				if (preDistanceScore > 0 && score <= 0) {
+					score = 1;
+				}
 
 				//TODO: Remove locations that we already have another Settler moving towards
 
-				scores[t] = score;
+				if (score > 0)
+					scores[t] = score;
 nextcandidate: ;
 			}
 			return scores;
