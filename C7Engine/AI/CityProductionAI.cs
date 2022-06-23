@@ -65,7 +65,7 @@ namespace C7Engine
 				weights.Add(priorityAdjustedScore);
 			}
 
-			IProducible chosen = ChooseWeightedPriority(prototypes, weights, PrioritizationType.WEIGHTED_QUADRATIC);
+			IProducible chosen = ChooseWeightedPriority(prototypes, weights, Weighting.WEIGHTED_QUADRATIC);
 			return chosen;
 		}
 
@@ -94,13 +94,13 @@ namespace C7Engine
 			return 0.0f;
 		}
 
-		private static IProducible ChooseWeightedPriority(List<IProducible> items, List<float> weights, PrioritizationType weighting) {
+		private static IProducible ChooseWeightedPriority(List<IProducible> items, List<float> weights, Weighting weighting) {
 			double sumOfAllWeights = 0.0;
 			List<double> cutoffs = new List<double>();
 			int i = 0;
 			foreach (float f in weights) {
 				double baseWeight = f;
-				double adjustedWeight = AdjustWeightByFactor(baseWeight, weighting);
+				double adjustedWeight = WeightAdjuster.AdjustWeightByFactor(baseWeight, weighting);
 				if (f <= 0) {
 					adjustedWeight = 0;
 				}
@@ -126,15 +126,6 @@ namespace C7Engine
 				idx++;
 			}
 			return items[0];	//TODO: Fallback
-		}
-
-		//TODO: Duplicated with StrategicPriorityArbitrator.  Should be common.
-		private static double AdjustWeightByFactor(double baseWeight, PrioritizationType weighting) {
-			if (weighting == PrioritizationType.WEIGHTED_QUADRATIC) {
-				return baseWeight * baseWeight;
-			} else {
-				return baseWeight;
-			}
 		}
 
 		public static float AdjustScoreByPopCost(City city, UnitPrototype unitPrototype, float baseScore) {

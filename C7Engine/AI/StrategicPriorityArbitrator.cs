@@ -41,7 +41,7 @@ namespace C7Engine.AI {
 
 			List<StrategicPriority> priorities = new List<StrategicPriority>();
 			for (int i = 0; i < numberOfPriorities; i++) {
-				StrategicPriority topPriority = ChooseStrategicPriority(possiblePriorities, PrioritizationType.WEIGHTED_LINEAR);
+				StrategicPriority topPriority = ChooseStrategicPriority(possiblePriorities, Weighting.WEIGHTED_LINEAR);
 				priorities.Add(topPriority);
 				possiblePriorities.Remove(topPriority);
 			}
@@ -77,8 +77,8 @@ namespace C7Engine.AI {
 			}
 			return count;
 		}
-		private static StrategicPriority ChooseStrategicPriority(List<StrategicPriority> possiblePriorities, PrioritizationType weighting) {
-			if (weighting == PrioritizationType.ALWAYS_CHOOSE_HIGHEST_SCORE) {
+		private static StrategicPriority ChooseStrategicPriority(List<StrategicPriority> possiblePriorities, Weighting weighting) {
+			if (weighting == Weighting.ALWAYS_CHOOSE_HIGHEST_SCORE) {
 				return FindTopScoringPriority(possiblePriorities);
 			} else {
 				return ChooseWeightedPriority(possiblePriorities, weighting);
@@ -98,12 +98,12 @@ namespace C7Engine.AI {
 			return topScore;
 		}
 
-		private static StrategicPriority ChooseWeightedPriority(List<StrategicPriority> possiblePriorities, PrioritizationType weighting) {
+		private static StrategicPriority ChooseWeightedPriority(List<StrategicPriority> possiblePriorities, Weighting weighting) {
 			double sumOfAllWeights = 0.0;
 			List<double> cutoffs = new List<double>();
 			foreach (StrategicPriority possiblePriority in possiblePriorities) {
 				double baseWeight = possiblePriority.GetCalculatedWeight();
-				double adjustedWeight = AdjustWeightByFactor(baseWeight, weighting);
+				double adjustedWeight = WeightAdjuster.AdjustWeightByFactor(baseWeight, weighting);
 
 				double oldCutoff = sumOfAllWeights;
 				sumOfAllWeights += adjustedWeight;
@@ -125,14 +125,6 @@ namespace C7Engine.AI {
 				idx++;
 			}
 			return new WarPriority();	//TODO: Fallback
-		}
-
-		private static double AdjustWeightByFactor(double baseWeight, PrioritizationType weighting) {
-			if (weighting == PrioritizationType.WEIGHTED_QUADRATIC) {
-				return baseWeight * baseWeight;
-			} else {
-				return baseWeight;
-			}
 		}
 	}
 }
