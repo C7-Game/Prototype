@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using C7Engine;
 using C7Engine.AI.StrategicAI;
+using Serilog;
 
 namespace C7GameData.AIData {
 	public class ExpansionPriority : StrategicPriority {
@@ -12,6 +13,8 @@ namespace C7GameData.AIData {
 
 		private static readonly int SETTLER_FLAT_APPEAL = 30;			//the base "flat" appeal of settler-type units
 		private static readonly float SETTLER_WEIGHTED_APPEAL = 4.0f;	//the multiplier effect on settler-type units
+
+		private ILogger log = Log.ForContext<ExpansionPriority>();
 
 		public ExpansionPriority() {
 			key = "Expansion";
@@ -34,8 +37,7 @@ namespace C7GameData.AIData {
 				if (prototype.actions.Contains("buildCity")) {
 					//Offset the shield cost and pop cost maluses, and add a flat 30 value to be equivalent to an early-game unit
 					int adjustment = prototype.shieldCost + 10 * prototype.populationCost + SETTLER_FLAT_APPEAL;
-					//TODO: Debug statement
-					// Console.WriteLine($"ExpansionPriority adjusting {producible} by {adjustment}");
+					log.Debug($"ExpansionPriority adjusting {producible} by {adjustment}");
 					return adjustment;
 				}
 			}

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using C7Engine.AI.StrategicAI;
+using Serilog;
 
 namespace C7Engine
 {
@@ -15,6 +16,8 @@ namespace C7Engine
 	 */
 	public class CityProductionAI
 	{
+
+		private static ILogger log = Log.ForContext<CityProductionAI>();
 
 		/**
 		 * Gets the next item to be produced in a given city.
@@ -42,13 +45,11 @@ namespace C7Engine
 
 			foreach (UnitPrototype unitPrototype in unitPrototypes) {
 				float baseScore = GetItemScore(unitPrototype);
-				//TODO: Debug statements
-				Console.WriteLine($" Base score for {unitPrototype} is {baseScore}");
+				log.Debug($" Base score for {unitPrototype} is {baseScore}");
 				// There may eventually be some additive adjusters (or that may play into the previous)
 				float flatAdjuster = GetPriorityFlatAdjusters(priorities, unitPrototype, baseScore);
-				baseScore = baseScore + flatAdjuster;
-				//TODO: Debug statements
-				// Console.WriteLine($"  Flat-adjusted score for {unitPrototype} is {baseScore}");
+				float flatAdjustedScore = baseScore + flatAdjuster;
+				log.Debug($"  Flat-adjusted score for {unitPrototype} is {flatAdjustedScore}");
 
 
 				//Exclude naval units from land-only cities
