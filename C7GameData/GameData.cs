@@ -34,7 +34,8 @@ namespace C7GameData
 		public GameData()
 		{
 			map = new GameMap();
-			rng = new Random(123);
+			rng = new Random();
+			// rng = new Random(123);	//Set a fixed seed here until we add it to the UI
 		}
 
 		public List<Player> GetHumanPlayers() {
