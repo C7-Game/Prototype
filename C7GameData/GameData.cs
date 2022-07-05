@@ -6,7 +6,7 @@ namespace C7GameData
 	public class GameData
 	{
 		public int turn {get; set;}
-		public Random rng; // TODO: Is GameData really the place for this?
+		public static Random rng; // TODO: Is GameData really the place for this?
 		public GameMap map {get; set;}
 		public List<Player> players = new List<Player>();
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
@@ -195,7 +195,7 @@ namespace C7GameData
 			Player computerPlayerThree = new Player(theNetherlands, orange);
 			players.Add(computerPlayerThree);
 
-			List<Tile> startingLocations = map.generateStartingLocations(rng, players.Count, 10);
+			List<Tile> startingLocations = map.generateStartingLocations(players.Count, 10);
 
 			int i = 0;
 			foreach (Player player in players)
@@ -210,7 +210,7 @@ namespace C7GameData
 			//Todo: We're using the same method for start locs and barb camps.  Really, we should use a similar one for
 			//variation, but the barb camp one should also take into account things like not spawning in revealed
 			//tiles.  It also would be really nice to be able to generate them separately and not have them overlap.
-			List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
+			List<Tile> barbarianCamps = map.generateStartingLocations(10, 10);
 			foreach (Tile barbCampLocation in barbarianCamps) {
 				if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
 					MapUnit barbWarrior = CreateDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);

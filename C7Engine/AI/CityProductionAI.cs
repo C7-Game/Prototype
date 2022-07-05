@@ -33,7 +33,7 @@ namespace C7Engine
 			}
 			if (lastProduced == unitPrototypes["Warrior"]) {
 				if (city.location.NeighborsWater()) {
-					if (EngineStorage.gameData.rng.Next(3) == 0) {
+					if (GameData.rng.Next(3) == 0) {
 						return unitPrototypes["Galley"];
 					}
 					else {
