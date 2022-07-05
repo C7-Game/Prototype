@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using C7GameData;
 using C7GameData.AIData;
@@ -53,7 +54,7 @@ namespace C7Engine
 				log.Information("No valid exploration locations for unit " + unit + " at location " + unit.location);
 				return false;
 			}
-			log.Debug($"Exploring for unit {unit}");
+			log.Verbose($"Exploring for unit {unit}");
 			KeyValuePair<Tile, float> topScoringTile = FindTopScoringTileForExploration(player, validNeighboringTiles, aiData.type);
 			Tile newLocation = topScoringTile.Key;
 
@@ -69,12 +70,20 @@ namespace C7Engine
 		}
 
 		private static bool FindPathToNewExplorationArea(Player player, ExplorerAIData explorerData, MapUnit unit) {
+			Stopwatch watch = new Stopwatch();
+			watch.Start();
 			List<Tile> validExplorerTiles = new List<Tile>();
 			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
 					.Where(t => unit.CanEnterTile(t, false) && t.cityAtTile == null && numUnknownNeighboringTiles(player, t) > 0))
 			{
 				validExplorerTiles.Add(t);
 			}
+
+			int CrowFliesDistance(Tile x, Tile y) {
+				return x.distanceTo(unit.location) - y.distanceTo(unit.location);
+			};
+
+			validExplorerTiles.Sort(CrowFliesDistance);
 
 			if (validExplorerTiles.Count == 0) {
 				//Nowhere to explore.
@@ -86,12 +95,36 @@ namespace C7Engine
 			TilePath chosenPath = null;
 
 			PathingAlgorithm algo = PathingAlgorithmChooser.GetAlgorithm();
+			log.Debug("Explorer pathing from " + unit.location + " with " + unit.unitType);
 			foreach (Tile t in validExplorerTiles) {
+				if (t.distanceTo(unit.location) > lowestDistance) {
+					//Impossible to be shorter, skip it
+					continue;
+				}
+
+				long millis = watch.ElapsedMilliseconds;
 				TilePath path = algo.PathFrom(unit.location, t);
 				if (path.PathLength() < lowestDistance) {
 					lowestDistance = path.PathLength();
 					chosenPath = path;
 				}
+
+				long elapsedTimeForTile = watch.ElapsedMilliseconds - millis;
+
+				if (elapsedTimeForTile >= 10) {
+					log.Warning("Pathing time for {Tile} = {Time} ms", t, elapsedTimeForTile);
+				}
+
+				if (lowestDistance == 1) {
+					break;
+				}
+			}
+
+			long totalPathingTime = watch.ElapsedMilliseconds;
+			if (totalPathingTime >= 100) {
+				log.Warning($"Explorer pathing took " + totalPathingTime + " milliseconds from " + unit.location + " with " + unit.unitType);
+			} else {
+				log.Debug($"Explorer pathing took " + totalPathingTime + " milliseconds");
 			}
 
 			if (chosenPath == null) {
