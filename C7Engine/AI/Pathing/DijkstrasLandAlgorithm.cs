@@ -40,6 +40,10 @@ namespace C7Engine.Pathing
 		}
 
 		public override TilePath PathFrom(Tile start, Tile destination) {
+			if (!destination.IsLand()) {
+				return TilePath.NONE;
+			}
+
 			// shortest distance from start to each tile on the continent
 			Dictionary<Tile, int> dist = new Dictionary<Tile, int>();
 			Dictionary<Tile, Tile> predecessors = new Dictionary<Tile, Tile>();

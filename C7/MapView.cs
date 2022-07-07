@@ -694,7 +694,7 @@ public class UnitLayer : LooseLayer {
 		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
 
 		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5),
-		    hpIndWidth = 6;
+			hpIndWidth = 6;
 		var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
 		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
 			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;

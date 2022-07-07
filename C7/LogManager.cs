@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Serilog;
 using Serilog.Templates;
@@ -22,7 +23,10 @@ public class LogManager : Node
 		// Includes all logs of an 'Information' level regardless of namespace, and all logs of
 		// the C7Engine.AI namespace regardless of log level.
 		Log.Logger = new LoggerConfiguration()
-			.WriteTo.GodotSink(formatter: consoleTemplate)
+			// .WriteTo.GodotSink(formatter: consoleTemplate)	//Writing to console can slow the game down considerably (see #278).  Thus it is disabled by default.
+			.WriteTo.File("log.txt", buffered: true, flushToDiskInterval: TimeSpan.FromMilliseconds(250), fileSizeLimitBytes: 5242880,	//5 MB
+			              outputTemplate: "[{Level:u3}] {Timestamp:HH:mm:ss} {SourceContext}: {Message:lj} {NewLine}{Exception}")
+
 			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information')")	//suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
 			.MinimumLevel.Debug()
 			.CreateLogger();
