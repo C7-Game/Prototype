@@ -54,7 +54,7 @@ namespace C7Engine
 
 				//Exclude naval units from land-only cities
 				if (unitPrototype.categories.Contains("Sea") && !city.location.NeighborsWater()) {
-					baseScore = 0.0f;
+					flatAdjustedScore = 0.0f;
 				}
 
 				// Below here are multiplicative adjusters

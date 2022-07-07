@@ -32,7 +32,7 @@ namespace C7Engine
 			} else {
 				player.turnsUntilPriorityReevaluation--;
 			}
-      
+
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
 				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.
@@ -91,6 +91,14 @@ namespace C7Engine
 				unit.currentAIData = settlerAiData;
 			}
 			else if (unit.location.cityAtTile != null && unit.location.unitsOnTile.Count(u => u.unitType.defense > 0 && u != unit) == 0) {
+				DefenderAIData ai = new DefenderAIData();
+				ai.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
+				ai.destination = unit.location;
+				log.Information("Set defender AI for " + unit + " with destination of " + ai.destination);
+				unit.currentAIData = ai;
+			}
+			else if (unit.unitType.name == "Catapult") {
+				//For now tell catapults to sit tight.  It's getting really annoying watching them pointlessly bombard barb camps forever
 				DefenderAIData ai = new DefenderAIData();
 				ai.goal = DefenderAIData.DefenderGoal.DEFEND_CITY;
 				ai.destination = unit.location;
