@@ -42,7 +42,7 @@ namespace C7Engine
 							new BarbarianAI().PlayTurn(player, gameData);
 							player.hasPlayedThisTurn = true;
 						} else if (! player.isHuman) {
-							PlayerAI.PlayTurn(player, gameData.rng);
+							PlayerAI.PlayTurn(player, GameData.rng);
 							player.hasPlayedThisTurn = true;
 						} else {
 							player.hasPlayedThisTurn = true;
@@ -62,7 +62,7 @@ namespace C7Engine
 				foreach (Tile tile in gameData.map.barbarianCamps)
 				{
 					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
-					int result = gameData.rng.Next(100);
+					int result = GameData.rng.Next(100);
 					log.Verbose("Random barb result = " + result);
 					if (result < 7) {
 						MapUnit newUnit = new MapUnit();

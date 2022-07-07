@@ -41,12 +41,6 @@ namespace C7GameData
 		{
 			GameData.PerformPostLoadActions();
 
-			//If we are loading from JSON and it lacks an RNG, set one
-			//This should be a temporary hack until we have a more stable C7 default rule set.
-			if (GameData.rng == null) {
-				GameData.rng = new Random();
-			}
-
 			return true;
 		}
 

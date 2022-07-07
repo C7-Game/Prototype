@@ -91,7 +91,7 @@ public static class MapUnitExtensions {
 			promotionChance /= 2.0;
 		// TODO: Double promotionChance if unit is owned by a militaristic civ
 
-		if (EngineStorage.gameData.rng.NextDouble() < promotionChance) {
+		if (GameData.rng.NextDouble() < promotionChance) {
 			ExperienceLevel nextLevel = EngineStorage.gameData.GetExperienceLevelAfter(unit.experienceLevel);
 			if (nextLevel != null) {
 				unit.experienceLevelKey = nextLevel.key;
@@ -153,7 +153,7 @@ public static class MapUnitExtensions {
 
 			// dADB = defense Against Defensive Bombard
 			double dADB = attacker.StrengthVersus(defensiveBombarder, CombatRole.DefensiveBombardDefense, defensiveBombarder.facingDirection);
-			if (EngineStorage.gameData.rng.NextDouble() < defensiveBombarderStrength / (defensiveBombarderStrength + dADB))
+			if (GameData.rng.NextDouble() < defensiveBombarderStrength / (defensiveBombarderStrength + dADB))
 				attacker.hitPointsRemaining -= 1;
 
 			defensiveBombarder.defensiveBombardsRemaining -= 1;
@@ -166,10 +166,10 @@ public static class MapUnitExtensions {
 		while (true) {
 			defender.animate(MapUnit.AnimatedAction.ATTACK1, false);
 			attacker.animate(MapUnit.AnimatedAction.ATTACK1, true );
-			if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
+			if (GameData.rng.NextDouble() < attackerOdds) {
 				if (defenderEligibleToRetreat &&
 				    defender.hitPointsRemaining == 1 &&
-				    EngineStorage.gameData.rng.NextDouble() < defender.RetreatChance(attacker, false)) {
+				    GameData.rng.NextDouble() < defender.RetreatChance(attacker, false)) {
 					// TODO: Defender retreat behavior requires some more work. There's an issue for it here:
 					// https://github.com/C7-Game/Prototype/issues/274
 					Tile retreatDestination = defender.location.neighbors[attacker.facingDirection];
@@ -186,7 +186,7 @@ public static class MapUnitExtensions {
 				}
 			} else {
 				if (attacker.hitPointsRemaining == 1 &&
-				    EngineStorage.gameData.rng.NextDouble() < attacker.RetreatChance(defender, true)) {
+				    GameData.rng.NextDouble() < attacker.RetreatChance(defender, true)) {
 					result = CombatResult.AttackerRetreated;
 					break;
 				}
@@ -228,7 +228,7 @@ public static class MapUnitExtensions {
 
 		unit.animate(MapUnit.AnimatedAction.ATTACK1, true);
 		unit.movementPointsRemaining -= 1;
-		if (EngineStorage.gameData.rng.NextDouble() < attackerOdds) {
+		if (GameData.rng.NextDouble() < attackerOdds) {
 			target.hitPointsRemaining -= 1;
 			tile.Animate(AnimatedEffect.Hit3, false);
 		} else

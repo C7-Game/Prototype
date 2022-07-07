@@ -167,13 +167,13 @@ namespace C7GameData
 
 		public delegate int[,] TerrainNoiseMapGenerator(int rng, int width, int height);
 
-		public List<Tile> generateStartingLocations(Random rng, int num, int minDistBetween)
+		public List<Tile> generateStartingLocations(int num, int minDistBetween)
 		{
 			var tr = new List<Tile>();
 			for (int n = 0; n < num; n++) {
 				bool foundOne = false;
 				for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
-					var randTile = tiles[rng.Next(0, tiles.Count)];
+					var randTile = tiles[GameData.rng.Next(0, tiles.Count)];
 					if (randTile.baseTerrainType.isWater())
 						continue;
 					int distToNearestOtherLoc = Int32.MaxValue;
