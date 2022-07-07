@@ -58,7 +58,7 @@ namespace C7GameData.AIData {
 		private static int CalculateAvailableLandScore(Player player)
 		{
 			//Figure out if there's land to settle, and how much
-			Dictionary<Tile, int> possibleLocations = SettlerLocationAI.GetPossibleNewCityLocations(player.cities[0].location, player);
+			Dictionary<Tile, int> possibleLocations = SettlerLocationAI.GetScoredSettlerCandidates(player.cities[0].location, player);
 			int score = possibleLocations.Count * 5;
 			foreach (int i in possibleLocations.Values) {
 				score += i / 10;

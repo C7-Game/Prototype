@@ -19,9 +19,7 @@ namespace C7Engine
 
 		//Figures out where to plant Settlers
 		public static Tile findSettlerLocation(Tile start, Player player) {
-			List<MapUnit> playerUnits = player.units;
-			IEnumerable<Tile> candidates = player.tileKnowledge.AllKnownTiles().Where(t => !IsInvalidCityLocation(t));
-			Dictionary<Tile, int> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
+			Dictionary<Tile, int> scores = GetScoredSettlerCandidates(start, player);
 			if (scores.Count == 0 || scores.Values.Max() <= 0) {
 				return Tile.NONE;	//nowhere to settle
 			}
@@ -39,6 +37,13 @@ namespace C7Engine
 				}
 			}
 			return returnValue;
+		}
+
+		public static Dictionary<Tile, int> GetScoredSettlerCandidates(Tile start, Player player) {
+			List<MapUnit> playerUnits = player.units;
+			IEnumerable<Tile> candidates = player.tileKnowledge.AllKnownTiles().Where(t => !IsInvalidCityLocation(t));
+			Dictionary<Tile, int> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
+			return scores;
 		}
 
 		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, IEnumerable<Tile> candidates, List<MapUnit> playerSettlers)
