@@ -49,14 +49,8 @@ namespace C7Engine
 		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, IEnumerable<Tile> candidates, List<MapUnit> playerSettlers)
 		{
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
-			candidates = candidates.Where(t => !SettlerAlreadyMovingTowardsTile(t, playerSettlers));
+			candidates = candidates.Where(t => !SettlerAlreadyMovingTowardsTile(t, playerSettlers) && t.IsAllowCities());
 			foreach (Tile t in candidates) {
-				//TODO: #120: Look at whether we can place cities here.  Hard-coded for now.
-				//Also likely move this into a "Where" clause above the loop so this loop is just the scoring/selection
-				if (t.overlayTerrainType.Key == "mountains") {
-					continue;
-				}
-
 				int score = GetTileYieldScore(t, player);
 				//For simplicity's sake, I'm only going to look at immediate neighbors here, but
 				//a lot more things should be considered over time.

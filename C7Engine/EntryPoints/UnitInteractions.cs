@@ -54,11 +54,15 @@ namespace C7Engine
 
 			// Eventually, we should look this up somewhere to see what all actions we have (and mods might add more)
 			// For now, this is still an improvement over the last iteration.
-			string[] implementedActions = { "hold", "wait", "fortify", "disband", "goTo", "buildCity", "bombard"};
+			string[] implementedActions = { "hold", "wait", "fortify", "disband", "goTo", "bombard"};
 			foreach (string action in implementedActions) {
 				if (unit.unitType.actions.Contains(action)) {
 					unit.availableActions.Add(action);
 				}
+			}
+
+			if (unit.canBuildCity()) {
+				unit.availableActions.Add("buildCity");
 			}
 
 			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.

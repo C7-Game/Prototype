@@ -589,10 +589,15 @@ public class Game : Node2D
 			}
 				break;
 
-			case "buildCity":
-			{
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-				popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
+			case "buildCity": {
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
+					if (currentUnit.canBuildCity()) {
+						PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+						popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
+							PopupOverlay.PopupCategory.Advisor);
+					}
+				}
 			}
 				break;
 
