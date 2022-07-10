@@ -102,7 +102,7 @@ namespace C7Engine
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
 			foreach (Tile t in candidates) {
 				//TODO: #120: Look at whether we can place cities here.  Hard-coded for now.
-				if (t.overlayTerrainType.Key == "mountains") {
+				if (!t.IsAllowCities()) {
 					continue;
 				}
 				if (t.cityAtTile != null || t.GetLandNeighbors().Exists(n => n.cityAtTile != null)) {

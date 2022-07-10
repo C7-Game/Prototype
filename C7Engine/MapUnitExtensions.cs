@@ -398,8 +398,18 @@ public static class MapUnitExtensions {
 		}
 	}
 
+	public static bool canBuildCity(this MapUnit unit)
+	{
+		return unit.unitType.actions.Contains("buildCity") && unit.location.IsAllowCities();
+	}
+
 	public static void buildCity(this MapUnit unit, string cityName)
 	{
+		if (!unit.canBuildCity()) {
+			log.Warning("can't build city here");
+			return;
+		}
+
 		unit.animate(MapUnit.AnimatedAction.BUILD, true);
 
 		// TODO: Need to check somewhere that this unit is allowed to build a city on its current tile. Either do that here or in every caller

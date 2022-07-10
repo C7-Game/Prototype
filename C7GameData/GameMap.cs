@@ -208,6 +208,7 @@ namespace C7GameData
 			grassland.baseShieldProduction = 1; //with only one terrain type, it needs to be > 0
 			grassland.baseCommerceProduction = 1;   //same as above
 			grassland.movementCost = 1;
+			grassland.allowCities = true;
 
 			TerrainType plains = new TerrainType();
 			plains.DisplayName = "Plains";
@@ -215,6 +216,7 @@ namespace C7GameData
 			plains.baseShieldProduction = 2;
 			plains.baseCommerceProduction = 1;
 			plains.movementCost = 1;
+			plains.allowCities = true;
 
 			TerrainType coast = new TerrainType();
 			coast.DisplayName = "Coast";
@@ -222,6 +224,7 @@ namespace C7GameData
 			coast.baseShieldProduction = 0;
 			coast.baseCommerceProduction = 1;
 			coast.movementCost = 1;
+			coast.allowCities = false;
 
 			GameMap dummyMap = new GameMap();
 			dummyMap.numTilesTall = 80;
