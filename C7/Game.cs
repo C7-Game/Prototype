@@ -359,7 +359,7 @@ public class Game : Node2D
 							if (tile != null) {
 								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
 								//TODO: Better check for "current/human player"
-								if (to_select != null && to_select.owner.color == 0x4040FFFF)
+								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
 							}
 						}
