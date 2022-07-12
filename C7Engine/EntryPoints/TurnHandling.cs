@@ -64,7 +64,7 @@ namespace C7Engine
 					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
 					int result = GameData.rng.Next(100);
 					log.Verbose("Random barb result = " + result);
-					if (result < 7) {
+					if (result < 4) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];
@@ -78,7 +78,7 @@ namespace C7Engine
 						gameData.mapUnits.Add(newUnit);
 						log.Debug("New barbarian added at " + tile);
 					}
-					else if (tile.NeighborsWater() && result < 10) {
+					else if (tile.NeighborsWater() && result < 6) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
@@ -100,6 +100,7 @@ namespace C7Engine
 					int initialSize = city.size;
 					IProducible producedItem = city.ComputeTurnProduction();
 					if (producedItem != null) {
+						log.Information($"Produced {producedItem} in {city}");
 						if (producedItem is UnitPrototype prototype) {
 							MapUnit newUnit = prototype.GetInstance();
 							newUnit.owner = city.owner;
@@ -123,10 +124,14 @@ namespace C7Engine
 					}
 					else if (newSize < initialSize) {
 						int diff = initialSize - newSize;
-						//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
-						for (int i = 1; i <= diff; i++) {
-							city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
-							city.residents.RemoveAt(city.residents.Count - i);
+						if (newSize == 0) {
+							log.Error($"Attempting to remove the last resident from {city}");
+						} else {
+							//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
+							for (int i = 1; i <= diff; i++) {
+								city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
+								city.residents.RemoveAt(city.residents.Count - i);
+							}
 						}
 					}
 				}

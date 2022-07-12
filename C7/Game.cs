@@ -400,6 +400,9 @@ public class Game : Node2D
 						if (tile.cityAtTile != null) {
 							City city = tile.cityAtTile;
 							GD.Print($"  {city.name}, production {city.shieldsStored} of {city.itemBeingProduced.shieldCost}");
+							foreach (CityResident resident in city.residents) {
+								GD.Print($"  Resident working at {resident.tileWorked}");
+							}
 						}
 
 						if (tile.unitsOnTile.Count > 0) {
