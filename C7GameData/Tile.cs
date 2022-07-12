@@ -129,6 +129,10 @@ namespace C7GameData
 			return !baseTerrainType.isWater();
 		}
 
+		public bool IsAllowCities() {
+			return overlayTerrainType.allowCities;
+		}
+
 		public TileDirection directionTo(Tile other)
 		{
 			// TODO: Consider edge wrapping, the direction should point along the shortest path as the crow flies.
