@@ -13,6 +13,7 @@ Armageddon1
 Caro-Kann
 Flintlock / maxpetul
 JimOfLeisure
+kright
 Lanzelot
 pcen
 Quintillus
