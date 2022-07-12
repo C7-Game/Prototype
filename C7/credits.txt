@@ -1,5 +1,5 @@
 [color=black][center]
-[b]C7 0.2 "Carthage" Preview 1[/b]
+[b]C7 0.2 "Carthage" Preview 2[/b]
 [url]c7-game.github.io[/url]
 
 [b]An open source project by the
