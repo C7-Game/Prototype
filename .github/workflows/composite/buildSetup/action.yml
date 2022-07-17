@@ -28,10 +28,6 @@ runs:
   - name: Set FOLDER_NAME
     run: |
       echo "FOLDER_NAME=${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}${BUILD_TIME}" >> $GITHUB_ENV
-  - name: Checkout
-    uses: actions/checkout@v2
-    with:
-      lfs: true
   - name: Setup
     run: |
       mkdir -v -p ~/.local/share/godot/templates
