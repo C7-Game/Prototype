@@ -18,10 +18,6 @@ on:
         description: Append ISO8601 date/time to folder name
         default: true
 
-defaults:
-  run:
-    shell: bash
-
 env:
   GODOT_VERSION: 3.4.4
   EXPORT_NAME: C7
