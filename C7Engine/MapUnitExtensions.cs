@@ -406,7 +406,7 @@ public static class MapUnitExtensions {
 	public static void buildCity(this MapUnit unit, string cityName)
 	{
 		if (!unit.canBuildCity()) {
-			log.Warning("can't build city here");
+			log.Warning($"can't build city at {unit.location}");
 			return;
 		}
 

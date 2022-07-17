@@ -174,7 +174,7 @@ namespace C7GameData
 				bool foundOne = false;
 				for (int numTries = 0; (! foundOne) && (numTries < 100); numTries++) {
 					var randTile = tiles[GameData.rng.Next(0, tiles.Count)];
-					if (randTile.baseTerrainType.isWater())
+					if (randTile.baseTerrainType.isWater() || !randTile.IsAllowCities())
 						continue;
 					int distToNearestOtherLoc = Int32.MaxValue;
 					foreach (var sL in tr) {

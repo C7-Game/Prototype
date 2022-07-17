@@ -17,7 +17,7 @@ namespace C7GameData
         public int baseShieldProduction {get; set; }
         public int baseCommerceProduction {get; set; }
         public int movementCost {get; set; }
-        public bool allowCities { get; set; }
+        public bool allowCities { get; set; } = true;
         public StrengthBonus defenseBonus;
 
         //some stuff about graphics would probably make sense, too
