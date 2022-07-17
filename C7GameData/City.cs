@@ -131,7 +131,7 @@ namespace C7GameData
 		}
 
 		public override string ToString() {
-			return $"name ({size})";
+			return $"{name} ({size})";
 		}
     }
 }
