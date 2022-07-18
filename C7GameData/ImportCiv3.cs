@@ -149,6 +149,8 @@ namespace C7GameData
 				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
 				c7Tile.riverWest = civ3Tile.RiverWest;
 				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
+				c7Tile.overlays.road = civ3Tile.Road;
+				c7Tile.overlays.railroad = civ3Tile.Railroad;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.Resource];
 				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.Resource].Key;
 				c7Save.GameData.map.tiles.Add(c7Tile);
