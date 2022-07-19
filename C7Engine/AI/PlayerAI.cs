@@ -21,18 +21,18 @@ namespace C7Engine
 			log.Information("-> Begin " + player.civilization.cityNames[0] + " turn");
 
 			if (player.turnsUntilPriorityReevaluation == 0) {
-				Console.WriteLine("Re-evaluating strategic priorities for " + player);
+				log.Information("Re-evaluating strategic priorities for " + player);
 				List<StrategicPriority> priorities = StrategicPriorityArbitrator.Arbitrate(player);
 				player.strategicPriorityData.Clear();
 				foreach (StrategicPriority priority in priorities) {
 					player.strategicPriorityData.Add(priority);
 				}
 				player.turnsUntilPriorityReevaluation = 15 + new Random().Next(10);
-				Console.WriteLine(player.turnsUntilPriorityReevaluation + " turns until next re-evaluation");
+				log.Information(player.turnsUntilPriorityReevaluation + " turns until next re-evaluation");
 			} else {
 				player.turnsUntilPriorityReevaluation--;
 			}
-      
+
 			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
 				//For each unit, if there's already an AI task assigned, it will attempt to complete its goal.

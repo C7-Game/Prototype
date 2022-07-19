@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Serilog;
 
 namespace ConvertCiv3Media
 {
@@ -7,6 +8,7 @@ namespace ConvertCiv3Media
     // Not intended to be a generalized/universal Flic reader
     // Implementing from description at https://www.drdobbs.com/windows/the-flic-file-format/184408954
     public class Flic {
+	    private static ILogger log = Log.ForContext<Flic>();
         // Images is an array of animations,images, each of which is a byte array of palette indexes
         public byte[,][] Images;
         // All animations/images have same palette, height, and width
@@ -180,7 +182,7 @@ namespace ConvertCiv3Media
                                 break;
                             default:
                                 // TODO: Have this throw an exception? Or maybe just keep skipping unkown chunks
-                                // Console.WriteLine("Subchunk not recognized: " + SubChunkType);
+                                log.Error("Subchunk not recognized: " + SubChunkType);
                                 break;
                         }
                         SubOffset += SubChunkLength;

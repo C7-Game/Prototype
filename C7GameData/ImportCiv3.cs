@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using Serilog;
 
 namespace C7GameData
 
@@ -18,6 +19,8 @@ namespace C7GameData
 	}
 	public class ImportCiv3
 	{
+
+		private static ILogger log = Log.ForContext<ImportCiv3>();
 		public static C7SaveFormat ImportSav(string savePath, string defaultBicPath)
 		{
 			// init empty C7 save
@@ -196,7 +199,7 @@ namespace C7GameData
 						resource.Category = ResourceCategory.STRATEGIC;
 						break;
 					default:
-						Console.WriteLine("WARNING!  Unknown resource category for " + good);
+						log.Warning("WARNING!  Unknown resource category for " + good);
 						resource.Category = ResourceCategory.NONE;
 						break;
 				}

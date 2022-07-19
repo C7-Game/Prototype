@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QueryCiv3\QueryCiv3.csproj" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
   </ItemGroup>
 
 </Project>

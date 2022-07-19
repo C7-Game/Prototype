@@ -38,7 +38,7 @@ namespace C7Engine
 			UnitPrototype highestScoring = unitPrototypes.First();
 			float highestScore = 0.0f;
 
-			Console.WriteLine($"Choosing what to produce next in {city.name}");
+			log.Information($"Choosing what to produce next in {city.name}");
 
 			List<IProducible> prototypes = new List<IProducible>();
 			List<float> weights = new List<float>();
@@ -61,7 +61,7 @@ namespace C7Engine
 				float popAdjustedScore = AdjustScoreByPopCost(city, unitPrototype, baseScore);
 				float priorityAdjustedScore = AdjustScoreByPriorities(priorities, unitPrototype, popAdjustedScore);
 
-				Console.WriteLine($" {unitPrototype.name} adjusted-scores {priorityAdjustedScore}");
+				log.Debug($" {unitPrototype.name} adjusted-scores {priorityAdjustedScore}");
 				prototypes.Add(unitPrototype);
 				weights.Add(priorityAdjustedScore);
 			}
@@ -109,7 +109,7 @@ namespace C7Engine
 				double oldCutoff = sumOfAllWeights;
 				sumOfAllWeights += adjustedWeight;
 
-				Console.WriteLine($"Item {items[i]} has range of {oldCutoff} to {sumOfAllWeights}");
+				log.Debug($"Item {items[i]} has range of {oldCutoff} to {sumOfAllWeights}");
 
 				cutoffs.Add(sumOfAllWeights);
 				i++;
@@ -117,11 +117,11 @@ namespace C7Engine
 
 			Random random = new Random();
 			double randomDouble = sumOfAllWeights * random.NextDouble();
-			Console.WriteLine($"Random number in range 0 to {sumOfAllWeights} is {randomDouble}");
+			log.Verbose($"Random number in range 0 to {sumOfAllWeights} is {randomDouble}");
 			int idx = 0;
 			foreach (double cutoff in cutoffs) {
 				if (randomDouble < cutoff) {
-					Console.WriteLine($"Chose item {items[idx]}");
+					log.Information($"Chose item {items[idx]}");
 					return items[idx];
 				}
 				idx++;
@@ -163,7 +163,7 @@ namespace C7Engine
 			foreach (StrategicPriority priority in priorities) {
 				float adjuster = priority.GetProductionItemFlatAdjuster(prototype);
 				// Low-level log, we don't have proper logs yet so it's commented out
-				// Console.WriteLine($"  Got adjuster of {adjuster} from {priority}; adjusting by ${adjuster * priorityMultiplier}");
+				log.Verbose($"  Got adjuster of {adjuster} from {priority}; adjusting by ${adjuster * priorityMultiplier}");
 				totalAdjusters += (adjuster * priorityMultiplier);
 				priorityMultiplier /= 2;
 			}

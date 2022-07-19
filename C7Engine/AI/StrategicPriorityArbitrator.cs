@@ -5,6 +5,7 @@ using System.Reflection;
 using C7Engine.AI.StrategicAI;
 using C7GameData;
 using C7GameData.AIData;
+using Serilog;
 
 namespace C7Engine.AI {
 
@@ -12,6 +13,8 @@ namespace C7Engine.AI {
 	 * Evaluates possible strategic priorities for the AI, and decides upon which ones the AI will pursue.
 	 */
 	public class StrategicPriorityArbitrator {
+
+		private static ILogger log = Log.ForContext<StrategicPriorityArbitrator>();
 
 		private static readonly int MIN_PRIORITIES = 2;
 		private static readonly int MAX_PRIORITIES = 4;
@@ -33,7 +36,7 @@ namespace C7Engine.AI {
 					priority.CalculateWeightAndMetadata(player);
 					possiblePriorities.Add(priority);
 				} else {
-					Console.WriteLine($"Zero-argument constructor for priority {priorityType} not found; skipping that priority type");
+					log.Warning($"Zero-argument constructor for priority {priorityType} not found; skipping that priority type");
 				}
 			}
 
@@ -94,7 +97,7 @@ namespace C7Engine.AI {
 					topScore = priority;
 				}
 			}
-			Console.WriteLine($"Chose priority {topScore} with score {max}");
+			log.Information($"Chose priority {topScore} with score {max}");
 			return topScore;
 		}
 
@@ -108,18 +111,18 @@ namespace C7Engine.AI {
 				double oldCutoff = sumOfAllWeights;
 				sumOfAllWeights += adjustedWeight;
 
-				Console.WriteLine($"Priority {possiblePriority} has range of {oldCutoff} to {sumOfAllWeights}");
+				log.Debug($"Priority {possiblePriority} has range of {oldCutoff} to {sumOfAllWeights}");
 
 				cutoffs.Add(sumOfAllWeights);
 			}
 
 			Random random = new Random();
 			double randomDouble = sumOfAllWeights * random.NextDouble();
-			Console.WriteLine($"Random number in range 0 to {sumOfAllWeights} is {randomDouble}");
+			log.Verbose($"Random number in range 0 to {sumOfAllWeights} is {randomDouble}");
 			int idx = 0;
 			foreach (double cutoff in cutoffs) {
 				if (randomDouble < cutoff) {
-					Console.WriteLine($"Chose priority {possiblePriorities[idx]}");
+					log.Information($"Chose priority {possiblePriorities[idx]}");
 					return possiblePriorities[idx];
 				}
 				idx++;
