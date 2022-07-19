@@ -28,7 +28,7 @@ namespace C7GameData.AIData {
 			if (player.cities.Count < 2) {
 				this.calculatedWeight = 0;
 			} else {
-				int landScore = CalculateAvailableLandScore(player);
+				int landScore = UtilityCalculations.CalculateAvailableLandScore(player);
 				//N.B. Eventually this won't be an all-or-nothing proposition; if land is getting tight but not quite zero,
 				//the AI may decide it's time for the next phrase of the game, especially if it's aggressive.
 				if (landScore == 0) {	//nowhere else to expand
@@ -51,19 +51,6 @@ namespace C7GameData.AIData {
 					}
 				}
 			}
-		}
-
-		//TODO: This is duplicated with ExpansionPriority.
-		//It should probably be a commonly-available utility method since it will affect multiple priorities
-		private static int CalculateAvailableLandScore(Player player)
-		{
-			//Figure out if there's land to settle, and how much
-			Dictionary<Tile, int> possibleLocations = SettlerLocationAI.GetPossibleNewCityLocations(player.cities[0].location, player);
-			int score = possibleLocations.Count * 5;
-			foreach (int i in possibleLocations.Values) {
-				score += i / 10;
-			}
-			return score;
 		}
 	}
 }

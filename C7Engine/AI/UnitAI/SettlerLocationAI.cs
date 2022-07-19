@@ -19,7 +19,7 @@ namespace C7Engine
 
 		//Figures out where to plant Settlers
 		public static Tile findSettlerLocation(Tile start, Player player) {
-			Dictionary<Tile, int> scores = GetPossibleNewCityLocations(start, player);
+			Dictionary<Tile, int> scores = GetScoredSettlerCandidates(start, player);
 			if (scores.Count == 0 || scores.Values.Max() <= 0) {
 				return Tile.NONE;	//nowhere to settle
 			}
@@ -39,86 +39,18 @@ namespace C7Engine
 			return returnValue;
 		}
 
-		/// <summary>
-		/// Returns possible city locations, and scores for them, for a given player and factoring in distance from a given start tile.
-		/// </summary>
-		/// <param name="start">The tile where a hypothetical unit would be starting from.  It will prefer closer tiles, all else equal.</param>
-		/// <param name="player">The player who might be considering building a new city.</param>
-		/// <returns>A map of viable tile locations, to their score.</returns>
-		public static Dictionary<Tile, int> GetPossibleNewCityLocations(Tile start, Player player)
-		{
-
-			List<City> playerCities = player.cities;
+		public static Dictionary<Tile, int> GetScoredSettlerCandidates(Tile start, Player player) {
 			List<MapUnit> playerUnits = player.units;
-			HashSet<Tile> candidates = GetCandidateTiles(start);
-			foreach (HashSet<Tile> moreCandidates in playerCities.Select(city => GetCandidateTiles(city.location))) {
-				candidates.UnionWith(moreCandidates);
-			}
-			return AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
-		}
-		private static HashSet<Tile> GetCandidateTiles(Tile start)
-		{
-
-			//First approach: Swing out from the start tile, searching for valid locations.
-			//This is not going to be amazing at first, don't take this as the One True Way.
-			//ringOne = direct neighbors of start tile.  Not valid.
-			HashSet<Tile> ringOne = new HashSet<Tile>(start.GetLandNeighbors());
-			//Ring two is outside the city, but only settled in CxC fashion, which we aren't teaching to
-			//the AI here.
-			HashSet<Tile> ringTwo = new HashSet<Tile>();
-			foreach (Tile t in ringOne) {
-				HashSet<Tile> tiles = new HashSet<Tile>(t.GetLandNeighbors());
-				ringTwo.UnionWith(tiles);
-			}
-			ringTwo.ExceptWith(ringOne);
-			ringTwo.Remove(start); //start probably got added in as a neighbor of ring 1.
-			//Ring three is CxxC style city planning.  Potentially valid.
-			HashSet<Tile> ringThree = new HashSet<Tile>();
-			foreach (Tile t in ringTwo) {
-				ringThree.UnionWith(new HashSet<Tile>(t.GetLandNeighbors()));
-			}
-			ringThree.ExceptWith(ringTwo);
-			ringThree.ExceptWith(ringOne);
-			//Ring four is CxxxC style city planning.  Also potentially valid.
-			HashSet<Tile> ringFour = new HashSet<Tile>();
-			foreach (Tile t in ringThree) {
-				ringFour.UnionWith(new HashSet<Tile>(t.GetLandNeighbors()));
-			}
-			ringFour.ExceptWith(ringThree);
-			ringFour.ExceptWith(ringTwo);
-
-			//Okay, we've got our rings.  Now let's try to evaluate them.
-			HashSet<Tile> candidates = new HashSet<Tile>();
-			candidates.UnionWith(ringThree);
-			candidates.UnionWith(ringFour);
-			return candidates;
+			IEnumerable<Tile> candidates = player.tileKnowledge.AllKnownTiles().Where(t => !IsInvalidCityLocation(t));
+			Dictionary<Tile, int> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
+			return scores;
 		}
 
-		/**
-		 * Returns a Dictionary of tiles and scores, containing only tiles whose settler score is greater than zero.
-		 */
-		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, HashSet<Tile> candidates, List<MapUnit> playerSettlers)
+		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, IEnumerable<Tile> candidates, List<MapUnit> playerSettlers)
 		{
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
+			candidates = candidates.Where(t => !SettlerAlreadyMovingTowardsTile(t, playerSettlers) && t.IsAllowCities());
 			foreach (Tile t in candidates) {
-				//TODO: #120: Look at whether we can place cities here.  Hard-coded for now.
-				if (t.overlayTerrainType.Key == "mountains") {
-					continue;
-				}
-				if (t.cityAtTile != null || t.GetLandNeighbors().Exists(n => n.cityAtTile != null)) {
-					continue;
-				}
-				foreach (MapUnit otherSettler in playerSettlers)
-				{
-					if (otherSettler.currentAIData is SettlerAIData otherSettlerAI) {
-						if (otherSettlerAI.destination == t) {
-							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.
-						}
-						if (otherSettlerAI.destination.GetLandNeighbors().Exists(n => n == t)) {
-							goto nextcandidate;
-						}
-					}
-				}
 				int score = GetTileYieldScore(t, player);
 				//For simplicity's sake, I'm only going to look at immediate neighbors here, but
 				//a lot more things should be considered over time.
@@ -134,7 +66,6 @@ namespace C7Engine
 				if (t.NeighborsWater()) {
 					score += 10;
 				}
-				//TODO: Exclude locations that are too close to another civ.
 
 				//Lower scores if they are far away
 				int preDistanceScore = score;
@@ -147,12 +78,8 @@ namespace C7Engine
 				if (preDistanceScore > 0 && score <= 0) {
 					score = 1;
 				}
-
-				//TODO: Remove locations that we already have another Settler moving towards
-
 				if (score > 0)
 					scores[t] = score;
-nextcandidate: ;
 			}
 			return scores;
 		}
@@ -168,6 +95,57 @@ nextcandidate: ;
 				score += LUXURY_RESOURCE_BONUS;
 			}
 			return score;
+		}
+
+		public static bool IsInvalidCityLocation(Tile tile) {
+			if (tile.HasCity) {
+				log.Verbose("Tile " + tile + " is invalid due to existing city of " + tile.cityAtTile.name);
+				return true;
+			}
+			foreach (Tile neighbor in tile.neighbors.Values) {
+				if (neighbor.HasCity) {
+					log.Verbose("Tile " + tile + " is invalid due to neighboring city of " + neighbor.cityAtTile.name);
+					return true;
+				}
+				foreach (Tile neighborOfNeighbor in neighbor.neighbors.Values) {
+					if (neighborOfNeighbor.HasCity) {
+						log.Verbose("Tile " + tile + " is invalid due to nearby city of " + neighborOfNeighbor.cityAtTile.name);
+						return true;
+					}
+				}
+			}
+
+			log.Information("Tile " + tile + " is a valid city location ");
+			return false;
+		}
+
+		/// <summary>
+		/// Returns true if one of the settlers in the list (which should be the list of the current AI's settlers) is
+		/// already heading to a tile near the requested tile.
+		/// Does not return true if only another AI's settlers are headed there, as the AI shouldn't know the other
+		/// AI's plans.
+		/// </summary>
+		/// <param name="tile">The tile under consideration for a future city.</param>
+		/// <param name="playerSettlers">The settlers owned by the AI considering building a city.</param>
+		/// <returns></returns>
+		public static bool SettlerAlreadyMovingTowardsTile(Tile tile, List<MapUnit> playerSettlers) {
+			foreach (MapUnit otherSettler in playerSettlers)
+			{
+				if (otherSettler.currentAIData is SettlerAIData otherSettlerAI) {
+					if (otherSettlerAI.destination == tile) {
+						return true;
+					}
+					if (otherSettlerAI.destination.GetLandNeighbors().Exists(innerRingTile => innerRingTile == tile)) {
+						return true;
+					}
+					foreach (Tile innerRingTile in otherSettlerAI.destination.GetLandNeighbors()) {
+						if (innerRingTile.GetLandNeighbors().Exists(outerRingTile => outerRingTile == tile)) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
 		}
 	}
 }

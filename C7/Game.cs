@@ -400,6 +400,9 @@ public class Game : Node2D
 						if (tile.cityAtTile != null) {
 							City city = tile.cityAtTile;
 							GD.Print($"  {city.name}, production {city.shieldsStored} of {city.itemBeingProduced.shieldCost}");
+							foreach (CityResident resident in city.residents) {
+								GD.Print($"  Resident working at {resident.tileWorked}");
+							}
 						}
 
 						if (tile.unitsOnTile.Count > 0) {
@@ -586,10 +589,15 @@ public class Game : Node2D
 			}
 				break;
 
-			case "buildCity":
-			{
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-				popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
+			case "buildCity": {
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
+					if (currentUnit.canBuildCity()) {
+						PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+						popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
+							PopupOverlay.PopupCategory.Advisor);
+					}
+				}
 			}
 				break;
 

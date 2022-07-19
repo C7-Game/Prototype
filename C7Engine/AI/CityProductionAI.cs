@@ -54,14 +54,14 @@ namespace C7Engine
 
 				//Exclude naval units from land-only cities
 				if (unitPrototype.categories.Contains("Sea") && !city.location.NeighborsWater()) {
-					baseScore = 0.0f;
+					flatAdjustedScore = 0.0f;
 				}
 
 				// Below here are multiplicative adjusters
-				float popAdjustedScore = AdjustScoreByPopCost(city, unitPrototype, baseScore);
+				float popAdjustedScore = AdjustScoreByPopCost(city, unitPrototype, flatAdjustedScore);
+				log.Debug($" {unitPrototype.name} pop-adjusted-scores {popAdjustedScore}");
 				float priorityAdjustedScore = AdjustScoreByPriorities(priorities, unitPrototype, popAdjustedScore);
-
-				log.Debug($" {unitPrototype.name} adjusted-scores {priorityAdjustedScore}");
+				log.Debug($" {unitPrototype.name} priority-adjusted-scores {priorityAdjustedScore}");
 				prototypes.Add(unitPrototype);
 				weights.Add(priorityAdjustedScore);
 			}
@@ -109,7 +109,7 @@ namespace C7Engine
 				double oldCutoff = sumOfAllWeights;
 				sumOfAllWeights += adjustedWeight;
 
-				log.Debug($"Item {items[i]} has range of {oldCutoff} to {sumOfAllWeights}");
+				log.Verbose($"Item {items[i]} has range of {oldCutoff} to {sumOfAllWeights}");
 
 				cutoffs.Add(sumOfAllWeights);
 				i++;
