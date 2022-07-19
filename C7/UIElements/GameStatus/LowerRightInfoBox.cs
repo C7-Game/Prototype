@@ -2,9 +2,11 @@ using Godot;
 using System;
 using ConvertCiv3Media;
 using C7GameData;
+using Serilog;
 
 public class LowerRightInfoBox : TextureRect
 {
+	private ILogger log = LogManager.ForContext<LowerRightInfoBox>();
 
 	TextureButton nextTurnButton = new TextureButton();
 	ImageTexture nextTurnOnTexture;
@@ -106,7 +108,7 @@ public class LowerRightInfoBox : TextureRect
 
 		if (!timerStarted) {
 			blinkingTimer.Start();
-			GD.Print("Started a timer for blinking");
+			log.Debug("Started a timer for blinking");
 
 			timerStarted = true;
 		}
@@ -133,7 +135,7 @@ public class LowerRightInfoBox : TextureRect
 	}
 
 	private void turnEnded() {
-		GD.Print("Emitting the blinky button pressed signal");
+		log.Debug("Emitting the blinky button pressed signal");
 		GetParent().EmitSignal("BlinkyEndTurnButtonPressed");
 	}
 

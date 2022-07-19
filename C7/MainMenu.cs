@@ -24,7 +24,6 @@ public class MainMenu : Node2D
 	public override void _Ready()
 	{
 		log = LogManager.ForContext<MainMenu>();
-		GD.Print("MainMenu got logger: " + log);
 		log.Debug("enter MainMenu._Ready");
 
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame

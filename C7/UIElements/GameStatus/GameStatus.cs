@@ -1,9 +1,12 @@
 using Godot;
 using System;
 using C7GameData;
+using Serilog;
 
 public class GameStatus : MarginContainer
 {
+
+	private ILogger log = LogManager.ForContext<GameStatus>();
 
 	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
 	Timer endTurnAlertTimer;
@@ -17,25 +20,25 @@ public class GameStatus : MarginContainer
 		MarginTop = -(137 + 1);
 		AddChild(LowerRightInfoBox);
 	}
-	
+
 	public void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
 		MapUnit newUnit = wrappedMapUnit.GetValue<MapUnit>();
-		GD.Print("Selected unit: " + newUnit + " at " + newUnit.location);
+		log.Information("Selected unit: " + newUnit + " at " + newUnit.location);
 		LowerRightInfoBox.UpdateUnitInfo(newUnit, newUnit.location.overlayTerrainType);
 	}
-	
+
 	private void OnTurnEnded()
 	{
 		LowerRightInfoBox.StopToggling();
 	}
-	
+
 	private void OnTurnStarted(int turnNumber)
-	{		
+	{
 		//Oh hai, we do need this handler here!
 		LowerRightInfoBox.SetTurn(turnNumber);
 	}
-	
+
 	private void OnNoMoreAutoselectableUnits()
 	{
 		LowerRightInfoBox.SetEndOfTurnStatus();

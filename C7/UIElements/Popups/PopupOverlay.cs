@@ -2,9 +2,13 @@ using Godot;
 using ConvertCiv3Media;
 using System;
 using System.Diagnostics;
+using Serilog;
 
 public class PopupOverlay : HBoxContainer
 {
+
+	private ILogger log = LogManager.ForContext<PopupOverlay>();
+
 	[Signal] public delegate void UnitDisbanded();
 	[Signal] public delegate void Quit();
 	[Signal] public delegate void BuildCity(string name);
@@ -22,12 +26,12 @@ public class PopupOverlay : HBoxContainer
 
 	public override void _Ready()
 	{
-		base._Ready();	
+		base._Ready();
 	}
-	
+
 	private void OnHidePopup()
 	{
-		GD.Print("Hiding popup");
+		log.Debug("Hiding popup");
 		RemoveChild(currentChild);
 		Hide();
 	}
@@ -43,7 +47,7 @@ public class PopupOverlay : HBoxContainer
 	{
 		if (child == null) // not necessary if we don't pass null?
 		{
-			GD.PrintErr("Received request to show null popup");
+			log.Error("Received request to show null popup");
 			return;
 		}
 
@@ -69,7 +73,7 @@ public class PopupOverlay : HBoxContainer
 				soundFile = "Sounds/PopupInfo.wav";
 				break;
 			default:
-				GD.PrintErr("Invalid popup category");
+				log.Error("Invalid popup category");
 				break;
 		}
 		AudioStreamSample wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
