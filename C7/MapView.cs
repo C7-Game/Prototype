@@ -1003,7 +1003,7 @@ public class RoadLayer : LooseLayer {
 
 		if (!hasRailRoad(tile)) {
 			int roadIndex = 0;
-			foreach (var dirToTile in tile.neighbors) {
+			foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
 				if (hasRoad(dirToTile.Value)) {
 					roadIndex |= getFlag(dirToTile.Key);
 				}
@@ -1013,11 +1013,11 @@ public class RoadLayer : LooseLayer {
 			// has railroad
 			int roadIndex = 0;
 			int railroadIndex = 0;
-			foreach (var dirToTile in tile.neighbors) {
+			foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
 				if (hasRailRoad(dirToTile.Value)) {
-					railroadIndex += getFlag(dirToTile.Key);
+					railroadIndex |= getFlag(dirToTile.Key);
 				} else if (hasRoad(dirToTile.Value)) {
-					roadIndex += getFlag(dirToTile.Key);
+					roadIndex |= getFlag(dirToTile.Key);
 				}
 			}
 			if (roadIndex != 0) {
