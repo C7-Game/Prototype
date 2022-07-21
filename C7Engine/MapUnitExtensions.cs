@@ -248,9 +248,12 @@ public static class MapUnitExtensions {
 		GameData gD = EngineStorage.gameData;
 		City city = location.cityAtTile;
 		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
-		return inFriendlyCity ? gD.healRateInCity : gD.healRateInNeutralField;
-		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (they
-		// shouldn't be able to heal outside of port).
+		if (inFriendlyCity)
+			return gD.healRateInCity;
+		if (unit.unitType.categories.Contains("Sea"))
+			return 0;
+		return gD.healRateInNeutralField;
+		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross
 	}
 
 	public static void OnBeginTurn(this MapUnit unit)
