@@ -24,8 +24,6 @@ namespace QueryCiv3.Sav
         public byte TextureLocation; // Between 0 and 80 inclusive (9*9 grid)
         public byte TextureFile; // 0: xtgc, 1: xgpc, 2: xdgc, 3: xdpc, 4: xdgp, 5: xggc, 6: wcso, 7: wsss, 8: wooo
         private fixed byte Flags1[6];
-        public bool Road     { get => Util.GetFlag(Flags1[2], 0); }
-        public bool Railroad { get => Util.GetFlag(Flags1[2], 1); }
         public short BarbarianCamp;
         public short CityID;
         public short ColonyID;
@@ -40,6 +38,9 @@ namespace QueryCiv3.Sav
 
         // TODO: Most flags need to be added
         private fixed byte Flags2[12];
+        public bool Road     { get => Util.GetFlag(Flags2[0], 0); }
+        public bool Railroad { get => Util.GetFlag(Flags2[0], 1); }
+
         public int BaseTerrain { get => Flags2[5] & 0x0f; }
         public int OverlayTerrain { get => (Flags2[5] & 0xf0) >> 4; }
 
