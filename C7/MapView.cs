@@ -5,6 +5,8 @@ using Godot;
 using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
+using Serilog;
+using Serilog.Events;
 
 // Loose layers are for drawing things on the map on a per-tile basis. (Historical aside: There used to be another kind of layer called a TileLayer
 // that was intended to draw regularly tiled objects like terrain sprites but using LooseLayers for everything was found to be a prefereable
@@ -846,6 +848,9 @@ public class BuildingLayer : LooseLayer {
 }
 
 public class CityLayer : LooseLayer {
+
+	private ILogger log = LogManager.ForContext<Game>();
+
 	private ImageTexture cityTexture;
 	private Vector2 citySpriteSize;
 	private DynamicFont smallFont = new DynamicFont();
@@ -874,7 +879,6 @@ public class CityLayer : LooseLayer {
 		}
 
 		City city = tile.cityAtTile;
-		// GD.Print("Tile " + tile.xCoordinate + ", " + tile.yCoordinate + " has a city named " + city.name);
 		Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
 		Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
 		looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
@@ -887,12 +891,14 @@ public class CityLayer : LooseLayer {
 		int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;
 		int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).x;
 		int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
-		// GD.Print("Width of city name = " + maxTextWidth);
 
 		int cityLabelWidth = maxTextWidth + (city.IsCapital()? 70 : 45);	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
 		int textAreaWidth = cityLabelWidth - (city.IsCapital() ? 50 : 25);
-		// GD.Print("City label width: " + cityLabelWidth);
-		// GD.Print("Text area width: " + textAreaWidth);
+		if (log.IsEnabled(LogEventLevel.Verbose)) {
+			log.Verbose("Width of city name = " + maxTextWidth);
+			log.Verbose("City label width: " + cityLabelWidth);
+			log.Verbose("Text area width: " + textAreaWidth);
+		}
 		const int CITY_LABEL_HEIGHT = 23;
 		const int TEXT_ROW_HEIGHT = 9;
 		const int LEFT_RIGHT_BOXES_WIDTH = 24;

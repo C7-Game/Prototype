@@ -4,6 +4,7 @@ using System.Collections;
 using System.Diagnostics;
 using C7Engine;
 using C7GameData;
+using Serilog;
 
 public class Game : Node2D
 {
@@ -12,6 +13,8 @@ public class Game : Node2D
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
 	[Signal] public delegate void NoMoreAutoselectableUnits();
+
+	private ILogger log = LogManager.ForContext<Game>();
 
 	enum GameState {
 		PreGame,
@@ -68,7 +71,7 @@ public class Game : Node2D
 
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
-				GD.Print("RelativeModPath ", map.RelativeModPath);
+				log.Debug("RelativeModPath ", map.RelativeModPath);
 				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
 				AddChild(mapView);
 
@@ -96,17 +99,17 @@ public class Game : Node2D
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
 
-			GD.Print("Now in game!");
+			log.Information("Now in game!");
 
 			loadTimer.Stop();
 			TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-			GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+			log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 		}
 		catch(Exception ex) {
 			errorOnLoad = true;
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
-			GD.PrintErr(ex);
+			log.Error(ex, "Unexpected error in Game.cs _Ready");
 		}
 	}
 
@@ -229,7 +232,7 @@ public class Game : Node2D
 		unit = UnitInteractions.UnitWithAvailableActions(unit);
 
 		if ((unit.path?.PathLength() ?? -1) > 0) {
-			GD.Print("cancelling path for " + unit);
+			log.Debug("cancelling path for " + unit);
 			unit.path = TilePath.NONE;
 		}
 
@@ -257,13 +260,13 @@ public class Game : Node2D
 		}
 		else
 		{
-			GD.Print("It's not your turn!");
+			log.Information("It's not your turn!");
 		}
 	}
 
 	private void OnPlayerStartTurn()
 	{
-		GD.Print("Starting player turn");
+		log.Information("Starting player turn");
 		int turnNumber = TurnHandling.GetTurnNumber();
 		EmitSignal(nameof(TurnStarted), turnNumber);
 		CurrentState = GameState.PlayerTurn;
@@ -277,9 +280,9 @@ public class Game : Node2D
 	{
 		if (CurrentState == GameState.PlayerTurn)
 		{
-			GD.Print("Ending player turn");
+			log.Information("Ending player turn");
 			EmitSignal(nameof(TurnEnded));
-			GD.Print("Starting computer turn");
+			log.Information("Starting computer turn");
 			CurrentState = GameState.ComputerTurn;
 			new MsgEndTurn().send(); // Triggers actual backend processing
 		}
@@ -395,6 +398,8 @@ public class Game : Node2D
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
 
 						string yield = tile.YieldString(controller);
+						//These GD.Print statements are debugging prints for developers to see info about the tile
+						//For now I'm leaving them as GD.Print.  Could revisit this later.
 						GD.Print($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
 
 						if (tile.cityAtTile != null) {
@@ -429,19 +434,18 @@ public class Game : Node2D
 		{
 			if (eventKeyDown.Scancode == (int)Godot.KeyList.Enter)
 			{
-				GD.Print("Enter pressed");
+				log.Verbose("Enter pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
 				{
-					GD.Print("Turn ending");
 					this.OnPlayerEndTurn();
 				}
 				else {
-					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
+					log.Debug("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
 				}
 			}
 			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Space)
 			{
-				GD.Print("Space pressed");
+				log.Verbose("Space pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
 				{
 					this.OnPlayerEndTurn();
@@ -495,7 +499,7 @@ public class Game : Node2D
 			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Escape)
 			{
 				if (!inUnitGoToMode) {
-					GD.Print("Got request for escape/quit");
+					log.Debug("Got request for escape/quit");
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 					popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 				}
@@ -565,7 +569,7 @@ public class Game : Node2D
 		// other than goTo
 		setGoToMode(buttonName == "goTo");
 
-		GD.Print("The " + buttonName + " button was pressed");
+		log.Verbose("The " + buttonName + " button was pressed");
 		switch (buttonName) {
 			case "hold":
 				new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
@@ -606,7 +610,7 @@ public class Game : Node2D
 
 			default:
 				//A nice sanity check if I use a different name here than where I created it...
-				GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+				log.Warning("An unrecognized button " + buttonName + " was pressed");
 				break;
 		}
 	}
@@ -634,7 +638,7 @@ public class Game : Node2D
 	 **/
 	private void OnQuitTheGame()
 	{
-		GD.Print("Goodbye!");
+		log.Information("Goodbye!");
 		GetTree().Quit();
 	}
 
