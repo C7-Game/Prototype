@@ -95,7 +95,9 @@ public class TerrainLayer : LooseLayer {
 			int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
 			var texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
 			var terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
-			var screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize);
+			//Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
+			//Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
+			var screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
 			looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
 		}
 		tilesToDraw.Clear();
