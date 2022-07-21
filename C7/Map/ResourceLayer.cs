@@ -1,11 +1,14 @@
 using C7GameData;
 using Godot;
 using Resource = C7GameData.Resource;
+using Serilog;
 
 namespace C7.Map
 {
 	public class ResourceLayer : LooseLayer
 	{
+		private ILogger log = LogManager.ForContext<ResourceLayer>();
+
 		private static readonly Vector2 resourceSize = new Vector2(50, 50);
 		private int maxRow;
 		private ImageTexture resourceTexture;
@@ -23,7 +26,7 @@ namespace C7.Map
 				int row = resourceIcon / 6;
 				int col = resourceIcon % 6;
 				if (row > maxRow) {
-					GD.Print("Resource icon for " + resource.Name + " is too high");
+					log.Warning("Resource icon for " + resource.Name + " is too high");
 					return;
 				}
 				Rect2 resourceRectangle = new Rect2(col * resourceSize.x, row * resourceSize.y, resourceSize);

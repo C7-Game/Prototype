@@ -38,7 +38,7 @@ namespace C7Engine
 			UnitPrototype highestScoring = unitPrototypes.First();
 			float highestScore = 0.0f;
 
-			log.Information($"Choosing what to produce next in {city}");
+			log.Information($"Choosing what to produce next in {city.name}");
 
 			List<IProducible> prototypes = new List<IProducible>();
 			List<float> weights = new List<float>();
@@ -163,7 +163,7 @@ namespace C7Engine
 			foreach (StrategicPriority priority in priorities) {
 				float adjuster = priority.GetProductionItemFlatAdjuster(prototype);
 				// Low-level log, we don't have proper logs yet so it's commented out
-				// Console.WriteLine($"  Got adjuster of {adjuster} from {priority}; adjusting by ${adjuster * priorityMultiplier}");
+				log.Verbose($"  Got adjuster of {adjuster} from {priority}; adjusting by ${adjuster * priorityMultiplier}");
 				totalAdjusters += (adjuster * priorityMultiplier);
 				priorityMultiplier /= 2;
 			}

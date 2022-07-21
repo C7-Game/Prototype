@@ -1,21 +1,23 @@
 using Godot;
+using Serilog;
 
 public class Credits : Node2D
 {
 	private string creditsText = "Could not load credits file";
 
+	private static ILogger log = Log.ForContext<Credits>();
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		GD.Print("Now rolling the credits!");
+		log.Information("Now rolling the credits!");
 		try
 		{
 			creditsText = System.IO.File.ReadAllText("./credits.txt");
 		}
 		catch(System.Exception ex)
 		{
-			GD.PrintErr("Failed to read from credits.txt!");
-			GD.PushError(ex.ToString());
+			log.Error(ex, "Failed to read from credits.txt!");
 		}
 		ShowCredits();
 	}
@@ -24,7 +26,7 @@ public class Credits : Node2D
 	{
 		ImageTexture CreditsTexture = Util.LoadTextureFromPCX("Art/Credits/credits_background.pcx");
 		ImageTexture GoBackTexture = Util.LoadTextureFromPCX("Art/exitBox-backgroundStates.pcx", 0, 0, 72, 48);
-		
+
 		TextureRect CreditsBackground = new TextureRect();
 		CreditsBackground.Texture = CreditsTexture;
 		AddChild(CreditsBackground);
@@ -35,7 +37,7 @@ public class Credits : Node2D
 		creditsLabel.BbcodeEnabled = true;
 		creditsLabel.BbcodeText = creditsText;
 		AddChild(creditsLabel);
-		
+
 		TextureButton GoBackButton = new TextureButton();
 		GoBackButton.TextureNormal = GoBackTexture;
 		GoBackButton.SetPosition(new Vector2(952, 720));
@@ -44,7 +46,7 @@ public class Credits : Node2D
 	}
 	public void ReturnToMenu()
 	{
-		GD.Print("Returning to main menu");
-		GetTree().ChangeScene("res://MainMenu.tscn");    
+		log.Information("Returning to main menu");
+		GetTree().ChangeScene("res://MainMenu.tscn");
 	}
 }

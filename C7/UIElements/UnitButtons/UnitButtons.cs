@@ -1,9 +1,12 @@
 using Godot;
 using System.Collections.Generic;
 using C7GameData;
+using Serilog;
 
 public class UnitButtons : VBoxContainer
 {
+
+	private ILogger log = LogManager.ForContext<UnitButtons>();
 
 	[Signal] public delegate void UnitButtonPressed(string button);
 
@@ -96,7 +99,7 @@ public class UnitButtons : VBoxContainer
 				buttonMap[buttonKey].Visible = true;
 			}
 			else {
-				GD.PrintErr("Could not find button " + buttonKey);
+				log.Warning("Could not find button " + buttonKey);
 			}
 		}
 

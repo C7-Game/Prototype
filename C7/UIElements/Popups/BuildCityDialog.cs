@@ -1,10 +1,13 @@
 using Godot;
+using Serilog;
 
 public class BuildCityDialog : Popup
 {
-	
+
 	LineEdit cityName = new LineEdit();
 	private string defaultName = "";
+
+	private ILogger log = LogManager.ForContext<BuildCityDialog>();
 
 	public BuildCityDialog(string defaultName)
 	{
@@ -92,7 +95,7 @@ public class BuildCityDialog : Popup
 	public void OnCityNameEntered(string name)
 	{
 		GetTree().SetInputAsHandled();
-		GD.Print("The user hit enter with a city name of " + name);
+		log.Debug("The user hit enter with a city name of " + name);
 		GetParent().EmitSignal("BuildCity", name);
 		GetParent().EmitSignal("HidePopup");
 	}

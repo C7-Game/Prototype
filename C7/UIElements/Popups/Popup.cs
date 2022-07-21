@@ -3,6 +3,7 @@ using ConvertCiv3Media;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Serilog;
 
 public class Margins
 {
@@ -30,6 +31,8 @@ public class Margins
  */
 public class Popup : TextureRect
 {
+	private ILogger log = LogManager.ForContext<Popup>();
+
     public BoxContainer.AlignMode alignment;
     public Margins margins;
 
@@ -146,7 +149,7 @@ public class Popup : TextureRect
         Image bottomRightPopup = PCXToGodot.getImageFromPCX(popupborders, 375, 91, 61, 44);
         imageTimer.Stop();
         TimeSpan stopwatchElapsed = imageTimer.Elapsed;
-        GD.Print("Image creation time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+        log.Debug("Image creation time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 
         //Dimensions are 530x320.  The leaderhead takes up 110.  So the popup is 530x210.
         //We have multiples of... 62? For the horizontal dimension, 45 for vertical.
