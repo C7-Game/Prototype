@@ -229,13 +229,14 @@ namespace C7GameData
 			return carthagePlayer;
 		}
 
-		private void CreateStartingDummyUnits(Player player, Tile location)
-		{
-			CreateDummyUnit(unitPrototypes["Settler"],  player, location);
-			CreateDummyUnit(unitPrototypes["Warrior"],  player, location);
-			CreateDummyUnit(unitPrototypes["Worker"],   player, location);
-			CreateDummyUnit(unitPrototypes["Chariot"],  player, location);
-			CreateDummyUnit(unitPrototypes["Catapult"], player, location);
+		private void CreateStartingDummyUnits(Player player, Tile location) {
+			string[] unitNames = { "Settler", "Warrior", "Worker", "Chariot", "Catapult" };
+			foreach (string unitName in unitNames)
+			{
+				if (unitPrototypes.ContainsKey(unitName)) {
+					CreateDummyUnit(unitPrototypes[unitName],  player, location);
+				}
+			}
 		}
 
 		private MapUnit CreateDummyUnit(UnitPrototype proto, Player owner, Tile tile)
