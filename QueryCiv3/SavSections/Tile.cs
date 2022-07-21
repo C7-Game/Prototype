@@ -38,6 +38,9 @@ namespace QueryCiv3.Sav
 
         // TODO: Most flags need to be added
         private fixed byte Flags2[12];
+        public bool Road     { get => Util.GetFlag(Flags2[0], 0); }
+        public bool Railroad { get => Util.GetFlag(Flags2[0], 1); }
+
         public int BaseTerrain { get => Flags2[5] & 0x0f; }
         public int OverlayTerrain { get => (Flags2[5] & 0xf0) >> 4; }
 

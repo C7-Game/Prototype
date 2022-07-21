@@ -53,6 +53,8 @@ namespace C7GameData
 		public bool riverWest;
 		public bool riverNorthwest;
 
+		public TileOverlays overlays = new TileOverlays();
+
 		public Tile()
 		{
 			unitsOnTile = new List<MapUnit>();
@@ -248,4 +250,9 @@ namespace C7GameData
 		}
 	}
 
+	public class TileOverlays {
+		public bool road = false;
+		public bool railroad = false;
+		// assume that railroad contains road too
+	}
 }

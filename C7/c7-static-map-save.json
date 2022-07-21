@@ -17554,7 +17554,10 @@
           "riverSouth": false,
           "riverSouthwest": false,
           "riverWest": false,
-          "riverNorthwest": false
+          "riverNorthwest": false,
+          "overlays": {
+          	"road": true
+          }
         },
         {
           "baseTerrainTypeKey": "grassland",
@@ -17581,7 +17584,10 @@
           "riverSouth": false,
           "riverSouthwest": false,
           "riverWest": false,
-          "riverNorthwest": false
+          "riverNorthwest": false,
+          "overlays": {
+            "road": true
+          }
         },
         {
           "baseTerrainTypeKey": "grassland",
@@ -17608,7 +17614,10 @@
           "riverSouth": false,
           "riverSouthwest": false,
           "riverWest": false,
-          "riverNorthwest": false
+          "riverNorthwest": false,
+          "overlays": {
+            "road": true
+          }
         },
         {
           "baseTerrainTypeKey": "coast",
@@ -18661,7 +18670,10 @@
           "riverSouth": false,
           "riverSouthwest": false,
           "riverWest": false,
-          "riverNorthwest": false
+          "riverNorthwest": false,
+          "overlays": {
+          	"road": true
+          }
         },
         {
           "baseTerrainTypeKey": "coast",
@@ -19687,7 +19699,11 @@
           "riverSouth": false,
           "riverSouthwest": false,
           "riverWest": false,
-          "riverNorthwest": false
+          "riverNorthwest": false,
+          "overlays": {
+            "road": true,
+            "railroad": true
+          }
         },
         {
           "baseTerrainTypeKey": "grassland",
@@ -19714,7 +19730,11 @@
           "riverSouth": false,
           "riverSouthwest": false,
           "riverWest": false,
-          "riverNorthwest": false
+          "riverNorthwest": false,
+          "overlays": {
+          	"road": true,
+          	"railroad": true
+          }
         },
         {
           "baseTerrainTypeKey": "grassland",
@@ -20740,7 +20760,11 @@
           "riverSouth": false,
           "riverSouthwest": false,
           "riverWest": false,
-          "riverNorthwest": false
+          "riverNorthwest": false,
+          "overlays": {
+            "road": true,
+            "railroad": true
+          }
         },
         {
           "baseTerrainTypeKey": "grassland",
@@ -86450,7 +86474,7 @@
         "baseShieldProduction": 0,
         "baseCommerceProduction": 0,
           "movementCost": 1,
-        "allowCities": true,  
+        "allowCities": true,
 	  "defenseBonus": {
 	      "description": "Grassland",
 	      "amount": 0.10
