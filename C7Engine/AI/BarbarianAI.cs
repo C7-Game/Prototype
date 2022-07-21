@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Serilog;
 
 namespace C7Engine {
@@ -18,9 +19,9 @@ namespace C7Engine {
 			// Copy unit list into temporary array so we can remove units while iterating.
 			// TODO: We also need to handle units spawned during the loop, e.g. leaders, armies, enslaved units. This is not so much an
 			// issue for the barbs but will be for similar loops elsewhere in the AI logic.
-			foreach(MapUnit unit in gameData.mapUnits.ToArray()) {
-				//TODO: Make it better fit the barbs and not be hard-coded to a magic number
-				if (unit.owner == gameData.players[0]) {
+			foreach (Player barbarianPlayer in gameData.players.Where(player => player.isBarbarians))
+			{
+				foreach (MapUnit unit in barbarianPlayer.units) {
 					if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
 						//Move randomly
 						List<Tile> validTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
