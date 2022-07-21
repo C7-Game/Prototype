@@ -80,7 +80,7 @@ namespace C7Engine
 						barbPlayer.units.Add(newUnit);
 						log.Debug("New barbarian added at " + tile);
 					}
-					else if (tile.NeighborsWater() && result < 60) {
+					else if (tile.NeighborsWater() && result < 6) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
