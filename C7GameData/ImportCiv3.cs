@@ -39,6 +39,7 @@ namespace C7GameData
 			c7Save.GameData.healRateInNeutralField = 1;
 			c7Save.GameData.healRateInHostileField = 0;
 			c7Save.GameData.healRateInCity = 2;
+			ImportBarbarianInfo(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
 			SetMapDimensions(civ3Save, c7Save);
 			SetWorldWrap(civ3Save, c7Save);
@@ -112,6 +113,7 @@ namespace C7GameData
 			c7Save.GameData.healRateInNeutralField = 1;
 			c7Save.GameData.healRateInHostileField = 0;
 			c7Save.GameData.healRateInCity = 2;
+			ImportBarbarianInfo(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);
@@ -220,6 +222,10 @@ namespace C7GameData
 			//Temporary limiter so you can't build everything out of the gate
 			//Once we have technology, we will remove this
 			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
+			//Temporary un-limiter for barbarian defaults
+			allowedUnits.Add(theBiq.Prto[theBiq.Rule[0].BasicBarbarianUnitType].Name);
+			allowedUnits.Add(theBiq.Prto[theBiq.Rule[0].AdvancedBarbarianUnitType].Name);
+			allowedUnits.Add(theBiq.Prto[theBiq.Rule[0].BarbarianSeaUnitType].Name);
 			foreach (PRTO prto in theBiq.Prto) {
 				if (allowedUnits.Contains(prto.Name)) {
 					UnitPrototype prototype = new UnitPrototype();
@@ -326,6 +332,9 @@ namespace C7GameData
 		}
 
 		private static void ImportBarbarianInfo(BiqData theBiq, C7SaveFormat c7SaveFormat) {
+			if (c7SaveFormat.GameData.unitPrototypes.Count == 0) {
+				throw new Exception("Must import unit prototypes prior to importing barbarian info");
+			}
 			BarbarianInfo barbInfo = c7SaveFormat.GameData.barbarianInfo;
 			RULE civ3Rules = theBiq.Rule[0];
 			barbInfo.basicBarbarianIndex = civ3Rules.BasicBarbarianUnitType;

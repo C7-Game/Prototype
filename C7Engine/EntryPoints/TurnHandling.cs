@@ -68,7 +68,7 @@ namespace C7Engine
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];
-						newUnit.unitType = gameData.unitPrototypes["Warrior"];
+						newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
 						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 						newUnit.experienceLevel = gameData.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;
@@ -82,7 +82,7 @@ namespace C7Engine
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
-						newUnit.unitType = gameData.unitPrototypes["Galley"];
+						newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;
 						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 						newUnit.experienceLevel = gameData.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;

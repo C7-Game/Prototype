@@ -1,3 +1,4 @@
+using System.Linq;
 using C7Engine.AI;
 
 namespace C7Engine
@@ -14,7 +15,7 @@ namespace C7Engine
 			City newCity = new City(tileWithNewCity, owner, name);
 			CityResident firstResident = new CityResident();
 			CityTileAssignmentAI.AssignNewCitizenToTile(newCity, firstResident);
-			newCity.SetItemBeingProduced(gameData.unitPrototypes["Warrior"]);
+			newCity.SetItemBeingProduced(gameData.unitPrototypes.Values.First());
 			gameData.cities.Add(newCity);
 			owner.cities.Add(newCity);
 			tileWithNewCity.cityAtTile = newCity;
