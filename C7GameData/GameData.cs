@@ -20,6 +20,8 @@ namespace C7GameData
 		[JsonIgnore]
 		public ExperienceLevel defaultExperienceLevel;
 
+		public BarbarianInfo barbarianInfo = new BarbarianInfo();
+
 		public StrengthBonus fortificationBonus;
 		public StrengthBonus riverCrossingBonus;
 		public StrengthBonus cityLevel1DefenseBonus;

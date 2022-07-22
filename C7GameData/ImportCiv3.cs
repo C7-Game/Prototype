@@ -325,6 +325,21 @@ namespace C7GameData
 			};
 		}
 
+		private static void ImportBarbarianInfo(BiqData theBiq, C7SaveFormat c7SaveFormat) {
+			BarbarianInfo barbInfo = c7SaveFormat.GameData.barbarianInfo;
+			RULE civ3Rules = theBiq.Rule[0];
+			barbInfo.basicBarbarianIndex = civ3Rules.BasicBarbarianUnitType;
+			barbInfo.advancedBarbarianIndex = civ3Rules.AdvancedBarbarianUnitType;
+			barbInfo.barbarianSeaUnitIndex = civ3Rules.BarbarianSeaUnitType;
+
+			barbInfo.basicBarbarian =
+				c7SaveFormat.GameData.unitPrototypes[theBiq.Prto[barbInfo.basicBarbarianIndex].Name];
+			barbInfo.advancedBarbarian =
+				c7SaveFormat.GameData.unitPrototypes[theBiq.Prto[barbInfo.advancedBarbarianIndex].Name];
+			barbInfo.barbarianSeaUnit =
+				c7SaveFormat.GameData.unitPrototypes[theBiq.Prto[barbInfo.barbarianSeaUnitIndex].Name];
+		}
+
 		private static void SetWorldWrap(SavData civ3Save, C7SaveFormat c7Save)
 		{
 			if (civ3Save != null && civ3Save.Wrld.Height > 0 && civ3Save.Wrld.Width > 0)
