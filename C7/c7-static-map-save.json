@@ -99783,6 +99783,90 @@
         ],
         "attributes": []
       },
+      "Scout": {
+        "name": "Scout",
+        "shieldCost": 10,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 2,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Explorer": {
+        "name": "Explorer",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 3,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Marine": {
+        "name": "Marine",
+        "shieldCost": 120,
+        "populationCost": 0,
+        "attack": 12,
+        "defense": 6,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 4,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Modern Paratrooper": {
+        "name": "Modern Paratrooper",
+        "shieldCost": 110,
+        "populationCost": 0,
+        "attack": 6,
+        "defense": 11,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 5,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
       "Warrior": {
         "name": "Warrior",
         "shieldCost": 10,
@@ -99792,6 +99876,69 @@
         "bombard": 0,
         "movement": 1,
         "iconIndex": 6,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Archer": {
+        "name": "Archer",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 1,
+        "bombard": 1,
+        "movement": 1,
+        "iconIndex": 7,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Spearman": {
+        "name": "Spearman",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 8,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Swordsman": {
+        "name": "Swordsman",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 3,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 9,
         "categories": [
           "Land"
         ],
@@ -99846,6 +99993,216 @@
         ],
         "attributes": []
       },
+      "Pikeman": {
+        "name": "Pikeman",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 12,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Longbowman": {
+        "name": "Longbowman",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 1,
+        "bombard": 2,
+        "movement": 1,
+        "iconIndex": 13,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Musketman": {
+        "name": "Musketman",
+        "shieldCost": 60,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 4,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 14,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Knight": {
+        "name": "Knight",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 15,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Rifleman": {
+        "name": "Rifleman",
+        "shieldCost": 80,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 6,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 16,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Cavalry": {
+        "name": "Cavalry",
+        "shieldCost": 80,
+        "populationCost": 0,
+        "attack": 6,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 17,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Infantry": {
+        "name": "Infantry",
+        "shieldCost": 90,
+        "populationCost": 0,
+        "attack": 6,
+        "defense": 10,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 18,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Tank": {
+        "name": "Tank",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 16,
+        "defense": 8,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 19,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Mech Infantry": {
+        "name": "Mech Infantry",
+        "shieldCost": 110,
+        "populationCost": 0,
+        "attack": 12,
+        "defense": 18,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 20,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Modern Armor": {
+        "name": "Modern Armor",
+        "shieldCost": 120,
+        "populationCost": 0,
+        "attack": 24,
+        "defense": 16,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 21,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
       "Catapult": {
         "name": "Catapult",
         "shieldCost": 20,
@@ -99855,6 +100212,138 @@
         "bombard": 4,
         "movement": 1,
         "iconIndex": 22,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Cannon": {
+        "name": "Cannon",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 8,
+        "movement": 1,
+        "iconIndex": 23,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Artillery": {
+        "name": "Artillery",
+        "shieldCost": 80,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 12,
+        "movement": 1,
+        "iconIndex": 24,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Radar Artillery": {
+        "name": "Radar Artillery",
+        "shieldCost": 120,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 16,
+        "movement": 2,
+        "iconIndex": 25,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Cruise Missile": {
+        "name": "Cruise Missile",
+        "shieldCost": 60,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 16,
+        "movement": 1,
+        "iconIndex": 26,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Tactical Nuke": {
+        "name": "Tactical Nuke",
+        "shieldCost": 300,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 27,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "ICBM": {
+        "name": "ICBM",
+        "shieldCost": 500,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 28,
         "categories": [
           "Land"
         ],
@@ -99879,6 +100368,1950 @@
         "iconIndex": 29,
         "categories": [
           "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Caravel": {
+        "name": "Caravel",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 4,
+        "iconIndex": 30,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Frigate": {
+        "name": "Frigate",
+        "shieldCost": 60,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 2,
+        "bombard": 3,
+        "movement": 5,
+        "iconIndex": 31,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Galleon": {
+        "name": "Galleon",
+        "shieldCost": 50,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 4,
+        "iconIndex": 32,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Ironclad": {
+        "name": "Ironclad",
+        "shieldCost": 90,
+        "populationCost": 0,
+        "attack": 5,
+        "defense": 6,
+        "bombard": 6,
+        "movement": 3,
+        "iconIndex": 33,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Transport": {
+        "name": "Transport",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 6,
+        "iconIndex": 34,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Carrier": {
+        "name": "Carrier",
+        "shieldCost": 180,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 8,
+        "bombard": 0,
+        "movement": 7,
+        "iconIndex": 35,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Submarine": {
+        "name": "Submarine",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 8,
+        "defense": 4,
+        "bombard": 0,
+        "movement": 4,
+        "iconIndex": 36,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Destroyer": {
+        "name": "Destroyer",
+        "shieldCost": 120,
+        "populationCost": 0,
+        "attack": 12,
+        "defense": 8,
+        "bombard": 6,
+        "movement": 8,
+        "iconIndex": 37,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Battleship": {
+        "name": "Battleship",
+        "shieldCost": 200,
+        "populationCost": 0,
+        "attack": 18,
+        "defense": 12,
+        "bombard": 8,
+        "movement": 5,
+        "iconIndex": 38,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "AEGIS Cruiser": {
+        "name": "AEGIS Cruiser",
+        "shieldCost": 160,
+        "populationCost": 0,
+        "attack": 15,
+        "defense": 10,
+        "bombard": 6,
+        "movement": 7,
+        "iconIndex": 39,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Nuclear Submarine": {
+        "name": "Nuclear Submarine",
+        "shieldCost": 140,
+        "populationCost": 0,
+        "attack": 8,
+        "defense": 4,
+        "bombard": 0,
+        "movement": 5,
+        "iconIndex": 40,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Fighter": {
+        "name": "Fighter",
+        "shieldCost": 80,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 2,
+        "bombard": 3,
+        "movement": 1,
+        "iconIndex": 41,
+        "categories": [
+          "Air"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband"
+        ],
+        "attributes": []
+      },
+      "Bomber": {
+        "name": "Bomber",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 2,
+        "bombard": 12,
+        "movement": 1,
+        "iconIndex": 42,
+        "categories": [
+          "Air"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband"
+        ],
+        "attributes": []
+      },
+      "Helicopter": {
+        "name": "Helicopter",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 43,
+        "categories": [
+          "Air"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband"
+        ],
+        "attributes": []
+      },
+      "Jet Fighter": {
+        "name": "Jet Fighter",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 8,
+        "defense": 4,
+        "bombard": 3,
+        "movement": 1,
+        "iconIndex": 44,
+        "categories": [
+          "Air"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband"
+        ],
+        "attributes": []
+      },
+      "Stealth Fighter": {
+        "name": "Stealth Fighter",
+        "shieldCost": 120,
+        "populationCost": 0,
+        "attack": 8,
+        "defense": 6,
+        "bombard": 6,
+        "movement": 1,
+        "iconIndex": 45,
+        "categories": [
+          "Air"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband"
+        ],
+        "attributes": []
+      },
+      "Stealth Bomber": {
+        "name": "Stealth Bomber",
+        "shieldCost": 240,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 5,
+        "bombard": 18,
+        "movement": 1,
+        "iconIndex": 46,
+        "categories": [
+          "Air"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband"
+        ],
+        "attributes": []
+      },
+      "Leader": {
+        "name": "Leader",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 47,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Army": {
+        "name": "Army",
+        "shieldCost": 400,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 48,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Jaguar Warrior": {
+        "name": "Jaguar Warrior",
+        "shieldCost": 15,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 49,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Bowman": {
+        "name": "Bowman",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 2,
+        "bombard": 1,
+        "movement": 1,
+        "iconIndex": 50,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Hoplite": {
+        "name": "Hoplite",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 51,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Impi": {
+        "name": "Impi",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 52,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Legionary": {
+        "name": "Legionary",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 3,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 53,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Immortals": {
+        "name": "Immortals",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 54,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "War Chariot": {
+        "name": "War Chariot",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 55,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Rider": {
+        "name": "Rider",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 56,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Mounted Warrior": {
+        "name": "Mounted Warrior",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 3,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 57,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Musketeer": {
+        "name": "Musketeer",
+        "shieldCost": 60,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 5,
+        "bombard": 2,
+        "movement": 1,
+        "iconIndex": 58,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Samurai": {
+        "name": "Samurai",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 4,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 59,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "War Elephant": {
+        "name": "War Elephant",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 60,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Cossack": {
+        "name": "Cossack",
+        "shieldCost": 90,
+        "populationCost": 0,
+        "attack": 6,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 61,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Panzer": {
+        "name": "Panzer",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 16,
+        "defense": 8,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 62,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Man-O-War": {
+        "name": "Man-O-War",
+        "shieldCost": 65,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 2,
+        "bombard": 4,
+        "movement": 5,
+        "iconIndex": 63,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "F-15": {
+        "name": "F-15",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 8,
+        "defense": 4,
+        "bombard": 6,
+        "movement": 1,
+        "iconIndex": 64,
+        "categories": [
+          "Air"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband"
+        ],
+        "attributes": []
+      },
+      "Privateer": {
+        "name": "Privateer",
+        "shieldCost": 50,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 1,
+        "bombard": 3,
+        "movement": 5,
+        "iconIndex": 65,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Keshik": {
+        "name": "Keshik",
+        "shieldCost": 60,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 76,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Conquistador": {
+        "name": "Conquistador",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 3,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 75,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Berserk": {
+        "name": "Berserk",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 6,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 74,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Sipahi": {
+        "name": "Sipahi",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 8,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 77,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Gallic Swordsman": {
+        "name": "Gallic Swordsman",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 3,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 78,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Ansar Warrior": {
+        "name": "Ansar Warrior",
+        "shieldCost": 60,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 3,
+        "iconIndex": 82,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Numidian Mercenary": {
+        "name": "Numidian Mercenary",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 80,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Hwach\u0027a": {
+        "name": "Hwach\u0027a",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 8,
+        "movement": 1,
+        "iconIndex": 79,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Medieval Infantry": {
+        "name": "Medieval Infantry",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 84,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Guerilla": {
+        "name": "Guerilla",
+        "shieldCost": 90,
+        "populationCost": 0,
+        "attack": 6,
+        "defense": 6,
+        "bombard": 3,
+        "movement": 1,
+        "iconIndex": 85,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Princess": {
+        "name": "Princess",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 121,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify"
+        ],
+        "attributes": []
+      },
+      "Lincoln": {
+        "name": "Lincoln",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 97,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Hammurabi": {
+        "name": "Hammurabi",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 100,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Mao": {
+        "name": "Mao",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 103,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Bismarck": {
+        "name": "Bismarck",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 107,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Alexander": {
+        "name": "Alexander",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 108,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Caesar": {
+        "name": "Caesar",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 116,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Xerxes": {
+        "name": "Xerxes",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 115,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Hiawatha": {
+        "name": "Hiawatha",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 110,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Shaka": {
+        "name": "Shaka",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 120,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Montezuma": {
+        "name": "Montezuma",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 99,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Cleopatra": {
+        "name": "Cleopatra",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 104,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Elizabeth": {
+        "name": "Elizabeth",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 105,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Catherine": {
+        "name": "Catherine",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 117,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Abu": {
+        "name": "Abu",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 98,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Hannibal": {
+        "name": "Hannibal",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 101,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Osman": {
+        "name": "Osman",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 114,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Temujin": {
+        "name": "Temujin",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 113,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Gandhi": {
+        "name": "Gandhi",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 109,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Ragnar": {
+        "name": "Ragnar",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 119,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Brennus": {
+        "name": "Brennus",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 102,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Tokugawa": {
+        "name": "Tokugawa",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 111,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Joan d\u0027Arc": {
+        "name": "Joan d\u0027Arc",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 106,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Wang Kon": {
+        "name": "Wang Kon",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 112,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Isabella": {
+        "name": "Isabella",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 118,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Enkidu Warrior": {
+        "name": "Enkidu Warrior",
+        "shieldCost": 10,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 175,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Three-Man Chariot": {
+        "name": "Three-Man Chariot",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 186,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Mursilis": {
+        "name": "Mursilis",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 169,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Gilgamesh": {
+        "name": "Gilgamesh",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 174,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Henry": {
+        "name": "Henry",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 173,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Carrack": {
+        "name": "Carrack",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 4,
+        "iconIndex": 198,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Swiss Mercenary": {
+        "name": "Swiss Mercenary",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 4,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 181,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "William of Orange": {
+        "name": "William of Orange",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 172,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Trebuchet": {
+        "name": "Trebuchet",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 0,
+        "defense": 0,
+        "bombard": 6,
+        "movement": 1,
+        "iconIndex": 190,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Pachacuti": {
+        "name": "Pachacuti",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 170,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Smoke-Jaguar": {
+        "name": "Smoke-Jaguar",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 171,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Theodora": {
+        "name": "Theodora",
+        "shieldCost": 0,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 168,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Chasqui Scout": {
+        "name": "Chasqui Scout",
+        "shieldCost": 20,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 176,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Javelin Thrower": {
+        "name": "Javelin Thrower",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 177,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Dromon": {
+        "name": "Dromon",
+        "shieldCost": 30,
+        "populationCost": 0,
+        "attack": 2,
+        "defense": 1,
+        "bombard": 2,
+        "movement": 3,
+        "iconIndex": 196,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Cruiser": {
+        "name": "Cruiser",
+        "shieldCost": 160,
+        "populationCost": 0,
+        "attack": 15,
+        "defense": 10,
+        "bombard": 7,
+        "movement": 6,
+        "iconIndex": 200,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "bombard",
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Crusader": {
+        "name": "Crusader",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 5,
+        "defense": 3,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 180,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Ancient Cavalry": {
+        "name": "Ancient Cavalry",
+        "shieldCost": 40,
+        "populationCost": 0,
+        "attack": 3,
+        "defense": 2,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 187,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Curragh": {
+        "name": "Curragh",
+        "shieldCost": 15,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 1,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 195,
+        "categories": [
+          "Sea"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Paratrooper": {
+        "name": "Paratrooper",
+        "shieldCost": 90,
+        "populationCost": 0,
+        "attack": 4,
+        "defense": 9,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 185,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "TOW Infantry": {
+        "name": "TOW Infantry",
+        "shieldCost": 120,
+        "populationCost": 0,
+        "attack": 12,
+        "defense": 14,
+        "bombard": 6,
+        "movement": 1,
+        "iconIndex": 203,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Flak": {
+        "name": "Flak",
+        "shieldCost": 70,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 6,
+        "bombard": 0,
+        "movement": 1,
+        "iconIndex": 205,
+        "categories": [
+          "Land"
+        ],
+        "actions": [
+          "hold",
+          "wait",
+          "fortify",
+          "disband",
+          "goTo"
+        ],
+        "attributes": []
+      },
+      "Mobile SAM": {
+        "name": "Mobile SAM",
+        "shieldCost": 100,
+        "populationCost": 0,
+        "attack": 1,
+        "defense": 6,
+        "bombard": 0,
+        "movement": 2,
+        "iconIndex": 206,
+        "categories": [
+          "Land"
         ],
         "actions": [
           "hold",

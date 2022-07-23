@@ -219,54 +219,48 @@ namespace C7GameData
 		}
 
 		private static void ImportUnitPrototypes(BiqData theBiq, C7SaveFormat c7SaveFormat) {
-			//Temporary limiter so you can't build everything out of the gate
-			//Once we have technology, we will remove this
-			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
-			//Temporary un-limiter for barbarian defaults
-			allowedUnits.Add(theBiq.Prto[theBiq.Rule[0].BasicBarbarianUnitType].Name);
-			allowedUnits.Add(theBiq.Prto[theBiq.Rule[0].AdvancedBarbarianUnitType].Name);
-			allowedUnits.Add(theBiq.Prto[theBiq.Rule[0].BarbarianSeaUnitType].Name);
 			foreach (PRTO prto in theBiq.Prto) {
-				if (allowedUnits.Contains(prto.Name)) {
-					UnitPrototype prototype = new UnitPrototype();
-					if (prto.Type == PRTO.TYPE_SEA) {
-						prototype.categories.Add("Sea");
-					}
-					else if (prto.Type == PRTO.TYPE_LAND) {
-						prototype.categories.Add("Land");
-					}
-					else if (prto.Type == PRTO.TYPE_AIR) {
-						prototype.categories.Add("Air");
-					}
-					prototype.name = prto.Name;
-					prototype.attack = prto.Attack;
-					prototype.defense = prto.Defense;
-					prototype.movement = prto.Movement;
-					prototype.shieldCost = prto.ShieldCost;
-					prototype.populationCost = prto.PopulationCost;
-					prototype.bombard = prto.BombardStrength;
-					prototype.iconIndex = prto.IconIndex;
-					if (prto.BuildCity) {
-						prototype.actions.Add("buildCity");
-					}
-					if (prto.Bombard) {
-						prototype.actions.Add("bombard");
-					}
-					if (prto.SkipTurn) {
-						prototype.actions.Add("hold");
-					}
-					if (prto.Wait) {
-						prototype.actions.Add("wait");
-					}
-					if (prto.Fortify) {
-						prototype.actions.Add("fortify");
-					}
-					if (prto.Disband) {
-						prototype.actions.Add("disband");
-					}
-					if (prto.GoTo) {
-						prototype.actions.Add("goTo");
-					}
+				UnitPrototype prototype = new UnitPrototype();
+				if (prto.Type == PRTO.TYPE_SEA) {
+					prototype.categories.Add("Sea");
+				}
+				else if (prto.Type == PRTO.TYPE_LAND) {
+					prototype.categories.Add("Land");
+				}
+				else if (prto.Type == PRTO.TYPE_AIR) {
+					prototype.categories.Add("Air");
+				}
+				prototype.name = prto.Name;
+				prototype.attack = prto.Attack;
+				prototype.defense = prto.Defense;
+				prototype.movement = prto.Movement;
+				prototype.shieldCost = prto.ShieldCost;
+				prototype.populationCost = prto.PopulationCost;
+				prototype.bombard = prto.BombardStrength;
+				prototype.iconIndex = prto.IconIndex;
+				if (prto.BuildCity) {
+					prototype.actions.Add("buildCity");
+				}
+				if (prto.Bombard) {
+					prototype.actions.Add("bombard");
+				}
+				if (prto.SkipTurn) {
+					prototype.actions.Add("hold");
+				}
+				if (prto.Wait) {
+					prototype.actions.Add("wait");
+				}
+				if (prto.Fortify) {
+					prototype.actions.Add("fortify");
+				}
+				if (prto.Disband) {
+					prototype.actions.Add("disband");
+				}
+				if (prto.GoTo) {
+					prototype.actions.Add("goTo");
+				}
+				//Temporary check until #329/#330 are finished
+				if (!c7SaveFormat.GameData.unitPrototypes.ContainsKey(prototype.name)) {
 					c7SaveFormat.GameData.unitPrototypes.Add(prototype.name, prototype);
 				}
 			}
