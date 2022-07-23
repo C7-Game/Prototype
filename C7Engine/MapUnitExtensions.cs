@@ -345,11 +345,19 @@ public static class MapUnitExtensions {
 			if (!unit.location.unitsOnTile.Remove(unit))
 				throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 			newLoc.unitsOnTile.Add(unit);
+			// todo switch to getMovementCost(loc, dir, newLoc)
 			unit.location = newLoc;
 			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
 			unit.OnEnterTile(newLoc);
 			unit.animate(MapUnit.AnimatedAction.RUN, wait);
 		}
+	}
+
+	public static float getMovementCost(Tile from, TileDirection dir, Tile newLocation) {
+		if (from.HasRiverCrossing(dir)) return newLocation.MovementCost();
+		if (newLocation.overlays.railroad) return 0;
+		if (newLocation.overlays.road) return 1.0f / 3;
+		return newLocation.MovementCost();
 	}
 
 	public static void moveAlongPath(this MapUnit unit)
