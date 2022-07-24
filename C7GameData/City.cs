@@ -88,14 +88,13 @@ namespace C7GameData
             }
 
 			shieldsStored += CurrentProductionYield();
-            if (shieldsStored >= itemBeingProduced.shieldCost) {
-	            shieldsStored = 0;
-	            if (itemBeingProduced.populationCost > 0) {
-		            size -= itemBeingProduced.populationCost;
-	            }
+            if (shieldsStored >= itemBeingProduced.shieldCost && size > itemBeingProduced.populationCost) {
+                shieldsStored = 0;
+                size -= itemBeingProduced.populationCost;
                 return itemBeingProduced;
             }
 
+            shieldsStored = Math.Min(shieldsStored, itemBeingProduced.shieldCost);
             return null;
         }
 
