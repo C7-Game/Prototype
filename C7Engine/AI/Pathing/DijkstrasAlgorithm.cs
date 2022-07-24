@@ -18,7 +18,7 @@ namespace C7Engine.Pathing {
 
 		/**
 		 * return Dictionary: Node -> Edge(previousNode, node, distanceToNodeFromStart)
-		 * with stopWhenReachDestination == false it calculate distances to each available point
+		 * when stopWhenReachDestination == false it calculates distances to each available point
 		 */
 		public static Dictionary<TNode, Edge<TNode>> run<TNode>(TNode start, TNode destination,
 			EdgeWalker<TNode> edgeWalker, bool stopWhenReachDestination = false)
@@ -51,14 +51,15 @@ namespace C7Engine.Pathing {
 			}
 
 			List<Tile> tilesInPath = new List<Tile>() { destination };
+			Tile tile = destination;
 			while (true) {
-				Edge<Tile> edge = walkingMap[destination];
-				if (edge.prev.Equals(destination)) {
+				Edge<Tile> edge = walkingMap[tile];
+				if (edge.prev.Equals(tile)) {
 					break;
 				}
 
-				destination = edge.prev;
-				tilesInPath.Add(destination);
+				tile = edge.prev;
+				tilesInPath.Add(tile);
 			}
 
 			tilesInPath.Reverse();
