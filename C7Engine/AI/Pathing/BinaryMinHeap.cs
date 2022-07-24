@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace C7Engine.Pathing {
 	/**
 	 * https://en.wikipedia.org/wiki/Binary_heap
-	 * min heap
 	 */
 	public class BinaryMinHeap<TValue> where TValue: IComparable<TValue> {
 		private readonly List<TValue> data = new List<TValue>();
@@ -17,7 +16,7 @@ namespace C7Engine.Pathing {
 			siftUp(data.Count - 1);
 		}
 
-		// extract them smallest value, O(log N)
+		// extract the smallest value, O(log N)
 		public TValue extract() {
 			TValue result = data[0];
 			data[0] = data[data.Count - 1];
