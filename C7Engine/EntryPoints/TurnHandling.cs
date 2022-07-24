@@ -124,7 +124,7 @@ namespace C7Engine
 					}
 					else if (newSize < initialSize) {
 						int diff = initialSize - newSize;
-						if (newSize == 0) {
+						if (newSize <= 0) {
 							log.Error($"Attempting to remove the last resident from {city}");
 						} else {
 							//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
