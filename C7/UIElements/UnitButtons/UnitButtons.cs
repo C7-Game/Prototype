@@ -1,9 +1,12 @@
 using Godot;
 using System.Collections.Generic;
 using C7GameData;
+using Serilog;
 
 public class UnitButtons : VBoxContainer
 {
+
+	private ILogger log = LogManager.ForContext<UnitButtons>();
 
 	[Signal] public delegate void UnitButtonPressed(string button);
 
@@ -73,12 +76,12 @@ public class UnitButtons : VBoxContainer
 	{
 		EmitSignal(nameof(UnitButtonPressed), buttonKey);
 	}
-	
+
 	private void OnNoMoreAutoselectableUnits()
 	{
 		this.Visible = false;
 	}
-	
+
 	private void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
 		MapUnit unit = wrappedMapUnit.GetValue<MapUnit>();
@@ -88,18 +91,21 @@ public class UnitButtons : VBoxContainer
 			button.Visible = false;
 		}
 
+		//TODO: This is technically right, since the unit's available actions have been attached,
+		//but is unintuitive since they typically are on the prototype.
+		//Goal: Send the actions as a list.
 		foreach (string buttonKey in unit.availableActions) {
 			if (buttonMap.ContainsKey(buttonKey)) {
 				buttonMap[buttonKey].Visible = true;
 			}
 			else {
-				GD.PrintErr("Could not find button " + buttonKey);
+				log.Warning("Could not find button " + buttonKey);
 			}
 		}
 
 		this.Visible = true;
 	}
-	
+
 	public override void _UnhandledInput(InputEvent @event) {
 		if (this.Visible)
 		{

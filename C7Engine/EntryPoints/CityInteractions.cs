@@ -1,3 +1,5 @@
+using C7Engine.AI;
+
 namespace C7Engine
 {
 	using C7GameData;
@@ -10,6 +12,8 @@ namespace C7Engine
 			Player owner = gameData.players.Find(player => player.guid == playerGuid);
 			Tile tileWithNewCity = gameData.map.tileAt(x, y);
 			City newCity = new City(tileWithNewCity, owner, name);
+			CityResident firstResident = new CityResident();
+			CityTileAssignmentAI.AssignNewCitizenToTile(newCity, firstResident);
 			newCity.SetItemBeingProduced(gameData.unitPrototypes["Warrior"]);
 			gameData.cities.Add(newCity);
 			owner.cities.Add(newCity);

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Diagnostics;
 using C7Engine;
 using C7GameData;
+using Serilog;
 
 public class Game : Node2D
 {
@@ -12,6 +13,8 @@ public class Game : Node2D
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
 	[Signal] public delegate void NoMoreAutoselectableUnits();
+
+	private ILogger log = LogManager.ForContext<Game>();
 
 	enum GameState {
 		PreGame,
@@ -30,6 +33,7 @@ public class Game : Node2D
 
 	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
 	public MapUnit CurrentlySelectedUnit = MapUnit.NONE;	//The selected unit.  May be changed by clicking on a unit or the next unit being auto-selected after orders are given for the current one.
+	private bool inUnitGoToMode = false;
 
 	// Normally if the currently selected unit (CSU) becomes fortified, we advance to the next autoselected unit. If this flag is set, we won't do
 	// that. This is useful so that the unit autoselector can be prevented from interfering with the player selecting fortified units.
@@ -61,61 +65,51 @@ public class Game : Node2D
 			AddChild(animSoundPlayer);
 			civ3AnimData = new Civ3AnimData(animSoundPlayer);
 			animTracker = new AnimationTracker(civ3AnimData);
-			EngineStorage.initialize(); // Spawns engine thread
 
-			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath);
+			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
 			Global.ResetLoadGamePath();
 
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
-				GD.Print("RelativeModPath ", map.RelativeModPath);
+				log.Debug("RelativeModPath ", map.RelativeModPath);
 				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
 				AddChild(mapView);
+
+				mapView.cameraZoom = (float)1.0;
+				mapView.gridLayer.visible = false;
+
+				// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their
+				// starting settler.
+				if (controller.cities.Count > 0) {
+					City capital = controller.cities.Find(c => c.IsCapital());
+					if (capital != null)
+						mapView.centerCameraOnTile(capital.location);
+				} else {
+					MapUnit startingSettler = controller.units.Find(u => u.unitType.actions.Contains("buildCity"));
+					if (startingSettler != null)
+						mapView.centerCameraOnTile(startingSettler.location);
+				}
 			}
 
 			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 			Player = GetNode<KinematicBody2D>("KinematicBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
-			mapView.cameraZoom = (float)1.0;
-			mapView.gridLayer.visible = false;
-			// If later recreating scene, the component may already exist, hence try/catch
-			try{
-				ComponentManager.Instance.AddComponent(new TurnCounterComponent());
-			}
-			catch {
-				ComponentManager.Instance.GetComponent<TurnCounterComponent>().SetTurnCounter();
-			}
 
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
 
-			// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their starting
-			// settler.
-			if (controller.cities.Count > 0)
-			{
-				City capital = controller.cities.Find(c => c.IsCapital());
-				if (capital != null)
-					mapView.centerCameraOnTile(capital.location);
-			}
-			else
-			{
-				MapUnit startingSettler = controller.units.Find(u => u.unitType.canFoundCity);
-				if (startingSettler != null)
-					mapView.centerCameraOnTile(startingSettler.location);
-			}
-
-			GD.Print("Now in game!");
+			log.Information("Now in game!");
 
 			loadTimer.Stop();
 			TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-			GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+			log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 		}
 		catch(Exception ex) {
 			errorOnLoad = true;
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
-			GD.PrintErr(ex);
+			log.Error(ex, "Unexpected error in Game.cs _Ready");
 		}
 	}
 
@@ -126,7 +120,7 @@ public class Game : Node2D
 		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
-				MapUnit unit = gameData.mapUnits.Find(u => u.guid == mSUA.unitGUID);
+				MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
 				if (unit != null) {
 					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
@@ -134,7 +128,7 @@ public class Game : Node2D
 					if (mSUA.action == MapUnit.AnimatedAction.ATTACK1)
 						ensureLocationIsInView(unit.location);
 
-					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent);
+					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent, mSUA.ending);
 				}
 				break;
 			case MsgStartEffectAnimation mSEA:
@@ -142,12 +136,10 @@ public class Game : Node2D
 				gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
 				Tile tile = gameData.map.tileAt(x, y);
 				if (tile != Tile.NONE)
-					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent);
+					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
 				break;
 			case MsgStartTurn mST:
-				//Simulating processing so the turn doesn't end too quickly
-				ComputerSimulateTurn();
-				GD.Print("Thinking...");
+				OnPlayerStartTurn();
 				break;
 			}
 		}
@@ -172,12 +164,7 @@ public class Game : Node2D
 			processEngineMessages(gameData);
 
 			if (!errorOnLoad) {
-				switch (CurrentState)
-				{
-				case GameState.PreGame:
-					StartGame();
-					break;
-				case GameState.PlayerTurn:
+				if (CurrentState == GameState.PlayerTurn) {
 					// If the selected unit is unfortified, prepare to autoselect the next one if it becomes fortified
 					if ((CurrentlySelectedUnit != MapUnit.NONE) && (! CurrentlySelectedUnit.isFortified))
 						KeepCSUWhenFortified = false;
@@ -189,9 +176,6 @@ public class Game : Node2D
 						  ! animTracker.getUnitAppearance(CurrentlySelectedUnit).DeservesPlayerAttention()) ||
 						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
-					break;
-				case GameState.ComputerTurn:
-					break;
 				}
 				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
 				//without a manual cast to int.
@@ -201,15 +185,6 @@ public class Game : Node2D
 				}
 			}
 		}
-	}
-
-	private void StartGame()
-	{
-		GD.Print("Game starting");
-		TurnCounterComponent turnCntCpnt = ComponentManager.Instance.GetComponent<TurnCounterComponent>();
-		// Connect(nameof(TurnStarted), turnCntCpnt, "OnTurnStarted");
-		// Connect(nameof(TurnEnded), this, nameof(OnPlayerEndTurn));
-		OnPlayerStartTurn();
 	}
 
 	// This is the terrain generator that used to be part of TerrainAsTileMap. Now it gets passed to and called from generateDummyGameMap so that
@@ -241,6 +216,12 @@ public class Game : Node2D
 		}
 	}
 
+	public void SetAnimationsEnabled(bool enabled)
+	{
+		new MsgSetAnimationsEnabled(enabled).send();
+		animTracker.endAllImmediately = ! enabled;
+	}
+
 	/**
 	 * Currently (11/14/2021), all unit selection goes through here.
 	 * Both code paths are in Game.cs for now, so it's local, but we may
@@ -248,6 +229,13 @@ public class Game : Node2D
 	 **/
 	public void setSelectedUnit(MapUnit unit)
 	{
+		unit = UnitInteractions.UnitWithAvailableActions(unit);
+
+		if ((unit.path?.PathLength() ?? -1) > 0) {
+			log.Debug("cancelling path for " + unit);
+			unit.path = TilePath.NONE;
+		}
+
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 
@@ -272,13 +260,13 @@ public class Game : Node2D
 		}
 		else
 		{
-			GD.Print("It's not your turn!");
+			log.Information("It's not your turn!");
 		}
 	}
 
 	private void OnPlayerStartTurn()
 	{
-		GD.Print("Starting player turn");
+		log.Information("Starting player turn");
 		int turnNumber = TurnHandling.GetTurnNumber();
 		EmitSignal(nameof(TurnStarted), turnNumber);
 		CurrentState = GameState.PlayerTurn;
@@ -292,32 +280,11 @@ public class Game : Node2D
 	{
 		if (CurrentState == GameState.PlayerTurn)
 		{
-			GD.Print("Ending player turn");
+			log.Information("Ending player turn");
 			EmitSignal(nameof(TurnEnded));
-			OnComputerStartTurn();
-		}
-	}
-
-	private void OnComputerStartTurn()
-	{
-		GD.Print("Starting computer turn");
-		CurrentState = GameState.ComputerTurn;
-		//Actual backend processing
-		new MsgEndTurn().send();
-	}
-
-	public async void ComputerSimulateTurn()
-	{
-		await ToSignal(GetTree().CreateTimer(0.25f), "timeout");
-		OnComputerEndTurn();
-	}
-
-	private void OnComputerEndTurn()
-	{
-		if (CurrentState == GameState.ComputerTurn)
-		{
-			GD.Print("Ending computer turn");
-			OnPlayerStartTurn();
+			log.Information("Starting computer turn");
+			CurrentState = GameState.ComputerTurn;
+			new MsgEndTurn().send(); // Triggers actual backend processing
 		}
 	}
 
@@ -378,19 +345,30 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				if(eventMouseButton.IsPressed())
 				{
-					// Select unit on tile at mouse location
-					using (var gameDataAccess = new UIGameDataAccess()) {
-						var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
-						if (tile != null) {
-							MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
-							//TODO: Better check for "current/human player"
-							if (to_select != null && to_select.owner.color == 0x4040FFFF)
-								setSelectedUnit(to_select);
+					if (inUnitGoToMode) {
+						setGoToMode(false);
+						using (var gameDataAccess = new UIGameDataAccess()) {
+							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							if (tile != null) {
+								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
+							}
 						}
 					}
+					else
+					{
+						// Select unit on tile at mouse location
+						using (var gameDataAccess = new UIGameDataAccess()) {
+							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							if (tile != null) {
+								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+								if (to_select != null && to_select.owner == controller)
+									setSelectedUnit(to_select);
+							}
+						}
 
-					OldPosition = eventMouseButton.Position;
-					IsMovingCamera = true;
+						OldPosition = eventMouseButton.Position;
+						IsMovingCamera = true;
+					}
 				}
 				else
 				{
@@ -407,8 +385,9 @@ public class Game : Node2D
 				GetTree().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
 			}
-			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (! eventMouseButton.IsPressed()))
+			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (!eventMouseButton.IsPressed()))
 			{
+				setGoToMode(false);
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
@@ -418,12 +397,23 @@ public class Game : Node2D
 						else if ((! shiftDown) && tile.unitsOnTile.Count > 0)
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
 
-						GD.Print("Clicked on (" + tile.xCoordinate.ToString() + ", " + tile.yCoordinate.ToString() + "): " + tile.overlayTerrainType.DisplayName);
+						string yield = tile.YieldString(controller);
+						//These GD.Print statements are debugging prints for developers to see info about the tile
+						//For now I'm leaving them as GD.Print.  Could revisit this later.
+						GD.Print($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
+
+						if (tile.cityAtTile != null) {
+							City city = tile.cityAtTile;
+							GD.Print($"  {city.name}, production {city.shieldsStored} of {city.itemBeingProduced.shieldCost}");
+							foreach (CityResident resident in city.residents) {
+								GD.Print($"  Resident working at {resident.tileWorked}");
+							}
+						}
 
 						if (tile.unitsOnTile.Count > 0) {
 							foreach (MapUnit unit in tile.unitsOnTile) {
 								GD.Print("  Unit on tile: " + unit);
-								GD.Print("  Strategy: " + unit.currentAIBehavior);
+								GD.Print("  Strategy: " + unit.currentAIData);
 							}
 						}
 					} else
@@ -440,34 +430,33 @@ public class Game : Node2D
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
-		else if (@event is InputEventKey eventKey && eventKey.Pressed)
+		else if (@event is InputEventKey eventKeyDown && eventKeyDown.Pressed)
 		{
-			if (eventKey.Scancode == (int)Godot.KeyList.Enter)
+			if (eventKeyDown.Scancode == (int)Godot.KeyList.Enter)
 			{
-				GD.Print("Enter pressed");
+				log.Verbose("Enter pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
 				{
-					GD.Print("Turn ending");
 					this.OnPlayerEndTurn();
 				}
 				else {
-					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
+					log.Debug("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
 				}
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.Space)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Space)
 			{
-				GD.Print("Space pressed");
+				log.Verbose("Space pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
 				{
 					this.OnPlayerEndTurn();
 				}
 			}
-			else if ((eventKey.Scancode >= (int)Godot.KeyList.Kp1) && (eventKey.Scancode <= (int)Godot.KeyList.Kp9))
+			else if ((eventKeyDown.Scancode >= (int)Godot.KeyList.Kp1) && (eventKeyDown.Scancode <= (int)Godot.KeyList.Kp9))
 			{ // Move units with the numpad keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
-					switch (eventKey.Scancode - (int)Godot.KeyList.Kp0) {
+					switch (eventKeyDown.Scancode - (int)Godot.KeyList.Kp0) {
 					case 1: dir = TileDirection.SOUTHWEST; break;
 					case 2: dir = TileDirection.SOUTH;     break;
 					case 3: dir = TileDirection.SOUTHEAST; break;
@@ -479,17 +468,16 @@ public class Game : Node2D
 					case 9: dir = TileDirection.NORTHEAST; break;
 					default: return; // Impossible
 					}
-					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
 					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
-
 				}
 			}
-			else if ((eventKey.Scancode >= (int)Godot.KeyList.Home) && (eventKey.Scancode <= (int)Godot.KeyList.Pagedown))
+			else if ((eventKeyDown.Scancode >= (int)Godot.KeyList.Home) && (eventKeyDown.Scancode <= (int)Godot.KeyList.Pagedown))
 			{ // Move units with the arrow and fn keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
-					switch (eventKey.Scancode) {
+					switch (eventKeyDown.Scancode) {
 					case (int)Godot.KeyList.Home:     dir = TileDirection.NORTHWEST; break; // fn-left arrow
 					case (int)Godot.KeyList.End:      dir = TileDirection.SOUTHWEST; break; // fn-right arrow
 					case (int)Godot.KeyList.Left:     dir = TileDirection.WEST;      break;
@@ -500,20 +488,23 @@ public class Game : Node2D
 					case (int)Godot.KeyList.Pagedown: dir = TileDirection.SOUTHEAST; break; // fn-down arrow
 					default: return; // Impossible
 					}
-					UnitInteractions.moveUnit(CurrentlySelectedUnit.guid, dir);
+					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
+					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.G && eventKey.Control)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.G && eventKeyDown.Control)
 			{
-				mapView.gridLayer.visible = ! mapView.gridLayer.visible;
+				mapView.gridLayer.visible = !mapView.gridLayer.visible;
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.Escape)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Escape)
 			{
-				GD.Print("Got request for escape/quit");
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-				popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
+				if (!inUnitGoToMode) {
+					log.Debug("Got request for escape/quit");
+					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+					popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
+				}
 			}
-			else if (eventKey.Scancode == (int)Godot.KeyList.Z)
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Z)
 			{
 				if (mapView.cameraZoom != 1) {
 					mapView.setCameraZoomFromMiddle(1.0f);
@@ -525,6 +516,21 @@ public class Game : Node2D
 					VSlider slider = GetNode<VSlider>("CanvasLayer/SlideOutBar/VBoxContainer/Zoom");
 					slider.Value = 0.5f;
 				}
+			}
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Shift && ! eventKeyDown.Echo)
+			{
+				SetAnimationsEnabled(false);
+			}
+
+			// always turn off go to mode unless G key is pressed
+			// do this after processing esc key
+			setGoToMode(eventKeyDown.Scancode == (int)Godot.KeyList.G);
+		}
+		else if (@event is InputEventKey eventKeyUp && ! eventKeyUp.Pressed)
+		{
+			if (eventKeyUp.Scancode == (int)Godot.KeyList.Shift)
+			{
+				SetAnimationsEnabled(true);
 			}
 		}
 		else if (@event is InputEventMagnifyGesture magnifyGesture)
@@ -547,6 +553,11 @@ public class Game : Node2D
 		this.setSelectedUnit(UnitInteractions.getNextSelectedUnit(gameData));
 	}
 
+	private void setGoToMode(bool isOn)
+	{
+		inUnitGoToMode = isOn;
+	}
+
 	///This is our global handler for unit buttons being pressed.  Both the mouse clicks and
 	///the keyboard shortcuts should wind up here.
 	///Eventually, we should quite possibly put this somewhere other than Game.cs, or at
@@ -554,36 +565,53 @@ public class Game : Node2D
 	///more things going on before figuring out what the 'right' thing is, though.
 	private void UnitButtonPressed(string buttonName)
 	{
-		GD.Print("The " + buttonName + " button was pressed");
-		if (buttonName.Equals("hold"))
-		{
-			UnitInteractions.holdUnit(CurrentlySelectedUnit.guid);
-		}
-		else if (buttonName.Equals("fortify"))
-		{
-			UnitInteractions.fortifyUnit(CurrentlySelectedUnit.guid);
-		}
-		else if (buttonName.Equals("wait"))
-		{
-			using (var gameDataAccess = new UIGameDataAccess()) {
-				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
-				GetNextAutoselectedUnit(gameDataAccess.gameData);
+		// this will detoggle goTo when clicking unit buttons
+		// other than goTo
+		setGoToMode(buttonName == "goTo");
+
+		log.Verbose("The " + buttonName + " button was pressed");
+		switch (buttonName) {
+			case "hold":
+				new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
+				break;
+
+			case "fortify":
+				new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
+				break;
+
+			case "wait":
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+					GetNextAutoselectedUnit(gameDataAccess.gameData);
+				}
+				break;
+
+			case "disband":
+			{
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
 			}
-		}
-		else if (buttonName.Equals("disband"))
-		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
-		}
-		else if (buttonName.Equals("buildCity"))
-		{
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
-		}
-		else
-		{
-			//A nice sanity check if I use a different name here than where I created it...
-			GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+				break;
+
+			case "buildCity": {
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
+					if (currentUnit.canBuildCity()) {
+						PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+						popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
+							PopupOverlay.PopupCategory.Advisor);
+					}
+				}
+			}
+				break;
+
+			case "goTo":
+				break;
+
+			default:
+				//A nice sanity check if I use a different name here than where I created it...
+				log.Warning("An unrecognized button " + buttonName + " was pressed");
+				break;
 		}
 	}
 
@@ -602,7 +630,7 @@ public class Game : Node2D
 	// Called by the disband popup
 	private void OnUnitDisbanded()
 	{
-		UnitInteractions.disbandUnit(CurrentlySelectedUnit.guid);
+		new MsgDisbandUnit(CurrentlySelectedUnit.guid).send();
 	}
 
 	/**
@@ -610,7 +638,7 @@ public class Game : Node2D
 	 **/
 	private void OnQuitTheGame()
 	{
-		GD.Print("Goodbye!");
+		log.Information("Goodbye!");
 		GetTree().Quit();
 	}
 

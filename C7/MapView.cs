@@ -5,6 +5,8 @@ using Godot;
 using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
+using Serilog;
+using Serilog.Events;
 
 // Loose layers are for drawing things on the map on a per-tile basis. (Historical aside: There used to be another kind of layer called a TileLayer
 // that was intended to draw regularly tiled objects like terrain sprites but using LooseLayers for everything was found to be a prefereable
@@ -286,7 +288,7 @@ public class ForestLayer : LooseLayer {
 		pinePlainsTexture        = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx"   , 0, 704, 768, 176);
 		pineTundraTexture        = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx"   , 0, 704, 768, 176);
 	}
-	
+
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		if (tile.overlayTerrainType.Key == "jungle") {
 			//Randomly, but predictably, choose a large jungle graphic
@@ -362,7 +364,7 @@ public class MarshLayer : LooseLayer {
 	//Because the marsh graphics are 88 pixels tall instead of the 64 of a tile, we also need an addition 12 pixel offset to the top
 	//88 - 64 = 24; 24/2 = 12.  This keeps the marsh centered with half the extra 24 pixels above the tile and half below.
 	readonly Vector2 MARSH_OFFSET = (float)0.5 * marshSize + new Vector2(0, -12);
-	
+
 	private ImageTexture largeMarshTexture;
 	private ImageTexture smallMarshTexture;
 
@@ -386,7 +388,7 @@ public class MarshLayer : LooseLayer {
 			}
 			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.x, randomJungleRow * marshSize.y, marshSize);
 			Rect2 screenTarget = new Rect2(tileCenter - MARSH_OFFSET, marshSize);
-			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);			
+			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);
 		}
 	}
 }
@@ -397,7 +399,7 @@ public class RiverLayer : LooseLayer
 	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.x / 2, 0);
 	private ImageTexture riverTexture;
 
-	public RiverLayer() { 
+	public RiverLayer() {
 		riverTexture = Util.LoadTextureFromPCX("Art/Terrain/mtnRivers.pcx");
 	}
 
@@ -433,7 +435,7 @@ public class RiverLayer : LooseLayer
 
 		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.x, riverRow * riverSize.y, riverSize);
 		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize + riverCenterOffset, riverSize);
-		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);		
+		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);
 	}
 }
 
@@ -589,11 +591,10 @@ public class UnitLayer : LooseLayer {
 		inst.meshInst.ZIndex = unitAnimZIndex;
 	}
 
-	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, double repCount, Vector2 tileCenter)
+	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, float progress, Vector2 tileCenter)
 	{
 		var flicSheet = anim.getFlicSheet();
 		var inst = getBlankAnimationInstance(looseView);
-		float progress = repCount > 1.0 ? 1f : (float)repCount; // TODO: We want some effects to loop
 		setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
 		inst.shaderMat.SetShaderParam("civColor", new Vector3(1, 1, 1));
 		inst.meshInst.Position = tileCenter;
@@ -666,8 +667,8 @@ public class UnitLayer : LooseLayer {
 		// First draw animated effects. These will always appear over top of units regardless of draw order due to z-index.
 		Civ3Anim tileEffect = looseView.mapView.game.animTracker.getTileEffect(tile);
 		if (tileEffect != null) {
-			(_, double repCount) = looseView.mapView.game.animTracker.getCurrentActionAndRepetitionCount(tile);
-			drawEffectAnimFrame(looseView, tileEffect, repCount, tileCenter);
+			(_, float progress) = looseView.mapView.game.animTracker.getCurrentActionAndProgress(tile);
+			drawEffectAnimFrame(looseView, tileEffect, progress, tileCenter);
 		}
 
 		if (tile.unitsOnTile.Count == 0)
@@ -694,7 +695,8 @@ public class UnitLayer : LooseLayer {
 		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
 		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
 
-		int hpIndHeight = 20, hpIndWidth = 6;
+		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5),
+			hpIndWidth = 6;
 		var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
 		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
 			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
@@ -762,6 +764,8 @@ public class UnitLayer : LooseLayer {
 				discard;
 			else if (colorIndex >= 240) // indices in [240, 253] are shadows
 				COLOR = vec4(0.0, 0.0, 0.0, float(16 * (255 - colorIndex)) / 255.0);
+			else if (colorIndex >= 224) // indices in [224, 239] are smoke
+				COLOR = vec4(0.0, 0.0, 0.0, 0.1 + 0.032 * float(colorIndex - 224));
 			else {
 				vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
 				bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
@@ -844,135 +848,144 @@ public class BuildingLayer : LooseLayer {
 }
 
 public class CityLayer : LooseLayer {
+
+	private ILogger log = LogManager.ForContext<Game>();
+
 	private ImageTexture cityTexture;
 	private Vector2 citySpriteSize;
+	private DynamicFont smallFont = new DynamicFont();
+	private DynamicFont midSizedFont = new DynamicFont();
+	private Pcx cityIcons = Util.LoadPCX("Art/Cities/city icons.pcx");
+	private Image nonEmbassyStar;
 
 	public CityLayer()
 	{
 		//TODO: Generalize, support multiple city types, etc.
-		this.cityTexture = Util.LoadTextureFromPCX("Art/Cities/rROMAN.PCX", 0, 0, 167, 95);
-		this.citySpriteSize = new Vector2(167, 95);
+		cityTexture = Util.LoadTextureFromPCX("Art/Cities/rROMAN.PCX", 0, 0, 167, 95);
+		citySpriteSize = new Vector2(167, 95);
+		smallFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf");
+		smallFont.Size = 11;
+
+		midSizedFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf");
+		midSizedFont.Size = 18;
+
+		nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
-		if (tile.cityAtTile != null) {
-			City city = tile.cityAtTile;
-			// GD.Print("Tile " + tile.xCoordinate + ", " + tile.yCoordinate + " has a city named " + city.name);
-			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
-			Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
-			looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
-
-			DynamicFont smallFont = new DynamicFont();
-			smallFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
-			smallFont.Size = 11;
-
-			String cityNameAndGrowth = city.name + " : " + city.TurnsUntilGrowth();
-			String productionDescription = city.itemBeingProduced.name + " : " + city.TurnsUntilProductionFinished();
-
-			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;
-			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).x;
-			int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
-			// GD.Print("Width of city name = " + maxTextWidth);
-
-			int cityLabelWidth = maxTextWidth + (city.IsCapital()? 70 : 45);	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
-			int textAreaWidth = cityLabelWidth - (city.IsCapital() ? 50 : 25);
-			// GD.Print("City label width: " + cityLabelWidth);
-			// GD.Print("Text area width: " + textAreaWidth);
-			const int CITY_LABEL_HEIGHT = 23;
-			const int TEXT_ROW_HEIGHT = 9;
-			const int LEFT_RIGHT_BOXES_WIDTH = 24;
-			const int LEFT_RIGHT_BOXES_HEIGHT = CITY_LABEL_HEIGHT - 2;
-
-			//Label/name/producing area
-			Image labelImage = new Image();
-			labelImage.Create(cityLabelWidth, CITY_LABEL_HEIGHT, false, Image.Format.Rgba8);
-			labelImage.Fill(Color.Color8(0, 0, 0, 0));
-			byte transparencyLevel = 192;	//25%
-			Color civColor = new Color(city.owner.color);
-			civColor = new Color(civColor, transparencyLevel);
-			Color civColorDarker = Color.Color8(0, 0, 138, transparencyLevel);	//todo: automate the darker() function.  maybe less transparency?
-			Color topRowGrey = Color.Color8(32, 32, 32, transparencyLevel);
-			Color bottomRowGrey = Color.Color8(48, 48, 48, transparencyLevel);
-			Color backgroundGrey = Color.Color8(64, 64, 64, transparencyLevel);
-			Color borderGrey = Color.Color8(80, 80, 80, transparencyLevel);
-
-			Image horizontalBorder = new Image();
-			horizontalBorder.Create(cityLabelWidth - 2, 1, false, Image.Format.Rgba8);
-			horizontalBorder.Fill(borderGrey);
-			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(cityLabelWidth - 2, 1)), new Vector2(1, 0));
-			labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(cityLabelWidth - 2, 1)), new Vector2(1, 22));
-
-			Image verticalBorder = new Image();
-			verticalBorder.Create(1, CITY_LABEL_HEIGHT - 2, false, Image.Format.Rgba8);
-			verticalBorder.Fill(borderGrey);
-			labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(0, 1));
-			labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(cityLabelWidth - 1, 1));
-
-			Image bottomRow = new Image();
-			bottomRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
-			bottomRow.Fill(bottomRowGrey);
-			labelImage.BlitRect(bottomRow, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 21));
-
-			Image topRow = new Image();
-			topRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
-			topRow.Fill(topRowGrey);
-			labelImage.BlitRect(topRow, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 1));
-
-			Image background = new Image();
-			background.Create(textAreaWidth, TEXT_ROW_HEIGHT, false, Image.Format.Rgba8);
-			background.Fill(backgroundGrey);
-			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(textAreaWidth, 9)), new Vector2(25, 2));
-			labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(textAreaWidth, 9)), new Vector2(25, 12));
-
-			Image centerDivider = new Image();
-			centerDivider.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
-			centerDivider.Fill(civColor);
-			labelImage.BlitRect(centerDivider, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 11));
-
-			Image leftAndRightBoxes = new Image();
-			leftAndRightBoxes.Create(LEFT_RIGHT_BOXES_WIDTH, LEFT_RIGHT_BOXES_HEIGHT, false, Image.Format.Rgba8);
-			leftAndRightBoxes.Fill(civColor);
-			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(1, 1));
-			if (city.IsCapital()) {
-				labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(cityLabelWidth - 25, 1));
-			
-				Pcx cityIcons = Util.LoadPCX("Art/Cities/city icons.pcx");
-				Image nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
-				labelImage.BlendRect(nonEmbassyStar, new Rect2(0, 0, new Vector2(18, 18)), new Vector2(cityLabelWidth - 24, 2));
-			}
-
-			//todo: darker shades of civ color around edges
-
-			ImageTexture label = new ImageTexture();
-			label.CreateFromImage(labelImage, 0);
-
-			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth/-2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));	//24 is a swag
-			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
-			looseView.DrawTextureRectRegion(label, labelDestination, allOfTheLabel);
-
-			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
-			int cityNameOffset = cityNameAndGrowthWidth/-2;
-			int prodDescriptionOffset = productionDescriptionWidth/-2;
-			if (!city.IsCapital()) {
-				cityNameOffset+=12;
-				prodDescriptionOffset+=12;
-			}
-			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityNameOffset, 24) + new Vector2(0, 10));
-			looseView.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
-			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20));
-			looseView.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
-
-			//City pop size
-			DynamicFont midSizedFont = new DynamicFont();
-			midSizedFont.FontData = ResourceLoader.Load("res://Fonts/NotoSans-Regular.ttf") as DynamicFontData;
-			midSizedFont.Size = 18;
-			string popSizeString = "" + city.size;
-			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
-			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH/2 - popSizeWidth/2;
-			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(popSizeOffset, 18));
-			looseView.DrawString(midSizedFont, popSizeDestination, popSizeString, Color.Color8(255, 255, 255, 255));
+		if (tile.cityAtTile is null) {
+			return;
 		}
+
+		City city = tile.cityAtTile;
+		Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
+		Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
+		looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
+
+		int turnsUntilGrowth = city.TurnsUntilGrowth();
+		string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue ? "- -" : "" + turnsUntilGrowth;
+		String cityNameAndGrowth = $"{city.name} : {turnsUntilGrowthText}";
+		String productionDescription = city.itemBeingProduced.name + " : " + city.TurnsUntilProductionFinished();
+
+		int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;
+		int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).x;
+		int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
+
+		int cityLabelWidth = maxTextWidth + (city.IsCapital()? 70 : 45);	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
+		int textAreaWidth = cityLabelWidth - (city.IsCapital() ? 50 : 25);
+		if (log.IsEnabled(LogEventLevel.Verbose)) {
+			log.Verbose("Width of city name = " + maxTextWidth);
+			log.Verbose("City label width: " + cityLabelWidth);
+			log.Verbose("Text area width: " + textAreaWidth);
+		}
+		const int CITY_LABEL_HEIGHT = 23;
+		const int TEXT_ROW_HEIGHT = 9;
+		const int LEFT_RIGHT_BOXES_WIDTH = 24;
+		const int LEFT_RIGHT_BOXES_HEIGHT = CITY_LABEL_HEIGHT - 2;
+
+		//Label/name/producing area
+		Image labelImage = new Image();
+		labelImage.Create(cityLabelWidth, CITY_LABEL_HEIGHT, false, Image.Format.Rgba8);
+		labelImage.Fill(Color.Color8(0, 0, 0, 0));
+		byte transparencyLevel = 192;	//25%
+		Color civColor = new Color(city.owner.color);
+		civColor = new Color(civColor, transparencyLevel);
+		Color civColorDarker = Color.Color8(0, 0, 138, transparencyLevel);	//todo: automate the darker() function.  maybe less transparency?
+		Color topRowGrey = Color.Color8(32, 32, 32, transparencyLevel);
+		Color bottomRowGrey = Color.Color8(48, 48, 48, transparencyLevel);
+		Color backgroundGrey = Color.Color8(64, 64, 64, transparencyLevel);
+		Color borderGrey = Color.Color8(80, 80, 80, transparencyLevel);
+
+		Image horizontalBorder = new Image();
+		horizontalBorder.Create(cityLabelWidth - 2, 1, false, Image.Format.Rgba8);
+		horizontalBorder.Fill(borderGrey);
+		labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(cityLabelWidth - 2, 1)), new Vector2(1, 0));
+		labelImage.BlitRect(horizontalBorder, new Rect2(0, 0, new Vector2(cityLabelWidth - 2, 1)), new Vector2(1, 22));
+
+		Image verticalBorder = new Image();
+		verticalBorder.Create(1, CITY_LABEL_HEIGHT - 2, false, Image.Format.Rgba8);
+		verticalBorder.Fill(borderGrey);
+		labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(0, 1));
+		labelImage.BlitRect(verticalBorder, new Rect2(0, 0, new Vector2(1, 23)), new Vector2(cityLabelWidth - 1, 1));
+
+		Image bottomRow = new Image();
+		bottomRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
+		bottomRow.Fill(bottomRowGrey);
+		labelImage.BlitRect(bottomRow, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 21));
+
+		Image topRow = new Image();
+		topRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
+		topRow.Fill(topRowGrey);
+		labelImage.BlitRect(topRow, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 1));
+
+		Image background = new Image();
+		background.Create(textAreaWidth, TEXT_ROW_HEIGHT, false, Image.Format.Rgba8);
+		background.Fill(backgroundGrey);
+		labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(textAreaWidth, 9)), new Vector2(25, 2));
+		labelImage.BlitRect(background, new Rect2(0, 0, new Vector2(textAreaWidth, 9)), new Vector2(25, 12));
+
+		Image centerDivider = new Image();
+		centerDivider.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
+		centerDivider.Fill(civColor);
+		labelImage.BlitRect(centerDivider, new Rect2(0, 0, new Vector2(textAreaWidth, 1)), new Vector2(25, 11));
+
+		Image leftAndRightBoxes = new Image();
+		leftAndRightBoxes.Create(LEFT_RIGHT_BOXES_WIDTH, LEFT_RIGHT_BOXES_HEIGHT, false, Image.Format.Rgba8);
+		leftAndRightBoxes.Fill(civColor);
+		labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(1, 1));
+		if (city.IsCapital()) {
+			labelImage.BlitRect(leftAndRightBoxes, new Rect2(0, 0, new Vector2(24, 21)), new Vector2(cityLabelWidth - 25, 1));
+			labelImage.BlendRect(nonEmbassyStar, new Rect2(0, 0, new Vector2(18, 18)), new Vector2(cityLabelWidth - 24, 2));
+		}
+
+		//todo: darker shades of civ color around edges
+
+		ImageTexture label = new ImageTexture();
+		label.CreateFromImage(labelImage, 0);
+
+		Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth/-2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));	//24 is a swag
+		Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
+		looseView.DrawTextureRectRegion(label, labelDestination, allOfTheLabel);
+
+		//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
+		int cityNameOffset = cityNameAndGrowthWidth/-2;
+		int prodDescriptionOffset = productionDescriptionWidth/-2;
+		if (!city.IsCapital()) {
+			cityNameOffset+=12;
+			prodDescriptionOffset+=12;
+		}
+		Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityNameOffset, 24) + new Vector2(0, 10));
+		looseView.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
+		Vector2 productionDestination = new Vector2(tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20));
+		looseView.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
+
+		//City pop size
+		string popSizeString = "" + city.size;
+		int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
+		int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH/2 - popSizeWidth/2;
+		Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(popSizeOffset, 18));
+		looseView.DrawString(midSizedFont, popSizeDestination, popSizeString, Color.Color8(255, 255, 255, 255));
 	}
 }
 
@@ -1086,6 +1099,7 @@ public class MapView : Node2D {
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());
 		looseView.layers.Add(new HillsLayer());
+		looseView.layers.Add(new RoadLayer());
 		looseView.layers.Add(new ResourceLayer());
 		gridLayer = new GridLayer();
 		looseView.layers.Add(gridLayer);

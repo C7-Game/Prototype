@@ -2,10 +2,11 @@ namespace C7GameData
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Text.Json.Serialization;
 	public class GameData
 	{
 		public int turn {get; set;}
-		public Random rng; // TODO: Is GameData really the place for this?
+		public static Random rng; // TODO: Is GameData really the place for this?
 		public GameMap map {get; set;}
 		public List<Player> players = new List<Player>();
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
@@ -14,10 +15,45 @@ namespace C7GameData
 		public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
 		public List<City> cities = new List<City>();
 
+		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();
+		public string defaultExperienceLevelKey;
+		[JsonIgnore]
+		public ExperienceLevel defaultExperienceLevel;
+
+		public StrengthBonus fortificationBonus;
+		public StrengthBonus riverCrossingBonus;
+		public StrengthBonus cityLevel1DefenseBonus;
+		public StrengthBonus cityLevel2DefenseBonus;
+		public StrengthBonus cityLevel3DefenseBonus;
+
+		public int healRateInFriendlyField;
+		public int healRateInNeutralField;
+		public int healRateInHostileField;
+		public int healRateInCity;
+
 		public GameData()
 		{
 			map = new GameMap();
 			rng = new Random();
+			// rng = new Random(123);	//Set a fixed seed here until we add it to the UI
+		}
+
+		public List<Player> GetHumanPlayers() {
+			return players.FindAll(p => p.isHuman);
+		}
+
+		public MapUnit GetUnit(string guid)
+		{
+			return mapUnits.Find(u => u.guid == guid);
+		}
+
+		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel)
+		{
+			int n = experienceLevels.IndexOf(experienceLevel);
+			if (n + 1 < experienceLevels.Count)
+				return experienceLevels[n + 1];
+			else
+				return null;
 		}
 
 		/**
@@ -29,13 +65,7 @@ namespace C7GameData
 		public void PerformPostLoadActions()
 		{
 			//Let each tile know who its neighbors are.  It needs to know this so its graphics can be selected appropriately.
-			foreach (Tile tile in map.tiles) {
-				Dictionary<TileDirection, Tile> neighbors = new Dictionary<TileDirection, Tile>();
-				foreach (TileDirection direction in Enum.GetValues(typeof(TileDirection))) {
-					neighbors[direction] = map.tileNeighbor(tile, direction);
-				}
-				tile.neighbors = neighbors;
-			}
+			map.computeNeighbors();
 		}
 
 		/**
@@ -53,12 +83,43 @@ namespace C7GameData
 		{
 			this.turn = 0;
 
-			CreateDefaultUnitPrototypes();
-
 			uint white = 0xFFFFFFFF;
 			Player barbarianPlayer = new Player(white);
 			barbarianPlayer.isBarbarians = true;
 			players.Add(barbarianPlayer);
+
+			Civilization carthage = new Civilization();
+			carthage.cityNames.Add("Carthage");
+			carthage.cityNames.Add("Utica");
+			carthage.cityNames.Add("Hadrumetum");
+			carthage.cityNames.Add("Hippo");
+			carthage.cityNames.Add("Kerkouane");
+			carthage.cityNames.Add("Lilybaeum");
+			carthage.cityNames.Add("Motya");
+			carthage.cityNames.Add("Thignica");
+			carthage.cityNames.Add("Zama");
+			carthage.cityNames.Add("Thabraca");
+			carthage.cityNames.Add("Panormus");
+			uint grey = 0xA0A0A0FF;
+			Player carthagePlayer = new Player(carthage, grey);
+			carthagePlayer.isHuman = true;
+			players.Add(carthagePlayer);
+
+			Civilization rome = new Civilization();
+			rome.cityNames.Add("Rome");
+			rome.cityNames.Add("Neapolis");
+			rome.cityNames.Add("Capua");
+			rome.cityNames.Add("Tarentum");
+			rome.cityNames.Add("Croton");
+			rome.cityNames.Add("Placentia on the Trebia");
+			rome.cityNames.Add("Cortona/Lake Trasimene");
+			rome.cityNames.Add("Cannae");
+			rome.cityNames.Add("Rhegium");
+			rome.cityNames.Add("Pompeii");
+			rome.cityNames.Add("Arettium");
+			uint romanRed = 0xE00000FF;
+			Player romePlayer = new Player(rome, romanRed);
+			players.Add(romePlayer);
 
 			Civilization babylon = new Civilization();
 			babylon.cityNames.Add("Babylon");
@@ -78,9 +139,9 @@ namespace C7GameData
 			babylon.cityNames.Add("Nineveh");
 
 			uint blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-			Player humanPlayer = new Player(babylon, blue);
-			humanPlayer.isHuman = true;
-			players.Add(humanPlayer);
+			Player babylonPlayer = new Player(babylon, blue);
+			babylonPlayer.isHuman = false;
+			players.Add(babylonPlayer);
 
 			Civilization greece = new Civilization();
 			greece.cityNames.Add("Athens");
@@ -135,7 +196,7 @@ namespace C7GameData
 			Player computerPlayerThree = new Player(theNetherlands, orange);
 			players.Add(computerPlayerThree);
 
-			List<Tile> startingLocations = map.generateStartingLocations(rng, 4, 10);
+			List<Tile> startingLocations = map.generateStartingLocations(players.Count, 10);
 
 			int i = 0;
 			foreach (Player player in players)
@@ -150,7 +211,7 @@ namespace C7GameData
 			//Todo: We're using the same method for start locs and barb camps.  Really, we should use a similar one for
 			//variation, but the barb camp one should also take into account things like not spawning in revealed
 			//tiles.  It also would be really nice to be able to generate them separately and not have them overlap.
-			List<Tile> barbarianCamps = map.generateStartingLocations(rng, 10, 10);
+			List<Tile> barbarianCamps = map.generateStartingLocations(10, 10);
 			foreach (Tile barbCampLocation in barbarianCamps) {
 				if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
 					MapUnit barbWarrior = CreateDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);
@@ -165,16 +226,17 @@ namespace C7GameData
 
 			//Cool, an entire game world has been created.  Now the user can do things with this super exciting hard-coded world!
 
-			return humanPlayer;
+			return carthagePlayer;
 		}
 
-		private void CreateStartingDummyUnits(Player player, Tile location)
-		{
-			CreateDummyUnit(unitPrototypes["Settler"],  player, location);
-			CreateDummyUnit(unitPrototypes["Warrior"],  player, location);
-			CreateDummyUnit(unitPrototypes["Worker"],   player, location);
-			CreateDummyUnit(unitPrototypes["Chariot"],  player, location);
-			CreateDummyUnit(unitPrototypes["Catapult"], player, location);
+		private void CreateStartingDummyUnits(Player player, Tile location) {
+			string[] unitNames = { "Settler", "Warrior", "Worker", "Chariot", "Catapult" };
+			foreach (string unitName in unitNames)
+			{
+				if (unitPrototypes.ContainsKey(unitName)) {
+					CreateDummyUnit(unitPrototypes[unitName],  player, location);
+				}
+			}
 		}
 
 		private MapUnit CreateDummyUnit(UnitPrototype proto, Player owner, Tile tile)
@@ -186,6 +248,8 @@ namespace C7GameData
 				unit.unitType = proto;
 				unit.owner = owner;
 				unit.location = tile;
+				unit.experienceLevelKey = defaultExperienceLevelKey;
+				unit.experienceLevel = defaultExperienceLevel;
 				unit.facingDirection = TileDirection.SOUTHWEST;
 				unit.movementPointsRemaining = proto.movement;
 				unit.hitPointsRemaining = 3;
@@ -196,19 +260,6 @@ namespace C7GameData
 				return unit;
 			} else
 				throw new System.Exception("Tried to add dummy unit at Tile.NONE");
-		}
-
-		private void CreateDefaultUnitPrototypes()
-		{
-			unitPrototypes = new Dictionary<string, UnitPrototype>()
-			{
-				{ "Warrior",  new UnitPrototype { name = "Warrior",  attack = 1, defense = 1, bombard = 0, movement = 1, iconIndex =  6, shieldCost = 10 }},
-				{ "Settler",  new UnitPrototype { name = "Settler",  attack = 0, defense = 0, bombard = 0, movement = 1, iconIndex =  0, shieldCost = 30, populationCost = 2 }},
-				{ "Worker",   new UnitPrototype { name = "Worker",   attack = 0, defense = 0, bombard = 0, movement = 1, iconIndex =  1, shieldCost = 30, populationCost = 1 }},
-				{ "Chariot",  new UnitPrototype { name = "Chariot",  attack = 1, defense = 1, bombard = 0, movement = 2, iconIndex = 10, shieldCost = 20 }},
-				{ "Galley",   new SeaUnit       { name = "Galley",   attack = 1, defense = 1, bombard = 0, movement = 3, iconIndex = 29, shieldCost = 30 }},
-				{ "Catapult", new UnitPrototype { name = "Catapult", attack = 0, defense = 0, bombard = 4, movement = 1, iconIndex = 22, shieldCost = 20 }},
-			};
 		}
 	}
 }

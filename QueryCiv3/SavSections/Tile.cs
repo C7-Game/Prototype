@@ -9,9 +9,13 @@ namespace QueryCiv3.Sav
         private fixed byte HeaderText1[4];
         public int Length1;
         public byte RiverInfo;
+        public bool RiverNorth     { get => Util.GetFlag(RiverInfo, 0); }
         public bool RiverNortheast { get => Util.GetFlag(RiverInfo, 1); }
+        public bool RiverEast      { get => Util.GetFlag(RiverInfo, 2); }
         public bool RiverSoutheast { get => Util.GetFlag(RiverInfo, 3); }
+        public bool RiverSouth     { get => Util.GetFlag(RiverInfo, 4); }
         public bool RiverSouthwest { get => Util.GetFlag(RiverInfo, 5); }
+        public bool RiverWest      { get => Util.GetFlag(RiverInfo, 6); }
         public bool RiverNorthwest { get => Util.GetFlag(RiverInfo, 7); }
         public byte Owner;
         private fixed byte UnknownBuffer[2];
@@ -34,6 +38,9 @@ namespace QueryCiv3.Sav
 
         // TODO: Most flags need to be added
         private fixed byte Flags2[12];
+        public bool Road     { get => Util.GetFlag(Flags2[0], 0); }
+        public bool Railroad { get => Util.GetFlag(Flags2[0], 1); }
+
         public int BaseTerrain { get => Flags2[5] & 0x0f; }
         public int OverlayTerrain { get => (Flags2[5] & 0xf0) >> 4; }
 

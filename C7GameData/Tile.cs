@@ -20,6 +20,9 @@ namespace C7GameData
 		[JsonIgnore]
 		public TerrainType overlayTerrainType = TerrainType.NONE;
 		public City cityAtTile;
+		[JsonIgnore]
+		public bool HasCity => cityAtTile != null && cityAtTile != City.NONE;
+		public CityResident personWorkingTile = null;	//allows us to see if another city is working this tile
 		public bool hasBarbarianCamp = false;
 
 		//One thing to decide is do we want to have a tile have a list of units on it,
@@ -42,29 +45,35 @@ namespace C7GameData
 		public bool isSnowCapped;
 		public bool isPineForest;
 
+		public bool riverNorth;
 		public bool riverNortheast;
+		public bool riverEast;
 		public bool riverSoutheast;
+		public bool riverSouth;
 		public bool riverSouthwest;
+		public bool riverWest;
 		public bool riverNorthwest;
+
+		public TileOverlays overlays = new TileOverlays();
 
 		public Tile()
 		{
 			unitsOnTile = new List<MapUnit>();
+			Resource = Resource.NONE;
 		}
 
-		public MapUnit findTopDefender(MapUnit opponent)
-		{
-			if (unitsOnTile.Count > 0) {
-				var tr = unitsOnTile[0];
-				foreach (var u in unitsOnTile)
-					if (u.HasPriorityAsDefender(tr, opponent))
-						tr = u;
-				return tr;
-			} else
-				return MapUnit.NONE;
+		// TODO: this should be either an extension in C7Engine, or otherwise
+		// calculated somewhere else, but it's not obvious to someone unfamiliar
+		// with the save format that it's the overaly terrain that has actual
+		// movement cost
+		public int MovementCost() {
+			return overlayTerrainType.movementCost;
 		}
 
-		public static Tile NONE = new Tile();
+		public static Tile NONE = new Tile() {
+			xCoordinate = -1,
+			yCoordinate = -1,
+		};
 
 		//This should be used when we want to check if land tiles are next to water tiles.
 		//Usually this is coast, but it could be Sea - see the "Deepwater Harbours" topics at CFC.
@@ -90,7 +99,7 @@ namespace C7GameData
 		}
 
 		public List<Tile> GetLandNeighbors() {
-			return neighbors.Values.Where(tile => !tile.baseTerrainType.isWater()).ToList();
+			return neighbors.Values.Where(tile => tile != NONE && !tile.baseTerrainType.isWater()).ToList();
 		}
 
 		/**
@@ -103,9 +112,28 @@ namespace C7GameData
 			return neighbors.Values.Where(tile => tile.baseTerrainType.Key == "coast").ToList();
 		}
 
+		public bool HasRiverCrossing(TileDirection dir)
+		{
+			switch (dir) {
+			case TileDirection.NORTH:     return riverNorth;
+			case TileDirection.NORTHEAST: return riverNortheast;
+			case TileDirection.EAST:      return riverEast;
+			case TileDirection.SOUTHEAST: return riverSoutheast;
+			case TileDirection.SOUTH:     return riverSouth;
+			case TileDirection.SOUTHWEST: return riverSouthwest;
+			case TileDirection.WEST:      return riverWest;
+			case TileDirection.NORTHWEST: return riverNorthwest;
+			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
+		}
+
 		public bool IsLand()
 		{
 			return !baseTerrainType.isWater();
+		}
+
+		public bool IsAllowCities() {
+			return overlayTerrainType.allowCities;
 		}
 
 		public TileDirection directionTo(Tile other)
@@ -138,6 +166,45 @@ namespace C7GameData
 		public int distanceTo(Tile other)
 		{
 			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
+		}
+
+		public int foodYield(Player player)
+		{
+			int yield = overlayTerrainType.baseFoodProduction;
+			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+				yield += this.Resource.FoodBonus;
+			}
+			return yield;
+		}
+
+		public int productionYield(Player player)
+		{
+			int yield = overlayTerrainType.baseShieldProduction;
+			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+				yield += this.Resource.ShieldsBonus;
+			}
+			return yield;
+		}
+
+		public int commerceYield(Player player)
+		{
+			int yield = overlayTerrainType.baseCommerceProduction;
+			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+				yield += this.Resource.CommerceBonus;
+			}
+			if (BordersRiver()) {
+				yield += 1;
+			}
+			return yield;
+		}
+
+		private bool BordersRiver() {
+			return riverNorth || riverNortheast || riverEast || riverSoutheast || riverSouth || riverSouthwest || riverWest || riverNorthwest;
+		}
+
+		//Convenience method for printing the yield
+		public string YieldString(Player player) {
+			return $"{foodYield(player)}/{productionYield(player)}/{commerceYield(player)})";
 		}
 	}
 
@@ -184,4 +251,9 @@ namespace C7GameData
 		}
 	}
 
+	public class TileOverlays {
+		public bool road = false;
+		public bool railroad = false;
+		// assume that railroad contains road too
+	}
 }

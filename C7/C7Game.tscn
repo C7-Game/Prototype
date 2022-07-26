@@ -150,7 +150,7 @@ size_flags_vertical = 3
 min_value = 0.1
 max_value = 2.0
 step = 0.1
-value = 0.3
+value = 1.0
 
 [node name="QuitButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
 margin_top = 448.0
@@ -224,12 +224,11 @@ margin_top = -112.0
 size_flags_vertical = 0
 custom_constants/separation = 0
 script = ExtResource( 12 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="AdvancedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
 margin_right = 1024.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 0, 32 )
 size_flags_vertical = 0
 custom_constants/separation = 0
 alignment = 1
@@ -237,16 +236,23 @@ alignment = 1
 [node name="RenameButton" type="TextureButton" parent="CanvasLayer/UnitButtons/AdvancedUnitControls"]
 margin_left = 512.0
 margin_right = 512.0
+margin_bottom = 32.0
 script = ExtResource( 8 )
 
 [node name="SpecializedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
+margin_top = 32.0
 margin_right = 1024.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 0, 32 )
 size_flags_vertical = 0
 custom_constants/separation = 0
 alignment = 1
 
 [node name="PrimaryUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
+margin_top = 64.0
 margin_right = 1024.0
+margin_bottom = 96.0
+rect_min_size = Vector2( 0, 32 )
 size_flags_vertical = 0
 custom_constants/separation = 0
 alignment = 1

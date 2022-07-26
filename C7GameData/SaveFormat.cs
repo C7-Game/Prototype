@@ -8,6 +8,7 @@ namespace C7GameData
 */
 {
 	using System;
+	using System.Collections.Generic;
 	using System.IO;
 	using System.IO.Compression;
 	using System.Text.Json;
@@ -23,9 +24,6 @@ namespace C7GameData
 	{
 		public string Version = "v0.0early-prototype";
 
-		// Rules is intended to be the analog to a BIC/X/Q
-		public C7RulesFormat Rules;
-
 		// This naming is probably bad form, but it makes sense to me to name it as such here
 		public GameData GameData;
 
@@ -34,21 +32,14 @@ namespace C7GameData
 			GameData = new GameData();
 		}
 
-		public C7SaveFormat(GameData gameData, C7RulesFormat rules = null)
+		public C7SaveFormat(GameData gameData)
 		{
 			GameData = gameData;
-			Rules = rules;
 		}
 
 		public bool PostLoadProcess()
 		{
 			GameData.PerformPostLoadActions();
-
-			//If we are loading from JSON and it lacks an RNG, set one
-			//This should be a temporary hack until we have a more stable C7 default rule set.
-			if (GameData.rng == null) {
-				GameData.rng = new Random();
-			}
 
 			return true;
 		}
@@ -87,7 +78,7 @@ namespace C7GameData
 				}
 			}
 
-			// Inflate things that are stored by reference
+			// Inflate things that are stored by reference, first tiles
 			foreach (Tile tile in save.GameData.map.tiles)
 			{
 				if (tile.ResourceKey == "NONE")
@@ -101,6 +92,15 @@ namespace C7GameData
 				tile.baseTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.baseTerrainTypeKey);
 				tile.overlayTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.overlayTerrainTypeKey);
 			}
+
+			// Inflate experience levels
+			var levelsByKey = new Dictionary<string, ExperienceLevel>();
+			foreach (ExperienceLevel eL in save.GameData.experienceLevels)
+				levelsByKey.Add(eL.key, eL);
+			save.GameData.defaultExperienceLevel = levelsByKey[save.GameData.defaultExperienceLevelKey];
+			foreach (MapUnit unit in save.GameData.mapUnits)
+				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
+
 			return save;
 		}
 
