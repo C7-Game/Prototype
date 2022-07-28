@@ -398,9 +398,11 @@ public static class MapUnitExtensions {
 		}
 	}
 
-	public static bool canBuildCity(this MapUnit unit)
-	{
-		return unit.unitType.actions.Contains("buildCity") && unit.location.IsAllowCities();
+	public static bool canBuildCity(this MapUnit unit) {
+		return unit.unitType.actions.Contains("buildCity")
+		       && unit.location.IsAllowCities()
+		       && !unit.location.HasCity
+		       && unit.location.neighbors.Values.All(t => !t.HasCity);
 	}
 
 	public static void buildCity(this MapUnit unit, string cityName)
