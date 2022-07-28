@@ -87000,6 +87000,7 @@
           "Land"
         ],
         "actions": [
+          "buildRoad",
           "hold",
           "wait",
           "fortify",

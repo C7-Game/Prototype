@@ -136,6 +136,19 @@ namespace C7Engine
 		}
 	}
 
+	public class MsgBuildRoad : MessageToEngine {
+		private string unitGUID;
+
+		public MsgBuildRoad(string unitGUID) {
+			this.unitGUID = unitGUID;
+		}
+
+		public override void process() {
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			unit?.buildRoad();
+		}
+	}
+
 	public class MsgChooseProduction : MessageToEngine {
 		private string cityGUID;
 		private string producibleName;

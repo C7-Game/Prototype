@@ -50,8 +50,8 @@ public class UnitButtons : VBoxContainer
 		AddNewButton(specializedControls, new UnitControlButton("scienceAge", 3, 2, onButtonPressed));	//validate
 		AddNewButton(specializedControls, new UnitControlButton("buildColony", 4, 2, onButtonPressed));	//validate
 		AddNewButton(specializedControls, new UnitControlButton("buildCity", (int)Godot.KeyList.B, 5, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("road", 6, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("railroad", 7, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("buildRoad", 6, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("buildRailroad", 7, 2, onButtonPressed));
 
 		AddNewButton(specializedControls, new UnitControlButton("fortress", 0, 3, onButtonPressed));
 		AddNewButton(specializedControls, new UnitControlButton("barricade", 4, 4, onButtonPressed));

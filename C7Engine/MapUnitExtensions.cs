@@ -421,5 +421,20 @@ public static class MapUnitExtensions {
 		unit.disband();
 	}
 
+	public static bool canBuildRoad(this MapUnit unit) {
+		return unit.unitType.actions.Contains("buildRoad") && unit.location.IsLand() && !unit.location.overlays.road;
+	}
+
+	public static void buildRoad(this MapUnit unit) {
+		if (!unit.canBuildRoad()) {
+			log.Warning($"can't build road by {unit}");
+			return;
+		}
+
+		// TODO add animation and long process of building
+		unit.location.overlays.road = true;
+		unit.movementPointsRemaining = 0;
+	}
+
 	}
 }
