@@ -54,7 +54,12 @@ public class TerrainLayer : LooseLayer {
 		public int CompareTo(TileToDraw other)
 		{
 			// "other" might be null, in which case we should return a positive value. CompareTo(null) will do this.
-			return this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other?.tile.ExtraInfo.BaseTerrainFileID);
+			try {
+				return this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other?.tile.ExtraInfo.BaseTerrainFileID);
+			} catch (Exception ex) {
+				//It also could be Tile.NONE.  In which case, also return a positive value.
+				return 1;
+			}
 		}
 	}
 
@@ -95,13 +100,15 @@ public class TerrainLayer : LooseLayer {
 	public override void onEndDraw(LooseView looseView, GameData gameData) {
 		tilesToDraw.Sort();
 		foreach (TileToDraw tTD in tilesToDraw) {
-			int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
-			Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
-			Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
-			//Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
-			//Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
-			Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
-			looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
+			if (tTD.tile != Tile.NONE) {
+				int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
+				Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
+				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
+				//Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
+				//Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
+				Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
+				looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
+			}
 		}
 		tilesToDraw.Clear();
 	}
