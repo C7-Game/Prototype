@@ -11,6 +11,7 @@ namespace C7.Map {
 		private ILogger log = LogManager.ForContext<Game>();
 
 		private ImageTexture cityTexture;
+		ImageTexture cityLabel = new ImageTexture();
 		private Vector2 citySpriteSize;
 		private DynamicFont smallFont = new DynamicFont();
 		private DynamicFont midSizedFont = new DynamicFont();
@@ -120,12 +121,11 @@ namespace C7.Map {
 
 			//todo: darker shades of civ color around edges
 
-			ImageTexture label = new ImageTexture();
-			label.CreateFromImage(labelImage, 0);
+			cityLabel.CreateFromImage(labelImage, 0);
 
 			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth/-2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));	//24 is a swag
 			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
-			looseView.DrawTextureRectRegion(label, labelDestination, allOfTheLabel);
+			looseView.DrawTextureRectRegion(cityLabel, labelDestination, allOfTheLabel);
 
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
 			int cityNameOffset = cityNameAndGrowthWidth/-2;
