@@ -269,6 +269,9 @@ public static class MapUnitExtensions {
 
 	public static void OnEnterTile(this MapUnit unit, Tile tile)
 	{
+		//Add to player knowledge of tiles
+		unit.owner.tileKnowledge.AddTilesToKnown(tile);
+
 		// Disperse barb camp
 		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
 			EngineStorage.gameData.map.barbarianCamps.Remove(tile);
