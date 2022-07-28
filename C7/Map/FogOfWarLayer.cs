@@ -1,4 +1,5 @@
 using C7GameData;
+using ConvertCiv3Media;
 using Godot;
 
 namespace C7.Map {
@@ -8,7 +9,8 @@ namespace C7.Map {
 		private readonly Vector2 tileSize;
 
 		public FogOfWarLayer() {
-			fogOfWarTexture = Util.LoadTextureFromPCX("Art/Terrain/FogOfWar.pcx");
+			Pcx fogOfWarPcx = new Pcx(Util.Civ3MediaPath("Art/Terrain/FogOfWar.pcx"));
+			fogOfWarTexture = PCXToGodot.getPureAlphaFromPCX(fogOfWarPcx);
 			tileSize = fogOfWarTexture.GetSize() / 9;
 		}
 
@@ -20,13 +22,13 @@ namespace C7.Map {
 			if (!tileKnowledge.isTileKnown(tile)) {
 				int sum = 0;
 				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTH]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]))
-					sum++;
+					sum += 1 * 2;
 				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.WEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]))
-					sum += 3;
+					sum += 3 * 2;
 				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.EAST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST]))
-					sum += 9;
+					sum += 9 * 2;
 				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTH]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST]))
-					sum += 27;
+					sum += 27 * 2;
 				if (sum != 0) {
 					looseView.DrawTextureRectRegion(fogOfWarTexture, screenTarget, getRect(sum));
 				}
