@@ -209,8 +209,8 @@ public class Game : Node2D
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location)
 	{
-		if (location != Tile.NONE) {
-			var relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
+		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
+			Vector2 relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
 			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
 				mapView.centerCameraOnTile(location);
 		}
