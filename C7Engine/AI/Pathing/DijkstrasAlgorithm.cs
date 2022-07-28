@@ -21,7 +21,7 @@ namespace C7Engine.Pathing {
 		 * when stopWhenReachDestination == false it calculates distances to each available point
 		 */
 		public static Dictionary<TNode, Edge<TNode>> run<TNode>(TNode start, TNode destination,
-			EdgeWalker<TNode> edgeWalker, bool stopWhenReachDestination = false)
+			EdgeWalker<TNode> edgeWalker, bool stopWhenReachDestination = true)
 		{
 			Dictionary<TNode, Edge<TNode>> visitedNodes = new Dictionary<TNode, Edge<TNode>>();
 			BinaryMinHeap<Edge<TNode>> edgesQueue = new BinaryMinHeap<Edge<TNode>>();
