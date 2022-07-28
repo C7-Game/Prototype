@@ -16,7 +16,16 @@ public class MapUnit
 	public string guid  {get;}
 	public UnitPrototype unitType {get; set;}
 	public Player owner {get; set;}
-	public Tile location {get; set;}
+	public Tile previousLocation { get; private set; }
+	private Tile currentLocation;
+
+	public Tile location {
+		get => currentLocation;
+		set {
+			previousLocation = location;
+			currentLocation = value;
+		}
+	}
 	public TilePath path {get; set;}
 
 	public string experienceLevelKey;
@@ -52,7 +61,7 @@ public class MapUnit
 	public override string ToString()
 	{
 		if (this != MapUnit.NONE) {
-			return unitType.name + " with " + movementPointsRemaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
+			return this.owner + " " + unitType.name + " with " + movementPointsRemaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
 		}
 		else {
 			return "This is the NONE unit";

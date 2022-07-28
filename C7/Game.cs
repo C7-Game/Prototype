@@ -121,7 +121,7 @@ public class Game : Node2D
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
 				MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
-				if (unit != null && controller.tileKnowledge.isTileKnown(unit.location)) {
+				if (unit != null && (controller.tileKnowledge.isTileKnown(unit.location) || controller.tileKnowledge.isTileKnown(unit.previousLocation))) {
 					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
 					// animations should be shown to the player.
