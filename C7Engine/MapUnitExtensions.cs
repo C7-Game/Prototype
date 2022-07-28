@@ -248,9 +248,12 @@ public static class MapUnitExtensions {
 		GameData gD = EngineStorage.gameData;
 		City city = location.cityAtTile;
 		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
-		return inFriendlyCity ? gD.healRateInCity : gD.healRateInNeutralField;
-		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (they
-		// shouldn't be able to heal outside of port).
+		if (inFriendlyCity)
+			return gD.healRateInCity;
+		if (unit.unitType.categories.Contains("Sea"))
+			return 0;
+		return gD.healRateInNeutralField;
+		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross
 	}
 
 	public static void OnBeginTurn(this MapUnit unit)
@@ -286,9 +289,12 @@ public static class MapUnitExtensions {
 	public static bool CanEnterTile(this MapUnit unit, Tile tile, bool allowCombat)
 	{
 		// Keep land units on land and sea units on water
-		if (unit.unitType.categories.Contains("Sea") && tile.IsLand())
+		if (unit.unitType.categories.Contains("Sea") && tile.IsLand()) {
+			if (tile.HasCity && tile.cityAtTile.owner == unit.owner) {
+				return true;
+			}
 			return false;
-		else if (unit.unitType.categories.Contains("Land") && ! tile.IsLand())
+		} else if (unit.unitType.categories.Contains("Land") && ! tile.IsLand())
 			return false;
 
 		// Check for units belonging to other civs
