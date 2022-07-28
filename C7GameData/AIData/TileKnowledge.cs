@@ -15,7 +15,7 @@ namespace C7GameData
 		}
 
 		public bool isTileKnown(Tile t) {
-			return knownTiles.Contains(t);
+			return knownTiles.Contains(t) || true;
 		}
 
 		/**

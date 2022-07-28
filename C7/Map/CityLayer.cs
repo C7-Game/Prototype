@@ -17,6 +17,8 @@ namespace C7.Map {
 		private Pcx cityIcons = Util.LoadPCX("Art/Cities/city icons.pcx");
 		private Image nonEmbassyStar;
 
+		ImageTexture label = new ImageTexture();
+
 		public CityLayer()
 		{
 			//TODO: Generalize, support multiple city types, etc.
@@ -120,8 +122,13 @@ namespace C7.Map {
 
 			//todo: darker shades of civ color around edges
 
-			ImageTexture label = new ImageTexture();
 			label.CreateFromImage(labelImage, 7);
+			labelImage.Lock();
+			Color color = labelImage.GetPixel(0, 0);
+			if (color.r8 == 255 && color.b8 == 255 && color.g8 == 255) {
+				log.Warning("Found the culprit");
+			}
+			labelImage.Unlock();
 
 			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth/-2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));	//24 is a swag
 			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
@@ -135,16 +142,16 @@ namespace C7.Map {
 				prodDescriptionOffset+=12;
 			}
 			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityNameOffset, 24) + new Vector2(0, 10));
-			// looseView.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
+			looseView.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
 			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20));
-			// looseView.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
+			looseView.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
 
 			//City pop size
 			string popSizeString = "" + city.size;
 			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
 			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH/2 - popSizeWidth/2;
 			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth/-2, 24) + new Vector2(popSizeOffset, 18));
-			// looseView.DrawString(midSizedFont, popSizeDestination, popSizeString, Color.Color8(255, 255, 255, 255));
+			looseView.DrawString(midSizedFont, popSizeDestination, popSizeString, Color.Color8(255, 255, 255, 255));
 		}
 	}
 }
