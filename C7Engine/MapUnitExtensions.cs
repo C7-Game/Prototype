@@ -406,10 +406,7 @@ public static class MapUnitExtensions {
 		if (unit.location.HasCity || !unit.location.IsAllowCities()) {
 			return false;
 		}
-		if (unit.location.neighbors.Values.Count(tile => tile.HasCity) > 0) {
-			return false;
-		}
-		return true;
+		return unit.location.neighbors.Values.All(tile => !tile.HasCity);
 	}
 
 	public static void buildCity(this MapUnit unit, string cityName)
