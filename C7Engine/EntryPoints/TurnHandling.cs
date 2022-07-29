@@ -59,6 +59,7 @@ namespace C7Engine
 				log.Information("\n*** Processing production for turn " + gameData.turn + " ***");
 
 				//Generate new barbarian units.
+				Player barbPlayer = gameData.players.Find(player => player.isBarbarians);
 				foreach (Tile tile in gameData.map.barbarianCamps)
 				{
 					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
@@ -76,6 +77,7 @@ namespace C7Engine
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
+						barbPlayer.units.Add(newUnit);
 						log.Debug("New barbarian added at " + tile);
 					}
 					else if (tile.NeighborsWater() && result < 6) {
@@ -90,6 +92,7 @@ namespace C7Engine
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
+						barbPlayer.units.Add(newUnit);
 						log.Debug("New barbarian galley added at " + tile);
 					}
 				}
