@@ -11,7 +11,7 @@ namespace C7.Map {
 		private ILogger log = LogManager.ForContext<Game>();
 
 		private ImageTexture cityTexture;
-		ImageTexture cityLabel = new ImageTexture();
+		private ImageTexture cityLabel = new ImageTexture();
 		private Vector2 citySpriteSize;
 		private DynamicFont smallFont = new DynamicFont();
 		private DynamicFont midSizedFont = new DynamicFont();
