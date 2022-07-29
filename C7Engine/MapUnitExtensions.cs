@@ -63,6 +63,22 @@ public static class MapUnitExtensions {
 		return unit.unitType.BaseStrength(role) * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
 	}
 
+	public static bool CanDefendAgainst(this MapUnit unit, MapUnit attacker) {
+		//Basically, unit type must match.  Sea/air units in a city/airfield can't defend against land units.
+		//Land units on a boat or planes on a carrier can't defend against boats.  Anti-air is another category that should be checked before the direct combat.
+		//Potential future hybrid units that have multiple categories (e.g. amphibious vehicles) may contain more than one category.
+		if (attacker.unitType.categories.Contains("Land") && !unit.unitType.categories.Contains("Land")) {
+			return false;
+		}
+		if (attacker.unitType.categories.Contains("Sea") && !unit.unitType.categories.Contains("Sea")) {
+			return false;
+		}
+		if (attacker.unitType.categories.Contains("Air") && !unit.unitType.categories.Contains("Air")) {
+			return false;
+		}
+		return true;
+	}
+
 	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
 	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
 	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
@@ -274,12 +290,14 @@ public static class MapUnitExtensions {
 	{
 		// Disperse barb camp
 		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
+			tile.DisbandNonDefendingUnits();
 			EngineStorage.gameData.map.barbarianCamps.Remove(tile);
 			tile.hasBarbarianCamp = false;
 		}
 
 		// Destroy enemy city on tile
-		if ((tile.cityAtTile != null) && (!unit.owner.IsAtPeaceWith(tile.cityAtTile.owner))) {
+		if (tile.HasCity && !unit.owner.IsAtPeaceWith(tile.cityAtTile.owner)) {
+			tile.DisbandNonDefendingUnits();
 			tile.cityAtTile.owner.cities.Remove(tile.cityAtTile);
 			EngineStorage.gameData.cities.Remove(tile.cityAtTile);
 			tile.cityAtTile = null;
@@ -319,7 +337,7 @@ public static class MapUnitExtensions {
 
 			// Trigger combat if the tile we're moving into has an enemy unit. Or if this unit can't fight, do nothing.
 			MapUnit defender = newLoc.FindTopDefender(unit);
-			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
+			if (defender != MapUnit.NONE && !unit.owner.IsAtPeaceWith(defender.owner)) {
 				if (unit.unitType.attack > 0) {
 					CombatResult combatResult = unit.fight(defender);
 					// If we were killed then of course there's nothing more to do. If the combat couldn't happen for whatever
@@ -350,11 +368,11 @@ public static class MapUnitExtensions {
 
 			if (!unit.location.unitsOnTile.Remove(unit))
 				throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
+			unit.OnEnterTile(newLoc);
 			newLoc.unitsOnTile.Add(unit);
 			// todo switch to getMovementCost(loc, dir, newLoc)
 			unit.location = newLoc;
 			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
-			unit.OnEnterTile(newLoc);
 			unit.animate(MapUnit.AnimatedAction.RUN, wait);
 		}
 	}
