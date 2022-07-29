@@ -605,6 +605,13 @@ public class Game : Node2D
 			}
 				break;
 
+			case "buildRoad": {
+				if (CurrentlySelectedUnit.canBuildRoad()) {
+					new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
+				}
+			}
+				break;
+
 			case "goTo":
 				break;
 

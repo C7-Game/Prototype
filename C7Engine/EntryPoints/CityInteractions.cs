@@ -18,6 +18,7 @@ namespace C7Engine
 			gameData.cities.Add(newCity);
 			owner.cities.Add(newCity);
 			tileWithNewCity.cityAtTile = newCity;
+			tileWithNewCity.overlays.road = true;
 		}
 	}
 }

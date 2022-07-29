@@ -65,6 +65,10 @@ namespace C7Engine
 				unit.availableActions.Add("buildCity");
 			}
 
+			if (unit.canBuildRoad()) {
+				unit.availableActions.Add("buildRoad");
+			}
+
 			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.
 			// unit.availableActions.Add("rename");
 
