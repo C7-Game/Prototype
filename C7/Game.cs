@@ -172,7 +172,7 @@ public class Game : Node2D
 					// Advance off the currently selected unit to the next one if it's out of moves or HP and not playing an
 					// animation we want to watch, or if it's fortified and we aren't set to keep fortified units selected.
 					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-						(((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
+						(((!CurrentlySelectedUnit.movementPoints.canMove || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
 						  ! animTracker.getUnitAppearance(CurrentlySelectedUnit).DeservesPlayerAttention()) ||
 						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
@@ -360,7 +360,7 @@ public class Game : Node2D
 						using (var gameDataAccess = new UIGameDataAccess()) {
 							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 							if (tile != null) {
-								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
+								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
 								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
 							}

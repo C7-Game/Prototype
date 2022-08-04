@@ -21,7 +21,7 @@ namespace C7Engine {
 			// issue for the barbs but will be for similar loops elsewhere in the AI logic.
 			foreach (MapUnit unit in player.units.ToArray()) {
 				if (UnitIsFreeToMove(unit)) {
-					while (unit.movementPointsRemaining > 0) {
+					while (unit.movementPoints.canMove) {
 						//Move randomly
 						List<Tile> validTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 						if (validTiles.Count == 0) {
@@ -35,7 +35,7 @@ namespace C7Engine {
 						if (newLocation != Tile.NONE) {
 							log.Debug("Moving barbarian at " + unit.location + " to " + newLocation);
 							unit.move(unit.location.directionTo(newLocation));
-							unit.movementPointsRemaining -= newLocation.MovementCost();
+							unit.movementPoints.onUnitMove(newLocation.MovementCost());
 						} else {
 							//Avoid potential infinite loop.
 							break;

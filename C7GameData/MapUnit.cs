@@ -23,7 +23,7 @@ public class MapUnit
 	[JsonIgnore]
 	public ExperienceLevel experienceLevel {get; set;}
 
-	public int movementPointsRemaining {get; set;}
+	public MovementPoints movementPoints = new MovementPoints();
 	public int hitPointsRemaining {get; set;}
 	public int maxHitPoints {
 		get {
@@ -52,7 +52,7 @@ public class MapUnit
 	public override string ToString()
 	{
 		if (this != MapUnit.NONE) {
-			return unitType.name + " with " + movementPointsRemaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
+			return unitType.name + " with " + movementPoints.remaining + " movement points and " + hitPointsRemaining + " hit points, guid = " + guid;
 		}
 		else {
 			return "This is the NONE unit";
@@ -64,7 +64,7 @@ public class MapUnit
 		UnitPrototype type = this.unitType;
 		string hPDesc = ((type.attack > 0) || (type.defense > 0)) ? $" ({hitPointsRemaining}/{maxHitPoints})" : "";
 		string attackDesc = (type.bombard > 0) ? $"{type.attack}({type.bombard})" : type.attack.ToString();
-		return $"{experienceLevel.displayName}{hPDesc} {type.name} ({attackDesc}.{type.defense}.{movementPointsRemaining}/{type.movement})";
+		return $"{experienceLevel.displayName}{hPDesc} {type.name} ({attackDesc}.{type.defense}.{movementPoints.remaining}/{type.movement})";
 	}
 
 	// TODO: The contents of this enum are copy-pasted from UnitAction in Civ3UnitSprite.cs. We should unify these so we don't have two different
