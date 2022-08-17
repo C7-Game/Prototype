@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using C7GameData;
 using ConvertCiv3Media;
 using Godot;
@@ -11,7 +12,7 @@ namespace C7.Map {
 		private ILogger log = LogManager.ForContext<Game>();
 
 		private ImageTexture cityTexture;
-		private ImageTexture cityLabel = new ImageTexture();
+		private Dictionary<string, ImageTexture> cityLabels = new Dictionary<string, ImageTexture>();
 		private Vector2 citySpriteSize;
 		private DynamicFont smallFont = new DynamicFont();
 		private DynamicFont midSizedFont = new DynamicFont();
@@ -121,10 +122,12 @@ namespace C7.Map {
 
 			//todo: darker shades of civ color around edges
 
+			ImageTexture cityLabel = new ImageTexture();
 			cityLabel.CreateFromImage(labelImage, 0);
 
 			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth/-2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));	//24 is a swag
 			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
+			cityLabels[city.name] = cityLabel;
 			looseView.DrawTextureRectRegion(cityLabel, labelDestination, allOfTheLabel);
 
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
