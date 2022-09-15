@@ -243,7 +243,7 @@ public static class MapUnitExtensions {
 			return;
 
 		unit.animate(MapUnit.AnimatedAction.ATTACK1, true);
-		unit.movementPointsRemaining -= 1;
+		unit.movementPoints.onUnitMove(1);
 		if (GameData.rng.NextDouble() < attackerOdds) {
 			target.hitPointsRemaining -= 1;
 			tile.Animate(AnimatedEffect.Hit3, false);
@@ -275,14 +275,14 @@ public static class MapUnitExtensions {
 	public static void OnBeginTurn(this MapUnit unit)
 	{
 		int maxMP = unit.unitType.movement;
-		if (unit.movementPointsRemaining >= maxMP) {
+		if (unit.movementPoints.remaining >= maxMP) {
 			int maxHP = unit.maxHitPoints;
 			if (unit.hitPointsRemaining < maxHP)
 				unit.hitPointsRemaining += unit.HealRateAt(unit.location);
 			if (unit.hitPointsRemaining > maxHP)
 				unit.hitPointsRemaining = maxHP;
 		}
-		unit.movementPointsRemaining = maxMP;
+		unit.movementPoints.reset(maxMP);
 		unit.defensiveBombardsRemaining = 1;
 	}
 
@@ -334,7 +334,7 @@ public static class MapUnitExtensions {
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-		if ((newLoc != Tile.NONE) && unit.CanEnterTile(newLoc, true) && (unit.movementPointsRemaining > 0)) {
+		if ((newLoc != Tile.NONE) && unit.CanEnterTile(newLoc, true) && (unit.movementPoints.canMove)) {
 			unit.facingDirection = dir;
 			unit.wake();
 
@@ -352,13 +352,13 @@ public static class MapUnitExtensions {
 					// but still pay one movement point for the combat.
 					else if (combatResult == CombatResult.DefenderKilled || combatResult == CombatResult.DefenderRetreated) {
 						if (!unit.CanEnterTile(newLoc, false)) {
-							unit.movementPointsRemaining -= 1;
+							unit.movementPoints.onUnitMove(1);
 							return;
 						}
 
 					// Similarly if we retreated, pay one MP for the combat but don't move.
 					} else if (combatResult == CombatResult.AttackerRetreated) {
-						unit.movementPointsRemaining -= 1;
+						unit.movementPoints.onUnitMove(1);
 						return;
 					}
 				} else if (unit.unitType.bombard > 0) {
@@ -369,13 +369,13 @@ public static class MapUnitExtensions {
 				}
 			}
 
+			float movementCost = getMovementCost(unit.location, dir, newLoc);
 			if (!unit.location.unitsOnTile.Remove(unit))
 				throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 			unit.OnEnterTile(newLoc);
 			newLoc.unitsOnTile.Add(unit);
-			// todo switch to getMovementCost(loc, dir, newLoc)
 			unit.location = newLoc;
-			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
+			unit.movementPoints.onUnitMove(movementCost);
 			unit.animate(MapUnit.AnimatedAction.RUN, wait);
 		}
 	}
@@ -389,7 +389,7 @@ public static class MapUnitExtensions {
 
 	public static void moveAlongPath(this MapUnit unit)
 	{
-		while (unit.movementPointsRemaining > 0 && unit.path?.PathLength() > 0) {
+		while (unit.movementPoints.canMove && unit.path?.PathLength() > 0) {
 			var dir = unit.location.directionTo(unit.path.Next());
 			unit.move(dir, true); //TODO: don't wait on last move animation?
 		}
@@ -406,12 +406,7 @@ public static class MapUnitExtensions {
 
 	public static void skipTurn(this MapUnit unit)
 	{
-		/**
-		* I'd like to enhance this so it's like Civ4, where the skip turn action takes the unit out of the rotation, but you can change your
-		* mind if need be.  But for now it'll be like Civ3, where you're out of luck if you realize that unit was needed for something; that
-		* also simplifies things here.
-		**/
-		unit.movementPointsRemaining = 0;
+		unit.movementPoints.skipTurn();
 	}
 
 	public static void disband(this MapUnit unit)
@@ -474,7 +469,7 @@ public static class MapUnitExtensions {
 
 		// TODO add animation and long process of building
 		unit.location.overlays.road = true;
-		unit.movementPointsRemaining = 0;
+		unit.movementPoints.onConsumeAll();
 	}
 
 	}

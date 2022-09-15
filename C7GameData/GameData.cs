@@ -251,7 +251,7 @@ namespace C7GameData
 				unit.experienceLevelKey = defaultExperienceLevelKey;
 				unit.experienceLevel = defaultExperienceLevel;
 				unit.facingDirection = TileDirection.SOUTHWEST;
-				unit.movementPointsRemaining = proto.movement;
+				unit.movementPoints.reset(proto.movement);
 				unit.hitPointsRemaining = 3;
 				tile.unitsOnTile.Add(unit);
 				//TODO: Probably remove mapUnits

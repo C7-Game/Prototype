@@ -700,8 +700,7 @@ public class UnitLayer : LooseLayer {
 
 		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
 
-		int mp = unit.movementPointsRemaining;
-		int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
+		int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
 		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
 		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
 		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
