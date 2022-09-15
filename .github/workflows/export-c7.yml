@@ -76,7 +76,7 @@ jobs:
         echo "Return code was " $RETURN
         if [ $RETURN -eq 0];
         then
-            exit $RETURN
+            exit 1337
         fi
     - name: Copy Static Files
       run: |
@@ -108,13 +108,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip
-        RETURN=if $?
-        echo "Return code was " $RETURN
-        if [ $RETURN -eq 0];
-        then
-            exit $RETURN
-        fi
+        exit $(godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip)
     - name: Copy Static Files
       run: |
         cd ${EXPORT_NAME}
