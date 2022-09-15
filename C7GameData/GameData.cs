@@ -257,6 +257,7 @@ namespace C7GameData
 				//TODO: Probably remove mapUnits
 				mapUnits.Add(unit);
 				owner.AddUnit(unit);
+				owner.tileKnowledge.AddTilesToKnown(tile);
 				return unit;
 			} else
 				throw new System.Exception("Tried to add dummy unit at Tile.NONE");

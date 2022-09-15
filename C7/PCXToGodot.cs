@@ -35,6 +35,28 @@ public class PCXToGodot : Godot.Object
 		return getImageFromBufferData(croppedWidth, croppedHeight, BufferData);
 	}
 
+	public static ImageTexture getPureAlphaFromPCX(Pcx alphaPcx) {
+		int[] bufferData = new int[alphaPcx.Width * alphaPcx.Height];
+		int[] alphaData = new int[256];
+		for (int i = 0; i < 256; i++) {
+			alphaData[i] = alphaPcx.Palette[i, 0];
+		}
+		int dataIndex = 0;
+		for (int y = 0; y < alphaPcx.Height; y++) {
+			for (int x = 0; x < alphaPcx.Width; x++, dataIndex++) {
+				int index = alphaPcx.ColorIndexAt(x, y);
+				if (index >= 254) {
+					bufferData[dataIndex] = 0;
+				} else {
+					bufferData[dataIndex] = alphaData[index] << 24;
+				}
+			}
+		}
+
+		Image outImage = getImageFromBufferData(alphaPcx.Width, alphaPcx.Height, bufferData);
+		return getImageTextureFromImage(outImage);
+	}
+
 	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx) {
 		return getImageFromPCXWithAlphaBlend(imagePcx, alphaPcx, 0, 0, imagePcx.Width, imagePcx.Height);
 	}
