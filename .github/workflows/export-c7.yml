@@ -38,7 +38,7 @@ jobs:
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
         godot -v --export${DEBUG_BUILD} "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
-        RETURN=if $?
+        RETURN= $?
         echo "Return code was " $RETURN
         if [ $RETURN -eq 0];
         then
@@ -72,7 +72,7 @@ jobs:
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
         godot -v --export${DEBUG_BUILD} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
-        RETURN=if $?
+        RETURN= $?
         echo "Return code was " $RETURN
         if [ $RETURN -eq 0];
         then
@@ -109,7 +109,7 @@ jobs:
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
         godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip
-        RETURN=if $?
+        RETURN = $?
         echo "Return code was " $RETURN
         if [ $RETURN -eq 0];
         then
