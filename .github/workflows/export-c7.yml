@@ -65,13 +65,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export${DEBUG_BUILD} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
-        RETURN=if $?
-        echo "Return code was " $RETURN
-        if [ $RETURN -eq 0];
-        then
-            exit 64
-        fi
+        exit $(godot -v --export${DEBUG_BUILD} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64)
     - name: Copy Static Files
       run: |
         if cp ${EXPORT_NAME}/c7-static-map-save.json build/${FOLDER_NAME}/ && cp ${EXPORT_NAME}/credits.txt build/${FOLDER_NAME}/  && cp ${EXPORT_NAME}/Title_Screen.jpg build/${FOLDER_NAME}/
@@ -102,7 +96,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip
+        exit $(godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip)
     - name: Copy Static Files
       run: |
         cd ${EXPORT_NAME}
