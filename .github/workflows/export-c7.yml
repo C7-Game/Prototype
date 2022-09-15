@@ -108,8 +108,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
-        if [ $(godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip) -eq 0];
-        then
+        godot -v --export${DEBUG_BUILD} "Mac OSX" ../build/${FOLDER_NAME}.zip
         RETURN=if $?
         echo "Return code was " $RETURN
         if [ $RETURN -eq 0];
