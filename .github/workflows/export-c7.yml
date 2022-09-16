@@ -45,6 +45,7 @@ jobs:
           echo "successfully copied static files to build"
         else
           echo "::warning title=Static File Copy Failed::Failed to add the static files to the build"
+          exit 1
         fi
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -73,6 +74,7 @@ jobs:
           echo "successfully copied static files to build"
         else
           echo "::warning title=Static File Copy Failed::Failed to add the static files to the build"
+          exit 1
         fi
     - name: Create Tar Archive
       run: |
@@ -105,6 +107,7 @@ jobs:
           echo "successfully copied static files to build"
         else
           echo "::warning title=Static File Copy Failed::Failed to add the static files to the build"
+          exit 1
         fi
     - name: Upload  Artifact
       uses: actions/upload-artifact@v2
