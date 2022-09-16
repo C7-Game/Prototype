@@ -14,7 +14,7 @@ public class GlobalSingleton : Node
     // For now this needs to get passed to QueryCiv3 when importing.
     public string DefaultBicPath { get => Util.GetCiv3Path() + @"/Conquests/conquests.biq"; }
     // This is the 'static map' used in lieu of terrain generation
-    public string DefaultGamePath { get => @"./c7-static-map-save.json"; }
+    public string DefaultGamePath { get => @"./Text/c7-static-map-save.json"; }
     public void ResetLoadGamePath()
     {
         LoadGamePath = DefaultGamePath;

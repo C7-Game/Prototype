@@ -13,7 +13,7 @@ public class Credits : Node2D
 		log.Information("Now rolling the credits!");
 		try
 		{
-			creditsText = System.IO.File.ReadAllText("./credits.txt");
+			creditsText = System.IO.File.ReadAllText("./Text/credits.txt");
 		}
 		catch(System.Exception ex)
 		{
