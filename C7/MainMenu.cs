@@ -76,7 +76,7 @@ public class MainMenu : Node2D
 
 	private void SetMainMenuBackground()
 	{
-		ImageTexture TitleScreenTexture = Util.LoadTextureFromC7JPG("Title_Screen.jpg");
+		ImageTexture TitleScreenTexture = Util.LoadTextureFromC7JPG("Art/Title_Screen.jpg");
 		MainMenuBackground = GetNode<TextureRect>("CanvasLayer/MainMenuBackground");
 		MainMenuBackground.StretchMode = TextureRect.StretchModeEnum.Scale;
 		MainMenuBackground.Texture = TitleScreenTexture;
