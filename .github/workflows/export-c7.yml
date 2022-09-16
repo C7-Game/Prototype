@@ -40,7 +40,7 @@ jobs:
         godot -v --export${DEBUG_BUILD} "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
     - name: Copy Static Files
       run: |
-        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
+        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp -r ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
         then
           echo "successfully copied static files to build"
         else
@@ -69,7 +69,7 @@ jobs:
         godot -v --export${DEBUG_BUILD} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
     - name: Copy Static Files
       run: |
-        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
+        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp -r ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
         then
           echo "successfully copied static files to build"
         else
