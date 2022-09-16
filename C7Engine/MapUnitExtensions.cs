@@ -63,6 +63,22 @@ public static class MapUnitExtensions {
 		return unit.unitType.BaseStrength(role) * StrengthBonus.ListToMultiplier(unit.ListStrengthBonusesVersus(opponent, role, attackDirection));
 	}
 
+	public static bool CanDefendAgainst(this MapUnit unit, MapUnit attacker) {
+		//Basically, unit type must match.  Sea/air units in a city/airfield can't defend against land units.
+		//Land units on a boat or planes on a carrier can't defend against boats.  Anti-air is another category that should be checked before the direct combat.
+		//Potential future hybrid units that have multiple categories (e.g. amphibious vehicles) may contain more than one category.
+		if (attacker.unitType.categories.Contains("Land") && !unit.unitType.categories.Contains("Land")) {
+			return false;
+		}
+		if (attacker.unitType.categories.Contains("Sea") && !unit.unitType.categories.Contains("Sea")) {
+			return false;
+		}
+		if (attacker.unitType.categories.Contains("Air") && !unit.unitType.categories.Contains("Air")) {
+			return false;
+		}
+		return true;
+	}
+
 	// Answers the question: if "opponent" is attacking the tile that this unit is standing on, does this unit defend instead of "otherDefender"?
 	// Note that otherDefender does not necessarily belong to the same civ as this unit. Under standard Civ 3 rules you can't have units belonging
 	// to two different civs on the same tile, but we don't want to assume that. In that case, whoever is an enemy of "opponent" should get
@@ -227,7 +243,7 @@ public static class MapUnitExtensions {
 			return;
 
 		unit.animate(MapUnit.AnimatedAction.ATTACK1, true);
-		unit.movementPointsRemaining -= 1;
+		unit.movementPoints.onUnitMove(1);
 		if (GameData.rng.NextDouble() < attackerOdds) {
 			target.hitPointsRemaining -= 1;
 			tile.Animate(AnimatedEffect.Hit3, false);
@@ -248,35 +264,43 @@ public static class MapUnitExtensions {
 		GameData gD = EngineStorage.gameData;
 		City city = location.cityAtTile;
 		bool inFriendlyCity = (city != null) && (city != City.NONE) && unit.owner.IsAtPeaceWith(city.owner);
-		return inFriendlyCity ? gD.healRateInCity : gD.healRateInNeutralField;
-		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross, and rules for naval units (they
-		// shouldn't be able to heal outside of port).
+		if (inFriendlyCity)
+			return gD.healRateInCity;
+		if (unit.unitType.categories.Contains("Sea"))
+			return 0;
+		return gD.healRateInNeutralField;
+		// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross
 	}
 
 	public static void OnBeginTurn(this MapUnit unit)
 	{
 		int maxMP = unit.unitType.movement;
-		if (unit.movementPointsRemaining >= maxMP) {
+		if (unit.movementPoints.remaining >= maxMP) {
 			int maxHP = unit.maxHitPoints;
 			if (unit.hitPointsRemaining < maxHP)
 				unit.hitPointsRemaining += unit.HealRateAt(unit.location);
 			if (unit.hitPointsRemaining > maxHP)
 				unit.hitPointsRemaining = maxHP;
 		}
-		unit.movementPointsRemaining = maxMP;
+		unit.movementPoints.reset(maxMP);
 		unit.defensiveBombardsRemaining = 1;
 	}
 
 	public static void OnEnterTile(this MapUnit unit, Tile tile)
 	{
+		//Add to player knowledge of tiles
+		unit.owner.tileKnowledge.AddTilesToKnown(tile);
+
 		// Disperse barb camp
 		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
+			tile.DisbandNonDefendingUnits();
 			EngineStorage.gameData.map.barbarianCamps.Remove(tile);
 			tile.hasBarbarianCamp = false;
 		}
 
 		// Destroy enemy city on tile
-		if ((tile.cityAtTile != null) && (!unit.owner.IsAtPeaceWith(tile.cityAtTile.owner))) {
+		if (tile.HasCity && !unit.owner.IsAtPeaceWith(tile.cityAtTile.owner)) {
+			tile.DisbandNonDefendingUnits();
 			tile.cityAtTile.owner.cities.Remove(tile.cityAtTile);
 			EngineStorage.gameData.cities.Remove(tile.cityAtTile);
 			tile.cityAtTile = null;
@@ -286,9 +310,12 @@ public static class MapUnitExtensions {
 	public static bool CanEnterTile(this MapUnit unit, Tile tile, bool allowCombat)
 	{
 		// Keep land units on land and sea units on water
-		if (unit.unitType.categories.Contains("Sea") && tile.IsLand())
+		if (unit.unitType.categories.Contains("Sea") && tile.IsLand()) {
+			if (tile.HasCity && tile.cityAtTile.owner == unit.owner) {
+				return true;
+			}
 			return false;
-		else if (unit.unitType.categories.Contains("Land") && ! tile.IsLand())
+		} else if (unit.unitType.categories.Contains("Land") && ! tile.IsLand())
 			return false;
 
 		// Check for units belonging to other civs
@@ -307,13 +334,13 @@ public static class MapUnitExtensions {
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		var newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
-		if ((newLoc != Tile.NONE) && unit.CanEnterTile(newLoc, true) && (unit.movementPointsRemaining > 0)) {
+		if ((newLoc != Tile.NONE) && unit.CanEnterTile(newLoc, true) && (unit.movementPoints.canMove)) {
 			unit.facingDirection = dir;
 			unit.wake();
 
 			// Trigger combat if the tile we're moving into has an enemy unit. Or if this unit can't fight, do nothing.
 			MapUnit defender = newLoc.FindTopDefender(unit);
-			if ((defender != MapUnit.NONE) && (!unit.owner.IsAtPeaceWith(defender.owner))) {
+			if (defender != MapUnit.NONE && !unit.owner.IsAtPeaceWith(defender.owner)) {
 				if (unit.unitType.attack > 0) {
 					CombatResult combatResult = unit.fight(defender);
 					// If we were killed then of course there's nothing more to do. If the combat couldn't happen for whatever
@@ -325,13 +352,13 @@ public static class MapUnitExtensions {
 					// but still pay one movement point for the combat.
 					else if (combatResult == CombatResult.DefenderKilled || combatResult == CombatResult.DefenderRetreated) {
 						if (!unit.CanEnterTile(newLoc, false)) {
-							unit.movementPointsRemaining -= 1;
+							unit.movementPoints.onUnitMove(1);
 							return;
 						}
 
 					// Similarly if we retreated, pay one MP for the combat but don't move.
 					} else if (combatResult == CombatResult.AttackerRetreated) {
-						unit.movementPointsRemaining -= 1;
+						unit.movementPoints.onUnitMove(1);
 						return;
 					}
 				} else if (unit.unitType.bombard > 0) {
@@ -342,19 +369,27 @@ public static class MapUnitExtensions {
 				}
 			}
 
+			float movementCost = getMovementCost(unit.location, dir, newLoc);
 			if (!unit.location.unitsOnTile.Remove(unit))
 				throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
+			unit.OnEnterTile(newLoc);
 			newLoc.unitsOnTile.Add(unit);
 			unit.location = newLoc;
-			unit.movementPointsRemaining -= newLoc.overlayTerrainType.movementCost;
-			unit.OnEnterTile(newLoc);
+			unit.movementPoints.onUnitMove(movementCost);
 			unit.animate(MapUnit.AnimatedAction.RUN, wait);
 		}
 	}
 
+	public static float getMovementCost(Tile from, TileDirection dir, Tile newLocation) {
+		if (from.HasRiverCrossing(dir)) return newLocation.MovementCost();
+		if (newLocation.overlays.railroad) return 0;
+		if (newLocation.overlays.road) return 1.0f / 3;
+		return newLocation.MovementCost();
+	}
+
 	public static void moveAlongPath(this MapUnit unit)
 	{
-		while (unit.movementPointsRemaining > 0 && unit.path?.PathLength() > 0) {
+		while (unit.movementPoints.canMove && unit.path?.PathLength() > 0) {
 			var dir = unit.location.directionTo(unit.path.Next());
 			unit.move(dir, true); //TODO: don't wait on last move animation?
 		}
@@ -371,12 +406,7 @@ public static class MapUnitExtensions {
 
 	public static void skipTurn(this MapUnit unit)
 	{
-		/**
-		* I'd like to enhance this so it's like Civ4, where the skip turn action takes the unit out of the rotation, but you can change your
-		* mind if need be.  But for now it'll be like Civ3, where you're out of luck if you realize that unit was needed for something; that
-		* also simplifies things here.
-		**/
-		unit.movementPointsRemaining = 0;
+		unit.movementPoints.skipTurn();
 	}
 
 	public static void disband(this MapUnit unit)
@@ -400,7 +430,13 @@ public static class MapUnitExtensions {
 
 	public static bool canBuildCity(this MapUnit unit)
 	{
-		return unit.unitType.actions.Contains("buildCity") && unit.location.IsAllowCities();
+		if (!unit.unitType.actions.Contains("buildCity")) {
+			return false;
+		}
+		if (unit.location.HasCity || !unit.location.IsAllowCities()) {
+			return false;
+		}
+		return unit.location.neighbors.Values.All(tile => !tile.HasCity);
 	}
 
 	public static void buildCity(this MapUnit unit, string cityName)
@@ -419,6 +455,21 @@ public static class MapUnitExtensions {
 		// TODO: Should directly delete the unit instead of disbanding it. Disbanding in a city will eventually award shields, which we
 		// obviously don't want to do here.
 		unit.disband();
+	}
+
+	public static bool canBuildRoad(this MapUnit unit) {
+		return unit.unitType.actions.Contains("buildRoad") && unit.location.IsLand() && !unit.location.overlays.road;
+	}
+
+	public static void buildRoad(this MapUnit unit) {
+		if (!unit.canBuildRoad()) {
+			log.Warning($"can't build road by {unit}");
+			return;
+		}
+
+		// TODO add animation and long process of building
+		unit.location.overlays.road = true;
+		unit.movementPoints.onConsumeAll();
 	}
 
 	}

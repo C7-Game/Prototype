@@ -54,7 +54,12 @@ public class TerrainLayer : LooseLayer {
 		public int CompareTo(TileToDraw other)
 		{
 			// "other" might be null, in which case we should return a positive value. CompareTo(null) will do this.
-			return this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other?.tile.ExtraInfo.BaseTerrainFileID);
+			try {
+				return this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other?.tile.ExtraInfo.BaseTerrainFileID);
+			} catch (Exception ex) {
+				//It also could be Tile.NONE.  In which case, also return a positive value.
+				return 1;
+			}
 		}
 	}
 
@@ -87,16 +92,23 @@ public class TerrainLayer : LooseLayer {
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		tilesToDraw.Add(new TileToDraw(tile, tileCenter));
+		tilesToDraw.Add(new TileToDraw(tile.neighbors[TileDirection.SOUTH], tileCenter + new Vector2(0, 64)));
+		tilesToDraw.Add(new TileToDraw(tile.neighbors[TileDirection.SOUTHWEST], tileCenter + new Vector2(-64, 32)));
+		tilesToDraw.Add(new TileToDraw(tile.neighbors[TileDirection.SOUTHEAST], tileCenter + new Vector2(64, 32)));
 	}
 
 	public override void onEndDraw(LooseView looseView, GameData gameData) {
 		tilesToDraw.Sort();
 		foreach (TileToDraw tTD in tilesToDraw) {
-			int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
-			var texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
-			var terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
-			var screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize);
-			looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
+			if (tTD.tile != Tile.NONE) {
+				int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
+				Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
+				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
+				//Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
+				//Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
+				Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
+				looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
+			}
 		}
 		tilesToDraw.Clear();
 	}
@@ -688,8 +700,7 @@ public class UnitLayer : LooseLayer {
 
 		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
 
-		int mp = unit.movementPointsRemaining;
-		int moveIndIndex = (mp <= 0) ? 4 : ((mp >= unit.unitType.movement) ? 0 : 2);
+		int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
 		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
 		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
 		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
@@ -1014,23 +1025,33 @@ public class LooseView : Node2D {
 			// Iterating over visible tiles is unfortunately pretty expensive. Assemble a list of Tile references and centers first so we don't
 			// have to reiterate for each layer. Doing this improves framerate significantly.
 			MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
-			var visibleTiles = new List<VisibleTile>();
+			List<VisibleTile> visibleTiles = new List<VisibleTile>();
 			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
 				if (gD.map.isRowAt(y))
 					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 						Tile tile = gD.map.tileAt(x, y);
-						if (tile != Tile.NONE)
+						if (tile != Tile.NONE && gameDataAccess.gameData.GetHumanPlayers()[0].tileKnowledge.isTileKnown(tile))
 							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
 					}
 
-			foreach (var layer in layers.FindAll(L => L.visible)) {
+			foreach (LooseLayer layer in layers.FindAll(L => L.visible)) {
 				layer.onBeginDraw(this, gD);
 				foreach (VisibleTile vT in visibleTiles)
 					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
 				layer.onEndDraw(this, gD);
 			}
 
-
+			foreach (LooseLayer layer in layers.FindAll(layer => layer is FogOfWarLayer)) {
+				for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
+					if (gD.map.isRowAt(y))
+						for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
+							Tile tile = gD.map.tileAt(x, y);
+							if (tile != Tile.NONE) {
+								VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) };
+								layer.drawObject(this, gD, tile, invisibleTile.tileCenter);
+							}
+						}
+			}
 		}
 	}
 }
@@ -1106,6 +1127,7 @@ public class MapView : Node2D {
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new CityLayer());
+		looseView.layers.Add(new FogOfWarLayer());
 
 		(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
 

@@ -253,12 +253,13 @@ namespace C7GameData
 				unit.experienceLevelKey = defaultExperienceLevelKey;
 				unit.experienceLevel = defaultExperienceLevel;
 				unit.facingDirection = TileDirection.SOUTHWEST;
-				unit.movementPointsRemaining = proto.movement;
+				unit.movementPoints.reset(proto.movement);
 				unit.hitPointsRemaining = 3;
 				tile.unitsOnTile.Add(unit);
 				//TODO: Probably remove mapUnits
 				mapUnits.Add(unit);
 				owner.AddUnit(unit);
+				owner.tileKnowledge.AddTilesToKnown(tile);
 				return unit;
 			} else
 				throw new System.Exception("Tried to add dummy unit at Tile.NONE");

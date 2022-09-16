@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Serilog;
 
 namespace C7Engine {
@@ -18,10 +19,9 @@ namespace C7Engine {
 			// Copy unit list into temporary array so we can remove units while iterating.
 			// TODO: We also need to handle units spawned during the loop, e.g. leaders, armies, enslaved units. This is not so much an
 			// issue for the barbs but will be for similar loops elsewhere in the AI logic.
-			foreach(MapUnit unit in gameData.mapUnits.ToArray()) {
-				//TODO: Make it better fit the barbs and not be hard-coded to a magic number
-				if (unit.owner == gameData.players[0]) {
-					if (unit.location.unitsOnTile.Count > 1 || unit.location.hasBarbarianCamp == false) {
+			foreach (MapUnit unit in player.units.ToArray()) {
+				if (UnitIsFreeToMove(unit)) {
+					while (unit.movementPoints.canMove) {
 						//Move randomly
 						List<Tile> validTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 						if (validTiles.Count == 0) {
@@ -35,10 +35,26 @@ namespace C7Engine {
 						if (newLocation != Tile.NONE) {
 							log.Debug("Moving barbarian at " + unit.location + " to " + newLocation);
 							unit.move(unit.location.directionTo(newLocation));
+							unit.movementPoints.onUnitMove(newLocation.MovementCost());
+						} else {
+							//Avoid potential infinite loop.
+							break;
 						}
 					}
 				}
 			}
+		}
+		private static bool UnitIsFreeToMove(MapUnit unit)
+		{
+			if (!unit.location.hasBarbarianCamp) {
+				return true;
+			}
+			//If we're on a barb camp, only move if there's another unit defending
+			return unit.location.unitsOnTile.Exists(mapUnit => mapUnit != unit && UnitIsLandDefender(mapUnit));
+		}
+
+		private static bool UnitIsLandDefender(MapUnit unit) {
+			return unit.unitType.categories.Contains("Land") && unit.unitType.defense > 0;
 		}
 	}
 }

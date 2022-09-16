@@ -245,6 +245,9 @@ namespace C7GameData
 				if (prto.BuildCity) {
 					prototype.actions.Add("buildCity");
 				}
+				if (prto.BuildRoad) {
+					prototype.actions.Add("buildRoad");
+				}
 				if (prto.Bombard) {
 					prototype.actions.Add("bombard");
 				}

@@ -115,7 +115,7 @@ namespace C7Engine
 				}
 			}
 
-			log.Information("Tile " + tile + " is a valid city location ");
+			log.Debug("Tile " + tile + " is a valid city location ");
 			return false;
 		}
 

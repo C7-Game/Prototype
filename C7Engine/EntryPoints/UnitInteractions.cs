@@ -21,7 +21,7 @@ namespace C7Engine
 				//than the old limit of one non-barbarian player.
 				if (player.isHuman) {
 					foreach (MapUnit unit in player.units) {
-						if (unit.movementPointsRemaining > 0 && !unit.IsBusy()) {
+						if (unit.movementPoints.canMove && !unit.IsBusy()) {
 							if (!waitQueue.Contains(unit)) {
 								return unit;
 							}
@@ -63,6 +63,10 @@ namespace C7Engine
 
 			if (unit.canBuildCity()) {
 				unit.availableActions.Add("buildCity");
+			}
+
+			if (unit.canBuildRoad()) {
+				unit.availableActions.Add("buildRoad");
 			}
 
 			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.
