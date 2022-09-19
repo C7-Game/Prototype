@@ -85,6 +85,19 @@ public class Util
 	}
 
 	/// <summary>
+	/// Sets the Civ3 legacy mod path.
+	/// This is here so Civ3MediaPath can refer to it, without having to grab it from all the places we might need to call
+	/// it, which is in 25 places currently.
+	///
+	/// N.B. This needs to be enhanced to support semicolon-separated mod paths.  But Civ3MediaPath also
+	/// needs to be enhanced to support that.
+	/// </summary>
+	private static string modPath;
+	public static void setModPath(string modPathParam) {
+		modPath = modPathParam;
+	}
+
+	/// <summary>
 	/// Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
 	/// Assumes Conquests/Complete
 	/// </summary>
@@ -92,7 +105,7 @@ public class Util
 	/// <param name="modPath">The mod path for a scenario, e.g. RFRE</param>
 	/// <returns>The path to the media on the file system, or an exception if it cannot be found</returns>
 	/// <exception cref="ApplicationException"></exception>
-	public static string Civ3MediaPath(string mediaPath, string modPath = "")
+	public static string Civ3MediaPath(string mediaPath)
 	{
 		//First, check if the file exists via a scenario's mod path
 		//For now this is only checked relative to Civ3, not relative to C7.
@@ -101,7 +114,7 @@ public class Util
 				modPath,
 				// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
 				//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
-				"Conquests/Conquests" + modPath, "Conquests/Scenarios" + modPath, "civ3PTW/Scenarios" + modPath
+				"Conquests/Conquests/" + modPath, "Conquests/Scenarios/" + modPath, "civ3PTW/Scenarios/" + modPath
 			};
 			for (int i = 0; i < tryPaths.Length; i++) {
 				string actualCasePath = CheckForMedia(mediaPath, tryPaths[i]);

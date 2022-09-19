@@ -71,6 +71,7 @@ public class Game : Node2D
 
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
+				Util.setModPath(gameDataAccess.gameData.scenarioSearchPath);
 				log.Debug("RelativeModPath ", map.RelativeModPath);
 				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
 				AddChild(mapView);

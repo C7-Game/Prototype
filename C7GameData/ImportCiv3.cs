@@ -38,6 +38,7 @@ namespace C7GameData
 			c7Save.GameData.healRateInNeutralField = 1;
 			c7Save.GameData.healRateInHostileField = 0;
 			c7Save.GameData.healRateInCity = 2;
+			c7Save.GameData.scenarioSearchPath = theBiq.Game[0].ScenarioSearchFolders;
 			ImportBarbarianInfo(theBiq, c7Save);
 		}
 
