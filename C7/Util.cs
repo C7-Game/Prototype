@@ -109,17 +109,20 @@ public class Util
 	{
 		//First, check if the file exists via a scenario's mod path
 		//For now this is only checked relative to Civ3, not relative to C7.
-		if (modPath != "") {
-			string[] tryPaths = new string[] {
-				modPath,
-				// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
-				//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
-				"Conquests/Conquests/" + modPath, "Conquests/Scenarios/" + modPath, "civ3PTW/Scenarios/" + modPath
-			};
-			for (int i = 0; i < tryPaths.Length; i++) {
-				string actualCasePath = CheckForMedia(mediaPath, tryPaths[i]);
-				if (actualCasePath != null)
-					return actualCasePath;
+		if (modPath != null) {
+			string[] paths = modPath.Split(";");
+			foreach (string path in paths) {
+				string[] tryPaths = new string[] {
+					path,
+					// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
+					//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
+					"Conquests/Conquests/" + path, "Conquests/Scenarios/" + path, "civ3PTW/Scenarios/" + path
+				};
+				for (int i = 0; i < tryPaths.Length; i++) {
+					string actualCasePath = CheckForMedia(mediaPath, tryPaths[i]);
+					if (actualCasePath != null)
+						return actualCasePath;
+				}
 			}
 		}
 
