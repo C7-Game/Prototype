@@ -108,7 +108,13 @@ public class Game : Node2D
 		catch(Exception ex) {
 			errorOnLoad = true;
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
+			string message = ex.Message;
+			string[] stack = ex.StackTrace.Split("\r\n");	//for some reason it is returned with \r\n in the string as one line.  let's make it readable!
+			foreach (string line in stack) {
+				message = message + "\r\n" + line;
+			}
+
+			popupOverlay.ShowPopup(new ErrorMessage(message), PopupOverlay.PopupCategory.Advisor);
 			log.Error(ex, "Unexpected error in Game.cs _Ready");
 		}
 	}

@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace C7GameData
 /*
 	The save format is intended to be serialized to JSON upon saving
@@ -100,6 +102,15 @@ namespace C7GameData
 			save.GameData.defaultExperienceLevel = levelsByKey[save.GameData.defaultExperienceLevelKey];
 			foreach (MapUnit unit in save.GameData.mapUnits)
 				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
+
+			//Inflate barbarian info
+			List<UnitPrototype> prototypes = save.GameData.unitPrototypes.Values.ToList();
+			save.GameData.barbarianInfo.basicBarbarian =
+				prototypes[save.GameData.barbarianInfo.basicBarbarianIndex];
+			save.GameData.barbarianInfo.advancedBarbarian =
+				prototypes[save.GameData.barbarianInfo.advancedBarbarianIndex];
+			save.GameData.barbarianInfo.barbarianSeaUnit =
+				prototypes[save.GameData.barbarianInfo.barbarianSeaUnitIndex];
 
 			return save;
 		}
