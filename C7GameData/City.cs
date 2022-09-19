@@ -43,6 +43,9 @@ namespace C7GameData
 
         public bool CanBuildUnit(UnitPrototype proto)
         {
+			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
+			if (!allowedUnits.Contains(proto.name))
+				return false;
             if (proto.categories.Contains("Sea"))
                 return location.NeighborsWater();
             else

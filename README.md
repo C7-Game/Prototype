@@ -17,7 +17,7 @@ You can view our progress towards the full "Carthage" milestone from [this proje
 
 At this stage, C7 is not yet a fully playable game, but becomes a little bit closer every month.  Take the latest release for a spin, leave some [feedback](https://forums.civfanatics.com/forums/civ3-future-development.604/), and follow the repo for updates.
 
-For now, an installation of _Sid Meier's Civilzation III Complete_ (or _Conquests_) is required for art assets, which you can find on Steam or GOG.
+For now, an installation of _Sid Meier's Civilization III Complete_ (or _Conquests_) is required for art assets, which you can find on Steam or GOG.
 
 ## Contributing
 

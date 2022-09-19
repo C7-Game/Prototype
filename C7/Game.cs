@@ -108,7 +108,13 @@ public class Game : Node2D
 		catch(Exception ex) {
 			errorOnLoad = true;
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
+			string message = ex.Message;
+			string[] stack = ex.StackTrace.Split("\r\n");	//for some reason it is returned with \r\n in the string as one line.  let's make it readable!
+			foreach (string line in stack) {
+				message = message + "\r\n" + line;
+			}
+
+			popupOverlay.ShowPopup(new ErrorMessage(message), PopupOverlay.PopupCategory.Advisor);
 			log.Error(ex, "Unexpected error in Game.cs _Ready");
 		}
 	}
@@ -121,7 +127,7 @@ public class Game : Node2D
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
 				MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
-				if (unit != null) {
+				if (unit != null && (controller.tileKnowledge.isTileKnown(unit.location) || controller.tileKnowledge.isTileKnown(unit.previousLocation))) {
 					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
 					// animations should be shown to the player.
@@ -129,14 +135,22 @@ public class Game : Node2D
 						ensureLocationIsInView(unit.location);
 
 					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent, mSUA.ending);
+				} else {
+					if (mSUA.completionEvent != null) {
+						mSUA.completionEvent.Set();
+					}
 				}
 				break;
 			case MsgStartEffectAnimation mSEA:
 				int x, y;
 				gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
 				Tile tile = gameData.map.tileAt(x, y);
-				if (tile != Tile.NONE)
+				if (tile != Tile.NONE && controller.tileKnowledge.isTileKnown(tile))
 					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
+				else {
+					if (mSEA.completionEvent != null)
+						mSEA.completionEvent.Set();
+				}
 				break;
 			case MsgStartTurn mST:
 				OnPlayerStartTurn();
@@ -209,8 +223,8 @@ public class Game : Node2D
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location)
 	{
-		if (location != Tile.NONE) {
-			var relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
+		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
+			Vector2 relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
 			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
 				mapView.centerCameraOnTile(location);
 		}
