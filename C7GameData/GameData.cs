@@ -33,6 +33,8 @@ namespace C7GameData
 		public int healRateInHostileField;
 		public int healRateInCity;
 
+		public bool observerMode = false;
+
 		public GameData()
 		{
 			map = new GameMap();
