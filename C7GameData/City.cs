@@ -135,6 +135,11 @@ namespace C7GameData
 			return CurrentFoodYield() - size * 2;
 		}
 
+		public void removeCitizen() {
+			residents[residents.Count - 1].tileWorked.personWorkingTile = null;
+			residents.RemoveAt(residents.Count - 1);
+		}
+
 		public override string ToString() {
 			return $"{name} ({size})";
 		}
