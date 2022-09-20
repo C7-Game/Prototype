@@ -32,17 +32,15 @@ namespace C7Engine
 		 */
 		public static IProducible GetNextItemToBeProduced(City city, IProducible lastProduced) {
 			List<StrategicPriority> priorities = city.owner.strategicPriorityData;
-			IEnumerable<UnitPrototype> unitPrototypes = EngineStorage.gameData.unitPrototypes.Values;
+			IEnumerable<IProducible> unitPrototypes = city.ListProductionOptions();
 
-			//Temp: Always choose highest-weighted item
-			UnitPrototype highestScoring = unitPrototypes.First();
-			float highestScore = 0.0f;
-
-			log.Information($"Choosing what to produce next in {city}");
+			log.Information($"Choosing what to produce next in {city.name}");
 
 			List<IProducible> prototypes = new List<IProducible>();
 			List<float> weights = new List<float>();
 
+			//N.B. This implicitly casts to UnitPrototype.  For now this is fine but once we add buildings, this (or the source of the list)
+			//will have to get smarter.
 			foreach (UnitPrototype unitPrototype in unitPrototypes) {
 				float baseScore = GetItemScore(unitPrototype);
 				log.Debug($" Base score for {unitPrototype} is {baseScore}");
@@ -163,7 +161,7 @@ namespace C7Engine
 			foreach (StrategicPriority priority in priorities) {
 				float adjuster = priority.GetProductionItemFlatAdjuster(prototype);
 				// Low-level log, we don't have proper logs yet so it's commented out
-				// Console.WriteLine($"  Got adjuster of {adjuster} from {priority}; adjusting by ${adjuster * priorityMultiplier}");
+				log.Verbose($"  Got adjuster of {adjuster} from {priority}; adjusting by ${adjuster * priorityMultiplier}");
 				totalAdjusters += (adjuster * priorityMultiplier);
 				priorityMultiplier /= 2;
 			}

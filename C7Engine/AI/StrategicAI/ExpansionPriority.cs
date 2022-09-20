@@ -8,8 +8,6 @@ namespace C7GameData.AIData {
 	public class ExpansionPriority : StrategicPriority {
 		private readonly int TEMP_GAME_LENGTH = 540;
 		private readonly int EARLY_GAME_CUTOFF = 25;	//what percentage of the game is early game, which should give expansion a boost?
-		private static readonly int POSSIBLE_CITY_LOCATION_SCORE = 2;	//how much weight to give to each possible city location
-		private static readonly int TILE_SCORE_DIVIDER = 1;	//how much to divide each location's tile score by
 
 		private static readonly int SETTLER_FLAT_APPEAL = 30;			//the base "flat" appeal of settler-type units
 		private static readonly float SETTLER_WEIGHTED_APPEAL = 4.0f;	//the multiplier effect on settler-type units
@@ -24,7 +22,7 @@ namespace C7GameData.AIData {
 			if (player.cities.Count < 2) {
 				this.calculatedWeight = 1000;
 			} else {
-				int score = CalculateAvailableLandScore(player);
+				int score = UtilityCalculations.CalculateAvailableLandScore(player);
 				score = ApplyEarlyGameMultiplier(score);
 				score = ApplyNationTraitMultiplier(score, player);
 
@@ -62,16 +60,6 @@ namespace C7GameData.AIData {
 			return "ExpansionPriority";
 		}
 
-		private static int CalculateAvailableLandScore(Player player)
-		{
-			//Figure out if there's land to settle, and how much
-			Dictionary<Tile, int> possibleLocations = SettlerLocationAI.GetScoredSettlerCandidates(player.cities[0].location, player);
-			int score = possibleLocations.Count * POSSIBLE_CITY_LOCATION_SCORE;
-			foreach (int i in possibleLocations.Values) {
-				score += i / TILE_SCORE_DIVIDER;
-			}
-			return score;
-		}
 		private int ApplyEarlyGameMultiplier(int score)
 		{
 			//If it's early game, multiply this score.

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Diagnostics;
 using C7Engine;
 using C7GameData;
+using Serilog;
 
 public class Game : Node2D
 {
@@ -12,6 +13,8 @@ public class Game : Node2D
 	[Signal] public delegate void ShowSpecificAdvisor();
 	[Signal] public delegate void NewAutoselectedUnit();
 	[Signal] public delegate void NoMoreAutoselectableUnits();
+
+	private ILogger log = LogManager.ForContext<Game>();
 
 	enum GameState {
 		PreGame,
@@ -68,7 +71,7 @@ public class Game : Node2D
 
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
-				GD.Print("RelativeModPath ", map.RelativeModPath);
+				log.Debug("RelativeModPath ", map.RelativeModPath);
 				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
 				AddChild(mapView);
 
@@ -96,17 +99,23 @@ public class Game : Node2D
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
 
-			GD.Print("Now in game!");
+			log.Information("Now in game!");
 
 			loadTimer.Stop();
 			TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-			GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+			log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 		}
 		catch(Exception ex) {
 			errorOnLoad = true;
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-			popupOverlay.ShowPopup(new ErrorMessage(ex.Message), PopupOverlay.PopupCategory.Advisor);
-			GD.PrintErr(ex);
+			string message = ex.Message;
+			string[] stack = ex.StackTrace.Split("\r\n");	//for some reason it is returned with \r\n in the string as one line.  let's make it readable!
+			foreach (string line in stack) {
+				message = message + "\r\n" + line;
+			}
+
+			popupOverlay.ShowPopup(new ErrorMessage(message), PopupOverlay.PopupCategory.Advisor);
+			log.Error(ex, "Unexpected error in Game.cs _Ready");
 		}
 	}
 
@@ -118,7 +127,7 @@ public class Game : Node2D
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
 				MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
-				if (unit != null) {
+				if (unit != null && (controller.tileKnowledge.isTileKnown(unit.location) || controller.tileKnowledge.isTileKnown(unit.previousLocation))) {
 					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
 					// animations should be shown to the player.
@@ -126,14 +135,22 @@ public class Game : Node2D
 						ensureLocationIsInView(unit.location);
 
 					animTracker.startAnimation(unit, mSUA.action, mSUA.completionEvent, mSUA.ending);
+				} else {
+					if (mSUA.completionEvent != null) {
+						mSUA.completionEvent.Set();
+					}
 				}
 				break;
 			case MsgStartEffectAnimation mSEA:
 				int x, y;
 				gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
 				Tile tile = gameData.map.tileAt(x, y);
-				if (tile != Tile.NONE)
+				if (tile != Tile.NONE && controller.tileKnowledge.isTileKnown(tile))
 					animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
+				else {
+					if (mSEA.completionEvent != null)
+						mSEA.completionEvent.Set();
+				}
 				break;
 			case MsgStartTurn mST:
 				OnPlayerStartTurn();
@@ -169,7 +186,7 @@ public class Game : Node2D
 					// Advance off the currently selected unit to the next one if it's out of moves or HP and not playing an
 					// animation we want to watch, or if it's fortified and we aren't set to keep fortified units selected.
 					if ((CurrentlySelectedUnit != MapUnit.NONE) &&
-						(((CurrentlySelectedUnit.movementPointsRemaining <= 0 || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
+						(((!CurrentlySelectedUnit.movementPoints.canMove || CurrentlySelectedUnit.hitPointsRemaining <= 0) &&
 						  ! animTracker.getUnitAppearance(CurrentlySelectedUnit).DeservesPlayerAttention()) ||
 						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
@@ -206,8 +223,8 @@ public class Game : Node2D
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location)
 	{
-		if (location != Tile.NONE) {
-			var relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
+		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
+			Vector2 relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
 			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
 				mapView.centerCameraOnTile(location);
 		}
@@ -229,7 +246,7 @@ public class Game : Node2D
 		unit = UnitInteractions.UnitWithAvailableActions(unit);
 
 		if ((unit.path?.PathLength() ?? -1) > 0) {
-			GD.Print("cancelling path for " + unit);
+			log.Debug("cancelling path for " + unit);
 			unit.path = TilePath.NONE;
 		}
 
@@ -257,13 +274,13 @@ public class Game : Node2D
 		}
 		else
 		{
-			GD.Print("It's not your turn!");
+			log.Information("It's not your turn!");
 		}
 	}
 
 	private void OnPlayerStartTurn()
 	{
-		GD.Print("Starting player turn");
+		log.Information("Starting player turn");
 		int turnNumber = TurnHandling.GetTurnNumber();
 		EmitSignal(nameof(TurnStarted), turnNumber);
 		CurrentState = GameState.PlayerTurn;
@@ -277,9 +294,9 @@ public class Game : Node2D
 	{
 		if (CurrentState == GameState.PlayerTurn)
 		{
-			GD.Print("Ending player turn");
+			log.Information("Ending player turn");
 			EmitSignal(nameof(TurnEnded));
-			GD.Print("Starting computer turn");
+			log.Information("Starting computer turn");
 			CurrentState = GameState.ComputerTurn;
 			new MsgEndTurn().send(); // Triggers actual backend processing
 		}
@@ -357,9 +374,8 @@ public class Game : Node2D
 						using (var gameDataAccess = new UIGameDataAccess()) {
 							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 							if (tile != null) {
-								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPointsRemaining > 0);
-								//TODO: Better check for "current/human player"
-								if (to_select != null && to_select.owner.color == 0x4040FFFF)
+								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
+								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
 							}
 						}
@@ -396,6 +412,8 @@ public class Game : Node2D
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
 
 						string yield = tile.YieldString(controller);
+						//These GD.Print statements are debugging prints for developers to see info about the tile
+						//For now I'm leaving them as GD.Print.  Could revisit this later.
 						GD.Print($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
 
 						if (tile.cityAtTile != null) {
@@ -430,19 +448,18 @@ public class Game : Node2D
 		{
 			if (eventKeyDown.Scancode == (int)Godot.KeyList.Enter)
 			{
-				GD.Print("Enter pressed");
+				log.Verbose("Enter pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
 				{
-					GD.Print("Turn ending");
 					this.OnPlayerEndTurn();
 				}
 				else {
-					GD.Print("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
+					log.Debug("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
 				}
 			}
 			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Space)
 			{
-				GD.Print("Space pressed");
+				log.Verbose("Space pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
 				{
 					this.OnPlayerEndTurn();
@@ -496,7 +513,7 @@ public class Game : Node2D
 			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Escape)
 			{
 				if (!inUnitGoToMode) {
-					GD.Print("Got request for escape/quit");
+					log.Debug("Got request for escape/quit");
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 					popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 				}
@@ -566,7 +583,7 @@ public class Game : Node2D
 		// other than goTo
 		setGoToMode(buttonName == "goTo");
 
-		GD.Print("The " + buttonName + " button was pressed");
+		log.Verbose("The " + buttonName + " button was pressed");
 		switch (buttonName) {
 			case "hold":
 				new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
@@ -590,10 +607,22 @@ public class Game : Node2D
 			}
 				break;
 
-			case "buildCity":
-			{
-				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-				popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
+			case "buildCity": {
+				using (var gameDataAccess = new UIGameDataAccess()) {
+					MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
+					if (currentUnit.canBuildCity()) {
+						PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+						popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
+							PopupOverlay.PopupCategory.Advisor);
+					}
+				}
+			}
+				break;
+
+			case "buildRoad": {
+				if (CurrentlySelectedUnit.canBuildRoad()) {
+					new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
+				}
 			}
 				break;
 
@@ -602,7 +631,7 @@ public class Game : Node2D
 
 			default:
 				//A nice sanity check if I use a different name here than where I created it...
-				GD.PrintErr("An unrecognized button " + buttonName + " was pressed");
+				log.Warning("An unrecognized button " + buttonName + " was pressed");
 				break;
 		}
 	}
@@ -630,7 +659,7 @@ public class Game : Node2D
 	 **/
 	private void OnQuitTheGame()
 	{
-		GD.Print("Goodbye!");
+		log.Information("Goodbye!");
 		GetTree().Quit();
 	}
 

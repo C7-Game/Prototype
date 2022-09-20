@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using Serilog;
 
 namespace C7GameData
 
@@ -18,6 +19,28 @@ namespace C7GameData
 	}
 	public class ImportCiv3
 	{
+
+		private static ILogger log = Log.ForContext<ImportCiv3>();
+
+		/// <summary>
+		/// Items loaded from the BIQ and used the same way in both the SAV and BIQ should generally go here.
+		/// This excludes items that can change mid-game, such as tiles (which may be chopped, roaded, etc.).
+		/// </summary>
+		/// <param name="theBiq">Source BIQ</param>
+		/// <param name="c7Save">Destination C7 in-memory structure</param>
+		private static void ImportSharedBiqData(BiqData theBiq, C7SaveFormat c7Save)
+		{
+			ImportUnitPrototypes(theBiq, c7Save);
+			ImportCiv3TerrainTypes(theBiq, c7Save);
+			ImportCiv3ExperienceLevels(theBiq, c7Save);
+			ImportCiv3DefensiveBonuses(theBiq, c7Save);
+			c7Save.GameData.healRateInFriendlyField = 1;
+			c7Save.GameData.healRateInNeutralField = 1;
+			c7Save.GameData.healRateInHostileField = 0;
+			c7Save.GameData.healRateInCity = 2;
+			ImportBarbarianInfo(theBiq, c7Save);
+		}
+
 		public static C7SaveFormat ImportSav(string savePath, string defaultBicPath)
 		{
 			// init empty C7 save
@@ -28,14 +51,7 @@ namespace C7GameData
 			SavData civ3Save = new SavData(Util.ReadFile(savePath), defaultBicBytes);
 			BiqData theBiq = civ3Save.Bic;
 
-			ImportUnitPrototypes(theBiq, c7Save);
-			ImportCiv3TerrainTypes(theBiq, c7Save);
-			ImportCiv3ExperienceLevels(theBiq, c7Save);
-			ImportCiv3DefensiveBonuses(theBiq, c7Save);
-			c7Save.GameData.healRateInFriendlyField = 1;
-			c7Save.GameData.healRateInNeutralField = 1;
-			c7Save.GameData.healRateInHostileField = 0;
-			c7Save.GameData.healRateInCity = 2;
+			ImportSharedBiqData(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(civ3Save.Bic, c7Save);
 			SetMapDimensions(civ3Save, c7Save);
 			SetWorldWrap(civ3Save, c7Save);
@@ -78,6 +94,8 @@ namespace C7GameData
 				c7Tile.riverSouthwest = civ3Tile.RiverSouthwest;
 				c7Tile.riverWest = civ3Tile.RiverWest;
 				c7Tile.riverNorthwest = civ3Tile.RiverNorthwest;
+				c7Tile.overlays.road = civ3Tile.Road;
+				c7Tile.overlays.railroad = civ3Tile.Railroad;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.ResourceID];
 				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.ResourceID].Key;
 				c7Save.GameData.map.tiles.Add(c7Tile);
@@ -99,14 +117,7 @@ namespace C7GameData
 			byte[] biqBytes = Util.ReadFile(biqPath);
 			BiqData theBiq = new BiqData(biqBytes);
 
-			ImportUnitPrototypes(theBiq, c7Save);
-			ImportCiv3TerrainTypes(theBiq, c7Save);
-			ImportCiv3ExperienceLevels(theBiq, c7Save);
-			ImportCiv3DefensiveBonuses(theBiq, c7Save);
-			c7Save.GameData.healRateInFriendlyField = 1;
-			c7Save.GameData.healRateInNeutralField = 1;
-			c7Save.GameData.healRateInHostileField = 0;
-			c7Save.GameData.healRateInCity = 2;
+			ImportSharedBiqData(theBiq, c7Save);
 			Dictionary<int, Resource> resourcesByIndex = ImportCiv3Resources(theBiq, c7Save);
 			SetMapDimensions(theBiq, c7Save);
 			SetWorldWrap(theBiq, c7Save);
@@ -149,6 +160,8 @@ namespace C7GameData
 				c7Tile.riverSouthwest = civ3Tile.RiverConnectionSouthwest;
 				c7Tile.riverWest = civ3Tile.RiverWest;
 				c7Tile.riverNorthwest = civ3Tile.RiverConnectionNorthwest;
+				c7Tile.overlays.road = civ3Tile.Road;
+				c7Tile.overlays.railroad = civ3Tile.Railroad;
 				c7Tile.Resource = resourcesByIndex[civ3Tile.Resource];
 				c7Tile.ResourceKey = resourcesByIndex[civ3Tile.Resource].Key;
 				c7Save.GameData.map.tiles.Add(c7Tile);
@@ -196,7 +209,7 @@ namespace C7GameData
 						resource.Category = ResourceCategory.STRATEGIC;
 						break;
 					default:
-						Console.WriteLine("WARNING!  Unknown resource category for " + good);
+						log.Warning("WARNING!  Unknown resource category for " + good);
 						resource.Category = ResourceCategory.NONE;
 						break;
 				}
@@ -210,50 +223,51 @@ namespace C7GameData
 		}
 
 		private static void ImportUnitPrototypes(BiqData theBiq, C7SaveFormat c7SaveFormat) {
-			//Temporary limiter so you can't build everything out of the gate
-			//Once we have technology, we will remove this
-			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
 			foreach (PRTO prto in theBiq.Prto) {
-				if (allowedUnits.Contains(prto.Name)) {
-					UnitPrototype prototype = new UnitPrototype();
-					if (prto.Type == PRTO.TYPE_SEA) {
-						prototype.categories.Add("Sea");
-					}
-					else if (prto.Type == PRTO.TYPE_LAND) {
-						prototype.categories.Add("Land");
-					}
-					else if (prto.Type == PRTO.TYPE_AIR) {
-						prototype.categories.Add("Air");
-					}
-					prototype.name = prto.Name;
-					prototype.attack = prto.Attack;
-					prototype.defense = prto.Defense;
-					prototype.movement = prto.Movement;
-					prototype.shieldCost = prto.ShieldCost;
-					prototype.populationCost = prto.PopulationCost;
-					prototype.bombard = prto.BombardStrength;
-					prototype.iconIndex = prto.IconIndex;
-					if (prto.BuildCity) {
-						prototype.actions.Add("buildCity");
-					}
-					if (prto.Bombard) {
-						prototype.actions.Add("bombard");
-					}
-					if (prto.SkipTurn) {
-						prototype.actions.Add("hold");
-					}
-					if (prto.Wait) {
-						prototype.actions.Add("wait");
-					}
-					if (prto.Fortify) {
-						prototype.actions.Add("fortify");
-					}
-					if (prto.Disband) {
-						prototype.actions.Add("disband");
-					}
-					if (prto.GoTo) {
-						prototype.actions.Add("goTo");
-					}
+				UnitPrototype prototype = new UnitPrototype();
+				if (prto.Type == PRTO.TYPE_SEA) {
+					prototype.categories.Add("Sea");
+				}
+				else if (prto.Type == PRTO.TYPE_LAND) {
+					prototype.categories.Add("Land");
+				}
+				else if (prto.Type == PRTO.TYPE_AIR) {
+					prototype.categories.Add("Air");
+				}
+				prototype.name = prto.Name;
+				prototype.attack = prto.Attack;
+				prototype.defense = prto.Defense;
+				prototype.movement = prto.Movement;
+				prototype.shieldCost = prto.ShieldCost;
+				prototype.populationCost = prto.PopulationCost;
+				prototype.bombard = prto.BombardStrength;
+				prototype.iconIndex = prto.IconIndex;
+				if (prto.BuildCity) {
+					prototype.actions.Add("buildCity");
+				}
+				if (prto.BuildRoad) {
+					prototype.actions.Add("buildRoad");
+				}
+				if (prto.Bombard) {
+					prototype.actions.Add("bombard");
+				}
+				if (prto.SkipTurn) {
+					prototype.actions.Add("hold");
+				}
+				if (prto.Wait) {
+					prototype.actions.Add("wait");
+				}
+				if (prto.Fortify) {
+					prototype.actions.Add("fortify");
+				}
+				if (prto.Disband) {
+					prototype.actions.Add("disband");
+				}
+				if (prto.GoTo) {
+					prototype.actions.Add("goTo");
+				}
+				//Temporary check until #329/#330 are finished
+				if (!c7SaveFormat.GameData.unitPrototypes.ContainsKey(prototype.name)) {
 					c7SaveFormat.GameData.unitPrototypes.Add(prototype.name, prototype);
 				}
 			}
@@ -316,6 +330,24 @@ namespace C7GameData
 				description = "Metropolis",
 				amount = theBiq.Rule[0].MetropolisDefenseBonus / 100.0
 			};
+		}
+
+		private static void ImportBarbarianInfo(BiqData theBiq, C7SaveFormat c7SaveFormat) {
+			if (c7SaveFormat.GameData.unitPrototypes.Count == 0) {
+				throw new Exception("Must import unit prototypes prior to importing barbarian info");
+			}
+			BarbarianInfo barbInfo = c7SaveFormat.GameData.barbarianInfo;
+			RULE civ3Rules = theBiq.Rule[0];
+			barbInfo.basicBarbarianIndex = civ3Rules.BasicBarbarianUnitType;
+			barbInfo.advancedBarbarianIndex = civ3Rules.AdvancedBarbarianUnitType;
+			barbInfo.barbarianSeaUnitIndex = civ3Rules.BarbarianSeaUnitType;
+
+			barbInfo.basicBarbarian =
+				c7SaveFormat.GameData.unitPrototypes[theBiq.Prto[barbInfo.basicBarbarianIndex].Name];
+			barbInfo.advancedBarbarian =
+				c7SaveFormat.GameData.unitPrototypes[theBiq.Prto[barbInfo.advancedBarbarianIndex].Name];
+			barbInfo.barbarianSeaUnit =
+				c7SaveFormat.GameData.unitPrototypes[theBiq.Prto[barbInfo.barbarianSeaUnitIndex].Name];
 		}
 
 		private static void SetWorldWrap(SavData civ3Save, C7SaveFormat c7Save)

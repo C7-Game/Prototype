@@ -21,7 +21,7 @@ namespace C7Engine
 				//than the old limit of one non-barbarian player.
 				if (player.isHuman) {
 					foreach (MapUnit unit in player.units) {
-						if (unit.movementPointsRemaining > 0 && !unit.IsBusy()) {
+						if (unit.movementPoints.canMove && !unit.IsBusy()) {
 							if (!waitQueue.Contains(unit)) {
 								return unit;
 							}
@@ -54,11 +54,19 @@ namespace C7Engine
 
 			// Eventually, we should look this up somewhere to see what all actions we have (and mods might add more)
 			// For now, this is still an improvement over the last iteration.
-			string[] implementedActions = { "hold", "wait", "fortify", "disband", "goTo", "buildCity", "bombard"};
+			string[] implementedActions = { "hold", "wait", "fortify", "disband", "goTo", "bombard"};
 			foreach (string action in implementedActions) {
 				if (unit.unitType.actions.Contains(action)) {
 					unit.availableActions.Add(action);
 				}
+			}
+
+			if (unit.canBuildCity()) {
+				unit.availableActions.Add("buildCity");
+			}
+
+			if (unit.canBuildRoad()) {
+				unit.availableActions.Add("buildRoad");
 			}
 
 			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.

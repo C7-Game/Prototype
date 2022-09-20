@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Serilog;
 
 /**
  * Handles managing the advisor screens.
@@ -8,6 +9,7 @@ using System;
  */
 public class Advisors : CenterContainer
 {
+	private ILogger log = LogManager.ForContext<Advisors>();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -21,13 +23,13 @@ public class Advisors : CenterContainer
 //  // Called every frame. 'delta' is the elapsed time since the previous frame.
 //  public override void _Process(float delta)
 //  {
-//      
+//
 //  }
 
 
 	private void ShowLatestAdvisor()
 	{
-		GD.Print("Received request to show latest advisor");
+		log.Debug("Received request to show latest advisor");
 
 		if (this.GetChildCount() == 0) {
 			DomesticAdvisor advisor = new DomesticAdvisor();
@@ -35,13 +37,12 @@ public class Advisors : CenterContainer
 		}
 		this.Show();
 	}
-	
-	
+
 	private void _on_Advisor_hide()
 	{
 		this.Hide();
 	}
-	
+
 	private void OnShowSpecificAdvisor(string advisorType)
 	{
 		if (advisorType.Equals("F1")) {
@@ -52,7 +53,7 @@ public class Advisors : CenterContainer
 			this.Show();
 		}
 	}
-	
+
 	public override void _UnhandledInput(InputEvent @event)
 	{
 		if (this.Visible) {
@@ -68,7 +69,7 @@ public class Advisors : CenterContainer
 						GetTree().SetInputAsHandled();
 					}
 					else {
-						GD.Print("Advisor received a key press; stopping propagation.");
+						log.Debug("Advisor received a key press; stopping propagation.");
 						GetTree().SetInputAsHandled();
 					}
 				}

@@ -49,33 +49,8 @@ namespace C7Engine
 		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, IEnumerable<Tile> candidates, List<MapUnit> playerSettlers)
 		{
 			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
+			candidates = candidates.Where(t => !SettlerAlreadyMovingTowardsTile(t, playerSettlers) && t.IsAllowCities());
 			foreach (Tile t in candidates) {
-				//TODO: #120: Look at whether we can place cities here.  Hard-coded for now.
-				if (t.overlayTerrainType.Key == "mountains") {
-					continue;
-				}
-				if (t.HasCity || t.GetLandNeighbors().Exists(n => n.HasCity)) {
-					scores[t] = 0;
-					continue;
-				}
-				foreach (MapUnit otherSettler in playerSettlers)
-				{
-					if (otherSettler.currentAIData is SettlerAIData otherSettlerAI) {
-						if (otherSettlerAI.destination == t) {
-							goto nextcandidate;	//in Java you can continue based on an outer loop label, but C# doesn't offer that.  So we'll use a beneficial goto instead.
-						}
-						if (otherSettlerAI.destination.GetLandNeighbors().Exists(innerRingTile => innerRingTile == t)) {
-							scores[t] = 0;
-							goto nextcandidate;
-						}
-						foreach (Tile innerRingTile in otherSettlerAI.destination.GetLandNeighbors()) {
-							if (innerRingTile.GetLandNeighbors().Exists(outerRingTile => outerRingTile == t)) {
-								scores[t] = 0;
-								goto nextcandidate;
-							}
-						}
-					}
-				}
 				int score = GetTileYieldScore(t, player);
 				//For simplicity's sake, I'm only going to look at immediate neighbors here, but
 				//a lot more things should be considered over time.
@@ -91,7 +66,6 @@ namespace C7Engine
 				if (t.NeighborsWater()) {
 					score += 10;
 				}
-				//TODO: Exclude locations that are too close to another civ.
 
 				//Lower scores if they are far away
 				int preDistanceScore = score;
@@ -104,12 +78,8 @@ namespace C7Engine
 				if (preDistanceScore > 0 && score <= 0) {
 					score = 1;
 				}
-
-				//TODO: Remove locations that we already have another Settler moving towards
-
 				if (score > 0)
 					scores[t] = score;
-nextcandidate: ;
 			}
 			return scores;
 		}
@@ -145,7 +115,36 @@ nextcandidate: ;
 				}
 			}
 
-			log.Information("Tile " + tile + " is a valid city location ");
+			log.Debug("Tile " + tile + " is a valid city location ");
+			return false;
+		}
+
+		/// <summary>
+		/// Returns true if one of the settlers in the list (which should be the list of the current AI's settlers) is
+		/// already heading to a tile near the requested tile.
+		/// Does not return true if only another AI's settlers are headed there, as the AI shouldn't know the other
+		/// AI's plans.
+		/// </summary>
+		/// <param name="tile">The tile under consideration for a future city.</param>
+		/// <param name="playerSettlers">The settlers owned by the AI considering building a city.</param>
+		/// <returns></returns>
+		public static bool SettlerAlreadyMovingTowardsTile(Tile tile, List<MapUnit> playerSettlers) {
+			foreach (MapUnit otherSettler in playerSettlers)
+			{
+				if (otherSettler.currentAIData is SettlerAIData otherSettlerAI) {
+					if (otherSettlerAI.destination == tile) {
+						return true;
+					}
+					if (otherSettlerAI.destination.GetLandNeighbors().Exists(innerRingTile => innerRingTile == tile)) {
+						return true;
+					}
+					foreach (Tile innerRingTile in otherSettlerAI.destination.GetLandNeighbors()) {
+						if (innerRingTile.GetLandNeighbors().Exists(outerRingTile => outerRingTile == tile)) {
+							return true;
+						}
+					}
+				}
+			}
 			return false;
 		}
 	}

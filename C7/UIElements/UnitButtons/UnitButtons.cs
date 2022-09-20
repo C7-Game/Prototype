@@ -1,9 +1,12 @@
 using Godot;
 using System.Collections.Generic;
 using C7GameData;
+using Serilog;
 
 public class UnitButtons : VBoxContainer
 {
+
+	private ILogger log = LogManager.ForContext<UnitButtons>();
 
 	[Signal] public delegate void UnitButtonPressed(string button);
 
@@ -47,8 +50,8 @@ public class UnitButtons : VBoxContainer
 		AddNewButton(specializedControls, new UnitControlButton("scienceAge", 3, 2, onButtonPressed));	//validate
 		AddNewButton(specializedControls, new UnitControlButton("buildColony", 4, 2, onButtonPressed));	//validate
 		AddNewButton(specializedControls, new UnitControlButton("buildCity", (int)Godot.KeyList.B, 5, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("road", 6, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("railroad", 7, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("buildRoad", (int)Godot.KeyList.R, 6, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("buildRailroad", 7, 2, onButtonPressed));
 
 		AddNewButton(specializedControls, new UnitControlButton("fortress", 0, 3, onButtonPressed));
 		AddNewButton(specializedControls, new UnitControlButton("barricade", 4, 4, onButtonPressed));
@@ -96,7 +99,7 @@ public class UnitButtons : VBoxContainer
 				buttonMap[buttonKey].Visible = true;
 			}
 			else {
-				GD.PrintErr("Could not find button " + buttonKey);
+				log.Warning("Could not find button " + buttonKey);
 			}
 		}
 

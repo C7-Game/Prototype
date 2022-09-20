@@ -59,6 +59,7 @@ namespace C7Engine
 				log.Information("\n*** Processing production for turn " + gameData.turn + " ***");
 
 				//Generate new barbarian units.
+				Player barbPlayer = gameData.players.Find(player => player.isBarbarians);
 				foreach (Tile tile in gameData.map.barbarianCamps)
 				{
 					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
@@ -68,7 +69,7 @@ namespace C7Engine
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];
-						newUnit.unitType = gameData.unitPrototypes["Warrior"];
+						newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
 						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 						newUnit.experienceLevel = gameData.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;
@@ -76,13 +77,14 @@ namespace C7Engine
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
+						barbPlayer.units.Add(newUnit);
 						log.Debug("New barbarian added at " + tile);
 					}
 					else if (tile.NeighborsWater() && result < 6) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
-						newUnit.unitType = gameData.unitPrototypes["Galley"];
+						newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;
 						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 						newUnit.experienceLevel = gameData.defaultExperienceLevel;
 						newUnit.hitPointsRemaining = 3;
@@ -90,6 +92,7 @@ namespace C7Engine
 
 						tile.unitsOnTile.Add(newUnit);
 						gameData.mapUnits.Add(newUnit);
+						barbPlayer.units.Add(newUnit);
 						log.Debug("New barbarian galley added at " + tile);
 					}
 				}
@@ -108,7 +111,7 @@ namespace C7Engine
 					}
 					else if (newSize < initialSize) {
 						int diff = initialSize - newSize;
-						if (newSize == 0) {
+						if (newSize <= 0) {
 							log.Error($"Attempting to remove the last resident from {city}");
 						} else {
 							//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two

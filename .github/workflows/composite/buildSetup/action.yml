@@ -1,0 +1,41 @@
+name: "Cross-Platform Setup"
+description: "Performs cross-platform build setup"
+
+runs:
+  using: "composite"
+  steps:
+  - name: Optionally set DEBUG_BUILD
+    shell: bash
+    if: github.event.inputs.debug-build == 'true'
+    run: |
+      echo "DEBUG_BUILD=-debug" >> $GITHUB_ENV
+  - name: Optionally set GH_USERNAME
+    shell: bash
+    if: github.event.inputs.include-username == 'true'
+    run: |
+      echo "GH_USERNAME=-${{ github.actor }}" >> $GITHUB_ENV
+  - name: Optionally set BUILD_TIME
+    shell: bash
+    if: github.event.inputs.include-datetime == 'true'
+    run: |
+      echo "BUILD_TIME=-$(date --iso-8601=minutes | sed -e 's/:/-/g' | sed -e 's/\+.*//')" >> $GITHUB_ENV
+  - name: Set .net6.0 SDK
+    shell: bash
+    run: |
+      wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+      dpkg -i packages-microsoft-prod.deb
+      rm packages-microsoft-prod.deb
+      apt-get update -qq
+      apt-get install -y apt-transport-https
+      apt-get update -qq
+      apt-get install -y dotnet-sdk-6.0
+  - name: Set FOLDER_NAME
+    shell: bash
+    run: |
+      echo "FOLDER_NAME=${EXPORT_NAME}${{ github.event.inputs.folder-suffix }}${GH_USERNAME}${BUILD_TIME}" >> $GITHUB_ENV
+  - name: Setup
+    shell: bash
+    run: |
+      mkdir -v -p ~/.local/share/godot/templates
+      mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable.mono ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono
+ 

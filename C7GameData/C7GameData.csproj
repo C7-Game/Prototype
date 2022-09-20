@@ -8,11 +8,12 @@
   <ItemGroup>
     <PackageReference Include="ini-parser" Version="3.4.0" />
     <PackageReference Include="System.Text.Json" Version="6.0.0" />
-    <PackageReference Include="System.IO.Compression" Version="4.0.0"/>
+    <PackageReference Include="System.IO.Compression" Version="4.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\QueryCiv3\QueryCiv3.csproj" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
   </ItemGroup>
 
 </Project>

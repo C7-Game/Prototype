@@ -2,14 +2,16 @@ using Godot;
 using System;
 using System.Diagnostics;
 using C7GameData;
+using Serilog;
 
 public class DisbandConfirmation : Popup
 {
+	private ILogger log = LogManager.ForContext<DisbandConfirmation>();
 
 	string unitType = "";
 
 	Stopwatch loadTimer = new Stopwatch();
-	
+
 	//So Godot doesn't print error " Cannot construct temporary MonoObject because the class does not define a parameterless constructor"
 	//Not sure how important that is *shrug*
 	public DisbandConfirmation() {}
@@ -68,7 +70,7 @@ public class DisbandConfirmation : Popup
 
 		loadTimer.Stop();
 		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-		GD.Print("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+		log.Verbose("Disband popup load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 	}
 
 	private void disband()
