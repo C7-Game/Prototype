@@ -6,6 +6,7 @@ using C7GameData;
 using C7GameData.AIData;
 using C7Engine.AI;
 using C7Engine.AI.StrategicAI;
+using C7Engine.AI.UnitAI;
 using Serilog;
 
 namespace C7Engine
@@ -97,6 +98,9 @@ namespace C7Engine
 				log.Information("Set defender AI for " + unit + " with destination of " + ai.destination);
 				unit.currentAIData = ai;
 			}
+			else if (UnitAttackingBarbCamp(unit, player)) {
+				log.Information("Set unit " + unit + " to take out barb camp");
+			}
 			else if (unit.unitType.name == "Catapult") {
 				//For now tell catapults to sit tight.  It's getting really annoying watching them pointlessly bombard barb camps forever
 				DefenderAIData ai = new DefenderAIData();
@@ -176,6 +180,39 @@ namespace C7Engine
 			}
 		}
 
+		public static bool UnitAttackingBarbCamp(MapUnit unit, Player player) {
+			if (unit.unitType.attack <= 0) {
+				return false;
+			}
+
+			List<Tile> reachableBarbCampsTiles = new List<Tile>();
+			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
+				         .Where(t => unit.CanEnterTile(t, true) && t.cityAtTile == null && t.hasBarbarianCamp))
+			{
+				reachableBarbCampsTiles.Add(t);
+			}
+
+			Tile closestBarbCamp = Tile.NONE;
+			int closestBarbDistance = Int32.MaxValue;
+			foreach (Tile t in reachableBarbCampsTiles) {
+				int crowDistance = t.distanceTo(unit.location);
+				if (crowDistance < closestBarbDistance) {
+					closestBarbCamp = t;
+					closestBarbDistance = crowDistance;
+				}
+			}
+
+			if (closestBarbDistance <= 3) {
+				CombatAIData caid = new CombatAIData();
+
+				PathingAlgorithm algorithm = PathingAlgorithmChooser.GetAlgorithm();
+				caid.path = algorithm.PathFrom(unit.location, closestBarbCamp);
+				unit.currentAIData = caid;
+				return true;
+			}
+			return false;
+		}
+
 		/**
 		 * Finds a nearby city that could use extra defenders.  Currently, that is a city that is tied
 		 * for the fewest units present, and among those, it's the closest.
@@ -233,7 +270,10 @@ namespace C7Engine
 			else if (aiData is ExplorerAIData eai) {
 				return new ExplorerAI();
 			}
-			throw new Exception("AI data not recognized");
+			else if (aiData is CombatAIData cai) {
+				return new CombatAI();
+			}
+			throw new Exception("AI data not recognized" + aiData);
 		}
 	}
 }

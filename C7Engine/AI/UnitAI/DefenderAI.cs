@@ -1,10 +1,9 @@
-﻿using System;
-using C7GameData;
+﻿using C7GameData;
 using C7GameData.AIData;
 using Serilog;
 
-namespace C7Engine.AI {
-	class DefenderAI : UnitAI {
+namespace C7Engine.AI.UnitAI {
+	class DefenderAI : C7Engine.UnitAI {
 
 		private ILogger log = Log.ForContext<DefenderAI>();
 

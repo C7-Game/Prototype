@@ -318,7 +318,7 @@ public static class MapUnitExtensions {
 		// Check for units belonging to other civs
 		foreach (MapUnit other in tile.unitsOnTile)
 			if (other.owner != unit.owner) {
-				if (! other.owner.IsAtPeaceWith(unit.owner))
+				if (!other.owner.IsAtPeaceWith(unit.owner))
 					return allowCombat;
 				else
 					return false;
