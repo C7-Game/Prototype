@@ -98,6 +98,27 @@ namespace C7Engine
 				foreach (City city in gameData.cities)
 				{
 					int initialSize = city.size;
+					city.ComputeCityGrowth();
+					int newSize = city.size;
+					if (newSize > initialSize) {
+						CityResident newResident = new CityResident();
+						newResident.nationality = city.owner.civilization;
+						log.Information("Adding new citizen to " + city);
+						CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
+					}
+					else if (newSize < initialSize) {
+						int diff = initialSize - newSize;
+						if (newSize == 0) {
+							log.Error($"Attempting to remove the last resident from {city}");
+						} else {
+							//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
+							for (int i = 1; i <= diff; i++) {
+								city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
+								city.residents.RemoveAt(city.residents.Count - i);
+							}
+						}
+					}
+
 					IProducible producedItem = city.ComputeTurnProduction();
 					if (producedItem != null) {
 						log.Information($"Produced {producedItem} in {city}");
@@ -112,27 +133,15 @@ namespace C7Engine
 							city.location.unitsOnTile.Add(newUnit);
 							gameData.mapUnits.Add(newUnit);
 							city.owner.AddUnit(newUnit);
-						}
-						city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
-					}
 
-					int newSize = city.size;
-					if (newSize > initialSize) {
-						CityResident newResident = new CityResident();
-						newResident.nationality = city.owner.civilization;
-						CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
-					}
-					else if (newSize < initialSize) {
-						int diff = initialSize - newSize;
-						if (newSize == 0) {
-							log.Error($"Attempting to remove the last resident from {city}");
-						} else {
-							//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
-							for (int i = 1; i <= diff; i++) {
-								city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
-								city.residents.RemoveAt(city.residents.Count - i);
+							if (newUnit.unitType.populationCost > 0) {
+								for (int i = 1; i <= newUnit.unitType.populationCost; i++) {
+									city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
+									city.residents.RemoveAt(city.residents.Count - i);
+								}
 							}
 						}
+						city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
 					}
 				}
 

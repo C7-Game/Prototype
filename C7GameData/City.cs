@@ -75,17 +75,20 @@ namespace C7GameData
             return TurnsToProduce(itemBeingProduced);
         }
 
+        public void ComputeCityGrowth() {
+	        foodStored += CurrentFoodYield() - size * 2;
+	        if (foodStored >= foodNeededToGrow) {
+		        size++;
+		        foodStored = 0;
+	        }
+        }
+
         /**
-         * Computes turn production.  Adjusts population if need be.  If the production queue finishes,
+         * Computes turn production.  If the production queue finishes,
          * returns the item that is built.  Otherwise, returns null.
          */
         public IProducible ComputeTurnProduction()
         {
-			foodStored += CurrentFoodYield() - size * 2;
-            if (foodStored >= foodNeededToGrow) {
-                size++;
-                foodStored = 0;
-            }
 
 			shieldsStored += CurrentProductionYield();
             if (shieldsStored >= itemBeingProduced.shieldCost) {
