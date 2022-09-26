@@ -12,10 +12,10 @@ namespace C7.Map
 	/// </summary>
 	public class TntLayer : LooseLayer
 	{
-		private ILogger log = LogManager.ForContext<ResourceLayer>();
+		private ILogger log = LogManager.ForContext<TntLayer>();
 
 		private static readonly Vector2 tntSize = new Vector2(128, 64);
-		private ImageTexture txtTexture;
+		private ImageTexture tntTexture;
 
 		//Each row corresponds to a terrain.  For now we're only adding one, maybe someday we'll add full TNT support
 		private readonly int GRASSLAND_ROW = 0;
@@ -28,14 +28,14 @@ namespace C7.Map
 
 		public TntLayer()
 		{
-			txtTexture = Util.LoadTextureFromPCX("Art/Terrain/tnt.pcx");
+			tntTexture = Util.LoadTextureFromPCX("Art/Terrain/tnt.pcx");
 		}
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 		{
 			if (tile.overlayTerrainType.Key == "grassland" && tile.isBonusShield) {
-				Rect2 tntRectangle = new Rect2(0 * tntSize.x, BONUS_GRASSLAND_TNT_OFF_ROW * tntSize.y, tntSize);
+				Rect2 tntRectangle = new Rect2(0, BONUS_GRASSLAND_TNT_OFF_ROW * tntSize.y, tntSize);
 				Rect2 screenTarget = new Rect2(tileCenter - 0.5f * tntSize, tntSize);
-				looseView.DrawTextureRectRegion(txtTexture, screenTarget, tntRectangle);
+				looseView.DrawTextureRectRegion(tntTexture, screenTarget, tntRectangle);
 			}
 		}
 	}
