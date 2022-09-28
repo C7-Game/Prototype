@@ -43,6 +43,9 @@ namespace C7GameData
 
         public bool CanBuildUnit(UnitPrototype proto)
         {
+			List<string> allowedUnits = new List<string> {"Warrior", "Chariot", "Settler", "Worker", "Catapult", "Galley"};
+			if (!allowedUnits.Contains(proto.name))
+				return false;
             if (proto.categories.Contains("Sea"))
                 return location.NeighborsWater();
             else
@@ -75,17 +78,20 @@ namespace C7GameData
             return TurnsToProduce(itemBeingProduced);
         }
 
+        public void ComputeCityGrowth() {
+	        foodStored += CurrentFoodYield() - size * 2;
+	        if (foodStored >= foodNeededToGrow) {
+		        size++;
+		        foodStored = 0;
+	        }
+        }
+
         /**
-         * Computes turn production.  Adjusts population if need be.  If the production queue finishes,
+         * Computes turn production.  If the production queue finishes,
          * returns the item that is built.  Otherwise, returns null.
          */
         public IProducible ComputeTurnProduction()
         {
-			foodStored += CurrentFoodYield() - size * 2;
-            if (foodStored >= foodNeededToGrow) {
-                size++;
-                foodStored = 0;
-            }
 
 			shieldsStored += CurrentProductionYield();
             if (shieldsStored >= itemBeingProduced.shieldCost && size > itemBeingProduced.populationCost) {
@@ -127,6 +133,11 @@ namespace C7GameData
 		private int FoodGrowthPerTurn()
 		{
 			return CurrentFoodYield() - size * 2;
+		}
+
+		public void removeCitizen() {
+			residents[residents.Count - 1].tileWorked.personWorkingTile = null;
+			residents.RemoveAt(residents.Count - 1);
 		}
 
 		public override string ToString() {

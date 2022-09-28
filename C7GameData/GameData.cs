@@ -20,6 +20,8 @@ namespace C7GameData
 		[JsonIgnore]
 		public ExperienceLevel defaultExperienceLevel;
 
+		public BarbarianInfo barbarianInfo = new BarbarianInfo();
+
 		public StrengthBonus fortificationBonus;
 		public StrengthBonus riverCrossingBonus;
 		public StrengthBonus cityLevel1DefenseBonus;
@@ -214,11 +216,11 @@ namespace C7GameData
 			List<Tile> barbarianCamps = map.generateStartingLocations(10, 10);
 			foreach (Tile barbCampLocation in barbarianCamps) {
 				if (barbCampLocation.unitsOnTile.Count == 0) { // in case a starting location is under one of the human player's units
-					MapUnit barbWarrior = CreateDummyUnit(unitPrototypes["Warrior"], barbarianPlayer, barbCampLocation);
-					barbWarrior.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
+					MapUnit barbarian = CreateDummyUnit(barbarianInfo.basicBarbarian, barbarianPlayer, barbCampLocation);
+					barbarian.isFortified = true; // Can't do this through UnitInteractions b/c we don't have access to the engine. Really this
 					// whole procedure of generating a map should be part of the engine not the data module.
-					barbWarrior.facingDirection = TileDirection.SOUTHEAST;
-					barbWarrior.location.hasBarbarianCamp = true;
+					barbarian.facingDirection = TileDirection.SOUTHEAST;
+					barbarian.location.hasBarbarianCamp = true;
 					map.barbarianCamps.Add(barbCampLocation);
 				}
 			}
@@ -257,6 +259,7 @@ namespace C7GameData
 				//TODO: Probably remove mapUnits
 				mapUnits.Add(unit);
 				owner.AddUnit(unit);
+				owner.tileKnowledge.AddTilesToKnown(tile);
 				return unit;
 			} else
 				throw new System.Exception("Tried to add dummy unit at Tile.NONE");

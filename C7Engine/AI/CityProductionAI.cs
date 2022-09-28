@@ -32,17 +32,15 @@ namespace C7Engine
 		 */
 		public static IProducible GetNextItemToBeProduced(City city, IProducible lastProduced) {
 			List<StrategicPriority> priorities = city.owner.strategicPriorityData;
-			IEnumerable<UnitPrototype> unitPrototypes = EngineStorage.gameData.unitPrototypes.Values;
-
-			//Temp: Always choose highest-weighted item
-			UnitPrototype highestScoring = unitPrototypes.First();
-			float highestScore = 0.0f;
+			IEnumerable<IProducible> unitPrototypes = city.ListProductionOptions();
 
 			log.Information($"Choosing what to produce next in {city.name}");
 
 			List<IProducible> prototypes = new List<IProducible>();
 			List<float> weights = new List<float>();
 
+			//N.B. This implicitly casts to UnitPrototype.  For now this is fine but once we add buildings, this (or the source of the list)
+			//will have to get smarter.
 			foreach (UnitPrototype unitPrototype in unitPrototypes) {
 				float baseScore = GetItemScore(unitPrototype);
 				log.Debug($" Base score for {unitPrototype} is {baseScore}");

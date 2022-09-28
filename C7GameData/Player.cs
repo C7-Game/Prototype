@@ -84,7 +84,9 @@ public class Player
 	}
 
 	public override string ToString() {
-		return civilization.cityNames.First();
+		if (civilization != null)
+			return civilization.cityNames.First();
+		return "";
 	}
 }
 
