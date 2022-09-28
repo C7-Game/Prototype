@@ -35,7 +35,6 @@ namespace C7Engine {
 						if (newLocation != Tile.NONE) {
 							log.Debug("Moving barbarian at " + unit.location + " to " + newLocation);
 							unit.move(unit.location.directionTo(newLocation));
-							unit.movementPoints.onUnitMove(newLocation.MovementCost());
 						} else {
 							//Avoid potential infinite loop.
 							break;

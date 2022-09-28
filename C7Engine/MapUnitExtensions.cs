@@ -382,8 +382,8 @@ public static class MapUnitExtensions {
 
 	public static float getMovementCost(Tile from, TileDirection dir, Tile newLocation) {
 		if (from.HasRiverCrossing(dir)) return newLocation.MovementCost();
-		if (newLocation.overlays.railroad) return 0;
-		if (newLocation.overlays.road) return 1.0f / 3;
+		if (from.overlays.railroad && newLocation.overlays.railroad) return 0;
+		if ((from.overlays.railroad || from.overlays.road) && newLocation.overlays.road) return 1.0f / 3;
 		return newLocation.MovementCost();
 	}
 
