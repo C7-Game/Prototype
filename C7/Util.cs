@@ -55,7 +55,7 @@ public class Util
 	// box. Arguments:
 	//   exactCaseRoot: The first part of the file path, not made case-insensitive. This is intended be the root Civ 3 path from GetCiv3Path().
 	//   ignoredCaseExtension: The second part of the file path that will be searched ignoring case.
-	static public string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension)
+	public static string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension)
 	{
 		// First try the basic built-in File.Exists method since it's adequate in most cases.
 		string fullPath = System.IO.Path.Combine(exactCaseRoot, ignoredCaseExtension);
@@ -104,7 +104,7 @@ public class Util
 				"Conquests/Conquests" + modPath, "Conquests/Scenarios" + modPath, "civ3PTW/Scenarios" + modPath
 			};
 			for (int i = 0; i < tryPaths.Length; i++) {
-				string actualCasePath = CheckForMedia(mediaPath, tryPaths[i]);
+				string actualCasePath = CheckForCiv3Media(mediaPath, tryPaths[i]);
 				if (actualCasePath != null)
 					return actualCasePath;
 			}
@@ -123,7 +123,7 @@ public class Util
 			""
 		};
 		for(int i = 0; i < basePaths.Length; i++) {
-			string actualCasePath = CheckForMedia(mediaPath, basePaths[i]);
+			string actualCasePath = CheckForCiv3Media(mediaPath, basePaths[i]);
 			if (actualCasePath != null)
 				return actualCasePath;
 		}
@@ -131,7 +131,7 @@ public class Util
 		throw new ApplicationException("Media path not found: " + mediaPath);
 	}
 
-	private static string CheckForMedia(string relPath, string rootPath)
+	private static string CheckForCiv3Media(string relPath, string rootPath)
 	{
 		// Combine TryPaths[i] and relPath. Make sure not to leave an erroneous forward slash at the start if TryPaths[i] is empty
 		string fullPath = rootPath != "" ? rootPath + "/" + relPath : relPath;
