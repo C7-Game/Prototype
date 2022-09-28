@@ -26,7 +26,7 @@ public class Util
 			MarginBottom = 750;
 			base._Ready();
 		}
-		
+
 	}
 	static public string GetCiv3Path()
 	{
@@ -55,7 +55,7 @@ public class Util
 	// box. Arguments:
 	//   exactCaseRoot: The first part of the file path, not made case-insensitive. This is intended be the root Civ 3 path from GetCiv3Path().
 	//   ignoredCaseExtension: The second part of the file path that will be searched ignoring case.
-	static public string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension)
+	public static string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension)
 	{
 		// First try the basic built-in File.Exists method since it's adequate in most cases.
 		string fullPath = System.IO.Path.Combine(exactCaseRoot, ignoredCaseExtension);
@@ -84,34 +84,59 @@ public class Util
 		return tr;
 	}
 
-	static public string Civ3MediaPath(string relPath, string relModPath = "")
-	// Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
-	// Assumes Conquests/Complete
+	/// <summary>
+	/// Pass this function a relative path (e.g. Art/Terrain/xpgc.pcx) and it will grab the correct version
+	/// Assumes Conquests/Complete
+	/// </summary>
+	/// <param name="mediaPath">The media path, e.g. Art/Units/units_32.pcx</param>
+	/// <param name="modPath">The mod path for a scenario, e.g. RFRE</param>
+	/// <returns>The path to the media on the file system, or an exception if it cannot be found</returns>
+	/// <exception cref="ApplicationException"></exception>
+	public static string Civ3MediaPath(string mediaPath, string modPath = "")
 	{
-		string [] TryPaths = new string [] {
-			relModPath,
-			// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
-			//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
-			"Conquests/Conquests" + relModPath,
-			"Conquests/Scenarios" + relModPath,
-			"civ3PTW/Scenarios" + relModPath,
+		//First, check if the file exists via a scenario's mod path
+		//For now this is only checked relative to Civ3, not relative to C7.
+		if (modPath != "") {
+			string[] tryPaths = new string[] {
+				modPath,
+				// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
+				//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
+				"Conquests/Conquests" + modPath, "Conquests/Scenarios" + modPath, "civ3PTW/Scenarios" + modPath
+			};
+			for (int i = 0; i < tryPaths.Length; i++) {
+				string actualCasePath = CheckForCiv3Media(mediaPath, tryPaths[i]);
+				if (actualCasePath != null)
+					return actualCasePath;
+			}
+		}
+
+		//Next, before trying the base Civ paths, see if we have it packaged with C7
+		string c7Path = FileExistsIgnoringCase("", mediaPath);
+		if (c7Path != null) {
+			return c7Path;
+		}
+
+		//Finally, check the base Civ paths
+		string[] basePaths = new string[] {
 			"Conquests",
 			"civ3PTW",
 			""
 		};
-		for(int i = 0; i < TryPaths.Length; i++)
-		{
-			// If relModPath not set, skip that check
-			if(i == 0 && relModPath == "") { continue; }
-
-			// Combine TryPaths[i] and relPath. Make sure not to leave an erroneous forward slash at the start if TryPaths[i] is empty
-			string tryRelPath = TryPaths[i] != "" ? TryPaths[i] + "/" + relPath : relPath;
-
-			string actualCasePath = FileExistsIgnoringCase(Civ3Root, tryRelPath);
+		for(int i = 0; i < basePaths.Length; i++) {
+			string actualCasePath = CheckForCiv3Media(mediaPath, basePaths[i]);
 			if (actualCasePath != null)
 				return actualCasePath;
 		}
-		throw new ApplicationException("Media path not found: " + relPath);
+
+		throw new ApplicationException("Media path not found: " + mediaPath);
+	}
+
+	private static string CheckForCiv3Media(string relPath, string rootPath)
+	{
+		// Combine TryPaths[i] and relPath. Make sure not to leave an erroneous forward slash at the start if TryPaths[i] is empty
+		string fullPath = rootPath != "" ? rootPath + "/" + relPath : relPath;
+
+		return FileExistsIgnoringCase(Civ3Root, fullPath);
 	}
 
 	//Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
@@ -126,7 +151,7 @@ public class Util
 		return texture;
 	}
 
-	//Send this function a path (e.g. Title_Screen.jpg) and it will 
+	//Send this function a path (e.g. Title_Screen.jpg) and it will
 	//load it up and convert it in both debug and release modes.
 	//Note: We probably will need variants of this for other file types, too.
 	static public ImageTexture LoadTextureFromC7JPG(string relPath) {
@@ -147,7 +172,7 @@ public class Util
 		texture.CreateFromImage(backgroundImage);
 		return texture;
 	}
-	
+
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
 	//Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
 	//file, and it'll load it up and return you what you need.
@@ -270,7 +295,7 @@ public class Util
 
 		bool formatFound = false;
 		bool dataFound = false;
-		
+
 		AudioStreamSample wav = new AudioStreamSample();
 
 		while (!file.EofReached())
@@ -337,7 +362,7 @@ public class Util
 		if (!formatFound || !dataFound) {
 			throw new Exception("Failed to find both the format and data chunks");
 		}
-		
+
 		return wav;
 	}
 }
