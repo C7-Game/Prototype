@@ -22,5 +22,5 @@
 LICENSE text eol=lf
 
 # Super-long text files
-C7/c7-static-map-save.json binary
-C7/c7-static-map-save.json -diff
+C7/Text/c7-static-map-save.json binary
+C7/Text/c7-static-map-save.json -diff

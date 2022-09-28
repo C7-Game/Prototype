@@ -19,7 +19,7 @@ namespace BuildDevSave
 
             C7SaveFormat output = ImportCiv3.ImportSav(GetCiv3Path + SavFilePath, GetCiv3Path + @"/Conquests/conquests.biq");
 
-            C7SaveFormat.Save(output, "../../C7/c7-static-map-save.json");
+            C7SaveFormat.Save(output, "../../C7/Text/c7-static-map-save.json");
         }
     }
 }
