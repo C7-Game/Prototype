@@ -179,7 +179,10 @@ namespace C7GameData
 		public int productionYield(Player player)
 		{
 			int yield = overlayTerrainType.baseShieldProduction;
-			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+			if (overlayTerrainType.Key == "grassland" && this.isBonusShield) {
+				yield++;
+			}
+			if (Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
 				yield += this.Resource.ShieldsBonus;
 			}
 			return yield;
