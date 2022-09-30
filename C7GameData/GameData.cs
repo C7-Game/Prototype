@@ -1,10 +1,15 @@
+using Serilog;
+
 namespace C7GameData
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Text.Json.Serialization;
-	public class GameData
-	{
+	public class GameData {
+		[JsonIgnore]
+		private static ILogger log = Log.ForContext<GameData>();
+
+		public int seed = -1;	//change here to set a hard-coded seed
 		public int turn {get; set;}
 		public static Random rng; // TODO: Is GameData really the place for this?
 		public GameMap map {get; set;}
@@ -38,8 +43,12 @@ namespace C7GameData
 		public GameData()
 		{
 			map = new GameMap();
-			rng = new Random();
-			// rng = new Random(123);	//Set a fixed seed here until we add it to the UI
+			if (seed == -1) {
+				rng = new Random();
+				seed = rng.Next(int.MaxValue);
+				log.Information("Random seed is " + seed);
+			}
+			rng = new Random(seed);
 		}
 
 		public List<Player> GetHumanPlayers() {

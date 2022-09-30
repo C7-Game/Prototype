@@ -27,7 +27,7 @@ namespace C7Engine
 				foreach (StrategicPriority priority in priorities) {
 					player.strategicPriorityData.Add(priority);
 				}
-				player.turnsUntilPriorityReevaluation = 15 + new Random().Next(10);
+				player.turnsUntilPriorityReevaluation = 15 + GameData.rng.Next(10);
 				log.Information(player.turnsUntilPriorityReevaluation + " turns until next re-evaluation");
 			} else {
 				player.turnsUntilPriorityReevaluation--;
