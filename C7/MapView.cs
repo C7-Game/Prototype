@@ -1030,29 +1030,37 @@ public class LooseView : Node2D {
 				if (gD.map.isRowAt(y))
 					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 						Tile tile = gD.map.tileAt(x, y);
-						if (tile != Tile.NONE && gameDataAccess.gameData.GetHumanPlayers()[0].tileKnowledge.isTileKnown(tile))
+						if (IsTileKnown(tile, gameDataAccess))
 							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
 					}
 
-			foreach (LooseLayer layer in layers.FindAll(L => L.visible)) {
+			foreach (LooseLayer layer in layers.FindAll(L => L.visible && !(L is FogOfWarLayer))) {
 				layer.onBeginDraw(this, gD);
 				foreach (VisibleTile vT in visibleTiles)
 					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
 				layer.onEndDraw(this, gD);
 			}
 
-			foreach (LooseLayer layer in layers.FindAll(layer => layer is FogOfWarLayer)) {
-				for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
-					if (gD.map.isRowAt(y))
-						for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
-							Tile tile = gD.map.tileAt(x, y);
-							if (tile != Tile.NONE) {
-								VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) };
-								layer.drawObject(this, gD, tile, invisibleTile.tileCenter);
+			if (!gD.observerMode) {
+				foreach (LooseLayer layer in layers.FindAll(layer => layer is FogOfWarLayer)) {
+					for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
+						if (gD.map.isRowAt(y))
+							for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
+								Tile tile = gD.map.tileAt(x, y);
+								if (tile != Tile.NONE) {
+									VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) };
+									layer.drawObject(this, gD, tile, invisibleTile.tileCenter);
+								}
 							}
-						}
+				}
 			}
 		}
+	}
+	private static bool IsTileKnown(Tile tile, UIGameDataAccess gameDataAccess) {
+		if (gameDataAccess.gameData.observerMode) {
+			return true;
+		}
+		return tile != Tile.NONE && gameDataAccess.gameData.GetHumanPlayers()[0].tileKnowledge.isTileKnown(tile);
 	}
 }
 

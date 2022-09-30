@@ -32,10 +32,7 @@ namespace C7Engine
 				foreach (Player player in gameData.players) {
 					if ((! player.hasPlayedThisTurn) &&
 					    ! (firstTurn && player.SitsOutFirstTurn())) {
-						if (player.guid == EngineStorage.uiControllerID) {
-							new MsgStartTurn().send();
-							return;
-						} else if (player.isBarbarians) {
+						if (player.isBarbarians) {
 							//Call the barbarian AI
 							//TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans,
 							//strategy, etc.) For now, we only have a random AI, so that will be in a future commit
@@ -44,8 +41,13 @@ namespace C7Engine
 						} else if (! player.isHuman) {
 							PlayerAI.PlayTurn(player, GameData.rng);
 							player.hasPlayedThisTurn = true;
-						} else {
+						} else if (player.guid != EngineStorage.uiControllerID) {
 							player.hasPlayedThisTurn = true;
+						}
+						//Human player check.  Let the human see what's going on even if they are in observer mode.
+						if (player.guid == EngineStorage.uiControllerID) {
+							new MsgStartTurn().send();
+							return;
 						}
 					}
 				}
