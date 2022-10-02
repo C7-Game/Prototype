@@ -15,14 +15,14 @@ namespace C7GameData.AIData
 			ESTABLISH_BEACHHEAD,	//e.g. on a new continent
 			PILLAGE_ENEMY_LANDS
 		}
-		
+
 		public DefenderGoal goal;
 		public Tile destination;
 		public TilePath pathToDestination;
-		
+
 		public override string ToString()
 		{
-			string cityName = destination.cityAtTile.name;
+			string cityName = destination.HasCity ? destination.cityAtTile.name : " at " + destination.ToString();
 			return goal + " " + cityName;
 		}
 	}
