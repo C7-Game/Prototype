@@ -27,7 +27,7 @@ namespace C7Engine {
 						if (validTiles.Count == 0) {
 							//This can happen if a barbarian galley spawns next to a 1-tile lake, moves there, and doesn't have anywhere else to go.
 							log.Warning("WARNING: No valid tiles for barbarian to move to");
-							continue;
+							break;
 						}
 						Tile newLocation = validTiles[GameData.rng.Next(validTiles.Count)];
 						//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
