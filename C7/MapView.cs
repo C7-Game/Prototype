@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using C7.Map;
 using Godot;
 using ConvertCiv3Media;
@@ -884,17 +885,25 @@ public class LooseView : Node2D {
 			// have to reiterate for each layer. Doing this improves framerate significantly.
 			MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
 			List<VisibleTile> visibleTiles = new List<VisibleTile>();
-			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
+			List<VisibleTile> neighboringVisibleTiles = new List<VisibleTile>();
+			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++) {
 				if (gD.map.isRowAt(y))
 					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 						Tile tile = gD.map.tileAt(x, y);
-						if (IsTileKnown(tile, gameDataAccess))
+						if (IsTileKnown(tile, gameDataAccess)) {
 							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
+							foreach (Tile t in tile.neighbors.Values) {
+								neighboringVisibleTiles.Add(new VisibleTile { tile = t, tileCenter = MapView.cellSize * new Vector2(t.xCoordinate + 1, t.yCoordinate + 1) });
+							}
+						}
 					}
+			}
+
+			List<VisibleTile> tilesIncludingNeighboringFogTiles = visibleTiles.Union(neighboringVisibleTiles).ToList();
 
 			foreach (LooseLayer layer in layers.FindAll(L => L.visible && !(L is FogOfWarLayer))) {
 				layer.onBeginDraw(this, gD);
-				foreach (VisibleTile vT in visibleTiles)
+				foreach (VisibleTile vT in tilesIncludingNeighboringFogTiles)
 					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
 				layer.onEndDraw(this, gD);
 			}

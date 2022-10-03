@@ -1,3 +1,4 @@
+using System;
 using C7GameData;
 using ConvertCiv3Media;
 using Godot;
@@ -31,6 +32,8 @@ namespace C7.Map {
 					sum += 27 * 2;
 				if (sum != 0) {
 					looseView.DrawTextureRectRegion(fogOfWarTexture, screenTarget, getRect(sum));
+				} else {
+					looseView.DrawTextureRectRegion(fogOfWarTexture, screenTarget, getRect(40));
 				}
 			}
 			//do nothing if the tile is known (equiv to the lower-right)
