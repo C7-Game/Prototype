@@ -21,5 +21,16 @@ namespace C7Engine
 			tileWithNewCity.cityAtTile = newCity;
 			tileWithNewCity.overlays.road = true;
 		}
+
+		public static void DestroyCity(int x, int y) {
+			Tile tile = EngineStorage.gameData.map.tileAt(x, y);
+			tile.DisbandNonDefendingUnits();
+			while (tile.cityAtTile.size > 0) {
+				tile.cityAtTile.RemoveCitizen();
+			}
+			tile.cityAtTile.owner.cities.Remove(tile.cityAtTile);
+			EngineStorage.gameData.cities.Remove(tile.cityAtTile);
+			tile.cityAtTile = null;
+		}
 	}
 }

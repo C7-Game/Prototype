@@ -116,7 +116,7 @@ namespace C7Engine
 							log.Error($"Attempting to remove the last resident from {city}");
 						} else {
 							for (int i = 0; i < diff; i++) {
-								city.removeCitizen();
+								city.RemoveCitizen();
 							}
 						}
 					}
@@ -138,7 +138,7 @@ namespace C7Engine
 
 							if (newUnit.unitType.populationCost > 0) {
 								for (int i = 0; i < newUnit.unitType.populationCost; i++) {
-									city.removeCitizen();
+									city.RemoveCitizen();
 								}
 							}
 						}
