@@ -35,7 +35,15 @@ public class Credits : Node2D
 		creditsLabel.RectPosition = new Vector2(80, 120);
 		creditsLabel.RectSize = new Vector2(864, 528);
 		creditsLabel.BbcodeEnabled = true;
+
+		DynamicFont smallFont = new DynamicFont();
+		smallFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf");
+		smallFont.Size = 12;
+
+		creditsLabel.AddFontOverride("normal_font", smallFont);
+		// creditsLabel.PushFont(ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf"));
 		creditsLabel.BbcodeText = creditsText;
+		creditsLabel.BbcodeText = "[color=black]<b>Bold Text</b>[b]Bold Text 2[/b]Not Bold Text";
 		AddChild(creditsLabel);
 
 		TextureButton GoBackButton = new TextureButton();
