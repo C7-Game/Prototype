@@ -115,9 +115,7 @@ namespace C7Engine
 						if (newSize <= 0) {
 							log.Error($"Attempting to remove the last resident from {city}");
 						} else {
-							for (int i = 0; i < diff; i++) {
-								city.removeCitizen();
-							}
+							city.RemoveCitizens(diff);
 						}
 					}
 
@@ -137,9 +135,7 @@ namespace C7Engine
 							city.owner.AddUnit(newUnit);
 
 							if (newUnit.unitType.populationCost > 0) {
-								for (int i = 0; i < newUnit.unitType.populationCost; i++) {
-									city.removeCitizen();
-								}
+								city.RemoveCitizens(newUnit.unitType.populationCost);
 							}
 						}
 						city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
