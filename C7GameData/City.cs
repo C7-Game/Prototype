@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Serilog;
 
 namespace C7GameData
 {
@@ -135,9 +136,26 @@ namespace C7GameData
 			return CurrentFoodYield() - size * 2;
 		}
 
-		public void RemoveCitizen() {
+		private void RemoveCitizen() {
 			residents[residents.Count - 1].tileWorked.personWorkingTile = null;
 			residents.RemoveAt(residents.Count - 1);
+		}
+
+		public void RemoveCitizens(int number) {
+			for (int i = 0; i < number; i++) {
+				if (residents.Count > 0) {
+					RemoveCitizen();
+				} else {
+					Log.Warning("Trying to remove last citizen from " + name);
+					break;
+				}
+			}
+		}
+
+		public void RemoveAllCitizens() {
+			while (residents.Count > 0) {
+				RemoveCitizen();
+			}
 		}
 
 		public override string ToString() {

@@ -25,9 +25,7 @@ namespace C7Engine
 		public static void DestroyCity(int x, int y) {
 			Tile tile = EngineStorage.gameData.map.tileAt(x, y);
 			tile.DisbandNonDefendingUnits();
-			while (tile.cityAtTile.size > 0) {
-				tile.cityAtTile.RemoveCitizen();
-			}
+			tile.cityAtTile.RemoveAllCitizens();
 			tile.cityAtTile.owner.cities.Remove(tile.cityAtTile);
 			EngineStorage.gameData.cities.Remove(tile.cityAtTile);
 			tile.cityAtTile = null;
