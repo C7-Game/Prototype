@@ -88,9 +88,6 @@ public class Util
 	/// Sets the Civ3 legacy mod path.
 	/// This is here so Civ3MediaPath can refer to it, without having to grab it from all the places we might need to call
 	/// it, which is in 25 places currently.
-	///
-	/// N.B. This needs to be enhanced to support semicolon-separated mod paths.  But Civ3MediaPath also
-	/// needs to be enhanced to support that.
 	/// </summary>
 	private static string modPath;
 	public static void setModPath(string modPathParam) {
