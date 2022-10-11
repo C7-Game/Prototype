@@ -536,6 +536,22 @@ public class Game : Node2D
 			{
 				SetAnimationsEnabled(false);
 			}
+			else if (eventKeyDown.Scancode == (int)Godot.KeyList.O && eventKeyDown.Shift && eventKeyDown.Control && eventKeyDown.Alt) {
+				using (UIGameDataAccess gameDataAccess = new UIGameDataAccess()) {
+					gameDataAccess.gameData.observerMode = !gameDataAccess.gameData.observerMode;
+					if (gameDataAccess.gameData.observerMode) {
+						foreach (Player player in gameDataAccess.gameData.players) {
+							player.isHuman = false;
+						}
+					} else {
+						foreach (Player player in gameDataAccess.gameData.players) {
+							if (player.guid == EngineStorage.uiControllerID) {
+								player.isHuman = true;
+							}
+						}
+					}
+				}
+			}
 
 			// always turn off go to mode unless G key is pressed
 			// do this after processing esc key

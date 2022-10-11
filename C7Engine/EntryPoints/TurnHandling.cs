@@ -32,10 +32,7 @@ namespace C7Engine
 				foreach (Player player in gameData.players) {
 					if ((! player.hasPlayedThisTurn) &&
 					    ! (firstTurn && player.SitsOutFirstTurn())) {
-						if (player.guid == EngineStorage.uiControllerID) {
-							new MsgStartTurn().send();
-							return;
-						} else if (player.isBarbarians) {
+						if (player.isBarbarians) {
 							//Call the barbarian AI
 							//TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans,
 							//strategy, etc.) For now, we only have a random AI, so that will be in a future commit
@@ -44,8 +41,13 @@ namespace C7Engine
 						} else if (! player.isHuman) {
 							PlayerAI.PlayTurn(player, GameData.rng);
 							player.hasPlayedThisTurn = true;
-						} else {
+						} else if (player.guid != EngineStorage.uiControllerID) {
 							player.hasPlayedThisTurn = true;
+						}
+						//Human player check.  Let the human see what's going on even if they are in observer mode.
+						if (player.guid == EngineStorage.uiControllerID) {
+							new MsgStartTurn().send();
+							return;
 						}
 					}
 				}
@@ -101,6 +103,22 @@ namespace C7Engine
 				foreach (City city in gameData.cities)
 				{
 					int initialSize = city.size;
+					city.ComputeCityGrowth();
+					int newSize = city.size;
+					if (newSize > initialSize) {
+						CityResident newResident = new CityResident();
+						newResident.nationality = city.owner.civilization;
+						CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
+					}
+					else if (newSize < initialSize) {
+						int diff = initialSize - newSize;
+						if (newSize <= 0) {
+							log.Error($"Attempting to remove the last resident from {city}");
+						} else {
+							city.RemoveCitizens(diff);
+						}
+					}
+
 					IProducible producedItem = city.ComputeTurnProduction();
 					if (producedItem != null) {
 						log.Information($"Produced {producedItem} in {city}");
@@ -115,27 +133,12 @@ namespace C7Engine
 							city.location.unitsOnTile.Add(newUnit);
 							gameData.mapUnits.Add(newUnit);
 							city.owner.AddUnit(newUnit);
-						}
-						city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
-					}
 
-					int newSize = city.size;
-					if (newSize > initialSize) {
-						CityResident newResident = new CityResident();
-						newResident.nationality = city.owner.civilization;
-						CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
-					}
-					else if (newSize < initialSize) {
-						int diff = initialSize - newSize;
-						if (newSize <= 0) {
-							log.Error($"Attempting to remove the last resident from {city}");
-						} else {
-							//Remove two residents.  Eventually, this will be prioritized by nationality, but for now just remove the last two
-							for (int i = 1; i <= diff; i++) {
-								city.residents[city.residents.Count - i].tileWorked.personWorkingTile = null;
-								city.residents.RemoveAt(city.residents.Count - i);
+							if (newUnit.unitType.populationCost > 0) {
+								city.RemoveCitizens(newUnit.unitType.populationCost);
 							}
 						}
+						city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
 					}
 				}
 

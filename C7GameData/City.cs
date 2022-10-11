@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Serilog;
 
 namespace C7GameData
 {
@@ -78,17 +79,20 @@ namespace C7GameData
             return TurnsToProduce(itemBeingProduced);
         }
 
+        public void ComputeCityGrowth() {
+	        foodStored += CurrentFoodYield() - size * 2;
+	        if (foodStored >= foodNeededToGrow) {
+		        size++;
+		        foodStored = 0;
+	        }
+        }
+
         /**
-         * Computes turn production.  Adjusts population if need be.  If the production queue finishes,
+         * Computes turn production.  If the production queue finishes,
          * returns the item that is built.  Otherwise, returns null.
          */
         public IProducible ComputeTurnProduction()
         {
-			foodStored += CurrentFoodYield() - size * 2;
-            if (foodStored >= foodNeededToGrow) {
-                size++;
-                foodStored = 0;
-            }
 
 			shieldsStored += CurrentProductionYield();
             if (shieldsStored >= itemBeingProduced.shieldCost && size > itemBeingProduced.populationCost) {
@@ -130,6 +134,28 @@ namespace C7GameData
 		private int FoodGrowthPerTurn()
 		{
 			return CurrentFoodYield() - size * 2;
+		}
+
+		private void RemoveCitizen() {
+			residents[residents.Count - 1].tileWorked.personWorkingTile = null;
+			residents.RemoveAt(residents.Count - 1);
+		}
+
+		public void RemoveCitizens(int number) {
+			for (int i = 0; i < number; i++) {
+				if (residents.Count > 0) {
+					RemoveCitizen();
+				} else {
+					Log.Warning("Trying to remove last citizen from " + name);
+					break;
+				}
+			}
+		}
+
+		public void RemoveAllCitizens() {
+			while (residents.Count > 0) {
+				RemoveCitizen();
+			}
 		}
 
 		public override string ToString() {

@@ -113,8 +113,7 @@ namespace C7Engine
 				i++;
 			}
 
-			Random random = new Random();
-			double randomDouble = sumOfAllWeights * random.NextDouble();
+			double randomDouble = sumOfAllWeights * GameData.rng.NextDouble();
 			log.Verbose($"Random number in range 0 to {sumOfAllWeights} is {randomDouble}");
 			int idx = 0;
 			foreach (double cutoff in cutoffs) {

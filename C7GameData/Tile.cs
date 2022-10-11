@@ -79,7 +79,7 @@ namespace C7GameData
 		//Sometimes we care *specifically* about the Coast terrain, e.g. galleys can only move on that terrain, not Sea or Ocean
 		//Those cases should not use this method.
 		public bool NeighborsWater() {
-			foreach (Tile neighbor in getDiagonalNeighbors()) {
+			foreach (Tile neighbor in neighbors.Values) {
 				if (neighbor.baseTerrainType.isWater()) {
 					return true;
 				}
@@ -87,9 +87,14 @@ namespace C7GameData
 			return false;
 		}
 
-		public Tile[] getDiagonalNeighbors() {
-			Tile[] diagonalNeighbors =  { neighbors[TileDirection.NORTHEAST], neighbors[TileDirection.NORTHWEST], neighbors[TileDirection.SOUTHEAST], neighbors[TileDirection.SOUTHWEST]};
-			return diagonalNeighbors;
+		/// <summary>
+		/// Returns neighbors along edges only.
+		/// This is used by some graphics algorithms.
+		/// </summary>
+		/// <returns></returns>
+		public Tile[] getEdgeNeighbors() {
+			Tile[] edgeNeighbors =  { neighbors[TileDirection.NORTHEAST], neighbors[TileDirection.NORTHWEST], neighbors[TileDirection.SOUTHEAST], neighbors[TileDirection.SOUTHWEST]};
+			return edgeNeighbors;
 		}
 
 		public override string ToString()
@@ -129,6 +134,10 @@ namespace C7GameData
 		public bool IsLand()
 		{
 			return !baseTerrainType.isWater();
+		}
+
+		public bool IsWater() {
+			return baseTerrainType.isWater();
 		}
 
 		public bool IsAllowCities() {
@@ -179,7 +188,10 @@ namespace C7GameData
 		public int productionYield(Player player)
 		{
 			int yield = overlayTerrainType.baseShieldProduction;
-			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
+			if (overlayTerrainType.Key == "grassland" && this.isBonusShield) {
+				yield++;
+			}
+			if (Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
 				yield += this.Resource.ShieldsBonus;
 			}
 			return yield;

@@ -34,12 +34,11 @@ namespace C7GameData.AIData {
 				if (landScore == 0) {	//nowhere else to expand
 					//Figure out who to fight.  This should obviously be more sophisticated and should favor reachable opponents.
 					//However, we don't yet store info on who's been discovered, so for now we'll choose someone randomly
-					Random random = new Random();
 					int opponentCount = EngineStorage.gameData.players.Count - 1;
 					foreach (Player nation in EngineStorage.gameData.players)
 					{
 						if (nation != player) {
-							int rnd = random.Next(opponentCount);
+							int rnd = GameData.rng.Next(opponentCount);
 							if (rnd == 0) {
 								//Let's fight this nation!
 								properties["opponent"] = nation.guid;
