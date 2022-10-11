@@ -40,6 +40,8 @@ namespace C7GameData
 
 		public bool observerMode = false;
 
+		public string scenarioSearchPath;	//legacy from Civ3, we'll probably have a more modern format someday but this keeps legacy compatibility
+
 		public GameData()
 		{
 			map = new GameMap();

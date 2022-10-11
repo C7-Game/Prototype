@@ -81,7 +81,7 @@ public class Civ3Map : Node2D
 		// temp if
 		if(FileNameLookup[fileID] != null)
 		{
-		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath(FileNameLookup[fileID].ToString(), ModRelPath));
+		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath(FileNameLookup[fileID].ToString()));//, ModRelPath));
 		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
 
 		for (int y = 0; y < PcxTxtr.Height; y += 64) {
