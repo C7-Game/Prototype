@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using C7.Map;
 using Godot;
 using ConvertCiv3Media;
@@ -309,7 +310,7 @@ public class ForestLayer : LooseLayer {
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
-			if (tile.NeighborsWater()) {
+			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
 				randomJungleColumn = tile.xCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			}
@@ -340,7 +341,7 @@ public class ForestLayer : LooseLayer {
 			}
 			else {
 				forestRow = tile.yCoordinate % 2;
-				if (tile.NeighborsWater()) {
+				if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
 					forestColumn = tile.xCoordinate % 5;
 					if (tile.baseTerrainType.Key == "grassland") {
 						forestTexture = smallForestTexture;
@@ -390,7 +391,7 @@ public class MarshLayer : LooseLayer {
 			int randomJungleRow = tile.yCoordinate % 2;
 			int randomMarshColumn;
 			ImageTexture marshTexture;
-			if (tile.NeighborsWater()) {
+			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
 				randomMarshColumn = tile.xCoordinate % 5;
 				marshTexture = smallMarshTexture;
 			}
