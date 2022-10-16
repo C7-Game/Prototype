@@ -98,7 +98,7 @@ namespace C7Engine
 				log.Information("Set defender AI for " + unit + " with destination of " + ai.destination);
 				unit.currentAIData = ai;
 			}
-			else if (UnitAttackingBarbCamp(unit, player)) {
+			else if (UnitCanAttackNearbyBarbCamp(unit, player)) {
 				log.Information("Set unit " + unit + " to take out barb camp");
 			}
 			else if (unit.unitType.name == "Catapult") {
@@ -180,20 +180,16 @@ namespace C7Engine
 			}
 		}
 
-		public static bool UnitAttackingBarbCamp(MapUnit unit, Player player) {
+		private static bool UnitCanAttackNearbyBarbCamp(MapUnit unit, Player player) {
 			if (unit.unitType.attack <= 0) {
 				return false;
 			}
 
-			List<Tile> reachableBarbCampsTiles = new List<Tile>();
-			foreach (Tile t in player.tileKnowledge.AllKnownTiles()
-				         .Where(t => unit.CanEnterTile(t, true) && t.cityAtTile == null && t.hasBarbarianCamp))
-			{
-				reachableBarbCampsTiles.Add(t);
-			}
+			List<Tile> reachableBarbCampsTiles = player.tileKnowledge.AllKnownTiles()
+				.Where(t => unit.CanEnterTile(t, true) && t.hasBarbarianCamp).ToList();
 
 			Tile closestBarbCamp = Tile.NONE;
-			int closestBarbDistance = Int32.MaxValue;
+			int closestBarbDistance = int.MaxValue;
 			foreach (Tile t in reachableBarbCampsTiles) {
 				int crowDistance = t.distanceTo(unit.location);
 				if (crowDistance < closestBarbDistance) {

@@ -13,12 +13,12 @@ namespace C7Engine.AI.UnitAI {
 	public class CombatAI : C7Engine.UnitAI {
 		private Tile target;
 
-		private ILogger log = Log.ForContext<DefenderAI>();
+		private ILogger log = Log.ForContext<CombatAI>();
 
 		public bool PlayTurn(Player player, MapUnit unit) {
 			CombatAIData explorerData = (CombatAIData)unit.currentAIData;
 
-			while (true) {
+			while (unit.movementPoints.remaining > 0) {
 				Tile t = explorerData.path.Next();
 				if (t == Tile.NONE) {
 					break;
@@ -31,7 +31,6 @@ namespace C7Engine.AI.UnitAI {
 				foreach (KeyValuePair<TileDirection, Tile> neighbor in unit.location.neighbors) {
 					if (neighbor.Value == t) {
 						unit.move(neighbor.Key);
-						return true;
 					}
 				}
 			}
