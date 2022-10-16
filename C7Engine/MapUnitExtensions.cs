@@ -387,7 +387,7 @@ public static class MapUnitExtensions {
 	public static void moveAlongPath(this MapUnit unit)
 	{
 		while (unit.movementPoints.canMove && unit.path?.PathLength() > 0) {
-			var dir = unit.location.directionTo(unit.path.Next());
+			TileDirection dir = unit.location.directionTo(unit.path.Next());
 			unit.move(dir, true); //TODO: don't wait on last move animation?
 		}
 	}
