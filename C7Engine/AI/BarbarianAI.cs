@@ -21,7 +21,7 @@ namespace C7Engine {
 			// issue for the barbs but will be for similar loops elsewhere in the AI logic.
 			foreach (MapUnit unit in player.units.ToArray()) {
 				if (UnitIsFreeToMove(unit)) {
-					while (unit.movementPoints.canMove) {
+					while (unit.hitPointsRemaining > 0 && unit.movementPoints.canMove) {
 						//Move randomly
 						List<Tile> validTiles = unit.unitType.categories.Contains("Sea") ? unit.location.GetCoastNeighbors() : unit.location.GetLandNeighbors();
 						if (validTiles.Count == 0) {
