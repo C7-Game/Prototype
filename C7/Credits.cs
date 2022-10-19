@@ -24,12 +24,12 @@ public class Credits : Node2D
 
 	private void ShowCredits()
 	{
-		ImageTexture CreditsTexture = Util.LoadTextureFromPCX("Art/Credits/credits_background.pcx");
-		ImageTexture GoBackTexture = Util.LoadTextureFromPCX("Art/exitBox-backgroundStates.pcx", 0, 0, 72, 48);
+		ImageTexture creditsTexture = Util.LoadTextureFromPCX("Art/Credits/credits_background.pcx");
+		ImageTexture goBackTexture = Util.LoadTextureFromPCX("Art/exitBox-backgroundStates.pcx", 0, 0, 72, 48);
 
-		TextureRect CreditsBackground = new TextureRect();
-		CreditsBackground.Texture = CreditsTexture;
-		AddChild(CreditsBackground);
+		TextureRect creditsBackground = new TextureRect();
+		creditsBackground.Texture = creditsTexture;
+		AddChild(creditsBackground);
 
 		RichTextLabel creditsLabel = new RichTextLabel();
 		creditsLabel.RectPosition = new Vector2(80, 120);
@@ -55,17 +55,14 @@ public class Credits : Node2D
 		theme.SetFont("bold_italics_font", "RichTextLabel", boldItalicFont);
 
 		creditsLabel.Theme = theme;
-
-		creditsLabel.AddFontOverride("normal_font", regularFont);
 		creditsLabel.BbcodeText = creditsText;
-		creditsLabel.BbcodeText = "[color=black]Regular Text[b]Bold Text 2[/b][i]Italic Text[/i][b][i]Bold Italic Text[/i][/b]";
 		AddChild(creditsLabel);
 
-		TextureButton GoBackButton = new TextureButton();
-		GoBackButton.TextureNormal = GoBackTexture;
-		GoBackButton.SetPosition(new Vector2(952, 720));
-		AddChild(GoBackButton);
-		GoBackButton.Connect("pressed", this, "ReturnToMenu");
+		TextureButton goBackButton = new TextureButton();
+		goBackButton.TextureNormal = goBackTexture;
+		goBackButton.SetPosition(new Vector2(952, 720));
+		AddChild(goBackButton);
+		goBackButton.Connect("pressed", this, "ReturnToMenu");
 	}
 	public void ReturnToMenu()
 	{
