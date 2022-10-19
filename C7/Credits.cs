@@ -36,14 +36,29 @@ public class Credits : Node2D
 		creditsLabel.RectSize = new Vector2(864, 528);
 		creditsLabel.BbcodeEnabled = true;
 
-		DynamicFont smallFont = new DynamicFont();
-		smallFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf");
-		smallFont.Size = 12;
+		DynamicFont regularFont = new DynamicFont();
+		DynamicFont boldFont = new DynamicFont();
+		DynamicFont italicFont = new DynamicFont();
+		DynamicFont boldItalicFont = new DynamicFont();
+		regularFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf");
+		boldFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Bold.ttf");
+		italicFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Italic.ttf");
+		boldItalicFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-BoldItalic.ttf");
+		regularFont.Size = 14;
+		boldFont.Size = 14;
+		italicFont.Size = 14;
+		boldItalicFont.Size = 14;
+		Theme theme = new Theme();
+		theme.SetFont("normal_font", "RichTextLabel", regularFont);
+		theme.SetFont("bold_font", "RichTextLabel", boldFont);
+		theme.SetFont("italics_font", "RichTextLabel", italicFont);
+		theme.SetFont("bold_italics_font", "RichTextLabel", boldItalicFont);
 
-		creditsLabel.AddFontOverride("normal_font", smallFont);
-		// creditsLabel.PushFont(ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf"));
+		creditsLabel.Theme = theme;
+
+		creditsLabel.AddFontOverride("normal_font", regularFont);
 		creditsLabel.BbcodeText = creditsText;
-		creditsLabel.BbcodeText = "[color=black]<b>Bold Text</b>[b]Bold Text 2[/b]Not Bold Text";
+		creditsLabel.BbcodeText = "[color=black]Regular Text[b]Bold Text 2[/b][i]Italic Text[/i][b][i]Bold Italic Text[/i][/b]";
 		AddChild(creditsLabel);
 
 		TextureButton GoBackButton = new TextureButton();
