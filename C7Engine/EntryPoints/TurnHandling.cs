@@ -29,123 +29,133 @@ namespace C7Engine
 				bool firstTurn = GetTurnNumber() == 0;
 
 				// Movement phase
-				foreach (Player player in gameData.players) {
-					if ((! player.hasPlayedThisTurn) &&
-					    ! (firstTurn && player.SitsOutFirstTurn())) {
-						if (player.isBarbarians) {
-							//Call the barbarian AI
-							//TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans,
-							//strategy, etc.) For now, we only have a random AI, so that will be in a future commit
-							new BarbarianAI().PlayTurn(player, gameData);
-							player.hasPlayedThisTurn = true;
-						} else if (! player.isHuman) {
-							PlayerAI.PlayTurn(player, GameData.rng);
-							player.hasPlayedThisTurn = true;
-						} else if (player.guid != EngineStorage.uiControllerID) {
-							player.hasPlayedThisTurn = true;
-						}
-						//Human player check.  Let the human see what's going on even if they are in observer mode.
-						if (player.guid == EngineStorage.uiControllerID) {
-							new MsgStartTurn().send();
-							return;
-						}
-					}
-				}
+				if (PlayPlayerTurns(gameData, firstTurn))
+					return;
 
 				//Clear all wait queue, so if a player ended the turn without handling all waited units, they are selected
 				//at the same place in the order.  Confirmed this is what Civ3 does.
 				UnitInteractions.ClearWaitQueue();
 
-				// Production phase BEGIN
-
-				log.Information("\n*** Processing production for turn " + gameData.turn + " ***");
-
-				//Generate new barbarian units.
-				Player barbPlayer = gameData.players.Find(player => player.isBarbarians);
-				foreach (Tile tile in gameData.map.barbarianCamps)
-				{
-					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
-					int result = GameData.rng.Next(100);
-					log.Verbose("Random barb result = " + result);
-					if (result < 4) {
-						MapUnit newUnit = new MapUnit();
-						newUnit.location = tile;
-						newUnit.owner = gameData.players[0];
-						newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
-						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-						newUnit.experienceLevel = gameData.defaultExperienceLevel;
-						newUnit.hitPointsRemaining = 3;
-						newUnit.isFortified = true; //todo: hack for unit selection
-
-						tile.unitsOnTile.Add(newUnit);
-						gameData.mapUnits.Add(newUnit);
-						barbPlayer.units.Add(newUnit);
-						log.Debug("New barbarian added at " + tile);
-					}
-					else if (tile.NeighborsWater() && result < 6) {
-						MapUnit newUnit = new MapUnit();
-						newUnit.location = tile;
-						newUnit.owner = gameData.players[0];    //todo: make this reliably point to the barbs
-						newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;
-						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-						newUnit.experienceLevel = gameData.defaultExperienceLevel;
-						newUnit.hitPointsRemaining = 3;
-						newUnit.isFortified = true; //todo: hack for unit selection
-
-						tile.unitsOnTile.Add(newUnit);
-						gameData.mapUnits.Add(newUnit);
-						barbPlayer.units.Add(newUnit);
-						log.Debug("New barbarian galley added at " + tile);
-					}
-				}
-
-				//City Production
-				foreach (City city in gameData.cities)
-				{
-					int initialSize = city.size;
-					city.ComputeCityGrowth();
-					int newSize = city.size;
-					if (newSize > initialSize) {
-						CityResident newResident = new CityResident();
-						newResident.nationality = city.owner.civilization;
-						CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
-					}
-					else if (newSize < initialSize) {
-						int diff = initialSize - newSize;
-						if (newSize <= 0) {
-							log.Error($"Attempting to remove the last resident from {city}");
-						} else {
-							city.RemoveCitizens(diff);
-						}
-					}
-
-					IProducible producedItem = city.ComputeTurnProduction();
-					if (producedItem != null) {
-						log.Information($"Produced {producedItem} in {city}");
-						if (producedItem is UnitPrototype prototype) {
-							MapUnit newUnit = prototype.GetInstance();
-							newUnit.owner = city.owner;
-							newUnit.location = city.location;
-							newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-							newUnit.experienceLevel = gameData.defaultExperienceLevel;
-							newUnit.facingDirection = TileDirection.SOUTHWEST;
-
-							city.location.unitsOnTile.Add(newUnit);
-							gameData.mapUnits.Add(newUnit);
-							city.owner.AddUnit(newUnit);
-
-							if (newUnit.unitType.populationCost > 0) {
-								city.RemoveCitizens(newUnit.unitType.populationCost);
-							}
-						}
-						city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
-					}
-				}
-
-				// END Production phase
+				SpawnBarbarians(gameData);
+				HandleCityResults(gameData);
 
 				gameData.turn++;
 				OnBeginTurn();
+			}
+		}
+		private static bool PlayPlayerTurns(GameData gameData, bool firstTurn)
+		{
+			foreach (Player player in gameData.players) {
+				if ((!player.hasPlayedThisTurn) &&
+				    !(firstTurn && player.SitsOutFirstTurn())) {
+					if (player.isBarbarians) {
+						//Call the barbarian AI
+						//TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans,
+						//strategy, etc.) For now, we only have a random AI, so that will be in a future commit
+						new BarbarianAI().PlayTurn(player, gameData);
+						player.hasPlayedThisTurn = true;
+					}
+					else if (!player.isHuman) {
+						PlayerAI.PlayTurn(player, GameData.rng);
+						player.hasPlayedThisTurn = true;
+					}
+					else if (player.guid != EngineStorage.uiControllerID) {
+						player.hasPlayedThisTurn = true;
+					}
+					//Human player check.  Let the human see what's going on even if they are in observer mode.
+					if (player.guid == EngineStorage.uiControllerID) {
+						new MsgStartTurn().send();
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		private static void SpawnBarbarians(GameData gameData)
+		{
+			//Generate new barbarian units.
+			Player barbPlayer = gameData.players.Find(player => player.isBarbarians);
+			foreach (Tile tile in gameData.map.barbarianCamps) {
+				//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
+				int result = GameData.rng.Next(100);
+				log.Verbose("Random barb result = " + result);
+				if (result < 4) {
+					MapUnit newUnit = new MapUnit();
+					newUnit.location = tile;
+					newUnit.owner = gameData.players[0];
+					newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
+					newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+					newUnit.experienceLevel = gameData.defaultExperienceLevel;
+					newUnit.hitPointsRemaining = 3;
+					newUnit.isFortified = true; //todo: hack for unit selection
+
+					tile.unitsOnTile.Add(newUnit);
+					gameData.mapUnits.Add(newUnit);
+					barbPlayer.units.Add(newUnit);
+					log.Debug("New barbarian added at " + tile);
+				}
+				else if (tile.NeighborsWater() && result < 6) {
+					MapUnit newUnit = new MapUnit();
+					newUnit.location = tile;
+					newUnit.owner = gameData.players[0]; //todo: make this reliably point to the barbs
+					newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;
+					newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+					newUnit.experienceLevel = gameData.defaultExperienceLevel;
+					newUnit.hitPointsRemaining = 3;
+					newUnit.isFortified = true; //todo: hack for unit selection
+
+					tile.unitsOnTile.Add(newUnit);
+					gameData.mapUnits.Add(newUnit);
+					barbPlayer.units.Add(newUnit);
+					log.Debug("New barbarian galley added at " + tile);
+				}
+			}
+		}
+		private static void HandleCityResults(GameData gameData)
+		{
+
+			log.Information("\n*** City production for turn " + gameData.turn + " ***");
+
+			foreach (City city in gameData.cities) {
+				int initialSize = city.size;
+				city.ComputeCityGrowth();
+				int newSize = city.size;
+				if (newSize > initialSize) {
+					CityResident newResident = new CityResident();
+					newResident.nationality = city.owner.civilization;
+					CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
+				}
+				else if (newSize < initialSize) {
+					int diff = initialSize - newSize;
+					if (newSize <= 0) {
+						log.Error($"Attempting to remove the last resident from {city}");
+					}
+					else {
+						city.RemoveCitizens(diff);
+					}
+				}
+
+				IProducible producedItem = city.ComputeTurnProduction();
+				if (producedItem != null) {
+					log.Information($"Produced {producedItem} in {city}");
+					if (producedItem is UnitPrototype prototype) {
+						MapUnit newUnit = prototype.GetInstance();
+						newUnit.owner = city.owner;
+						newUnit.location = city.location;
+						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+						newUnit.experienceLevel = gameData.defaultExperienceLevel;
+						newUnit.facingDirection = TileDirection.SOUTHWEST;
+
+						city.location.unitsOnTile.Add(newUnit);
+						gameData.mapUnits.Add(newUnit);
+						city.owner.AddUnit(newUnit);
+
+						if (newUnit.unitType.populationCost > 0) {
+							city.RemoveCitizens(newUnit.unitType.populationCost);
+						}
+					}
+					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
+				}
 			}
 		}
 
