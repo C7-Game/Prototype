@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace C7Engine
 {
 	using System;
@@ -29,7 +31,14 @@ namespace C7Engine
 
 			EngineStorage.gameData = save.GameData;
 
-			EngineStorage.uiControllerID = humanPlayer.guid;
+			if (humanPlayer != null)
+				EngineStorage.uiControllerID = humanPlayer.guid;
+			else {
+				//This occurs when a game is saved in Observer Mode
+				//We still need this to be set for things like making sure the game doesn't autoplay forever in Observer Mode,
+				//and for now can assume the first player is the human
+				EngineStorage.uiControllerID = save.GameData.players.First().guid;
+			}
 			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();
 

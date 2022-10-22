@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace C7GameData
 {
 	public class TileKnowledge
 	{
-		HashSet<Tile> knownTiles = new HashSet<Tile>();
+		//Public solely so System.Text.Json will serialize it.
+		public HashSet<Tile> knownTiles = new HashSet<Tile>();
 		HashSet<Tile> visibleTiles = new HashSet<Tile>();
 
 		public void AddTilesToKnown(Tile unitLocation) {
