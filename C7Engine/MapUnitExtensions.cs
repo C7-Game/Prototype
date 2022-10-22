@@ -327,7 +327,15 @@ public static class MapUnitExtensions {
 		return true;
 	}
 
-	public static void move(this MapUnit unit, TileDirection dir, bool wait = false)
+	/// <summary>
+	/// Moves the unit in the given direction
+	/// </summary>
+	/// <param name="unit"></param>
+	/// <param name="dir">Which direction to move, e.g. northeast, west, etc.</param>
+	/// <param name="wait">Whether the method should wait to return until animations complete</param>
+	/// <returns>True if the unit is alive after the movement, false otherwise</returns>
+	/// <exception cref="Exception"></exception>
+	public static bool move(this MapUnit unit, TileDirection dir, bool wait = false)
 	{
 		(int dx, int dy) = dir.toCoordDiff();
 		Tile newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
@@ -342,27 +350,31 @@ public static class MapUnitExtensions {
 					CombatResult combatResult = unit.fight(defender);
 					// If we were killed then of course there's nothing more to do. If the combat couldn't happen for whatever
 					// reason, just give up on trying to move.
-					if (combatResult == CombatResult.AttackerKilled || combatResult == CombatResult.Impossible)
-						return;
+					if (combatResult == CombatResult.AttackerKilled) {
+						return false;
+					}
+					if (combatResult == CombatResult.Impossible) {
+						return true;
+					}
 
 					// If the enemy was defeated, check if there is another enemy on the tile. If so we can't complete the move
 					// but still pay one movement point for the combat.
 					else if (combatResult == CombatResult.DefenderKilled || combatResult == CombatResult.DefenderRetreated) {
 						if (!unit.CanEnterTile(newLoc, false)) {
 							unit.movementPoints.onUnitMove(1);
-							return;
+							return true;
 						}
 
 					// Similarly if we retreated, pay one MP for the combat but don't move.
 					} else if (combatResult == CombatResult.AttackerRetreated) {
 						unit.movementPoints.onUnitMove(1);
-						return;
+						return true;
 					}
 				} else if (unit.unitType.bombard > 0) {
 					unit.bombard(newLoc);
-					return;
+					return true;
 				} else {
-					return;
+					return true;
 				}
 			}
 
@@ -375,6 +387,7 @@ public static class MapUnitExtensions {
 			unit.movementPoints.onUnitMove(movementCost);
 			unit.animate(MapUnit.AnimatedAction.RUN, wait);
 		}
+		return true;
 	}
 
 	public static float getMovementCost(Tile from, TileDirection dir, Tile newLocation) {
