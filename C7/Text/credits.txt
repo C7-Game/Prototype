@@ -1,5 +1,5 @@
 [color=black][center]
-[b]C7 0.2 "Carthage" Preview 1[/b]
+[b]C7 0.2 "Carthage" Preview 4[/b]
 [url]c7-game.github.io[/url]
 
 [b]An open source project by the
@@ -13,11 +13,16 @@ Armageddon1
 Caro-Kann
 Flintlock / maxpetul
 JimOfLeisure
+Kright
 Lanzelot
 pcen
 Quintillus
 steviek
 WildWeazel
+
+[b]Artists[/b]
+
+Plotinus
 
 [b]Co-conspirators[/b]
 
@@ -173,7 +178,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 [b]Noto Sans[/b] [url]https://fonts.google.com/noto/specimen/Noto+Sans[/url]
-NotoSans-Regular.ttf: Copyright 2012 Google Inc. All Rights Reserved.
+NotoSans-Regular.ttf, NotoSans-Bold.ttf, NotoSans-Italic.ttf, NotoSans-BoldItalic.ttf: Open Font License
 
 
 
