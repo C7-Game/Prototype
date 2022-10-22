@@ -318,7 +318,7 @@ public static class MapUnitExtensions {
 		// Check for units belonging to other civs
 		foreach (MapUnit other in tile.unitsOnTile)
 			if (other.owner != unit.owner) {
-				if (! other.owner.IsAtPeaceWith(unit.owner))
+				if (!other.owner.IsAtPeaceWith(unit.owner))
 					return allowCombat;
 				else
 					return false;
@@ -387,7 +387,7 @@ public static class MapUnitExtensions {
 	public static void moveAlongPath(this MapUnit unit)
 	{
 		while (unit.movementPoints.canMove && unit.path?.PathLength() > 0) {
-			var dir = unit.location.directionTo(unit.path.Next());
+			TileDirection dir = unit.location.directionTo(unit.path.Next());
 			unit.move(dir, true); //TODO: don't wait on last move animation?
 		}
 	}
