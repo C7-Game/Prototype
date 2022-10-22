@@ -10,6 +10,10 @@ namespace C7GameData
 		public double retreatChance;
 		public double promotionChance;
 
+		//Parameterless constructor for System.Text.Json deserialization
+		//We either need to switch to Newtonsoft JSON or add custom code to avoid this (https://stackoverflow.com/questions/59198417/deserialization-of-reference-types-without-parameterless-constructor-is-not-supp)
+		public ExperienceLevel() {}
+
 		public ExperienceLevel(string key, string displayName, int baseHitPoints, double retreatChance, double promotionChance)
 		{
 			this.key = key;
