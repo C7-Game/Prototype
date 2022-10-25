@@ -27,7 +27,8 @@ namespace C7.Map {
 		public CityLayer()
 		{
 			//TODO: Generalize, support multiple city types, etc.
-			cityTexture = Util.LoadTextureFromPCX("Art/Cities/rROMAN.PCX", 0, 0, 167, 95);
+			//TODO: Centered city art texture
+			cityTexture = Util.LoadTextureFromPCX("Art/Cities/rMIDEAST.PCX", 0, 0, 167, 95);
 			citySpriteSize = new Vector2(167, 95);
 			smallFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf");
 			smallFont.Size = 11;
