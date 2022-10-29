@@ -43,6 +43,13 @@ namespace C7Engine
 				OnBeginTurn();
 			}
 		}
+
+		/// <summary>
+		/// Plays the turns for all the players in the game (including barbarians).
+		/// </summary>
+		/// <param name="gameData"></param>
+		/// <param name="firstTurn"></param>
+		/// <returns>true when it is time for the human to take control again</returns>
 		private static bool PlayPlayerTurns(GameData gameData, bool firstTurn)
 		{
 			foreach (Player player in gameData.players) {
