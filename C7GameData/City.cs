@@ -85,6 +85,10 @@ namespace C7GameData
 		        size++;
 		        foodStored = 0;
 	        }
+	        else if (foodStored < 0) {
+		        size--;
+		        foodStored = 0;
+	        }
         }
 
         /**

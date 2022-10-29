@@ -50,7 +50,7 @@ namespace C7.Map {
 			looseView.DrawTextureRectRegion(cityTexture, screenRect, textRect);
 
 			int turnsUntilGrowth = city.TurnsUntilGrowth();
-			string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue ? "- -" : "" + turnsUntilGrowth;
+			string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue || turnsUntilGrowth < 0 ? "- -" : "" + turnsUntilGrowth;
 			string cityNameAndGrowth = $"{city.name} : {turnsUntilGrowthText}";
 			string productionDescription = city.itemBeingProduced.name + " : " + city.TurnsUntilProductionFinished();
 
@@ -101,7 +101,11 @@ namespace C7.Map {
 			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
 			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH / 2 - popSizeWidth / 2;
 			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth / -2, 24) + new Vector2(popSizeOffset, 18));
-			looseView.DrawString(midSizedFont, popSizeDestination, popSizeString, Color.Color8(255, 255, 255, 255));
+			Color popColor = Color.Color8(255, 255, 255, 255);
+			if (city.TurnsUntilGrowth() < 0) {
+				popColor = Color.Color8(255, 0, 0, 255);
+			}
+			looseView.DrawString(midSizedFont, popSizeDestination, popSizeString, popColor);
 		}
 
 		private Image CreateLabelBackground(int cityLabelWidth, City city, int textAreaWidth)
