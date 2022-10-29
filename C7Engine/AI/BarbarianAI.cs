@@ -34,7 +34,9 @@ namespace C7Engine {
 						//if it tries to move e.g. north from the north pole.  Hence, this check.
 						if (newLocation != Tile.NONE) {
 							log.Debug("Moving barbarian at " + unit.location + " to " + newLocation);
-							unit.move(unit.location.directionTo(newLocation));
+							if (!unit.move(unit.location.directionTo(newLocation))) {
+								break;
+							}
 						} else {
 							//Avoid potential infinite loop.
 							break;
