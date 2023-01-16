@@ -113,7 +113,7 @@ public class Util
 					path,
 					// Needed for some reason as Steam version at least puts some mod art in Extras instead of Scenarios
 					//  Also, the case mismatch is intentional. C3C makes a capital C path, but it's lower-case on the filesystem
-					"Conquests/Conquests" + path, "Conquests/Scenarios" + path, "civ3PTW/Scenarios" + path
+					"Conquests/Conquests/" + path, "Conquests/Scenarios/" + path, "civ3PTW/Scenarios/" + path
 				};
 				for (int i = 0; i < tryPaths.Length; i++) {
 					string actualCasePath = CheckForCiv3Media(mediaPath, tryPaths[i]);
