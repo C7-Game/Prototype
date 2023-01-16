@@ -28,8 +28,11 @@ namespace C7.Map {
 		{
 			//TODO: Generalize, support multiple city types, etc.
 			//TODO: Centered city art texture
-			cityTexture = Util.LoadTextureFromPCX("Art/Cities/rMIDEAST.PCX", 0, 0, 167, 95);
-			citySpriteSize = new Vector2(167, 95);
+			Pcx pcx = Util.LoadPCX("Art/Cities/rMIDEAST.PCX");
+			int height = pcx.Height/4;
+			int width = pcx.Width/3;
+			cityTexture = Util.LoadTextureFromPCX("Art/Cities/rMIDEAST.PCX", 0, 0, width, height);
+			citySpriteSize = new Vector2(width, height);
 			smallFont.FontData = ResourceLoader.Load<DynamicFontData>("res://Fonts/NotoSans-Regular.ttf");
 			smallFont.Size = 11;
 
