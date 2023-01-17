@@ -14,12 +14,8 @@ namespace C7.Map {
 		private ImageTexture cityTexture;
 		private Dictionary<string, ImageTexture> cityLabels = new Dictionary<string, ImageTexture>();
 
-
-
-
 		public CityLayer()
 		{
-
 
 		}
 
@@ -33,6 +29,7 @@ namespace C7.Map {
 
 			CityScene cityScene = new CityScene(city, tile, tileCenter);
 			looseView.AddChild(cityScene);
+			GD.Print("Child count " + looseView.GetChildren().Count);
 		}
 	}
 }

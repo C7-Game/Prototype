@@ -31,6 +31,10 @@ namespace C7.Map {
 		ImageTexture cityLabel = new ImageTexture();
 
 		private TextureRect theTexture = new TextureRect();
+		private TextureRect labelTextureRect = new TextureRect();
+		Label cityNameLabel = new Label();
+		Label productionLabel = new Label();
+		Label popSizeLabel = new Label();
 
 		public CityScene(City city, Tile tile, Vector2 tileCenter) {
 			this.city = city;
@@ -52,23 +56,19 @@ namespace C7.Map {
 			midSizedFont.Size = 18;
 
 			nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
-			this.AddChild(theTexture);
+			AddChild(theTexture);
+			AddChild(labelTextureRect);
+			AddChild(cityNameLabel);
+			AddChild(productionLabel);
+			AddChild(popSizeLabel);
 		}
 
 		public override void _Draw() {
-			// base._Draw();
+			base._Draw();
 
-			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
-			Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
 			theTexture.MarginLeft = tileCenter.x - (float)0.5 * citySpriteSize.x;
 			theTexture.MarginTop = tileCenter.y - (float)0.5 * citySpriteSize.y;
 			theTexture.Texture = cityTexture;
-			//Drawing text gives this error:
-			//ERROR: Drawing is only allowed inside NOTIFICATION_DRAW, _draw() function or 'draw' signal.
-			//  theTexture.DrawString(smallFont, new Vector2(0, 0), "Test String", Color.Color8(255, 0, 0))
-			//Even though we're in the _Draw() method (which is the C# capitalization of it).  For some reason it works in LooseLayer, which is also a Node2D with public override void _Draw().
-			//We'll have to either figure that out or figure out an alternative in order to be able to use this modus operandi effectively.
-
 
 			int turnsUntilGrowth = city.TurnsUntilGrowth();
 			string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue || turnsUntilGrowth < 0 ? "- -" : "" + turnsUntilGrowth;
@@ -92,19 +92,13 @@ namespace C7.Map {
 
 			DrawLabelOnScreen(tileCenter, cityLabelWidth, city, cityLabel);
 			DrawTextOnLabel(tileCenter, cityNameAndGrowthWidth, productionDescriptionWidth, city, cityNameAndGrowth, productionDescription, cityLabelWidth);
-
 		}
 
 		private void DrawLabelOnScreen(Vector2 tileCenter, int cityLabelWidth, City city, ImageTexture cityLabel)
 		{
-			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth / -2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT)); //24 is a swag
-			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
-
-			TextureRect label = new TextureRect();
-			label.MarginLeft = tileCenter.x + (cityLabelWidth / -2);
-			label.MarginTop = tileCenter.y + 24;
-			label.Texture = cityLabel;
-			AddChild(label);
+			labelTextureRect.MarginLeft = tileCenter.x + (cityLabelWidth / -2);
+			labelTextureRect.MarginTop = tileCenter.y + 24;
+			labelTextureRect.Texture = cityLabel;
 		}
 
 		private void DrawTextOnLabel(Vector2 tileCenter, int cityNameAndGrowthWidth, int productionDescriptionWidth, City city, string cityNameAndGrowth, string productionDescription, int cityLabelWidth) {
@@ -119,23 +113,16 @@ namespace C7.Map {
 				cityNameOffset += 12;
 				prodDescriptionOffset += 12;
 			}
-			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityNameOffset, 24) + new Vector2(0, 10));
-			Label cityNameLabel = new Label();
+
 			cityNameLabel.Theme = smallFontTheme;
 			cityNameLabel.Text = cityNameAndGrowth;
 			cityNameLabel.MarginLeft = tileCenter.x + cityNameOffset;
 			cityNameLabel.MarginTop = tileCenter.y + 22;
-			AddChild(cityNameLabel);
-			// theTexture.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
 
-			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20));
-			Label productionLabel = new Label();
 			productionLabel.Theme = smallFontTheme;
 			productionLabel.Text = productionDescription;
 			productionLabel.MarginLeft = tileCenter.x + prodDescriptionOffset;
 			productionLabel.MarginTop = tileCenter.y + 32;
-			AddChild(productionLabel);
-			// theTexture.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
 
 			//City pop size
 			string popSizeString = "" + city.size;
@@ -154,13 +141,10 @@ namespace C7.Map {
 				popSizeTheme.SetColor("font_color", "Label", Color.Color8(255, 0, 0, 255));
 			}
 
-			Label popSizeLabel = new Label();
 			popSizeLabel.Theme = popSizeTheme;
 			popSizeLabel.Text = popSizeString;
 			popSizeLabel.MarginLeft = tileCenter.x + cityLabelWidth / -2 + popSizeOffset;
 			popSizeLabel.MarginTop = tileCenter.y + 22;
-			AddChild(popSizeLabel);
-			// theTexture.DrawString(midSizedFont, popSizeDestination, popSizeString, popColor);
 		}
 
 		private Image CreateLabelBackground(int cityLabelWidth, City city, int textAreaWidth)
