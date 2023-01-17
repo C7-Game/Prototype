@@ -69,6 +69,13 @@ namespace C7.Map {
 			midSizedFont.Size = 18;
 
 			nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
+
+			theTexture.MouseFilter = Control.MouseFilterEnum.Ignore;
+			labelTextureRect.MouseFilter = Control.MouseFilterEnum.Ignore;
+			cityNameLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
+			productionLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
+			popSizeLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
+
 			AddChild(theTexture);
 			AddChild(labelTextureRect);
 			AddChild(cityNameLabel);
