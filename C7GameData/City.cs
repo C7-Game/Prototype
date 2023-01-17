@@ -18,6 +18,7 @@ namespace C7GameData
         public int foodStored = 0;
         public int foodNeededToGrow = 20;
 
+        public bool capital = false;
         public Player owner {get; set;}
         public List<CityResident> residents = new List<CityResident>();
 
@@ -38,8 +39,7 @@ namespace C7GameData
 
         public bool IsCapital()
         {
-            //TODO: Look through built cities, figure out if it is or not
-            return true;
+            return capital;
         }
 
         public bool CanBuildUnit(UnitPrototype proto)
