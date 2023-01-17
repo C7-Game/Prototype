@@ -30,6 +30,8 @@ namespace C7.Map {
 
 		ImageTexture cityLabel = new ImageTexture();
 
+		private TextureRect theTexture = new TextureRect();
+
 		public CityScene(City city, Tile tile, Vector2 tileCenter) {
 			this.city = city;
 			this.tile = tile;
@@ -50,13 +52,23 @@ namespace C7.Map {
 			midSizedFont.Size = 18;
 
 			nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
+			this.AddChild(theTexture);
 		}
 
 		public override void _Draw() {
-			base._Draw();
+			// base._Draw();
+
 			Rect2 screenRect = new Rect2(tileCenter - (float)0.5 * citySpriteSize, citySpriteSize);
 			Rect2 textRect = new Rect2(new Vector2(0, 0), citySpriteSize);
-			this.DrawTextureRectRegion(cityTexture, screenRect, textRect);
+			theTexture.MarginLeft = tileCenter.x - (float)0.5 * citySpriteSize.x;
+			theTexture.MarginTop = tileCenter.y - (float)0.5 * citySpriteSize.y;
+			theTexture.Texture = cityTexture;
+			//Drawing text gives this error:
+			//ERROR: Drawing is only allowed inside NOTIFICATION_DRAW, _draw() function or 'draw' signal.
+			//  theTexture.DrawString(smallFont, new Vector2(0, 0), "Test String", Color.Color8(255, 0, 0))
+			//Even though we're in the _Draw() method (which is the C# capitalization of it).  For some reason it works in LooseLayer, which is also a Node2D with public override void _Draw().
+			//We'll have to either figure that out or figure out an alternative in order to be able to use this modus operandi effectively.
+
 
 			int turnsUntilGrowth = city.TurnsUntilGrowth();
 			string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue || turnsUntilGrowth < 0 ? "- -" : "" + turnsUntilGrowth;
@@ -80,13 +92,14 @@ namespace C7.Map {
 
 			DrawLabelOnScreen(tileCenter, cityLabelWidth, city, cityLabel);
 			DrawTextOnLabel(tileCenter, cityNameAndGrowthWidth, productionDescriptionWidth, city, cityNameAndGrowth, productionDescription, cityLabelWidth);
+
 		}
 
 		private void DrawLabelOnScreen(Vector2 tileCenter, int cityLabelWidth, City city, ImageTexture cityLabel)
 		{
 			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth / -2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT)); //24 is a swag
 			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
-			DrawTextureRectRegion(cityLabel, labelDestination, allOfTheLabel);
+			// DrawTextureRectRegion(cityLabel, labelDestination, allOfTheLabel);
 		}
 
 		private void DrawTextOnLabel(Vector2 tileCenter, int cityNameAndGrowthWidth, int productionDescriptionWidth, City city, string cityNameAndGrowth, string productionDescription, int cityLabelWidth)
@@ -99,9 +112,9 @@ namespace C7.Map {
 				prodDescriptionOffset += 12;
 			}
 			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityNameOffset, 24) + new Vector2(0, 10));
-			DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
+			// theTexture.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
 			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20));
-			DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
+			// theTexture.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
 
 			//City pop size
 			string popSizeString = "" + city.size;
@@ -112,7 +125,7 @@ namespace C7.Map {
 			if (city.TurnsUntilGrowth() < 0) {
 				popColor = Color.Color8(255, 0, 0, 255);
 			}
-			DrawString(midSizedFont, popSizeDestination, popSizeString, popColor);
+			// theTexture.DrawString(midSizedFont, popSizeDestination, popSizeString, popColor);
 		}
 
 		private Image CreateLabelBackground(int cityLabelWidth, City city, int textAreaWidth)
