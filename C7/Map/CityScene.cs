@@ -36,10 +36,21 @@ namespace C7.Map {
 		Label productionLabel = new Label();
 		Label popSizeLabel = new Label();
 
+		Theme smallFontTheme = new Theme();
+		Theme popThemeRed = new Theme();
+		Theme popSizeTheme = new Theme();
+
 		public CityScene(City city, Tile tile, Vector2 tileCenter) {
 			this.city = city;
 			this.tile = tile;
 			this.tileCenter = tileCenter;
+
+			smallFontTheme.DefaultFont = smallFont;
+			smallFontTheme.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
+			popSizeTheme.DefaultFont = midSizedFont;
+			popSizeTheme.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
+			popThemeRed.DefaultFont = midSizedFont;
+			popThemeRed.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
 
 			//TODO: Generalize, support multiple city types, etc.
 			Pcx pcx = Util.LoadPCX("Art/Cities/rMIDEAST.PCX");
@@ -102,9 +113,6 @@ namespace C7.Map {
 		}
 
 		private void DrawTextOnLabel(Vector2 tileCenter, int cityNameAndGrowthWidth, int productionDescriptionWidth, City city, string cityNameAndGrowth, string productionDescription, int cityLabelWidth) {
-			Theme smallFontTheme = new Theme();
-			smallFontTheme.DefaultFont = smallFont;
-			smallFontTheme.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
 
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
 			int cityNameOffset = cityNameAndGrowthWidth / -2;
@@ -134,14 +142,12 @@ namespace C7.Map {
 				popColor = Color.Color8(255, 0, 0, 255);
 			}
 
-			Theme popSizeTheme = new Theme();
-			popSizeTheme.DefaultFont = midSizedFont;
-			popSizeTheme.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
+			popSizeLabel.Theme = popSizeTheme;
+
 			if (city.TurnsUntilGrowth() < 0) {
-				popSizeTheme.SetColor("font_color", "Label", Color.Color8(255, 0, 0, 255));
+				popSizeLabel.Theme = popThemeRed;
 			}
 
-			popSizeLabel.Theme = popSizeTheme;
 			popSizeLabel.Text = popSizeString;
 			popSizeLabel.MarginLeft = tileCenter.x + cityLabelWidth / -2 + popSizeOffset;
 			popSizeLabel.MarginTop = tileCenter.y + 22;
