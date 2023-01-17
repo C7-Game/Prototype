@@ -27,7 +27,6 @@ namespace C7.Map {
 		public CityLayer()
 		{
 			//TODO: Generalize, support multiple city types, etc.
-			//TODO: Centered city art texture
 			Pcx pcx = Util.LoadPCX("Art/Cities/rMIDEAST.PCX");
 			int height = pcx.Height/4;
 			int width = pcx.Width/3;
