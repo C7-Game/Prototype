@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using C7Engine.AI;
 using Serilog;
 
@@ -22,15 +23,19 @@ namespace C7Engine
 		}
 
 		// Implements the game loop. This method is called when the game is started and when the player signals that they're done moving.
-		internal static void AdvanceTurn()
-		{
+		internal static void AdvanceTurn() {
+			Stopwatch stopwatch = new Stopwatch();
+			stopwatch.Start();
 			GameData gameData = EngineStorage.gameData;
 			while (true) { // Loop ends with a function return once we reach the UI controller during the movement phase
 				bool firstTurn = GetTurnNumber() == 0;
 
 				// Movement phase
-				if (PlayPlayerTurns(gameData, firstTurn))
+				if (PlayPlayerTurns(gameData, firstTurn)) {
+					stopwatch.Stop();
+					log.Information("Turn time took " + stopwatch.ElapsedMilliseconds + " milliseconds");
 					return;
+				}
 
 				//Clear all wait queue, so if a player ended the turn without handling all waited units, they are selected
 				//at the same place in the order.  Confirmed this is what Civ3 does.
