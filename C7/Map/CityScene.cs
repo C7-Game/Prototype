@@ -99,11 +99,19 @@ namespace C7.Map {
 		{
 			Rect2 labelDestination = new Rect2(tileCenter + new Vector2(cityLabelWidth / -2, 24), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT)); //24 is a swag
 			Rect2 allOfTheLabel = new Rect2(new Vector2(0, 0), new Vector2(cityLabelWidth, CITY_LABEL_HEIGHT));
-			// DrawTextureRectRegion(cityLabel, labelDestination, allOfTheLabel);
+
+			TextureRect label = new TextureRect();
+			label.MarginLeft = tileCenter.x + (cityLabelWidth / -2);
+			label.MarginTop = tileCenter.y + 24;
+			label.Texture = cityLabel;
+			AddChild(label);
 		}
 
-		private void DrawTextOnLabel(Vector2 tileCenter, int cityNameAndGrowthWidth, int productionDescriptionWidth, City city, string cityNameAndGrowth, string productionDescription, int cityLabelWidth)
-		{
+		private void DrawTextOnLabel(Vector2 tileCenter, int cityNameAndGrowthWidth, int productionDescriptionWidth, City city, string cityNameAndGrowth, string productionDescription, int cityLabelWidth) {
+			Theme smallFontTheme = new Theme();
+			smallFontTheme.DefaultFont = smallFont;
+			smallFontTheme.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
+
 			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
 			int cityNameOffset = cityNameAndGrowthWidth / -2;
 			int prodDescriptionOffset = productionDescriptionWidth / -2;
@@ -112,8 +120,21 @@ namespace C7.Map {
 				prodDescriptionOffset += 12;
 			}
 			Vector2 cityNameDestination = new Vector2(tileCenter + new Vector2(cityNameOffset, 24) + new Vector2(0, 10));
+			Label cityNameLabel = new Label();
+			cityNameLabel.Theme = smallFontTheme;
+			cityNameLabel.Text = cityNameAndGrowth;
+			cityNameLabel.MarginLeft = tileCenter.x + cityNameOffset;
+			cityNameLabel.MarginTop = tileCenter.y + 22;
+			AddChild(cityNameLabel);
 			// theTexture.DrawString(smallFont, cityNameDestination, cityNameAndGrowth, Color.Color8(255, 255, 255, 255));
+
 			Vector2 productionDestination = new Vector2(tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20));
+			Label productionLabel = new Label();
+			productionLabel.Theme = smallFontTheme;
+			productionLabel.Text = productionDescription;
+			productionLabel.MarginLeft = tileCenter.x + prodDescriptionOffset;
+			productionLabel.MarginTop = tileCenter.y + 32;
+			AddChild(productionLabel);
 			// theTexture.DrawString(smallFont, productionDestination, productionDescription, Color.Color8(255, 255, 255, 255));
 
 			//City pop size
@@ -125,6 +146,20 @@ namespace C7.Map {
 			if (city.TurnsUntilGrowth() < 0) {
 				popColor = Color.Color8(255, 0, 0, 255);
 			}
+
+			Theme popSizeTheme = new Theme();
+			popSizeTheme.DefaultFont = midSizedFont;
+			popSizeTheme.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
+			if (city.TurnsUntilGrowth() < 0) {
+				popSizeTheme.SetColor("font_color", "Label", Color.Color8(255, 0, 0, 255));
+			}
+
+			Label popSizeLabel = new Label();
+			popSizeLabel.Theme = popSizeTheme;
+			popSizeLabel.Text = popSizeString;
+			popSizeLabel.MarginLeft = tileCenter.x + cityLabelWidth / -2 + popSizeOffset;
+			popSizeLabel.MarginTop = tileCenter.y + 22;
+			AddChild(popSizeLabel);
 			// theTexture.DrawString(midSizedFont, popSizeDestination, popSizeString, popColor);
 		}
 
