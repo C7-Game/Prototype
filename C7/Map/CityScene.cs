@@ -40,6 +40,8 @@ namespace C7.Map {
 		Theme popThemeRed = new Theme();
 		Theme popSizeTheme = new Theme();
 
+		private int lastLabelWidth = 0;
+
 		public CityScene(City city, Tile tile, Vector2 tileCenter) {
 			this.city = city;
 			this.tile = tile;
@@ -98,8 +100,11 @@ namespace C7.Map {
 				log.Verbose("Text area width: " + textAreaWidth);
 			}
 
-			Image labelBackground = CreateLabelBackground(cityLabelWidth, city, textAreaWidth);
-			cityLabel.CreateFromImage(labelBackground, 0);
+			if (cityLabelWidth != lastLabelWidth) {
+				Image labelBackground = CreateLabelBackground(cityLabelWidth, city, textAreaWidth);
+				cityLabel.CreateFromImage(labelBackground, 0);
+				lastLabelWidth = cityLabelWidth;
+			}
 
 			DrawLabelOnScreen(tileCenter, cityLabelWidth, city, cityLabel);
 			DrawTextOnLabel(tileCenter, cityNameAndGrowthWidth, productionDescriptionWidth, city, cityNameAndGrowth, productionDescription, cityLabelWidth);
