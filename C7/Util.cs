@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using C7Engine;
 using Godot;
 using ConvertCiv3Media;
 
@@ -32,6 +33,10 @@ public class Util
 	{
 		// Use CIV3_HOME env var if present
 		string path = System.Environment.GetEnvironmentVariable("CIV3_HOME");
+		if (path != null) return path;
+
+		// Use settings value if present
+		path = C7Settings.GetSettingValue("locations", "civ3InstallDir");
 		if (path != null) return path;
 
 		// Look up in Windows registry if present
