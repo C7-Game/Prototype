@@ -15,12 +15,6 @@ namespace C7.Map {
 
 		private ImageTexture cityTexture;
 
-		private DynamicFont smallFont = new DynamicFont();
-		private DynamicFont midSizedFont = new DynamicFont();
-
-		private Pcx cityIcons = Util.LoadPCX("Art/Cities/city icons.pcx");
-		private Image nonEmbassyStar;
-
 		const int CITY_LABEL_HEIGHT = 23;
 		const int LEFT_RIGHT_BOXES_WIDTH = 24;
 		const int LEFT_RIGHT_BOXES_HEIGHT = CITY_LABEL_HEIGHT - 2;
@@ -33,17 +27,18 @@ namespace C7.Map {
 		Label productionLabel = new Label();
 		Label popSizeLabel = new Label();
 
-		Theme smallFontTheme = new Theme();
-		Theme popThemeRed = new Theme();
-		Theme popSizeTheme = new Theme();
+		private static DynamicFont smallFont = new DynamicFont();
+		private static DynamicFont midSizedFont = new DynamicFont();
+
+		private static Pcx cityIcons = Util.LoadPCX("Art/Cities/city icons.pcx");
+		private static Image nonEmbassyStar;
+		private static Theme smallFontTheme = new Theme();
+		private static Theme popThemeRed = new Theme();
+		private static Theme popSizeTheme = new Theme();
 
 		private int lastLabelWidth = 0;
 
-		public CityLabelScene(City city, Tile tile, Vector2 tileCenter) {
-			this.city = city;
-			this.tile = tile;
-			this.tileCenter = tileCenter;
-
+		static CityLabelScene() {
 			smallFontTheme.DefaultFont = smallFont;
 			smallFontTheme.SetColor("font_color", "Label", Color.Color8(255, 255, 255, 255));
 			popSizeTheme.DefaultFont = midSizedFont;
@@ -58,6 +53,13 @@ namespace C7.Map {
 			midSizedFont.Size = 18;
 
 			nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
+		}
+
+		public CityLabelScene(City city, Tile tile, Vector2 tileCenter) {
+			this.city = city;
+			this.tile = tile;
+			this.tileCenter = tileCenter;
+
 
 			labelTextureRect.MouseFilter = Control.MouseFilterEnum.Ignore;
 			cityNameLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
@@ -131,11 +133,6 @@ namespace C7.Map {
 			string popSizeString = "" + city.size;
 			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
 			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH / 2 - popSizeWidth / 2;
-			Vector2 popSizeDestination = new Vector2(tileCenter + new Vector2(cityLabelWidth / -2, 24) + new Vector2(popSizeOffset, 18));
-			Color popColor = Color.Color8(255, 255, 255, 255);
-			if (city.TurnsUntilGrowth() < 0) {
-				popColor = Color.Color8(255, 0, 0, 255);
-			}
 
 			popSizeLabel.Theme = popSizeTheme;
 
