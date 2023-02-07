@@ -18,6 +18,7 @@ namespace C7.Map
 		private ImageTexture tntTexture;
 
 		//Each row corresponds to a terrain.  For now we're only adding one, maybe someday we'll add full TNT support
+#pragma warning disable CS0414
 		private readonly int GRASSLAND_ROW = 0;
 		private readonly int BONUS_GRASSLAND_ROW = 1;
 		private readonly int PLAINS_ROW = 2;
@@ -25,6 +26,7 @@ namespace C7.Map
 		private readonly int BONUS_GRASSLAND_TNT_OFF_ROW = 3;
 		private readonly int TUNDRA_ROW = 4;
 		private readonly int FLOOD_PLAIN_ROW = 5;
+#pragma warning restore CS0414
 
 		public TntLayer()
 		{

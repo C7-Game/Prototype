@@ -14,7 +14,7 @@ namespace C7Engine
 			try {
 				settings = new FileIniDataParser().ReadFile(SETTINGS_FILE_NAME);
 			}
-			catch(ParsingException ex) {
+			catch(ParsingException) {
 				//First run.  The file doesn't exist.  That's okay.  We'll use sensible defaults.
 				settings = new IniData();
 				SaveSettings();
