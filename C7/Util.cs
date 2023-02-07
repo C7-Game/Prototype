@@ -5,22 +5,19 @@ using System.Runtime.InteropServices;
 using Godot;
 using ConvertCiv3Media;
 
-public class Util
-{
+public class Util {
 	static public string Civ3Root = GetCiv3Path();
 	public class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 	// While instantiated it will return to the last-accessed folder when reopened
 	{
 		public string RelPath= "";
-		public Civ3FileDialog(FileDialog.ModeEnum mode = FileDialog.ModeEnum.OpenFile)
-		{
+		public Civ3FileDialog(FileDialog.ModeEnum mode = FileDialog.ModeEnum.OpenFile) {
 			Mode = mode;
 		}
-		public override void _Ready()
-		{
+		public override void _Ready() {
 			Access = AccessEnum.Filesystem;
-			CurrentDir = Util.GetCiv3Path() + "/" + RelPath;
+			CurrentDir = Civ3Root + "/" + RelPath;
 			Resizable = true;
 			MarginRight = 550;
 			MarginBottom = 750;
@@ -28,25 +25,45 @@ public class Util
 		}
 
 	}
-	static public string GetCiv3Path()
-	{
+
+	static private string SteamCommonDir() {
+		string home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+		if (home == null) { return null; }
+		return System.IO.Path.Combine(home, "Library/Application Support/Steam/steamapps/common");
+	}
+
+	static private bool FolderIsCiv3(System.IO.DirectoryInfo di) {
+		return di.EnumerateFiles().Any(f => f.Name == "civ3id.mb");
+	}
+
+	static public string GetCiv3Path() {
 		// Use CIV3_HOME env var if present
 		string path = System.Environment.GetEnvironmentVariable("CIV3_HOME");
-		if (path != null) return path;
+		if (path != null) { return path; }
 
-		// Look up in Windows registry if present
-		path = Civ3PathFromRegistry();
-		if (path != null) return path;
+		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+			// Look up in Windows registry if present
+			path = Civ3PathFromRegistry();
+			if (path != null) { return path; }
+		} else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+			// Check for a civ3 folder in steamapps/common
+			// TODO: should this method only be used at dev time?
+			var root = new System.IO.DirectoryInfo(Util.SteamCommonDir());
+			foreach (System.IO.DirectoryInfo di in root.GetDirectories()) {
+				if (Util.FolderIsCiv3(di)) {
+					return di.FullName;
+				}
+			}
+		}
 
-		// TODO: Maybe check an array of hard-coded paths during dev time?
 		return "/civ3/path/not/found";
 	}
 
-	static public string Civ3PathFromRegistry()
-	{
+	static public string Civ3PathFromRegistry() {
 		// Assuming 64-bit platform, get vanilla Civ3 install folder from registry
 		// Return null if value not present or if key not found
-		return (string)Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", null);
+		object path = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", null);
+		return path == null ? null : (string)path;
 	}
 
 	// Checks if a file exists ignoring case on the latter parts of its path. If the file is found, returns its full path re-capitalized as
@@ -55,8 +72,7 @@ public class Util
 	// box. Arguments:
 	//   exactCaseRoot: The first part of the file path, not made case-insensitive. This is intended be the root Civ 3 path from GetCiv3Path().
 	//   ignoredCaseExtension: The second part of the file path that will be searched ignoring case.
-	public static string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension)
-	{
+	public static string FileExistsIgnoringCase(string exactCaseRoot, string ignoredCaseExtension) {
 		// First try the basic built-in File.Exists method since it's adequate in most cases.
 		string fullPath = System.IO.Path.Combine(exactCaseRoot, ignoredCaseExtension);
 		if (System.IO.File.Exists(fullPath))
@@ -65,7 +81,7 @@ public class Util
 		// If that didn't work, do a case-insensitive search starting at the root path and stepping through each piece of the extension. Skip
 		// this step if the root directory doesn't exist or if running on Windows.
 		string tr = null;
-		if ((! RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) &&
+		if ((!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) &&
 			System.IO.Directory.Exists(exactCaseRoot)) {
 			tr = exactCaseRoot;
 			foreach (string step in ignoredCaseExtension.Replace('\\', '/').Split('/')) {
@@ -102,8 +118,7 @@ public class Util
 	/// <param name="modPath">The mod path for a scenario, e.g. RFRE</param>
 	/// <returns>The path to the media on the file system, or an exception if it cannot be found</returns>
 	/// <exception cref="ApplicationException"></exception>
-	public static string Civ3MediaPath(string mediaPath)
-	{
+	public static string Civ3MediaPath(string mediaPath) {
 		//First, check if the file exists via a scenario's mod path
 		//For now this is only checked relative to Civ3, not relative to C7.
 		if (!string.IsNullOrEmpty(modPath)) {
@@ -135,7 +150,7 @@ public class Util
 			"civ3PTW",
 			""
 		};
-		for(int i = 0; i < basePaths.Length; i++) {
+		for (int i = 0; i < basePaths.Length; i++) {
 			string actualCasePath = CheckForCiv3Media(mediaPath, basePaths[i]);
 			if (actualCasePath != null)
 				return actualCasePath;
@@ -144,8 +159,7 @@ public class Util
 		throw new ApplicationException("Media path not found: " + mediaPath);
 	}
 
-	private static string CheckForCiv3Media(string relPath, string rootPath)
-	{
+	private static string CheckForCiv3Media(string relPath, string rootPath) {
 		// Combine TryPaths[i] and relPath. Make sure not to leave an erroneous forward slash at the start if TryPaths[i] is empty
 		string fullPath = rootPath != "" ? rootPath + "/" + relPath : relPath;
 
@@ -153,8 +167,7 @@ public class Util
 	}
 
 	//Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
-	static public ImageTexture LoadTextureFromPCX(string relPath)
-	{
+	static public ImageTexture LoadTextureFromPCX(string relPath) {
 		if (textureCache.ContainsKey(relPath)) {
 			return textureCache[relPath];
 		}
@@ -174,8 +187,7 @@ public class Util
 			//Doesn't work in release mode, which according to https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
 			//is due to a design issue in Godot's import pipeline
 			backgroundImage.Load("res://" + relPath);
-		}
-		else {
+		} else {
 			//This loads it from the folder where the executable is in release mode.
 			//Doesn't work in debug mode because the executable will be where Godot is installed,
 			//not where our project is located.
@@ -189,8 +201,7 @@ public class Util
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
 	//Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
 	//file, and it'll load it up and return you what you need.
-	static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height)
-	{
+	static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height) {
 		string key = relPath + "-" + leftStart + "-" + topStart + "-" + width + "-" + height;
 		if (textureCache.ContainsKey(key)) {
 			return textureCache[key];
@@ -206,8 +217,7 @@ public class Util
 	/**
 	 * Utility method for loading PCX files that will cache them, so we don't have to load them from disk so often.
 	 **/
-	static public Pcx LoadPCX(string relPath)
-	{
+	static public Pcx LoadPCX(string relPath) {
 		if (PcxCache.ContainsKey(relPath)) {
 			return PcxCache[relPath];
 		}
@@ -217,8 +227,7 @@ public class Util
 	}
 
 	// Creates a texture from raw palette data. The data must be 256 pixels by 3 channels. Returns a 16x16 unfiltered RGB texture.
-	public static ImageTexture createPaletteTexture(byte[,] raw)
-	{
+	public static ImageTexture createPaletteTexture(byte[,] raw) {
 		if ((raw.GetLength(0) != 256) || (raw.GetLength(1) != 3))
 			throw new Exception("Invalid palette dimensions. Palettes must be 256x3.");
 
@@ -237,8 +246,7 @@ public class Util
 
 	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
 	// color palette and the second is the size of the image itself and contains the indices in R8 format.
-	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string filePath)
-	{
+	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string filePath) {
 		var pcx = LoadPCX(filePath);
 
 		var imgIndices = new Image();
@@ -256,8 +264,7 @@ public class Util
 	}
 
 	// Loads a Flic and also converts it into a sprite sheet
-	public static (FlicSheet, Flic) loadFlicSheet(string filePath)
-	{
+	public static (FlicSheet, Flic) loadFlicSheet(string filePath) {
 		var flic = new Flic(Util.Civ3MediaPath(filePath));
 
 		var texPalette = Util.createPaletteTexture(flic.Palette);
@@ -288,21 +295,18 @@ public class Util
 	}
 
 
-	static public AudioStreamSample LoadWAVFromDisk(string path)
-	{
+	static public AudioStreamSample LoadWAVFromDisk(string path) {
 		File file = new File();
 		file.Open(path, Godot.File.ModeFlags.Read);
 
 		string riffString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
-		if (riffString != "RIFF")
-		{
+		if (riffString != "RIFF") {
 			throw new Exception("Unsupported file");
 		}
-		uint fileSize = file.Get32();	//minus 8 bytes
+		uint fileSize = file.Get32();   //minus 8 bytes
 
 		string waveString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
-		if (waveString != "WAVE")
-		{
+		if (waveString != "WAVE") {
 			throw new Exception("Unsupported file");
 		}
 
@@ -311,8 +315,7 @@ public class Util
 
 		AudioStreamSample wav = new AudioStreamSample();
 
-		while (!file.EofReached())
-		{
+		while (!file.EofReached()) {
 			string chunk = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
 			uint chunkSize = file.Get32();
 			ulong position = file.GetPosition();
@@ -322,7 +325,7 @@ public class Util
 				break;
 			}
 
-			if (chunk == "fmt ")	//format chunk
+			if (chunk == "fmt ")    //format chunk
 			{
 				//There is some disagreement between the C++ and GDScript sources
 				//as to which compression codes Godot supports.  The C++ has a comment
@@ -334,36 +337,31 @@ public class Util
 				ushort compressionCode = file.Get16();
 				if (compressionCode == 1) {
 					wav.Format = Godot.AudioStreamSample.FormatEnum.Format16Bits;
-				}
-				else if (compressionCode == 0) {
+				} else if (compressionCode == 0) {
 					wav.Format = Godot.AudioStreamSample.FormatEnum.Format8Bits;
-				}
-				else if (compressionCode == 2) {
+				} else if (compressionCode == 2) {
 					wav.Format = Godot.AudioStreamSample.FormatEnum.ImaAdpcm;
 				}
 
 				ushort channels = file.Get16();
 				if (channels == 2) {
 					wav.Stereo = true;
-				}
-				else if (channels < 1 || channels > 5) {
+				} else if (channels < 1 || channels > 5) {
 					throw new Exception("Only mono and stream WAV files supported");
 				}
 
 				uint sampleRate = file.Get32();
 				wav.MixRate = (int)sampleRate;
 
-				uint averageBPS = file.Get32();	//unused
-				ushort blockAlign = file.Get16();	//unused
+				uint averageBPS = file.Get32(); //unused
+				ushort blockAlign = file.Get16();   //unused
 				ushort formatBits = file.Get16();
 
 				if (formatBits % 8 != 0 || formatBits == 0) {
 					throw new Exception("Format bits must be a multiple of 8");
 				}
 				formatFound = true;
-			}
-			else if (chunk == "data")
-			{
+			} else if (chunk == "data") {
 				byte[] allTheData = file.GetBuffer(chunkSize);
 				wav.Data = allTheData;
 				dataFound = true;
