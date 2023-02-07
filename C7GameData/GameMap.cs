@@ -199,8 +199,7 @@ namespace C7GameData
 		 * implement a more sophisticated generator in the engine.
 		 **/
 		// TerrainType declarations here have been copied to ImportCiv3, and all loaded terrain is set with one of them
-		[Obsolete]
-		public static GameMap generateDummyGameMap(Random rng, TerrainNoiseMapGenerator terrainGen)
+		public static GameMap Generate(Random rng)
 		{
 			TerrainType grassland = new TerrainType();
 			grassland.DisplayName = "Grassland";
@@ -226,27 +225,25 @@ namespace C7GameData
 			coast.movementCost = 1;
 			coast.allowCities = false;
 
-			GameMap dummyMap = new GameMap();
-			dummyMap.numTilesTall = 80;
-			dummyMap.numTilesWide = 80;
+			GameMap m = new GameMap();
+			m.numTilesTall = 80;
+			m.numTilesWide = 80;
 
 			// NOTE: The order of terrain types in this array must match the indices produced by terrainGen
-			dummyMap.terrainTypes.Add(plains);
-			dummyMap.terrainTypes.Add(grassland);
-			dummyMap.terrainTypes.Add(coast);
+			m.terrainTypes.Add(plains);
+			m.terrainTypes.Add(grassland);
+			m.terrainTypes.Add(coast);
 
-			dummyMap.terrainNoiseMap = terrainGen(rng.Next(), dummyMap.numTilesWide, dummyMap.numTilesTall);
-
-			for (int y = 0; y < dummyMap.numTilesTall; y++) {
-				for (int x = y%2; x < dummyMap.numTilesWide; x += 2) {
+			for (int y = 0; y < m.numTilesTall; y++) {
+				for (int x = y%2; x < m.numTilesWide; x += 2) {
 					Tile newTile = new Tile();
 					newTile.xCoordinate = x;
 					newTile.yCoordinate = y;
-					newTile.baseTerrainType = dummyMap.terrainTypes[dummyMap.terrainNoiseMap[x, y]];
-					dummyMap.tiles.Add(newTile);
+					newTile.baseTerrainType = m.terrainTypes[rng.Next() % m.terrainTypes.Count];
+					m.tiles.Add(newTile);
 				}
 			}
-			return dummyMap;
+			return m;
 		}
 
 		// STATUS 2021-11-26: This noise function is not currently referenced, but it is a very useful
@@ -258,7 +255,7 @@ namespace C7GameData
 		//  Might be able to implement them, use https://www.youtube.com/watch?v=MRNFcywkUSA&list=PLFt_AvWsXl0eBW2EiBtl_sxmDtSgZBxB3&index=4 as reference
 		// TODO: Parameterize octaves, persistence, scale/period; compare this generator to Godot's
 		// NOTE: Godot's OpenSimplexNoise returns -1 to 1; this one seems to be from 0 to 1 like most Simplex/Perlin implementations
-		public static double[,] tempMapGenPrototyping(int width, int height, bool wrapX = true, bool wrapY = false)
+		public static double[,] tempMapGenPrototyping(int rng, int width, int height, bool wrapX = true, bool wrapY = false)
 		{
 			// TODO: I think my octaves implementation is broken; specifically it needs normalizing I think as additional octaves drive more extreme values
 			int octaves = 1;
