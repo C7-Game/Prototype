@@ -40,7 +40,7 @@ public sealed class ComponentManager
     }
 }
 
-public class GameComponent : Godot.Object
+public partial class GameComponent : Godot.Object
 {
 
 }

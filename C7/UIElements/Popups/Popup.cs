@@ -1,11 +1,11 @@
-﻿using Godot;
+using Godot;
 using ConvertCiv3Media;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Serilog;
 
-public class Margins
+public partial class Margins
 {
     public Margins(float top = 0, float bottom = 0, float left = 0, float right = 0)
     {
@@ -29,11 +29,11 @@ public class Margins
  * pixels lower than it would otherwise. This is used when a popup includes an advisor, since the vOffset adds a
  * transparent region above the top of the popup background in which the advisor texture can be drawn.
  */
-public class Popup : TextureRect
+public partial class Popup : TextureRect
 {
 	private ILogger log = LogManager.ForContext<Popup>();
 
-    public BoxContainer.AlignMode alignment;
+    public BoxContainer.AlignmentMode alignment;
     public Margins margins;
 
     const int HTILE_SIZE = 61;
@@ -52,20 +52,20 @@ public class Popup : TextureRect
         newButton.TextureHover = HoverButton;
         newButton.SetPosition(new Vector2(HORIZONTAL_POSITION, verticalPosition));
         AddChild(newButton);
-        newButton.Connect("pressed", this, actionName);
+        newButton.Connect("pressed",new Callable(this,actionName));
 
         Button newButtonLabel = new Button();
         newButtonLabel.Text = label;
 
         newButtonLabel.SetPosition(new Vector2(HORIZONTAL_POSITION + 25, verticalPosition + BUTTON_LABEL_OFFSET));
         AddChild(newButtonLabel);
-        newButtonLabel.Connect("pressed", this, actionName);
+        newButtonLabel.Connect("pressed",new Callable(this,actionName));
     }
 
     protected void AddHeader(string text, int vOffset)
     {
         HBoxContainer header = new HBoxContainer();
-        header.Alignment = BoxContainer.AlignMode.Center;
+        header.Alignment = BoxContainer.AlignmentMode.Center;
         Label advisorType = new Label();
 
         //Set the font size.  For labels, there is no one-off override, so we have to
@@ -75,7 +75,7 @@ public class Popup : TextureRect
         //second to whatever type it should apply to.  But that is based on nothing official.
         //Also you can set the size with bigFont.Size = 72, but that applies everywhere the font
         //is used in the whole program.  Not recommended.
-        DynamicFont bigFont = ResourceLoader.Load<DynamicFont>("res://Fonts/NSansFont24Pt.tres");
+        FontFile bigFont = ResourceLoader.Load<FontFile>("res://Fonts/NSansFont24Pt.tres");
         Theme theme = new Theme();
         theme.SetFont("font", "Label", bigFont);
         advisorType.Theme = theme;
@@ -84,33 +84,31 @@ public class Popup : TextureRect
         header.SetPosition(new Vector2(0, vOffset));
         header.AnchorLeft = 0.0f;
         header.AnchorRight = 1.0f;
-        header.MarginRight = 10;    // For some reason this isn't causing it to be indented 10 pixels from the right.
+        header.OffsetRight = 10;    // For some reason this isn't causing it to be indented 10 pixels from the right.
         AddChild(header);
     }
 
     private void DrawRow(Image image, int vOffset, int width, Image left, Image center, Image right)
     {
 
-        image.BlitRect(left, new Rect2(new Vector2(0, 0), new Vector2(left.GetWidth(), left.GetHeight())), new Vector2(0, vOffset));
+        image.BlitRect(left, new Rect2i(new Vector2i(0, 0), new Vector2i(left.GetWidth(), left.GetHeight())), new Vector2i(0, vOffset));
 
         int leftOffset = HTILE_SIZE;
         for (; leftOffset < width - HTILE_SIZE; leftOffset += HTILE_SIZE)
         {
-            image.BlitRect(center, new Rect2(new Vector2(0, 0), new Vector2(center.GetWidth(), center.GetHeight())), new Vector2(leftOffset, vOffset));
+            image.BlitRect(center, new Rect2i(new Vector2i(0, 0), new Vector2i(center.GetWidth(), center.GetHeight())), new Vector2i(leftOffset, vOffset));
         }
 
         leftOffset = width - HTILE_SIZE;
-        image.BlitRect(right, new Rect2(new Vector2(0, 0), new Vector2(right.GetWidth(), right.GetHeight())), new Vector2(leftOffset, vOffset));
+        image.BlitRect(right, new Rect2i(new Vector2i(0, 0), new Vector2i(right.GetWidth(), right.GetHeight())), new Vector2i(leftOffset, vOffset));
     }
 
     protected void AddTexture(int width, int height)
     {
-        ImageTexture tex = new ImageTexture();
         Image image = new Image();
         image.Create(width, height, false, Image.Format.Rgba8);
         image.Fill(Color.Color8(0, 0, 0, 0));
-        tex.CreateFromImage(image);
-        Texture = tex;
+        this.Texture = ImageTexture.CreateFromImage(image);
     }
 
     protected void AddBackground(int width, int height, int vOffset = 0)
@@ -168,8 +166,7 @@ public class Popup : TextureRect
         vOffset = height - VTILE_SIZE;
         DrawRow(image, vOffset, width, bottomLeftPopup, bottomCenterPopup, bottomRightPopup);
 
-        ImageTexture texture = new ImageTexture();
-        texture.CreateFromImage(image);
+        ImageTexture texture = ImageTexture.CreateFromImage(image);
         backgroundCache.Add((width, height), texture);
 
         rect.Texture = texture;

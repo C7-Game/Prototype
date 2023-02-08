@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class DomesticAdvisor : TextureRect
+public partial class DomesticAdvisor : TextureRect
 {
 	// Declare member variables here. Examples:
 	// private int a = 2;
@@ -15,7 +15,7 @@ public class DomesticAdvisor : TextureRect
 
 	private void CreateUI() {
 		ImageTexture DomesticBackground = Util.LoadTextureFromPCX("Art/Advisors/domestic.pcx");
-		this.Texture = DomesticBackground;
+		this.Texture2D = DomesticBackground;
 
 		//TODO: Age-based background.  Only use Ancient for now.
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupDOMESTIC.pcx", 1, 40, 149, 110);
@@ -25,7 +25,7 @@ public class DomesticAdvisor : TextureRect
 
 		TextureRect AdvisorHead = new TextureRect();
 		//TODO: Randomize or set logically
-		AdvisorHead.Texture = AdvisorSurprised;
+		AdvisorHead.Texture2D = AdvisorSurprised;
 		AdvisorHead.SetPosition(new Vector2(851, 0));
 		AddChild(AdvisorHead);
 
@@ -46,7 +46,7 @@ public class DomesticAdvisor : TextureRect
 		GoBackButton.TextureNormal = GoBackTexture;
 		GoBackButton.SetPosition(new Vector2(952, 720));
 		AddChild(GoBackButton);
-		GoBackButton.Connect("pressed", this, "ReturnToMenu");
+		GoBackButton.Connect("pressed",new Callable(this,"ReturnToMenu"));
 	}
 
 	private void ReturnToMenu()

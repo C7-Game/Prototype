@@ -21,7 +21,7 @@ using IniParser;
 using IniParser.Model;
 using C7GameData;
 
-public class Civ3AnimData
+public partial class Civ3AnimData
 {
 	private AudioStreamPlayer audioPlayer;
 
@@ -74,13 +74,13 @@ public class Civ3AnimData
 		return tr;
 	}
 
-	private Dictionary<string, AudioStreamSample> wavs = new Dictionary<string, AudioStreamSample>();
+	private Dictionary<string, AudioStreamWAV> wavs = new Dictionary<string, AudioStreamWAV>();
 
 	public void playSound(string rootPath, IniData iniData, MapUnit.AnimatedAction action)
 	{
 		string fileName = iniData["Sound Effects"][action.ToString()];
 		if (fileName.EndsWith(".WAV", StringComparison.CurrentCultureIgnoreCase)) {
-			AudioStreamSample wav;
+			AudioStreamWAV wav;
 			var pathKey = rootPath + "/" + fileName;
 			if (! wavs.TryGetValue(pathKey, out wav)) {
 				wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(pathKey));
@@ -102,7 +102,7 @@ public class Civ3AnimData
 	}
 }
 
-public class Civ3Anim
+public partial class Civ3Anim
 {
 	public Civ3AnimData civ3AnimData  { get; private set; }
 	public string folderPath { get; private set; } // For example "Art/Units/Warrior" or "Art/Animations/Trajectory"

@@ -3,7 +3,7 @@ using ConvertCiv3Media;
 using Godot;
 
 namespace C7.Map {
-	public class FogOfWarLayer : LooseLayer {
+	public partial class FogOfWarLayer : LooseLayer {
 
 		private readonly ImageTexture fogOfWarTexture;
 		private readonly Vector2 tileSize;

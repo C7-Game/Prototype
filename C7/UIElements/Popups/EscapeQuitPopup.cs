@@ -1,6 +1,6 @@
 using Godot;
 
-public class EscapeQuitPopup : Popup
+public partial class EscapeQuitPopup : Popup
 {
 
 	public EscapeQuitPopup()

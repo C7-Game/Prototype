@@ -1,7 +1,7 @@
 using Godot;
 using Serilog;
 
-public class BuildCityDialog : Popup
+public partial class BuildCityDialog : Popup
 {
 
 	LineEdit cityName = new LineEdit();
@@ -27,7 +27,7 @@ public class BuildCityDialog : Popup
 
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupCULTURE.pcx", 1, 40, 149, 110);
 		TextureRect AdvisorHead = new TextureRect();
-		AdvisorHead.Texture = AdvisorHappy;
+		AdvisorHead.Texture2D = AdvisorHappy;
 		//Appears at 400, 110 in game, but leftmost 25px are transparent with default graphics
 		AdvisorHead.SetPosition(new Vector2(375, 0));
 		AddChild(AdvisorHead);
@@ -58,7 +58,7 @@ public class BuildCityDialog : Popup
 		cityName.SelectAll();
 		cityName.GrabFocus();
 
-		cityName.Connect("text_entered", this, "OnCityNameEntered");
+		cityName.Connect("text_entered",new Callable(this,"OnCityNameEntered"));
 
 		//Cancel/confirm buttons.  Note the X button is thinner than the O button.
 		ImageTexture circleTexture= Util.LoadTextureFromPCX("Art/X-o_ALLstates-sprite.pcx", 1, 1, 19, 19);
@@ -80,8 +80,8 @@ public class BuildCityDialog : Popup
 		cancelButton.SetPosition(new Vector2(500, 213));
 		AddChild(cancelButton);
 
-		confirmButton.Connect("pressed", this, "OnConfirmButtonPressed");
-		cancelButton.Connect("pressed", GetParent(), "OnHidePopup");
+		confirmButton.Connect("pressed",new Callable(this,"OnConfirmButtonPressed"));
+		cancelButton.Connect("pressed",new Callable(GetParent(),"OnHidePopup"));
 	}
 
 	/**

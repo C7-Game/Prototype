@@ -3,7 +3,7 @@ using Godot;
 using C7GameData;
 using C7Engine;
 
-public class RightClickMenu : VBoxContainer
+public partial class RightClickMenu : VBoxContainer
 {
 	protected Game game;
 
@@ -38,7 +38,7 @@ public class RightClickMenu : VBoxContainer
 		this.Show();
 
 		// Move "position" if the menu would extend past the right or bottom edges of the screen
-		Vector2 offScreen = position + this.RectSize - GetViewport().Size;
+		Vector2 offScreen = position + this.Size; // - GetViewport().GetSize;
 		if (offScreen.x > 0) {
 			position.x -= offScreen.x;
 			if (position.x < 0)
@@ -50,7 +50,7 @@ public class RightClickMenu : VBoxContainer
 				position.y = 0;
 		}
 
-		this.RectPosition = position;
+		this.SetPosition(position);
 	}
 
 	public void CloseAndDelete()
@@ -69,27 +69,29 @@ public class RightClickMenu : VBoxContainer
 		};
 	}
 
-	public Button AddItem(string text, Texture icon = null)
+	public Button AddItem(string text, Texture2D icon = null)
 	{
 		var button = new Button();
 		button.Text = text;
-		if (icon != null)
+		if (icon != null) {
 			button.Icon = icon;
-		button.Align = Button.TextAlign.Left;
+		}
+		button.Alignment = HorizontalAlignment.Left;
 		this.AddChild(button);
 		return button;
 	}
 
 	public void RemoveAll()
 	{
-		foreach (Node child in this.GetChildren())
+		foreach (Node child in this.GetChildren()) {
 			child.QueueFree();
+		}
 	}
 
 	public override void _Input(InputEvent @event)
 	{
-		bool mouseOverMenu = new Rect2(Vector2.Zero, this.RectSize).HasPoint(this.GetLocalMousePosition());
-		bool escapeKeyWasPressed = (@event is InputEventKey keyEvent) && keyEvent.Pressed && keyEvent.Scancode == (int)Godot.KeyList.Escape;
+		bool mouseOverMenu = new Rect2(Vector2.Zero, this.Size).HasPoint(this.GetLocalMousePosition());
+		bool escapeKeyWasPressed = (@event is InputEventKey keyEvent) && keyEvent.Pressed && keyEvent.Keycode == Godot.Key.Escape;
 		bool mouseClickedOutsideMenu = (@event is InputEventMouseButton mouseButtonEvent) && mouseButtonEvent.IsPressed() && !mouseOverMenu;
 
 		if (escapeKeyWasPressed || mouseClickedOutsideMenu) {
@@ -107,7 +109,7 @@ public class RightClickMenu : VBoxContainer
 	}
 }
 
-public class RightClickTileMenu : RightClickMenu
+public partial class RightClickTileMenu : RightClickMenu
 {
 	public RightClickTileMenu(Game game, Tile tile) : base(game) {
 		ResetItems(tile);
@@ -142,15 +144,18 @@ public class RightClickTileMenu : RightClickMenu
 			fortifiedCount += isFortified ? 1 : 0;
 			string action = getUnitAction(unit, isFortified);
 
-			AddItem($"{action} {unit.Describe()}").Connect("pressed", this, "SelectUnit", new Godot.Collections.Array() {unit.guid});
+			System.Action del = () => {
+				SelectUnit(unit.guid);
+			};
+			AddItem($"{action} {unit.Describe()}").Connect("pressed", new Callable(new System.Action(() => SelectUnit(unit.guid))));
 		}
 		int unfortifiedCount = units.Count - fortifiedCount;
 
 		if (fortifiedCount > 1) {
-			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, false});
+			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", new Callable(new System.Action(() => ForAll(tile.xCoordinate, tile.yCoordinate, false))));
 		}
 		if (unfortifiedCount > 1) {
-			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", this, "ForAll", new Godot.Collections.Array() {tile.xCoordinate, tile.yCoordinate, true});
+			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", new Callable(new System.Action(() => ForAll(tile.xCoordinate,tile.yCoordinate,true))));
 		}
 	}
 
@@ -163,7 +168,7 @@ public class RightClickTileMenu : RightClickMenu
 				ResetItems(toSelect.location, new Dictionary<string, bool>() {{toSelect.guid, false}});
 			}
 		}
-		if (!Input.IsKeyPressed((int)KeyList.Shift)) {
+		if (!Input.IsKeyPressed(Godot.Key.Shift)) {
 			CloseAndDelete();
 		}
 	}
@@ -185,14 +190,14 @@ public class RightClickTileMenu : RightClickMenu
 			}
 			ResetItems(tile, modified);
 		}
-		if (!Input.IsKeyPressed((int)KeyList.Shift)) {
+		if (!Input.IsKeyPressed(Godot.Key.Shift)) {
 			CloseAndDelete();
 		}
 	}
 
 }
 
-public class RightClickChooseProductionMenu : RightClickMenu
+public partial class RightClickChooseProductionMenu : RightClickMenu
 {
 	private string cityGUID;
 
@@ -213,7 +218,7 @@ public class RightClickChooseProductionMenu : RightClickMenu
 		foreach (IProducible option in city.ListProductionOptions()) {
 			int buildTime = city.TurnsToProduce(option);
 			AddItem($"{option.name} ({buildTime} turns)", GetProducibleIcon(option))
-				.Connect("pressed", this, "ChooseProduction", new Godot.Collections.Array() { option.name });
+				.Connect("pressed",new Callable(new System.Action(() => ChooseProduction(option.name))));
 		}
 	}
 

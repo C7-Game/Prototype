@@ -13,7 +13,7 @@
  *          //Do whatever you like with unwrappedUnit...
  *      }
  **/
-public class ParameterWrapper : Godot.Object
+public partial class ParameterWrapper : Godot.Object
 {
     private readonly object value;
 

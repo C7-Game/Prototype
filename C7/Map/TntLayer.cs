@@ -10,7 +10,7 @@ namespace C7.Map
 	/// there are bonus grasslands.
 	/// Note: I don't know why it's called tnt.
 	/// </summary>
-	public class TntLayer : LooseLayer
+	public partial class TntLayer : LooseLayer
 	{
 		private ILogger log = LogManager.ForContext<TntLayer>();
 

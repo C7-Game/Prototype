@@ -3,7 +3,7 @@ using System;
 using C7GameData;
 using Serilog;
 
-public class GameStatus : MarginContainer
+public partial class GameStatus : MarginContainer
 {
 
 	private ILogger log = LogManager.ForContext<GameStatus>();
@@ -11,13 +11,13 @@ public class GameStatus : MarginContainer
 	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
 	Timer endTurnAlertTimer;
 
-	[Signal] public delegate void BlinkyEndTurnButtonPressed();
+	[Signal] public delegate void BlinkyEndTurnButtonPressedEventHandler();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		MarginLeft = -(294 + 5);
-		MarginTop = -(137 + 1);
+		OffsetLeft = -(294 + 5);
+		OffsetTop = -(137 + 1);
 		AddChild(LowerRightInfoBox);
 	}
 

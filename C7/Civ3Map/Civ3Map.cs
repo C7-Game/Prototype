@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ConvertCiv3Media;
 using C7GameData;
 
-public class Civ3Map : Node2D
+public partial class Civ3Map : Node2D
 {
 	public List<Tile> Civ3Tiles;
 	public int[,] Map { get; protected set; }

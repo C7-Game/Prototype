@@ -1,4 +1,4 @@
-﻿using Godot;
+using Godot;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -6,7 +6,7 @@ using Serilog.Configuration;
 using Serilog.Formatting;
 using System.IO;
 
-public class GodotSink : ILogEventSink
+public partial class GodotSink : ILogEventSink
 {
     private readonly ITextFormatter _formatter;
 

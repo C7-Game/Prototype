@@ -7,7 +7,7 @@ using Serilog;
  * Showing them, hiding them... maybe some other things eventually.
  * This is part of the effort to de-centralize from Game.cs and be more event driven.
  */
-public class Advisors : CenterContainer
+public partial class Advisors : CenterContainer
 {
 	private ILogger log = LogManager.ForContext<Advisors>();
 

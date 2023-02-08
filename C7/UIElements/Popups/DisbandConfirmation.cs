@@ -4,7 +4,7 @@ using System.Diagnostics;
 using C7GameData;
 using Serilog;
 
-public class DisbandConfirmation : Popup
+public partial class DisbandConfirmation : Popup
 {
 	private ILogger log = LogManager.ForContext<DisbandConfirmation>();
 
@@ -43,7 +43,7 @@ public class DisbandConfirmation : Popup
 
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupDOMESTIC.pcx", 1, 40, 149, 110);
 		TextureRect AdvisorHead = new TextureRect();
-		AdvisorHead.Texture = AdvisorHappy;
+		AdvisorHead.Texture2D = AdvisorHappy;
 		//Appears at 400, 110 in game, but leftmost 25px are transparent with default graphics
 		AdvisorHead.SetPosition(new Vector2(375, 0));
 		AddChild(AdvisorHead);

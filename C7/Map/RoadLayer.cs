@@ -5,7 +5,7 @@ using Godot;
 
 namespace C7.Map
 {
-	public class RoadLayer : LooseLayer {
+	public partial class RoadLayer : LooseLayer {
 		private readonly ImageTexture roadTexture;
 		private readonly ImageTexture railroadTexture;
 		private readonly Vector2 tileSize;

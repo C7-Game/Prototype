@@ -1,6 +1,6 @@
-﻿using Godot;
+using Godot;
 
-public class GameMenu : Popup
+public partial class GameMenu : Popup
 {
 
     public GameMenu() {

@@ -6,13 +6,13 @@ using C7Engine;
 using C7GameData;
 using Serilog;
 
-public class Game : Node2D
+public partial class Game : Node2D
 {
-	[Signal] public delegate void TurnStarted();
-	[Signal] public delegate void TurnEnded();
-	[Signal] public delegate void ShowSpecificAdvisor();
-	[Signal] public delegate void NewAutoselectedUnit();
-	[Signal] public delegate void NoMoreAutoselectableUnits();
+	[Signal] public delegate void TurnStartedEventHandler();
+	[Signal] public delegate void TurnEndedEventHandler();
+	[Signal] public delegate void ShowSpecificAdvisorEventHandler();
+	[Signal] public delegate void NewAutoselectedUnitEventHandler();
+	[Signal] public delegate void NoMoreAutoselectableUnitsEventHandler();
 
 	private ILogger log = LogManager.ForContext<Game>();
 
@@ -42,7 +42,7 @@ public class Game : Node2D
 	Control Toolbar;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
-	private KinematicBody2D Player;
+	private CharacterBody2D Player;
 
 	Stopwatch loadTimer = new Stopwatch();
 	GlobalSingleton Global;
@@ -93,9 +93,9 @@ public class Game : Node2D
 			}
 
 			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
-			Player = GetNode<KinematicBody2D>("KinematicBody2D");
+			Player = GetNode<CharacterBody2D>("CharacterBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
-			// GetTree().Root.Connect("size_changed", this, "_OnViewportSizeChanged");
+			// GetTree().Root.Connect("size_changed",new Callable(this,"_OnViewportSizeChanged"));
 
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
@@ -170,7 +170,7 @@ public class Game : Node2D
 		animTracker.update();
 	}
 
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
 		using (var gameDataAccess = new UIGameDataAccess()) {
@@ -192,10 +192,10 @@ public class Game : Node2D
 						 (CurrentlySelectedUnit.isFortified && ! KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
 				}
-				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.KeyList.F1 (etc.) doesn't work
+				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.Key.F1 (etc.) doesn't work
 				//without a manual cast to int.
 				//https://github.com/godotengine/godot/issues/16388
-				if (Input.IsKeyPressed((int)Godot.KeyList.F1)) {
+				if (Input.IsKeyPressed(Godot.Key.F1)) {
 					EmitSignal("ShowSpecificAdvisor", "F1");
 				}
 			}
@@ -208,14 +208,14 @@ public class Game : Node2D
 	public int[,] genBasicTerrainNoiseMap(int seed, int mapWidth, int mapHeight)
 	{
 		var tr = new int[mapWidth,mapHeight];
-		Godot.OpenSimplexNoise noise = new Godot.OpenSimplexNoise();
+		Godot.FastNoiseLite noise = new Godot.FastNoiseLite();
 		noise.Seed = seed;
 		// Populate map values
 		for (int y = 0; y < mapHeight; y++) {
 			for (int x = 0; x < mapWidth; x++) {
 				// Multiplying x & y for noise coordinate sampling
-				float foo = noise.GetNoise2d(x*2,y*2);
-				tr[x,y] = foo < 0.1 ? 2 : foo < 0.4? 1 : 0;
+				float n = noise.GetNoise2d(x*2,y*2);
+				tr[x,y] = n < 0.1 ? 2 : n < 0.4? 1 : 0;
 			}
 		}
 		return tr;
@@ -283,7 +283,7 @@ public class Game : Node2D
 	{
 		log.Information("Starting player turn");
 		int turnNumber = TurnHandling.GetTurnNumber();
-		EmitSignal(nameof(TurnStarted), turnNumber);
+		EmitSignal(nameof(TurnStartedEventHandler), turnNumber);
 		CurrentState = GameState.PlayerTurn;
 
 		using (var gameDataAccess = new UIGameDataAccess()) {
@@ -296,7 +296,7 @@ public class Game : Node2D
 		if (CurrentState == GameState.PlayerTurn)
 		{
 			log.Information("Ending player turn");
-			EmitSignal(nameof(TurnEnded));
+			EmitSignal(nameof(TurnEndedEventHandler));
 			log.Information("Starting computer turn");
 			CurrentState = GameState.ComputerTurn;
 			new MsgEndTurn().send(); // Triggers actual backend processing
@@ -308,8 +308,8 @@ public class Game : Node2D
 		// This apparently exits the whole program
 		// GetTree().Quit();
 
-		// ChangeScene deletes the current scene and frees its memory, so this is quitting to main menu
-		GetTree().ChangeScene("res://MainMenu.tscn");
+		// ChangeSceneToFile deletes the current scene and frees its memory, so this is quitting to main menu
+		GetTree().ChangeSceneToFile("res://MainMenu.tscn");
 	}
 
 	public void _on_Zoom_value_changed(float value)
@@ -355,9 +355,9 @@ public class Game : Node2D
 		// Control node must not be in the way and/or have mouse pass enabled
 		if(@event is InputEventMouseButton eventMouseButton)
 		{
-			if(eventMouseButton.ButtonIndex == (int)ButtonList.Left)
+			if(eventMouseButton.ButtonIndex == MouseButton.Left)
 			{
-				GetTree().SetInputAsHandled();
+				GetViewport().SetInputAsHandled();
 				if(eventMouseButton.IsPressed())
 				{
 					if (inUnitGoToMode) {
@@ -390,23 +390,23 @@ public class Game : Node2D
 					IsMovingCamera = false;
 				}
 			}
-			else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelUp)
+			else if(eventMouseButton.ButtonIndex == MouseButton.WheelUp)
 			{
-				GetTree().SetInputAsHandled();
+				GetViewport().SetInputAsHandled();
 				AdjustZoomSlider(1, GetViewport().GetMousePosition());
 			}
-			else if(eventMouseButton.ButtonIndex == (int)ButtonList.WheelDown)
+			else if(eventMouseButton.ButtonIndex == MouseButton.WheelDown)
 			{
-				GetTree().SetInputAsHandled();
+				GetViewport().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
 			}
-			else if ((eventMouseButton.ButtonIndex == (int)ButtonList.Right) && (!eventMouseButton.IsPressed()))
+			else if ((eventMouseButton.ButtonIndex == MouseButton.Right) && (!eventMouseButton.IsPressed()))
 			{
 				setGoToMode(false);
 				using (var gameDataAccess = new UIGameDataAccess()) {
 					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 					if (tile != null) {
-						bool shiftDown = Input.IsKeyPressed((int)Godot.KeyList.Shift);
+						bool shiftDown = Input.IsKeyPressed(Godot.Key.Shift);
 						if (shiftDown && tile.cityAtTile?.owner == controller)
 							new RightClickChooseProductionMenu(this, tile.cityAtTile).Open(eventMouseButton.Position);
 						else if ((! shiftDown) && tile.unitsOnTile.Count > 0)
@@ -440,14 +440,14 @@ public class Game : Node2D
 		{
 			if(IsMovingCamera)
 			{
-				GetTree().SetInputAsHandled();
+				GetViewport().SetInputAsHandled();
 				mapView.cameraLocation += OldPosition - eventMouseMotion.Position;
 				OldPosition = eventMouseMotion.Position;
 			}
 		}
 		else if (@event is InputEventKey eventKeyDown && eventKeyDown.Pressed)
 		{
-			if (eventKeyDown.Scancode == (int)Godot.KeyList.Enter)
+			if (eventKeyDown.Keycode == Godot.Key.Enter)
 			{
 				log.Verbose("Enter pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
@@ -458,7 +458,7 @@ public class Game : Node2D
 					log.Debug("There is a " + CurrentlySelectedUnit.unitType.name + " selected; not ending turn");
 				}
 			}
-			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Space)
+			else if (eventKeyDown.Keycode == Godot.Key.Space)
 			{
 				log.Verbose("Space pressed");
 				if (CurrentlySelectedUnit == MapUnit.NONE)
@@ -466,12 +466,12 @@ public class Game : Node2D
 					this.OnPlayerEndTurn();
 				}
 			}
-			else if ((eventKeyDown.Scancode >= (int)Godot.KeyList.Kp1) && (eventKeyDown.Scancode <= (int)Godot.KeyList.Kp9))
+			else if ((eventKeyDown.Keycode >= Godot.Key.Kp1) && (eventKeyDown.Keycode <= Godot.Key.Kp9))
 			{ // Move units with the numpad keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
-					switch (eventKeyDown.Scancode - (int)Godot.KeyList.Kp0) {
+					switch (eventKeyDown.Keycode - Godot.Key.Kp0) {
 					case 1: dir = TileDirection.SOUTHWEST; break;
 					case 2: dir = TileDirection.SOUTH;     break;
 					case 3: dir = TileDirection.SOUTHEAST; break;
@@ -487,31 +487,31 @@ public class Game : Node2D
 					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
-			else if ((eventKeyDown.Scancode >= (int)Godot.KeyList.Home) && (eventKeyDown.Scancode <= (int)Godot.KeyList.Pagedown))
+			else if ((eventKeyDown.Keycode >= Godot.Key.Home) && (eventKeyDown.Keycode <= Godot.Key.Pagedown))
 			{ // Move units with the arrow and fn keys
 				if (CurrentlySelectedUnit != MapUnit.NONE)
 				{
 					TileDirection dir;
-					switch (eventKeyDown.Scancode) {
-					case (int)Godot.KeyList.Home:     dir = TileDirection.NORTHWEST; break; // fn-left arrow
-					case (int)Godot.KeyList.End:      dir = TileDirection.SOUTHWEST; break; // fn-right arrow
-					case (int)Godot.KeyList.Left:     dir = TileDirection.WEST;      break;
-					case (int)Godot.KeyList.Up:       dir = TileDirection.NORTH;     break;
-					case (int)Godot.KeyList.Right:    dir = TileDirection.EAST;      break;
-					case (int)Godot.KeyList.Down:     dir = TileDirection.SOUTH;     break;
-					case (int)Godot.KeyList.Pageup:   dir = TileDirection.NORTHEAST; break; // fn-up arrow
-					case (int)Godot.KeyList.Pagedown: dir = TileDirection.SOUTHEAST; break; // fn-down arrow
+					switch (eventKeyDown.Keycode) {
+					case Godot.Key.Home:     dir = TileDirection.NORTHWEST; break; // fn-left arrow
+					case Godot.Key.End:      dir = TileDirection.SOUTHWEST; break; // fn-right arrow
+					case Godot.Key.Left:     dir = TileDirection.WEST;      break;
+					case Godot.Key.Up:       dir = TileDirection.NORTH;     break;
+					case Godot.Key.Right:    dir = TileDirection.EAST;      break;
+					case Godot.Key.Down:     dir = TileDirection.SOUTH;     break;
+					case Godot.Key.Pageup:   dir = TileDirection.NORTHEAST; break; // fn-up arrow
+					case Godot.Key.Pagedown: dir = TileDirection.SOUTHEAST; break; // fn-down arrow
 					default: return; // Impossible
 					}
 					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
 					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
-			else if (eventKeyDown.Scancode == (int)Godot.KeyList.G && eventKeyDown.Control)
+			else if (eventKeyDown.Keycode == Godot.Key.G && eventKeyDown.IsCommandOrControlPressed())
 			{
 				mapView.gridLayer.visible = !mapView.gridLayer.visible;
 			}
-			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Escape)
+			else if (eventKeyDown.Keycode == Godot.Key.Escape)
 			{
 				if (!inUnitGoToMode) {
 					log.Debug("Got request for escape/quit");
@@ -519,7 +519,7 @@ public class Game : Node2D
 					popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 				}
 			}
-			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Z)
+			else if (eventKeyDown.Keycode == Godot.Key.Z)
 			{
 				if (mapView.cameraZoom != 1) {
 					mapView.setCameraZoomFromMiddle(1.0f);
@@ -532,11 +532,11 @@ public class Game : Node2D
 					slider.Value = 0.5f;
 				}
 			}
-			else if (eventKeyDown.Scancode == (int)Godot.KeyList.Shift && ! eventKeyDown.Echo)
+			else if (eventKeyDown.Keycode == Godot.Key.Shift && ! eventKeyDown.Echo)
 			{
 				SetAnimationsEnabled(false);
 			}
-			else if (eventKeyDown.Scancode == (int)Godot.KeyList.O && eventKeyDown.Shift && eventKeyDown.Control && eventKeyDown.Alt) {
+			else if (eventKeyDown.Keycode == Godot.Key.O && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 				using (UIGameDataAccess gameDataAccess = new UIGameDataAccess()) {
 					gameDataAccess.gameData.observerMode = !gameDataAccess.gameData.observerMode;
 					if (gameDataAccess.gameData.observerMode) {
@@ -555,11 +555,11 @@ public class Game : Node2D
 
 			// always turn off go to mode unless G key is pressed
 			// do this after processing esc key
-			setGoToMode(eventKeyDown.Scancode == (int)Godot.KeyList.G);
+			setGoToMode(eventKeyDown.Keycode == Godot.Key.G);
 		}
 		else if (@event is InputEventKey eventKeyUp && ! eventKeyUp.Pressed)
 		{
-			if (eventKeyUp.Scancode == (int)Godot.KeyList.Shift)
+			if (eventKeyUp.Keycode == Godot.Key.Shift)
 			{
 				SetAnimationsEnabled(true);
 			}

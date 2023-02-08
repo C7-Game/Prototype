@@ -5,7 +5,7 @@ using Serilog;
 
 namespace C7.Map
 {
-	public class ResourceLayer : LooseLayer
+	public partial class ResourceLayer : LooseLayer
 	{
 		private ILogger log = LogManager.ForContext<ResourceLayer>();
 

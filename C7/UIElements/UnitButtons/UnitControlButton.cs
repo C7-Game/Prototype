@@ -2,14 +2,14 @@ using Godot;
 using ConvertCiv3Media;
 using System;
 
-public class UnitControlButton : TextureButton
+public partial class UnitControlButton : TextureButton
 {
 
     public string key;
     private int graphicsX;
     private int graphicsY;
     private Action<string> onPressedAction;
-    public int shortcutKey;
+    public Godot.Key shortcutKey;
 
     public static int scale = 32;   //how many pixels each button is in each direction
 
@@ -21,7 +21,7 @@ public class UnitControlButton : TextureButton
         this.onPressedAction = onPressedAction;
     }
 
-    public UnitControlButton(string key, int shortcut, int graphicsX, int graphicsY, Action<string> onPressedAction) {
+    public UnitControlButton(string key, Godot.Key shortcut, int graphicsX, int graphicsY, Action<string> onPressedAction) {
         this.key = key;
         this.shortcutKey = shortcut;
         this.graphicsX = graphicsX;
@@ -43,9 +43,10 @@ public class UnitControlButton : TextureButton
         this.TextureHover = rolloverTexture;
         this.TexturePressed = pressedTexture;
 
-        this.Connect("pressed", this, "ButtonPressed");
+        this.Connect("pressed",new Callable(this,"ButtonPressed"));
 	}
 
+	// TODO: check hides inherited warning
     private void ButtonPressed()
     {
         onPressedAction(this.key);

@@ -3,7 +3,7 @@ using System;
 using C7Engine;
 using Serilog;
 
-public class MainMenu : Node2D
+public partial class MainMenu : Node2D
 {
 	private ILogger log;
 
@@ -32,15 +32,15 @@ public class MainMenu : Node2D
 		Global.ResetLoadGamePath();
 		LoadDialog = new Util.Civ3FileDialog();
 		LoadDialog.RelPath = @"Conquests/Saves";
-		LoadDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
+		LoadDialog.Connect("file_selected",new Callable(this,nameof(_on_FileDialog_file_selected)));
 		LoadScenarioDialog = new Util.Civ3FileDialog();
 		LoadScenarioDialog.RelPath = @"Conquests/Scenarios";
-		LoadScenarioDialog.Connect("file_selected", this, nameof(_on_FileDialog_file_selected));
+		LoadScenarioDialog.Connect("file_selected",new Callable(this,nameof(_on_FileDialog_file_selected)));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
 		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
 		SetCiv3HomeDialog = GetNode<FileDialog>("CanvasLayer/SetCiv3HomeDialog");
 		// For some reason this option isn't available in the scene UI
-		SetCiv3HomeDialog.Mode = FileDialog.ModeEnum.OpenDir;
+		SetCiv3HomeDialog.FileMode = FileDialog.FileModeEnum.OpenDir;
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadScenarioDialog);
 		DisplayTitleScreen();
 	}
@@ -90,41 +90,41 @@ public class MainMenu : Node2D
 		newButton.TextureHover = HoverButton;
 		newButton.SetPosition(new Vector2(MENU_OFFSET_FROM_LEFT, MENU_OFFSET_FROM_TOP + verticalPosition));
 		MainMenuBackground.AddChild(newButton);
-		newButton.Connect("pressed", this, actionName);
+		newButton.Connect("pressed",new Callable(this,actionName));
 
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
 
 		newButtonLabel.SetPosition(new Vector2(MENU_OFFSET_FROM_LEFT + 25, MENU_OFFSET_FROM_TOP + verticalPosition + BUTTON_LABEL_OFFSET));
 		MainMenuBackground.AddChild(newButtonLabel);
-		newButtonLabel.Connect("pressed", this, actionName);
+		newButtonLabel.Connect("pressed",new Callable(this,actionName));
 	}
 
 	public void StartGame()
 	{
 		log.Information("start game button pressed");
 		PlayButtonPressedSound();
-		GetTree().ChangeScene("res://C7Game.tscn");
+		GetTree().ChangeSceneToFile("res://C7Game.tscn");
 	}
 
 	public void LoadGame()
 	{
 		log.Information("load game button pressed");
 		PlayButtonPressedSound();
-		LoadDialog.Popup_();
+		LoadDialog.Popup();
 	}
 
 	public void LoadScenario()
 	{
 		log.Information("load scenario button pressed");
 		PlayButtonPressedSound();
-		LoadScenarioDialog.Popup_();
+		LoadScenarioDialog.Popup();
 	}
 
 	public void showCredits()
 	{
 		log.Information("credits button pressed");
-		GetTree().ChangeScene("res://Credits.tscn");
+		GetTree().ChangeSceneToFile("res://Credits.tscn");
 	}
 
 	public void HallOfFame()
@@ -140,12 +140,12 @@ public class MainMenu : Node2D
 
 	public void _on_Exit_pressed()
 	{
-		GetTree().Notification(MainLoop.NotificationWmQuitRequest);
+		GetTree().Notification(111/*MainLoop.NotificationWmQuitRequest*/);
 	}
 
 	private void PlayButtonPressedSound()
 	{
-		AudioStreamSample wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath("Sounds/Button1.wav"));
+		AudioStreamWAV wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath("Sounds/Button1.wav"));
 		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("CanvasLayer/SoundEffectPlayer");
 		player.Stream = wav;
 		player.Play();
@@ -155,12 +155,12 @@ public class MainMenu : Node2D
 	{
 		log.Information("loading {path}", path);
 		Global.LoadGamePath = path;
-		GetTree().ChangeScene("res://C7Game.tscn");
+		GetTree().ChangeSceneToFile("res://C7Game.tscn");
 	}
 
 	private void _on_SetCiv3Home_pressed()
 	{
-		SetCiv3HomeDialog.Popup_();
+		SetCiv3HomeDialog.Popup();
 	}
 
 	private void _on_SetCiv3HomeDialog_dir_selected(string path)
