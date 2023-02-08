@@ -64,13 +64,13 @@ public partial class Advisors : CenterContainer
 				//as most of the global ones should *not* go through here.
 				if (eventKey.Pressed)
 				{
-					if (eventKey.Scancode == (int)Godot.KeyList.Escape) {
+					if (eventKey.Keycode == Godot.Key.Escape) {
 						this.Hide();
-						GetTree().SetInputAsHandled();
+						GetViewport().SetInputAsHandled();
 					}
 					else {
 						log.Debug("Advisor received a key press; stopping propagation.");
-						GetTree().SetInputAsHandled();
+						GetViewport().SetInputAsHandled();
 					}
 				}
 			}

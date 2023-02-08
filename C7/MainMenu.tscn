@@ -17,6 +17,8 @@ visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 color = Color(0.286275, 0.592157, 0.580392, 1)
@@ -32,6 +34,8 @@ offset_left = -160.0
 offset_top = -54.0
 offset_right = 160.0
 offset_bottom = 54.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Civfanatics Creation &
 Customization Community's
 Civ3 Conquests Clone
@@ -51,6 +55,8 @@ script = ExtResource("3")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme = ExtResource("4")
 stretch_mode = 1
 
@@ -64,6 +70,8 @@ offset_left = -84.5
 offset_top = -93.7225
 offset_right = 84.5
 offset_bottom = -73.7225
+grow_horizontal = 2
+grow_vertical = 2
 text = "Select Civ3 Home Folder"
 
 [node name="SetCiv3HomeDialog" type="FileDialog" parent="CanvasLayer"]

@@ -15,7 +15,7 @@ public partial class DomesticAdvisor : TextureRect
 
 	private void CreateUI() {
 		ImageTexture DomesticBackground = Util.LoadTextureFromPCX("Art/Advisors/domestic.pcx");
-		this.Texture2D = DomesticBackground;
+		this.Texture = DomesticBackground;
 
 		//TODO: Age-based background.  Only use Ancient for now.
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupDOMESTIC.pcx", 1, 40, 149, 110);
@@ -25,7 +25,7 @@ public partial class DomesticAdvisor : TextureRect
 
 		TextureRect AdvisorHead = new TextureRect();
 		//TODO: Randomize or set logically
-		AdvisorHead.Texture2D = AdvisorSurprised;
+		AdvisorHead.Texture = AdvisorSurprised;
 		AdvisorHead.SetPosition(new Vector2(851, 0));
 		AddChild(AdvisorHead);
 
@@ -40,7 +40,7 @@ public partial class DomesticAdvisor : TextureRect
 		DialogBoxAdvise.Text = "You are running C7!";
 		DialogBoxAdvise.SetPosition(new Vector2(815, 119));
 		AddChild(DialogBoxAdvise);
-		
+
 		ImageTexture GoBackTexture = Util.LoadTextureFromPCX("Art/exitBox-backgroundStates.pcx", 0, 0, 72, 48);
 		TextureButton GoBackButton = new TextureButton();
 		GoBackButton.TextureNormal = GoBackTexture;
