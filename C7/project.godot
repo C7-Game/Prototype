@@ -6,16 +6,16 @@
 ;   [section] ; section goes between []
 ;   param=value ; assign values to parameters
 
-config_version=4
+config_version=5
 
-_global_script_classes=[  ]
-_global_script_class_icons={
-}
+_global_script_classes=[]
+_global_script_class_icons={}
 
 [application]
 
 config/name="C7"
 run/main_scene="res://MainMenu.tscn"
+config/features=PackedStringArray("4.0", "C#")
 boot_splash/image="res://icon.png"
 config/icon="res://icon.png"
 
@@ -27,6 +27,10 @@ LogManager="*res://LogManager.cs"
 [display]
 
 window/size/height=768
+
+[dotnet]
+
+project/assembly_name="C7"
 
 [global]
 

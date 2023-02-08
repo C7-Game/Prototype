@@ -2,7 +2,7 @@ using Godot;
 using System;
 using ConvertCiv3Media;
 
-public class PCXToGodot : Godot.Object
+public partial class PCXToGodot : Godot.Object
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 
@@ -104,9 +104,7 @@ public class PCXToGodot : Godot.Object
 	}
 
 	private static ImageTexture getImageTextureFromImage(Image image) {
-		ImageTexture Txtr = new ImageTexture();
-		Txtr.CreateFromImage(image, 0);
-		return Txtr;
+		return ImageTexture.CreateFromImage(image);
 	}
 
 	private static int[] loadPalette(byte[,] palette, bool shadows = false) {

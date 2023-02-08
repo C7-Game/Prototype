@@ -2,7 +2,7 @@ using Godot;
 using ConvertCiv3Media;
 using System;
 
-public class Civ3Unit : Civ3UnitSprite
+public partial class Civ3Unit : Civ3UnitSprite
 {
     public MovingSprite AS;
     public SpriteFrames SF;
@@ -25,7 +25,7 @@ public class Civ3Unit : Civ3UnitSprite
             if (Animations[(int)actn] != null) {
                 foreach (Direction dir in Enum.GetValues(typeof(Direction))) {
                     string ActionAndDirection = String.Format("{0}-{1}", actn.ToString(), dir.ToString());
-                    SF.AddAnimation(ActionAndDirection);
+                    SF.AddAnimationLibrary(ActionAndDirection);
                     SF.SetAnimationSpeed(ActionAndDirection, 10);
 
                     for (int i = 0; i < Animations[(int)actn].Images.GetLength(1); i++) {
@@ -97,7 +97,7 @@ public class Civ3Unit : Civ3UnitSprite
     }
 
     public static unsafe byte[] getBmpBuffer(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
-        
+
         int bmpSize = width * height * 4 + 54;  //54 = Windows 3 BMP header size.
         byte[] bmpBuffer = new byte[bmpSize];
         fixed (byte* fPtr = bmpBuffer) {
@@ -156,10 +156,10 @@ public class Civ3Unit : Civ3UnitSprite
         return bmpBuffer;
     }
 }
-// This is just to add some movement to an AnimatedSprite
-public class MovingSprite : AnimatedSprite {
+// This is just to add some movement to an AnimatedSprite2D
+public partial class MovingSprite : AnimatedSprite2D {
     public Vector2 Velocity = new Vector2(0, 0);
-    public override void _PhysicsProcess(float delta) {
+    public override void _PhysicsProcess(double delta) {
         Position = Position + Velocity;
         if (Position.x > 1040) {
             Position = new Vector2(-30, Position.y);

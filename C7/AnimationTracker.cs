@@ -6,7 +6,7 @@ using System.Linq;
 using C7GameData;
 using C7Engine;
 
-public class AnimationTracker {
+public partial class AnimationTracker {
 	private Civ3AnimData civ3AnimData;
 	public bool endAllImmediately = false; // If true, update() ends all running animations regardless of time remaining.
 
@@ -72,7 +72,7 @@ public class AnimationTracker {
 		if (activeAnims.TryGetValue(unit.guid, out aa)) {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
-			activeAnims.Remove(unit.guid);
+			activeAnims.RemoveAt(unit.guid);
 		}
 	}
 
@@ -122,7 +122,7 @@ public class AnimationTracker {
 				keysToRemove.Add(id);
 		}
 		foreach (var key in keysToRemove)
-			activeAnims.Remove(key);
+			activeAnims.RemoveAt(key);
 	}
 
 	public MapUnit.Appearance getUnitAppearance(MapUnit unit)

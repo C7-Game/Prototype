@@ -5,25 +5,25 @@ using System.Runtime.InteropServices;
 using Godot;
 using ConvertCiv3Media;
 
-public class Util {
+public partial class Util {
 	static public string Civ3Root = GetCiv3Path();
-	public class Civ3FileDialog : FileDialog
+	public partial class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 	// While instantiated it will return to the last-accessed folder when reopened
 	{
 		public string RelPath= "";
-		public Civ3FileDialog(FileDialog.ModeEnum mode = FileDialog.ModeEnum.OpenFile) {
-			Mode = mode;
+		public Civ3FileDialog(FileDialog.FileModeEnum mode = FileDialog.FileModeEnum.OpenFile) {
+			FileMode = mode;
 		}
+
 		public override void _Ready() {
 			Access = AccessEnum.Filesystem;
 			CurrentDir = Civ3Root + "/" + RelPath;
-			Resizable = true;
-			MarginRight = 550;
-			MarginBottom = 750;
+			// Resizable = true;
+			// OffsetRight = 550;
+			// OffsetBottom = 750;
 			base._Ready();
 		}
-
 	}
 
 	static private string SteamCommonDir() {
@@ -192,9 +192,7 @@ public class Util {
 			//not where our project is located.
 			backgroundImage.Load(OS.GetExecutablePath().GetBaseDir().PlusFile(relPath));
 		}
-		ImageTexture texture = new ImageTexture();
-		texture.CreateFromImage(backgroundImage);
-		return texture;
+		return ImageTexture.CreateFromImage(backgroundImage);
 	}
 
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
@@ -238,9 +236,7 @@ public class Util {
 
 		var img = new Image();
 		img.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
-		var tex = new ImageTexture();
-		tex.CreateFromImage(img, 0);
-		return tex;
+		return ImageTexture.CreateFromImage(img);
 	}
 
 	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
@@ -250,8 +246,7 @@ public class Util {
 
 		var imgIndices = new Image();
 		imgIndices.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
-		var texIndices = new ImageTexture();
-		texIndices.CreateFromImage(imgIndices, 0);
+		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (createPaletteTexture(pcx.Palette), texIndices);
 	}
@@ -287,14 +282,12 @@ public class Util {
 
 		var imgIndices = new Image();
 		imgIndices.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
-		var texIndices = new ImageTexture();
-		texIndices.CreateFromImage(imgIndices, 0);
+		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);
 	}
 
-
-	static public AudioStreamSample LoadWAVFromDisk(string path) {
+	static public AudioStreamWAV LoadWAVFromDisk(string path) {
 		File file = new File();
 		file.Open(path, Godot.File.ModeFlags.Read);
 
@@ -312,7 +305,7 @@ public class Util {
 		bool formatFound = false;
 		bool dataFound = false;
 
-		AudioStreamSample wav = new AudioStreamSample();
+		AudioStreamWAV wav = new AudioStreamWAV();
 
 		while (!file.EofReached()) {
 			string chunk = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
@@ -332,14 +325,14 @@ public class Util {
 				//formats are not supported in its importer.  The GDScript seems
 				//to match up with the current FormatEnum.  I'm going to go out on
 				//a limb and say the GDScript is probably more current relative
-				//to what AudioStreamSample supports.  But that could be wrong.
+				//to what AudioStreamWAV supports.  But that could be wrong.
 				ushort compressionCode = file.Get16();
 				if (compressionCode == 1) {
-					wav.Format = Godot.AudioStreamSample.FormatEnum.Format16Bits;
+					wav.Format = Godot.AudioStreamWAV.FormatEnum.Format16Bits;
 				} else if (compressionCode == 0) {
-					wav.Format = Godot.AudioStreamSample.FormatEnum.Format8Bits;
+					wav.Format = Godot.AudioStreamWAV.FormatEnum.Format8Bits;
 				} else if (compressionCode == 2) {
-					wav.Format = Godot.AudioStreamSample.FormatEnum.ImaAdpcm;
+					wav.Format = Godot.AudioStreamWAV.FormatEnum.ImaAdpcm;
 				}
 
 				ushort channels = file.Get16();

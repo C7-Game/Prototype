@@ -4,7 +4,7 @@ using ConvertCiv3Media;
 using C7GameData;
 using Serilog;
 
-public class LowerRightInfoBox : TextureRect
+public partial class LowerRightInfoBox : TextureRect
 {
 	private ILogger log = LogManager.ForContext<LowerRightInfoBox>();
 
@@ -32,7 +32,7 @@ public class LowerRightInfoBox : TextureRect
 		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
 		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
 		TextureRect boxRightRectangle = new TextureRect();
-		boxRightRectangle.Texture = boxRight;
+		boxRightRectangle.Texture2D = boxRight;
 		boxRightRectangle.SetPosition(new Vector2(0, 0));
 		AddChild(boxRightRectangle);
 
@@ -46,7 +46,7 @@ public class LowerRightInfoBox : TextureRect
 		nextTurnButton.TextureHover = nextTurnOnTexture;
 		nextTurnButton.SetPosition(new Vector2(0, 0));
 		AddChild(nextTurnButton);
-		nextTurnButton.Connect("pressed", this, "turnEnded");
+		nextTurnButton.Connect("pressed",new Callable(this,"turnEnded"));
 
 
 		//Labels and whatnot in this text box
@@ -54,21 +54,21 @@ public class LowerRightInfoBox : TextureRect
 		lblUnitSelected.Align = Label.AlignEnum.Right;
 		lblUnitSelected.SetPosition(new Vector2(0, 20));
 		lblUnitSelected.AnchorRight = 1.0f;
-		lblUnitSelected.MarginRight = -35;
+		lblUnitSelected.OffsetRight = -35;
 		boxRightRectangle.AddChild(lblUnitSelected);
 
 		attackDefenseMovement.Text = "0.0. 1/1";
 		attackDefenseMovement.Align = Label.AlignEnum.Right;
 		attackDefenseMovement.SetPosition(new Vector2(0, 35));
 		attackDefenseMovement.AnchorRight = 1.0f;
-		attackDefenseMovement.MarginRight = -35;
+		attackDefenseMovement.OffsetRight = -35;
 		boxRightRectangle.AddChild(attackDefenseMovement);
 
 		terrainType.Text = "Grassland";
 		terrainType.Align = Label.AlignEnum.Right;
 		terrainType.SetPosition(new Vector2(0, 50));
 		terrainType.AnchorRight = 1.0f;
-		terrainType.MarginRight = -35;
+		terrainType.OffsetRight = -35;
 		boxRightRectangle.AddChild(terrainType);
 
 		//For the centered labels, we anchor them center, with equal weight on each side.
@@ -82,7 +82,7 @@ public class LowerRightInfoBox : TextureRect
 		civAndGovt.AnchorLeft = 0.5f;
 		civAndGovt.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(civAndGovt);
-		civAndGovt.MarginLeft = -1 * (civAndGovt.RectSize.x/2.0f);
+		civAndGovt.OffsetLeft = -1 * (civAndGovt.RectSize.x/2.0f);
 
 		yearAndGold.Text = "Turn 0  10 Gold (+0 per turn)";
 		yearAndGold.Align = Label.AlignEnum.Center;
@@ -90,12 +90,12 @@ public class LowerRightInfoBox : TextureRect
 		yearAndGold.AnchorLeft = 0.5f;
 		yearAndGold.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(yearAndGold);
-		yearAndGold.MarginLeft = -1 * (yearAndGold.RectSize.x/2.0f);
+		yearAndGold.OffsetLeft = -1 * (yearAndGold.RectSize.x/2.0f);
 
 		//Setup up, but do not start, the timer.
 		blinkingTimer.OneShot = false;
 		blinkingTimer.WaitTime = 0.6f;
-		blinkingTimer.Connect("timeout", this, "toggleEndTurnButton");
+		blinkingTimer.Connect("timeout",new Callable(this,"toggleEndTurnButton"));
 		AddChild(blinkingTimer);
 	}
 

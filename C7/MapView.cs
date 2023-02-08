@@ -31,7 +31,7 @@ public abstract class LooseLayer {
 	public bool visible = true;
 }
 
-public class TerrainLayer : LooseLayer {
+public partial class TerrainLayer : LooseLayer {
 
 	public static readonly Vector2 terrainSpriteSize = new Vector2(128, 64);
 
@@ -115,7 +115,7 @@ public class TerrainLayer : LooseLayer {
 	}
 }
 
-public class HillsLayer : LooseLayer {
+public partial class HillsLayer : LooseLayer {
 	public static readonly Vector2 mountainSize = new Vector2(128, 88);
 	public static readonly Vector2 volcanoSize = new Vector2(128, 88);	//same as mountain
 	public static readonly Vector2 hillsSize = new Vector2(128, 72);
@@ -273,7 +273,7 @@ public class HillsLayer : LooseLayer {
 	}
 }
 
-public class ForestLayer : LooseLayer {
+public partial class ForestLayer : LooseLayer {
 	public static readonly Vector2 forestJungleSize = new Vector2(128, 88);
 
 	private ImageTexture largeJungleTexture;
@@ -372,7 +372,7 @@ public class ForestLayer : LooseLayer {
 		}
 	}
 }
-public class MarshLayer : LooseLayer {
+public partial class MarshLayer : LooseLayer {
 	public static readonly Vector2 marshSize = new Vector2(128, 88);
 	//Because the marsh graphics are 88 pixels tall instead of the 64 of a tile, we also need an addition 12 pixel offset to the top
 	//88 - 64 = 24; 24/2 = 12.  This keeps the marsh centered with half the extra 24 pixels above the tile and half below.
@@ -406,7 +406,7 @@ public class MarshLayer : LooseLayer {
 	}
 }
 
-public class RiverLayer : LooseLayer
+public partial class RiverLayer : LooseLayer
 {
 	public static readonly Vector2 riverSize = new Vector2(128, 64);
 	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.x / 2, 0);
@@ -452,7 +452,7 @@ public class RiverLayer : LooseLayer
 	}
 }
 
-public class GridLayer : LooseLayer {
+public partial class GridLayer : LooseLayer {
 	public Color color = Color.Color8(50, 50, 50, 150);
 	public float lineWidth = (float)1.0;
 
@@ -469,7 +469,7 @@ public class GridLayer : LooseLayer {
 	}
 }
 
-public class UnitLayer : LooseLayer {
+public partial class UnitLayer : LooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
@@ -523,14 +523,14 @@ public class UnitLayer : LooseLayer {
 	// added to the node tree. AnimationInstances are only active for one frame at a time but they live as long as the UnitLayer. They are
 	// retrieved or created as needed by getBlankAnimationInstance during the drawing of units and are hidden & requeued for use at the beginning
 	// of each frame.
-	public class AnimationInstance {
+	public partial class AnimationInstance {
 		public ShaderMaterial shaderMat;
 		public MeshInstance2D meshInst;
 
 		public AnimationInstance(LooseView looseView)
 		{
 			(shaderMat, meshInst) = createShadedQuad(getUnitShader());
-			shaderMat.SetShaderParam("civColorWhitePalette", looseView.mapView.civColorWhitePalette);
+			shaderMat.SetShaderParameter("civColorWhitePalette", looseView.mapView.civColorWhitePalette);
 
 			looseView.AddChild(meshInst);
 			meshInst.Hide();
@@ -556,12 +556,12 @@ public class UnitLayer : LooseLayer {
 	// varies between 0.0 for the first column and 1.0 for the last one.
 	public static void setFlicShaderParams(ShaderMaterial mat, Util.FlicSheet flicSheet, int row, float relativeColumn)
 	{
-		mat.SetShaderParam("palette", flicSheet.palette);
-		mat.SetShaderParam("indices", flicSheet.indices);
+		mat.SetShaderParameter("palette", flicSheet.palette);
+		mat.SetShaderParameter("indices", flicSheet.indices);
 
 		var indicesDims = new Vector2(flicSheet.indices.GetWidth(), flicSheet.indices.GetHeight());
 		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
-		mat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
+		mat.SetShaderParameter("relSpriteSize", spriteSize / indicesDims);
 
 		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		int spriteColumn = (int)(relativeColumn * spritesPerRow);
@@ -569,7 +569,7 @@ public class UnitLayer : LooseLayer {
 			spriteColumn = spritesPerRow - 1;
 		else if (spriteColumn < 0)
 			spriteColumn = 0;
-		mat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
+		mat.SetShaderParameter("spriteXY", new Vector2(spriteColumn, row));
 	}
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter)
@@ -595,8 +595,8 @@ public class UnitLayer : LooseLayer {
 		var inst = getBlankAnimationInstance(looseView);
 
 		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, appearance.progress);
-		var civColor = new Color(unit.owner.color);
-		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
+		var civColor = new Color((uint)unit.owner.color);
+		inst.shaderMat.SetShaderParameter("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
 
 		inst.meshInst.Position = position;
 		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
@@ -609,7 +609,7 @@ public class UnitLayer : LooseLayer {
 		var flicSheet = anim.getFlicSheet();
 		var inst = getBlankAnimationInstance(looseView);
 		setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
-		inst.shaderMat.SetShaderParam("civColor", new Vector3(1, 1, 1));
+		inst.shaderMat.SetShaderParameter("civColor", new Vector3(1, 1, 1));
 		inst.meshInst.Position = tileCenter;
 		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
 		inst.meshInst.ZIndex = effectAnimZIndex;
@@ -836,7 +836,7 @@ public class UnitLayer : LooseLayer {
 	}
 }
 
-public class BuildingLayer : LooseLayer {
+public partial class BuildingLayer : LooseLayer {
 	private ImageTexture buildingsTex;
 	private Vector2 buildingSpriteSize;
 
@@ -859,7 +859,7 @@ public class BuildingLayer : LooseLayer {
 	}
 }
 
-public class LooseView : Node2D {
+public partial class LooseView : Node2D {
 	public MapView mapView;
 	public List<LooseLayer> layers = new List<LooseLayer>();
 
@@ -923,7 +923,7 @@ public class LooseView : Node2D {
 	}
 }
 
-public class MapView : Node2D {
+public partial class MapView : Node2D {
 	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
 	// staggered and half overlap).
 	public static readonly Vector2 cellSize = new Vector2(64, 32);
@@ -1002,7 +1002,7 @@ public class MapView : Node2D {
 		AddChild(looseView);
 	}
 
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		// Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but long term I think it's
 		// better to redraw everything every frame like a typical modern video game.

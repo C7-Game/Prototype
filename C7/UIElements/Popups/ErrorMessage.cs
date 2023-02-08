@@ -1,6 +1,6 @@
 using Godot;
 
-public class ErrorMessage : Popup
+public partial class ErrorMessage : Popup
 {
 	private string message = "";
 
@@ -33,6 +33,6 @@ public class ErrorMessage : Popup
 
 	private void quit()
 	{
-		GetTree().ChangeScene("res://MainMenu.tscn");
+		GetTree().ChangeSceneToFile("res://MainMenu.tscn");
 	}
 }

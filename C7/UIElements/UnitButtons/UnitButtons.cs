@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using C7GameData;
 using Serilog;
 
-public class UnitButtons : VBoxContainer
+public partial class UnitButtons : VBoxContainer
 {
 
 	private ILogger log = LogManager.ForContext<UnitButtons>();
 
-	[Signal] public delegate void UnitButtonPressed(string button);
+	[Signal] public delegate void UnitButtonPressedEventHandler(string button);
 
 	private Dictionary<string, UnitControlButton> buttonMap = new Dictionary<string, UnitControlButton>();
 	HBoxContainer primaryControls;
@@ -25,11 +25,11 @@ public class UnitButtons : VBoxContainer
 		primaryControls = GetNode<HBoxContainer>("PrimaryUnitControls");
 		specializedControls = GetNode<HBoxContainer>("SpecializedUnitControls");
 
-		AddNewButton(primaryControls, new UnitControlButton("hold", (int)Godot.KeyList.Space, 0, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("wait", (int)Godot.KeyList.W,  1, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("fortify", (int)Godot.KeyList.F,  2, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("disband", (int)Godot.KeyList.D, 3, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton("goTo", (int)Godot.KeyList.G, 4, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("hold", Godot.Key.Space, 0, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("wait", Godot.Key.W,  1, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("fortify", Godot.Key.F,  2, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("disband", Godot.Key.D, 3, 0, onButtonPressed));
+		AddNewButton(primaryControls, new UnitControlButton("goTo", Godot.Key.G, 4, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("explore", 5, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("sentry", 6, 0, onButtonPressed));
 		AddNewButton(primaryControls, new UnitControlButton("sentryEnemyOnly", 2, 5, onButtonPressed));
@@ -49,8 +49,8 @@ public class UnitButtons : VBoxContainer
 		AddNewButton(specializedControls, new UnitControlButton("sacrifice", 3, 2, onButtonPressed));
 		AddNewButton(specializedControls, new UnitControlButton("scienceAge", 3, 2, onButtonPressed));	//validate
 		AddNewButton(specializedControls, new UnitControlButton("buildColony", 4, 2, onButtonPressed));	//validate
-		AddNewButton(specializedControls, new UnitControlButton("buildCity", (int)Godot.KeyList.B, 5, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("buildRoad", (int)Godot.KeyList.R, 6, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("buildCity", Godot.Key.B, 5, 2, onButtonPressed));
+		AddNewButton(specializedControls, new UnitControlButton("buildRoad", Godot.Key.R, 6, 2, onButtonPressed));
 		AddNewButton(specializedControls, new UnitControlButton("buildRailroad", 7, 2, onButtonPressed));
 
 		AddNewButton(specializedControls, new UnitControlButton("fortress", 0, 3, onButtonPressed));
@@ -114,9 +114,9 @@ public class UnitButtons : VBoxContainer
 				foreach (UnitControlButton button in buttonMap.Values)
 				{
 					if (button.Visible == true) {
-						if (eventKey.Scancode == button.shortcutKey && !eventKey.Shift && !eventKey.Command && !eventKey.Control && !eventKey.Alt) {
+						if (eventKey.Keycode == button.shortcutKey && !eventKey.ShiftPressed && !eventKey.IsCommandOrControlPressed() && !eventKey.AltPressed) {
 							this.onButtonPressed(button.key);
-							GetTree().SetInputAsHandled();
+							GetViewport().SetInputAsHandled();
 						}
 					}
 				}

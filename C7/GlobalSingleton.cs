@@ -5,7 +5,7 @@ using Godot;
     a game in main menu. This script is set to auto load in project settings.
     See https://docs.godotengine.org/en/stable/getting_started/step_by_step/singletons_autoload.html
 ****/
-public class GlobalSingleton : Node
+public partial class GlobalSingleton : Node
 {
     // Will have main menu file picker set this and Game.cs pass it to C7Engine.createGame
     // which then should blank it again to prevent reloading same if going back to main menu

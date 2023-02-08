@@ -3,7 +3,7 @@ using Godot;
 using Serilog;
 using Serilog.Templates;
 
-public class LogManager : Node
+public partial class LogManager : Node
 {
 	public override void _Ready()
 	{
@@ -35,9 +35,9 @@ public class LogManager : Node
 		Log.ForContext<LogManager>().Debug("Hello!");
 	}
 
-	public override void _Notification(int what)
+	public override void _Notification(long what)
 	{
-		if (what == MainLoop.NotificationWmQuitRequest)
+		if (what == Godot.Object.NotificationPredelete)
 		{
 			GD.Print("Goodbye logger!");
 			Log.ForContext<LogManager>().Debug("Goodbye!");
