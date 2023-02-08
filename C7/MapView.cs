@@ -494,7 +494,7 @@ public partial class UnitLayer : LooseLayer {
 	// when used.
 	public static (ShaderMaterial, MeshInstance2D) createShadedQuad(Shader shader)
 	{
-		var quad = new QuadMesh();
+		var quad = new PlaneMesh();
 		quad.Size = new Vector2(1, 1);
 
 		var shaderMat = new ShaderMaterial();
@@ -631,7 +631,7 @@ public partial class UnitLayer : LooseLayer {
 		}
 
 		const double period = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
-		var repCount = (double)OS.GetTicksMsec() / 1000.0 / period;
+		var repCount = (double)Time.GetTicksMsec() / 1000.0 / period;
 		var progress = (float)(repCount - Math.Floor(repCount));
 
 		setFlicShaderParams(cursorMat, cursorFlicSheet, 0, progress);
@@ -1006,14 +1006,13 @@ public partial class MapView : Node2D {
 	{
 		// Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but long term I think it's
 		// better to redraw everything every frame like a typical modern video game.
-		looseView.Update();
+		looseView._Draw();
 	}
 
 	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
 	public Vector2 getVisibleAreaSize()
 	{
-		var viewport = GetViewport();
-		return (viewport != null) ? viewport.Size : OS.WindowSize;
+		return GetViewport() != null ? GetViewportRect().Size : DisplayServer.WindowGetSize();
 	}
 
 	public VisibleRegion getVisibleRegion()

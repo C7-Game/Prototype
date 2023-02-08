@@ -6,7 +6,7 @@ public partial class ErrorMessage : Popup
 
 	public ErrorMessage(string message) {
 		this.message = message;
-		alignment = BoxContainer.AlignMode.Center;
+		alignment = BoxContainer.AlignmentMode.Center;
 		margins = new Margins(top: 100);
 	}
 
@@ -27,7 +27,7 @@ public partial class ErrorMessage : Popup
 		errorDescription.Text = "Not a valid save file\n" + message;
 		errorDescription.SetPosition(new Vector2(25, 162));
 		AddChild(errorDescription);
-		
+
 		AddButton("Return to Menu", 290, "quit");
 	}
 

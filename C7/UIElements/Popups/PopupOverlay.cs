@@ -98,7 +98,7 @@ public partial class PopupOverlay : HBoxContainer
 				//as most of the global ones should *not* go through here.
 				if (eventKey.Pressed)
 				{
-					GetTree().SetInputAsHandled();
+					GetViewport().SetInputAsHandled();
 				}
 			}
 		}

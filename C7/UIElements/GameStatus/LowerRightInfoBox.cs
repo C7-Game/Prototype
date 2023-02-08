@@ -32,7 +32,7 @@ public partial class LowerRightInfoBox : TextureRect
 		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
 		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
 		TextureRect boxRightRectangle = new TextureRect();
-		boxRightRectangle.Texture2D = boxRight;
+		boxRightRectangle.Texture = boxRight;
 		boxRightRectangle.SetPosition(new Vector2(0, 0));
 		AddChild(boxRightRectangle);
 
@@ -51,21 +51,21 @@ public partial class LowerRightInfoBox : TextureRect
 
 		//Labels and whatnot in this text box
 		lblUnitSelected.Text = "Settler";
-		lblUnitSelected.Align = Label.AlignEnum.Right;
+		lblUnitSelected.HorizontalAlignment = HorizontalAlignment.Right;
 		lblUnitSelected.SetPosition(new Vector2(0, 20));
 		lblUnitSelected.AnchorRight = 1.0f;
 		lblUnitSelected.OffsetRight = -35;
 		boxRightRectangle.AddChild(lblUnitSelected);
 
 		attackDefenseMovement.Text = "0.0. 1/1";
-		attackDefenseMovement.Align = Label.AlignEnum.Right;
+		attackDefenseMovement.HorizontalAlignment = HorizontalAlignment.Right;
 		attackDefenseMovement.SetPosition(new Vector2(0, 35));
 		attackDefenseMovement.AnchorRight = 1.0f;
 		attackDefenseMovement.OffsetRight = -35;
 		boxRightRectangle.AddChild(attackDefenseMovement);
 
 		terrainType.Text = "Grassland";
-		terrainType.Align = Label.AlignEnum.Right;
+		terrainType.HorizontalAlignment = HorizontalAlignment.Right;
 		terrainType.SetPosition(new Vector2(0, 50));
 		terrainType.AnchorRight = 1.0f;
 		terrainType.OffsetRight = -35;
@@ -77,20 +77,20 @@ public partial class LowerRightInfoBox : TextureRect
 		//Seems like there probably is an easier way, but I haven't found it yet.
 		Label civAndGovt = new Label();
 		civAndGovt.Text = "Carthage - Despotism (5.5.0)";
-		civAndGovt.Align = Label.AlignEnum.Center;
+		civAndGovt.HorizontalAlignment = HorizontalAlignment.Center;
 		civAndGovt.SetPosition(new Vector2(0, 90));
 		civAndGovt.AnchorLeft = 0.5f;
 		civAndGovt.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(civAndGovt);
-		civAndGovt.OffsetLeft = -1 * (civAndGovt.RectSize.x/2.0f);
+		civAndGovt.OffsetLeft = -1 * (civAndGovt.Size.x/2.0f);
 
 		yearAndGold.Text = "Turn 0  10 Gold (+0 per turn)";
-		yearAndGold.Align = Label.AlignEnum.Center;
+		yearAndGold.HorizontalAlignment = HorizontalAlignment.Center;
 		yearAndGold.SetPosition(new Vector2(0, 105));
 		yearAndGold.AnchorLeft = 0.5f;
 		yearAndGold.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(yearAndGold);
-		yearAndGold.OffsetLeft = -1 * (yearAndGold.RectSize.x/2.0f);
+		yearAndGold.OffsetLeft = -1 * (yearAndGold.Size.x/2.0f);
 
 		//Setup up, but do not start, the timer.
 		blinkingTimer.OneShot = false;

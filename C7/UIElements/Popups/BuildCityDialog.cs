@@ -12,7 +12,7 @@ public partial class BuildCityDialog : Popup
 	public BuildCityDialog(string defaultName)
 	{
 		this.defaultName = defaultName;
-		alignment = BoxContainer.AlignMode.End;
+		alignment = BoxContainer.AlignmentMode.End;
 		margins = new Margins(right: -10); // 10px margin from the right
 	}
 
@@ -27,7 +27,7 @@ public partial class BuildCityDialog : Popup
 
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupCULTURE.pcx", 1, 40, 149, 110);
 		TextureRect AdvisorHead = new TextureRect();
-		AdvisorHead.Texture2D = AdvisorHappy;
+		AdvisorHead.Texture = AdvisorHappy;
 		//Appears at 400, 110 in game, but leftmost 25px are transparent with default graphics
 		AdvisorHead.SetPosition(new Vector2(375, 0));
 		AddChild(AdvisorHead);
@@ -37,7 +37,7 @@ public partial class BuildCityDialog : Popup
 		AddHeader("Name this town?", 120);
 
 		HBoxContainer labelAndName = new HBoxContainer();
-		labelAndName.Alignment = BoxContainer.AlignMode.Begin;
+		labelAndName.Alignment = BoxContainer.AlignmentMode.Begin;
 		labelAndName.SizeFlagsHorizontal = 3;   //fill and expand
 		labelAndName.SizeFlagsStretchRatio = 1;
 		labelAndName.AnchorLeft = 0.0f;
@@ -94,7 +94,7 @@ public partial class BuildCityDialog : Popup
 
 	public void OnCityNameEntered(string name)
 	{
-		GetTree().SetInputAsHandled();
+		GetViewport().SetInputAsHandled();
 		log.Debug("The user hit enter with a city name of " + name);
 		GetParent().EmitSignal("BuildCity", name);
 		GetParent().EmitSignal("HidePopup");
@@ -105,9 +105,9 @@ public partial class BuildCityDialog : Popup
 		if (this.Visible) {
 			if (@event is InputEventKey eventKey && eventKey.Pressed)
 			{
-				if (eventKey.Scancode == (int)Godot.KeyList.Escape)
+				if (eventKey.Keycode == Godot.Key.Escape)
 				{
-					GetTree().SetInputAsHandled();
+					GetViewport().SetInputAsHandled();
 					GetParent().EmitSignal("HidePopup");
 				}
 			}

@@ -72,7 +72,7 @@ public partial class AnimationTracker {
 		if (activeAnims.TryGetValue(unit.guid, out aa)) {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
-			activeAnims.RemoveAt(unit.guid);
+			activeAnims.Remove(unit.guid);
 		}
 	}
 
@@ -122,7 +122,7 @@ public partial class AnimationTracker {
 				keysToRemove.Add(id);
 		}
 		foreach (var key in keysToRemove)
-			activeAnims.RemoveAt(key);
+			activeAnims.Remove(key);
 	}
 
 	public MapUnit.Appearance getUnitAppearance(MapUnit unit)
