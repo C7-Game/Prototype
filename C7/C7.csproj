@@ -3,6 +3,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConvertCiv3Media\ConvertCiv3Media.csproj" />
