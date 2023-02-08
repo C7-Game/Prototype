@@ -1006,7 +1006,7 @@ public partial class MapView : Node2D {
 	{
 		// Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but long term I think it's
 		// better to redraw everything every frame like a typical modern video game.
-		looseView._Draw();
+		looseView.QueueRedraw();
 	}
 
 	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
