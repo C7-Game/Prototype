@@ -254,8 +254,9 @@ public partial class Game : Node2D
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 
-		if (unit != MapUnit.NONE)
+		if (unit != MapUnit.NONE) {
 			ensureLocationIsInView(unit.location);
+		}
 
 		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {

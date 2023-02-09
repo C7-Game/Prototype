@@ -85,8 +85,6 @@ public partial class UnitButtons : VBoxContainer
 	private void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
 	{
 		MapUnit unit = wrappedMapUnit.GetValue<MapUnit>();
-
-
 		foreach (UnitControlButton button in buttonMap.Values) {
 			button.Visible = false;
 		}
