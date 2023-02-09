@@ -86,10 +86,8 @@ public partial class Civ3Unit : Civ3UnitSprite
 	//   handled differently. Probably needs combining and refactoring
 	public static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
 		Image OutImage = Image.Create(width, height, false, Image.Format.Rgba8);
-		// OutImage.Lock();
 		byte[] bmpBuffer = getBmpBuffer(colorIndices, palette, width, height, transparent, shadows);
 		OutImage.LoadBmpFromBuffer(bmpBuffer);
-		// OutImage.Unlock();
 
 		return OutImage;
 	}

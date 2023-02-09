@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bogodo7uupwnu"]
+[gd_scene load_steps=14 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" path="res://Game.cs" id="1"]
 [ext_resource type="Script" path="res://UIElements/Advisors/Advisors.cs" id="3"]
@@ -237,12 +237,6 @@ anchor_mode = 0
 [connection signal="TurnEnded" from="." to="CanvasLayer/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/GameStatus" method="OnTurnStarted"]
 [connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/GameStatus" to="." method="OnPlayerEndTurn"]
-[connection signal="UnitButtonPressed" from="CanvasLayer/UnitButtons" to="." method="UnitButtonPressed"]
-[connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
-[connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]
-[connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
-[connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
-
 [connection signal="toggled" from="CanvasLayer/SlideOutBar/SlideToggle" to="." method="_on_SlideToggle_toggled"]
 [connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
@@ -252,3 +246,8 @@ anchor_mode = 0
 [connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
+[connection signal="UnitButtonPressed" from="CanvasLayer/UnitButtons" to="." method="UnitButtonPressed"]
+[connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
+[connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]
+[connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
+[connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
