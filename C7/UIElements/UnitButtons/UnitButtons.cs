@@ -74,7 +74,7 @@ public partial class UnitButtons : VBoxContainer
 
 	private void onButtonPressed(string buttonKey)
 	{
-		EmitSignal(nameof(UnitButtonPressed), buttonKey);
+		EmitSignal("UnitButtonPressed", buttonKey);
 	}
 
 	private void OnNoMoreAutoselectableUnits()

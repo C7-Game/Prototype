@@ -144,7 +144,7 @@ public partial class MainMenu : Node2D
 
 	private void PlayButtonPressedSound()
 	{
-		AudioStreamWAV wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath("Sounds/Button1.wav"));
+		AudioStreamWav wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath("Sounds/Button1.wav"));
 		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("CanvasLayer/SoundEffectPlayer");
 		player.Stream = wav;
 		player.Play();

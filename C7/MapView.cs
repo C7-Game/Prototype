@@ -104,7 +104,7 @@ public partial class TerrainLayer : LooseLayer {
 			if (tTD.tile != Tile.NONE) {
 				int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
 				Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
-				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
+				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.Y);
 				//Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
 				//Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
 				Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
@@ -150,7 +150,7 @@ public partial class HillsLayer : LooseLayer {
 			int row = pcxIndex/4;
 			int column = pcxIndex % 4;
 			if (tile.overlayTerrainType.Key == "mountains") {
-				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
+				Rect2 mountainRectangle = new Rect2(column * mountainSize.X, row * mountainSize.Y, mountainSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
 				ImageTexture mountainGraphics;
 				if (tile.isSnowCapped) {
@@ -171,7 +171,7 @@ public partial class HillsLayer : LooseLayer {
 				looseView.DrawTextureRectRegion(mountainGraphics, screenTarget, mountainRectangle);
 			}
 			else if (tile.overlayTerrainType.Key == "hills") {
-				Rect2 hillsRectangle = new Rect2(column * hillsSize.x, row * hillsSize.y, hillsSize);
+				Rect2 hillsRectangle = new Rect2(column * hillsSize.X, row * hillsSize.Y, hillsSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
 				ImageTexture hillGraphics;
 				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
@@ -187,7 +187,7 @@ public partial class HillsLayer : LooseLayer {
 				looseView.DrawTextureRectRegion(hillGraphics, screenTarget, hillsRectangle);
 			}
 			else if (tile.overlayTerrainType.Key == "volcano") {
-				Rect2 volcanoRectangle = new Rect2(column * volcanoSize.x, row * volcanoSize.y, volcanoSize);
+				Rect2 volcanoRectangle = new Rect2(column * volcanoSize.X, row * volcanoSize.Y, volcanoSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * volcanoSize + new Vector2(0, -12), volcanoSize);
 				ImageTexture volcanoGraphics;
 				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
@@ -318,7 +318,7 @@ public partial class ForestLayer : LooseLayer {
 				randomJungleColumn = tile.xCoordinate % 4;
 				jungleTexture = largeJungleTexture;
 			}
-			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.x, randomJungleRow * forestJungleSize.y, forestJungleSize);
+			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.X, randomJungleRow * forestJungleSize.Y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
 			looseView.DrawTextureRectRegion(jungleTexture, screenTarget, jungleRectangle);
 		}
@@ -366,7 +366,7 @@ public partial class ForestLayer : LooseLayer {
 					}
 				}
 			}
-			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.x, forestRow * forestJungleSize.y, forestJungleSize);
+			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.X, forestRow * forestJungleSize.Y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
 			looseView.DrawTextureRectRegion(forestTexture, screenTarget, forestRectangle);
 		}
@@ -399,7 +399,7 @@ public partial class MarshLayer : LooseLayer {
 				randomMarshColumn = tile.xCoordinate % 4;
 				marshTexture = largeMarshTexture;
 			}
-			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.x, randomJungleRow * marshSize.y, marshSize);
+			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.X, randomJungleRow * marshSize.Y, marshSize);
 			Rect2 screenTarget = new Rect2(tileCenter - MARSH_OFFSET, marshSize);
 			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);
 		}
@@ -409,7 +409,7 @@ public partial class MarshLayer : LooseLayer {
 public partial class RiverLayer : LooseLayer
 {
 	public static readonly Vector2 riverSize = new Vector2(128, 64);
-	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.x / 2, 0);
+	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.X / 2, 0);
 	private ImageTexture riverTexture;
 
 	public RiverLayer() {
@@ -446,7 +446,7 @@ public partial class RiverLayer : LooseLayer
 		int riverRow = riverGraphicsIndex / 4;
 		int riverColumn = riverGraphicsIndex % 4;
 
-		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.x, riverRow * riverSize.y, riverSize);
+		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.X, riverRow * riverSize.Y, riverSize);
 		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize + riverCenterOffset, riverSize);
 		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);
 	}
@@ -461,9 +461,9 @@ public partial class GridLayer : LooseLayer {
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		var cS = MapView.cellSize;
-		var left  = tileCenter + new Vector2(-cS.x,  0   );
-		var top   = tileCenter + new Vector2( 0   , -cS.y);
-		var right = tileCenter + new Vector2( cS.x,  0   );
+		var left  = tileCenter + new Vector2(-cS.X, 0    );
+		var top   = tileCenter + new Vector2( 0   , -cS.Y);
+		var right = tileCenter + new Vector2( cS.X, 0    );
 		looseView.DrawLine(left, top  , color, lineWidth);
 		looseView.DrawLine(top , right, color, lineWidth);
 	}
@@ -596,7 +596,7 @@ public partial class UnitLayer : LooseLayer {
 
 		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, appearance.progress);
 		var civColor = new Color((uint)unit.owner.color);
-		inst.shaderMat.SetShaderParameter("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
+		inst.shaderMat.SetShaderParameter("civColor", new Vector3(civColor.R, civColor.G, civColor.B));
 
 		inst.meshInst.Position = position;
 		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
@@ -1020,7 +1020,7 @@ public partial class MapView : Node2D {
 		(int x0, int y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
 		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		return new VisibleRegion { upperLeftX = x0 - 2, upperLeftY = y0 - 2,
-			lowerRightX = x0 + (int)mapViewSize.x, lowerRightY = y0 + (int)mapViewSize.y };
+			lowerRightX = x0 + (int)mapViewSize.X, lowerRightY = y0 + (int)mapViewSize.Y };
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
@@ -1053,22 +1053,22 @@ public partial class MapView : Node2D {
 		// larger than the map (if we're zoomed far out) so in that case we must apply the constraint the other way around, i.e. constrain the
 		// map to the viewport rather than the viewport to the map.
 		Vector2 visAreaSize = getVisibleAreaSize();
-		Vector2 mapPixelSize = new Vector2(cameraZoom, cameraZoom) * (new Vector2(cellSize.x * (mapWidth + 1), cellSize.y * (mapHeight + 1)));
+		Vector2 mapPixelSize = new Vector2(cameraZoom, cameraZoom) * (new Vector2(cellSize.X * (mapWidth + 1), cellSize.Y * (mapHeight + 1)));
 		if (!wrapHorizontally) {
 			float leftLim, rightLim;
 			{
-				if (mapPixelSize.x >= visAreaSize.x) {
+				if (mapPixelSize.X >= visAreaSize.X) {
 					leftLim = 0;
-					rightLim = mapPixelSize.x - visAreaSize.x;
+					rightLim = mapPixelSize.X - visAreaSize.X;
 				} else {
-					leftLim = mapPixelSize.x - visAreaSize.x;
+					leftLim = mapPixelSize.X - visAreaSize.X;
 					rightLim = 0;
 				}
 			}
-			if (location.x < leftLim)
-				location.x = leftLim;
-			else if (location.x > rightLim)
-				location.x = rightLim;
+			if (location.X < leftLim)
+				location.X = leftLim;
+			else if (location.X > rightLim)
+				location.X = rightLim;
 		}
 		if (!wrapVertically) {
 			// These margins allow the player to move the camera that far off those map edges so that the UI controls don't cover up the
@@ -1076,18 +1076,18 @@ public partial class MapView : Node2D {
 			float topMargin = 70, bottomMargin = 140;
 			float topLim, bottomLim;
 			{
-				if (mapPixelSize.y >= visAreaSize.y) {
+				if (mapPixelSize.Y >= visAreaSize.Y) {
 					topLim = -topMargin;
-					bottomLim = mapPixelSize.y - visAreaSize.y + bottomMargin;
+					bottomLim = mapPixelSize.Y - visAreaSize.Y + bottomMargin;
 				} else {
-					topLim = mapPixelSize.y - visAreaSize.y;
+					topLim = mapPixelSize.Y - visAreaSize.Y;
 					bottomLim = 0;
 				}
 			}
-			if (location.y < topLim)
-				location.y = topLim;
-			else if (location.y > bottomLim)
-				location.y = bottomLim;
+			if (location.Y < topLim)
+				location.Y = topLim;
+			else if (location.Y > bottomLim)
+				location.Y = bottomLim;
 		}
 
 		internalCameraLocation = location;
@@ -1117,15 +1117,15 @@ public partial class MapView : Node2D {
 		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
-		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
+		int x = (int)intMapLoc.X, y = (int)intMapLoc.Y;
 		bool evenColumn = x%2 == 0, evenRow = y%2 == 0;
 		if (evenColumn ^ evenRow) {
-			if (fracMapLoc.y > fracMapLoc.x)
+			if (fracMapLoc.Y > fracMapLoc.X)
 				x -= 1;
 			else
 				y -= 1;
 		} else {
-			if (fracMapLoc.y < 1 - fracMapLoc.x) {
+			if (fracMapLoc.Y < 1 - fracMapLoc.X) {
 				x -= 1;
 				y -= 1;
 			}

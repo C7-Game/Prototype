@@ -190,7 +190,7 @@ public partial class Util {
 			//This loads it from the folder where the executable is in release mode.
 			//Doesn't work in debug mode because the executable will be where Godot is installed,
 			//not where our project is located.
-			backgroundImage.Load(OS.GetExecutablePath().GetBaseDir().PlusFile(relPath));
+			backgroundImage.Load(OS.GetExecutablePath().GetBaseDir().PathJoin(relPath));
 		}
 		return ImageTexture.CreateFromImage(backgroundImage);
 	}
@@ -234,8 +234,7 @@ public partial class Util {
 			for (int k = 0; k < 3; k++)
 				flatPalette[k + 3 * n] = raw[n, k];
 
-		var img = new Image();
-		img.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
+		var img = Image.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
 		return ImageTexture.CreateFromImage(img);
 	}
 
@@ -244,8 +243,7 @@ public partial class Util {
 	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string filePath) {
 		var pcx = LoadPCX(filePath);
 
-		var imgIndices = new Image();
-		imgIndices.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
+		var imgIndices = Image.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
 		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (createPaletteTexture(pcx.Palette), texIndices);
@@ -280,16 +278,14 @@ public partial class Util {
 						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
 					}
 
-		var imgIndices = new Image();
-		imgIndices.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
+		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
 		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);
 	}
 
-	static public AudioStreamWAV LoadWAVFromDisk(string path) {
-		File file = new File();
-		file.Open(path, Godot.File.ModeFlags.Read);
+	static public AudioStreamWav LoadWAVFromDisk(string path) {
+		FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
 		string riffString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
 		if (riffString != "RIFF") {
@@ -305,7 +301,7 @@ public partial class Util {
 		bool formatFound = false;
 		bool dataFound = false;
 
-		AudioStreamWAV wav = new AudioStreamWAV();
+		AudioStreamWav wav = new AudioStreamWav();
 
 		while (!file.EofReached()) {
 			string chunk = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
@@ -328,11 +324,11 @@ public partial class Util {
 				//to what AudioStreamWAV supports.  But that could be wrong.
 				ushort compressionCode = file.Get16();
 				if (compressionCode == 1) {
-					wav.Format = Godot.AudioStreamWAV.FormatEnum.Format16Bits;
+					wav.Format = AudioStreamWav.FormatEnum.Format16Bits;
 				} else if (compressionCode == 0) {
-					wav.Format = Godot.AudioStreamWAV.FormatEnum.Format8Bits;
+					wav.Format = AudioStreamWav.FormatEnum.Format8Bits;
 				} else if (compressionCode == 2) {
-					wav.Format = Godot.AudioStreamWAV.FormatEnum.ImaAdpcm;
+					wav.Format = AudioStreamWav.FormatEnum.ImaAdpcm;
 				}
 
 				ushort channels = file.Get16();
@@ -359,7 +355,7 @@ public partial class Util {
 				dataFound = true;
 			}
 
-			file.Seek((long)(position + chunkSize));
+			file.Seek(position + chunkSize);
 		}
 
 		if (!formatFound || !dataFound) {

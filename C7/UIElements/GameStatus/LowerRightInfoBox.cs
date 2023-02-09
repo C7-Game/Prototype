@@ -82,7 +82,7 @@ public partial class LowerRightInfoBox : TextureRect
 		civAndGovt.AnchorLeft = 0.5f;
 		civAndGovt.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(civAndGovt);
-		civAndGovt.OffsetLeft = -1 * (civAndGovt.Size.x/2.0f);
+		civAndGovt.OffsetLeft = -1 * (civAndGovt.Size.X/2.0f);
 
 		yearAndGold.Text = "Turn 0  10 Gold (+0 per turn)";
 		yearAndGold.HorizontalAlignment = HorizontalAlignment.Center;
@@ -90,7 +90,7 @@ public partial class LowerRightInfoBox : TextureRect
 		yearAndGold.AnchorLeft = 0.5f;
 		yearAndGold.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(yearAndGold);
-		yearAndGold.OffsetLeft = -1 * (yearAndGold.Size.x/2.0f);
+		yearAndGold.OffsetLeft = -1 * (yearAndGold.Size.X/2.0f);
 
 		//Setup up, but do not start, the timer.
 		blinkingTimer.OneShot = false;

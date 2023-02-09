@@ -10,7 +10,8 @@ public partial class Civ3Unit : Civ3UnitSprite
 	public Civ3Unit(Civ3Unit civ3Unit) : base(civ3Unit) {
 		this.AS = (MovingSprite)civ3Unit.AS.Duplicate();
 		this.SF = (SpriteFrames)civ3Unit.SF.Duplicate();
-		this.AS.Frames = this.SF;
+		// TODO(pcen): this does not work in Godot 4
+		// this.AS.Frames = this.SF;
 	}
 	public Civ3Unit(string path, byte unitColor = 0) : base(path, unitColor) {
 		AS = new MovingSprite();
@@ -18,7 +19,8 @@ public partial class Civ3Unit : Civ3UnitSprite
 		// temporarily making it bigger
 		// AS.Scale = new Vector2(2, 2);
 		SF = new SpriteFrames();
-		AS.Frames = SF;
+		// TODO(pcen): this does not work in Godot 4
+		// AS.Frames = SF;
 		// TODO: Loop through animations and create sprites
 		foreach (UnitAction actn in Enum.GetValues(typeof(UnitAction))) {
 			// Ensuring there is image data for this action
@@ -84,8 +86,7 @@ public partial class Civ3Unit : Civ3UnitSprite
 	// TODO: This is mostly duplicated in/from PCXToGodot.cs, but special indexes
 	//   handled differently. Probably needs combining and refactoring
 	public static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
-		Image OutImage = new Image();
-		OutImage.Create(width, height, false, Image.Format.Rgba8);
+		Image OutImage = Image.Create(width, height, false, Image.Format.Rgba8);
 		// OutImage.Lock();
 		byte[] bmpBuffer = getBmpBuffer(colorIndices, palette, width, height, transparent, shadows);
 		OutImage.LoadBmpFromBuffer(bmpBuffer);
@@ -159,17 +160,17 @@ public partial class MovingSprite : AnimatedSprite2D {
 	public Vector2 Velocity = new Vector2(0, 0);
 	public override void _PhysicsProcess(double delta) {
 		Position = Position + Velocity;
-		if (Position.x > 1040) {
-			Position = new Vector2(-30, Position.y);
+		if (Position.X > 1040) {
+			Position = new Vector2(-30, Position.Y);
 		}
-		if (Position.x < -30) {
-			Position = new Vector2(1040, Position.y);
+		if (Position.X < -30) {
+			Position = new Vector2(1040, Position.Y);
 		}
-		if (Position.y > 800) {
-			Position = new Vector2(Position.x, -30);
+		if (Position.Y > 800) {
+			Position = new Vector2(Position.X, -30);
 		}
-		if (Position.y < -30) {
-			Position = new Vector2(Position.x, 800);
+		if (Position.Y < -30) {
+			Position = new Vector2(Position.X, 800);
 		}
 	}
 }

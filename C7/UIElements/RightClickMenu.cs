@@ -39,15 +39,15 @@ public partial class RightClickMenu : VBoxContainer
 
 		// Move "position" if the menu would extend past the right or bottom edges of the screen
 		Vector2 offScreen = position + this.Size; // - GetViewport().GetSize;
-		if (offScreen.x > 0) {
-			position.x -= offScreen.x;
-			if (position.x < 0)
-				position.x = 0;
+		if (offScreen.X > 0) {
+			position.X -= offScreen.X;
+			if (position.X < 0)
+				position.X = 0;
 		}
-		if (offScreen.y > 0) {
-			position.y -= offScreen.y;
-			if (position.y < 0)
-				position.y = 0;
+		if (offScreen.Y > 0) {
+			position.Y -= offScreen.Y;
+			if (position.Y < 0)
+				position.Y = 0;
 		}
 
 		this.SetPosition(position);
@@ -144,18 +144,15 @@ public partial class RightClickTileMenu : RightClickMenu
 			fortifiedCount += isFortified ? 1 : 0;
 			string action = getUnitAction(unit, isFortified);
 
-			System.Action del = () => {
-				SelectUnit(unit.guid);
-			};
-			AddItem($"{action} {unit.Describe()}").Connect("pressed", new Callable(new System.Action(() => SelectUnit(unit.guid))));
+			AddItem($"{action} {unit.Describe()}").Connect("pressed", Callable.From(new System.Action(() => SelectUnit(unit.guid))));
 		}
 		int unfortifiedCount = units.Count - fortifiedCount;
 
 		if (fortifiedCount > 1) {
-			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", new Callable(new System.Action(() => ForAll(tile.xCoordinate, tile.yCoordinate, false))));
+			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", Callable.From(new System.Action(() => ForAll(tile.xCoordinate, tile.yCoordinate, false))));
 		}
 		if (unfortifiedCount > 1) {
-			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", new Callable(new System.Action(() => ForAll(tile.xCoordinate,tile.yCoordinate,true))));
+			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", Callable.From(new System.Action(() => ForAll(tile.xCoordinate,tile.yCoordinate,true))));
 		}
 	}
 
@@ -218,7 +215,7 @@ public partial class RightClickChooseProductionMenu : RightClickMenu
 		foreach (IProducible option in city.ListProductionOptions()) {
 			int buildTime = city.TurnsToProduce(option);
 			AddItem($"{option.name} ({buildTime} turns)", GetProducibleIcon(option))
-				.Connect("pressed",new Callable(new System.Action(() => ChooseProduction(option.name))));
+				.Connect("pressed", Callable.From(new System.Action(() => ChooseProduction(option.name))));
 		}
 	}
 

@@ -59,8 +59,8 @@ namespace C7.Map {
 			string cityNameAndGrowth = $"{city.name} : {turnsUntilGrowthText}";
 			string productionDescription = city.itemBeingProduced.name + " : " + city.TurnsUntilProductionFinished();
 
-			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).x;
-			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).x;
+			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).X;
+			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).X;
 			int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
 
 			int cityLabelWidth = maxTextWidth + (city.IsCapital()? 70 : 45);	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
@@ -102,7 +102,7 @@ namespace C7.Map {
 
 			//City pop size
 			string popSizeString = "" + city.size;
-			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).x;
+			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).X;
 			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH / 2 - popSizeWidth / 2;
 			Vector2 popSizeDestination = tileCenter + new Vector2(cityLabelWidth / -2, 24) + new Vector2(popSizeOffset, 18);
 			Color popColor = Color.Color8(255, 255, 255, 255);
@@ -115,8 +115,7 @@ namespace C7.Map {
 		private Image CreateLabelBackground(int cityLabelWidth, City city, int textAreaWidth)
 		{
 			//Label/name/producing area
-			Image labelImage = new Image();
-			labelImage.Create(cityLabelWidth, CITY_LABEL_HEIGHT, false, Image.Format.Rgba8);
+			Image labelImage = Image.Create(cityLabelWidth, CITY_LABEL_HEIGHT, false, Image.Format.Rgba8);
 			labelImage.Fill(Color.Color8(0, 0, 0, 0));
 			byte transparencyLevel = 192; //25%
 			Color civColor = new Color((uint)city.owner.color);
@@ -127,46 +126,39 @@ namespace C7.Map {
 			Color backgroundGrey = Color.Color8(64, 64, 64, transparencyLevel);
 			Color borderGrey = Color.Color8(80, 80, 80, transparencyLevel);
 
-			Image horizontalBorder = new Image();
-			horizontalBorder.Create(cityLabelWidth - 2, 1, false, Image.Format.Rgba8);
+			Image horizontalBorder = Image.Create(cityLabelWidth - 2, 1, false, Image.Format.Rgba8);
 			horizontalBorder.Fill(borderGrey);
-			labelImage.BlitRect(horizontalBorder, new Rect2i(0, 0, new Vector2i(cityLabelWidth - 2, 1)), new Vector2i(1, 0));
-			labelImage.BlitRect(horizontalBorder, new Rect2i(0, 0, new Vector2i(cityLabelWidth - 2, 1)), new Vector2i(1, 22));
+			labelImage.BlitRect(horizontalBorder, new Rect2I(0, 0, new Vector2I(cityLabelWidth - 2, 1)), new Vector2I(1, 0));
+			labelImage.BlitRect(horizontalBorder, new Rect2I(0, 0, new Vector2I(cityLabelWidth - 2, 1)), new Vector2I(1, 22));
 
-			Image verticalBorder = new Image();
-			verticalBorder.Create(1, CITY_LABEL_HEIGHT - 2, false, Image.Format.Rgba8);
+			Image verticalBorder = Image.Create(1, CITY_LABEL_HEIGHT - 2, false, Image.Format.Rgba8);
 			verticalBorder.Fill(borderGrey);
-			labelImage.BlitRect(verticalBorder, new Rect2i(0, 0, new Vector2i(1, 23)), new Vector2i(0, 1));
-			labelImage.BlitRect(verticalBorder, new Rect2i(0, 0, new Vector2i(1, 23)), new Vector2i(cityLabelWidth - 1, 1));
+			labelImage.BlitRect(verticalBorder, new Rect2I(0, 0, new Vector2I(1, 23)), new Vector2I(0, 1));
+			labelImage.BlitRect(verticalBorder, new Rect2I(0, 0, new Vector2I(1, 23)), new Vector2I(cityLabelWidth - 1, 1));
 
-			Image bottomRow = new Image();
-			bottomRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
+			Image bottomRow = Image.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
 			bottomRow.Fill(bottomRowGrey);
-			labelImage.BlitRect(bottomRow, new Rect2i(0, 0, new Vector2i(textAreaWidth, 1)), new Vector2i(25, 21));
+			labelImage.BlitRect(bottomRow, new Rect2I(0, 0, new Vector2I(textAreaWidth, 1)), new Vector2I(25, 21));
 
-			Image topRow = new Image();
-			topRow.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
+			Image topRow = Image.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
 			topRow.Fill(topRowGrey);
-			labelImage.BlitRect(topRow, new Rect2i(0, 0, new Vector2i(textAreaWidth, 1)), new Vector2i(25, 1));
+			labelImage.BlitRect(topRow, new Rect2I(0, 0, new Vector2I(textAreaWidth, 1)), new Vector2I(25, 1));
 
-			Image background = new Image();
-			background.Create(textAreaWidth, TEXT_ROW_HEIGHT, false, Image.Format.Rgba8);
+			Image background = Image.Create(textAreaWidth, TEXT_ROW_HEIGHT, false, Image.Format.Rgba8);
 			background.Fill(backgroundGrey);
-			labelImage.BlitRect(background, new Rect2i(0, 0, new Vector2i(textAreaWidth, 9)), new Vector2i(25, 2));
-			labelImage.BlitRect(background, new Rect2i(0, 0, new Vector2i(textAreaWidth, 9)), new Vector2i(25, 12));
+			labelImage.BlitRect(background, new Rect2I(0, 0, new Vector2I(textAreaWidth, 9)), new Vector2I(25, 2));
+			labelImage.BlitRect(background, new Rect2I(0, 0, new Vector2I(textAreaWidth, 9)), new Vector2I(25, 12));
 
-			Image centerDivider = new Image();
-			centerDivider.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
+			Image centerDivider = Image.Create(textAreaWidth, 1, false, Image.Format.Rgba8);
 			centerDivider.Fill(civColor);
-			labelImage.BlitRect(centerDivider, new Rect2i(0, 0, new Vector2i(textAreaWidth, 1)), new Vector2i(25, 11));
+			labelImage.BlitRect(centerDivider, new Rect2I(0, 0, new Vector2I(textAreaWidth, 1)), new Vector2I(25, 11));
 
-			Image leftAndRightBoxes = new Image();
-			leftAndRightBoxes.Create(LEFT_RIGHT_BOXES_WIDTH, LEFT_RIGHT_BOXES_HEIGHT, false, Image.Format.Rgba8);
+			Image leftAndRightBoxes = Image.Create(LEFT_RIGHT_BOXES_WIDTH, LEFT_RIGHT_BOXES_HEIGHT, false, Image.Format.Rgba8);
 			leftAndRightBoxes.Fill(civColor);
-			labelImage.BlitRect(leftAndRightBoxes, new Rect2i(0, 0, new Vector2i(24, 21)), new Vector2i(1, 1));
+			labelImage.BlitRect(leftAndRightBoxes, new Rect2I(0, 0, new Vector2I(24, 21)), new Vector2I(1, 1));
 			if (city.IsCapital()) {
-				labelImage.BlitRect(leftAndRightBoxes, new Rect2i(0, 0, new Vector2i(24, 21)), new Vector2i(cityLabelWidth - 25, 1));
-				labelImage.BlendRect(nonEmbassyStar, new Rect2i(0, 0, new Vector2i(18, 18)), new Vector2i(cityLabelWidth - 24, 2));
+				labelImage.BlitRect(leftAndRightBoxes, new Rect2I(0, 0, new Vector2I(24, 21)), new Vector2I(cityLabelWidth - 25, 1));
+				labelImage.BlendRect(nonEmbassyStar, new Rect2I(0, 0, new Vector2I(18, 18)), new Vector2I(cityLabelWidth - 24, 2));
 			}
 			//todo: darker shades of civ color around edges
 			return labelImage;

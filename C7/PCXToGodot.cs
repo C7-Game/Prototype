@@ -2,7 +2,7 @@ using Godot;
 using System;
 using ConvertCiv3Media;
 
-public partial class PCXToGodot : Godot.Object
+public partial class PCXToGodot : GodotObject
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 
@@ -96,10 +96,9 @@ public partial class PCXToGodot : Godot.Object
 	}
 
 	private static Image getImageFromBufferData(int width, int height, int[] bufferData) {
-		Image image = new Image();
 		var Data = new byte[4 * width * height];
 		Buffer.BlockCopy(bufferData, 0, Data, 0, 4 * width * height);
-		image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
+		Image image = Image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
 		return image;
 	}
 

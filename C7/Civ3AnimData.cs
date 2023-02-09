@@ -74,13 +74,13 @@ public partial class Civ3AnimData
 		return tr;
 	}
 
-	private Dictionary<string, AudioStreamWAV> wavs = new Dictionary<string, AudioStreamWAV>();
+	private Dictionary<string, AudioStreamWav> wavs = new Dictionary<string, AudioStreamWav>();
 
 	public void playSound(string rootPath, IniData iniData, MapUnit.AnimatedAction action)
 	{
 		string fileName = iniData["Sound Effects"][action.ToString()];
 		if (fileName.EndsWith(".WAV", StringComparison.CurrentCultureIgnoreCase)) {
-			AudioStreamWAV wav;
+			AudioStreamWav wav;
 			var pathKey = rootPath + "/" + fileName;
 			if (! wavs.TryGetValue(pathKey, out wav)) {
 				wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(pathKey));

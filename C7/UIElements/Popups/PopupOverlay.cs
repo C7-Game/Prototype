@@ -36,7 +36,7 @@ public partial class PopupOverlay : HBoxContainer
 		Hide();
 	}
 
-	public void PlaySound(AudioStreamWAV wav)
+	public void PlaySound(AudioStreamWav wav)
 	{
 		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("PopupSound");
 		player.Stream = wav;
@@ -76,7 +76,7 @@ public partial class PopupOverlay : HBoxContainer
 				log.Error("Invalid popup category");
 				break;
 		}
-		AudioStreamWAV wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
+		AudioStreamWav wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
 		Visible = true;
 		PlaySound(wav);
 	}

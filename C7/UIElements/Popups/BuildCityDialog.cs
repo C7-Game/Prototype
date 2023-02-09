@@ -38,7 +38,7 @@ public partial class BuildCityDialog : Popup
 
 		HBoxContainer labelAndName = new HBoxContainer();
 		labelAndName.Alignment = BoxContainer.AlignmentMode.Begin;
-		labelAndName.SizeFlagsHorizontal = 3;   //fill and expand
+		labelAndName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		labelAndName.SizeFlagsStretchRatio = 1;
 		labelAndName.AnchorLeft = 0.0f;
 		labelAndName.AnchorRight = 0.85f;
@@ -48,7 +48,7 @@ public partial class BuildCityDialog : Popup
 		nameLabel.Text = "Name: ";
 		labelAndName.AddChild(nameLabel);
 
-		cityName.SizeFlagsHorizontal = 3;  //fill and expand
+		cityName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		cityName.SizeFlagsStretchRatio = 1;
 		cityName.Text = defaultName;
 		labelAndName.AddChild(cityName);
