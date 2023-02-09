@@ -26,7 +26,6 @@ public partial class Advisors : CenterContainer
 //
 //  }
 
-
 	private void ShowLatestAdvisor()
 	{
 		log.Debug("Received request to show latest advisor");
