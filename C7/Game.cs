@@ -602,54 +602,52 @@ public partial class Game : Node2D
 
 		log.Verbose("The " + buttonName + " button was pressed");
 		switch (buttonName) {
-			case "hold":
-				new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
-				break;
+		case "hold":
+			new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
+			break;
 
-			case "fortify":
-				new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
-				break;
+		case "fortify":
+			new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
+			break;
 
-			case "wait":
-				using (var gameDataAccess = new UIGameDataAccess()) {
-					UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
-					GetNextAutoselectedUnit(gameDataAccess.gameData);
-				}
-				break;
+		case "wait":
+			using (var gameDataAccess = new UIGameDataAccess()) {
+				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+				GetNextAutoselectedUnit(gameDataAccess.gameData);
+			}
+			break;
 
-			case "disband":
+		case "disband":
 			{
 				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 				popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
 			}
-				break;
+			break;
 
-			case "buildCity": {
-				using (var gameDataAccess = new UIGameDataAccess()) {
-					MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
-					if (currentUnit.canBuildCity()) {
-						PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-						popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
-							PopupOverlay.PopupCategory.Advisor);
-					}
+		case "buildCity":
+			using (var gameDataAccess = new UIGameDataAccess()) {
+				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
+				if (currentUnit.canBuildCity()) {
+					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
+						PopupOverlay.PopupCategory.Advisor);
 				}
 			}
-				break;
+			break;
 
-			case "buildRoad": {
-				if (CurrentlySelectedUnit.canBuildRoad()) {
-					new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
-				}
+		case "buildRoad":
+			if (CurrentlySelectedUnit.canBuildRoad()) {
+				new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
 			}
-				break;
+			break;
 
-			case "goTo":
-				break;
+		case "goTo":
+			break;
 
-			default:
-				//A nice sanity check if I use a different name here than where I created it...
-				log.Warning("An unrecognized button " + buttonName + " was pressed");
-				break;
+		default:
+			//A nice sanity check if I use a different name here than where I created it...
+			log.Warning("An unrecognized button " + buttonName + " was pressed");
+			break;
 		}
 	}
 

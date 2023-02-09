@@ -79,9 +79,9 @@ anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 1024.0
+offset_left = -128.0
 offset_top = 80.0
-offset_right = 1024.0
+offset_right = -128.0
 offset_bottom = 1744.0
 grow_horizontal = 0
 grow_vertical = 2
@@ -238,3 +238,4 @@ anchor_mode = 0
 [connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
+[connection signal="UnitButtonPressed" from="CanvasLayer/UnitButtons" to="." method="UnitButtonPressed"]
