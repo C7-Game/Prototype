@@ -10,17 +10,16 @@ public partial class Civ3Unit : Civ3UnitSprite
 	public Civ3Unit(Civ3Unit civ3Unit) : base(civ3Unit) {
 		this.AS = (MovingSprite)civ3Unit.AS.Duplicate();
 		this.SF = (SpriteFrames)civ3Unit.SF.Duplicate();
-		// TODO(pcen): this does not work in Godot 4
-		// this.AS.Frames = this.SF;
+		this.AS.SpriteFrames = this.SF;
 	}
+
 	public Civ3Unit(string path, byte unitColor = 0) : base(path, unitColor) {
-		AS = new MovingSprite();
-		AS.Position = new Vector2(128 * 5, 64 * 3 - 12);
+		this.AS = new MovingSprite();
+		this.AS.Position = new Vector2(128 * 5, 64 * 3 - 12);
 		// temporarily making it bigger
-		// AS.Scale = new Vector2(2, 2);
-		SF = new SpriteFrames();
-		// TODO(pcen): this does not work in Godot 4
-		// AS.Frames = SF;
+		// this.AS.Scale = new Vector2(2, 2);
+		this.SF = new SpriteFrames();
+		this.AS.SpriteFrames = SF;
 		// TODO: Loop through animations and create sprites
 		foreach (UnitAction actn in Enum.GetValues(typeof(UnitAction))) {
 			// Ensuring there is image data for this action
