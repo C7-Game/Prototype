@@ -1,3 +1,5 @@
+using Godot;
+
 /**
  * A work-around to not being able to pass objects in Godot.
  * To pass via signals, an object must extend Godot.Object.
@@ -13,17 +15,20 @@
  *          //Do whatever you like with unwrappedUnit...
  *      }
  **/
-public partial class ParameterWrapper : Godot.Object
+
+// TODO(pcen): migrating to Godot 4 come back and check if this workaround is still needed
+
+public partial class ParameterWrapper : GodotObject
 {
-    private readonly object value;
+	private readonly object value;
 
-    public ParameterWrapper(object value)
-    {
-        this.value = value;
-    }
+	public ParameterWrapper(object value)
+	{
+		this.value = value;
+	}
 
-    public T GetValue<T>()
-    {
-        return (T)this.value;
-    }
+	public T GetValue<T>()
+	{
+		return (T)this.value;
+	}
 }

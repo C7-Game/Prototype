@@ -29,7 +29,7 @@ namespace C7.Map
 					log.Warning("Resource icon for " + resource.Name + " is too high");
 					return;
 				}
-				Rect2 resourceRectangle = new Rect2(col * resourceSize.x, row * resourceSize.y, resourceSize);
+				Rect2 resourceRectangle = new Rect2(col * resourceSize.X, row * resourceSize.Y, resourceSize);
 				Rect2 screenTarget = new Rect2(tileCenter - 0.5f * resourceSize, resourceSize);
 				looseView.DrawTextureRectRegion(resourceTexture, screenTarget, resourceRectangle);
 			}

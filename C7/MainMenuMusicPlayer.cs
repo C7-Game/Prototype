@@ -17,8 +17,7 @@ public partial class MainMenuMusicPlayer : AudioStreamPlayer
 
 		try {
 			string mp3Path = Util.Civ3MediaPath("Sounds/Menu/Menu1.mp3");
-			File mp3File = new File();
-			mp3File.Open(mp3Path, File.ModeFlags.Read);
+			FileAccess mp3File = FileAccess.Open(mp3Path, FileAccess.ModeFlags.Read);
 
 			AudioStreamMP3 mp3 = new AudioStreamMP3();
 			long fileSize = (long)mp3File.GetLength();	//might blow up if it's > 2 GB, oh well

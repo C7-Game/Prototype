@@ -35,7 +35,7 @@ namespace C7.Map
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 		{
 			if (tile.overlayTerrainType.Key == "grassland" && tile.isBonusShield) {
-				Rect2 tntRectangle = new Rect2(0, BONUS_GRASSLAND_TNT_OFF_ROW * tntSize.y, tntSize);
+				Rect2 tntRectangle = new Rect2(0, BONUS_GRASSLAND_TNT_OFF_ROW * tntSize.Y, tntSize);
 				Rect2 screenTarget = new Rect2(tileCenter - 0.5f * tntSize, tntSize);
 				looseView.DrawTextureRectRegion(tntTexture, screenTarget, tntRectangle);
 			}

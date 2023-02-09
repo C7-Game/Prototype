@@ -260,10 +260,10 @@ public partial class Game : Node2D
 		//Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {
 			ParameterWrapper wrappedUnit = new ParameterWrapper(CurrentlySelectedUnit);
-			EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
+			EmitSignal("NewAutoselectedUnit", wrappedUnit);
 		}
 		else {
-			EmitSignal(nameof(NoMoreAutoselectableUnits));
+			EmitSignal("NoMoreAutoselectableUnits");
 		}
 	}
 
@@ -283,7 +283,7 @@ public partial class Game : Node2D
 	{
 		log.Information("Starting player turn");
 		int turnNumber = TurnHandling.GetTurnNumber();
-		EmitSignal(nameof(TurnStartedEventHandler), turnNumber);
+		EmitSignal("TurnStarted", turnNumber);
 		CurrentState = GameState.PlayerTurn;
 
 		using (var gameDataAccess = new UIGameDataAccess()) {
@@ -296,7 +296,7 @@ public partial class Game : Node2D
 		if (CurrentState == GameState.PlayerTurn)
 		{
 			log.Information("Ending player turn");
-			EmitSignal(nameof(TurnEndedEventHandler));
+			EmitSignal("TurnEnded");
 			log.Information("Starting computer turn");
 			CurrentState = GameState.ComputerTurn;
 			new MsgEndTurn().send(); // Triggers actual backend processing
