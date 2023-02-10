@@ -47,8 +47,7 @@ public class Util {
 			if (path != null) { return path; }
 		} else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
 			// Check for a civ3 folder in steamapps/common
-			// TODO: should this method only be used at dev time?
-			var root = new System.IO.DirectoryInfo(Util.SteamCommonDir());
+			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(Util.SteamCommonDir());
 			foreach (System.IO.DirectoryInfo di in root.GetDirectories()) {
 				if (Util.FolderIsCiv3(di)) {
 					return di.FullName;

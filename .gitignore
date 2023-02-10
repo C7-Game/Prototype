@@ -3,6 +3,7 @@
 .import/
 export.cfg
 logs/
+.godot
 
 ### This is excluded because Android builds may have secrets in export_presets.cfg ; see https://github.com/godotengine/godot-demo-projects/issues/329
 # re-ignoring it so manual exports don't mess with the to-be-finely-honed settings; can manually add if needs updating
