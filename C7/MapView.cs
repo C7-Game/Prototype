@@ -460,10 +460,10 @@ public partial class GridLayer : LooseLayer {
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
-		var cS = MapView.cellSize;
-		var left  = tileCenter + new Vector2(-cS.X, 0    );
-		var top   = tileCenter + new Vector2( 0   , -cS.Y);
-		var right = tileCenter + new Vector2( cS.X, 0    );
+		Vector2 cS = MapView.cellSize;
+		Vector2 left  = tileCenter + new Vector2(-cS.X, 0    );
+		Vector2 top   = tileCenter + new Vector2( 0   , -cS.Y);
+		Vector2 right = tileCenter + new Vector2( cS.X, 0    );
 		looseView.DrawLine(left, top  , color, lineWidth);
 		looseView.DrawLine(top , right, color, lineWidth);
 	}
@@ -495,6 +495,7 @@ public partial class UnitLayer : LooseLayer {
 	public static (ShaderMaterial, MeshInstance2D) createShadedQuad(Shader shader)
 	{
 		PlaneMesh mesh = new PlaneMesh();
+		mesh.SubdivideDepth = 1;
 		mesh.Orientation = PlaneMesh.OrientationEnum.Z;
 		mesh.Size = new Vector2(1, 1);
 
@@ -999,8 +1000,8 @@ public partial class MapView : Node2D {
 		looseView.layers.Add(new TntLayer());
 		looseView.layers.Add(new RoadLayer());
 		looseView.layers.Add(new ResourceLayer());
-		gridLayer = new GridLayer();
-		looseView.layers.Add(gridLayer);
+		this.gridLayer = new GridLayer();
+		looseView.layers.Add(this.gridLayer);
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new CityLayer());
