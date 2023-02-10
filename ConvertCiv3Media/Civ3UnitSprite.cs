@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using IniParser;
 using IniParser.Model;
@@ -67,6 +66,7 @@ namespace ConvertCiv3Media {
 		// unitColor must be from 0 - 31
 		public Civ3UnitSprite(Civ3UnitSprite civ3UnitSprite) {
 		}
+
 		public Civ3UnitSprite(string unitPath, byte unitColor = 0) {
 			// TODO: Parameterize this and/or take ini path and chop it up
 			// string UnitIniPath = unitPath + "Warrior.INI";
@@ -117,21 +117,21 @@ namespace ConvertCiv3Media {
 		}
 
 		/*
-        public virtual void InitDisplay() {
-            // override this method in the display framework to convert media to display framework objects
-        }
-        */
+		public virtual void InitDisplay() {
+			// override this method in the display framework to convert media to display framework objects
+		}
+		*/
 		virtual public void Animation(UnitAction action, Direction direction) {
 			// override this method in the display framework
 		}
 		/*
-        virtual public void Play() {
-            // override this method in the display framework to start animation
-        }
-        virtual public void Stop() {
-            // override this method in the display framework to stop animation
-        }
-        */
+		virtual public void Play() {
+			// override this method in the display framework to start animation
+		}
+		virtual public void Stop() {
+			// override this method in the display framework to stop animation
+		}
+		*/
 		virtual public void Move(Direction direction, float speed = 1) {
 		}
 		// public void PlaySound(UnitAction action);

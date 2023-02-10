@@ -490,31 +490,33 @@ public partial class UnitLayer : LooseLayer {
 		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
 	}
 
-	// Creates a quad mesh with the given shader attached. The quad is 1.0 units long on both sides, intended to be scaled to the appropriate size
-	// when used.
+	// Creates a plane mesh facing the positive Z-axis with the given shader attached. The quad is 1.0 units long on both sides,
+	// intended to be scaled to the appropriate size when used.
 	public static (ShaderMaterial, MeshInstance2D) createShadedQuad(Shader shader)
 	{
-		var quad = new PlaneMesh();
-		quad.Size = new Vector2(1, 1);
+		PlaneMesh mesh = new PlaneMesh();
+		mesh.Orientation = PlaneMesh.OrientationEnum.Z;
+		mesh.Size = new Vector2(1, 1);
 
-		var shaderMat = new ShaderMaterial();
+		ShaderMaterial shaderMat = new ShaderMaterial();
 		shaderMat.Shader = shader;
 
-		var meshInst = new MeshInstance2D();
+		MeshInstance2D meshInst = new MeshInstance2D();
 		meshInst.Material = shaderMat;
-		meshInst.Mesh = quad;
+		meshInst.Mesh = mesh;
 
 		return (shaderMat, meshInst);
 	}
 
 	public Color getHPColor(float fractionRemaining)
 	{
-		if (fractionRemaining >= (float)0.67)
+		if (fractionRemaining >= (float)0.67) {
 			return Color.Color8(0, 255, 0);
-		else if (fractionRemaining >= (float)0.34)
+		} else if (fractionRemaining >= (float)0.34) {
 			return Color.Color8(255, 255, 0);
-		else
+		} else {
 			return Color.Color8(255, 0, 0);
+		}
 	}
 
 	// AnimationInstance represents an animation appearing on the screen. It's specific to a unit, action, and direction. AnimationInstances have
@@ -642,13 +644,15 @@ public partial class UnitLayer : LooseLayer {
 	public override void onBeginDraw(LooseView looseView, GameData gameData)
 	{
 		// Reset animation instances
-		for (int n = 0; n < nextBlankAnimInst; n++)
+		for (int n = 0; n < nextBlankAnimInst; n++) {
 			animInsts[n].meshInst.Hide();
+		}
 		nextBlankAnimInst = 0;
 
 		// Hide cursor if it's been initialized
-		if (cursorMesh != null)
+		if (cursorMesh != null) {
 			cursorMesh.Hide();
+		}
 
 		looseView.mapView.game.updateAnimations(gameData);
 	}
@@ -684,18 +688,20 @@ public partial class UnitLayer : LooseLayer {
 			drawEffectAnimFrame(looseView, tileEffect, progress, tileCenter);
 		}
 
-		if (tile.unitsOnTile.Count == 0)
+		if (tile.unitsOnTile.Count == 0) {
 			return;
+		}
 
 		var white = Color.Color8(255, 255, 255);
 
-		var unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
-		var appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
-		var animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
+		MapUnit unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
+		MapUnit.Appearance appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
+		Vector2 animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
-		if ((unit != MapUnit.NONE) && (unit == looseView.mapView.game.CurrentlySelectedUnit))
+		if ((unit != MapUnit.NONE) && (unit == looseView.mapView.game.CurrentlySelectedUnit)) {
 			drawCursor(looseView, tileCenter + animOffset);
+		}
 
 		drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
 
@@ -707,9 +713,8 @@ public partial class UnitLayer : LooseLayer {
 		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
 		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
 
-		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5),
-			hpIndWidth = 6;
-		var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
+		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5), hpIndWidth = 6;
+		Rect2 hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
 		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
 			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
 			looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
@@ -885,18 +890,22 @@ public partial class LooseView : Node2D {
 			// have to reiterate for each layer. Doing this improves framerate significantly.
 			MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
 			List<VisibleTile> visibleTiles = new List<VisibleTile>();
-			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
-				if (gD.map.isRowAt(y))
+			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++) {
+				if (gD.map.isRowAt(y)) {
 					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 						Tile tile = gD.map.tileAt(x, y);
-						if (IsTileKnown(tile, gameDataAccess))
+						if (IsTileKnown(tile, gameDataAccess)) {
 							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
+						}
 					}
+				}
+			}
 
 			foreach (LooseLayer layer in layers.FindAll(L => L.visible && !(L is FogOfWarLayer))) {
 				layer.onBeginDraw(this, gD);
-				foreach (VisibleTile vT in visibleTiles)
+				foreach (VisibleTile vT in visibleTiles) {
 					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
+				}
 				layer.onEndDraw(this, gD);
 			}
 
