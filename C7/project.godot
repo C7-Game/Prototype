@@ -37,6 +37,10 @@ limits=false
 
 theme/custom="res://C7Theme.tres"
 
+[mono]
+
+project/assembly_name="C7"
+
 [network]
 
 limits/debugger_stdout/max_chars_per_second=65535
