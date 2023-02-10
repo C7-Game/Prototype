@@ -205,21 +205,21 @@ public partial class Game : Node2D
 	// This is the terrain generator that used to be part of TerrainAsTileMap. Now it gets passed to and called from generateDummyGameMap so that
 	// function can be more in charge of terrain generation. Eventually we'll want generation to be part of the engine not the UI but we can't
 	// simply move this function there right now since we don't want the engine to depend on Godot.
-	// public int[,] genBasicTerrainNoiseMap(int seed, int mapWidth, int mapHeight)
-	// {
-	// 	var tr = new int[mapWidth,mapHeight];
-	// 	Godot.FastNoiseLite noise = new Godot.FastNoiseLite();
-	// 	noise.Seed = seed;
-	// 	// Populate map values
-	// 	for (int y = 0; y < mapHeight; y++) {
-	// 		for (int x = 0; x < mapWidth; x++) {
-	// 			// Multiplying x & y for noise coordinate sampling
-	// 			float n = noise.GetNoise2d(x*2,y*2);
-	// 			tr[x,y] = n < 0.1 ? 2 : n < 0.4? 1 : 0;
-	// 		}
-	// 	}
-	// 	return tr;
-	// }
+	public int[,] genBasicTerrainNoiseMap(int seed, int mapWidth, int mapHeight)
+	{
+		var tr = new int[mapWidth,mapHeight];
+		Godot.FastNoiseLite noise = new Godot.FastNoiseLite();
+		noise.Seed = seed;
+		// Populate map values
+		for (int y = 0; y < mapHeight; y++) {
+			for (int x = 0; x < mapWidth; x++) {
+				// Multiplying x & y for noise coordinate sampling
+				float n = noise.GetNoise2D(x*2,y*2);
+				tr[x,y] = n < 0.1 ? 2 : n < 0.4? 1 : 0;
+			}
+		}
+		return tr;
+	}
 
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location)
