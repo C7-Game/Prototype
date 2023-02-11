@@ -34,6 +34,15 @@ namespace C7Engine {
 								break;
 							}
 
+							//Check if there are any undefended units that can be taken!
+							foreach (Tile tile in validTiles) {
+								if (tile.unitsOnTile.Exists(mapUnit => UndefendedUnit(mapUnit))) {
+									unit.move(unit.location.directionTo(tile));
+									// TODO: Restructure so we can avoid gotos.
+									goto nextMovementPoint;
+								}
+							}
+
 							Tile newLocation = validTiles[GameData.rng.Next(validTiles.Count)];
 							//Because it chooses a semi-cardinal direction at random, not accounting for map, it could get none
 							//if it tries to move e.g. north from the north pole.  Hence, this check.
@@ -46,10 +55,21 @@ namespace C7Engine {
 								//Avoid potential infinite loop.
 								break;
 							}
+nextMovementPoint: ;
 						}
 					}
 				}
 			}
+		}
+
+		private static bool UndefendedUnit(MapUnit unit) {
+			if (unit.owner.isBarbarians) {
+				return false;
+			}
+
+			return unit.location.unitsOnTile.Count(mapUnit => {
+				return mapUnit.unitType.defense > 0;
+			}) == 0;
 		}
 
 		private static bool UnitIsFreeToMove(MapUnit unit)
