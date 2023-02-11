@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace C7GameData {
 	/**
@@ -17,6 +18,10 @@ namespace C7GameData {
 
 		public void AddTribe(Tile tile, MapUnit startingUnit) {
 			tribes.Add(new BarbarianTribe(tile, startingUnit));
+		}
+
+		public ReadOnlyCollection<BarbarianTribe> getTribes() {
+			return tribes.AsReadOnly();
 		}
 	}
 }

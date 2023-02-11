@@ -430,12 +430,23 @@ public static class MapUnitExtensions {
 		// EngineStorage.animTracker.endAnimation(unit, false);   TODO: Must send message instead of call directly
 		unit.location.unitsOnTile.Remove(unit);
 		gameData.mapUnits.Remove(unit);
-		foreach(Player player in gameData.players)
+		foreach (Player player in gameData.players)
 		{
-			if (player.units.Contains(unit)) {
-				player.units.Remove(unit);
+			if (!player.isBarbarians) {
+				if (player.units.Contains(unit)) {
+					player.units.Remove(unit);
+					break;
+				}
+			} else {
+				foreach (BarbarianTribe tribe in ((BarbarianPlayer)(player)).getTribes()) {
+					if (tribe.GetUnits().Contains(unit)) {
+						tribe.RemoveUnit(unit);
+						goto endDisband;
+					}
+				}
 			}
 		}
+endDisband: ;
 	}
 
 	public static bool canBuildCity(this MapUnit unit)
