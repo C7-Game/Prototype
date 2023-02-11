@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using C7Engine.AI.UnitAI;
 using Serilog;
 
 namespace C7Engine {
@@ -10,6 +11,10 @@ namespace C7Engine {
 	public class BarbarianAI {
 
 		private ILogger log = Log.ForContext<BarbarianAI>();
+
+		// Threshold at which barbarians take risky actions.
+		// In the future this may vary based on barbarian settings, and perhaps the situation
+		const double COLLEGE_TRY_THRESHOLD = 1.0 / 3;
 
 		public void PlayTurn(Player player, GameData gameData) {
 			if (!player.isBarbarians) {
@@ -37,9 +42,26 @@ namespace C7Engine {
 							//Check if there are any undefended units that can be taken!
 							foreach (Tile tile in validTiles) {
 								if (tile.unitsOnTile.Exists(mapUnit => UndefendedUnit(mapUnit))) {
-									unit.move(unit.location.directionTo(tile));
+									bool alive = unit.move(unit.location.directionTo(tile));
 									// TODO: Restructure so we can avoid gotos.
 									goto nextMovementPoint;
+								}
+							}
+
+							//See if there are and tile where we might be able to to defeat another unit, if we give
+							//it the old college try
+							foreach (Tile tile in validTiles) {
+								if (tile.unitsOnTile.Exists(mapUnit => mapUnit.owner != barbs)) {
+									MapUnit topDefender = tile.FindTopDefender(unit);
+									double odds = CombatOdds.OddsOfVictory(unit, topDefender);
+									if (odds > COLLEGE_TRY_THRESHOLD) {
+										log.Information("Barbarian attacking " + topDefender.unitType + " with odds of " + odds);
+										bool alive = unit.move(unit.location.directionTo(tile));
+										if (alive) {
+											goto nextMovementPoint;
+										}
+										goto nextUnit;
+									}
 								}
 							}
 
@@ -58,6 +80,7 @@ namespace C7Engine {
 nextMovementPoint: ;
 						}
 					}
+nextUnit: ;
 				}
 			}
 		}
