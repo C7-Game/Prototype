@@ -295,6 +295,12 @@ public static class MapUnitExtensions {
 		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
 			tile.DisbandNonDefendingUnits();
 			EngineStorage.gameData.map.barbarianCamps.Remove(tile);
+			BarbarianPlayer barbarians = (BarbarianPlayer)EngineStorage.gameData.players.Find(player => player.isBarbarians);
+			foreach (BarbarianTribe tribe in barbarians.getTribes()) {
+				if (tribe.GetCamps().Contains(tile)) {
+					tribe.RemoveCamp(tile);
+				}
+			}
 			tile.hasBarbarianCamp = false;
 		}
 

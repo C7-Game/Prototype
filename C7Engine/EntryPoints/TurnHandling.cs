@@ -87,7 +87,7 @@ namespace C7Engine
 					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
 					int result = GameData.rng.Next(100);
 					log.Verbose("Random barb result = " + result);
-					if (result < 4) {
+					if (result < 5) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = barbPlayer;
@@ -101,7 +101,7 @@ namespace C7Engine
 						gameData.mapUnits.Add(newUnit);
 						tribe.AddUnit(newUnit);
 						log.Debug("New barbarian added at " + tile);
-					} else if (tile.NeighborsWater() && result < 6) {
+					} else if (tile.NeighborsWater() && result < 7) {
 						MapUnit newUnit = new MapUnit();
 						newUnit.location = tile;
 						newUnit.owner = barbPlayer;

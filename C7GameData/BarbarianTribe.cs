@@ -29,5 +29,9 @@ namespace C7GameData {
 		public ReadOnlyCollection<Tile> GetCamps() {
 			return campLocations.AsReadOnly();
 		}
+
+		public void RemoveCamp(Tile tile) {
+			this.campLocations.Remove(tile);
+		}
 	}
 }
