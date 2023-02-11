@@ -99,8 +99,7 @@ namespace C7GameData
 			this.turn = 0;
 
 			uint white = 0xFFFFFFFF;
-			Player barbarianPlayer = new Player(white);
-			barbarianPlayer.isBarbarians = true;
+			BarbarianPlayer barbarianPlayer = new BarbarianPlayer(white);
 			players.Add(barbarianPlayer);
 
 			Civilization carthage = new Civilization();
@@ -235,6 +234,7 @@ namespace C7GameData
 					barbarian.facingDirection = TileDirection.SOUTHEAST;
 					barbarian.location.hasBarbarianCamp = true;
 					map.barbarianCamps.Add(barbCampLocation);
+					barbarianPlayer.AddTribe(barbCampLocation, barbarian);
 				}
 			}
 
