@@ -34,7 +34,7 @@ public partial class LogManager : Node {
 	}
 
 	public override void _Notification(int what) {
-		if (what == GodotObject.NotificationPredelete) {
+		if (what == ((long)DisplayServer.WindowEvent.CloseRequest)) {
 			GD.Print("Goodbye logger!");
 			Log.ForContext<LogManager>().Debug("Goodbye!");
 			Log.CloseAndFlush();

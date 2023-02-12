@@ -45,7 +45,7 @@ public partial class PCXToGodot : GodotObject
 		for (int y = 0; y < alphaPcx.Height; y++) {
 			for (int x = 0; x < alphaPcx.Width; x++, dataIndex++) {
 				int index = alphaPcx.ColorIndexAt(x, y);
-				if (index >= 254) {
+				if (index >= CIV3_TRANSPARENCY_START) {
 					bufferData[dataIndex] = 0;
 				} else {
 					bufferData[dataIndex] = alphaData[index] << 24;
@@ -106,7 +106,7 @@ public partial class PCXToGodot : GodotObject
 		return ImageTexture.CreateFromImage(image);
 	}
 
-	private static int[] loadPalette(byte[,] palette, bool shadows = false) {
+	private static int[] loadPalette(byte[,] palette, bool shadows = true) {
 		int Red, Green, Blue;
 		int Alpha = 255 << 24;
 		int[] ColorData = new int[256];
@@ -118,8 +118,14 @@ public partial class PCXToGodot : GodotObject
 			ColorData[i] = Red + Green + Blue + Alpha;
 		}
 
+		// February 12, 2023: porting to Godot 4, the default rendering for ImageTexture
+		// is changed, and a blend mode for the rendering canvas item must be specified.
+		// Using premultiplied alpha, the RGB values of the transparent palette colors
+		// should be set to zero. There may be a better blending more to use, but this
+		// fixes the visual artifacts that appeared (magenta lines along tile edges) that
+		// appeared when porting to Godot 4 (as of rc-1).
 		for (int i = CIV3_TRANSPARENCY_START; i < 256; i++) {
-			ColorData[i] &= 0x00ffffff;
+			ColorData[i] = 0;
 		}
 
 		if (shadows) {

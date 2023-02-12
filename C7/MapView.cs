@@ -73,7 +73,7 @@ public partial class TerrainLayer : LooseLayer {
 
 	public List<ImageTexture> loadTerrainTripleSheets()
 	{
-		var fileNames = new List<string> {
+		List<string> fileNames = new List<string> {
 			"Art/Terrain/xtgc.pcx",
 			"Art/Terrain/xpgc.pcx",
 			"Art/Terrain/xdgc.pcx",
@@ -84,10 +84,7 @@ public partial class TerrainLayer : LooseLayer {
 			"Art/Terrain/wSSS.pcx",
 			"Art/Terrain/wOOO.pcx",
 		};
-		var tr = new List<ImageTexture>();
-		foreach (var fileName in fileNames)
-			tr.Add(Util.LoadTextureFromPCX(fileName));
-		return tr;
+		return fileNames.ConvertAll(name => Util.LoadTextureFromPCX(name));
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
@@ -857,7 +854,7 @@ public partial class BuildingLayer : LooseLayer {
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.hasBarbarianCamp) {
-			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize);	//(2, 0) is the offset in the TerrainBuildings.PCX file (top row, third in)
+			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize); //(2, 0) is the offset in the TerrainBuildings.PCX file (top row, third in)
 			// TODO: Modify this calculation so it doesn't assume buildingSpriteSize is the same as the size of the terrain tiles
 			var screenRect = new Rect2(tileCenter - (float)0.5 * buildingSpriteSize, buildingSpriteSize);
 			looseView.DrawTextureRectRegion(buildingsTex, screenRect, texRect);
@@ -872,6 +869,12 @@ public partial class LooseView : Node2D {
 	public LooseView(MapView mapView)
 	{
 		this.mapView = mapView;
+		// Use premultiplied alpha blending to prevent magenta lines along terrain borders
+		// and hill/mountain outlines. Might change in the future if this is not the desired
+		// blending behaviour for all LooseView instances.
+		CanvasItemMaterial material = new CanvasItemMaterial();
+		this.Material = material;
+		material.BlendMode = CanvasItemMaterial.BlendModeEnum.PremultAlpha;
 	}
 
 	private struct VisibleTile
