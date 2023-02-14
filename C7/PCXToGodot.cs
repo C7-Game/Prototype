@@ -84,7 +84,7 @@ public partial class PCXToGodot : GodotObject
 		return getImageTextureFromImage(OutImage);
 	}
 
-	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
+	public static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
 		int[] ColorData = loadPalette(palette, shadows);
 		int[] BufferData = new int[width * height];
 
