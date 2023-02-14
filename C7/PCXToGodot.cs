@@ -6,6 +6,7 @@ public partial class PCXToGodot : GodotObject
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 
+
 	public static ImageTexture getImageTextureFromPCX(Pcx pcx) {
 		Image ImgTxtr = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
 		return getImageTextureFromImage(ImgTxtr);
@@ -93,6 +94,28 @@ public partial class PCXToGodot : GodotObject
 		}
 
 		return getImageFromBufferData(width, height, BufferData);
+	}
+
+	public static (Image, Image) ByteArrayWithTintToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
+		int[] colorData = loadPalette(palette, shadows);
+		int[] baseLayer = new int[width * height];
+		int[] tintLayer = new int[width * height];
+
+		var whitePcx = Util.LoadPCX("Art/Units/Palettes/ntp00.pcx");
+		int[] whiteColorData = loadPalette(whitePcx.Palette, false);
+
+		for (int i = 0; i < width * height; i++) {
+			int index = colorIndices[i];
+			bool tinted = (index < 16) || ((index < 64) && (index % 2 == 0));
+			if (tinted) {
+				tintLayer[i] = whiteColorData[index];
+				baseLayer[i] = 0; // transparent
+			} else {
+				baseLayer[i] = colorData[index];
+				tintLayer[i] = 0; // transparent
+			}
+		}
+		return (getImageFromBufferData(width, height, baseLayer), getImageFromBufferData(width, height, tintLayer));
 	}
 
 	private static Image getImageFromBufferData(int width, int height, int[] bufferData) {

@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dg3a4p2dfansm"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_dw6je"]
+
+[node name="Node2D" type="Node2D"]
+position = Vector2(143, 121)
+
+[node name="TextureRect" type="TextureRect" parent="."]
+material = SubResource("CanvasItemMaterial_dw6je")
+offset_left = -114.0
+offset_top = -89.0
+offset_right = 826.0
+offset_bottom = 480.0
