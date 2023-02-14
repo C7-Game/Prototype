@@ -176,9 +176,9 @@ public partial class Util {
 		return texture;
 	}
 
-	static public ImageTexture LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
-		Image img = PCXToGodot.ByteArrayToImage(image, pallete, width, height, shadows: true);
-		return ImageTexture.CreateFromImage(img);
+	static public (ImageTexture, ImageTexture) LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
+		var (img, clothes) = PCXToGodot.ByteArrayWithTintToImage(image, pallete, width, height, shadows: true);
+		return (ImageTexture.CreateFromImage(img), ImageTexture.CreateFromImage(clothes));
 	}
 
 	static public Flic LoadFlic(string path) {
@@ -264,14 +264,27 @@ public partial class Util {
 		public int spriteWidth, spriteHeight;
 	}
 
+	public static void loadFlicAnimation(string path, string name, ref SpriteFrames frames) {
+		string tintName = name + "_tint";
+		frames.AddAnimation(name);
+		frames.AddAnimation(tintName);
+
+		Flic flic = LoadFlic(path);
+		foreach (byte[] frame in flic.Images) {
+			(ImageTexture bl, ImageTexture tl) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
+			frames.AddFrame(name, bl, 0.5f); // TODO: frame duration is controlled by .ini
+			frames.AddFrame(tintName, tl, 0.5f); // TODO: frame duration is controlled by .ini
+		}
+	}
+
 	// Loads a Flic and also converts it into a sprite sheet
 	public static (FlicSheet, Flic) loadFlicSheet(string filePath) {
 		var flic = new Flic(Util.Civ3MediaPath(filePath));
 
 		var texPalette = Util.createPaletteTexture(flic.Palette);
 
-		var countColumns = flic.Images.GetLength(1); // Each column contains one frame
-		var countRows = flic.Images.GetLength(0); // Each row contains one animation
+		var countColumns = 1;//flic.Images.GetLength(1); // Each column contains one frame
+		var countRows = 1;// flic.Images.GetLength(0); // Each row contains one animation
 		var countImages = countColumns * countRows;
 
 		byte[] allIndices = new byte[countRows * countColumns * flic.Width * flic.Height];
@@ -287,7 +300,7 @@ public partial class Util {
 						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
 					}
 
-		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
+		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.Rf, allIndices);
 		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);
