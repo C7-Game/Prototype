@@ -166,4 +166,23 @@ public partial class Civ3Anim
 		double frameCount = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		return frameCount / 20.0; // Civ 3 anims often run at 20 FPS   TODO: Do they all? How could we tell? Is it exactly 20 FPS?
 	}
+
+	// public (AnimatedSprite2D, AnimatedSprite2D) GetAnimatedSprite2D() {
+	// 	AnimatedSprite2D sprite = new AnimatedSprite2D();
+	// 	SpriteFrames frames = new SpriteFrames();
+	// 	sprite.SpriteFrames = frames;
+	// 	Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames);
+
+	// 	AnimatedSprite2D spriteTint = new AnimatedSprite2D();
+	// 	SpriteFrames framesTint = new SpriteFrames();
+	// 	spriteTint.SpriteFrames = framesTint;
+	// 	Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref framesTint);
+
+	// 	ShaderMaterial material = new ShaderMaterial();
+	// 	material.Shader = GD.Load<Shader>("res://tests/Anim.gdshader");
+	// 	material.SetShaderParameter("tintColor", new Vector3(1f,1f,1f));
+	// 	spriteTint.Material = material;
+
+	// 	return (sprite, spriteTint);
+	// }
 }

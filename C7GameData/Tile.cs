@@ -227,7 +227,7 @@ namespace C7GameData
 		SOUTH,
 		SOUTHWEST,
 		WEST,
-		NORTHWEST
+		NORTHWEST,
 	}
 
 	public static class TileDirectionExtensions {
@@ -257,6 +257,20 @@ namespace C7GameData
 			case TileDirection.SOUTHWEST: return (-1,  1);
 			case TileDirection.WEST:      return (-2,  0);
 			case TileDirection.NORTHWEST: return (-1, -1);
+			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
+		}
+
+		public static string shortName(this TileDirection dir) {
+			switch (dir) {
+			case TileDirection.NORTH:     return "N";
+			case TileDirection.NORTHEAST: return "NE";
+			case TileDirection.EAST:      return "E";
+			case TileDirection.SOUTHEAST: return "SE";
+			case TileDirection.SOUTH:     return "S";
+			case TileDirection.SOUTHWEST: return "SW";
+			case TileDirection.WEST:      return "W";
+			case TileDirection.NORTHWEST: return "NW";
 			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
 			}
 		}

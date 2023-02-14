@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Godot;
 using ConvertCiv3Media;
+using C7GameData;
 
 public partial class Util {
 	static public string Civ3Root = GetCiv3Path();
@@ -177,8 +178,8 @@ public partial class Util {
 	}
 
 	static public (ImageTexture, ImageTexture) LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
-		var (img, clothes) = PCXToGodot.ByteArrayWithTintToImage(image, pallete, width, height, shadows: true);
-		return (ImageTexture.CreateFromImage(img), ImageTexture.CreateFromImage(clothes));
+		var (baseImage, tintImage) = PCXToGodot.ByteArrayWithTintToImage(image, pallete, width, height, shadows: true);
+		return (ImageTexture.CreateFromImage(baseImage), ImageTexture.CreateFromImage(tintImage));
 	}
 
 	static public Flic LoadFlic(string path) {
@@ -264,16 +265,37 @@ public partial class Util {
 		public int spriteWidth, spriteHeight;
 	}
 
+	private static TileDirection flicRowToAnimationDirection(int row) {
+		switch (row) {
+			case 0: return TileDirection.SOUTHWEST;
+			case 1: return TileDirection.SOUTH;
+			case 2: return TileDirection.SOUTHEAST;
+			case 3: return TileDirection.EAST;
+			case 4: return TileDirection.NORTHEAST;
+			case 5: return TileDirection.NORTH;
+			case 6: return TileDirection.NORTHWEST;
+			case 7: return TileDirection.WEST;
+		}
+		return TileDirection.NORTH;
+	}
+
 	public static void loadFlicAnimation(string path, string name, ref SpriteFrames frames) {
 		string tintName = name + "_tint";
-		frames.AddAnimation(name);
-		frames.AddAnimation(tintName);
-
 		Flic flic = LoadFlic(path);
-		foreach (byte[] frame in flic.Images) {
-			(ImageTexture bl, ImageTexture tl) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
-			frames.AddFrame(name, bl, 0.5f); // TODO: frame duration is controlled by .ini
-			frames.AddFrame(tintName, tl, 0.5f); // TODO: frame duration is controlled by .ini
+
+		for (int row = 0; row < flic.Images.GetLength(0); row++) {
+			string directionStr = flicRowToAnimationDirection(row).shortName();
+			string animationName = name + "_" + directionStr;
+			frames.AddAnimation(animationName);
+			string animationTintName = tintName + "_" + directionStr;
+			frames.AddAnimation(animationTintName);
+
+			for (int col = 0; col < flic.Images.GetLength(1); col++) {
+				byte[] frame = flic.Images[row,col];
+				(ImageTexture bl, ImageTexture tl) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
+				frames.AddFrame(animationName, bl, 0.5f);     // TODO: frame duration is controlled by .ini
+				frames.AddFrame(animationTintName, tl, 0.5f); // TODO: frame duration is controlled by .ini
+			}
 		}
 	}
 
@@ -283,8 +305,8 @@ public partial class Util {
 
 		var texPalette = Util.createPaletteTexture(flic.Palette);
 
-		var countColumns = 1;//flic.Images.GetLength(1); // Each column contains one frame
-		var countRows = 1;// flic.Images.GetLength(0); // Each row contains one animation
+		var countColumns = flic.Images.GetLength(1); // Each column contains one frame
+		var countRows = flic.Images.GetLength(0); // Each row contains one animation
 		var countImages = countColumns * countRows;
 
 		byte[] allIndices = new byte[countRows * countColumns * flic.Width * flic.Height];
@@ -300,7 +322,7 @@ public partial class Util {
 						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
 					}
 
-		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.Rf, allIndices);
+		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
 		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);

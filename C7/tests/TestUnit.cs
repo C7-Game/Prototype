@@ -105,15 +105,15 @@ public partial class TestUnit : Node2D
 		Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref framesTint);
 
 		ShaderMaterial material = new ShaderMaterial();
-		material.Shader = GD.Load<Shader>("res://tests/Anim.gdshader");
+		material.Shader = GD.Load<Shader>("res://tests/Tint.gdshader");
 		material.SetShaderParameter("tintColor", new Vector3(1f,1f,1f));
 		spriteTint.Material = material;
 
 		AddChild(sprite);
 		AddChild(spriteTint);
 
-		sprite.Play("run");
-		spriteTint.Play("run_tint");
+		sprite.Play("run_E");
+		spriteTint.Play("run_tint_E");
 
 		sprite.Position = new Vector2(30, 30);
 		spriteTint.Position = new Vector2(30, 30);
