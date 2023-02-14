@@ -16,6 +16,8 @@ namespace ConvertCiv3Media
 		public byte[,] Palette = new byte[256,3];
 		public int Width = 0;
 		public int Height = 0;
+		public int NumAnimations = 0;
+		public int FramesPerAnimation = 0;
 
 		private string path;
 
@@ -24,19 +26,6 @@ namespace ConvertCiv3Media
 		public Flic(string path) {
 			this.path = path;
 			this.Load(path);
-		}
-
-		public (byte[], int, int) AllBytes() {
-			int width = Width * Images.GetLength(0);
-			int height = Height * Images.GetLength(1);
-			byte[] data = new byte[width * height];
-			int offset = 0;
-			foreach (var item in Images)
-			{
-				item.CopyTo(data, offset);
-				offset += item.Length;
-			}
-			return (data, width, height);
 		}
 
 		public void Load(string path) {
@@ -55,20 +44,20 @@ namespace ConvertCiv3Media
 			int ImageLength = this.Width * this.Height;
 
 			// Civ3-specific values
-			int NumAnimations = BitConverter.ToUInt16(FlicBytes, 0x60);
+			this.NumAnimations = BitConverter.ToUInt16(FlicBytes, 0x60);
 			// but every animation has a ring frame, so there are this many frames plus one for each
-			int NumFramesPerAnimation = BitConverter.ToUInt16(FlicBytes, 0x62);
+			this.FramesPerAnimation = BitConverter.ToUInt16(FlicBytes, 0x62);
 			// Leaderheads don't have the above values, so revert to act like a regular Flic
 			// TODO: See if this affects my ring-frame skip
 			if (NumAnimations == 0) {
-				NumAnimations = 1;
-				NumFramesPerAnimation = NumFrames;
+				this.NumAnimations = 1;
+				this.FramesPerAnimation = NumFrames;
 			}
 
 			// Initialize image frames
-			this.Images = new byte[NumAnimations, NumFramesPerAnimation][];
-			for (int i = 0; i < NumAnimations; i++) {
-				for (int j = 0; j < NumFramesPerAnimation; j++) {
+			this.Images = new byte[NumAnimations, this.FramesPerAnimation][];
+			for (int i = 0; i < this.NumAnimations; i++) {
+				for (int j = 0; j < this.FramesPerAnimation; j++) {
 					this.Images[i,j] = new byte[this.Width * this.Height];
 				}
 			}
@@ -80,7 +69,7 @@ namespace ConvertCiv3Media
 			// Animations loop
 			for (int anim = 0; anim < NumAnimations; anim++) {
 				// Flic frames loop
-				for (int f = 0; f < NumFramesPerAnimation; f++) {
+				for (int f = 0; f < this.FramesPerAnimation; f++) {
 					// Frame chunk headers should be 0xF1Fa; prefix chunk header is 0xF100
 					// TODO: add exceptions if the headers don't match?
 					int ChunkLength = BitConverter.ToInt32(FlicBytes, Offset);

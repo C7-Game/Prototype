@@ -524,15 +524,35 @@ public partial class UnitLayer : LooseLayer {
 	// retrieved or created as needed by getBlankAnimationInstance during the drawing of units and are hidden & requeued for use at the beginning
 	// of each frame.
 	public partial class AnimationInstance {
-		public ShaderMaterial shaderMat;
-		public MeshInstance2D meshInst;
+
+		public AnimatedSprite2D sprite;
+		public AnimatedSprite2D spriteTint;
+		public ShaderMaterial material;
+
+
+		public void SetPosition(Vector2 position) {
+			this.sprite.Position = position;
+			this.spriteTint.Position = position;
+		}
 
 		public AnimationInstance(LooseView looseView)
 		{
-			(shaderMat, meshInst) = createShadedQuad(getUnitShader());
-			shaderMat.SetShaderParameter("civColorWhitePalette", looseView.mapView.civColorWhitePalette);
-			looseView.AddChild(meshInst);
-			meshInst.Hide();
+			this.sprite = new AnimatedSprite2D();
+			SpriteFrames frames = new SpriteFrames();
+			this.sprite.SpriteFrames = frames;
+			Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames);
+
+			this.spriteTint = new AnimatedSprite2D();
+			SpriteFrames framesTint = new SpriteFrames();
+			this.spriteTint.SpriteFrames = framesTint;
+			Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref framesTint);
+
+			this.material = new ShaderMaterial();
+			this.material.Shader = GD.Load<Shader>("res://tests/Tint.gdshader");
+			this.spriteTint.Material = this.material;
+
+			looseView.AddChild(sprite);
+			looseView.AddChild(spriteTint);
 		}
 	}
 
@@ -545,10 +565,9 @@ public partial class UnitLayer : LooseLayer {
 		if (nextBlankAnimInst >= animInsts.Count) {
 			animInsts.Add(new AnimationInstance(looseView));
 		}
-		var tr = animInsts[nextBlankAnimInst];
+		AnimationInstance inst = animInsts[nextBlankAnimInst];
 		nextBlankAnimInst++;
-		tr.meshInst.Show();
-		return tr;
+		return inst;
 	}
 
 	// Sets the palette, indices, relSpriteSize, and spriteXY parameters on a ShaderMaterial to pick a sprite from a FlicSheet. relativeColumn
@@ -573,7 +592,7 @@ public partial class UnitLayer : LooseLayer {
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter)
 	{
-		var flicSheet = looseView.mapView.game.civ3AnimData.forUnit(unit.unitType.name, appearance.action).getFlicSheet();
+		// (AnimatedSprite2D sprite, AnimatedSprite2D spriteTint) = looseView.mapView.game.civ3AnimData.forUnit(unit.unitType.name, appearance.action).GetAnimatedSprite2D();
 
 		int dirIndex = 0;
 		switch (appearance.direction) {
@@ -589,29 +608,44 @@ public partial class UnitLayer : LooseLayer {
 
 		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
-		var position = tileCenter + animOffset - new Vector2(0, flicSheet.spriteHeight / 4);
+		var position = tileCenter + animOffset;// - new Vector2(0, flicSheet.spriteHeight / 4);
 
-		var inst = getBlankAnimationInstance(looseView);
+		AnimationInstance inst = getBlankAnimationInstance(looseView);
+		inst.SetPosition(position);
 
-		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, appearance.progress);
-		var civColor = new Color((uint)unit.owner.color);
-		inst.shaderMat.SetShaderParameter("civColor", new Vector3(civColor.R, civColor.G, civColor.B));
+		string animName = "run_" + appearance.direction.shortName();
+		string animTintName = "run_tint_" + appearance.direction.shortName();
 
-		inst.meshInst.Position = position;
-		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
-		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
-		inst.meshInst.ZIndex = unitAnimZIndex;
+		int frameCount = inst.sprite.SpriteFrames.GetFrameCount(animName);
+		int nextFrame = (int)((float)frameCount * appearance.progress);
+		if (nextFrame >= frameCount) {
+			nextFrame = frameCount - 1;
+		} else if (nextFrame < 0) {
+			nextFrame = 0;
+		}
+
+		var civColor = new Color(unit.owner.color);
+		inst.material.SetShaderParameter("tintColor", new Vector3(civColor.R, civColor.G, civColor.B));
+		inst.sprite.Show();
+		inst.sprite.ZIndex = unitAnimZIndex;
+		inst.sprite.Animation = animName;
+		inst.sprite.Frame = nextFrame;
+
+		inst.spriteTint.Show();
+		inst.spriteTint.Animation = animTintName;
+		inst.sprite.ZIndex = unitAnimZIndex;
+		inst.spriteTint.Frame = nextFrame;
 	}
 
 	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, float progress, Vector2 tileCenter)
 	{
-		var flicSheet = anim.getFlicSheet();
-		var inst = getBlankAnimationInstance(looseView);
-		setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
-		inst.shaderMat.SetShaderParameter("civColor", new Vector3(1, 1, 1));
-		inst.meshInst.Position = tileCenter;
-		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
-		inst.meshInst.ZIndex = effectAnimZIndex;
+		// var flicSheet = anim.getFlicSheet();
+		// var inst = getBlankAnimationInstance(looseView);
+		// setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
+		// inst.shaderMat.SetShaderParameter("civColor", new Vector3(1, 1, 1));
+		// inst.meshInst.Position = tileCenter;
+		// inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
+		// inst.meshInst.ZIndex = effectAnimZIndex;
 	}
 
 	private Util.FlicSheet cursorFlicSheet;
@@ -642,7 +676,8 @@ public partial class UnitLayer : LooseLayer {
 	{
 		// Reset animation instances
 		for (int n = 0; n < nextBlankAnimInst; n++) {
-			animInsts[n].meshInst.Hide();
+			animInsts[n].sprite.Hide();
+			animInsts[n].spriteTint.Hide();
 		}
 		nextBlankAnimInst = 0;
 
@@ -997,7 +1032,7 @@ public partial class MapView : Node2D {
 		this.wrapVertically = wrapVertically;
 
 		looseView = new LooseView(this);
-		// looseView.layers.Add(new TerrainLayer());
+		looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new RiverLayer());
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());

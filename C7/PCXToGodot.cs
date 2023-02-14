@@ -6,7 +6,6 @@ public partial class PCXToGodot : GodotObject
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 
-
 	public static ImageTexture getImageTextureFromPCX(Pcx pcx) {
 		Image ImgTxtr = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
 		return getImageTextureFromImage(ImgTxtr);
@@ -96,6 +95,9 @@ public partial class PCXToGodot : GodotObject
 		return getImageFromBufferData(width, height, BufferData);
 	}
 
+	// ByteArrayWithTintToImage is used to load create images from flic frames
+	// that contain a tinted layer such as unit animations, where the unit's
+	// clothing is tinted by their civ color.
 	public static (Image, Image) ByteArrayWithTintToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
 		int[] colorData = loadPalette(palette, shadows);
 		int[] baseLayer = new int[width * height];
