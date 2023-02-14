@@ -25,6 +25,20 @@ namespace ConvertCiv3Media
 			this.path = path;
 			this.Load(path);
 		}
+
+		public (byte[], int, int) AllBytes() {
+			int width = Width * Images.GetLength(0);
+			int height = Height * Images.GetLength(1);
+			byte[] data = new byte[width * height];
+			int offset = 0;
+			foreach (var item in Images)
+			{
+				item.CopyTo(data, offset);
+				offset += item.Length;
+			}
+			return (data, width, height);
+		}
+
 		public void Load(string path) {
 			byte[] FlicBytes = File.ReadAllBytes(path);
 

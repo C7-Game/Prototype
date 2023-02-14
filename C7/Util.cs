@@ -181,6 +181,15 @@ public partial class Util {
 		return texture;
 	}
 
+	static public ImageTexture LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
+		Image img = PCXToGodot.ByteArrayToImage(image, pallete, width, height, shadows: true);
+		return ImageTexture.CreateFromImage(img);
+	}
+
+	static public Flic LoadFlic(string path) {
+		return new ConvertCiv3Media.Flic(Util.Civ3MediaPath(path));
+	}
+
 	//Send this function a path (e.g. Title_Screen.jpg) and it will
 	//load it up and convert it in both debug and release modes.
 	//Note: We probably will need variants of this for other file types, too.

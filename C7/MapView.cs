@@ -531,7 +531,6 @@ public partial class UnitLayer : LooseLayer {
 		{
 			(shaderMat, meshInst) = createShadedQuad(getUnitShader());
 			shaderMat.SetShaderParameter("civColorWhitePalette", looseView.mapView.civColorWhitePalette);
-
 			looseView.AddChild(meshInst);
 			meshInst.Hide();
 		}
@@ -793,7 +792,6 @@ public partial class UnitLayer : LooseLayer {
 		";
 		var tr = new Shader();
 		tr.Code = shaderSource;
-
 		unitShader = tr;
 		return tr;
 	}
@@ -869,6 +867,10 @@ public partial class LooseView : Node2D {
 	public LooseView(MapView mapView)
 	{
 		this.mapView = mapView;
+		SetPremultAlpha();
+	}
+
+	public void SetPremultAlpha() {
 		// Use premultiplied alpha blending to prevent magenta lines along terrain borders
 		// and hill/mountain outlines. Might change in the future if this is not the desired
 		// blending behaviour for all LooseView instances.
@@ -995,7 +997,7 @@ public partial class MapView : Node2D {
 		this.wrapVertically = wrapVertically;
 
 		looseView = new LooseView(this);
-		looseView.layers.Add(new TerrainLayer());
+		// looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new RiverLayer());
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());
