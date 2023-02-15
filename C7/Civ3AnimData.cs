@@ -107,6 +107,7 @@ public partial class Civ3Anim
 	public Civ3AnimData civ3AnimData  { get; private set; }
 	public string folderPath { get; private set; } // For example "Art/Units/Warrior" or "Art/Animations/Trajectory"
 	public string iniFileName { get; private set; }
+	private string unitType;
 	public MapUnit.AnimatedAction action { get; private set; }
 
 	public Civ3Anim(Civ3AnimData civ3AnimData, string unitTypeName, MapUnit.AnimatedAction action)
@@ -115,6 +116,7 @@ public partial class Civ3Anim
 		this.folderPath = "Art/Units/" + unitTypeName;
 		this.iniFileName = unitTypeName + ".ini";
 		this.action = action;
+		this.unitType = unitTypeName;
 	}
 
 	public static readonly Dictionary<AnimatedEffect, string> effectCategories = new Dictionary<AnimatedEffect, string>
@@ -155,6 +157,16 @@ public partial class Civ3Anim
 		return civ3AnimData.getFlicSheet(folderPath, getINIData(), action);
 	}
 
+	public void loadSpriteAnimation(AnimatedSprite2D animation) {
+		string animationName = unitType + "_" + this.action.ToString();
+		if (animation.SpriteFrames.HasAnimation(animationName + "_NORTH")) {
+			return;
+		}
+		string flicPath = this.folderPath + "/" + this.civ3AnimData.getFlicFileName(getINIData(), this.action);
+		SpriteFrames spriteFrames = animation.SpriteFrames; // ref semantics feel kinda dumb since it's not even necessary in C#
+		Util.loadFlicAnimation(flicPath, animationName, ref spriteFrames);
+	}
+
 	public void playSound()
 	{
 		civ3AnimData.playSound(folderPath, getINIData(), action);
@@ -166,23 +178,4 @@ public partial class Civ3Anim
 		double frameCount = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		return frameCount / 20.0; // Civ 3 anims often run at 20 FPS   TODO: Do they all? How could we tell? Is it exactly 20 FPS?
 	}
-
-	// public (AnimatedSprite2D, AnimatedSprite2D) GetAnimatedSprite2D() {
-	// 	AnimatedSprite2D sprite = new AnimatedSprite2D();
-	// 	SpriteFrames frames = new SpriteFrames();
-	// 	sprite.SpriteFrames = frames;
-	// 	Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames);
-
-	// 	AnimatedSprite2D spriteTint = new AnimatedSprite2D();
-	// 	SpriteFrames framesTint = new SpriteFrames();
-	// 	spriteTint.SpriteFrames = framesTint;
-	// 	Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref framesTint);
-
-	// 	ShaderMaterial material = new ShaderMaterial();
-	// 	material.Shader = GD.Load<Shader>("res://tests/Anim.gdshader");
-	// 	material.SetShaderParameter("tintColor", new Vector3(1f,1f,1f));
-	// 	spriteTint.Material = material;
-
-	// 	return (sprite, spriteTint);
-	// }
 }

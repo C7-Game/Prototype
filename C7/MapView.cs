@@ -523,16 +523,32 @@ public partial class UnitLayer : LooseLayer {
 	// added to the node tree. AnimationInstances are only active for one frame at a time but they live as long as the UnitLayer. They are
 	// retrieved or created as needed by getBlankAnimationInstance during the drawing of units and are hidden & requeued for use at the beginning
 	// of each frame.
+
+	// should hold animation players instead of animations
 	public partial class AnimationInstance {
 
 		public AnimatedSprite2D sprite;
 		public AnimatedSprite2D spriteTint;
 		public ShaderMaterial material;
 
-
 		public void SetPosition(Vector2 position) {
 			this.sprite.Position = position;
 			this.spriteTint.Position = position;
+		}
+
+		public int GetNextFrameByProgress(string animation, float progress) {
+			// AnimatedSprite2D has a settable FrameProgress field, which I expected to
+			// update the current frame of the animation upon setting, but it did not
+			// when I tried it, so instead, calculate what the next frame should be
+			// based on the progress.
+			int frameCount = this.sprite.SpriteFrames.GetFrameCount(animation);
+			int nextFrame = (int)((float)frameCount * progress);
+			return nextFrame >= frameCount ? frameCount - 1 : (nextFrame < 0 ? 0 : nextFrame);
+		}
+
+		public void SetFrame(int frame) {
+			this.sprite.Frame = frame;
+			this.spriteTint.Frame = frame;
 		}
 
 		public AnimationInstance(LooseView looseView)
@@ -540,16 +556,16 @@ public partial class UnitLayer : LooseLayer {
 			this.sprite = new AnimatedSprite2D();
 			SpriteFrames frames = new SpriteFrames();
 			this.sprite.SpriteFrames = frames;
-			Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames);
+			this.sprite.ZIndex = unitAnimZIndex;
 
 			this.spriteTint = new AnimatedSprite2D();
 			SpriteFrames framesTint = new SpriteFrames();
 			this.spriteTint.SpriteFrames = framesTint;
-			Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref framesTint);
 
 			this.material = new ShaderMaterial();
 			this.material.Shader = GD.Load<Shader>("res://tests/Tint.gdshader");
 			this.spriteTint.Material = this.material;
+			this.sprite.ZIndex = unitAnimZIndex;
 
 			looseView.AddChild(sprite);
 			looseView.AddChild(spriteTint);
@@ -592,49 +608,35 @@ public partial class UnitLayer : LooseLayer {
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter)
 	{
-		// (AnimatedSprite2D sprite, AnimatedSprite2D spriteTint) = looseView.mapView.game.civ3AnimData.forUnit(unit.unitType.name, appearance.action).GetAnimatedSprite2D();
-
-		int dirIndex = 0;
-		switch (appearance.direction) {
-		case TileDirection.NORTH:     dirIndex = 5; break;
-		case TileDirection.NORTHEAST: dirIndex = 4; break;
-		case TileDirection.EAST:      dirIndex = 3; break;
-		case TileDirection.SOUTHEAST: dirIndex = 2; break;
-		case TileDirection.SOUTH:     dirIndex = 1; break;
-		case TileDirection.SOUTHWEST: dirIndex = 0; break;
-		case TileDirection.WEST:      dirIndex = 7; break;
-		case TileDirection.NORTHWEST: dirIndex = 6; break;
-		}
-
+		/*
+			This whole function is really hacky since I ported everything in the fastest way possible to get
+			animation working with Godot 4.
+		*/
 		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
+
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
 		var position = tileCenter + animOffset;// - new Vector2(0, flicSheet.spriteHeight / 4);
 
 		AnimationInstance inst = getBlankAnimationInstance(looseView);
+		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType.name, appearance.action).loadSpriteAnimation(inst.sprite);
+		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType.name, appearance.action).loadSpriteAnimation(inst.spriteTint);
+
 		inst.SetPosition(position);
 
-		string animName = "run_" + appearance.direction.shortName();
-		string animTintName = "run_tint_" + appearance.direction.shortName();
-
-		int frameCount = inst.sprite.SpriteFrames.GetFrameCount(animName);
-		int nextFrame = (int)((float)frameCount * appearance.progress);
-		if (nextFrame >= frameCount) {
-			nextFrame = frameCount - 1;
-		} else if (nextFrame < 0) {
-			nextFrame = 0;
-		}
+		string animName = unit.unitType.name + "_" + appearance.action.ToString() + "_" + appearance.direction.ToString();
+		string animTintName = "TINT_" + animName;
 
 		var civColor = new Color(unit.owner.color);
+		int nextFrame = inst.GetNextFrameByProgress(animName, appearance.progress);
+		inst.SetFrame(nextFrame);
+
 		inst.material.SetShaderParameter("tintColor", new Vector3(civColor.R, civColor.G, civColor.B));
 		inst.sprite.Show();
-		inst.sprite.ZIndex = unitAnimZIndex;
 		inst.sprite.Animation = animName;
-		inst.sprite.Frame = nextFrame;
 
+		inst.sprite.Frame = nextFrame;
 		inst.spriteTint.Show();
 		inst.spriteTint.Animation = animTintName;
-		inst.sprite.ZIndex = unitAnimZIndex;
-		inst.spriteTint.Frame = nextFrame;
 	}
 
 	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, float progress, Vector2 tileCenter)
