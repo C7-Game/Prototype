@@ -25,7 +25,7 @@ public partial class Game : Node2D
 	public Player controller; // Player that's controlling the UI.
 
 	private MapView mapView;
-	public Civ3AnimData civ3AnimData;
+	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
 
 	Hashtable Terrmask = new Hashtable();
@@ -63,7 +63,7 @@ public partial class Game : Node2D
 		try {
 			var animSoundPlayer = new AudioStreamPlayer();
 			AddChild(animSoundPlayer);
-			civ3AnimData = new Civ3AnimData(animSoundPlayer);
+			civ3AnimData = new AnimationManager(animSoundPlayer);
 			animTracker = new AnimationTracker(civ3AnimData);
 
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread

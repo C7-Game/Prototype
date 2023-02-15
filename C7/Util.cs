@@ -265,40 +265,6 @@ public partial class Util {
 		public int spriteWidth, spriteHeight;
 	}
 
-	private static TileDirection flicRowToAnimationDirection(int row) {
-		switch (row) {
-			case 0: return TileDirection.SOUTHWEST;
-			case 1: return TileDirection.SOUTH;
-			case 2: return TileDirection.SOUTHEAST;
-			case 3: return TileDirection.EAST;
-			case 4: return TileDirection.NORTHEAST;
-			case 5: return TileDirection.NORTH;
-			case 6: return TileDirection.NORTHWEST;
-			case 7: return TileDirection.WEST;
-		}
-		return TileDirection.NORTH;
-	}
-
-	public static void loadFlicAnimation(string path, string name, ref SpriteFrames frames) {
-		string tintName = "TINT_" + name;
-		Flic flic = LoadFlic(path);
-
-		for (int row = 0; row < flic.Images.GetLength(0); row++) {
-			string directionStr = flicRowToAnimationDirection(row).ToString();
-			string animationName = name + "_" + directionStr;
-			frames.AddAnimation(animationName);
-			string animationTintName = tintName + "_" + directionStr;
-			frames.AddAnimation(animationTintName);
-
-			for (int col = 0; col < flic.Images.GetLength(1); col++) {
-				byte[] frame = flic.Images[row,col];
-				(ImageTexture bl, ImageTexture tl) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
-				frames.AddFrame(animationName, bl, 0.5f);     // TODO: frame duration is controlled by .ini
-				frames.AddFrame(animationTintName, tl, 0.5f); // TODO: frame duration is controlled by .ini
-			}
-		}
-	}
-
 	// Loads a Flic and also converts it into a sprite sheet
 	public static (FlicSheet, Flic) loadFlicSheet(string filePath) {
 		var flic = new Flic(Util.Civ3MediaPath(filePath));
