@@ -285,11 +285,11 @@ public partial class Util {
 	}
 
 	public static void loadFlicAnimation(string path, string name, ref SpriteFrames frames) {
-		string tintName = name + "_tint";
+		string tintName = "TINT_" + name;
 		Flic flic = LoadFlic(path);
 
 		for (int row = 0; row < flic.Images.GetLength(0); row++) {
-			string directionStr = flicRowToAnimationDirection(row).shortName();
+			string directionStr = flicRowToAnimationDirection(row).ToString();
 			string animationName = name + "_" + directionStr;
 			frames.AddAnimation(animationName);
 			string animationTintName = tintName + "_" + directionStr;
