@@ -623,7 +623,7 @@ public partial class UnitLayer : LooseLayer {
 
 		inst.SetPosition(position);
 
-		string animName = unit.unitType.name + "_" + appearance.action.ToString() + "_" + appearance.direction.ToString();
+		string animName = Civ3AnimData.AnimationKey(unit.unitType, appearance.action, appearance.direction);
 		string animTintName = "TINT_" + animName;
 
 		var civColor = new Color(unit.owner.color);

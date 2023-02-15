@@ -23,6 +23,23 @@ using C7GameData;
 
 public partial class Civ3AnimData
 {
+
+	public static string BaseAnimationKey(string unitName, MapUnit.AnimatedAction action) {
+		return String.Format("{0}_{1}", unitName, action.ToString());
+	}
+
+	public static string BaseAnimationKey(UnitPrototype unit, MapUnit.AnimatedAction action) {
+		return BaseAnimationKey(unit.name, action);
+	}
+
+	public static string AnimationKey(string baseKey, TileDirection direction) {
+		return String.Format("{0}_{1}", baseKey, direction.ToString());
+	}
+
+	public static string AnimationKey(UnitPrototype unit, MapUnit.AnimatedAction action, TileDirection direction) {
+		return AnimationKey(BaseAnimationKey(unit, action), direction);
+	}
+
 	private AudioStreamPlayer audioPlayer;
 
 	public Civ3AnimData(AudioStreamPlayer audioPlayer)
@@ -158,13 +175,14 @@ public partial class Civ3Anim
 	}
 
 	public void loadSpriteAnimation(AnimatedSprite2D animation) {
-		string animationName = unitType + "_" + this.action.ToString();
-		if (animation.SpriteFrames.HasAnimation(animationName + "_NORTH")) {
+		string baseName = Civ3AnimData.BaseAnimationKey(this.unitType, this.action);
+		if (animation.SpriteFrames.HasAnimation(Civ3AnimData.AnimationKey(baseName, TileDirection.NORTH))) {
+			// pick a random direction to check, since all directions are loaded from a single flic file
 			return;
 		}
 		string flicPath = this.folderPath + "/" + this.civ3AnimData.getFlicFileName(getINIData(), this.action);
 		SpriteFrames spriteFrames = animation.SpriteFrames; // ref semantics feel kinda dumb since it's not even necessary in C#
-		Util.loadFlicAnimation(flicPath, animationName, ref spriteFrames);
+		Util.loadFlicAnimation(flicPath, baseName, ref spriteFrames);
 	}
 
 	public void playSound()
