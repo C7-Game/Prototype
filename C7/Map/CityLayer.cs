@@ -19,7 +19,6 @@ namespace C7.Map {
 
 		public CityLayer()
 		{
-
 		}
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
