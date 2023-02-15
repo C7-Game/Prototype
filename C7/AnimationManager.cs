@@ -100,6 +100,8 @@ public partial class AnimationManager {
 			case 6: return TileDirection.NORTHWEST;
 			case 7: return TileDirection.WEST;
 		}
+		// TODO: I wanted to add a TileDirection.INVALID enum value when implementing this,
+		// but adding an INVALID value broke stuff: https://github.com/C7-Game/Prototype/issues/397
 		return TileDirection.NORTH;
 	}
 

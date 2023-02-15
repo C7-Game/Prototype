@@ -102,8 +102,8 @@ public partial class TerrainLayer : LooseLayer {
 				int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
 				Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
 				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.Y);
-				//Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
-				//Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
+				// Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
+				// Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
 				Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
 				looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
 			}
@@ -671,8 +671,8 @@ public partial class MapView : Node2D {
 	// same after the zoom level is changed, and if center is screenSize/2, the tile in the center of the window won't change.
 	public void setCameraZoom(float newScale, Vector2 center)
 	{
-		var v2NewZoom = new Vector2(newScale, newScale);
-		var v2OldZoom = new Vector2(cameraZoom, cameraZoom);
+		Vector2 v2NewZoom = new Vector2(newScale, newScale);
+		Vector2 v2OldZoom = new Vector2(cameraZoom, cameraZoom);
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
 			looseView.Scale = v2NewZoom;

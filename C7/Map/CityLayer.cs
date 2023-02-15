@@ -32,13 +32,11 @@ namespace C7.Map {
 			int width = pcx.Width/3;
 			cityTexture = Util.LoadTextureFromPCX("Art/Cities/rMIDEAST.PCX", 0, 0, width, height);
 			citySpriteSize = new Vector2(width, height);
-			smallFont.Data = ResourceLoader.Load<FontFile>("res://Fonts/NotoSans-Regular.ttf").Data;
-			// TODO: port to Godot 4
-			// smallFont.Size = 11;
+			smallFont = ResourceLoader.Load<FontFile>("res://Fonts/NotoSans-Regular.ttf");
+			smallFont.FixedSize = 10;
 
-			midSizedFont.Data = ResourceLoader.Load<FontFile>("res://Fonts/NotoSans-Regular.ttf").Data;
-			// TODO: port to Godot 4
-			// midSizedFont.Size = 18;
+			midSizedFont = ResourceLoader.Load<FontFile>("res://Fonts/NotoSans-Regular.ttf");
+			midSizedFont.FixedSize = 16;
 
 			nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
 		}
@@ -88,7 +86,7 @@ namespace C7.Map {
 
 		private void DrawTextOnLabel(LooseView looseView, Vector2 tileCenter, int cityNameAndGrowthWidth, int productionDescriptionWidth, City city, string cityNameAndGrowth, string productionDescription, int cityLabelWidth)
 		{
-			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
+			// Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
 			int cityNameOffset = cityNameAndGrowthWidth / -2;
 			int prodDescriptionOffset = productionDescriptionWidth / -2;
 			if (!city.IsCapital()) {
@@ -100,7 +98,7 @@ namespace C7.Map {
 			Vector2 productionDestination = tileCenter + new Vector2(prodDescriptionOffset, 24) + new Vector2(0, 20);
 			looseView.DrawString(smallFont, productionDestination, productionDescription, modulate: Color.Color8(255, 255, 255, 255));
 
-			//City pop size
+			// City pop size
 			string popSizeString = "" + city.size;
 			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).X;
 			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH / 2 - popSizeWidth / 2;
