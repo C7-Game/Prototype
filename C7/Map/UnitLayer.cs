@@ -102,6 +102,10 @@ public partial class UnitLayer : LooseLayer {
 			this.spriteTint.Hide();
 		}
 
+		public Vector2 FrameSize(string animation) {
+			return this.sprite.SpriteFrames.GetFrameTexture(animation, 0).GetSize();
+		}
+
 		public AnimationInstance(LooseView looseView) {
 			AnimationManager manager = looseView.mapView.game.civ3AnimData;
 
@@ -147,30 +151,23 @@ public partial class UnitLayer : LooseLayer {
 
 		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		int spriteColumn = (int)(relativeColumn * spritesPerRow);
-		if (spriteColumn >= spritesPerRow)
+		if (spriteColumn >= spritesPerRow) {
 			spriteColumn = spritesPerRow - 1;
-		else if (spriteColumn < 0)
+		} else if (spriteColumn < 0) {
 			spriteColumn = 0;
+		}
 		mat.SetShaderParameter("spriteXY", new Vector2(spriteColumn, row));
 	}
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
-		/*
-			This whole function is really hacky since I ported everything in the fastest way possible to get
-			animation working with Godot 4.
-		*/
-		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
-
-		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
-		var position = tileCenter + animOffset;// - new Vector2(0, flicSheet.spriteHeight / 4);
-
 		AnimationInstance inst = getBlankAnimationInstance(looseView);
 		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
-		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
-
-		inst.SetPosition(position);
-
 		string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
+
+		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
+		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
+		Vector2 position = tileCenter + animOffset - new Vector2(0, inst.FrameSize(animName).Y / 4);
+		inst.SetPosition(position);
 
 		var civColor = new Color(unit.owner.color);
 		int nextFrame = inst.GetNextFrameByProgress(animName, appearance.progress);
