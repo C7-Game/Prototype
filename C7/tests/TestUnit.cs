@@ -112,11 +112,10 @@ public partial class TestUnit : Node2D
 		AddChild(sprite);
 		AddChild(spriteTint);
 
-		sprite.Play("run_E");
-		spriteTint.Play("run_tint_E");
-
+		sprite.Play("run_EAST");
+		spriteTint.Play("TINT_run_EAST");
 		sprite.Position = new Vector2(30, 30);
-		spriteTint.Position = new Vector2(30, 30);
+		spriteTint.Position = new Vector2(80, 30);
 
 		// var flic = Util.LoadFlic("Art/Units/warrior/warriorDefault.flc");
 		// var sheet = flicSheet(flic);
