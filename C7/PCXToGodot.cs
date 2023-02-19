@@ -143,14 +143,8 @@ public partial class PCXToGodot : GodotObject
 			ColorData[i] = Red + Green + Blue + Alpha;
 		}
 
-		// February 12, 2023: porting to Godot 4, the default rendering for ImageTexture
-		// is changed, and a blend mode for the rendering canvas item must be specified.
-		// Using premultiplied alpha, the RGB values of the transparent palette colors
-		// should be set to zero. There may be a better blending more to use, but this
-		// fixes the visual artifacts that appeared (magenta lines along tile edges) that
-		// appeared when porting to Godot 4 (as of rc-1).
 		for (int i = CIV3_TRANSPARENCY_START; i < 256; i++) {
-			ColorData[i] = 0;
+			ColorData[i] &= 0x00ffffff;
 		}
 
 		if (shadows) {
