@@ -105,7 +105,7 @@ public partial class AnimationManager {
 		return TileDirection.NORTH;
 	}
 
-	public static (SpriteFrames, SpriteFrames) loadFlicAnimation(string path, string name, ref SpriteFrames frames, ref SpriteFrames tint) {
+	public static void loadFlicAnimation(string path, string name, ref SpriteFrames frames, ref SpriteFrames tint) {
 		Flic flic = Util.LoadFlic(path);
 
 		for (int row = 0; row < flic.Images.GetLength(0); row++) {
@@ -121,7 +121,19 @@ public partial class AnimationManager {
 				tint.AddFrame(animationName, tl, 0.5f);   // TODO: frame duration is controlled by .ini
 			}
 		}
-		return (frames, tint);
+	}
+
+	public static void loadCursorAnimation(string path, ref SpriteFrames frames) {
+		Flic flic = Util.LoadFlic(path);
+		int row = 0;
+		string name = "cursor";
+		frames.AddAnimation(name);
+
+		for (int col = 0; col < flic.Images.GetLength(1); col++) {
+			byte[] frame = flic.Images[row,col];
+			(ImageTexture bl, ImageTexture tl) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
+			frames.AddFrame(name, bl, 0.5f); // TODO: frame duration is controlled by .ini
+		}
 	}
 
 	public bool LoadAnimation(UnitPrototype unit, MapUnit.AnimatedAction action) {

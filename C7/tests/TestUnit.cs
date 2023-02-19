@@ -35,6 +35,15 @@ public partial class TestUnit : Node2D
 
 		float SCALE = 6;
 		this.Scale = new Vector2(SCALE, SCALE);
+
+
+		AnimatedSprite2D cursor = new AnimatedSprite2D();
+		SpriteFrames cursorFrames = new SpriteFrames();
+		cursor.SpriteFrames = cursorFrames;
+		AnimationManager.loadCursorAnimation("Art/Animations/Cursor/Cursor.flc", ref cursorFrames);
+		cursor.Position = new Vector2(120, 30);
+		cursor.Play("cursor");
+		AddChild(cursor);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

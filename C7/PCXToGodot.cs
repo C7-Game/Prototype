@@ -104,14 +104,17 @@ public partial class PCXToGodot : GodotObject
 		int[] tintLayer = new int[width * height];
 
 		var whitePcx = Util.LoadPCX("Art/Units/Palettes/ntp00.pcx");
-		int[] whiteColorData = loadPalette(whitePcx.Palette, false);
+		int[] whiteColorData = loadPalette(whitePcx.Palette, true);
 
 		for (int i = 0; i < width * height; i++) {
 			int index = colorIndices[i];
-			bool tinted = (index < 16) || ((index < 64) && (index % 2 == 0));
+			bool tinted = index < 16 || (index < 64 && index % 2 == 0);
+			bool shadow = index >= 224 && index <= 239;
 			if (tinted) {
 				tintLayer[i] = whiteColorData[index];
 				baseLayer[i] = 0; // transparent
+			} else if (shadow) {
+				baseLayer[i] = ((int)new Color(1.0f, 1.0f, 1.0f, (float)index - 224f / 239f - 224f).ToArgb32());
 			} else {
 				baseLayer[i] = colorData[index];
 				tintLayer[i] = 0; // transparent
