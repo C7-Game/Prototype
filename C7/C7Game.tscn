@@ -59,7 +59,6 @@ _data = {
 }
 
 [node name="C7Game" type="Node2D"]
-texture_filter = 1
 script = ExtResource("1")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
