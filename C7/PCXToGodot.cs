@@ -114,7 +114,9 @@ public partial class PCXToGodot : GodotObject
 				tintLayer[i] = whiteColorData[index];
 				baseLayer[i] = 0; // transparent
 			} else if (shadow) {
+				// shadow belongs to the base texture
 				baseLayer[i] = ((int)new Color(1.0f, 1.0f, 1.0f, (float)index - 224f / 239f - 224f).ToArgb32());
+				tintLayer[i] = 0; // transparent
 			} else {
 				baseLayer[i] = colorData[index];
 				tintLayer[i] = 0; // transparent

@@ -139,26 +139,6 @@ public partial class UnitLayer : LooseLayer {
 		return inst;
 	}
 
-	// Sets the palette, indices, relSpriteSize, and spriteXY parameters on a ShaderMaterial to pick a sprite from a FlicSheet. relativeColumn
-	// varies between 0.0 for the first column and 1.0 for the last one.
-	public static void setFlicShaderParams(ShaderMaterial mat, Util.FlicSheet flicSheet, int row, float relativeColumn) {
-		mat.SetShaderParameter("palette", flicSheet.palette);
-		mat.SetShaderParameter("indices", flicSheet.indices);
-
-		var indicesDims = new Vector2(flicSheet.indices.GetWidth(), flicSheet.indices.GetHeight());
-		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
-		mat.SetShaderParameter("relSpriteSize", spriteSize / indicesDims);
-
-		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
-		int spriteColumn = (int)(relativeColumn * spritesPerRow);
-		if (spriteColumn >= spritesPerRow) {
-			spriteColumn = spritesPerRow - 1;
-		} else if (spriteColumn < 0) {
-			spriteColumn = 0;
-		}
-		mat.SetShaderParameter("spriteXY", new Vector2(spriteColumn, row));
-	}
-
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
 		AnimationInstance inst = getBlankAnimationInstance(looseView);
 		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
@@ -188,27 +168,28 @@ public partial class UnitLayer : LooseLayer {
 		// inst.meshInst.ZIndex = effectAnimZIndex;
 	}
 
-	private Util.FlicSheet cursorFlicSheet;
-	private ShaderMaterial cursorMat = null;
-	private MeshInstance2D cursorMesh = null;
+	private AnimatedSprite2D cursorSprite = null;
 
 	public void drawCursor(LooseView looseView, Vector2 position) {
 		// Initialize cursor if necessary
-		if (cursorMesh == null) {
-			(cursorFlicSheet, _) = Util.loadFlicSheet("Art/Animations/Cursor/Cursor.flc");
-			(cursorMat, cursorMesh) = createShadedQuad(getCursorShader());
-			cursorMesh.Scale = new Vector2(cursorFlicSheet.spriteWidth, -1 * cursorFlicSheet.spriteHeight);
-			cursorMesh.ZIndex = cursorZIndex;
-			looseView.AddChild(cursorMesh);
+		if (cursorSprite == null) {
+			cursorSprite = new AnimatedSprite2D();
+			SpriteFrames frames = new SpriteFrames();
+			cursorSprite.SpriteFrames = frames;
+			AnimationManager.loadCursorAnimation("Art/Animations/Cursor/Cursor.flc", ref frames);
+			cursorSprite.Animation = "cursor"; // hardcoded in loadCursorAnimation
+			looseView.AddChild(cursorSprite);
 		}
 
 		const double period = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
-		var repCount = (double)Time.GetTicksMsec() / 1000.0 / period;
-		var progress = (float)(repCount - Math.Floor(repCount));
-
-		setFlicShaderParams(cursorMat, cursorFlicSheet, 0, progress);
-		cursorMesh.Position = position;
-		cursorMesh.Show();
+		double repCount = (double)Time.GetTicksMsec() / 1000.0 / period;
+		float progress = (float)(repCount - Math.Floor(repCount));
+		cursorSprite.Position = position;
+		int frameCount = cursorSprite.SpriteFrames.GetFrameCount("cursor");
+		int nextFrame = (int)((float)frameCount * progress);
+		nextFrame = nextFrame >= frameCount ? frameCount - 1 : (nextFrame < 0 ? 0 : nextFrame);
+		cursorSprite.Frame = nextFrame;
+		cursorSprite.Show();
 	}
 
 	public override void onBeginDraw(LooseView looseView, GameData gameData) {
@@ -219,9 +200,7 @@ public partial class UnitLayer : LooseLayer {
 		nextBlankAnimInst = 0;
 
 		// Hide cursor if it's been initialized
-		if (cursorMesh != null) {
-			cursorMesh.Hide();
-		}
+		cursorSprite?.Hide();
 
 		looseView.mapView.game.updateAnimations(gameData);
 	}
@@ -306,44 +285,5 @@ public partial class UnitLayer : LooseLayer {
 				looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
 			}
 		}
-	}
-
-	private static Shader cursorShader = null;
-
-	public static Shader getCursorShader() {
-		if (cursorShader != null)
-			return cursorShader;
-
-		string shaderSource = @"
-		shader_type canvas_item;
-
-		uniform sampler2D palette;
-		uniform sampler2D indices;
-		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
-		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
-
-		void vertex()
-		{
-			UV = (spriteXY + UV) * relSpriteSize;
-		}
-
-		void fragment()
-		{
-			int colorIndex = int(255.0 * texture(indices, UV).r);
-			if ((colorIndex >= 224) && (colorIndex <= 239))
-				COLOR = vec4(1.0, 1.0, 1.0, float(colorIndex - 224) / float(239 - 224));
-			else if (colorIndex >= 254) // indices 254 and 255 are transparent
-				discard;
-			else {
-				vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
-				COLOR = texture(palette, paletteCoords);
-			}
-		}
-		";
-		var tr = new Shader();
-		tr.Code = shaderSource;
-
-		cursorShader = tr;
-		return tr;
 	}
 }
