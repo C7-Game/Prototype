@@ -33,10 +33,10 @@ namespace C7.Map {
 			cityTexture = Util.LoadTextureFromPCX("Art/Cities/rMIDEAST.PCX", 0, 0, width, height);
 			citySpriteSize = new Vector2(width, height);
 			smallFont = ResourceLoader.Load<FontFile>("res://Fonts/NotoSans-Regular.ttf");
-			smallFont.FixedSize = 10;
+			smallFont.FixedSize = 8;
 
 			midSizedFont = ResourceLoader.Load<FontFile>("res://Fonts/NotoSans-Regular.ttf");
-			midSizedFont.FixedSize = 16;
+			midSizedFont.FixedSize = 12;
 
 			nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
 		}
@@ -61,7 +61,7 @@ namespace C7.Map {
 			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).X;
 			int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
 
-			int cityLabelWidth = maxTextWidth + (city.IsCapital()? 70 : 45);	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
+			int cityLabelWidth = maxTextWidth + (city.IsCapital()? 70 : 45); //TODO: Is 65 right?  70?  Will depend on whether it's capital, too
 			int textAreaWidth = cityLabelWidth - (city.IsCapital() ? 50 : 25);
 			if (log.IsEnabled(LogEventLevel.Verbose)) {
 				log.Verbose("Width of city name = " + maxTextWidth);

@@ -1,4 +1,3 @@
-
 # Godot-specific ignores
 .import/
 export.cfg
@@ -44,6 +43,7 @@ project.lock.json
 *.sln.docstates
 C7.ini
 log.txt
+*.csproj.old
 
 # Build results
 [Dd]ebug/

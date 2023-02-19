@@ -496,16 +496,6 @@ public partial class LooseView : Node2D {
 	public LooseView(MapView mapView)
 	{
 		this.mapView = mapView;
-		SetPremultAlpha();
-	}
-
-	public void SetPremultAlpha() {
-		// Use premultiplied alpha blending to prevent magenta lines along terrain borders
-		// and hill/mountain outlines. Might change in the future if this is not the desired
-		// blending behaviour for all LooseView instances.
-		CanvasItemMaterial material = new CanvasItemMaterial();
-		this.Material = material;
-		material.BlendMode = CanvasItemMaterial.BlendModeEnum.PremultAlpha;
 	}
 
 	private struct VisibleTile
