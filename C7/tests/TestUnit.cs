@@ -13,12 +13,12 @@ public partial class TestUnit : Node2D
 		AnimatedSprite2D sprite = new AnimatedSprite2D();
 		SpriteFrames frames = new SpriteFrames();
 		sprite.SpriteFrames = frames;
-		// Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames);
 
 		AnimatedSprite2D spriteTint = new AnimatedSprite2D();
 		SpriteFrames framesTint = new SpriteFrames();
 		spriteTint.SpriteFrames = framesTint;
-		// Util.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref framesTint);
+
+		AnimationManager.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames, ref framesTint);
 
 		ShaderMaterial material = new ShaderMaterial();
 		material.Shader = GD.Load<Shader>("res://UnitTint.gdshader");
@@ -29,7 +29,7 @@ public partial class TestUnit : Node2D
 		AddChild(spriteTint);
 
 		sprite.Play("run_EAST");
-		spriteTint.Play("TINT_run_EAST");
+		spriteTint.Play("run_EAST");
 		sprite.Position = new Vector2(30, 30);
 		spriteTint.Position = new Vector2(30, 30);
 
