@@ -50,4 +50,5 @@ limits/debugger_stdout/max_chars_per_second=65535
 [rendering]
 
 environment/defaults/default_clear_color=Color(0.894118, 0, 0.615686, 0)
+textures/canvas_textures/default_texture_filter=0
 environment/default_environment="res://default_env.tres"
