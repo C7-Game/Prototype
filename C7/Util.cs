@@ -186,23 +186,19 @@ public partial class Util {
 		return new ConvertCiv3Media.Flic(Util.Civ3MediaPath(path));
 	}
 
-	//Send this function a path (e.g. Title_Screen.jpg) and it will
-	//load it up and convert it in both debug and release modes.
-	//Note: We probably will need variants of this for other file types, too.
+	static private string getProjectDirectoryPath() {
+		// see issue https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
+		// - use local resource folder in debug mode
+		// - use executable folder in release mode
+		return OS.IsDebugBuild() ? "res://" : OS.GetExecutablePath().GetBaseDir();
+	}
+
+	// Send this function a path (e.g. Title_Screen.jpg) and it will
+	// load it up and convert it in both debug and release modes.
+	// Note: We probably will need variants of this for other file types, too.
 	static public ImageTexture LoadTextureFromC7JPG(string relPath) {
-		Image backgroundImage = new Image();
-		if (OS.IsDebugBuild()) {
-			//This loads it from the local resource folder in debug mode.
-			//Doesn't work in release mode, which according to https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
-			//is due to a design issue in Godot's import pipeline
-			backgroundImage.Load("res://" + relPath);
-		} else {
-			//This loads it from the folder where the executable is in release mode.
-			//Doesn't work in debug mode because the executable will be where Godot is installed,
-			//not where our project is located.
-			backgroundImage.Load(OS.GetExecutablePath().GetBaseDir().PathJoin(relPath));
-		}
-		return ImageTexture.CreateFromImage(backgroundImage);
+		Image img = Image.LoadFromFile(Util.getProjectDirectoryPath().PathJoin(relPath));
+		return ImageTexture.CreateFromImage(img);
 	}
 
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();

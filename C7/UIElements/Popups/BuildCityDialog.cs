@@ -58,7 +58,7 @@ public partial class BuildCityDialog : Popup
 		cityName.SelectAll();
 		cityName.GrabFocus();
 
-		cityName.Connect("text_entered",new Callable(this,"OnCityNameEntered"));
+		cityName.Connect("text_submitted", new Callable(this, "OnCityNameEntered"));
 
 		//Cancel/confirm buttons.  Note the X button is thinner than the O button.
 		ImageTexture circleTexture= Util.LoadTextureFromPCX("Art/X-o_ALLstates-sprite.pcx", 1, 1, 19, 19);
