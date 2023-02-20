@@ -125,6 +125,11 @@ namespace C7GameData
 				WriteIndented = true,
 				// By default it only serializes getters, this makes it serialize fields, too
 				IncludeFields = true,
+
+				Converters = {
+					// Serialize 2D array types
+					new Json2DArrayConverter()
+				},
 			};
 		}
 
