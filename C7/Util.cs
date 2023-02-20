@@ -6,9 +6,10 @@ using C7Engine;
 using Godot;
 using ConvertCiv3Media;
 using C7GameData;
+using QueryCiv3;
 
 public partial class Util {
-	static public string Civ3Root = GetCiv3Path();
+	static public string Civ3Root = Civ3Location.GetCiv3Path();
 	public partial class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 	// While instantiated it will return to the last-accessed folder when reopened

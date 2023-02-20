@@ -15,80 +15,61 @@ namespace C7GameData
 	using System.IO.Compression;
 	using System.Text.Json;
 
-	public enum SaveCompression
-	{
+	public enum SaveCompression {
 		None,
 		Zip,
 		Invalid,
 	}
 
-	public class C7SaveFormat
-	{
+	public class C7SaveFormat {
 		public string Version = "v0.0early-prototype";
 
 		// This naming is probably bad form, but it makes sense to me to name it as such here
 		public GameData GameData;
 
-		public C7SaveFormat()
-		{
+		public C7SaveFormat() {
 			GameData = new GameData();
 		}
 
-		public C7SaveFormat(GameData gameData)
-		{
+		public C7SaveFormat(GameData gameData) {
 			GameData = gameData;
 		}
 
-		public bool PostLoadProcess()
-		{
+		public bool PostLoadProcess() {
 			GameData.PerformPostLoadActions();
 
 			return true;
 		}
 
-		static SaveCompression getCompression(string path)
-		{
+		static SaveCompression getCompression(string path) {
 			var ext = Path.GetExtension(path);
-			if (ext.Equals(".JSON", StringComparison.CurrentCultureIgnoreCase))
-			{
+			if (ext.Equals(".JSON", StringComparison.CurrentCultureIgnoreCase)) {
 				return SaveCompression.None;
-			}
-			else if (ext.Equals(".ZIP", StringComparison.CurrentCultureIgnoreCase))
-			{
+			} else if (ext.Equals(".ZIP", StringComparison.CurrentCultureIgnoreCase)) {
 				return SaveCompression.Zip;
 			}
 			return SaveCompression.Invalid;
 		}
 
-		public static C7SaveFormat Load(string path)
-		{
+		public static C7SaveFormat Load(string path) {
 			SaveCompression format = getCompression(path);
 			C7SaveFormat save = null;
-			if (format == SaveCompression.None)
-			{
+			if (format == SaveCompression.None) {
 				save = JsonSerializer.Deserialize<C7SaveFormat>(File.ReadAllText(path), JsonOptions);
-			}
-			else
-			{
-				using (var archive = new ZipArchive(new FileStream(path, FileMode.Open), ZipArchiveMode.Read))
-				{
+			} else {
+				using (var archive = new ZipArchive(new FileStream(path, FileMode.Open), ZipArchiveMode.Read)) {
 					ZipArchiveEntry entry = archive.GetEntry("save");
-					using (Stream stream = entry.Open())
-					{
+					using (Stream stream = entry.Open()) {
 						save = JsonSerializer.Deserialize<C7SaveFormat>(stream, JsonOptions);
 					}
 				}
 			}
 
 			// Inflate things that are stored by reference, first tiles
-			foreach (Tile tile in save.GameData.map.tiles)
-			{
-				if (tile.ResourceKey == "NONE")
-				{
+			foreach (Tile tile in save.GameData.map.tiles) {
+				if (tile.ResourceKey == "NONE") {
 					tile.Resource = Resource.NONE;
-				}
-				else
-				{
+				} else {
 					tile.Resource = save.GameData.Resources.Find(r => r.Key == tile.ResourceKey);
 				}
 				tile.baseTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.baseTerrainTypeKey);
@@ -115,18 +96,14 @@ namespace C7GameData
 			return save;
 		}
 
-		public static void Save(C7SaveFormat save, string path)
-		{
+		public static void Save(C7SaveFormat save, string path) {
 			SaveCompression format = getCompression(path);
 			byte[] json = JsonSerializer.SerializeToUtf8Bytes(save, JsonOptions);
-			if (format == SaveCompression.Zip)
-			{
-				using (var zipStream = new MemoryStream())
-				{
+			if (format == SaveCompression.Zip) {
+				using (var zipStream = new MemoryStream()) {
 					var archive = new ZipArchive(zipStream, ZipArchiveMode.Create);
 					ZipArchiveEntry entry = archive.CreateEntry("save");
-					using (Stream stream = entry.Open())
-					{
+					using (Stream stream = entry.Open()) {
 						stream.Write(json, 0, json.Length);
 					}
 					// ZipArchive needs to be disposed in order for its content
@@ -135,17 +112,13 @@ namespace C7GameData
 					archive.Dispose();
 					File.WriteAllBytes(path, zipStream.ToArray());
 				}
-			}
-			else
-			{
+			} else {
 				File.WriteAllBytes(path, json);
 			}
 		}
 
-		public static JsonSerializerOptions JsonOptions
-		{
-			get => new JsonSerializerOptions
-			{
+		public static JsonSerializerOptions JsonOptions {
+			get => new JsonSerializerOptions {
 				// Lower-case the first letter in JSON because JSON naming standards
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
 				// Pretty print during development; may change this for production
