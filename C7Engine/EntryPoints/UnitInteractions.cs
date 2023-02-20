@@ -4,7 +4,6 @@ using Serilog;
 namespace C7Engine
 {
 	using C7GameData;
-	using System;
 	using System.Collections.Generic;
 
 	public class UnitInteractions
@@ -15,17 +14,13 @@ namespace C7Engine
 
 		public static MapUnit getNextSelectedUnit(GameData gameData)
 		{
-			foreach (Player player in gameData.players) {
+			foreach (Player player in gameData.players.Where(p => p.isHuman)) {
 				//TODO: Should pass in a player GUID instead of checking for human
 				//This current limits us to one human player, although it's better
 				//than the old limit of one non-barbarian player.
-				if (player.isHuman) {
-					foreach (MapUnit unit in player.units) {
-						if (unit.movementPoints.canMove && !unit.IsBusy()) {
-							if (!waitQueue.Contains(unit)) {
-								return unit;
-							}
-						}
+				foreach (MapUnit unit in player.units.Where(u => u.movementPoints.canMove && !u.IsBusy())) {
+					if (!waitQueue.Contains(unit)) {
+						return unit;
 					}
 				}
 			}

@@ -15,14 +15,14 @@ public partial class RightClickMenu : VBoxContainer
 		// but didn't look into how it works, but that's probably what we'll want to do.
 		Color black = Color.Color8(0, 0, 0, 255);
 		var theme = new Theme();
-		theme.SetConstant("separation", "VBoxContainer", 0);
+		theme.SetConstant("separation"     , "VBoxContainer", 0);
 		theme.SetColor("font_color"        , "Button", black);
 		theme.SetColor("font_color_hover"  , "Button", black);
 		theme.SetColor("font_color_pressed", "Button", black);
 		theme.SetColor("font_color_focus"  , "Button", black);
-		theme.SetStylebox("normal" , "Button", GetItemStyleBox(Color.Color8(255, 247, 222, 255)));
-		theme.SetStylebox("hover"  , "Button", GetItemStyleBox(Color.Color8(255, 189, 107, 255)));
-		theme.SetStylebox("pressed", "Button", GetItemStyleBox(Color.Color8(140, 200, 200, 255)));
+		theme.SetStylebox("normal"         , "Button", GetItemStyleBox(Color.Color8(255, 247, 222, 255)));
+		theme.SetStylebox("hover"          , "Button", GetItemStyleBox(Color.Color8(255, 189, 107, 255)));
+		theme.SetStylebox("pressed"        , "Button", GetItemStyleBox(Color.Color8(140, 200, 200, 255)));
 		this.Theme = theme;
 
 		this.Hide();
@@ -38,18 +38,13 @@ public partial class RightClickMenu : VBoxContainer
 		this.Show();
 
 		// Move "position" if the menu would extend past the right or bottom edges of the screen
-		Vector2 offScreen = position + this.Size; // - GetViewport().GetSize;
+		Vector2 offScreen = position + this.Size - DisplayServer.WindowGetSize();
 		if (offScreen.X > 0) {
-			position.X -= offScreen.X;
-			if (position.X < 0)
-				position.X = 0;
+			position.X = Mathf.Max(0, position.X - offScreen.X);
 		}
 		if (offScreen.Y > 0) {
-			position.Y -= offScreen.Y;
-			if (position.Y < 0)
-				position.Y = 0;
+			position.Y = Mathf.Max(0, position.Y - offScreen.Y);
 		}
-
 		this.SetPosition(position);
 	}
 
@@ -97,12 +92,11 @@ public partial class RightClickMenu : VBoxContainer
 		if (escapeKeyWasPressed || mouseClickedOutsideMenu) {
 			this.AcceptEvent(); // Prevents other controls from receiving this event
 			CloseAndDelete();
-
-		// Eat all events other than mouse events while the cursor is over the menu. We want the menu to grab all input while it's open but we
-		// must make sure not to block mouse events from reaching its child buttons. (This had me confused for a while since the Godot docs
-		// say that events reach children before their parents, but the catch is that there are three phases of input processing. The "input"
-		// phase, this function, then "gui input", and finally "unhandled input". If a control eats an event during the "input" phase it won't
-		// proceed to the "gui input" phase where buttons actually respond to it.)
+			// Eat all events other than mouse events while the cursor is over the menu. We want the menu to grab all input while it's open but we
+			// must make sure not to block mouse events from reaching its child buttons. (This had me confused for a while since the Godot docs
+			// say that events reach children before their parents, but the catch is that there are three phases of input processing. The "input"
+			// phase, this function, then "gui input", and finally "unhandled input". If a control eats an event during the "input" phase it won't
+			// proceed to the "gui input" phase where buttons actually respond to it.)
 		} else if (!((@event is InputEventMouse) && mouseOverMenu)) {
 			this.AcceptEvent();
 		}
@@ -144,15 +138,15 @@ public partial class RightClickTileMenu : RightClickMenu
 			fortifiedCount += isFortified ? 1 : 0;
 			string action = getUnitAction(unit, isFortified);
 
-			AddItem($"{action} {unit.Describe()}").Connect("pressed", Callable.From(new System.Action(() => SelectUnit(unit.guid))));
+			AddItem($"{action} {unit.Describe()}").Connect("pressed", Callable.From(() => SelectUnit(unit.guid)));
 		}
 		int unfortifiedCount = units.Count - fortifiedCount;
 
 		if (fortifiedCount > 1) {
-			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", Callable.From(new System.Action(() => ForAll(tile.xCoordinate, tile.yCoordinate, false))));
+			AddItem($"Wake All ({fortifiedCount} units)").Connect("pressed", Callable.From(() => ForAll(tile.xCoordinate, tile.yCoordinate, false)));
 		}
 		if (unfortifiedCount > 1) {
-			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", Callable.From(new System.Action(() => ForAll(tile.xCoordinate,tile.yCoordinate,true))));
+			AddItem($"Fortify All ({unfortifiedCount} units)").Connect("pressed", Callable.From(() => ForAll(tile.xCoordinate,tile.yCoordinate,true)));
 		}
 	}
 
