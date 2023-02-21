@@ -75,6 +75,8 @@ namespace C7GameData
 					u.owner = p;
 				}
 			}
+
+			GameData.map.tiles.Add(Tile.NONE);
 		}
 
 		static SaveCompression getCompression(string path) {
