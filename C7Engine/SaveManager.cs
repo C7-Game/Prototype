@@ -51,7 +51,7 @@
 			default:
 				throw new FileLoadException("invalid save format");
 			}
-			throw new FileLoadException("could not process save file");
+			return save;
 		}
 
 		public static void Save(string path) {

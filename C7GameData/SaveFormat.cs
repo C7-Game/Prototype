@@ -65,6 +65,13 @@ namespace C7GameData
 
 			// Inflate tile neighbors
 			GameData.map.computeNeighbors();
+
+			// Link map units to their owners
+			foreach (Player p in GameData.players) {
+				foreach (MapUnit u in p.units) {
+					u.owner = p;
+				}
+			}
 		}
 
 		static SaveCompression getCompression(string path) {
