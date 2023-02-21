@@ -16,7 +16,7 @@ namespace C7Engine
 			EngineStorage.createThread();
 			EngineStorage.gameDataMutex.WaitOne();
 
-			C7SaveFormat save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
+			C7SaveFormat save = SaveManager.Load(loadFilePath, defaultBicPath);
 			EngineStorage.gameData = save.GameData;
 			// Consider if we have any need to keep a reference to the save object handy...probably not
 

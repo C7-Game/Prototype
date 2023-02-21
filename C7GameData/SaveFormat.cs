@@ -84,7 +84,7 @@ namespace C7GameData
 			foreach (MapUnit unit in save.GameData.mapUnits)
 				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
 
-			//Inflate barbarian info
+			// Inflate barbarian info
 			List<UnitPrototype> prototypes = save.GameData.unitPrototypes.Values.ToList();
 			save.GameData.barbarianInfo.basicBarbarian =
 				prototypes[save.GameData.barbarianInfo.basicBarbarianIndex];

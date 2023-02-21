@@ -34,7 +34,7 @@
 		}
 
 		// Load and initialize a save
-		public static C7SaveFormat LoadSave(string path, string bicPath)
+		public static C7SaveFormat Load(string path, string bicPath)
 		{
 			C7SaveFormat save = null;
 			switch (getFileFormat(path))
@@ -56,6 +56,12 @@
 				return save;
 			}
 			throw new FileLoadException("could not process save file");
+		}
+
+		public static void Save(string path) {
+			C7SaveFormat save = new C7SaveFormat(EngineStorage.gameData);
+			C7SaveFormat.Save(save, path);
+			new MsgFinishSave().send();
 		}
 
 	}

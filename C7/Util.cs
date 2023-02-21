@@ -20,10 +20,10 @@ public partial class Util {
 
 		public override void _Ready() {
 			Access = AccessEnum.Filesystem;
-			CurrentDir = Civ3Root + "/" + RelPath;
-			// Resizable = true;
-			// OffsetRight = 550;
-			// OffsetBottom = 750;
+			CurrentDir = Util.getProjectDirectoryPath();
+
+			Position = new Vector2I(200, 200);
+			Size = new Vector2I(500, 500);
 			base._Ready();
 		}
 	}

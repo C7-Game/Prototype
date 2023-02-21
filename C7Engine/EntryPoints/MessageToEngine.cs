@@ -206,4 +206,16 @@ namespace C7Engine
 			EngineStorage.animationsEnabled = enabled;
 		}
 	}
+
+	public class MsgSaveGame : MessageToEngine {
+		private string path;
+
+		public MsgSaveGame(string path) {
+			this.path = path;
+		}
+
+		public override void process() {
+			SaveManager.Save(this.path);
+		}
+	}
 }

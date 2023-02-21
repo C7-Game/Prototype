@@ -156,6 +156,10 @@ public partial class Game : Node2D
 			case MsgStartTurn mST:
 				OnPlayerStartTurn();
 				break;
+			case MsgFinishSave mFS:
+				PopupOverlay overlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				overlay.CloseCurrentPopup();
+				break;
 			}
 		}
 	}
@@ -682,5 +686,11 @@ public partial class Game : Node2D
 	private void OnBuildCity(string name)
 	{
 		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();
+	}
+
+	private void OnSaveGame() {
+		string path = Global.LoadGamePath + "_save.json";
+		log.Debug("saving game to ", path);
+		new MsgSaveGame(path).send();
 	}
 }

@@ -1,15 +1,13 @@
 using Godot;
 
-public partial class GameMenu : Popup
-{
+public partial class GameMenu : Popup {
 
 	public GameMenu() {
 		alignment = BoxContainer.AlignmentMode.Center;
 		margins = new Margins(top: 100);
 	}
 
-	public override void _Ready()
-	{
+	public override void _Ready() {
 		base._Ready();
 
 		AddTexture(370, 300);
@@ -26,14 +24,16 @@ public partial class GameMenu : Popup
 		AddButton("Quit Game (ESC)", 210, "quit");
 	}
 
-	private void quit()
-	{
+	private void quit() {
 		GetParent().EmitSignal("Quit");
 	}
 
-	private void map()
-	{
+	private void map() {
 		GetParent().EmitSignal("HidePopup");
+	}
+
+	private void save() {
+		GetParent().EmitSignal("SaveGame");
 	}
 
 }

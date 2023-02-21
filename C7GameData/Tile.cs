@@ -19,10 +19,13 @@ namespace C7GameData
 		public string overlayTerrainTypeKey { get; set; }
 		[JsonIgnore]
 		public TerrainType overlayTerrainType = TerrainType.NONE;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 		public City cityAtTile;
 		[JsonIgnore]
 		public bool HasCity => cityAtTile != null && cityAtTile != City.NONE;
-		public CityResident personWorkingTile = null;	//allows us to see if another city is working this tile
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+		public CityResident personWorkingTile = null; //allows us to see if another city is working this tile
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool hasBarbarianCamp = false;
 
 		//One thing to decide is do we want to have a tile have a list of units on it,
@@ -36,21 +39,32 @@ namespace C7GameData
 		[JsonIgnore]
 		public Resource Resource { get; set; }
 
+		[JsonIgnore]
 		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();
 
 		//See discussion on page 4 of the "Babylon" thread (https://forums.civfanatics.com/threads/0-1-babylon-progress-thread.673959) about sub-terrain type and Civ3 properties.
 		//We may well move these properties somewhere, whether that's Civ3ExtraInfo, a Civ3Tile child class, a Dictionary property, or something else, in the future.
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool isBonusShield;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool isSnowCapped;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool isPineForest;
-
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverNorth;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverNortheast;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverEast;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverSoutheast;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverSouth;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverSouthwest;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverWest;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool riverNorthwest;
 
 		public TileOverlays overlays = new TileOverlays();
@@ -277,7 +291,9 @@ namespace C7GameData
 	}
 
 	public class TileOverlays {
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool road = false;
+		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 		public bool railroad = false;
 		// assume that railroad contains road too
 	}

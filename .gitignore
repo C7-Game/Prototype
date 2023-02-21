@@ -44,6 +44,7 @@ project.lock.json
 C7.ini
 log.txt
 *.csproj.old
+test.json
 
 # Build results
 [Dd]ebug/
