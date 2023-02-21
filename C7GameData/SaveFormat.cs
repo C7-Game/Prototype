@@ -35,10 +35,36 @@ namespace C7GameData
 			GameData = gameData;
 		}
 
-		public bool PostLoadProcess() {
-			GameData.PerformPostLoadActions();
+		// postLoadActions inflates things in the save that are stored by reference,
+		// and recomputes data such as tile neighbors not stored in the save.
+		private void postLoadActions() {
+			// Inflate tiles
+			foreach (Tile tile in GameData.map.tiles) {
+				if (tile.ResourceKey == "NONE") {
+					tile.Resource = Resource.NONE;
+				} else {
+					tile.Resource = GameData.Resources.Find(r => r.Key == tile.ResourceKey);
+				}
+				tile.baseTerrainType = GameData.terrainTypes.Find(t => t.Key == tile.baseTerrainTypeKey);
+				tile.overlayTerrainType = GameData.terrainTypes.Find(t => t.Key == tile.overlayTerrainTypeKey);
+			}
 
-			return true;
+			// Inflate experience levels
+			var levelsByKey = new Dictionary<string, ExperienceLevel>();
+			foreach (ExperienceLevel eL in GameData.experienceLevels)
+				levelsByKey.Add(eL.key, eL);
+			GameData.defaultExperienceLevel = levelsByKey[GameData.defaultExperienceLevelKey];
+			foreach (MapUnit unit in GameData.mapUnits)
+				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
+
+			// Inflate barbarian info
+			List<UnitPrototype> prototypes = GameData.unitPrototypes.Values.ToList();
+			GameData.barbarianInfo.basicBarbarian = prototypes[GameData.barbarianInfo.basicBarbarianIndex];
+			GameData.barbarianInfo.advancedBarbarian = prototypes[GameData.barbarianInfo.advancedBarbarianIndex];
+			GameData.barbarianInfo.barbarianSeaUnit = prototypes[GameData.barbarianInfo.barbarianSeaUnitIndex];
+
+			// Inflate tile neighbors
+			GameData.map.computeNeighbors();
 		}
 
 		static SaveCompression getCompression(string path) {
@@ -64,35 +90,7 @@ namespace C7GameData
 					}
 				}
 			}
-
-			// Inflate things that are stored by reference, first tiles
-			foreach (Tile tile in save.GameData.map.tiles) {
-				if (tile.ResourceKey == "NONE") {
-					tile.Resource = Resource.NONE;
-				} else {
-					tile.Resource = save.GameData.Resources.Find(r => r.Key == tile.ResourceKey);
-				}
-				tile.baseTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.baseTerrainTypeKey);
-				tile.overlayTerrainType = save.GameData.terrainTypes.Find(t => t.Key == tile.overlayTerrainTypeKey);
-			}
-
-			// Inflate experience levels
-			var levelsByKey = new Dictionary<string, ExperienceLevel>();
-			foreach (ExperienceLevel eL in save.GameData.experienceLevels)
-				levelsByKey.Add(eL.key, eL);
-			save.GameData.defaultExperienceLevel = levelsByKey[save.GameData.defaultExperienceLevelKey];
-			foreach (MapUnit unit in save.GameData.mapUnits)
-				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
-
-			// Inflate barbarian info
-			List<UnitPrototype> prototypes = save.GameData.unitPrototypes.Values.ToList();
-			save.GameData.barbarianInfo.basicBarbarian =
-				prototypes[save.GameData.barbarianInfo.basicBarbarianIndex];
-			save.GameData.barbarianInfo.advancedBarbarian =
-				prototypes[save.GameData.barbarianInfo.advancedBarbarianIndex];
-			save.GameData.barbarianInfo.barbarianSeaUnit =
-				prototypes[save.GameData.barbarianInfo.barbarianSeaUnitIndex];
-
+			save.postLoadActions();
 			return save;
 		}
 

@@ -51,10 +51,6 @@
 			default:
 				throw new FileLoadException("invalid save format");
 			}
-			if (save.PostLoadProcess())
-			{
-				return save;
-			}
 			throw new FileLoadException("could not process save file");
 		}
 
