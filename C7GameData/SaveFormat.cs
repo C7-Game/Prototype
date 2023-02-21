@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace C7GameData
 /*
@@ -51,11 +52,13 @@ namespace C7GameData
 
 			// Inflate experience levels
 			var levelsByKey = new Dictionary<string, ExperienceLevel>();
-			foreach (ExperienceLevel eL in GameData.experienceLevels)
+			foreach (ExperienceLevel eL in GameData.experienceLevels) {
 				levelsByKey.Add(eL.key, eL);
+			}
 			GameData.defaultExperienceLevel = levelsByKey[GameData.defaultExperienceLevelKey];
-			foreach (MapUnit unit in GameData.mapUnits)
+			foreach (MapUnit unit in GameData.mapUnits) {
 				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
+			}
 
 			// Inflate barbarian info
 			List<UnitPrototype> prototypes = GameData.unitPrototypes.Values.ToList();
@@ -130,6 +133,8 @@ namespace C7GameData
 				WriteIndented = true,
 				// By default it only serializes getters, this makes it serialize fields, too
 				IncludeFields = true,
+
+				ReferenceHandler = ReferenceHandler.Preserve,
 
 				Converters = {
 					// Serialize 2D array types
