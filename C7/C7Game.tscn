@@ -79,9 +79,9 @@ anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 1024.0
+offset_left = -128.0
 offset_top = 80.0
-offset_right = 1024.0
+offset_right = -128.0
 offset_bottom = 9520.0
 grow_horizontal = 0
 grow_vertical = 2
@@ -250,4 +250,5 @@ anchor_mode = 0
 [connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
 [connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]
 [connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
+[connection signal="SaveGame" from="CanvasLayer/PopupOverlay" to="." method="OnSaveGame"]
 [connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]

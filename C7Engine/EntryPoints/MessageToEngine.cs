@@ -26,18 +26,18 @@ namespace C7Engine
 
 	public class MsgSetFortification : MessageToEngine
 	{
-		private string unitGUID;
+		private EntityId unitId;
 		private bool fortifyElseWake;
 
-		public MsgSetFortification(string unitGUID, bool fortifyElseWake)
+		public MsgSetFortification(EntityId unitId, bool fortifyElseWake)
 		{
-			this.unitGUID = unitGUID;
+			this.unitId = unitId;
 			this.fortifyElseWake = fortifyElseWake;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitId);
 
 			// Simply do nothing if we weren't given a valid GUID. TODO: Maybe this is an error we need to handle? In an MP game, we should reject
 			// invalid actions at the server level but at the client level an invalid action received from the server indicates a desync.
@@ -52,99 +52,99 @@ namespace C7Engine
 
 	public class MsgMoveUnit : MessageToEngine
 	{
-		private string unitGUID;
+		private EntityId unitId;
 		private TileDirection dir;
 
-		public MsgMoveUnit(string unitGUID, TileDirection dir)
+		public MsgMoveUnit(EntityId unitId, TileDirection dir)
 		{
-			this.unitGUID = unitGUID;
+			this.unitId = unitId;
 			this.dir = dir;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitId);
 			unit?.move(dir);
 		}
 	}
 
 	public class MsgSetUnitPath : MessageToEngine
 	{
-		private string unitGUID;
+		private EntityId unitId;
 		private int destX;
 		private int destY;
 
-		public MsgSetUnitPath(string unitGUID, Tile tile)
+		public MsgSetUnitPath(EntityId unitId, Tile tile)
 		{
-			this.unitGUID = unitGUID;
+			this.unitId = unitId;
 			this.destX = tile.xCoordinate;
 			this.destY = tile.yCoordinate;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitId);
 			unit?.setUnitPath(EngineStorage.gameData.map.tileAt(destX, destY));
 		}
 	}
 
 	public class MsgSkipUnitTurn : MessageToEngine
 	{
-		private string unitGUID;
+		private EntityId unitId;
 
-		public MsgSkipUnitTurn(string unitGUID)
+		public MsgSkipUnitTurn(EntityId unitId)
 		{
-			this.unitGUID = unitGUID;
+			this.unitId = unitId;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitId);
 			unit?.skipTurn();
 		}
 	}
 
 	public class MsgDisbandUnit : MessageToEngine {
-		private string unitGUID;
+		private EntityId unitId;
 
-		public MsgDisbandUnit(string unitGUID)
+		public MsgDisbandUnit(EntityId unitId)
 		{
-			this.unitGUID = unitGUID;
+			this.unitId = unitId;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitId);
 			unit?.disband();
 		}
 	}
 
 	public class MsgBuildCity : MessageToEngine {
-		private string unitGUID;
+		private EntityId unitId;
 		private string cityName;
 
-		public MsgBuildCity(string unitGUID, string cityName)
+		public MsgBuildCity(EntityId unitId, string cityName)
 		{
-			this.unitGUID = unitGUID;
+			this.unitId = unitId;
 			this.cityName = cityName;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitId);
 			unit?.buildCity(cityName);
 		}
 	}
 
 	public class MsgBuildRoad : MessageToEngine {
-		private string unitGUID;
+		private EntityId unitId;
 
-		public MsgBuildRoad(string unitGUID) {
-			this.unitGUID = unitGUID;
+		public MsgBuildRoad(EntityId unitId) {
+			this.unitId = unitId;
 		}
 
 		public override void process() {
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitId);
 			unit?.buildRoad();
 		}
 	}
@@ -204,6 +204,18 @@ namespace C7Engine
 		public override void process()
 		{
 			EngineStorage.animationsEnabled = enabled;
+		}
+	}
+
+	public class MsgSaveGame : MessageToEngine {
+		private string path;
+
+		public MsgSaveGame(string path) {
+			this.path = path;
+		}
+
+		public override void process() {
+			SaveManager.Save(this.path);
 		}
 	}
 }

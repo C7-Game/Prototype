@@ -9,6 +9,7 @@ using QueryCiv3;
 
 public partial class Util {
 	static public string Civ3Root = Civ3Location.GetCiv3Path();
+
 	public partial class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 	// While instantiated it will return to the last-accessed folder when reopened
@@ -20,10 +21,11 @@ public partial class Util {
 
 		public override void _Ready() {
 			Access = AccessEnum.Filesystem;
-			CurrentDir = Civ3Root + "/" + RelPath;
-			// Resizable = true;
-			// OffsetRight = 550;
-			// OffsetBottom = 750;
+			// CurrentDir = Civ3Root + "/" + RelPath;
+			CurrentDir = Util.getProjectDirectoryPath();
+
+			Position = new Vector2I(0, 0);
+			Size = new Vector2I(400, 400);
 			base._Ready();
 		}
 	}

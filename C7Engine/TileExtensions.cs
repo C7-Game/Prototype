@@ -15,12 +15,13 @@ namespace C7Engine
 				}
 
 				MapUnit leadingCandidate = tile.unitsOnTile[0];
-				foreach (MapUnit u in tile.unitsOnTile)
-					if (u.HasPriorityAsDefender(leadingCandidate, opponent))
-						leadingCandidate = u;
+				foreach (MapUnit u in tile.unitsOnTile.Where(u => u.HasPriorityAsDefender(leadingCandidate, opponent))) {
+					leadingCandidate = u;
+				}
 				return leadingCandidate;
-			} else
+			} else {
 				return MapUnit.NONE;
+			}
 		}
 
 		/// <summary>

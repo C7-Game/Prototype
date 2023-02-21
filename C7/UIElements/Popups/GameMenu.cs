@@ -36,4 +36,7 @@ public partial class GameMenu : Popup
 		GetParent().EmitSignal("HidePopup");
 	}
 
+	private void save() {
+		GetParent().EmitSignal("SaveGame");
+	}
 }

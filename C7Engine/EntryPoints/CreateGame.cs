@@ -1,7 +1,8 @@
+using C7GameData;
+using System;
+
 namespace C7Engine
 {
-	using System;
-	using C7GameData;
 
 	public class CreateGame
 	{
@@ -16,9 +17,14 @@ namespace C7Engine
 			EngineStorage.createThread();
 			EngineStorage.gameDataMutex.WaitOne();
 
-			C7SaveFormat save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
+			C7SaveFormat save = SaveManager.Load(loadFilePath, defaultBicPath);
 			EngineStorage.gameData = save.GameData;
 			// Consider if we have any need to keep a reference to the save object handy...probably not
+
+			// var humanPlayer = save.GameData.players.Find(p => p.isHuman);
+			// Console.WriteLine("human player city 0: " +humanPlayer.civilization.cityNames[0]);
+			// Console.WriteLine("human player guid: " + humanPlayer.guid.ToString());
+			// save.GameData.turn = 0;
 
 			var humanPlayer = save.GameData.CreateDummyGameData();
 			EngineStorage.uiControllerID = humanPlayer.guid;

@@ -16,7 +16,7 @@ namespace C7GameData
 		public List<Player> players = new List<Player>();
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
 		public List<Resource> Resources = new List<Resource>();
-		public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
+		public List<MapUnit> mapUnits = new List<MapUnit>();
 		public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
 		public List<City> cities = new List<City>();
 
@@ -57,9 +57,9 @@ namespace C7GameData
 			return players.FindAll(p => p.isHuman);
 		}
 
-		public MapUnit GetUnit(string guid)
+		public MapUnit GetUnit(EntityId id)
 		{
-			return mapUnits.Find(u => u.guid == guid);
+			return mapUnits.Find(u => u.id == id);
 		}
 
 		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel)
@@ -96,6 +96,7 @@ namespace C7GameData
 		 **/
 		public Player CreateDummyGameData()
 		{
+			this.mapUnits = new List<MapUnit>();
 			this.turn = 0;
 
 			uint white = 0xFFFFFFFF;

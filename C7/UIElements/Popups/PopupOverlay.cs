@@ -1,7 +1,4 @@
 using Godot;
-using ConvertCiv3Media;
-using System;
-using System.Diagnostics;
 using Serilog;
 
 public partial class PopupOverlay : HBoxContainer
@@ -13,6 +10,7 @@ public partial class PopupOverlay : HBoxContainer
 	[Signal] public delegate void QuitEventHandler();
 	[Signal] public delegate void BuildCityEventHandler(string name);
 	[Signal] public delegate void HidePopupEventHandler();
+	[Signal] public delegate void SaveGameEventHandler();
 
 	Control currentChild = null;
 
@@ -27,6 +25,12 @@ public partial class PopupOverlay : HBoxContainer
 	public override void _Ready()
 	{
 		base._Ready();
+	}
+
+	public void CloseCurrentPopup() {
+		log.Debug("Closing current popup");
+		RemoveChild(currentChild);
+		Hide();
 	}
 
 	private void OnHidePopup()

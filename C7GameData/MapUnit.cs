@@ -10,12 +10,23 @@ namespace C7GameData {
 	 * A unit on the map.  Not to be confused with a unit prototype.
 	 **/
 	public class MapUnit {
-		public string guid { get; }
+		public EntityId id;
 		public UnitPrototype unitType { get; set; }
-		public Player owner { get; set; }
-		public Tile previousLocation { get; private set; }
-		private Tile currentLocation;
 
+		[JsonIgnore] // creates a cycle player -> unit -> player TODO: inflate
+		public Player owner { get; set; }
+
+		[JsonIgnore]
+		public Tile previousLocation { get; set; }
+		public int prevX {get => previousLocation?.xCoordinate ?? -1; }
+		public int prevY {get => previousLocation?.yCoordinate ?? -1; }
+
+		[JsonIgnore]
+		private Tile currentLocation;
+		public int curX {get => currentLocation?.xCoordinate ?? -1; }
+		public int curY {get => currentLocation?.yCoordinate ?? -1; }
+
+		[JsonIgnore]
 		public Tile location {
 			get => currentLocation;
 			set {
@@ -47,7 +58,7 @@ namespace C7GameData {
 		public UnitAIData currentAIData;
 
 		public MapUnit() {
-			guid = Guid.NewGuid().ToString();
+			this.id = new EntityId();
 		}
 
 		public bool IsBusy() {
@@ -56,7 +67,7 @@ namespace C7GameData {
 
 		public override string ToString() {
 			if (this != MapUnit.NONE) {
-				return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP, guid = " + guid;
+				return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP";
 			} else {
 				return "This is the NONE unit";
 			}

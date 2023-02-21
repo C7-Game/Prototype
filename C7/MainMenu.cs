@@ -31,10 +31,10 @@ public partial class MainMenu : Node2D
 		Global.ResetLoadGamePath();
 		LoadDialog = new Util.Civ3FileDialog();
 		LoadDialog.RelPath = @"Conquests/Saves";
-		LoadDialog.Connect("file_selected",new Callable(this,nameof(_on_FileDialog_file_selected)));
+		LoadDialog.Connect("file_selected", Callable.From((string path) => _on_FileDialog_file_selected(path)));
 		LoadScenarioDialog = new Util.Civ3FileDialog();
 		LoadScenarioDialog.RelPath = @"Conquests/Scenarios";
-		LoadScenarioDialog.Connect("file_selected",new Callable(this,nameof(_on_FileDialog_file_selected)));
+		LoadScenarioDialog.Connect("file_selected", Callable.From((string path) => _on_FileDialog_file_selected(path)));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
 		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
 		SetCiv3HomeDialog = GetNode<FileDialog>("CanvasLayer/SetCiv3HomeDialog");
@@ -152,7 +152,7 @@ public partial class MainMenu : Node2D
 
 	private void _on_FileDialog_file_selected(string path)
 	{
-		log.Information("loading {path}", path);
+		GD.Print("loading " + path);
 		Global.LoadGamePath = path;
 		GetTree().ChangeSceneToFile("res://C7Game.tscn");
 	}

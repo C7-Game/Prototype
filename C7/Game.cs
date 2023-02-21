@@ -68,6 +68,7 @@ public partial class Game : Node2D
 
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
 			Global.ResetLoadGamePath();
+			GD.Print("game created");
 
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
@@ -87,8 +88,10 @@ public partial class Game : Node2D
 						mapView.centerCameraOnTile(capital.location);
 				} else {
 					MapUnit startingSettler = controller.units.Find(u => u.unitType.actions.Contains("buildCity"));
-					if (startingSettler != null)
+					if (startingSettler != null) {
+						// controller.tileKnowledge.AddTilesToKnown(startingSettler.location);
 						mapView.centerCameraOnTile(startingSettler.location);
+					}
 				}
 			}
 
@@ -106,7 +109,7 @@ public partial class Game : Node2D
 			TimeSpan stopwatchElapsed = loadTimer.Elapsed;
 			log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 		}
-		catch(Exception ex) {
+		catch (Exception ex) {
 			errorOnLoad = true;
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			string message = ex.Message;
@@ -127,7 +130,7 @@ public partial class Game : Node2D
 		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
 			switch (msg) {
 			case MsgStartUnitAnimation mSUA:
-				MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
+				MapUnit unit = gameData.GetUnit(mSUA.unitId);
 				if (unit != null && (controller.tileKnowledge.isTileKnown(unit.location) || controller.tileKnowledge.isTileKnown(unit.previousLocation))) {
 					// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 					// (optionally, depending on preferences) and generalized so that modders can specify whether custom
@@ -155,6 +158,10 @@ public partial class Game : Node2D
 				break;
 			case MsgStartTurn mST:
 				OnPlayerStartTurn();
+				break;
+			case MsgFinishSave mFS:
+				PopupOverlay overlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				overlay.CloseCurrentPopup();
 				break;
 			}
 		}
@@ -366,7 +373,7 @@ public partial class Game : Node2D
 						using (var gameDataAccess = new UIGameDataAccess()) {
 							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 							if (tile != null) {
-								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
+								new MsgSetUnitPath(CurrentlySelectedUnit.id, tile).send();
 							}
 						}
 					}
@@ -484,8 +491,8 @@ public partial class Game : Node2D
 					case 9: dir = TileDirection.NORTHEAST; break;
 					default: return; // Impossible
 					}
-					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
-					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
+					new MsgMoveUnit(CurrentlySelectedUnit.id, dir).send();
+					setSelectedUnit(CurrentlySelectedUnit); //also triggers updating the lower-left info box
 				}
 			}
 			else if ((eventKeyDown.Keycode >= Godot.Key.Home) && (eventKeyDown.Keycode <= Godot.Key.Pagedown))
@@ -504,7 +511,7 @@ public partial class Game : Node2D
 					case Godot.Key.Pagedown: dir = TileDirection.SOUTHEAST; break; // fn-down arrow
 					default: return; // Impossible
 					}
-					new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
+					new MsgMoveUnit(CurrentlySelectedUnit.id, dir).send();
 					setSelectedUnit(CurrentlySelectedUnit);	//also triggers updating the lower-left info box
 				}
 			}
@@ -604,16 +611,16 @@ public partial class Game : Node2D
 		log.Verbose("The " + buttonName + " button was pressed");
 		switch (buttonName) {
 		case "hold":
-			new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
+			new MsgSkipUnitTurn(CurrentlySelectedUnit.id).send();
 			break;
 
 		case "fortify":
-			new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
+			new MsgSetFortification(CurrentlySelectedUnit.id, true).send();
 			break;
 
 		case "wait":
 			using (var gameDataAccess = new UIGameDataAccess()) {
-				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.id);
 				GetNextAutoselectedUnit(gameDataAccess.gameData);
 			}
 			break;
@@ -627,7 +634,7 @@ public partial class Game : Node2D
 
 		case "buildCity":
 			using (var gameDataAccess = new UIGameDataAccess()) {
-				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
+				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.id);
 				if (currentUnit.canBuildCity()) {
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
@@ -638,7 +645,7 @@ public partial class Game : Node2D
 
 		case "buildRoad":
 			if (CurrentlySelectedUnit.canBuildRoad()) {
-				new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
+				new MsgBuildRoad(CurrentlySelectedUnit.id).send();
 			}
 			break;
 
@@ -667,7 +674,7 @@ public partial class Game : Node2D
 	// Called by the disband popup
 	private void OnUnitDisbanded()
 	{
-		new MsgDisbandUnit(CurrentlySelectedUnit.guid).send();
+		new MsgDisbandUnit(CurrentlySelectedUnit.id).send();
 	}
 
 	/**
@@ -681,6 +688,12 @@ public partial class Game : Node2D
 
 	private void OnBuildCity(string name)
 	{
-		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();
+		new MsgBuildCity(CurrentlySelectedUnit.id, name).send();
+	}
+
+	private void OnSaveGame() {
+		string savePath = Global.LoadGamePath + ".save.json";
+		log.Debug("Saving game to ", savePath);
+		new MsgSaveGame(savePath).send();
 	}
 }

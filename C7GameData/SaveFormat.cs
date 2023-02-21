@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace C7GameData
 /*
@@ -78,11 +79,13 @@ namespace C7GameData
 
 			// Inflate experience levels
 			var levelsByKey = new Dictionary<string, ExperienceLevel>();
-			foreach (ExperienceLevel eL in save.GameData.experienceLevels)
+			foreach (ExperienceLevel eL in save.GameData.experienceLevels) {
 				levelsByKey.Add(eL.key, eL);
+			}
 			save.GameData.defaultExperienceLevel = levelsByKey[save.GameData.defaultExperienceLevelKey];
-			foreach (MapUnit unit in save.GameData.mapUnits)
+			foreach (MapUnit unit in save.GameData.mapUnits) {
 				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
+			}
 
 			//Inflate barbarian info
 			List<UnitPrototype> prototypes = save.GameData.unitPrototypes.Values.ToList();
@@ -92,6 +95,18 @@ namespace C7GameData
 				prototypes[save.GameData.barbarianInfo.advancedBarbarianIndex];
 			save.GameData.barbarianInfo.barbarianSeaUnit =
 				prototypes[save.GameData.barbarianInfo.barbarianSeaUnitIndex];
+
+			foreach (Player p in save.GameData.players) {
+				foreach(MapUnit u in p.units) {
+					u.owner = p;
+					if (u.curX != -1 && u.curY != -1) {
+						u.location = save.GameData.map.tileAt(u.curX, u.curY);
+					}
+					if (u.prevX != -1 && u.prevY != -1) {
+						u.previousLocation = save.GameData.map.tileAt(u.prevX, u.prevY);
+					}
+				}
+			}
 
 			return save;
 		}
