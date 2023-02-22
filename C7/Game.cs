@@ -688,8 +688,7 @@ public partial class Game : Node2D
 		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();
 	}
 
-	private void OnSaveGame() {
-		string path = Global.LoadGamePath + "_save.json";
+	private void OnSaveGame(string path) {
 		log.Debug("saving game to ", path);
 		new MsgSaveGame(path).send();
 	}

@@ -2,6 +2,8 @@ using Godot;
 
 public partial class GameMenu : Popup {
 
+	public Util.Civ3FileDialog SaveDialog;
+
 	public GameMenu() {
 		alignment = BoxContainer.AlignmentMode.Center;
 		margins = new Margins(top: 100);
@@ -9,6 +11,10 @@ public partial class GameMenu : Popup {
 
 	public override void _Ready() {
 		base._Ready();
+
+		this.SaveDialog = new Util.Civ3FileDialog(FileDialog.FileModeEnum.SaveFile);
+		this.SaveDialog.Connect("file_selected", Callable.From((string path) => GetParent().EmitSignal("SaveGame", path)));
+		GetNode<CanvasLayer>("/root/C7Game/CanvasLayer").AddChild(this.SaveDialog);
 
 		AddTexture(370, 300);
 		AddBackground(370, 300);
@@ -33,7 +39,6 @@ public partial class GameMenu : Popup {
 	}
 
 	private void save() {
-		GetParent().EmitSignal("SaveGame");
+		SaveDialog.Popup();
 	}
-
 }

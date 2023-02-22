@@ -12,7 +12,7 @@ public partial class PopupOverlay : HBoxContainer {
 	[Signal] public delegate void QuitEventHandler();
 	[Signal] public delegate void BuildCityEventHandler(string name);
 	[Signal] public delegate void HidePopupEventHandler();
-	[Signal] public delegate void SaveGameEventHandler();
+	[Signal] public delegate void SaveGameEventHandler(string path);
 
 	Control currentChild = null;
 
