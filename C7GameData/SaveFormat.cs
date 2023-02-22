@@ -76,6 +76,10 @@ namespace C7GameData
 				}
 			}
 
+			// HACK: when serializing save to JSON with references, a copy of Tile.NONE is not saved
+			// resulting in a reference not found error when deserializing the save. I think adding
+			// it here works since Tile.NONE has not been referenced yet in code, so the copy in the
+			// map.tiles is not a reference to Tile.NONE, but the actual instance. Need to
 			GameData.map.tiles.Add(Tile.NONE);
 		}
 
