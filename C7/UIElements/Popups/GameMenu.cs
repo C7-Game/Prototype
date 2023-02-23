@@ -1,9 +1,9 @@
+using System;
 using Godot;
 
 public partial class GameMenu : Popup
 {
-
-	private static GameMenu instance = null;
+	private static readonly Lazy<GameMenu> lazy = new Lazy<GameMenu>(() => new GameMenu());
 
 	private GameMenu() {
 		alignment = BoxContainer.AlignmentMode.Center;
@@ -23,12 +23,7 @@ public partial class GameMenu : Popup
 		AddButton("Quit Game (ESC)", 210, "quit");
 	}
 
-	public static GameMenu Get() {
-		if (GameMenu.instance == null) {
-			GameMenu.instance = new GameMenu();
-		}
-		return GameMenu.instance;
-	}
+	public static GameMenu Instance { get => lazy.Value; }
 
 	public override void _Ready()
 	{
@@ -44,5 +39,4 @@ public partial class GameMenu : Popup
 	{
 		GetParent().EmitSignal("HidePopup");
 	}
-
 }
