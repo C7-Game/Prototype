@@ -12,7 +12,7 @@ namespace C7GameData {
 	public class MapUnit {
 		public string guid { get; }
 		public UnitPrototype unitType { get; set; }
-		[JsonIgnore]
+		[JsonIgnore] // inflated in Player.OnDeserialized
 		public Player owner { get; set; }
 		public Tile previousLocation { get; private set; }
 		private Tile currentLocation;

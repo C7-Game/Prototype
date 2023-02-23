@@ -1,11 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
 namespace C7GameData
 {
-	using System;
-	using System.Collections.Generic;
 	/**
 	 * The game map, at the top level.
 	 */
-	public class GameMap
+	public class GameMap : IJsonOnDeserialized
 	{
 		// This may not belong here, but I'm not sure where it should go just now
 		public string RelativeModPath = "";
@@ -17,7 +19,7 @@ namespace C7GameData
 		// The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
 		// This is kind of a temporary thing. The reason it works this way right now is because I'm just rearranging the generation code from
 		// TerrainAsTileMap, eventually we'll want a more complex map generator which probably won't need this var.
-		[System.Text.Json.Serialization.JsonIgnore]
+		[JsonIgnore]
 		public int[,] terrainNoiseMap;
 
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
@@ -338,6 +340,11 @@ namespace C7GameData
 				}
 			}
 			return noiseField;
+		}
+
+		public void OnDeserialized() {
+			// Tile does not serialize Tile.neighbors so it is inflated here
+			this.computeNeighbors();
 		}
 	}
 }

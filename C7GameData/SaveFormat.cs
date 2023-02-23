@@ -66,16 +66,6 @@ namespace C7GameData
 			GameData.barbarianInfo.advancedBarbarian = prototypes[GameData.barbarianInfo.advancedBarbarianIndex];
 			GameData.barbarianInfo.barbarianSeaUnit = prototypes[GameData.barbarianInfo.barbarianSeaUnitIndex];
 
-			// Inflate tile neighbors
-			GameData.map.computeNeighbors();
-
-			// Link map units to their owners
-			foreach (Player p in GameData.players) {
-				foreach (MapUnit u in p.units) {
-					u.owner = p;
-				}
-			}
-
 			// HACK: when serializing save to JSON with references, a copy of Tile.NONE is not saved
 			// resulting in a reference not found error when deserializing the save. I think adding
 			// it here works since Tile.NONE has not been referenced yet in code, so the copy in the

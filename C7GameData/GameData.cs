@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Serilog;
 
 namespace C7GameData
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text.Json.Serialization;
 	public class GameData {
 		[JsonIgnore]
 		private static ILogger log = Log.ForContext<GameData>();

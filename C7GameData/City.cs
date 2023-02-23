@@ -23,6 +23,8 @@ namespace C7GameData
 
         public static City NONE = new City(Tile.NONE, null, "Dummy City");
 
+        public City() {} // for json serialization
+
         public City(Tile location, Player owner, string name)
         {
             guid = Guid.NewGuid().ToString();
