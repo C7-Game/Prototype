@@ -51,6 +51,10 @@ public partial class PopupOverlay : HBoxContainer
 			return;
 		}
 
+		if (child == currentChild) {
+			return; // already being displayed
+		}
+
 		Alignment = child.alignment;
 		OffsetTop = child.margins.top;
 		OffsetBottom = child.margins.bottom;

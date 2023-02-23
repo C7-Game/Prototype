@@ -3,14 +3,11 @@ using Godot;
 public partial class GameMenu : Popup
 {
 
-	public GameMenu() {
+	private static GameMenu instance = null;
+
+	private GameMenu() {
 		alignment = BoxContainer.AlignmentMode.Center;
 		margins = new Margins(top: 100);
-	}
-
-	public override void _Ready()
-	{
-		base._Ready();
 
 		AddTexture(370, 300);
 		AddBackground(370, 300);
@@ -24,6 +21,18 @@ public partial class GameMenu : Popup
 		AddButton("Retire (Ctrl-Q)", 160, "retire");
 		AddButton("Save Game (Ctrl-S)", 185, "save");
 		AddButton("Quit Game (ESC)", 210, "quit");
+	}
+
+	public static GameMenu Get() {
+		if (GameMenu.instance == null) {
+			GameMenu.instance = new GameMenu();
+		}
+		return GameMenu.instance;
+	}
+
+	public override void _Ready()
+	{
+		base._Ready();
 	}
 
 	private void quit()
