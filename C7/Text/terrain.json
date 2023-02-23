@@ -1,0 +1,181 @@
+{
+	"metadata": {
+		"mod": "civ3"
+	},
+	"types": {
+		"desert": {
+			"displayName": "Desert",
+			"baseFoodProduction": 0,
+			"baseShieldProduction": 1,
+			"baseCommerceProduction": 0,
+			"movementCost": 1,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Desert",
+				"amount": 0.1
+			}
+		},
+		"plains": {
+			"displayName": "Plains",
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 1,
+			"baseCommerceProduction": 0,
+			"movementCost": 1,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Plains",
+				"amount": 0.1
+			}
+		},
+		"grassland": {
+			"displayName": "Grassland",
+			"baseFoodProduction": 2,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 0,
+			"movementCost": 1,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Grassland",
+				"amount": 0.1
+			}
+		},
+		"tundra": {
+			"displayName": "Tundra",
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 0,
+			"movementCost": 1,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Tundra",
+				"amount": 0.1
+			}
+		},
+		"flood plain": {
+			"displayName": "Flood Plain",
+			"baseFoodProduction": 3,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 0,
+			"movementCost": 1,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Flood Plain",
+				"amount": 0.1
+			}
+		},
+		"hills": {
+			"displayName": "Hills",
+			"hilly": true,
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 1,
+			"baseCommerceProduction": 0,
+			"movementCost": 2,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Hills",
+				"amount": 0.5
+			}
+		},
+		"mountains": {
+			"displayName": "Mountains",
+			"hilly": true,
+			"baseFoodProduction": 0,
+			"baseShieldProduction": 1,
+			"baseCommerceProduction": 0,
+			"movementCost": 3,
+			"allowCities": false,
+			"defenseBonus": {
+				"description": "Mountains",
+				"amount": 1
+			}
+		},
+		"forest": {
+			"displayName": "Forest",
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 2,
+			"baseCommerceProduction": 0,
+			"movementCost": 2,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Forest",
+				"amount": 0.25
+			}
+		},
+		"jungle": {
+			"displayName": "Jungle",
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 0,
+			"movementCost": 3,
+			"allowCities": true,
+			"defenseBonus": {
+				"description": "Jungle",
+				"amount": 0.25
+			}
+		},
+		"marsh": {
+			"displayName": "Marsh",
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 0,
+			"movementCost": 2,
+			"allowCities": false,
+			"defenseBonus": {
+				"description": "Marsh",
+				"amount": 0.2
+			}
+		},
+		"volcano": {
+			"displayName": "Volcano",
+			"hilly": true,
+			"baseFoodProduction": 0,
+			"baseShieldProduction": 3,
+			"baseCommerceProduction": 0,
+			"movementCost": 3,
+			"allowCities": false,
+			"defenseBonus": {
+				"description": "Volcano",
+				"amount": 0.8
+			}
+		},
+		"coast": {
+			"displayName": "Coast",
+			"water": true,
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 2,
+			"movementCost": 1,
+			"allowCities": false,
+			"defenseBonus": {
+				"description": "Coast",
+				"amount": 0.1
+			}
+		},
+		"sea": {
+			"displayName": "Sea",
+			"water": true,
+			"baseFoodProduction": 1,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 1,
+			"movementCost": 1,
+			"allowCities": false,
+			"defenseBonus": {
+				"description": "Sea",
+				"amount": 0.1
+			}
+		},
+		"ocean": {
+			"displayName": "Ocean",
+			"water": true,
+			"baseFoodProduction": 0,
+			"baseShieldProduction": 0,
+			"baseCommerceProduction": 0,
+			"movementCost": 1,
+			"allowCities": false,
+			"defenseBonus": {
+				"description": "Ocean",
+				"amount": 0.1
+			}
+		}
+	}
+}
