@@ -17,7 +17,7 @@ public partial class MenuButton : TextureButton
 	public override void _Pressed()
 	{
 		PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-		popupOverlay.ShowPopup(new GameMenu(), PopupOverlay.PopupCategory.Info);
+		popupOverlay.ShowPopup(GameMenu.Instance, PopupOverlay.PopupCategory.Info);
 	}
 
 }

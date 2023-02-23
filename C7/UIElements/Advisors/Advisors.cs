@@ -20,12 +20,6 @@ public partial class Advisors : CenterContainer
 		this.Hide();
 	}
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//
-//  }
-
 	private void ShowLatestAdvisor()
 	{
 		log.Debug("Received request to show latest advisor");

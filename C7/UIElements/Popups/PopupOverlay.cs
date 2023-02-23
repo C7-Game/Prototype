@@ -1,7 +1,4 @@
 using Godot;
-using ConvertCiv3Media;
-using System;
-using System.Diagnostics;
 using Serilog;
 
 public partial class PopupOverlay : HBoxContainer
@@ -34,6 +31,7 @@ public partial class PopupOverlay : HBoxContainer
 		log.Debug("Hiding popup");
 		RemoveChild(currentChild);
 		Hide();
+		currentChild = null;
 	}
 
 	public void PlaySound(AudioStreamWav wav)
@@ -43,12 +41,17 @@ public partial class PopupOverlay : HBoxContainer
 		player.Play();
 	}
 
-	public void ShowPopup(Popup child, PopupCategory category)
+	public bool ShowPopup(Popup child, PopupCategory category)
 	{
-		if (child == null) // not necessary if we don't pass null?
-		{
+		if (child is null) {
+			// not necessary if we don't pass null? / always pass in new Popup explicitly
 			log.Error("Received request to show null popup");
-			return;
+			return false;
+		}
+
+		if (currentChild is not null) {
+			log.Debug("cannot show popup since current child is not null");
+			return false; // already showing a popup
 		}
 
 		Alignment = child.alignment;
@@ -79,6 +82,7 @@ public partial class PopupOverlay : HBoxContainer
 		AudioStreamWav wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
 		Visible = true;
 		PlaySound(wav);
+		return true;
 	}
 
 	/**
