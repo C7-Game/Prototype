@@ -11,7 +11,6 @@ namespace C7GameData
 
 		public int seed = -1;	//change here to set a hard-coded seed
 		public int turn {get; set;}
-		[JsonInclude]
 		public static Random rng; // TODO: Is GameData really the place for this?
 		public GameMap map {get; set;}
 		public List<Player> players = new List<Player>();

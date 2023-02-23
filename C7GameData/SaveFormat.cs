@@ -64,8 +64,6 @@ namespace C7GameData
 					}
 				}
 			}
-			// load default civ3 terrain types
-			save.GameData.terrainTypes =
 
 			// Inflate things that are stored by reference, first tiles
 			foreach (Tile tile in save.GameData.map.tiles) {

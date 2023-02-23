@@ -28,7 +28,7 @@ namespace C7GameData {
 		// different custom terrains in Mod A than Mod B, while still allowing internationalized versions of their
 		// names that don't break the scenario. E.g. "ocean". When a terrain named "foo" in a terrain file for mod "bar"
 		// is imported, the key is "foo/bar".
-		[JsonIgnore]
+		// [JsonIgnore] TODO: cannot ignore while terrain is stored in map
 		public string Key { get; set; } = "";
 		//The name is the display name.  E.g. "Ocean" in English scenarios, "Hochsee" in German scenarios.
 		public string DisplayName { get; set; } = "";
