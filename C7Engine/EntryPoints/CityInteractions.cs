@@ -16,6 +16,9 @@ namespace C7Engine
 			CityResident firstResident = new CityResident();
 			CityTileAssignmentAI.AssignNewCitizenToTile(newCity, firstResident);
 			newCity.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(newCity, null));
+			if (owner.cities.Count == 0) {
+				newCity.capital = true;
+			}
 			gameData.cities.Add(newCity);
 			owner.cities.Add(newCity);
 			tileWithNewCity.cityAtTile = newCity;

@@ -61,7 +61,7 @@ public class MapUnit
 	public override string ToString()
 	{
 		if (this != MapUnit.NONE) {
-			return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP, guid = " + guid;
+			return this.owner + " " + unitType.name + " at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP, guid = " + guid;
 		}
 		else {
 			return "This is the NONE unit";
