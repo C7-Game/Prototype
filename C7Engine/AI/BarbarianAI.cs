@@ -41,7 +41,7 @@ namespace C7Engine {
 
 							//Check if there are any undefended units that can be taken!
 							foreach (Tile tile in validTiles) {
-								if (tile.unitsOnTile.Exists(mapUnit => UndefendedUnit(mapUnit))) {
+								if (tile.unitsOnTile.Exists(mapUnit => IsUndefendedUnit(mapUnit))) {
 									bool alive = unit.move(unit.location.directionTo(tile));
 									// TODO: Restructure so we can avoid gotos.
 									goto nextMovementPoint;
@@ -85,7 +85,7 @@ nextUnit: ;
 			}
 		}
 
-		private static bool UndefendedUnit(MapUnit unit) {
+		private static bool IsUndefendedUnit(MapUnit unit) {
 			if (unit.owner.isBarbarians) {
 				return false;
 			}

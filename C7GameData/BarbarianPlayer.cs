@@ -23,5 +23,14 @@ namespace C7GameData {
 		public ReadOnlyCollection<BarbarianTribe> getTribes() {
 			return tribes.AsReadOnly();
 		}
+
+		public override void RemoveUnit(MapUnit unit) {
+			foreach (BarbarianTribe tribe in tribes) {
+				if (tribe.GetUnits().Contains(unit)) {
+					tribe.RemoveUnit(unit);
+					break;
+				}
+			}
+		}
 	}
 }
