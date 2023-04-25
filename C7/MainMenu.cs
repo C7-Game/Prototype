@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using C7Engine;
 using Serilog;
 
 public class MainMenu : Node2D
@@ -165,6 +166,8 @@ public class MainMenu : Node2D
 	private void _on_SetCiv3HomeDialog_dir_selected(string path)
 	{
 		Util.Civ3Root = path;
+		C7Settings.SetValue("locations", "civ3InstallDir", path);
+		C7Settings.SaveSettings();
 		// This function should only be reachable if DisplayTitleScreen failed on previous runs, so should be OK to run here
 		DisplayTitleScreen();
 	}
