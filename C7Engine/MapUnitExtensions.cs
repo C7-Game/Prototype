@@ -295,6 +295,12 @@ public static class MapUnitExtensions {
 		if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
 			tile.DisbandNonDefendingUnits();
 			EngineStorage.gameData.map.barbarianCamps.Remove(tile);
+			BarbarianPlayer barbarians = (BarbarianPlayer)EngineStorage.gameData.players.Find(player => player.isBarbarians);
+			foreach (BarbarianTribe tribe in barbarians.getTribes()) {
+				if (tribe.GetCamps().Contains(tile)) {
+					tribe.RemoveCamp(tile);
+				}
+			}
 			tile.hasBarbarianCamp = false;
 		}
 
@@ -430,12 +436,7 @@ public static class MapUnitExtensions {
 		// EngineStorage.animTracker.endAnimation(unit, false);   TODO: Must send message instead of call directly
 		unit.location.unitsOnTile.Remove(unit);
 		gameData.mapUnits.Remove(unit);
-		foreach(Player player in gameData.players)
-		{
-			if (player.units.Contains(unit)) {
-				player.units.Remove(unit);
-			}
-		}
+		unit.owner.RemoveUnit(unit);
 	}
 
 	public static bool canBuildCity(this MapUnit unit)

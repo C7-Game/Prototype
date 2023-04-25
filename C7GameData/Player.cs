@@ -83,6 +83,12 @@ public class Player
 		return true;
 	}
 
+	public virtual void RemoveUnit(MapUnit unit) {
+		if (units.Contains(unit)) {
+			units.Remove(unit);
+		}
+	}
+
 	public override string ToString() {
 		if (civilization != null)
 			return civilization.cityNames.First();

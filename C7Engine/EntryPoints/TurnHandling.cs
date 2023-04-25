@@ -86,40 +86,41 @@ namespace C7Engine
 		private static void SpawnBarbarians(GameData gameData)
 		{
 			//Generate new barbarian units.
-			Player barbPlayer = gameData.players.Find(player => player.isBarbarians);
-			foreach (Tile tile in gameData.map.barbarianCamps) {
-				//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
-				int result = GameData.rng.Next(100);
-				log.Verbose("Random barb result = " + result);
-				if (result < 4) {
-					MapUnit newUnit = new MapUnit();
-					newUnit.location = tile;
-					newUnit.owner = gameData.players[0];
-					newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
-					newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-					newUnit.experienceLevel = gameData.defaultExperienceLevel;
-					newUnit.hitPointsRemaining = 3;
-					newUnit.isFortified = true; //todo: hack for unit selection
+			BarbarianPlayer barbPlayer = (BarbarianPlayer)gameData.players.Find(player => player.isBarbarians);
+			foreach (BarbarianTribe tribe in barbPlayer.getTribes()) {
+				foreach (Tile tile in tribe.GetCamps()) {
+					//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
+					int result = GameData.rng.Next(100);
+					log.Verbose("Random barb result = " + result);
+					if (result < 5) {
+						MapUnit newUnit = new MapUnit();
+						newUnit.location = tile;
+						newUnit.owner = barbPlayer;
+						newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
+						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+						newUnit.experienceLevel = gameData.defaultExperienceLevel;
+						newUnit.hitPointsRemaining = 3;
+						newUnit.isFortified = true; //todo: hack for unit selection
 
-					tile.unitsOnTile.Add(newUnit);
-					gameData.mapUnits.Add(newUnit);
-					barbPlayer.units.Add(newUnit);
-					log.Debug("New barbarian added at " + tile);
-				}
-				else if (tile.NeighborsWater() && result < 6) {
-					MapUnit newUnit = new MapUnit();
-					newUnit.location = tile;
-					newUnit.owner = gameData.players[0]; //todo: make this reliably point to the barbs
-					newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;
-					newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-					newUnit.experienceLevel = gameData.defaultExperienceLevel;
-					newUnit.hitPointsRemaining = 3;
-					newUnit.isFortified = true; //todo: hack for unit selection
+						tile.unitsOnTile.Add(newUnit);
+						gameData.mapUnits.Add(newUnit);
+						tribe.AddUnit(newUnit);
+						log.Debug("New barbarian added at " + tile);
+					} else if (tile.NeighborsWater() && result < 7) {
+						MapUnit newUnit = new MapUnit();
+						newUnit.location = tile;
+						newUnit.owner = barbPlayer;
+						newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;
+						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+						newUnit.experienceLevel = gameData.defaultExperienceLevel;
+						newUnit.hitPointsRemaining = 3;
+						newUnit.isFortified = true; //todo: hack for unit selection
 
-					tile.unitsOnTile.Add(newUnit);
-					gameData.mapUnits.Add(newUnit);
-					barbPlayer.units.Add(newUnit);
-					log.Debug("New barbarian galley added at " + tile);
+						tile.unitsOnTile.Add(newUnit);
+						gameData.mapUnits.Add(newUnit);
+						tribe.AddUnit(newUnit);
+						log.Debug("New barbarian galley added at " + tile);
+					}
 				}
 			}
 		}
