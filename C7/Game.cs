@@ -93,7 +93,7 @@ public partial class Game : Node2D
 			}
 
 			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
-			Player = GetNode<CharacterBody2D>("CharacterBody2D");
+			// Player = GetNode<CharacterBody2D>("CharacterBody2D");
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed",new Callable(this,"_OnViewportSizeChanged"));
 

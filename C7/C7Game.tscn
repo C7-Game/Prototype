@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cldl5nk4n61m2"]
+[gd_scene load_steps=15 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" path="res://Game.cs" id="1"]
 [ext_resource type="Script" path="res://UIElements/Advisors/Advisors.cs" id="3"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://UIElements/UnitButtons/RenameButton.cs" id="8"]
 [ext_resource type="Script" path="res://UIElements/Popups/PopupOverlay.cs" id="9"]
 [ext_resource type="Theme" uid="uid://c1jpmssnhvodi" path="res://C7Theme.tres" id="10"]
+[ext_resource type="Script" path="res://PlayerController.gd" id="11_fjijt"]
 [ext_resource type="Script" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
 
 [sub_resource type="Animation" id="2"]
@@ -79,9 +80,9 @@ anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 1024.0
+offset_left = -128.0
 offset_top = 80.0
-offset_right = 1024.0
+offset_right = -128.0
 offset_bottom = 9520.0
 grow_horizontal = 0
 grow_vertical = 2
@@ -224,9 +225,10 @@ script = ExtResource("9")
 
 [node name="PopupSound" type="AudioStreamPlayer" parent="CanvasLayer/PopupOverlay"]
 
-[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+[node name="PlayerController" type="CharacterBody2D" parent="."]
+script = ExtResource("11_fjijt")
 
-[node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
+[node name="Camera2D" type="Camera2D" parent="PlayerController"]
 anchor_mode = 0
 
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/GameStatus" method="OnNewUnitSelected"]
