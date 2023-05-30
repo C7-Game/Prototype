@@ -2,8 +2,7 @@ using Serilog;
 
 namespace C7Engine
 {
-
-using System;
+	using System;
 using System.Collections.Generic;
 using System.Linq;
 using Pathing;
@@ -440,7 +439,7 @@ public static class MapUnitExtensions {
 
 	public static bool canBuildCity(this MapUnit unit)
 	{
-		if (!unit.unitType.actions.Contains("buildCity")) {
+		if (!unit.unitType.actions.Contains(C7Action.UnitBuildCity)) {
 			return false;
 		}
 		if (unit.location.HasCity || !unit.location.IsAllowCities()) {
@@ -468,7 +467,7 @@ public static class MapUnitExtensions {
 	}
 
 	public static bool canBuildRoad(this MapUnit unit) {
-		return unit.unitType.actions.Contains("buildRoad") && unit.location.IsLand() && !unit.location.overlays.road;
+		return unit.unitType.actions.Contains(C7Action.UnitBuildRoad) && unit.location.IsLand() && !unit.location.overlays.road;
 	}
 
 	public static void buildRoad(this MapUnit unit) {

@@ -244,28 +244,28 @@ namespace C7GameData
 				prototype.bombard = prto.BombardStrength;
 				prototype.iconIndex = prto.IconIndex;
 				if (prto.BuildCity) {
-					prototype.actions.Add("buildCity");
+					prototype.actions.Add(C7Action.UnitBuildCity);
 				}
 				if (prto.BuildRoad) {
-					prototype.actions.Add("buildRoad");
+					prototype.actions.Add(C7Action.UnitBuildRoad);
 				}
 				if (prto.Bombard) {
-					prototype.actions.Add("bombard");
+					prototype.actions.Add(C7Action.UnitBombard);
 				}
 				if (prto.SkipTurn) {
-					prototype.actions.Add("hold");
+					prototype.actions.Add(C7Action.UnitHold);
 				}
 				if (prto.Wait) {
-					prototype.actions.Add("wait");
+					prototype.actions.Add(C7Action.UnitWait);
 				}
 				if (prto.Fortify) {
-					prototype.actions.Add("fortify");
+					prototype.actions.Add(C7Action.UnitFortify);
 				}
 				if (prto.Disband) {
-					prototype.actions.Add("disband");
+					prototype.actions.Add(C7Action.UnitDisband);
 				}
 				if (prto.GoTo) {
-					prototype.actions.Add("goTo");
+					prototype.actions.Add(C7Action.UnitGoto);
 				}
 				//Temporary check until #329/#330 are finished
 				if (!c7SaveFormat.GameData.unitPrototypes.ContainsKey(prototype.name)) {
