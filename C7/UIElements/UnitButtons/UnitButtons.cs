@@ -74,8 +74,6 @@ public partial class UnitButtons : VBoxContainer {
 	}
 
 	private void onButtonPressed(string action) {
-		GD.Print("pressed " + action);
-		log.Debug("pressed button " + action);
 		Input.ActionPress(action);
 	}
 
