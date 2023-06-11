@@ -382,26 +382,25 @@ public partial class Game : Node2D {
 							new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
 
 						string yield = tile.YieldString(controller);
-						//These GD.Print statements are debugging prints for developers to see info about the tile
-						//For now I'm leaving them as GD.Print.  Could revisit this later.
-						GD.Print($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
+						log.Debug($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
 
 						if (tile.cityAtTile != null) {
 							City city = tile.cityAtTile;
-							GD.Print($"  {city.name}, production {city.shieldsStored} of {city.itemBeingProduced.shieldCost}");
+							log.Debug($"  {city.name}, production {city.shieldsStored} of {city.itemBeingProduced.shieldCost}");
 							foreach (CityResident resident in city.residents) {
-								GD.Print($"  Resident working at {resident.tileWorked}");
+								log.Debug($"  Resident working at {resident.tileWorked}");
 							}
 						}
 
 						if (tile.unitsOnTile.Count > 0) {
 							foreach (MapUnit unit in tile.unitsOnTile) {
-								GD.Print("  Unit on tile: " + unit);
-								GD.Print("  Strategy: " + unit.currentAIData);
+								log.Debug("  Unit on tile: " + unit);
+								log.Debug("  Strategy: " + unit.currentAIData);
 							}
 						}
-					} else
-						GD.Print("Didn't click on any tile");
+					} else {
+						log.Debug("Didn't click on any tile");
+					}
 				}
 			}
 		} else if (@event is InputEventMouseMotion eventMouseMotion && IsMovingCamera) {
@@ -425,10 +424,6 @@ public partial class Game : Node2D {
 					}
 				}
 			}
-		} else if (@event is InputEventKey eventKeyUp && !eventKeyUp.Pressed) {
-			if (eventKeyUp.Keycode == Godot.Key.Shift) {
-				SetAnimationsEnabled(true);
-			}
 		} else if (@event is InputEventMagnifyGesture magnifyGesture) {
 			// UI slider has the min/max zoom settings for now
 			VSlider slider = GetNode<VSlider>("CanvasLayer/SlideOutBar/VBoxContainer/Zoom");
@@ -446,7 +441,7 @@ public partial class Game : Node2D {
 	// Handle Godot keybind actions
 	private void processActions() {
 
-		if (Input.IsActionJustPressed("end_turn") && !this.HasCurrentlySelectedUnit()) {
+		if (Input.IsActionJustPressed(C7Action.EndTurn) && !this.HasCurrentlySelectedUnit()) {
 			log.Verbose("end_turn key pressed");
 			this.OnPlayerEndTurn();
 		}
@@ -551,7 +546,7 @@ public partial class Game : Node2D {
 		if (Input.IsActionJustPressed(C7Action.UnitBuildCity) && CurrentlySelectedUnit.canBuildCity()) {
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
-				GD.Print(currentUnit.Describe());
+				log.Debug(currentUnit.Describe());
 				if (currentUnit.canBuildCity()) {
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),

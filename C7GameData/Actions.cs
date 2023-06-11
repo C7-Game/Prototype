@@ -1,5 +1,6 @@
 namespace C7GameData {
 	public static class C7Action {
+		public static readonly string EndTurn = "end_turn";
 		public static readonly string UnitBombard = "unit_bombard";
 		public static readonly string UnitBuildCity = "unit_build_city";
 		public static readonly string UnitBuildRoad = "unit_build_road";
