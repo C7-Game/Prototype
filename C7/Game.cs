@@ -450,21 +450,21 @@ public partial class Game : Node2D {
 			// TODO: replace bool with an invalid TileDirection enum
 			TileDirection dir = TileDirection.NORTH;
 			bool moveUnit = true;
-			if (Input.IsActionJustPressed("move_unit_southwest")) {
+			if (Input.IsActionJustPressed(C7Action.MoveUnitSouthwest)) {
 				dir = TileDirection.SOUTHWEST;
-			} else if (Input.IsActionJustPressed("move_unit_south")) {
+			} else if (Input.IsActionJustPressed(C7Action.MoveUnitSouth)) {
 				dir = TileDirection.SOUTH;
-			} else if (Input.IsActionJustPressed("move_unit_southeast")) {
+			} else if (Input.IsActionJustPressed(C7Action.MoveUnitSoutheast)) {
 				dir = TileDirection.SOUTHEAST;
-			} else if (Input.IsActionJustPressed("move_unit_west")) {
+			} else if (Input.IsActionJustPressed(C7Action.MoveUnitWest)) {
 				dir = TileDirection.WEST;
-			} else if (Input.IsActionJustPressed("move_unit_east")) {
+			} else if (Input.IsActionJustPressed(C7Action.MoveUnitEast)) {
 				dir = TileDirection.EAST;
-			} else if (Input.IsActionJustPressed("move_unit_northwest")) {
+			} else if (Input.IsActionJustPressed(C7Action.MoveUnitNorthwest)) {
 				dir = TileDirection.NORTHWEST;
-			} else if (Input.IsActionJustPressed("move_unit_north")) {
+			} else if (Input.IsActionJustPressed(C7Action.MoveUnitNorth)) {
 				dir = TileDirection.NORTH;
-			} else if (Input.IsActionJustPressed("move_unit_northeast")) {
+			} else if (Input.IsActionJustPressed(C7Action.MoveUnitNortheast)) {
 				dir = TileDirection.NORTHEAST;
 			} else {
 				moveUnit = false;
@@ -475,17 +475,17 @@ public partial class Game : Node2D {
 			}
 		}
 
-		if (Input.IsActionJustPressed("toggle_grid")) {
+		if (Input.IsActionJustPressed(C7Action.ToggleGrid)) {
 			this.mapView.gridLayer.visible = !this.mapView.gridLayer.visible;
 		}
 
-		if (Input.IsActionJustPressed("escape") && !this.inUnitGoToMode) {
+		if (Input.IsActionJustPressed(C7Action.Escape) && !this.inUnitGoToMode) {
 			log.Debug("Got request for escape/quit");
 			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 		}
 
-		if (Input.IsActionJustPressed("toggle_zoom")) {
+		if (Input.IsActionJustPressed(C7Action.ToggleZoom)) {
 			if (mapView.cameraZoom != 1) {
 				mapView.setCameraZoomFromMiddle(1.0f);
 				VSlider slider = GetNode<VSlider>("CanvasLayer/SlideOutBar/VBoxContainer/Zoom");
@@ -497,9 +497,9 @@ public partial class Game : Node2D {
 			}
 		}
 
-		if (Input.IsActionJustPressed("toggle_animations")) {
+		if (Input.IsActionJustPressed(C7Action.ToggleAnimations)) {
 			SetAnimationsEnabled(false);
-		} else if (Input.IsActionJustReleased("toggle_animations")) {
+		} else if (Input.IsActionJustReleased(C7Action.ToggleAnimations)) {
 			SetAnimationsEnabled(true);
 		}
 
