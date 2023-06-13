@@ -2,53 +2,39 @@ using Godot;
 using ConvertCiv3Media;
 using System;
 
-public partial class UnitControlButton : TextureButton
-{
+public partial class UnitControlButton : TextureButton {
 
-	public string key;
-	private int graphicsX;
-	private int graphicsY;
+	public string action; // corresponding Godot action (keybinding)
+	private int x;
+	private int y;
 	private Action<string> onPressedAction;
-	public Godot.Key shortcutKey;
 
-	public static int scale = 32;   //how many pixels each button is in each direction
+	public static int scale = 32; // how many pixels each button is in each direction
 
-	public UnitControlButton(string key, int graphicsX, int graphicsY, Action<string> onPressedAction)
-	{
-		this.key = key;
-		this.graphicsX = graphicsX;
-		this.graphicsY = graphicsY;
-		this.onPressedAction = onPressedAction;
-	}
-
-	public UnitControlButton(string key, Godot.Key shortcut, int graphicsX, int graphicsY, Action<string> onPressedAction) {
-		this.key = key;
-		this.shortcutKey = shortcut;
-		this.graphicsX = graphicsX;
-		this.graphicsY = graphicsY;
+	public UnitControlButton(string action, int x, int y, Action<string> onPressedAction) {
+		this.action = action;
+		this.x = x;
+		this.y = y;
 		this.onPressedAction = onPressedAction;
 	}
 
 	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
-	{
+	public override void _Ready() {
 		Pcx buttonPcx = new Pcx(Util.Civ3MediaPath("Conquests/Art/interface/NormButtons.PCX"));
 		Pcx buttonPcxRollover = new Pcx(Util.Civ3MediaPath("Conquests/Art/interface/rolloverbuttons.PCX"));
 		Pcx buttonPcxPressed = new Pcx(Util.Civ3MediaPath("Conquests/Art/interface/highlightedbuttons.PCX"));
 		Pcx buttonPcxAlpha = new Pcx(Util.Civ3MediaPath("Conquests/Art/interface/ButtonAlpha.pcx"));
-		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, graphicsX * scale, graphicsY * scale, scale, scale);
-		ImageTexture rolloverTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcxRollover, buttonPcxAlpha, graphicsX * scale, graphicsY * scale, scale, scale);
-		ImageTexture pressedTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcxPressed, buttonPcxAlpha, graphicsX * scale, graphicsY * scale, scale, scale);
+		ImageTexture menuTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcx, buttonPcxAlpha, x * scale, y * scale, scale, scale);
+		ImageTexture rolloverTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcxRollover, buttonPcxAlpha, x * scale, y * scale, scale, scale);
+		ImageTexture pressedTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(buttonPcxPressed, buttonPcxAlpha, x * scale, y * scale, scale, scale);
 		this.TextureNormal = menuTexture;
 		this.TextureHover = rolloverTexture;
 		this.TexturePressed = pressedTexture;
 
-		this.Connect("pressed", new Callable(this, "ButtonPressed"));
+		this.Connect("pressed", new Callable(this, "onButtonPress"));
 	}
 
-	// TODO: check hides inherited warning
-	private void ButtonPressed()
-	{
-		onPressedAction(this.key);
+	private void onButtonPress() {
+		onPressedAction(this.action);
 	}
 }
