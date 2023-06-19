@@ -5,16 +5,63 @@ using C7Engine;
 using ConvertCiv3Media;
 using Godot;
 
+// UnitSprite represents an animated unit. It's specific to a unit, action, and direction.
+// UnitSprite comprises two sprites: a base sprite and a civ color-tinted sprite. The
+// shading is done in the UnitTint.gdshader shader.
+public partial class UnitSprite : Node2D {
+
+	private readonly int unitAnimZIndex = 100;
+	private readonly string unitShaderPath = "res://UnitTint.gdshader";
+	private Shader unitShader;
+
+	public AnimatedSprite2D sprite;
+	public AnimatedSprite2D spriteTint;
+	public ShaderMaterial material;
+
+	public int GetNextFrameByProgress(string animation, float progress) {
+		int frameCount = sprite.SpriteFrames.GetFrameCount(animation);
+		int nextFrame = (int)((float)frameCount * progress);
+		return Mathf.Clamp(nextFrame, 0, frameCount - 1);
+	}
+
+	public void SetFrame(int frame) {
+		sprite.Frame = frame;
+		spriteTint.Frame = frame;
+	}
+
+	public void SetAnimation(string name) {
+		sprite.Animation = name;
+		spriteTint.Animation = name;
+	}
+
+	public Vector2 FrameSize(string animation) {
+		return sprite.SpriteFrames.GetFrameTexture(animation, 0).GetSize();
+	}
+
+	public UnitSprite(AnimationManager manager) {
+		sprite = new AnimatedSprite2D{
+			ZIndex = unitAnimZIndex,
+			SpriteFrames = manager.spriteFrames,
+		};
+		spriteTint = new AnimatedSprite2D{
+			ZIndex = unitAnimZIndex,
+			SpriteFrames= manager.tintFrames,
+		};
+
+		material = new ShaderMaterial();
+		unitShader = GD.Load<Shader>(unitShaderPath);
+		material.Shader = unitShader;
+		spriteTint.Material = material;
+
+		AddChild(sprite);
+		AddChild(spriteTint);
+	}
+}
+
 public partial class UnitLayer : LooseLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
-
-	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
-	// any particular order so we must use the ZIndex property to ensure they're properly layered.
-	public const int effectAnimZIndex = 150;
-	public const int unitAnimZIndex = 100;
-	public const int cursorZIndex = 50;
 
 	public UnitLayer() {
 		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));
@@ -53,101 +100,28 @@ public partial class UnitLayer : LooseLayer {
 		}
 	}
 
-	// AnimationInstance represents an animation appearing on the screen. It's specific to a unit, action, and direction. AnimationInstances have
-	// two components: a ShaderMaterial and a MeshInstance2D. The ShaderMaterial runs the unit shader (created by UnitLayer.getShader) with all
-	// the parameters set to a particular texture, civ color, direction, etc. The MeshInstance2D is what's actually drawn by Godot, i.e., what's
-	// added to the node tree. AnimationInstances are only active for one frame at a time but they live as long as the UnitLayer. They are
-	// retrieved or created as needed by getBlankAnimationInstance during the drawing of units and are hidden & requeued for use at the beginning
-	// of each frame.
-
-	// should hold animation players instead of animations
-	public partial class AnimationInstance {
-
-		public AnimatedSprite2D sprite;
-		public AnimatedSprite2D spriteTint;
-		public ShaderMaterial material;
-
-		public void SetPosition(Vector2 position) {
-			this.sprite.Position = position;
-			this.spriteTint.Position = position;
-		}
-
-		public int GetNextFrameByProgress(string animation, float progress) {
-			// AnimatedSprite2D has a settable FrameProgress field, which I expected to
-			// update the current frame of the animation upon setting, but it did not
-			// when I tried it, so instead, calculate what the next frame should be
-			// based on the progress.
-			int frameCount = this.sprite.SpriteFrames.GetFrameCount(animation);
-			int nextFrame = (int)((float)frameCount * progress);
-			return nextFrame >= frameCount ? frameCount - 1 : (nextFrame < 0 ? 0 : nextFrame);
-		}
-
-		public void SetFrame(int frame) {
-			this.sprite.Frame = frame;
-			this.spriteTint.Frame = frame;
-		}
-
-		public void SetAnimation(string name) {
-			this.sprite.Animation = name;
-			this.spriteTint.Animation = name;
-		}
-
-		public void Show() {
-			this.sprite.Show();
-			this.spriteTint.Show();
-		}
-
-		public void Hide() {
-			this.sprite.Hide();
-			this.spriteTint.Hide();
-		}
-
-		public Vector2 FrameSize(string animation) {
-			return this.sprite.SpriteFrames.GetFrameTexture(animation, 0).GetSize();
-		}
-
-		public AnimationInstance(AnimationManager manager) {
-			// AnimationManager manager = looseView.mapView.game.civ3AnimData;
-
-			this.sprite = new AnimatedSprite2D();
-			this.sprite.ZIndex = unitAnimZIndex;
-			this.sprite.SpriteFrames = manager.spriteFrames;
-
-			this.spriteTint = new AnimatedSprite2D();
-			this.spriteTint.ZIndex = unitAnimZIndex;
-			this.spriteTint.SpriteFrames = manager.tintFrames;
-
-			this.material = new ShaderMaterial();
-			this.material.Shader = GD.Load<Shader>("res://UnitTint.gdshader");
-			this.spriteTint.Material = this.material;
-
-			// looseView.AddChild(sprite);
-			// looseView.AddChild(spriteTint);
-		}
-	}
-
-	private List<AnimationInstance> animInsts = new List<AnimationInstance>();
+	private List<UnitSprite> animInsts = new List<UnitSprite>();
 	private int nextBlankAnimInst = 0;
 
 	// Returns the next unused AnimationInstance or creates & returns a new one if none are available.
-	public AnimationInstance getBlankAnimationInstance(LooseView looseView) {
+	public UnitSprite getBlankAnimationInstance(LooseView looseView) {
 		if (nextBlankAnimInst >= animInsts.Count) {
 			// animInsts.Add(new AnimationInstance(looseView));
 		}
-		AnimationInstance inst = animInsts[nextBlankAnimInst];
+		UnitSprite inst = animInsts[nextBlankAnimInst];
 		nextBlankAnimInst++;
 		return inst;
 	}
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
-		AnimationInstance inst = getBlankAnimationInstance(looseView);
+		UnitSprite inst = getBlankAnimationInstance(looseView);
 		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
 		string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
 
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
 		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
 		Vector2 position = tileCenter + animOffset - new Vector2(0, inst.FrameSize(animName).Y / 4);
-		inst.SetPosition(position);
+		inst.Position = position;
 
 		var civColor = new Color(unit.owner.color);
 		int nextFrame = inst.GetNextFrameByProgress(animName, appearance.progress);
