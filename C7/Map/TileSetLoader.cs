@@ -13,6 +13,7 @@ namespace C7.Map {
 		Resource,
 		TerrainYield,
 		Building,
+		Grid,
 		Invalid,
 	};
 
@@ -44,6 +45,7 @@ namespace C7.Map {
 		TerrainYield,
 		TerrainBuilding,
 		GoodyHut,
+		Grid,
 		Invalid,
 	}
 
@@ -216,6 +218,13 @@ namespace C7.Map {
 				TileSetAtlasSource source = loader.Load();
 				tileset.AddSource(source, atlas.Index());
 			}
+
+			TileSetAtlasSource gridSource = new TileSetAtlasSource{
+				Texture = Util.LoadTextureFromC7JPG("Art/grid.png"),
+				TextureRegionSize = tileSize,
+			};
+			gridSource.CreateTile(new Vector2I(0, 0));
+			tileset.AddSource(gridSource, Atlas.Grid.Index());
 
 			return tileset;
 		}

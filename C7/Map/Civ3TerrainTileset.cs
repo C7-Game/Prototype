@@ -95,9 +95,13 @@ namespace C7.Map {
 			if (corners.Length != 4) {
 				throw new ArgumentException($"terrain corner must be of 4 tiles but got {corners.Length}");
 			}
-			return terrainPcxList.Find(pcx => pcx.validFor(corners));
-		}
-
+			TerrainPcx pcx = terrainPcxList.Find(pcx => pcx.validFor(corners));
+			if (pcx is null) {
+				string msg = corners.Join(", ");
+				// GD.Print($"could not find pcx for terrain corner combination: {msg}");
+				throw new ArgumentException($"could not find pcx for terrain corner combination: {msg}");
+			}
+			return pcx;
+ 		}
 	}
-
 }

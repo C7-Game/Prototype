@@ -1,43 +1,47 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using C7Engine.AI.StrategicAI;
-using C7GameData.AIData;
 
 namespace C7GameData
 {
-using System;
 
 public class Player
 {
-	public string guid { get; set; }
+	public EntityID id { get; set; }
 	public uint color { get; set; }
 	public bool isBarbarians = false;
-	//TODO: Refactor front-end so it sends player GUID with requests.
+	//TODO: Refactor front-end so it sends player ID with requests.
 	//We should allow multiple humans, this is a temporary measure.
 	public bool isHuman = false;
 	public bool hasPlayedThisTurn = false;
 
 	public Civilization civilization;
-	private int cityNameIndex = 0;
+	public int cityNameIndex = 0;
 
+	[JsonIgnore]
 	public List<MapUnit> units = new List<MapUnit>();
+	[JsonIgnore]
 	public List<City> cities = new List<City>();
 	public TileKnowledge tileKnowledge = new TileKnowledge();
 
 	//Ordered list of priority data.  First is most important.
+	[JsonIgnore]
 	public List<StrategicPriority> strategicPriorityData = new List<StrategicPriority>();
 	public int turnsUntilPriorityReevaluation = 0;
 
+	public Player() {}
+
 	public Player(uint color)
 	{
-		guid = Guid.NewGuid().ToString();
+		id = EntityID.New("Player");
 		this.color = color & 0xFFFFFFFF;
 	}
 
 	public Player(Civilization civilization, uint color)
 	{
 		this.civilization = civilization;
-		guid = Guid.NewGuid().ToString();
+		id = EntityID.New("Player");
 		this.color = color & 0xFFFFFFFF;
 	}
 
@@ -60,8 +64,6 @@ public class Player
 		cityNameIndex++;
 		return name;
 	}
-
-	public Player(){}
 
 	public bool IsAtPeaceWith(Player other)
 	{

@@ -122,7 +122,6 @@ namespace QueryCiv3.Sav
         private fixed int Embargoes[32];
         private fixed byte UnknownBuffer9[72];
         public int Color;
-
         private fixed byte Text[176];
         public string LeaderName { get => Util.GetString(ref this, 1896, 32); }
         public string Title { get => Util.GetString(ref this, 1928, 24); }

@@ -10,10 +10,10 @@ namespace C7GameData {
 	 * A unit on the map.  Not to be confused with a unit prototype.
 	 **/
 	public class MapUnit {
-		public string guid { get; }
+		public EntityID id { get; set; }
 		public UnitPrototype unitType { get; set; }
 		public Player owner { get; set; }
-		public Tile previousLocation { get; private set; }
+		public Tile previousLocation { get; set; }
 		private Tile currentLocation;
 
 		public Tile location {
@@ -46,8 +46,10 @@ namespace C7GameData {
 		public List<string> availableActions = new List<string>();
 		public UnitAIData currentAIData;
 
-		public MapUnit() {
-			guid = Guid.NewGuid().ToString();
+		public MapUnit() {}
+
+		public MapUnit(string prototype) {
+			id = EntityID.New(prototype);
 		}
 
 		public bool IsBusy() {
@@ -56,7 +58,7 @@ namespace C7GameData {
 
 		public override string ToString() {
 			if (this != MapUnit.NONE) {
-				return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP, guid = " + guid;
+				return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP, guid = " + id.ToString();
 			} else {
 				return "This is the NONE unit";
 			}
@@ -114,6 +116,6 @@ namespace C7GameData {
 			}
 		}
 
-		public static MapUnit NONE = new MapUnit();
+		public static MapUnit NONE = new MapUnit("NONE");
 	}
 }

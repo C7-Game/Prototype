@@ -11,7 +11,7 @@ namespace QueryCiv3 {
 	}
 
 	public struct IntBitmap {
-		private int Flags;
+		public int Flags;
 		public bool this[int i] { get => ((Flags >> i) & 1) == 1; }
 	}
 

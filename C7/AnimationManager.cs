@@ -81,8 +81,9 @@ public partial class AnimationManager {
 	}
 
 	public string getUnitFlicFilepath(UnitPrototype unit, MapUnit.AnimatedAction action) {
-		string directory = String.Format("Art/Units/{0}", unit.name);
-		IniData ini = getUnitINIData(unit.name);
+		string name = unit.name == "Army" ? "Army Ancient Times" : unit.name; // TODO: workaround for age specific army flic
+		string directory = String.Format("Art/Units/{0}", name);
+		IniData ini = getUnitINIData(name);
 		string filename = getFlicFileName(ini, action);
 		return directory.PathJoin(filename);
 	}

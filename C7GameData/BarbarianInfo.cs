@@ -11,9 +11,12 @@ namespace C7GameData {
 		public int basicBarbarianIndex = 0;
 		public int advancedBarbarianIndex = 0;
 		public int barbarianSeaUnitIndex = 0;
-		[JsonIgnore] public UnitPrototype basicBarbarian;
-		[JsonIgnore] public UnitPrototype advancedBarbarian;
-		[JsonIgnore] public UnitPrototype barbarianSeaUnit;
+		[JsonIgnore]
+		public UnitPrototype basicBarbarian;
+		[JsonIgnore]
+		public UnitPrototype advancedBarbarian;
+		[JsonIgnore]
+		public UnitPrototype barbarianSeaUnit;
 
 		public int defaultHitpoints = 2;
 		public int maxHitpoints = 2;

@@ -2,6 +2,7 @@ namespace C7GameData
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Text.Json.Serialization;
 	/**
 	 * The game map, at the top level.
 	 */
@@ -17,7 +18,7 @@ namespace C7GameData
 		// The terrainNoiseMap is a full width-by-height matrix unlike the normal game map which has only width/2 tiles per row which are staggered.
 		// This is kind of a temporary thing. The reason it works this way right now is because I'm just rearranging the generation code from
 		// TerrainAsTileMap, eventually we'll want a more complex map generator which probably won't need this var.
-		[System.Text.Json.Serialization.JsonIgnore]
+		[JsonIgnore]
 		public int[,] terrainNoiseMap;
 
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
@@ -29,10 +30,8 @@ namespace C7GameData
 			this.tiles = new List<Tile>();
 		}
 
-		public int tileCoordsToIndex(int x, int y)
-		{
-			return y * numTilesWide/2 + (y%2 == 0 ? x/2 : (x-1)/2);
-		}
+		public int tileCoordsToIndex(int x, int y) => y * numTilesWide/2 + (y%2 == 0 ? x/2 : (x-1)/2);
+		public int tileToIndex(Tile tile) => tileCoordsToIndex(tile.xCoordinate, tile.yCoordinate);
 
 		public void tileIndexToCoords(int index, out int x, out int y)
 		{

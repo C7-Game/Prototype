@@ -1,9 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace C7GameData
 {
-	using System;
-	using System.Text.Json.Serialization;
-	using System.Collections.Generic;
-	using System.Linq;
+
 	public class Tile
 	{
 		// ExtraInfo will eventually be type object and use a type descriminator in JSON to determine
@@ -14,15 +15,15 @@ namespace C7GameData
 		public int xCoordinate;
 		public int yCoordinate;
 		public string baseTerrainTypeKey { get; set; }
-		[JsonIgnore]
 		public TerrainType baseTerrainType = TerrainType.NONE;
 		public string overlayTerrainTypeKey { get; set; }
-		[JsonIgnore]
+
 		public TerrainType overlayTerrainType = TerrainType.NONE;
 		public City cityAtTile;
-		[JsonIgnore]
 		public bool HasCity => cityAtTile != null && cityAtTile != City.NONE;
+
 		public CityResident personWorkingTile = null;	//allows us to see if another city is working this tile
+
 		public bool hasBarbarianCamp = false;
 
 		//One thing to decide is do we want to have a tile have a list of units on it,
@@ -33,7 +34,6 @@ namespace C7GameData
 		//has the best defense, or which tile a unit is on when viewing the Military Advisor.
 		public List<MapUnit> unitsOnTile = new List<MapUnit>();
 		public string ResourceKey { get; set; }
-		[JsonIgnore]
 		public Resource Resource { get; set; }
 
 		public Dictionary<TileDirection, Tile> neighbors { get; set; } = new Dictionary<TileDirection, Tile>();
@@ -264,25 +264,10 @@ namespace C7GameData
 			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
 			}
 		}
-
-		// public static string shortName(this TileDirection dir) {
-		// 	switch (dir) {
-		// 	case TileDirection.NORTH:     return "N";
-		// 	case TileDirection.NORTHEAST: return "NE";
-		// 	case TileDirection.EAST:      return "E";
-		// 	case TileDirection.SOUTHEAST: return "SE";
-		// 	case TileDirection.SOUTH:     return "S";
-		// 	case TileDirection.SOUTHWEST: return "SW";
-		// 	case TileDirection.WEST:      return "W";
-		// 	case TileDirection.NORTHWEST: return "NW";
-		// 	default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
-		// 	}
-		// }
 	}
 
 	public class TileOverlays {
 		public bool road = false;
-		public bool railroad = false;
-		// assume that railroad contains road too
+		public bool railroad = false; // assume that railroad contains road too
 	}
 }

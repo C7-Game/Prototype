@@ -71,11 +71,11 @@ namespace C7Engine
 						PlayerAI.PlayTurn(player, GameData.rng);
 						player.hasPlayedThisTurn = true;
 					}
-					else if (player.guid != EngineStorage.uiControllerID) {
+					else if (player.id != EngineStorage.uiControllerID) {
 						player.hasPlayedThisTurn = true;
 					}
 					//Human player check.  Let the human see what's going on even if they are in observer mode.
-					if (player.guid == EngineStorage.uiControllerID) {
+					if (player.id == EngineStorage.uiControllerID) {
 						new MsgStartTurn().send();
 						return true;
 					}
@@ -92,7 +92,7 @@ namespace C7Engine
 				int result = GameData.rng.Next(100);
 				log.Verbose("Random barb result = " + result);
 				if (result < 4) {
-					MapUnit newUnit = new MapUnit();
+					MapUnit newUnit = new MapUnit(gameData.barbarianInfo.basicBarbarian.name);
 					newUnit.location = tile;
 					newUnit.owner = gameData.players[0];
 					newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
@@ -107,7 +107,7 @@ namespace C7Engine
 					log.Debug("New barbarian added at " + tile);
 				}
 				else if (tile.NeighborsWater() && result < 6) {
-					MapUnit newUnit = new MapUnit();
+					MapUnit newUnit = new MapUnit(gameData.barbarianInfo.barbarianSeaUnit.name);
 					newUnit.location = tile;
 					newUnit.owner = gameData.players[0]; //todo: make this reliably point to the barbs
 					newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;

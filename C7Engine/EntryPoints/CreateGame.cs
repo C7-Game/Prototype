@@ -1,7 +1,9 @@
 namespace C7Engine
 {
 	using System;
+	using System.Linq;
 	using C7GameData;
+	using C7GameData.Save;
 
 	public class CreateGame
 	{
@@ -16,12 +18,18 @@ namespace C7Engine
 			EngineStorage.createThread();
 			EngineStorage.gameDataMutex.WaitOne();
 
-			C7SaveFormat save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
-			EngineStorage.gameData = save.GameData;
-			// Consider if we have any need to keep a reference to the save object handy...probably not
+			SaveGame save = SaveGame.Load(loadFilePath);
+			GameData gameData = save.ToGameData();
 
-			var humanPlayer = save.GameData.CreateDummyGameData();
-			EngineStorage.uiControllerID = humanPlayer.guid;
+			EngineStorage.gameData = gameData;
+
+			Player humanPlayer = gameData.players.Any(p => p.isHuman) switch {
+				true => gameData.players.Find(p => p.isHuman),
+				false => gameData.CreateDummyGameData(),
+			};
+			Console.WriteLine($"human player: {humanPlayer.civilization.name}");
+
+			EngineStorage.uiControllerID = humanPlayer.id;
 			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();
 

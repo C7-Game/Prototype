@@ -1,6 +1,7 @@
 namespace C7GameData
 {
 	using System.Collections.Generic;
+	using System.Linq;
 
 	public struct StrengthBonus
 	{

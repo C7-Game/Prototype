@@ -55,7 +55,7 @@ public partial class AnimationTracker {
 
 	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
-		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType, action), completionEvent, ending);
+		startAnimation(unit.id.ToString(), civ3AnimData.forUnit(unit.unitType, action), completionEvent, ending);
 	}
 
 	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent, AnimationEnding ending)
@@ -66,16 +66,16 @@ public partial class AnimationTracker {
 	public void endAnimation(MapUnit unit)
 	{
 		ActiveAnimation aa;
-		if (activeAnims.TryGetValue(unit.guid, out aa)) {
+		if (activeAnims.TryGetValue(unit.id.ToString(), out aa)) {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
-			activeAnims.Remove(unit.guid);
+			activeAnims.Remove(unit.id.ToString());
 		}
 	}
 
 	public bool hasCurrentAction(MapUnit unit)
 	{
-		return activeAnims.ContainsKey(unit.guid);
+		return activeAnims.ContainsKey(unit.id.ToString());
 	}
 
 	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(string id)
@@ -97,7 +97,7 @@ public partial class AnimationTracker {
 
 	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(MapUnit unit)
 	{
-		return getCurrentActionAndProgress(unit.guid);
+		return getCurrentActionAndProgress(unit.id.ToString());
 	}
 
 	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(Tile tile)

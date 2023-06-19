@@ -45,7 +45,7 @@ namespace C7GameData
 
 		public MapUnit GetInstance()
 		{
-			MapUnit instance = new MapUnit();
+			MapUnit instance = new MapUnit(this.name);
 			instance.unitType = this;
 			instance.hitPointsRemaining = 3;    //todo: make this configurable
 			instance.movementPoints.reset(movement);

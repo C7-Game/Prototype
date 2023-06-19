@@ -21,11 +21,18 @@ namespace C7.Map {
 		public int worldEdgeLeft {get; private set;}
 		private int width;
 		private int height;
-		public bool showGrid {
-			get => showGrid;
-			set {
-				showGrid = value;
+		bool wrapHorizontally;
+		bool wrapVertically;
+		private bool showGrid = false;
+		private void setShowGrid(bool value) {
+			bool update = showGrid != value;
+			showGrid = value;
+			if (update) {
+				updateGridLayer();
 			}
+		}
+		public void toggleGrid() {
+			setShowGrid(!showGrid);
 		}
 		private Game game;
 		private GameData data;
@@ -52,7 +59,6 @@ namespace C7.Map {
 		}
 
 		public void addCity(City city, Tile tile) {
-			log.Debug($"adding city at tile ({tile.xCoordinate}, {tile.yCoordinate})");
 			CityScene scene = new CityScene(city, tile);
 			scene.Position = tilemap.MapToLocal(stackedCoords(tile));
 			AddChild(scene);
@@ -159,35 +165,94 @@ namespace C7.Map {
 			// AddChild(terrainTilemapShadow);
 		}
 
-		private void setTerrainTiles() {
-			string[] corners(int x, int y) {
-				string left = terrain[x, y];
-				string right = terrain[(x + 1) % width, y];
-				bool even = y % 2 == 0;
-				string top = "coast";
-				if (y > 0) {
-					top = even ? terrain[x, y - 1] : terrain[(x + 1) % width, y - 1];
-				}
-				string bottom = "coast";
-				if (y < height - 1) {
-					bottom = even ? terrain[x, y + 1] : terrain[(x + 1) % width, y + 1];
-				}
-				return new string[4]{top, right, bottom, left};
+		// wraps horizontally
+		private string[] corners(int x, int y) {
+			string left = terrain[x, y];
+			string right = right = terrain[(x + 1) % width, y];
+			bool even = y % 2 == 0;
+			string top = left;
+			if (y > 0) {
+				top = even ? terrain[x, y - 1] : terrain[(x + 1) % width, y - 1];
 			}
-			void lookupAndSetTerrainTile(int x, int y, int cellX, int cellY) {
+			string bottom = left;
+			if (y < height - 1) {
+				bottom = even ? terrain[x, y + 1] : terrain[(x + 1) % width, y + 1];
+			}
+			return new string[4]{top, right, bottom, left};
+		}
+
+		// on maps that do not wrap horizontally, corners for imaginary off-map
+		// tiles need to be created in order for tiles on the map to be correct
+		private string[] verticalEdgeCornersNoWrap(int x, int y) {
+			string sides = terrain[x, y];
+			string top = y > 0 ? terrain[x, y - 1] : sides;
+			string bottom = y < height - 1 ? terrain[x, y + 1] : sides;
+			return new string[4]{top, sides, bottom, sides};
+		}
+
+		private string[] horizontalEdgeCornersNoWrap(int x, int y) {
+			string bottom = terrain[x, y]; // top == bottom == right
+			string left = terrain[x > 0 ? x - 1 : x, y];
+			return new string[4]{bottom, bottom, bottom, left};
+		}
+
+		// computes and generates a terrain tilemap
+		//
+		private void setTerrainTiles(bool wrapX) {
+			// computes which terrain tile to use based on the corners function and adds to the terrain tilemap
+			// different corners functions are needed depending on whether or not the map wraps horizontally and
+			// vertically
+			void setTerrainTile(int x, int y, int cellX, int cellY, Func<int, int, string[]> corners) {
 				Vector2I cell = new Vector2I(cellX, cellY);
 				string[] corner = corners(x, y);
 				TerrainPcx pcx = Civ3TerrainTileSet.GetPcxFor(corner);
 				Vector2I texCoords = pcx.getTextureCoords(corner);
-				setTerrainTile(cell, pcx.atlas, texCoords);
+				this.setTerrainTile(cell, pcx.atlas, texCoords);
 			}
-			for (int x = 0; x < width; x++) {
+			// Start with left tile of terrain intersection being x = 0,
+			// and end at x = width - 2, since the edges of the tilemap
+			// depend on whether or not the map wraps horizontally. Do
+			// vertical edge skirts last.
+			for (int x = 0; x < width - 1; x++) {
 				for (int y = 0; y < height; y++) {
-					lookupAndSetTerrainTile(x, y, x, y);
+					setTerrainTile(x, y, x, y, corners);
 				}
 			}
-			for (int y = 0; y < height; y++) {
-				lookupAndSetTerrainTile(width - 1, y, -1, y);
+
+			// for top and bottom skirts, since the y coordinate of the tilemap
+			// tile being drawn to is offset by one from the row where the actual
+			// tile is (y - 1 for the top skirt and y + 1 for the bottom skirt),
+			// the x coordinate the tile is drawn to in the tilemap needs to be offset
+			// if the row of the actual tile is even due to the isometric tile layout
+
+			// bottom skirt
+			int xOffset = height - 1 % 2 == 0 ? -1 : 0;
+			for (int x = 0; x < width; x++) {
+				setTerrainTile(x, height - 1, x + xOffset, height, horizontalEdgeCornersNoWrap);
+			}
+
+			// top skirt
+			for (int x = 0; x < width; x++) {
+				// offset tilemap x coordinate by 1 since top row is always y == 0
+				setTerrainTile(x, 0, x - 1, -1, horizontalEdgeCornersNoWrap);
+			}
+
+			if (!wrapX) {
+				// right skirt and left skirt
+				for (int y = 0; y < height; y++) {
+					setTerrainTile(width - 1, y, width - 1, y, verticalEdgeCornersNoWrap);
+					setTerrainTile(0, y, -1, y, verticalEdgeCornersNoWrap);
+				}
+			} else {
+				// default corners wraps
+				for (int y = 0; y < height; y++) {
+					// for left-most tiles in a wrapping map, the "left" tile
+					// in the intersection is the wrapped tile from x = width - 1
+ 					setTerrainTile(width - 1, y, -1, y, corners);
+					// for right-most tiles in a map, the "right" tile is the
+					// left-most, and this behavior is implemented in corners using modulo
+					setTerrainTile(width - 1, y, width - 1, y, corners);
+ 				}
 			}
 		}
 
@@ -217,6 +282,8 @@ namespace C7.Map {
 			gameMap = data.map;
 			width = gameMap.numTilesWide / 2;
 			height = gameMap.numTilesTall;
+			wrapHorizontally = gameMap.wrapHorizontally;
+			wrapVertically = gameMap.wrapVertically;
 			initializeTileMap();
 			terrain = new string[width, height];
 			worldEdgeRight = (int)ToGlobal(tilemap.MapToLocal(new Vector2I(width - 1, 1))).X + tileSize.X / 2;
@@ -232,12 +299,13 @@ namespace C7.Map {
 				Vector2I coords = stackedCoords(t);
 				terrain[coords.X, coords.Y] = t.baseTerrainTypeKey;
 			}
-			setTerrainTiles();
+			setTerrainTiles(gameMap.wrapHorizontally);
 
 			// update each tile once to add all initial layers
 			foreach (Tile tile in gameMap.tiles) {
 				updateTile(tile);
 			}
+			setShowGrid(true);
 		}
 
 		public Tile tileAt(GameMap gameMap, Vector2 globalMousePosition) {
@@ -516,6 +584,23 @@ namespace C7.Map {
 			updateTerrainOverlayLayer(tile);
 
 			updateBuildingLayer(tile);
+
+			if (tile.cityAtTile is not null) {
+				City city = tile.cityAtTile;
+				if (!cityScenes.ContainsKey(city)) {
+					addCity(city, tile);
+				}
+			}
+		}
+
+		private void updateGridLayer() {
+			if (showGrid) {
+				foreach (Tile tile in data.map.tiles) {
+					setCell(Layer.Grid, Atlas.Grid, tile, Vector2I.Zero);
+				}
+			} else {
+				tilemap.ClearLayer(Layer.Grid.Index());
+			}
 		}
 	}
 }

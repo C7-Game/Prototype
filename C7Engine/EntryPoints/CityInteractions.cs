@@ -6,13 +6,13 @@ namespace C7Engine
 
 	public class CityInteractions
 	{
-		public static void BuildCity(int x, int y, string playerGuid, string name)
+		public static void BuildCity(int x, int y, EntityID playerId, string name)
 		{
 			GameData gameData = EngineStorage.gameData;
-			Player owner = gameData.players.Find(player => player.guid == playerGuid);
+			Player owner = gameData.players.Find(player => player.id == playerId);
 			Tile tileWithNewCity = gameData.map.tileAt(x, y);
 			City newCity = new City(tileWithNewCity, owner, name);
-			CityResident firstResident = new CityResident();
+			CityResident firstResident = new CityResident{nationality = owner.civilization};
 			CityTileAssignmentAI.AssignNewCitizenToTile(newCity, firstResident);
 			newCity.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(newCity, null));
 			if (owner.cities.Count == 0) {

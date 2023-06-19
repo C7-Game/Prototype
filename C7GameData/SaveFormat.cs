@@ -1,4 +1,9 @@
+using System;
 using System.Linq;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Text.Json;
 
 namespace C7GameData
 /*
@@ -9,11 +14,6 @@ namespace C7GameData
 	settings to use camel case instead, unless there is reason not to.
 */
 {
-	using System;
-	using System.Collections.Generic;
-	using System.IO;
-	using System.IO.Compression;
-	using System.Text.Json;
 
 	public enum SaveCompression {
 		None,
@@ -33,12 +33,6 @@ namespace C7GameData
 
 		public C7SaveFormat(GameData gameData) {
 			GameData = gameData;
-		}
-
-		public bool PostLoadProcess() {
-			GameData.PerformPostLoadActions();
-
-			return true;
 		}
 
 		static SaveCompression getCompression(string path) {

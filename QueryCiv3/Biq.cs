@@ -92,6 +92,12 @@ namespace QueryCiv3
         public string Title;
         public string Description;
 
+        public static unsafe BiqData LoadFile(string biqFilePath)
+        {
+            byte[] biqBytes = Util.ReadFile(biqFilePath);
+            return new BiqData(biqBytes);
+        }
+
         public unsafe BiqData(byte[] biqBytes)
         {
             Load(biqBytes);

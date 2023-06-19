@@ -6,8 +6,8 @@ namespace C7GameData
     using System;
     public class City
     {
-        public string guid {get;}
-        public Tile location {get;}
+        public EntityID id {get; set;}
+        public Tile location {get; set;}
         public string name;
         public int size = 1;
 
@@ -24,9 +24,11 @@ namespace C7GameData
 
         public static City NONE = new City(Tile.NONE, null, "Dummy City");
 
+        public City() {}
+
         public City(Tile location, Player owner, string name)
         {
-            guid = Guid.NewGuid().ToString();
+            id = EntityID.New("city");
             this.location = location;
             this.owner = owner;
             this.name = name;

@@ -16,7 +16,7 @@ namespace C7GameData
 		public List<Player> players = new List<Player>();
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
 		public List<Resource> Resources = new List<Resource>();
-		public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
+		public List<MapUnit> mapUnits {get; set;} = new List<MapUnit>();
 		public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
 		public List<City> cities = new List<City>();
 
@@ -57,30 +57,15 @@ namespace C7GameData
 			return players.FindAll(p => p.isHuman);
 		}
 
-		public MapUnit GetUnit(string guid)
+		public MapUnit GetUnit(EntityID id)
 		{
-			return mapUnits.Find(u => u.guid == guid);
+			return mapUnits.Find(u => u.id == id);
 		}
 
 		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel)
 		{
 			int n = experienceLevels.IndexOf(experienceLevel);
-			if (n + 1 < experienceLevels.Count)
-				return experienceLevels[n + 1];
-			else
-				return null;
-		}
-
-		/**
-		 * This is intended as a place to set up post-load actions on the save, regardless of
-		 * whether it is loaded from a legacy Civ3 file or a C7 native file.
-		 * This likely is any sort of calculation which is useful to have in the game state, but
-		 * can be re-generated from save data and does not make sense to serialize.
-		 **/
-		public void PerformPostLoadActions()
-		{
-			//Let each tile know who its neighbors are.  It needs to know this so its graphics can be selected appropriately.
-			map.computeNeighbors();
+			return n + 1 < experienceLevels.Count ? experienceLevels[n + 1] : null;
 		}
 
 		/**
@@ -103,7 +88,7 @@ namespace C7GameData
 			barbarianPlayer.isBarbarians = true;
 			players.Add(barbarianPlayer);
 
-			Civilization carthage = new Civilization();
+			Civilization carthage = new Civilization("Carthage");
 			carthage.cityNames.Add("Carthage");
 			carthage.cityNames.Add("Utica");
 			carthage.cityNames.Add("Hadrumetum");
@@ -120,7 +105,7 @@ namespace C7GameData
 			carthagePlayer.isHuman = true;
 			players.Add(carthagePlayer);
 
-			Civilization rome = new Civilization();
+			Civilization rome = new Civilization("Rome");
 			rome.cityNames.Add("Rome");
 			rome.cityNames.Add("Neapolis");
 			rome.cityNames.Add("Capua");
@@ -136,7 +121,7 @@ namespace C7GameData
 			Player romePlayer = new Player(rome, romanRed);
 			players.Add(romePlayer);
 
-			Civilization babylon = new Civilization();
+			Civilization babylon = new Civilization("Babylon");
 			babylon.cityNames.Add("Babylon");
 			babylon.cityNames.Add("Kish");
 			babylon.cityNames.Add("Sippar");
@@ -158,7 +143,7 @@ namespace C7GameData
 			babylonPlayer.isHuman = false;
 			players.Add(babylonPlayer);
 
-			Civilization greece = new Civilization();
+			Civilization greece = new Civilization("Greece");
 			greece.cityNames.Add("Athens");
 			greece.cityNames.Add("Sparta");
 			greece.cityNames.Add("Corinth");
@@ -175,7 +160,7 @@ namespace C7GameData
 			Player computerPlayOne = new Player(greece, green);
 			players.Add(computerPlayOne);
 
-			Civilization america = new Civilization();
+			Civilization america = new Civilization("America");
 			america.cityNames.Add("Philadelphia");
 			america.cityNames.Add("New York");
 			america.cityNames.Add("Boston");
@@ -196,7 +181,7 @@ namespace C7GameData
 			Player computerPlayerTwo = new Player(america, teal);
 			players.Add(computerPlayerTwo);
 
-			Civilization theNetherlands = new Civilization();
+			Civilization theNetherlands = new Civilization("Netherlands");
 			theNetherlands.cityNames.Add("Amsterdam");
 			theNetherlands.cityNames.Add("Rotterdam");
 			theNetherlands.cityNames.Add("The Hague");
@@ -259,7 +244,7 @@ namespace C7GameData
 			//TODO: The fact that we have to check for this makes me wonder why...
 			if (tile != Tile.NONE) {
 				//TODO: Generate unit from its prototype
-				MapUnit unit = new MapUnit();
+				MapUnit unit = new MapUnit(proto.name);
 				unit.unitType = proto;
 				unit.owner = owner;
 				unit.location = tile;
