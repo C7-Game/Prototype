@@ -9,7 +9,11 @@
 [ext_resource type="Script" path="res://UIElements/UnitButtons/RenameButton.cs" id="8"]
 [ext_resource type="Script" path="res://UIElements/Popups/PopupOverlay.cs" id="9"]
 [ext_resource type="Theme" uid="uid://c1jpmssnhvodi" path="res://C7Theme.tres" id="10"]
+<<<<<<< HEAD
 [ext_resource type="Script" path="res://PlayerCamera.cs" id="11_pkhac"]
+=======
+[ext_resource type="Script" path="res://PlayerCamera.gd" id="11_ab5st"]
+>>>>>>> 5667f49 (add Camera2D)
 [ext_resource type="Script" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
 
 [sub_resource type="Animation" id="2"]
@@ -92,6 +96,7 @@ script = ExtResource("9")
 
 [node name="PopupSound" type="AudioStreamPlayer" parent="CanvasLayer/PopupOverlay"]
 
+<<<<<<< HEAD
 [node name="Control" type="Control" parent="CanvasLayer"]
 layout_mode = 3
 anchors_preset = 15
@@ -254,6 +259,15 @@ libraries = {
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/Control/UnitButtons" method="OnNewUnitSelected"]
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/GameStatus" method="OnNoMoreAutoselectableUnits"]
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/UnitButtons" method="OnNoMoreAutoselectableUnits"]
+=======
+[node name="PlayerCamera" type="Camera2D" parent="CanvasLayer"]
+script = ExtResource("11_ab5st")
+
+[connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/GameStatus" method="OnNewUnitSelected"]
+[connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/UnitButtons" method="OnNewUnitSelected"]
+[connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/GameStatus" method="OnNoMoreAutoselectableUnits"]
+[connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/UnitButtons" method="OnNoMoreAutoselectableUnits"]
+>>>>>>> 5667f49 (add Camera2D)
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnStarted"]
