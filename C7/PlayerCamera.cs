@@ -44,4 +44,13 @@ public partial class PlayerCamera : Camera2D
 		Vector2 target = map.tileToLocal(tile);
 		Position = target;
 	}
+
+	public bool isTileInView(Tile tile, MapView map) {
+		Rect2 visible = getVisibleWorld();
+		Vector2 target = map.tileToLocal(tile);
+		float size = 30;
+		target -= Vector2.One * (size / 2);
+		Rect2 boundingBox = new Rect2(target, size, size);
+		return visible.Encloses(boundingBox);
+	}
 }

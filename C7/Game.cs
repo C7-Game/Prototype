@@ -94,9 +94,6 @@ public partial class Game : Node2D {
 
 			Toolbar = GetNode<Control>("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer");
 
-			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
-			// GetTree().Root.Connect("size_changed",new Callable(this,"_OnViewportSizeChanged"));
-
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
 
@@ -153,6 +150,11 @@ public partial class Game : Node2D {
 					break;
 				case MsgStartTurn mST:
 					OnPlayerStartTurn();
+					break;
+				case MsgCityBuilt mBC:
+					Tile cityTile = gameData.map.tiles[mBC.tileIndex];
+					City city = cityTile.cityAtTile;
+					mapView.addCity(city, cityTile);
 					break;
 			}
 		}
@@ -220,11 +222,10 @@ public partial class Game : Node2D {
 
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location) {
-		// TODO: implement
 		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
-			// Vector2 relativeScreenLocation = oldMapView.screenLocationOfTile(location, true) / oldMapView.getVisibleAreaSize();
-			// if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
-			// 	oldMapView.centerCameraOnTile(location);
+			if (!camera.isTileInView(location, mapView)) {
+				camera.centerOnTile(location, mapView);
+			}
 		}
 	}
 
@@ -340,18 +341,6 @@ public partial class Game : Node2D {
 								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
 								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
-							}
-							GD.Print($"tile: {tile.xCoordinate}, {tile.yCoordinate}: {tile.baseTerrainType.Key} - {tile.overlayTerrainType.Key}");
-							int left = mapView.worldEdgeLeft;
-							int right = mapView.worldEdgeRight;
-							int camLeft = (int)camera.getVisibleWorld().Position.X;
-							int camRight = (int)camera.getVisibleWorld().End.X;
-							GD.Print(camera.getVisibleWorld().End);
-							if (camLeft <= left) {
-								GD.Print($"left is visible - world: {left}, cam: {camLeft}");
-							}
-							if (camRight >= right) {
-								GD.Print($"right is visible - world: {right}, cam: {camRight}");
 							}
 						}
 					}
@@ -529,7 +518,6 @@ public partial class Game : Node2D {
 		if (Input.IsActionJustPressed(C7Action.UnitBuildRoad) && CurrentlySelectedUnit.canBuildRoad()) {
 			new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
 		}
-
 	}
 
 	private void GetNextAutoselectedUnit(GameData gameData) {
