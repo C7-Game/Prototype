@@ -23,14 +23,6 @@ public partial class Game : Node2D {
 	}
 
 	public Player controller; // Player that's controlling the UI.
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-	private Corners corners;
->>>>>>> 24eca8d (rendering terrain)
-=======
-	private TerrainTileMap corners;
->>>>>>> 5667f49 (add Camera2D)
 	private MapView mapView;
 	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
@@ -97,16 +89,9 @@ public partial class Game : Node2D {
 					}
 					camera.centerOnTile(startingUnit.location, mapView);
 				}
-				corners = new TerrainTileMap(map);
 			}
 
-<<<<<<< HEAD
 			AddChild(mapView);
-=======
-			AddChild(corners);
-
-			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
->>>>>>> 24eca8d (rendering terrain)
 
 			Toolbar = GetNode<Control>("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer");
 

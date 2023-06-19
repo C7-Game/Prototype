@@ -108,7 +108,7 @@ namespace C7.Map {
 				}
 			}
 			// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
-			return selected is not null ? selected : (interesting is not null ? interesting : bestDefender);
+			return selected ?? interesting ?? bestDefender ?? MapUnit.NONE;
 		}
 
 		public List<Tile> getVisibleTiles() {
@@ -147,7 +147,7 @@ namespace C7.Map {
 			terrainTilemapShadow.TileSet = terrainTileset;
 			terrainTilemapShadow.Position = terrainTilemap.Position + (Vector2I.Left * tileSize.X * width);
 
-			tilemap = new TileMap{ YSortEnabled = true };
+			tilemap = new TileMap { YSortEnabled = true };
 			tileset = TileSetLoader.LoadCiv3TileSet();
 			tilemap.TileSet = tileset;
 
@@ -155,7 +155,11 @@ namespace C7.Map {
 			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
 				if (layer != Layer.Invalid) {
 					tilemap.AddLayer(layer.Index());
-					tilemap.SetLayerYSortEnabled(layer.Index(), true);
+					if (layer != Layer.FogOfWar) {
+						tilemap.SetLayerYSortEnabled(layer.Index(), true);
+					} else {
+						tilemap.SetLayerZIndex(layer.Index(), 15);
+					}
 				}
 			}
 
@@ -299,13 +303,13 @@ namespace C7.Map {
 				Vector2I coords = stackedCoords(t);
 				terrain[coords.X, coords.Y] = t.baseTerrainTypeKey;
 			}
-			setTerrainTiles(gameMap.wrapHorizontally);
+			setTerrainTiles(wrapHorizontally);
 
 			// update each tile once to add all initial layers
+			TileKnowledge tk = data.GetHumanPlayers()[0].tileKnowledge; // race condition, probably
 			foreach (Tile tile in gameMap.tiles) {
-				updateTile(tile);
+				updateTile(tile, tk);
 			}
-			setShowGrid(true);
 		}
 
 		public Tile tileAt(GameMap gameMap, Vector2 globalMousePosition) {
@@ -443,16 +447,16 @@ namespace C7.Map {
 		private Vector2I getHillTextureCoordinate(Tile tile) {
 			int index = 0;
 			if (tile.neighbors[TileDirection.NORTHWEST].overlayTerrainType.isHilly()) {
-				index++;
+				index += 1;
 			}
 			if (tile.neighbors[TileDirection.NORTHEAST].overlayTerrainType.isHilly()) {
-				index+=2;
+				index += 2;
 			}
 			if (tile.neighbors[TileDirection.SOUTHWEST].overlayTerrainType.isHilly()) {
-				index+=4;
+				index += 4;
 			}
 			if (tile.neighbors[TileDirection.SOUTHEAST].overlayTerrainType.isHilly()) {
-				index+=8;
+				index += 8;
 			}
 			return new Vector2I(index % 4, index / 4);
 		}
@@ -558,11 +562,41 @@ namespace C7.Map {
 			}
 		}
 
-		public void updateTile(Tile tile) {
+		// updateFogOfWarLayer returns true if the tile is visible or
+		// semi-visible, indicating other layers should be updated.
+		private bool updateFogOfWarLayer(Tile tile, TileKnowledge tk) {
+			if (!tk.isTileKnown(tile)) {
+				int sum = 0;
+				if (tk.isTileKnown(tile.neighbors[TileDirection.NORTH]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST])) {
+					sum += 1 * 2;
+				}
+				if (tk.isTileKnown(tile.neighbors[TileDirection.WEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST])) {
+					sum += 3 * 2;
+				}
+				if (tk.isTileKnown(tile.neighbors[TileDirection.EAST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+					sum += 9 * 2;
+				}
+				if (tk.isTileKnown(tile.neighbors[TileDirection.SOUTH]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+					sum += 27 * 2;
+				}
+				setCell(Layer.FogOfWar, Atlas.FogOfWar, tile, new Vector2I(sum % 9, sum / 9));
+				return sum != 0; // if the sum is not 0, parts of the tile may be visible
+			}
+			return true; // no fog of war, tile
+		}
+
+		public void updateTile(Tile tile, TileKnowledge tk = null) {
 			if (tile == Tile.NONE || tile is null) {
 				string msg = tile is null ? "null tile" : "Tile.NONE";
 				log.Warning($"attempting to update {msg}");
 				return;
+			}
+
+			if (tk is not null) {
+				bool isTileVisible = updateFogOfWarLayer(tile, tk);
+				if (!isTileVisible) {
+					return; // no need to update the rest of the layers
+				}
 			}
 
 			updateRoadLayer(tile, true);

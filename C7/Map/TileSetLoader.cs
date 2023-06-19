@@ -1,7 +1,5 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace C7.Map {
 
@@ -14,6 +12,7 @@ namespace C7.Map {
 		TerrainYield,
 		Building,
 		Grid,
+		FogOfWar,
 		Invalid,
 	};
 
@@ -46,6 +45,7 @@ namespace C7.Map {
 		TerrainBuilding,
 		GoodyHut,
 		Grid,
+		FogOfWar,
 		Invalid,
 	}
 
@@ -71,7 +71,7 @@ namespace C7.Map {
 			regionSize = rs;
 			textureOrigin = new Vector2I(0, y);
 			source = new TileSetAtlasSource{
-				Texture = Util.LoadTextureFromPCX(path),
+				Texture = path.EndsWith("FogOfWar.pcx") ? Util.LoadFogOfWarPCX(path) : Util.LoadTextureFromPCX(path),
 				TextureRegionSize = regionSize,
 			};
 		}
@@ -123,9 +123,11 @@ namespace C7.Map {
 		}
 	};
 
-	class NonSquareAtlasLoader : AtlasLoader {
+	// loads an atlas that is a rectangle, except the last row contains less
+	// tiles than the full width.
+	class NonRectAtlasLoader : AtlasLoader {
 		int lastRowWidth;
-		public NonSquareAtlasLoader(string p, int w, int h, int lastRowWidth, Vector2I rs) : base(p, w, h, rs) {
+		public NonRectAtlasLoader(string p, int w, int h, int lastRowWidth, Vector2I rs) : base(p, w, h, rs) {
 			this.lastRowWidth = lastRowWidth;
 		}
 
@@ -174,7 +176,7 @@ namespace C7.Map {
 		private static readonly Vector2I buildingSize = new Vector2I(128, 64);
 
 		private static readonly Dictionary<Atlas, AtlasLoader> civ3PcxForAtlas = new Dictionary<Atlas, AtlasLoader> {
-			{Atlas.Resource, new NonSquareAtlasLoader("Conquests/Art/resources.pcx", 6, 4, 4, resourceSize)},
+			{Atlas.Resource, new NonRectAtlasLoader("Conquests/Art/resources.pcx", 6, 4, 4, resourceSize)},
 
 			{Atlas.Road, new AtlasLoader("Art/Terrain/roads.pcx", 16, 16, tileSize)},
 			{Atlas.Rail, new AtlasLoader("Art/Terrain/railroads.pcx", 16, 16, tileSize)},
@@ -203,7 +205,8 @@ namespace C7.Map {
 			{Atlas.Marsh, new MarshAtlasLoader("Art/Terrain/marsh.pcx", marshSize)},
 
 			{Atlas.TerrainBuilding, new AtlasLoader("Art/Terrain/TerrainBuildings.pcx", 4, 4, buildingSize)},
-			{Atlas.GoodyHut, new NonSquareAtlasLoader("Art/Terrain/goodyhuts.pcx", 3, 3, 2, buildingSize)},
+			{Atlas.GoodyHut, new NonRectAtlasLoader("Art/Terrain/goodyhuts.pcx", 3, 3, 2, buildingSize)},
+			{Atlas.FogOfWar, new NonRectAtlasLoader("Art/Terrain/FogOfWar.pcx", 9, 9, 8, tileSize)},
 		};
 
 		public static TileSet LoadCiv3TileSet() {

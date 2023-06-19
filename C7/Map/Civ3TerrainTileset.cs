@@ -95,6 +95,7 @@ namespace C7.Map {
 			if (corners.Length != 4) {
 				throw new ArgumentException($"terrain corner must be of 4 tiles but got {corners.Length}");
 			}
+<<<<<<< HEAD
 			TerrainPcx pcx = terrainPcxList.Find(pcx => pcx.validFor(corners));
 			if (pcx is null) {
 				string msg = corners.Join(", ");
@@ -104,4 +105,11 @@ namespace C7.Map {
 			return pcx;
  		}
 	}
+=======
+			return terrainPcxList.Find(pcx => pcx.validFor(corners));
+		}
+
+	}
+
+>>>>>>> a0f852c (test drawing units in word coordinates)
 }
