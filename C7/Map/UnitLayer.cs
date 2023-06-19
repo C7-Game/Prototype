@@ -124,7 +124,7 @@ public partial class UnitLayer : LooseLayer {
 		string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
 
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
-		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
+		var animOffset = OldMapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
 		Vector2 position = tileCenter + animOffset - new Vector2(0, inst.FrameSize(animName).Y / 4);
 		inst.Position = position;
 
@@ -221,7 +221,7 @@ public partial class UnitLayer : LooseLayer {
 
 		MapUnit unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
 		MapUnit.Appearance appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
-		Vector2 animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
+		Vector2 animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * OldMapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
 		if ((unit != MapUnit.NONE) && (unit == looseView.mapView.game.CurrentlySelectedUnit)) {

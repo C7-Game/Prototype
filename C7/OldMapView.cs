@@ -101,7 +101,7 @@ public partial class TerrainLayer : LooseLayer {
 			if (tTD.tile != Tile.NONE) {
 				int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
 				Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
-				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.Y);
+				Vector2 terrainOffset = new Vector2(0, -1 * OldMapView.cellSize.Y);
 				// Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
 				// Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
 				Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
@@ -457,7 +457,7 @@ public partial class GridLayer : LooseLayer {
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
-		Vector2 cS = MapView.cellSize;
+		Vector2 cS = OldMapView.cellSize;
 		Vector2 left  = tileCenter + new Vector2(-cS.X, 0    );
 		Vector2 top   = tileCenter + new Vector2( 0   , -cS.Y);
 		Vector2 right = tileCenter + new Vector2( cS.X, 0    );
@@ -490,10 +490,10 @@ public partial class BuildingLayer : LooseLayer {
 }
 
 public partial class LooseView : Node2D {
-	public MapView mapView;
+	public OldMapView mapView;
 	public List<LooseLayer> layers = new List<LooseLayer>();
 
-	public LooseView(MapView mapView)
+	public LooseView(OldMapView mapView)
 	{
 		this.mapView = mapView;
 	}
@@ -513,14 +513,14 @@ public partial class LooseView : Node2D {
 
 			// Iterating over visible tiles is unfortunately pretty expensive. Assemble a list of Tile references and centers first so we don't
 			// have to reiterate for each layer. Doing this improves framerate significantly.
-			MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
+			OldMapView.VisibleRegion visRegion = mapView.getVisibleRegion();
 			List<VisibleTile> visibleTiles = new List<VisibleTile>();
 			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++) {
 				if (gD.map.isRowAt(y)) {
 					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 						Tile tile = gD.map.tileAt(x, y);
 						if (IsTileKnown(tile, gameDataAccess)) {
-							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
+							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = OldMapView.cellSize * new Vector2(x + 1, y + 1) });
 						}
 					}
 				}
@@ -541,7 +541,7 @@ public partial class LooseView : Node2D {
 							for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 								Tile tile = gD.map.tileAt(x, y);
 								if (tile != Tile.NONE) {
-									VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) };
+									VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = OldMapView.cellSize * new Vector2(x + 1, y + 1) };
 									layer.drawObject(this, gD, tile, invisibleTile.tileCenter);
 								}
 							}
@@ -557,7 +557,7 @@ public partial class LooseView : Node2D {
 	}
 }
 
-public partial class MapView : Node2D {
+public partial class OldMapView : Node2D {
 	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
 	// staggered and half overlap).
 	public static readonly Vector2 cellSize = new Vector2(64, 32);
@@ -606,7 +606,7 @@ public partial class MapView : Node2D {
 	public GridLayer gridLayer { get; private set; }
 
 	public ImageTexture civColorWhitePalette = null;
-	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
+	public OldMapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
 	{
 		this.game = game;
 		this.mapWidth = mapWidth;
