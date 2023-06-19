@@ -606,7 +606,7 @@ public partial class MapView : Node2D {
 	public GridLayer gridLayer { get; private set; }
 
 	public ImageTexture civColorWhitePalette = null;
-
+	private Corners corners;
 	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
 	{
 		this.game = game;
@@ -616,7 +616,7 @@ public partial class MapView : Node2D {
 		this.wrapVertically = wrapVertically;
 
 		looseView = new LooseView(this);
-		looseView.layers.Add(new TerrainLayer());
+		// looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new RiverLayer());
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());
@@ -629,7 +629,7 @@ public partial class MapView : Node2D {
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new CityLayer());
-		looseView.layers.Add(new FogOfWarLayer());
+		// looseView.layers.Add(new FogOfWarLayer());
 
 		(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
 
