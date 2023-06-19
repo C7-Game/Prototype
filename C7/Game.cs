@@ -23,8 +23,8 @@ public partial class Game : Node2D {
 	}
 
 	public Player controller; // Player that's controlling the UI.
-	private TerrainTileMap corners;
 	private MapView mapView;
+	private OldMapView oldMapView;
 	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
 
@@ -42,12 +42,10 @@ public partial class Game : Node2D {
 	public bool KeepCSUWhenFortified = false;
 
 	Control Toolbar;
-	private bool IsMovingCamera;
-	private Vector2 OldPosition;
 
 	Stopwatch loadTimer = new Stopwatch();
 	GlobalSingleton Global;
-
+	private PlayerCamera camera;
 	bool errorOnLoad = false;
 
 	public override void _EnterTree() {
@@ -68,31 +66,33 @@ public partial class Game : Node2D {
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
 			Global.ResetLoadGamePath();
 
+			camera = GetNode("./CanvasLayer/PlayerCamera") as PlayerCamera;
+
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
 				Util.setModPath(gameDataAccess.gameData.scenarioSearchPath);
 				log.Debug("RelativeModPath ", map.RelativeModPath);
-				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
-				AddChild(mapView);
+				oldMapView = new OldMapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
+				AddChild(oldMapView);
 
-				mapView.cameraZoom = (float)1.0;
-				mapView.gridLayer.visible = false;
+				oldMapView.cameraZoom = (float)1.0;
+				oldMapView.gridLayer.visible = false;
 
 				// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their
 				// starting settler.
 				if (controller.cities.Count > 0) {
 					City capital = controller.cities.Find(c => c.IsCapital());
 					if (capital != null)
-						mapView.centerCameraOnTile(capital.location);
+						oldMapView.centerCameraOnTile(capital.location);
 				} else {
 					MapUnit startingSettler = controller.units.Find(u => u.unitType.actions.Contains(C7Action.UnitBuildCity));
 					if (startingSettler != null)
-						mapView.centerCameraOnTile(startingSettler.location);
+						oldMapView.centerCameraOnTile(startingSettler.location);
 				}
-				corners = new TerrainTileMap(this, gameDataAccess.gameData);
+				mapView = new MapView(this, gameDataAccess.gameData);
 			}
 
-			AddChild(corners);
+			AddChild(mapView);
 
 			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 
@@ -192,9 +192,7 @@ public partial class Game : Node2D {
 						 (CurrentlySelectedUnit.isFortified && !KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
 				}
-				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.Key.F1 (etc.) doesn't work
-				//without a manual cast to int.
-				//https://github.com/godotengine/godot/issues/16388
+				// Listen to keys. TODO: move this
 				if (Input.IsKeyPressed(Godot.Key.F1)) {
 					EmitSignal("ShowSpecificAdvisor", "F1");
 				}
@@ -223,9 +221,9 @@ public partial class Game : Node2D {
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location) {
 		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
-			Vector2 relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
+			Vector2 relativeScreenLocation = oldMapView.screenLocationOfTile(location, true) / oldMapView.getVisibleAreaSize();
 			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
-				mapView.centerCameraOnTile(location);
+				oldMapView.centerCameraOnTile(location);
 		}
 	}
 
@@ -293,42 +291,23 @@ public partial class Game : Node2D {
 	}
 
 	public void _on_QuitButton_pressed() {
-		// This apparently exits the whole program
-		// GetTree().Quit();
-
 		// ChangeSceneToFile deletes the current scene and frees its memory, so this is quitting to main menu
 		GetTree().ChangeSceneToFile("res://MainMenu.tscn");
-	}
-
-	public void _on_Zoom_value_changed(float value) {
-		mapView.setCameraZoomFromMiddle(value);
 	}
 
 	public void AdjustZoomSlider(int numSteps, Vector2 zoomCenter) {
 		VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
 		double newScale = slider.Value + slider.Step * (double)numSteps;
-		if (newScale < slider.MinValue)
-			newScale = slider.MinValue;
-		else if (newScale > slider.MaxValue)
-			newScale = slider.MaxValue;
+		newScale = Mathf.Clamp(newScale, slider.MinValue, slider.MaxValue);
 
 		// Note we must set the camera zoom before setting the new slider value since setting the value will trigger the callback which will
 		// adjust the zoom around a center we don't want.
-		mapView.setCameraZoom((float)newScale, zoomCenter);
+		// camera.scaleZoom(zoom)
 		slider.Value = newScale;
 	}
 
-	public void _on_RightButton_pressed() {
-		mapView.cameraLocation += new Vector2(128, 0);
-	}
-	public void _on_LeftButton_pressed() {
-		mapView.cameraLocation += new Vector2(-128, 0);
-	}
-	public void _on_UpButton_pressed() {
-		mapView.cameraLocation += new Vector2(0, -64);
-	}
-	public void _on_DownButton_pressed() {
-		mapView.cameraLocation += new Vector2(0, 64);
+	private void onSliderZoomChanged(float value) {
+		camera.setZoom(value);
 	}
 
 	public override void _Input(InputEvent @event) {
@@ -340,13 +319,14 @@ public partial class Game : Node2D {
 	public override void _UnhandledInput(InputEvent @event) {
 		// Control node must not be in the way and/or have mouse pass enabled
 		if (@event is InputEventMouseButton eventMouseButton) {
+			Vector2 globalMousePosition = GetGlobalMousePosition();
 			if (eventMouseButton.ButtonIndex == MouseButton.Left) {
 				GetViewport().SetInputAsHandled();
 				if (eventMouseButton.IsPressed()) {
 					if (inUnitGoToMode) {
 						setGoToMode(false);
 						using (var gameDataAccess = new UIGameDataAccess()) {
-							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
 							if (tile != null) {
 								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
 							}
@@ -354,19 +334,14 @@ public partial class Game : Node2D {
 					} else {
 						// Select unit on tile at mouse location
 						using (var gameDataAccess = new UIGameDataAccess()) {
-							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
 							if (tile != null) {
 								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
 								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
 							}
 						}
-
-						OldPosition = eventMouseButton.Position;
-						IsMovingCamera = true;
 					}
-				} else {
-					IsMovingCamera = false;
 				}
 			} else if (eventMouseButton.ButtonIndex == MouseButton.WheelUp) {
 				GetViewport().SetInputAsHandled();
@@ -374,10 +349,10 @@ public partial class Game : Node2D {
 			} else if (eventMouseButton.ButtonIndex == MouseButton.WheelDown) {
 				GetViewport().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
-			} else if ((eventMouseButton.ButtonIndex == MouseButton.Right) && (!eventMouseButton.IsPressed())) {
+			} else if (eventMouseButton.ButtonIndex == MouseButton.Right && !eventMouseButton.IsPressed()) {
 				setGoToMode(false);
 				using (var gameDataAccess = new UIGameDataAccess()) {
-					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+					var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
 					if (tile != null) {
 						bool shiftDown = Input.IsKeyPressed(Godot.Key.Shift);
 						if (shiftDown && tile.cityAtTile?.owner == controller)
@@ -407,10 +382,8 @@ public partial class Game : Node2D {
 					}
 				}
 			}
-		} else if (@event is InputEventMouseMotion eventMouseMotion && IsMovingCamera) {
+		} else if (@event is InputEventMouseMotion eventMouseMotion) {
 			GetViewport().SetInputAsHandled();
-			mapView.cameraLocation += OldPosition - eventMouseMotion.Position;
-			OldPosition = eventMouseMotion.Position;
 		} else if (@event is InputEventKey eventKeyDown && eventKeyDown.Pressed) {
 			if (eventKeyDown.Keycode == Godot.Key.O && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 				using (UIGameDataAccess gameDataAccess = new UIGameDataAccess()) {
@@ -428,17 +401,6 @@ public partial class Game : Node2D {
 					}
 				}
 			}
-		} else if (@event is InputEventMagnifyGesture magnifyGesture) {
-			// UI slider has the min/max zoom settings for now
-			VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
-			double newScale = mapView.cameraZoom * magnifyGesture.Factor;
-			if (newScale < slider.MinValue)
-				newScale = slider.MinValue;
-			else if (newScale > slider.MaxValue)
-				newScale = slider.MaxValue;
-			mapView.setCameraZoom((float)newScale, magnifyGesture.Position);
-			// Update the UI slider
-			slider.Value = newScale;
 		}
 	}
 
@@ -480,7 +442,7 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.ToggleGrid)) {
-			this.mapView.gridLayer.visible = !this.mapView.gridLayer.visible;
+			this.oldMapView.gridLayer.visible = !this.oldMapView.gridLayer.visible;
 		}
 
 		if (Input.IsActionJustPressed(C7Action.Escape) && !this.inUnitGoToMode) {
@@ -490,15 +452,7 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.ToggleZoom)) {
-			if (mapView.cameraZoom != 1) {
-				mapView.setCameraZoomFromMiddle(1.0f);
-				VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
-				slider.Value = 1.0f;
-			} else {
-				mapView.setCameraZoomFromMiddle(0.5f);
-				VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
-				slider.Value = 0.5f;
-			}
+			camera.setZoom(camera.zoomFactor != 1 ? 1.0f : 0.5f);
 		}
 
 		if (Input.IsActionJustPressed(C7Action.ToggleAnimations)) {
