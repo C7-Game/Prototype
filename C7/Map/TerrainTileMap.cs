@@ -44,7 +44,7 @@ namespace C7.Map {
 		}
 	}
 
-	partial class Corners : Node2D {
+	partial class TerrainTileMap : Node2D {
 		private List<string> terrainPcxFiles = new List<string> {
 			"Art/Terrain/xtgc.pcx",
 			"Art/Terrain/xpgc.pcx",
@@ -109,7 +109,7 @@ namespace C7.Map {
 			this.tilemap.SetCell(0, cell, atlas, texCoords);
 		}
 
-		public Corners(C7GameData.GameMap gameMap) {
+		public TerrainTileMap(C7GameData.GameMap gameMap) {
 			this.textures = terrainPcxFiles.ConvertAll(path => Util.LoadTextureFromPCX(path));
 			this.initializeTileMap();
 			this.width = gameMap.numTilesWide / 2;
