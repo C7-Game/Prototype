@@ -2,6 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using C7GameData;
 
 namespace C7.Map {
 
@@ -58,47 +59,72 @@ namespace C7.Map {
 		};
 		private List<TerrainPcx> terrainPcxList;
 		private string[,]terrain;
+		private TileMap terrainTilemap;
+		private TileSet terrainTileset;
 		private TileMap tilemap;
 		private TileSet tileset;
 		private List<ImageTexture> textures;
 		private Vector2I tileSize = new Vector2I(128, 64);
 		private int width;
 		private int height;
+		private GameMap gameMap;
+
+		private TileSet makeTileSet() {
+			TileSet ts = new TileSet();
+			ts.TileShape = TileSet.TileShapeEnum.Isometric;
+			ts.TileLayout = TileSet.TileLayoutEnum.Stacked;
+			ts.TileOffsetAxis = TileSet.TileOffsetAxisEnum.Horizontal;
+			ts.TileSize = tileSize;
+			return ts;
+		}
 
 		private void initializeTileMap() {
-			this.tilemap = new TileMap();
-			this.tileset = new TileSet();
+			this.terrainTilemap = new TileMap();
+			terrainTileset = makeTileSet();
 
-			this.tileset.TileShape = TileSet.TileShapeEnum.Isometric;
-			this.tileset.TileLayout = TileSet.TileLayoutEnum.Stacked;
-			this.tileset.TileOffsetAxis = TileSet.TileOffsetAxisEnum.Horizontal;
-			this.tileset.TileSize = this.tileSize;
-
-			foreach (ImageTexture texture in this.textures) {
+			foreach (ImageTexture texture in textures) {
 				TileSetAtlasSource source = new TileSetAtlasSource();
 				source.Texture = texture;
-				source.TextureRegionSize = this.tileSize;
+				source.TextureRegionSize = tileSize;
 				for (int x = 0; x < 9; x++) {
 					for (int y = 0; y < 9; y++) {
 						source.CreateTile(new Vector2I(x, y));
 					}
 				}
-				this.tileset.AddSource(source);
+				terrainTileset.AddSource(source);
 			}
-			this.tilemap.TileSet = tileset;
+			terrainTilemap.TileSet = terrainTileset;
 
-			this.terrainPcxList = new List<TerrainPcx>() {
+			terrainPcxList = new List<TerrainPcx>() {
 				new TerrainPcx("tgc", new string[]{"tundra", "grassland", "coast"}, 0),
 				new TerrainPcx("pgc", new string[]{"plains", "grassland", "coast"}, 1),
 				new TerrainPcx("dgc", new string[]{"desert", "grassland", "coast"}, 2),
 				new TerrainPcx("dpc", new string[]{"desert", "plains", "coast"}, 3),
 				new TerrainPcx("dgp", new string[]{"desert", "grassland", "plains"}, 4),
-				// new TerrainPcx("ggc", new string[]{"grassland", "grassland", "coast"}, 5),
+				new TerrainPcx("ggc", new string[]{"grassland", "grassland", "coast"}, 5),
 				new TerrainPcx("cso", new string[]{"coast", "sea", "ocean"}, 6),
 				new TerrainPcx("sss", new string[]{"sea", "sea", "sea"}, 7),
 				new TerrainPcx("ooo", new string[]{"ocean", "ocean", "ocean"}, 8),
 			};
-			AddChild(this.tilemap);
+			terrainTilemap.Position += Vector2I.Right * (width / 2);
+
+			tilemap = new TileMap();
+			tileset = makeTileSet();
+			tilemap.TileSet = tileset;
+
+			AddChild(terrainTilemap);
+			AddChild(tilemap);
+		}
+
+		public override void _UnhandledInput(InputEvent @event) {
+			base._UnhandledInput(@event);
+			if (@event is InputEventMouseButton mb && mb.IsPressed()) {
+				Vector2 mousePosition = GetGlobalMousePosition();
+				Vector2I tile = tilemap.LocalToMap(ToLocal(mousePosition));
+				GD.Print($"clicked on tile {tile.ToString()}");
+				string terrainName = terrain[tile.X, tile.Y];
+				GD.Print($"terrain type is {terrainName}");
+			}
 		}
 
 		private TerrainPcx getPcxForCorner(string[] corner) {
@@ -106,22 +132,25 @@ namespace C7.Map {
 		}
 
 		void fill(Vector2I cell, int atlas, Vector2I texCoords) {
-			this.tilemap.SetCell(0, cell, atlas, texCoords);
+			terrainTilemap.SetCell(0, cell, atlas, texCoords);
 		}
 
-		public TerrainTileMap(C7GameData.GameMap gameMap) {
-			this.textures = terrainPcxFiles.ConvertAll(path => Util.LoadTextureFromPCX(path));
-			this.initializeTileMap();
-			this.width = gameMap.numTilesWide / 2;
-			this.height = gameMap.numTilesTall;
-			this.terrain = new string[width, height];
+		private Vector2I stackedCoords(int x, int y) {
+			x = y % 2 == 0 ? x / 2 : (x - 1) / 2;
+			return new Vector2I(x, y);
+		}
+
+		public TerrainTileMap(Game game, GameData data) {
+			textures = terrainPcxFiles.ConvertAll(path => Util.LoadTextureFromPCX(path));
+			gameMap = data.map;
+			width = gameMap.numTilesWide / 2;
+			height = gameMap.numTilesTall;
+			initializeTileMap();
+			terrain = new string[width, height];
 
 			foreach (C7GameData.Tile t in gameMap.tiles) {
-				int x = t.xCoordinate;
-				int y = t.yCoordinate;
-				// stacked coordinates
-				x = y % 2 == 0 ? x / 2 : (x - 1) / 2;
-				this.terrain[x, y] = t.baseTerrainTypeKey;
+				Vector2I coords = stackedCoords(t.xCoordinate, t.yCoordinate);
+				terrain[coords.X, coords.Y] = t.baseTerrainTypeKey;
 			}
 
 			for (int x = 0; x < width; x++) {
@@ -145,6 +174,24 @@ namespace C7.Map {
 				}
 			}
 
+			foreach (Tile tile in gameMap.tiles) {
+				if (tile.unitsOnTile.Count > 0) {
+					MapUnit unit = tile.unitsOnTile[0];
+					var ai = new UnitLayer.AnimationInstance(game.civ3AnimData);
+					MapUnit.Appearance appearance = game.animTracker.getUnitAppearance(unit);
+
+					var coords = stackedCoords(tile.xCoordinate, tile.yCoordinate);
+					var worldCoords = tilemap.MapToLocal(coords);
+					ai.SetPosition(worldCoords);
+
+					game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
+					string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
+					ai.SetAnimation(animName);
+					ai.SetFrame(0);
+					AddChild(ai.sprite);
+					AddChild(ai.spriteTint);
+				}
+			}
 		}
 	}
 }

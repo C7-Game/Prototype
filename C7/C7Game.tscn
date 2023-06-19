@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://UIElements/UnitButtons/RenameButton.cs" id="8"]
 [ext_resource type="Script" path="res://UIElements/Popups/PopupOverlay.cs" id="9"]
 [ext_resource type="Theme" uid="uid://c1jpmssnhvodi" path="res://C7Theme.tres" id="10"]
-[ext_resource type="Script" path="res://PlayerCamera.gd" id="11_ab5st"]
+[ext_resource type="Script" path="res://PlayerCamera.cs" id="11_pkhac"]
 [ext_resource type="Script" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
 
 [sub_resource type="Animation" id="2"]
@@ -241,7 +241,7 @@ libraries = {
 }
 
 [node name="PlayerCamera" type="Camera2D" parent="CanvasLayer"]
-script = ExtResource("11_ab5st")
+script = ExtResource("11_pkhac")
 
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/Control/GameStatus" method="OnNewUnitSelected"]
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/Control/UnitButtons" method="OnNewUnitSelected"]

@@ -106,8 +106,8 @@ public partial class UnitLayer : LooseLayer {
 			return this.sprite.SpriteFrames.GetFrameTexture(animation, 0).GetSize();
 		}
 
-		public AnimationInstance(LooseView looseView) {
-			AnimationManager manager = looseView.mapView.game.civ3AnimData;
+		public AnimationInstance(AnimationManager manager) {
+			// AnimationManager manager = looseView.mapView.game.civ3AnimData;
 
 			this.sprite = new AnimatedSprite2D();
 			this.sprite.ZIndex = unitAnimZIndex;
@@ -121,8 +121,8 @@ public partial class UnitLayer : LooseLayer {
 			this.material.Shader = GD.Load<Shader>("res://UnitTint.gdshader");
 			this.spriteTint.Material = this.material;
 
-			looseView.AddChild(sprite);
-			looseView.AddChild(spriteTint);
+			// looseView.AddChild(sprite);
+			// looseView.AddChild(spriteTint);
 		}
 	}
 
@@ -132,7 +132,7 @@ public partial class UnitLayer : LooseLayer {
 	// Returns the next unused AnimationInstance or creates & returns a new one if none are available.
 	public AnimationInstance getBlankAnimationInstance(LooseView looseView) {
 		if (nextBlankAnimInst >= animInsts.Count) {
-			animInsts.Add(new AnimationInstance(looseView));
+			// animInsts.Add(new AnimationInstance(looseView));
 		}
 		AnimationInstance inst = animInsts[nextBlankAnimInst];
 		nextBlankAnimInst++;
