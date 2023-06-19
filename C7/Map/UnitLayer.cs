@@ -34,6 +34,11 @@ public partial class UnitSprite : Node2D {
 		spriteTint.Animation = name;
 	}
 
+	public void Play(string name) {
+		sprite.Play(name);
+		spriteTint.Play(name);
+	}
+
 	public Vector2 FrameSize(string animation) {
 		return sprite.SpriteFrames.GetFrameTexture(animation, 0).GetSize();
 	}

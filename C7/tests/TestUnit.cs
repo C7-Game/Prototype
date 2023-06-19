@@ -11,34 +11,17 @@ public partial class TestUnit : Node2D
 	{
 		AnimationManager manager = new AnimationManager(null);
 		UnitSprite sprite = new UnitSprite(manager);
-		manager.forUnit(new UnitPrototype{name="warrior"}, MapUnit.AnimatedAction.RUN);
-
-		AnimatedSprite2D sprite = new AnimatedSprite2D();
-		SpriteFrames frames = new SpriteFrames();
-		sprite.SpriteFrames = frames;
-
-		AnimatedSprite2D spriteTint = new AnimatedSprite2D();
-		SpriteFrames framesTint = new SpriteFrames();
-		spriteTint.SpriteFrames = framesTint;
-
-		AnimationManager.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames, ref framesTint);
-
-		ShaderMaterial material = new ShaderMaterial();
-		material.Shader = GD.Load<Shader>("res://UnitTint.gdshader");
-		material.SetShaderParameter("tintColor", new Vector3(1f,1f,1f));
-		spriteTint.Material = material;
-
+		UnitPrototype prototype = new UnitPrototype{name="warrior"};
+		manager.forUnit(prototype, MapUnit.AnimatedAction.RUN).loadSpriteAnimation();
+		string name = AnimationManager.AnimationKey(prototype, MapUnit.AnimatedAction.RUN, TileDirection.EAST);
 		AddChild(sprite);
-		AddChild(spriteTint);
 
-		sprite.Play("run_EAST");
-		spriteTint.Play("run_EAST");
+		float scale = 6;
+		this.Scale = new Vector2(scale, scale);
+
+		sprite.material.SetShaderParameter("tintColor", new Vector3(1f,1f,1f));
 		sprite.Position = new Vector2(30, 30);
-		spriteTint.Position = new Vector2(30, 30);
-
-		float SCALE = 6;
-		this.Scale = new Vector2(SCALE, SCALE);
-
+		sprite.Play(name);
 
 		AnimatedSprite2D cursor = new AnimatedSprite2D();
 		SpriteFrames cursorFrames = new SpriteFrames();
