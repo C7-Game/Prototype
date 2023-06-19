@@ -21,4 +21,9 @@ public partial class PlayerCamera : Camera2D
 			Zoom = Vector2.One * zoomFactor;
 		}
 	}
+
+	public Rect2 getVisibleWorld() {
+		Transform2D vpToGlobal = (GetViewport().GlobalCanvasTransform * this.GetCanvasTransform()).AffineInverse();
+		return vpToGlobal * GetViewportRect();
+	}
 }

@@ -6,45 +6,6 @@ using C7GameData;
 
 namespace C7.Map {
 
-	class TerrainPcx {
-		private static Random prng = new Random();
-		private string name;
-		// abc refers to the layout of the terrain tiles in the pcx based on
-		// the positions of each terrain at the corner of 4 tiles.
-		// - https://forums.civfanatics.com/threads/terrain-editing.622999/
-		// - https://forums.civfanatics.com/threads/editing-terrain-pcx-files.102840/
-		private string[] abc;
-		public int atlas;
-		public TerrainPcx(string name, string[] abc, int atlas) {
-			this.name = name;
-			this.abc = abc;
-			this.atlas = atlas;
-		}
-		public bool validFor(string[] corner) {
-			return corner.All(tile => abc.Contains(tile));
-		}
-		private int abcIndex(string terrain) {
-			List<int> indices = new List<int>();
-			for (int i = 0; i < abc.Count(); i++) {
-				if (abc[i] == terrain) {
-					indices.Add(i);
-				}
-			}
-			return indices[prng.Next(indices.Count)];
-		}
-
-		// getTextureCoords looks up the correct texture index in the pcx
-		// for the given position of each corner terrain type
-		public Vector2I getTextureCoords(string[] corner) {
-			int top = abcIndex(corner[0]);
-			int right = abcIndex(corner[1]);
-			int bottom = abcIndex(corner[2]);
-			int left = abcIndex(corner[3]);
-			int index = top + (left * 3) + (right * 9) + (bottom * 27);
-			return new Vector2I(index % 9, index / 9);
-		}
-	}
-
 	partial class TerrainTileMap : Node2D {
 		private List<string> terrainPcxFiles = new List<string> {
 			"Art/Terrain/xtgc.pcx",
@@ -177,19 +138,17 @@ namespace C7.Map {
 			foreach (Tile tile in gameMap.tiles) {
 				if (tile.unitsOnTile.Count > 0) {
 					MapUnit unit = tile.unitsOnTile[0];
-					var ai = new UnitLayer.AnimationInstance(game.civ3AnimData);
+					UnitSprite sprite = new UnitSprite(game.civ3AnimData);
 					MapUnit.Appearance appearance = game.animTracker.getUnitAppearance(unit);
 
 					var coords = stackedCoords(tile.xCoordinate, tile.yCoordinate);
-					var worldCoords = tilemap.MapToLocal(coords);
-					ai.SetPosition(worldCoords);
+					sprite.Position = tilemap.MapToLocal(coords);
 
 					game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
 					string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
-					ai.SetAnimation(animName);
-					ai.SetFrame(0);
-					AddChild(ai.sprite);
-					AddChild(ai.spriteTint);
+					sprite.SetAnimation(animName);
+					sprite.SetFrame(0);
+					AddChild(sprite);
 				}
 			}
 		}

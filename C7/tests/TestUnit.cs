@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using ConvertCiv3Media;
+using C7GameData;
 
 public partial class TestUnit : Node2D
 {
@@ -8,7 +9,9 @@ public partial class TestUnit : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		//AudioStreamPlayer player = GetNode<AudioStreamPlayer>("CanvasLayer/SoundEffectPlayer");
+		AnimationManager manager = new AnimationManager(null);
+		UnitSprite sprite = new UnitSprite(manager);
+		manager.forUnit(new UnitPrototype{name="warrior"}, MapUnit.AnimatedAction.RUN);
 
 		AnimatedSprite2D sprite = new AnimatedSprite2D();
 		SpriteFrames frames = new SpriteFrames();
