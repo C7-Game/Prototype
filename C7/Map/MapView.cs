@@ -3,6 +3,8 @@ using C7GameData;
 using System;
 using Serilog;
 using System.Linq;
+using System.Collections.Generic;
+using C7Engine;
 
 namespace C7.Map {
 
@@ -34,17 +36,96 @@ namespace C7.Map {
 		private GameData data;
 		private GameMap gameMap;
 
-		public override void _Draw() {
-			GD.Print("draw...");
-			game.animTracker.update();
-			foreach ((string id, AnimationTracker.ActiveAnimation anim) in game.animTracker.activeAnims) {
-				GD.Print($"{id}: {anim.ToString()}");
+		private Dictionary<MapUnit, UnitSprite> unitSprites = new Dictionary<MapUnit, UnitSprite>();
+		private CursorSprite cursor;
+
+		private UnitSprite spriteFor(MapUnit unit) {
+			UnitSprite sprite = unitSprites.GetValueOrDefault(unit, null);
+			if (sprite is null) {
+				sprite = new UnitSprite(game.civ3AnimData);
+				unitSprites.Add(unit, sprite);
+				AddChild(sprite);
 			}
-			base._Draw();
+			return sprite;
 		}
 
-		public override void _Process(double delta) {
-			base._Process(delta);
+		private Vector2 getSpriteLocalPosition(Tile tile, MapUnit.Appearance appearance) {
+			Vector2 position = tilemap.MapToLocal(stackedCoords(tile));
+			Vector2 offset = tileSize * new Vector2(appearance.offsetX, appearance.offsetY) / 2;
+			return position + offset;
+		}
+
+		private void animateUnit(Tile tile, MapUnit unit) {
+			// TODO: simplify AnimationManager and drawing animations it is unnecessarily complex
+			// - also investigate if the custom offset tracking and SetFrame can be replaced by
+			//   engine functionality
+			MapUnit.Appearance appearance = game.animTracker.getUnitAppearance(unit);
+			string name = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
+			C7Animation animation = game.civ3AnimData.forUnit(unit.unitType, appearance.action);
+			animation.loadSpriteAnimation();
+			UnitSprite sprite = spriteFor(unit);
+			int frame = sprite.GetNextFrameByProgress(name, appearance.progress);
+			float yOffset = sprite.FrameSize(name).Y / 4f; // TODO: verify actual value
+			Vector2 position = getSpriteLocalPosition(tile, appearance);
+			sprite.Position = position - new Vector2(0, yOffset);
+			Color civColor = new Color(unit.owner.color);
+			sprite.SetColor(civColor);
+			sprite.SetAnimation(name);
+			sprite.SetFrame(frame);
+			sprite.Show();
+
+			if (unit == game.CurrentlySelectedUnit) {
+				cursor.Position = position;
+				cursor.Show();
+			}
+		}
+
+		private MapUnit selectUnitToDisplay(List<MapUnit> units) {
+			if (units.Count == 0) {
+				return MapUnit.NONE;
+			}
+			MapUnit bestDefender = units[0], selected = null, interesting = null;
+			MapUnit currentlySelected = game.CurrentlySelectedUnit;
+			foreach (MapUnit unit in units) {
+				if (unit == currentlySelected) {
+					selected = unit;
+				}
+				if (unit.HasPriorityAsDefender(bestDefender, currentlySelected)) {
+					bestDefender = unit;
+				}
+				if (game.animTracker.getUnitAppearance(unit).DeservesPlayerAttention()) {
+					interesting = unit;
+				}
+			}
+			// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
+			return selected is not null ? selected : (interesting is not null ? interesting : bestDefender);
+		}
+
+		public List<Tile> getVisibleTiles() {
+			List<Tile> tiles = new List<Tile>();
+			Rect2 bounds = game.camera.getVisibleWorld();
+			Vector2I topLeft = tilemap.LocalToMap(ToLocal(bounds.Position));
+			Vector2I bottomRight = tilemap.LocalToMap(ToLocal(bounds.End));
+			for (int x = topLeft.X - 1; x < bottomRight.X + 1; x++) {
+				for (int y = topLeft.Y - 1; y < bottomRight.Y + 1; y++) {
+					(int usX, int usY) = unstackedCoords(new Vector2I(x, y));
+					tiles.Add(data.map.tileAt(usX, usY));
+				}
+			}
+			return tiles;
+		}
+
+		public void updateAnimations() {
+			foreach (UnitSprite s in unitSprites.Values) {
+				s.Hide();
+			}
+			cursor.Hide();
+			foreach (Tile tile in getVisibleTiles()) {
+				MapUnit unit = selectUnitToDisplay(tile.unitsOnTile);
+				if (unit != MapUnit.NONE) {
+					animateUnit(tile, unit);
+				}
+			}
 		}
 
 		private void initializeTileMap() {
@@ -127,7 +208,10 @@ namespace C7.Map {
 		public MapView(Game game, GameData data) {
 			this.data = data;
 			this.game = game;
+			this.data = data;
 			this.gameMap = data.map;
+			cursor = new CursorSprite();
+			AddChild(cursor);
 			width = gameMap.numTilesWide / 2;
 			height = gameMap.numTilesTall;
 			initializeTileMap();
@@ -150,24 +234,6 @@ namespace C7.Map {
 			// update each tile once to add all initial layers
 			foreach (Tile tile in gameMap.tiles) {
 				updateTile(tile);
-			}
-
-			// temp but place units in current position
-			foreach (Tile tile in gameMap.tiles) {
-				if (tile.unitsOnTile.Count > 0) {
-					MapUnit unit = tile.unitsOnTile[0];
-					UnitSprite sprite = new UnitSprite(game.civ3AnimData);
-					MapUnit.Appearance appearance = game.animTracker.getUnitAppearance(unit);
-
-					var coords = stackedCoords(tile);
-					sprite.Position = tilemap.MapToLocal(coords);
-
-					game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
-					string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
-					sprite.SetAnimation(animName);
-					sprite.SetFrame(0);
-					AddChild(sprite);
-				}
 			}
 		}
 

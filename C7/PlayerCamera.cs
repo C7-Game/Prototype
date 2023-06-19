@@ -4,7 +4,7 @@ using C7GameData;
 
 public partial class PlayerCamera : Camera2D
 {
-	private readonly float maxZoom = 2.0f;
+	private readonly float maxZoom = 3.0f;
 	private readonly float minZoom = 0.2f;
 	public float zoomFactor {get; private set; } = 1.0f;
 
@@ -25,11 +25,13 @@ public partial class PlayerCamera : Camera2D
 	}
 
 	public override void _UnhandledInput(InputEvent @event) {
-		if (@event is InputEventMouseMotion mm && mm.ButtonMask == MouseButtonMask.Left) {
-			Position -= mm.Relative / Zoom;
-		}
-		if (@event is InputEventMagnifyGesture mg) {
-			scaleZoom(mg.Factor);
+		switch (@event) {
+		case InputEventMouseMotion mouseDrag when mouseDrag.ButtonMask == MouseButtonMask.Left:
+			Position -= mouseDrag.Relative / Zoom;
+			break;
+		case InputEventMagnifyGesture magnifyGesture:
+			scaleZoom(magnifyGesture.Factor);
+			break;
 		}
 	}
 
