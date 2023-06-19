@@ -5,6 +5,7 @@ using System.Diagnostics;
 using C7Engine;
 using C7GameData;
 using Serilog;
+using C7.Map;
 
 public partial class Game : Node2D {
 	[Signal] public delegate void TurnStartedEventHandler();
@@ -22,7 +23,7 @@ public partial class Game : Node2D {
 	}
 
 	public Player controller; // Player that's controlling the UI.
-
+	private Corners corners;
 	private MapView mapView;
 	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
@@ -88,9 +89,12 @@ public partial class Game : Node2D {
 					if (startingSettler != null)
 						mapView.centerCameraOnTile(startingSettler.location);
 				}
+				corners = new Corners(map);
 			}
 
-			Toolbar = GetNode<Control>("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer");
+			AddChild(corners);
+
+			Toolbar = GetNode<Control>("CanvasLayer/ToolBar/MarginContainer/HBoxContainer");
 
 			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
 			// GetTree().Root.Connect("size_changed",new Callable(this,"_OnViewportSizeChanged"));
