@@ -37,6 +37,7 @@ namespace C7.Map {
 		private GameMap gameMap;
 
 		private Dictionary<MapUnit, UnitSprite> unitSprites = new Dictionary<MapUnit, UnitSprite>();
+		private Dictionary<City, CityScene> cityScenes = new Dictionary<City, CityScene>();
 		private CursorSprite cursor;
 
 		private UnitSprite spriteFor(MapUnit unit) {
@@ -53,6 +54,14 @@ namespace C7.Map {
 			Vector2 position = tilemap.MapToLocal(stackedCoords(tile));
 			Vector2 offset = tileSize * new Vector2(appearance.offsetX, appearance.offsetY) / 2;
 			return position + offset;
+		}
+
+		public void addCity(City city, Tile tile) {
+			log.Debug($"adding city at tile ({tile.xCoordinate}, {tile.yCoordinate})");
+			CityScene scene = new CityScene(city, tile);
+			scene.Position = tilemap.MapToLocal(stackedCoords(tile));
+			AddChild(scene);
+			cityScenes.Add(city, scene);
 		}
 
 		private void animateUnit(Tile tile, MapUnit unit) {
