@@ -88,6 +88,7 @@ public partial class Game : Node2D {
 						camera.centerOnTile(startingSettler.location, mapView);
 					}
 				}
+				corners = new Corners(map);
 			}
 
 			AddChild(mapView);
