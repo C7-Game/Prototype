@@ -606,7 +606,6 @@ public partial class MapView : Node2D {
 	public GridLayer gridLayer { get; private set; }
 
 	public ImageTexture civColorWhitePalette = null;
-	private Corners corners;
 	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically)
 	{
 		this.game = game;

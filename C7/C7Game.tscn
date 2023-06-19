@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cldl5nk4n61m2"]
+[gd_scene load_steps=15 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" path="res://Game.cs" id="1"]
 [ext_resource type="Script" path="res://UIElements/Advisors/Advisors.cs" id="3"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://UIElements/UnitButtons/RenameButton.cs" id="8"]
 [ext_resource type="Script" path="res://UIElements/Popups/PopupOverlay.cs" id="9"]
 [ext_resource type="Theme" uid="uid://c1jpmssnhvodi" path="res://C7Theme.tres" id="10"]
+[ext_resource type="Script" path="res://PlayerCamera.gd" id="11_ab5st"]
 [ext_resource type="Script" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
 
 [sub_resource type="Animation" id="2"]
@@ -239,10 +240,14 @@ libraries = {
 "": SubResource("AnimationLibrary_bowxq")
 }
 
+[node name="PlayerCamera" type="Camera2D" parent="CanvasLayer"]
+script = ExtResource("11_ab5st")
+
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/Control/GameStatus" method="OnNewUnitSelected"]
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/Control/UnitButtons" method="OnNewUnitSelected"]
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/GameStatus" method="OnNoMoreAutoselectableUnits"]
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/UnitButtons" method="OnNoMoreAutoselectableUnits"]
+
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnStarted"]

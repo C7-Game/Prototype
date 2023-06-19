@@ -23,7 +23,7 @@ public partial class Game : Node2D {
 	}
 
 	public Player controller; // Player that's controlling the UI.
-	private Corners corners;
+	private TerrainTileMap corners;
 	private MapView mapView;
 	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
@@ -89,7 +89,7 @@ public partial class Game : Node2D {
 					if (startingSettler != null)
 						mapView.centerCameraOnTile(startingSettler.location);
 				}
-				corners = new Corners(map);
+				corners = new TerrainTileMap(map);
 			}
 
 			AddChild(corners);
