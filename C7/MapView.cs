@@ -626,7 +626,7 @@ public partial class MapView : Node2D {
 		this.gridLayer = new GridLayer();
 		looseView.layers.Add(this.gridLayer);
 		looseView.layers.Add(new BuildingLayer());
-		looseView.layers.Add(new UnitLayer());
+		// looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new CityLayer());
 		// looseView.layers.Add(new FogOfWarLayer());
 
