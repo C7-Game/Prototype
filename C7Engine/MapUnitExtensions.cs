@@ -366,9 +366,9 @@ namespace C7Engine {
 					throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 				unit.OnEnterTile(newLoc);
 				newLoc.unitsOnTile.Add(unit);
+				unit.animate(MapUnit.AnimatedAction.RUN, wait);
 				unit.location = newLoc;
 				unit.movementPoints.onUnitMove(movementCost);
-				unit.animate(MapUnit.AnimatedAction.RUN, wait);
 			}
 			return true;
 		}

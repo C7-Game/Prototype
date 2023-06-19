@@ -44,7 +44,7 @@ public partial class Game : Node2D {
 
 	Stopwatch loadTimer = new Stopwatch();
 	GlobalSingleton Global;
-	private PlayerCamera camera;
+	public PlayerCamera camera;
 	bool errorOnLoad = false;
 
 	public override void _EnterTree() {
@@ -158,17 +158,17 @@ public partial class Game : Node2D {
 		}
 	}
 
-	// Instead of Game calling animTracker.update periodically (this used to happen in _Process), this method gets called as necessary to bring
-	// the animations up to date. Right now it's called from UnitLayer right before it draws the units on the map. This method also processes all
-	// waiting messages b/c some of them might pertain to animations. TODO: Consider processing only the animation messages here.
-	// Must only be called while holding the game data mutex
+	// updateAnimations updates animation states in the tracker and then their corresponding
+	// sprites in the MapView. It must be called when holding the game data mutex.
+	// TODO: before switching to tilemap, this was only called by the old UnitLayer _Draw
+	// method. It only really needs to be called as frequently as animations update...
 	public void updateAnimations(GameData gameData) {
-		processEngineMessages(gameData);
 		animTracker.update();
+		mapView.updateAnimations();
 	}
 
 	public override void _Process(double delta) {
-		this.processActions();
+		processActions();
 
 		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
 		using (var gameDataAccess = new UIGameDataAccess()) {
@@ -195,6 +195,8 @@ public partial class Game : Node2D {
 					EmitSignal("ShowSpecificAdvisor", "F1");
 				}
 			}
+
+			updateAnimations(gameDataAccess.gameData);
 		}
 	}
 
