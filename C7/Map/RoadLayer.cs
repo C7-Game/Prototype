@@ -26,7 +26,7 @@ namespace C7.Map
 			if (!hasRailRoad(tile)) {
 				int roadIndex = 0;
 				foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
-					if (hasRoad(dirToTile.Value)) {
+					if (dirToTile.Value.overlays.road) {
 						roadIndex |= getFlag(dirToTile.Key);
 					}
 				}

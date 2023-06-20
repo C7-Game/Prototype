@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using C7GameData;
+using System;
 
 namespace C7.Map {
 
@@ -43,6 +44,14 @@ namespace C7.Map {
 			};
 		}
 
+		private void addUniformTilesToAtlasSource(ref TileSetAtlasSource source, int width, int height) {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					source.CreateTile(new Vector2I(x, y));
+				}
+			}
+		}
+
 		private void initializeTileMap() {
 			this.terrainTilemap = new TileMap();
 			terrainTilemap.TextureFilter = TextureFilterEnum.Nearest;
@@ -53,11 +62,7 @@ namespace C7.Map {
 				TileSetAtlasSource source = new TileSetAtlasSource();
 				source.Texture = texture;
 				source.TextureRegionSize = tileSize;
-				for (int x = 0; x < 9; x++) {
-					for (int y = 0; y < 9; y++) {
-						source.CreateTile(new Vector2I(x, y));
-					}
-				}
+				addUniformTilesToAtlasSource(ref source, 9, 9);
 				terrainTileset.AddSource(source);
 			}
 			terrainTilemap.TileSet = terrainTileset;
@@ -66,9 +71,16 @@ namespace C7.Map {
 			tilemap = new TileMap();
 			tileset = makeTileSet();
 			tilemap.TileSet = tileset;
+			TileSetAtlasSource roads = new TileSetAtlasSource{
+				Texture = Util.LoadTextureFromPCX("Art/Terrain/roads.pcx"),
+				TextureRegionSize = tileSize,
+			};
+			addUniformTilesToAtlasSource(ref roads, 16, 16);
+			tileset.AddSource(roads);
 
-			AddChild(terrainTilemap);
+			tilemap.ZIndex = 100;
 			AddChild(tilemap);
+			AddChild(terrainTilemap);
 		}
 
 		private void setTerrainTiles() {
@@ -87,30 +99,19 @@ namespace C7.Map {
 						bottom = even ? terrain[x, y + 1] : terrain[(x + 1) % width, y + 1];
 					}
 					string[] corner = new string[4]{top, right, bottom, left};
-					TerrainPcx pcx = getPcxForCorner(corner);
+					TerrainPcx pcx = terrainPcxList.Find(pcx => pcx.validFor(corner));
 					Vector2I texCoords = pcx.getTextureCoords(corner);
-					fill(cell, pcx.atlas, texCoords);
+					setTerrainTile(cell, pcx.atlas, texCoords);
 				}
 			}
 		}
 
-		public override void _UnhandledInput(InputEvent @event) {
-			base._UnhandledInput(@event);
-			// if (@event is InputEventMouseButton mb && mb.IsPressed()) {
-			// 	Vector2 mousePosition = GetGlobalMousePosition();
-			// 	Vector2I tile = tilemap.LocalToMap(ToLocal(mousePosition));
-			// 	GD.Print($"clicked on tile {tile.ToString()}");
-			// 	string terrainName = terrain[tile.X, tile.Y];
-			// 	GD.Print($"terrain type is {terrainName}");
-			// }
-		}
-
-		private TerrainPcx getPcxForCorner(string[] corner) {
-			return terrainPcxList.Find(tpcx => tpcx.validFor(corner));
-		}
-
-		void fill(Vector2I cell, int atlas, Vector2I texCoords) {
+		void setTerrainTile(Vector2I cell, int atlas, Vector2I texCoords) {
 			terrainTilemap.SetCell(0, cell, atlas, texCoords);
+		}
+
+		void setTile(Vector2I cell, int atlas, Vector2I texCoords) {
+			tilemap.SetCell(0, cell, atlas, texCoords);
 		}
 
 		private Vector2I stackedCoords(int x, int y) {
@@ -119,8 +120,7 @@ namespace C7.Map {
 		}
 
 		private (int, int) unstackedCoords(Vector2I stacked) {
-			int x = stacked.X;
-			int y = stacked.Y;
+			(int x, int y) = (stacked.X, stacked.Y);
 			x = y % 2 == 0 ? x * 2 : (x * 2) + 1;
 			return (x, y);
 		}
@@ -163,5 +163,41 @@ namespace C7.Map {
 			(int x, int y) = unstackedCoords(tilemapCoord);
 			return gameMap.tileAt(x, y);
 		}
+
+		public void updateTile(Tile tile, bool center = true) {
+			// update terrain ?
+			if (tile.overlays.road) {
+				int index = 0;
+				foreach (KeyValuePair<TileDirection, Tile> neighbor in tile.neighbors) {
+					if (neighbor.Value.overlays.road) {
+						index |= roadFlag(neighbor.Key);
+					}
+				}
+				int row = index >> 4;
+				int column = index & 0xF;
+				Vector2I texCoords = new Vector2I(column, row);
+				setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 0, texCoords);
+				if (center) {
+					foreach (Tile neighbor in tile.neighbors.Values) {
+						updateTile(neighbor, false);
+					}
+				}
+			}
+		}
+
+		private static int roadFlag(TileDirection direction) {
+			return direction switch {
+				TileDirection.NORTHEAST => 0x1,
+				TileDirection.EAST => 0x2,
+				TileDirection.SOUTHEAST => 0x4,
+				TileDirection.SOUTH => 0x8,
+				TileDirection.SOUTHWEST => 0x10,
+				TileDirection.WEST => 0x20,
+				TileDirection.NORTHWEST => 0x40,
+				TileDirection.NORTH => 0x80,
+				_ => throw new ArgumentOutOfRangeException("Invalid TileDirection")
+			};
+		}
+
 	}
 }
