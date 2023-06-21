@@ -2,10 +2,12 @@ using Godot;
 using C7GameData;
 using System;
 using Serilog;
+using System.Linq;
 
 namespace C7.Map {
 
 	public enum Layer {
+		Hill,
 		River,
 		Road,
 		Rail,
@@ -21,6 +23,14 @@ namespace C7.Map {
 	}
 
 	public enum Atlas {
+		Hill,
+		ForestHill,
+		JungleHill,
+		Mountain,
+		SnowMountain,
+		ForestMountain,
+		JungleMountain,
+		Volcano,
 		River,
 		Road,
 		Rail,
@@ -42,6 +52,8 @@ namespace C7.Map {
 		private TileMap tilemap;
 		private TileSet tileset;
 		private Vector2I tileSize = new Vector2I(128, 64);
+		private Vector2I hillSize = new Vector2I(128, 72);
+		private Vector2I mountainSize = new Vector2I(128, 88);
 		private Vector2I resourceSize = new Vector2I(50, 50);
 		private ILogger log = LogManager.ForContext<MapView>();
 
@@ -75,13 +87,21 @@ namespace C7.Map {
 			return source;
 		}
 
+		private void addUniformOffsetsToAtlasSource(ref TileSetAtlasSource source, int width, int height, Vector2I offset) {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = offset;
+				}
+			}
+		}
+
 		private void initializeTileMap() {
 			terrainTilemap = new TileMap();
 			terrainTileset = Civ3TerrainTileSet.Generate();
 			terrainTilemap.TileSet = terrainTileset;
 			terrainTilemap.Position += Vector2I.Right * (tileSize.X / 2);
 
-			tilemap = new TileMap();
+			tilemap = new TileMap{ YSortEnabled = true };
 			tileset = makeTileSet();
 			tilemap.TileSet = tileset;
 			TileSetAtlasSource roads = loadAtlasSource("Art/Terrain/roads.pcx", tileSize, 16, 16);
@@ -101,13 +121,37 @@ namespace C7.Map {
 			}
 
 			TileSetAtlasSource tnt = loadAtlasSource("Art/Terrain/tnt.pcx", tileSize, 3, 6);
+
 			TileSetAtlasSource rivers = loadAtlasSource("Art/Terrain/mtnRivers.pcx", tileSize, 4, 4);
+
+			TileSetAtlasSource hills = loadAtlasSource("Art/Terrain/xhills.pcx", hillSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref hills, 4, 4, new Vector2I(0, 4));
+			TileSetAtlasSource forestHills = loadAtlasSource("Art/Terrain/hill forests.pcx", hillSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref forestHills, 4, 4, new Vector2I(0, 4));
+			TileSetAtlasSource jungleHills = loadAtlasSource("Art/Terrain/hill jungle.pcx", hillSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref jungleHills, 4, 4, new Vector2I(0, 4));
+
+			TileSetAtlasSource mountain = loadAtlasSource("Art/Terrain/Mountains.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref mountain, 4, 4, new Vector2I(0, 12));
+			TileSetAtlasSource snowMountain = loadAtlasSource("Art/Terrain/Mountains-snow.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref snowMountain, 4, 4, new Vector2I(0, 12));
+			TileSetAtlasSource forestMountain = loadAtlasSource("Art/Terrain/mountain forests.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref forestMountain, 4, 4, new Vector2I(0, 12));
+			TileSetAtlasSource jungleMountain = loadAtlasSource("Art/Terrain/mountain jungles.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref jungleMountain, 4, 4, new Vector2I(0, 12));
 
 			tileset.AddSource(roads, Atlas.Road.Index());
 			tileset.AddSource(rails, Atlas.Rail.Index());
 			tileset.AddSource(resources, Atlas.Resource.Index());
 			tileset.AddSource(tnt, Atlas.TerrainYield.Index());
 			tileset.AddSource(rivers, Atlas.River.Index());
+			tileset.AddSource(hills, Atlas.Hill.Index());
+			tileset.AddSource(forestHills, Atlas.ForestHill.Index());
+			tileset.AddSource(jungleHills, Atlas.JungleHill.Index());
+			tileset.AddSource(mountain, Atlas.Mountain.Index());
+			tileset.AddSource(snowMountain, Atlas.SnowMountain.Index());
+			tileset.AddSource(forestMountain, Atlas.ForestMountain.Index());
+			tileset.AddSource(jungleMountain, Atlas.JungleMountain.Index());
 
 			// create tilemap layers
 			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
@@ -180,6 +224,7 @@ namespace C7.Map {
 			}
 			setTerrainTiles();
 
+			// update each tile once to add all initial layers
 			foreach (Tile tile in gameMap.tiles) {
 				updateTile(tile);
 			}
@@ -209,23 +254,15 @@ namespace C7.Map {
 			return gameMap.tileAt(x, y);
 		}
 
-		private void setCell(Layer layer, Atlas atlas, Vector2I coords, Vector2I atlasCoords) {
+		private void setCell(Layer layer, Atlas atlas, Tile tile, Vector2I atlasCoords) {
 			if (!tileset.HasSource(atlas.Index())) {
 				log.Warning($"atlas id {atlas} is not a valid tileset source");
 			}
-			tilemap.SetCell(layer.Index(), coords, atlas.Index(), atlasCoords);
-		}
-
-		private void setCell(Layer layer, Atlas atlas, Tile tile, Vector2I atlasCoords) {
-			setCell(layer, atlas, stackedCoords(tile), atlasCoords);
-		}
-
-		private void eraseCell(Layer layer, Vector2I coords) {
-			tilemap.EraseCell(layer.Index(), coords);
+			tilemap.SetCell(layer.Index(), stackedCoords(tile), atlas.Index(), atlasCoords);
 		}
 
 		private void eraseCell(Layer layer, Tile tile) {
-			eraseCell(layer, stackedCoords(tile));
+			tilemap.EraseCell(layer.Index(), stackedCoords(tile));
 		}
 
 		private void updateRoadLayer(Tile tile, bool center) {
@@ -310,6 +347,79 @@ namespace C7.Map {
 			}
 		}
 
+		private void updateHillLayer(Tile tile) {
+			if (!tile.overlayTerrainType.isHilly()) {
+				eraseCell(Layer.Hill, tile);
+				return;
+			}
+			Vector2I texCoord = getHillTextureCoordinate(tile);
+			TerrainType nearbyVegitation = getDominantVegetationNearHillyTile(tile);
+			switch (tile.overlayTerrainType.Key) {
+			case "hills":
+				Atlas hillAtlas = nearbyVegitation.Key switch {
+					"forest" => Atlas.ForestHill,
+					"jungle" => Atlas.JungleHill,
+					_ => Atlas.Hill,
+				};
+				setCell(Layer.Hill, hillAtlas, tile, texCoord);
+				break;
+			case "mountains":
+				Atlas mountainAtlas = nearbyVegitation.Key switch {
+					"forest" => Atlas.ForestMountain,
+					"jungle" => Atlas.JungleMountain,
+					_ => tile.isSnowCapped ? Atlas.SnowMountain : Atlas.Mountain,
+				};
+				setCell(Layer.Hill, mountainAtlas, tile, texCoord);
+				break;
+			default:
+				break;
+			}
+		}
+
+		private Vector2I getHillTextureCoordinate(Tile tile) {
+			int index = 0;
+			if (tile.neighbors[TileDirection.NORTHWEST].overlayTerrainType.isHilly()) {
+				index++;
+			}
+			if (tile.neighbors[TileDirection.NORTHEAST].overlayTerrainType.isHilly()) {
+				index+=2;
+			}
+			if (tile.neighbors[TileDirection.SOUTHWEST].overlayTerrainType.isHilly()) {
+				index+=4;
+			}
+			if (tile.neighbors[TileDirection.SOUTHEAST].overlayTerrainType.isHilly()) {
+				index+=8;
+			}
+			return new Vector2I(index % 4, index / 4);
+		}
+
+		private TerrainType getDominantVegetationNearHillyTile(Tile center) {
+			TerrainType northeastType = center.neighbors[TileDirection.NORTHEAST].overlayTerrainType;
+			TerrainType northwestType = center.neighbors[TileDirection.NORTHWEST].overlayTerrainType;
+			TerrainType southeastType = center.neighbors[TileDirection.SOUTHEAST].overlayTerrainType;
+			TerrainType southwestType = center.neighbors[TileDirection.SOUTHWEST].overlayTerrainType;
+
+			TerrainType[] neighborTerrains = { northeastType, northwestType, southeastType, southwestType };
+
+			int hills = neighborTerrains.Where(tt => tt.isHilly()).Count();
+			TerrainType forest = neighborTerrains.FirstOrDefault(tt => tt.Key == "forest", null);
+			int forests = neighborTerrains.Where(tt => tt.Key == "forest").Count();
+			TerrainType jungle = neighborTerrains.FirstOrDefault(tt => tt.Key == "jungle", null);
+			int jungles = neighborTerrains.Where(tt => tt.Key == "jungle").Count();
+
+			if (hills + forests + jungles < 4) { // some surrounding tiles are neither forested nor hilly
+				return TerrainType.NONE;
+			}
+			if (forests == 0 && jungles == 0) {
+				return TerrainType.NONE; // all hills
+			}
+			if (forests == jungles) {
+				// deterministically choose one on a tie so it doesn't change if the tile is updated
+				return center.xCoordinate % 2 == 0 ? forest : jungle;
+			}
+			return forests > jungles ? forest : jungle;
+		}
+
 		public void updateTile(Tile tile) {
 			if (tile == Tile.NONE || tile is null) {
 				string msg = tile is null ? "null tile" : "Tile.NONE";
@@ -334,6 +444,8 @@ namespace C7.Map {
 			}
 
 			updateRiverLayer(tile);
+
+			updateHillLayer(tile);
 		}
 
 	}
