@@ -615,18 +615,15 @@ public partial class OldMapView : Node2D {
 		this.wrapVertically = wrapVertically;
 
 		looseView = new LooseView(this);
-		// looseView.layers.Add(new TerrainLayer());
 		looseView.layers.Add(new RiverLayer());
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());
 		looseView.layers.Add(new HillsLayer());
 		looseView.layers.Add(new TntLayer());
-		looseView.layers.Add(new RoadLayer());
 		looseView.layers.Add(new ResourceLayer());
 		this.gridLayer = new GridLayer();
 		looseView.layers.Add(this.gridLayer);
 		looseView.layers.Add(new BuildingLayer());
-		// looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new CityLayer());
 		// looseView.layers.Add(new FogOfWarLayer());
 

@@ -8,14 +8,17 @@ namespace C7.Map {
 	public enum MapLayer {
 		Road,
 		Rail,
+		Resource,
 		Invalid,
 	};
 
 	public static class MapLayerMethods {
 		public static (int, int) LayerAndAtlas(this MapLayer mapLayer) {
 			return mapLayer switch {
+				// (layer, atlas)
 				MapLayer.Road => (0, 0),
 				MapLayer.Rail => (1, 1),
+				MapLayer.Resource => (2, 2),
 				MapLayer.Invalid => throw new ArgumentException("MapLayer.Invalid has no tilemap layer"),
 				_ => throw new ArgumentException($"unknown MapLayer enum value: ${mapLayer}"),
 			};
@@ -33,6 +36,7 @@ namespace C7.Map {
 		private TileMap tilemap;
 		private TileSet tileset;
 		private Vector2I tileSize = new Vector2I(128, 64);
+		private Vector2I resourceSize = new Vector2I(50, 50);
 		private int width;
 		private int height;
 		private GameMap gameMap;
@@ -75,11 +79,25 @@ namespace C7.Map {
 			TileSetAtlasSource roads = loadAtlasSource("Art/Terrain/roads.pcx", tileSize, 16, 16);
 			TileSetAtlasSource rails = loadAtlasSource("Art/Terrain/railroads.pcx", tileSize, 16, 16);
 
+			TileSetAtlasSource resources = new TileSetAtlasSource{
+				Texture = Util.LoadTextureFromPCX("Art/resources.pcx"),
+				TextureRegionSize = resourceSize,
+			};
+			for (int y = 0; y < 4; y++) {
+				for (int x = 0; x < 6; x++) {
+					if (x == 4 && y == 3) {
+						break;
+					}
+					resources.CreateTile(new Vector2I(x, y));
+				}
+			}
+
 			// the order in which these are added determines their atlas ID
 			// TODO: associate pcx file(s) with MapLayer enum to ensure they
 			// are added in the correct order wrt their atlas ID
 			tileset.AddSource(roads);
 			tileset.AddSource(rails);
+			tileset.AddSource(resources);
 			// create tilemap layers
 			foreach (MapLayer mapLayer in Enum.GetValues(typeof(MapLayer))) {
 				if (mapLayer != MapLayer.Invalid) {
@@ -149,6 +167,10 @@ namespace C7.Map {
 			}
 			setTerrainTiles();
 
+			foreach (Tile tile in gameMap.tiles) {
+				updateTile(tile);
+			}
+
 			// temp but place units in current position
 			foreach (Tile tile in gameMap.tiles) {
 				if (tile.unitsOnTile.Count > 0) {
@@ -183,6 +205,19 @@ namespace C7.Map {
 			tilemap.SetCell(layer, coords, atlas, atlasCoords);
 		}
 
+		private void setCell(MapLayer mapLayer, Tile tile, Vector2I atlasCoords) {
+			setCell(mapLayer, stackedCoords(tile), atlasCoords);
+		}
+
+		private void eraseCell(MapLayer mapLayer, Vector2I coords) {
+			int layer = mapLayer.Layer();
+			tilemap.EraseCell(layer, coords);
+		}
+
+		private void eraseCell(MapLayer mapLayer, Tile tile) {
+			eraseCell(mapLayer, stackedCoords(tile));
+		}
+
 		private void updateRoadLayer(Tile tile, bool center) {
 			if (!tile.overlays.road) {
 				return;
@@ -195,7 +230,8 @@ namespace C7.Map {
 						index |= roadFlag(direction);
 					}
 				}
-				setCell(MapLayer.Road, stackedCoords(tile), roadIndexTo2D(index));
+				setCell(MapLayer.Road, tile, roadIndexTo2D(index));
+				eraseCell(MapLayer.Rail, tile);
 			} else {
 				// railroad
 				int roadIndex = 0;
@@ -208,9 +244,11 @@ namespace C7.Map {
 					}
 				}
 				if (roadIndex != 0) {
-					setCell(MapLayer.Road, stackedCoords(tile), roadIndexTo2D(roadIndex));
+					setCell(MapLayer.Road, tile, roadIndexTo2D(roadIndex));
+				} else {
+					eraseCell(MapLayer.Road, tile);
 				}
-				setCell(MapLayer.Rail, stackedCoords(tile), roadIndexTo2D(railIndex));
+				setCell(MapLayer.Rail, tile, roadIndexTo2D(railIndex));
 			}
 
 			if (center) {
@@ -237,8 +275,14 @@ namespace C7.Map {
 
 		public void updateTile(Tile tile) {
 			// update terrain ?
-			if (tile.overlays.road) {
-				updateRoadLayer(tile, true);
+			updateRoadLayer(tile, true);
+
+			if (tile.Resource != C7GameData.Resource.NONE) {
+				int index = tile.Resource.Index;
+				Vector2I texCoord = new Vector2I(index % 6, index / 6);
+				setCell(MapLayer.Resource, tile, texCoord);
+			} else {
+				eraseCell(MapLayer.Resource, tile);
 			}
 		}
 
