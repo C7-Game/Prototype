@@ -403,52 +403,6 @@ public partial class MarshLayer : LooseLayer {
 	}
 }
 
-public partial class RiverLayer : LooseLayer
-{
-	public static readonly Vector2 riverSize = new Vector2(128, 64);
-	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.X / 2, 0);
-	private ImageTexture riverTexture;
-
-	public RiverLayer() {
-		riverTexture = Util.LoadTextureFromPCX("Art/Terrain/mtnRivers.pcx");
-	}
-
-	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
-	{
-		//The "point" is the easternmost point of the tile for which we are drawing rivers.
-		//Which river graphics to used is calculated by evaluating the tiles that neighbor
-		//that point.
-		Tile northOfPoint = tile.neighbors[TileDirection.NORTHEAST];
-		Tile eastOfPoint = tile.neighbors[TileDirection.EAST];
-		Tile westOfPoint = tile;
-		Tile southOfPoint = tile.neighbors[TileDirection.SOUTHEAST];
-
-		int riverGraphicsIndex = 0;
-
-		if (northOfPoint.riverSouthwest) {
-			riverGraphicsIndex++;
-		}
-		if (eastOfPoint.riverNorthwest) {
-			riverGraphicsIndex+=2;
-		}
-		if (westOfPoint.riverSoutheast) {
-			riverGraphicsIndex+=4;
-		}
-		if (southOfPoint.riverNortheast) {
-			riverGraphicsIndex+=8;
-		}
-		if (riverGraphicsIndex == 0) {
-			return;
-		}
-		int riverRow = riverGraphicsIndex / 4;
-		int riverColumn = riverGraphicsIndex % 4;
-
-		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.X, riverRow * riverSize.Y, riverSize);
-		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize + riverCenterOffset, riverSize);
-		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);
-	}
-}
-
 public partial class GridLayer : LooseLayer {
 	public Color color = Color.Color8(50, 50, 50, 150);
 	public float lineWidth = (float)1.0;
@@ -615,12 +569,9 @@ public partial class OldMapView : Node2D {
 		this.wrapVertically = wrapVertically;
 
 		looseView = new LooseView(this);
-		looseView.layers.Add(new RiverLayer());
 		looseView.layers.Add(new ForestLayer());
 		looseView.layers.Add(new MarshLayer());
 		looseView.layers.Add(new HillsLayer());
-		looseView.layers.Add(new TntLayer());
-		looseView.layers.Add(new ResourceLayer());
 		this.gridLayer = new GridLayer();
 		looseView.layers.Add(this.gridLayer);
 		looseView.layers.Add(new BuildingLayer());

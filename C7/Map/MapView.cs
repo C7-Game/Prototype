@@ -1,7 +1,7 @@
 using Godot;
-using System.Collections.Generic;
 using C7GameData;
 using System;
+using Serilog;
 
 namespace C7.Map {
 
@@ -9,6 +9,8 @@ namespace C7.Map {
 		Road,
 		Rail,
 		Resource,
+		TerrainYield,
+		River,
 		Invalid,
 	};
 
@@ -16,9 +18,12 @@ namespace C7.Map {
 		public static (int, int) LayerAndAtlas(this MapLayer mapLayer) {
 			return mapLayer switch {
 				// (layer, atlas)
-				MapLayer.Road => (0, 0),
-				MapLayer.Rail => (1, 1),
-				MapLayer.Resource => (2, 2),
+				// TODO: figure out how many can go on the same layer?
+				MapLayer.River => (0, 0),
+				MapLayer.Road => (1, 1),
+				MapLayer.Rail => (2, 2),
+				MapLayer.Resource => (3, 3),
+				MapLayer.TerrainYield => (4, 4),
 				MapLayer.Invalid => throw new ArgumentException("MapLayer.Invalid has no tilemap layer"),
 				_ => throw new ArgumentException($"unknown MapLayer enum value: ${mapLayer}"),
 			};
@@ -26,6 +31,11 @@ namespace C7.Map {
 		public static int Layer(this MapLayer mapLayer) {
 			(int layer, _) = mapLayer.LayerAndAtlas();
 			return layer;
+		}
+
+		public static int Atlas(this MapLayer mapLayer) {
+			(_, int atlas) = mapLayer.LayerAndAtlas();
+			return atlas;
 		}
 	};
 
@@ -37,6 +47,8 @@ namespace C7.Map {
 		private TileSet tileset;
 		private Vector2I tileSize = new Vector2I(128, 64);
 		private Vector2I resourceSize = new Vector2I(50, 50);
+		private ILogger log = LogManager.ForContext<MapView>();
+
 		private int width;
 		private int height;
 		private GameMap gameMap;
@@ -92,12 +104,15 @@ namespace C7.Map {
 				}
 			}
 
-			// the order in which these are added determines their atlas ID
-			// TODO: associate pcx file(s) with MapLayer enum to ensure they
-			// are added in the correct order wrt their atlas ID
-			tileset.AddSource(roads);
-			tileset.AddSource(rails);
-			tileset.AddSource(resources);
+			TileSetAtlasSource tnt = loadAtlasSource("Art/Terrain/tnt.pcx", tileSize, 3, 6);
+			TileSetAtlasSource rivers = loadAtlasSource("Art/Terrain/mtnRivers.pcx", tileSize, 4, 4);
+
+			tileset.AddSource(roads, MapLayer.Road.Atlas());
+			tileset.AddSource(rails, MapLayer.Rail.Atlas());
+			tileset.AddSource(resources, MapLayer.Resource.Atlas());
+			tileset.AddSource(tnt, MapLayer.TerrainYield.Atlas());
+			tileset.AddSource(rivers, MapLayer.River.Atlas());
+
 			// create tilemap layers
 			foreach (MapLayer mapLayer in Enum.GetValues(typeof(MapLayer))) {
 				if (mapLayer != MapLayer.Invalid) {
@@ -161,6 +176,12 @@ namespace C7.Map {
 			initializeTileMap();
 			terrain = new string[width, height];
 
+			// Convert coordinates from current save coordinates to
+			// stacked coordinates used by Godot's TileMap, and
+			// write terrain types to 2D array for generating corners
+			// TODO in the future convert civ3 coordinates to stacked
+			// coordinates when reading from the civ3 save so Tile has
+			// stacked coordinates
 			foreach (C7GameData.Tile t in gameMap.tiles) {
 				Vector2I coords = stackedCoords(t);
 				terrain[coords.X, coords.Y] = t.baseTerrainTypeKey;
@@ -202,6 +223,9 @@ namespace C7.Map {
 
 		private void setCell(MapLayer mapLayer, Vector2I coords, Vector2I atlasCoords) {
 			(int layer, int atlas) = mapLayer.LayerAndAtlas();
+			if (!tileset.HasSource(atlas)) {
+				log.Warning($"atlas id {atlas} is not a valid tileset source");
+			}
 			tilemap.SetCell(layer, coords, atlas, atlasCoords);
 		}
 
@@ -220,6 +244,8 @@ namespace C7.Map {
 
 		private void updateRoadLayer(Tile tile, bool center) {
 			if (!tile.overlays.road) {
+				eraseCell(MapLayer.Road, tile);
+				eraseCell(MapLayer.Rail, tile);
 				return;
 			}
 			if (!tile.overlays.railroad) {
@@ -230,8 +256,8 @@ namespace C7.Map {
 						index |= roadFlag(direction);
 					}
 				}
-				setCell(MapLayer.Road, tile, roadIndexTo2D(index));
 				eraseCell(MapLayer.Rail, tile);
+				setCell(MapLayer.Road, tile, roadIndexTo2D(index));
 			} else {
 				// railroad
 				int roadIndex = 0;
@@ -273,8 +299,34 @@ namespace C7.Map {
 			};
 		}
 
+		private void updateRiverLayer(Tile tile) {
+			// The "point" is the easternmost point of the current tile.
+			// The river graphic is determined by the tiles neighboring that point.
+			Tile northOfPoint = tile.neighbors[TileDirection.NORTHEAST];
+			Tile eastOfPoint = tile.neighbors[TileDirection.EAST];
+			Tile westOfPoint = tile;
+			Tile southOfPoint = tile.neighbors[TileDirection.SOUTHEAST];
+
+			int index = 0;
+			index += northOfPoint.riverSouthwest ? 1 : 0;
+			index += eastOfPoint.riverNorthwest ? 2 : 0;
+			index += westOfPoint.riverSoutheast ? 4 : 0;
+			index += southOfPoint.riverNortheast ? 8 : 0;
+
+			if (index == 0) {
+				eraseCell(MapLayer.River, tile);
+			} else {
+				setCell(MapLayer.River, tile, new Vector2I(index % 4, index / 4));
+			}
+		}
+
 		public void updateTile(Tile tile) {
-			// update terrain ?
+			if (tile == Tile.NONE || tile is null) {
+				string msg = tile is null ? "null tile" : "Tile.NONE";
+				log.Warning($"attempting to update {msg}");
+				return;
+			}
+
 			updateRoadLayer(tile, true);
 
 			if (tile.Resource != C7GameData.Resource.NONE) {
@@ -284,6 +336,14 @@ namespace C7.Map {
 			} else {
 				eraseCell(MapLayer.Resource, tile);
 			}
+
+			if (tile.baseTerrainType.Key == "grassland" && tile.isBonusShield) {
+				setCell(MapLayer.TerrainYield, tile, new Vector2I(0, 3));
+			} else {
+				eraseCell(MapLayer.TerrainYield, tile);
+			}
+
+			updateRiverLayer(tile);
 		}
 
 	}
