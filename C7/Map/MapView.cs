@@ -76,9 +76,14 @@ namespace C7.Map {
 				TextureRegionSize = tileSize,
 			};
 			addUniformTilesToAtlasSource(ref roads, 16, 16);
+			TileSetAtlasSource rails = new TileSetAtlasSource{
+				Texture = Util.LoadTextureFromPCX("Art/Terrain/railroads.pcx"),
+				TextureRegionSize = tileSize,
+			};
 			tileset.AddSource(roads);
+			tileset.AddSource(rails);
 
-			tilemap.ZIndex = 100;
+			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
 			AddChild(tilemap);
 			AddChild(terrainTilemap);
 		}
@@ -164,23 +169,47 @@ namespace C7.Map {
 			return gameMap.tileAt(x, y);
 		}
 
-		public void updateTile(Tile tile, bool center = true) {
-			// update terrain ?
-			if (tile.overlays.road) {
+		private Vector2I roadIndexTo2D(int index) {
+			int column = index & 0xF;
+			int row = index >> 4;
+			return new Vector2I(column, row);
+		}
+
+		private void updateRoadLayer(Tile tile, bool center) {
+			if (!tile.overlays.road) {
+				return;
+			}
+			if (!tile.overlays.railroad) {
+				// road
 				int index = 0;
-				foreach (KeyValuePair<TileDirection, Tile> neighbor in tile.neighbors) {
-					if (neighbor.Value.overlays.road) {
-						index |= roadFlag(neighbor.Key);
+				foreach ((TileDirection direction, Tile neighbor) in tile.neighbors) {
+					if (neighbor.overlays.road) {
+						index |= roadFlag(direction);
 					}
 				}
-				int row = index >> 4;
-				int column = index & 0xF;
-				Vector2I texCoords = new Vector2I(column, row);
-				setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 0, texCoords);
-				if (center) {
-					foreach (Tile neighbor in tile.neighbors.Values) {
-						updateTile(neighbor, false);
+				setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 0, roadIndexTo2D(index));
+			} else {
+				// railroad
+				int roadIndex = 0;
+				int railIndex = 0;
+				foreach ((TileDirection direction, Tile neighbor) in tile.neighbors) {
+					if (neighbor.overlays.railroad) {
+						railIndex |= roadFlag(direction);
+					} else if (neighbor.overlays.road) {
+						roadIndex |= roadFlag(direction);
 					}
+				}
+				if (roadIndex != 0) {
+					setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 0, roadIndexTo2D(roadIndex));
+				}
+				// TODO: this needs to go on a different layer in the tilemap
+				setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 1, roadIndexTo2D(railIndex));
+			}
+
+			if (center) {
+				// updating a tile may change neighboring tiles
+				foreach (Tile neighbor in tile.neighbors.Values) {
+					updateRoadLayer(neighbor, false);
 				}
 			}
 		}
@@ -197,6 +226,13 @@ namespace C7.Map {
 				TileDirection.NORTH => 0x80,
 				_ => throw new ArgumentOutOfRangeException("Invalid TileDirection")
 			};
+		}
+
+		public void updateTile(Tile tile) {
+			// update terrain ?
+			if (tile.overlays.road) {
+				updateRoadLayer(tile, true);
+			}
 		}
 
 	}
