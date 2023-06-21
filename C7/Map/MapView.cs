@@ -54,6 +54,15 @@ namespace C7.Map {
 			}
 		}
 
+		private TileSetAtlasSource loadAtlasSource(string relPath, Vector2I tileSize, int width, int height) {
+			TileSetAtlasSource source = new TileSetAtlasSource{
+				Texture = Util.LoadTextureFromPCX(relPath),
+				TextureRegionSize = tileSize,
+			};
+			addUniformTilesToAtlasSource(ref source, width, height);
+			return source;
+		}
+
 		private void initializeTileMap() {
 			terrainTilemap = new TileMap();
 			terrainTileset = Civ3TerrainTileSet.Generate();
@@ -63,22 +72,17 @@ namespace C7.Map {
 			tilemap = new TileMap();
 			tileset = makeTileSet();
 			tilemap.TileSet = tileset;
-			TileSetAtlasSource roads = new TileSetAtlasSource{
-				Texture = Util.LoadTextureFromPCX("Art/Terrain/roads.pcx"),
-				TextureRegionSize = tileSize,
-			};
-			addUniformTilesToAtlasSource(ref roads, 16, 16);
-			TileSetAtlasSource rails = new TileSetAtlasSource{
-				Texture = Util.LoadTextureFromPCX("Art/Terrain/railroads.pcx"),
-				TextureRegionSize = tileSize,
-			};
-			addUniformTilesToAtlasSource(ref rails, 16, 16);
+			TileSetAtlasSource roads = loadAtlasSource("Art/Terrain/roads.pcx", tileSize, 16, 16);
+			TileSetAtlasSource rails = loadAtlasSource("Art/Terrain/railroads.pcx", tileSize, 16, 16);
+
+			// the order in which these are added determines their atlas ID
+			// TODO: associate pcx file(s) with MapLayer enum to ensure they
+			// are added in the correct order wrt their atlas ID
 			tileset.AddSource(roads);
 			tileset.AddSource(rails);
 			// create tilemap layers
 			foreach (MapLayer mapLayer in Enum.GetValues(typeof(MapLayer))) {
 				if (mapLayer != MapLayer.Invalid) {
-					GD.Print($"layer {mapLayer.Layer()}");
 					tilemap.AddLayer(mapLayer.Layer());
 				}
 			}
@@ -119,7 +123,9 @@ namespace C7.Map {
 			tilemap.SetCell(0, cell, atlas, texCoords);
 		}
 
-		private Vector2I stackedCoords(int x, int y) {
+		private Vector2I stackedCoords(Tile tile) {
+			int x = tile.xCoordinate;
+			int y = tile.yCoordinate;
 			x = y % 2 == 0 ? x / 2 : (x - 1) / 2;
 			return new Vector2I(x, y);
 		}
@@ -138,7 +144,7 @@ namespace C7.Map {
 			terrain = new string[width, height];
 
 			foreach (C7GameData.Tile t in gameMap.tiles) {
-				Vector2I coords = stackedCoords(t.xCoordinate, t.yCoordinate);
+				Vector2I coords = stackedCoords(t);
 				terrain[coords.X, coords.Y] = t.baseTerrainTypeKey;
 			}
 			setTerrainTiles();
@@ -150,7 +156,7 @@ namespace C7.Map {
 					UnitSprite sprite = new UnitSprite(game.civ3AnimData);
 					MapUnit.Appearance appearance = game.animTracker.getUnitAppearance(unit);
 
-					var coords = stackedCoords(tile.xCoordinate, tile.yCoordinate);
+					var coords = stackedCoords(tile);
 					sprite.Position = tilemap.MapToLocal(coords);
 
 					game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
@@ -169,9 +175,7 @@ namespace C7.Map {
 		}
 
 		private Vector2I roadIndexTo2D(int index) {
-			int column = index & 0xF;
-			int row = index >> 4;
-			return new Vector2I(column, row);
+			return new Vector2I(index & 0xF, index >> 4);
 		}
 
 		private void setCell(MapLayer mapLayer, Vector2I coords, Vector2I atlasCoords) {
@@ -191,7 +195,7 @@ namespace C7.Map {
 						index |= roadFlag(direction);
 					}
 				}
-				setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 0, roadIndexTo2D(index));
+				setCell(MapLayer.Road, stackedCoords(tile), roadIndexTo2D(index));
 			} else {
 				// railroad
 				int roadIndex = 0;
@@ -204,9 +208,9 @@ namespace C7.Map {
 					}
 				}
 				if (roadIndex != 0) {
-					setCell(MapLayer.Road, stackedCoords(tile.xCoordinate, tile.yCoordinate), roadIndexTo2D(roadIndex));
+					setCell(MapLayer.Road, stackedCoords(tile), roadIndexTo2D(roadIndex));
 				}
-				setCell(MapLayer.Rail, stackedCoords(tile.xCoordinate, tile.yCoordinate), roadIndexTo2D(railIndex));
+				setCell(MapLayer.Rail, stackedCoords(tile), roadIndexTo2D(railIndex));
 			}
 
 			if (center) {
