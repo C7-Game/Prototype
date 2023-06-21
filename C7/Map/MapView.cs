@@ -7,6 +7,7 @@ using System.Linq;
 namespace C7.Map {
 
 	public enum Layer {
+		Forest,
 		Hill,
 		River,
 		Road,
@@ -31,6 +32,8 @@ namespace C7.Map {
 		ForestMountain,
 		JungleMountain,
 		Volcano,
+		PlainsForest,
+		GrasslandsForest,
 		River,
 		Road,
 		Rail,
@@ -54,6 +57,7 @@ namespace C7.Map {
 		private Vector2I tileSize = new Vector2I(128, 64);
 		private Vector2I hillSize = new Vector2I(128, 72);
 		private Vector2I mountainSize = new Vector2I(128, 88);
+		private Vector2I forestSize = new Vector2I(128, 88);
 		private Vector2I resourceSize = new Vector2I(50, 50);
 		private ILogger log = LogManager.ForContext<MapView>();
 
@@ -87,12 +91,28 @@ namespace C7.Map {
 			return source;
 		}
 
-		private void addUniformOffsetsToAtlasSource(ref TileSetAtlasSource source, int width, int height, Vector2I offset) {
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = offset;
+		// private void addUniformOffsetsToAtlasSource(ref TileSetAtlasSource source, int width, int height, Vector2I offset) {
+		// 	for (int x = 0; x < width; x++) {
+		// 		for (int y = 0; y < height; y++) {
+		// 			source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = offset;
+		// 		}
+		// 	}
+		// }
+
+		private TileSetAtlasSource loadForestSource(string relPath) {
+			TileSetAtlasSource source = new TileSetAtlasSource{
+				Texture = Util.LoadTextureFromPCX(relPath),
+				TextureRegionSize = forestSize,
+			};
+			for (int x = 0; x < 6; x++) {
+				for (int y = 4; y < 10; y++) {
+					if ((y < 6 && x > 3) || (y < 8 && x > 4)) {
+						continue; // forest tilemap is shaped like this
+					}
+					source.CreateTile(new Vector2I(x, y));
 				}
 			}
+			return source;
 		}
 
 		private void initializeTileMap() {
@@ -125,20 +145,16 @@ namespace C7.Map {
 			TileSetAtlasSource rivers = loadAtlasSource("Art/Terrain/mtnRivers.pcx", tileSize, 4, 4);
 
 			TileSetAtlasSource hills = loadAtlasSource("Art/Terrain/xhills.pcx", hillSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref hills, 4, 4, new Vector2I(0, 4));
 			TileSetAtlasSource forestHills = loadAtlasSource("Art/Terrain/hill forests.pcx", hillSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref forestHills, 4, 4, new Vector2I(0, 4));
 			TileSetAtlasSource jungleHills = loadAtlasSource("Art/Terrain/hill jungle.pcx", hillSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref jungleHills, 4, 4, new Vector2I(0, 4));
 
 			TileSetAtlasSource mountain = loadAtlasSource("Art/Terrain/Mountains.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref mountain, 4, 4, new Vector2I(0, 12));
 			TileSetAtlasSource snowMountain = loadAtlasSource("Art/Terrain/Mountains-snow.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref snowMountain, 4, 4, new Vector2I(0, 12));
 			TileSetAtlasSource forestMountain = loadAtlasSource("Art/Terrain/mountain forests.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref forestMountain, 4, 4, new Vector2I(0, 12));
 			TileSetAtlasSource jungleMountain = loadAtlasSource("Art/Terrain/mountain jungles.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref jungleMountain, 4, 4, new Vector2I(0, 12));
+
+			TileSetAtlasSource plainsForest = loadForestSource("Art/Terrain/plains forests.pcx");
+			TileSetAtlasSource grasslandsForest = loadForestSource("Art/Terrain/grassland forests.pcx");
 
 			tileset.AddSource(roads, Atlas.Road.Index());
 			tileset.AddSource(rails, Atlas.Rail.Index());
@@ -152,6 +168,8 @@ namespace C7.Map {
 			tileset.AddSource(snowMountain, Atlas.SnowMountain.Index());
 			tileset.AddSource(forestMountain, Atlas.ForestMountain.Index());
 			tileset.AddSource(jungleMountain, Atlas.JungleMountain.Index());
+			tileset.AddSource(plainsForest, Atlas.PlainsForest.Index());
+			tileset.AddSource(grasslandsForest, Atlas.GrasslandsForest.Index());
 
 			// create tilemap layers
 			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
@@ -420,6 +438,34 @@ namespace C7.Map {
 			return forests > jungles ? forest : jungle;
 		}
 
+		private void updateForestLayer(Tile tile) {
+			if (tile.overlayTerrainType.Key == "forest") {
+				(int row, int col) = (0, 0);
+				if (tile.isPineForest) {
+					row = 8 + tile.xCoordinate % 2; // pine starts at row 8 in atlas
+					col = tile.xCoordinate % 7;     // pine has 6 columns
+				} else {
+					bool small = tile.getEdgeNeighbors().Any(t => t.IsWater());
+					// this technically omits one large and one small tile but the math is simpler
+					if (small) {
+						row = 6 + tile.xCoordinate % 2;
+						col = 1 + tile.xCoordinate % 4;
+					} else {
+						row = 4 + tile.xCoordinate % 2;
+						col = tile.xCoordinate % 4;
+					}
+				}
+				Atlas atlas = tile.baseTerrainType.Key switch {
+					"plains" => Atlas.PlainsForest,
+					"grassland" => Atlas.GrasslandsForest,
+					_ => Atlas.PlainsForest,
+				};
+				setCell(Layer.Forest, atlas, tile, new Vector2I(col, row));
+			} else {
+				eraseCell(Layer.Forest, tile);
+			}
+		}
+
 		public void updateTile(Tile tile) {
 			if (tile == Tile.NONE || tile is null) {
 				string msg = tile is null ? "null tile" : "Tile.NONE";
@@ -446,6 +492,8 @@ namespace C7.Map {
 			updateRiverLayer(tile);
 
 			updateHillLayer(tile);
+
+			updateForestLayer(tile);
 		}
 
 	}

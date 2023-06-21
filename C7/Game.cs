@@ -340,13 +340,7 @@ public partial class Game : Node2D {
 								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
 							}
-							if (!tile.IsWater()) {
-								tile.overlays.road = true;
-								if (eventMouseButton.ShiftPressed) {
-									tile.overlays.railroad = true;
-								}
-								mapView.updateTile(tile);
-							}
+							GD.Print($"tile: {tile.xCoordinate}, {tile.yCoordinate}: {tile.baseTerrainType.Key} - {tile.overlayTerrainType.Key}");
 						}
 					}
 				}
