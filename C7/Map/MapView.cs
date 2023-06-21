@@ -7,8 +7,7 @@ using System.Linq;
 namespace C7.Map {
 
 	public enum Layer {
-		Forest,
-		Hill,
+		TerrainOverlay,
 		River,
 		Road,
 		Rail,
@@ -112,6 +111,10 @@ namespace C7.Map {
 						continue; // forest tilemap is shaped like this
 					}
 					source.CreateTile(new Vector2I(x, y));
+					if (y == 4 || y == 5) {
+						// offset big textures by 12 pixels
+						source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = new Vector2I(0, 12);
+					}
 				}
 			}
 			return source;
@@ -385,7 +388,6 @@ namespace C7.Map {
 
 		private void updateHillLayer(Tile tile) {
 			if (!tile.overlayTerrainType.isHilly()) {
-				eraseCell(Layer.Hill, tile);
 				return;
 			}
 			Vector2I texCoord = getHillTextureCoordinate(tile);
@@ -410,7 +412,7 @@ namespace C7.Map {
 				_ => Atlas.Invalid,
 			};
 			if (atlas != Atlas.Invalid) {
-				setCell(Layer.Hill, atlas, tile, texCoord);
+				setCell(Layer.TerrainOverlay, atlas, tile, texCoord);
 			}
 		}
 
@@ -480,9 +482,23 @@ namespace C7.Map {
 					"grassland" => Atlas.GrasslandsForest,
 					_ => Atlas.PlainsForest,
 				};
-				setCell(Layer.Forest, atlas, tile, new Vector2I(col, row));
+				setCell(Layer.TerrainOverlay, atlas, tile, new Vector2I(col, row));
+			}
+		}
+
+		private bool isForest(Tile tile) {
+			return tile.overlayTerrainType.Key == "forest" || tile.overlayTerrainType.Key == "jungle";
+		}
+
+		private void updateTerrainOverlayLayer(Tile tile) {
+			if (!tile.overlayTerrainType.isHilly() && !isForest(tile)) {
+				eraseCell(Layer.TerrainOverlay, tile);
+				return;
+			}
+			if (tile.overlayTerrainType.isHilly()) {
+				updateHillLayer(tile);
 			} else {
-				eraseCell(Layer.Forest, tile);
+				updateForestLayer(tile);
 			}
 		}
 
@@ -509,12 +525,7 @@ namespace C7.Map {
 				eraseCell(Layer.TerrainYield, tile);
 			}
 
-			updateRiverLayer(tile);
-
-			updateHillLayer(tile);
-
-			updateForestLayer(tile);
+			updateTerrainOverlayLayer(tile);
 		}
-
 	}
 }
