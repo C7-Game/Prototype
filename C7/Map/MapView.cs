@@ -5,31 +5,33 @@ using System;
 
 namespace C7.Map {
 
+	public enum MapLayer {
+		Road,
+		Rail,
+		Invalid,
+	};
+
+	public static class MapLayerMethods {
+		public static (int, int) LayerAndAtlas(this MapLayer mapLayer) {
+			return mapLayer switch {
+				MapLayer.Road => (0, 0),
+				MapLayer.Rail => (1, 1),
+				MapLayer.Invalid => throw new ArgumentException("MapLayer.Invalid has no tilemap layer"),
+				_ => throw new ArgumentException($"unknown MapLayer enum value: ${mapLayer}"),
+			};
+		}
+		public static int Layer(this MapLayer mapLayer) {
+			(int layer, _) = mapLayer.LayerAndAtlas();
+			return layer;
+		}
+	};
+
 	partial class MapView : Node2D {
-		// same order as terrainPcxList
-		private List<string> terrainPcxFiles = new List<string> {
-			"Art/Terrain/xtgc.pcx", "Art/Terrain/xpgc.pcx", "Art/Terrain/xdgc.pcx",
-			"Art/Terrain/xdpc.pcx", "Art/Terrain/xdgp.pcx", "Art/Terrain/xggc.pcx",
-			"Art/Terrain/wCSO.pcx", "Art/Terrain/wSSS.pcx", "Art/Terrain/wOOO.pcx",
-		};
-		// same order as terrainPcxFiles
-		private List<TerrainPcx> terrainPcxList = new List<TerrainPcx>() {
-			new TerrainPcx("tgc", new string[]{"tundra", "grassland", "coast"}, 0),
-			new TerrainPcx("pgc", new string[]{"plains", "grassland", "coast"}, 1),
-			new TerrainPcx("dgc", new string[]{"desert", "grassland", "coast"}, 2),
-			new TerrainPcx("dpc", new string[]{"desert", "plains", "coast"}, 3),
-			new TerrainPcx("dgp", new string[]{"desert", "grassland", "plains"}, 4),
-			new TerrainPcx("ggc", new string[]{"grassland", "grassland", "coast"}, 5),
-			new TerrainPcx("cso", new string[]{"coast", "sea", "ocean"}, 6),
-			new TerrainPcx("sss", new string[]{"sea", "sea", "sea"}, 7),
-			new TerrainPcx("ooo", new string[]{"ocean", "ocean", "ocean"}, 8),
-		};
 		private string[,]terrain;
 		private TileMap terrainTilemap;
 		private TileSet terrainTileset;
 		private TileMap tilemap;
 		private TileSet tileset;
-		private List<ImageTexture> textures;
 		private Vector2I tileSize = new Vector2I(128, 64);
 		private int width;
 		private int height;
@@ -53,20 +55,10 @@ namespace C7.Map {
 		}
 
 		private void initializeTileMap() {
-			this.terrainTilemap = new TileMap();
-			terrainTilemap.TextureFilter = TextureFilterEnum.Nearest;
-			terrainTileset = makeTileSet();
-
-			// register 9 x 9 layout of tiles in each terrain pcx
-			foreach (ImageTexture texture in textures) {
-				TileSetAtlasSource source = new TileSetAtlasSource();
-				source.Texture = texture;
-				source.TextureRegionSize = tileSize;
-				addUniformTilesToAtlasSource(ref source, 9, 9);
-				terrainTileset.AddSource(source);
-			}
+			terrainTilemap = new TileMap();
+			terrainTileset = Civ3TerrainTileSet.Generate();
 			terrainTilemap.TileSet = terrainTileset;
-			terrainTilemap.Position += Vector2I.Right * (width / 2);
+			terrainTilemap.Position += Vector2I.Right * (tileSize.X / 2);
 
 			tilemap = new TileMap();
 			tileset = makeTileSet();
@@ -80,8 +72,16 @@ namespace C7.Map {
 				Texture = Util.LoadTextureFromPCX("Art/Terrain/railroads.pcx"),
 				TextureRegionSize = tileSize,
 			};
+			addUniformTilesToAtlasSource(ref rails, 16, 16);
 			tileset.AddSource(roads);
 			tileset.AddSource(rails);
+			// create tilemap layers
+			foreach (MapLayer mapLayer in Enum.GetValues(typeof(MapLayer))) {
+				if (mapLayer != MapLayer.Invalid) {
+					GD.Print($"layer {mapLayer.Layer()}");
+					tilemap.AddLayer(mapLayer.Layer());
+				}
+			}
 
 			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
 			AddChild(tilemap);
@@ -104,7 +104,7 @@ namespace C7.Map {
 						bottom = even ? terrain[x, y + 1] : terrain[(x + 1) % width, y + 1];
 					}
 					string[] corner = new string[4]{top, right, bottom, left};
-					TerrainPcx pcx = terrainPcxList.Find(pcx => pcx.validFor(corner));
+					TerrainPcx pcx = Civ3TerrainTileSet.GetPcxFor(corner);
 					Vector2I texCoords = pcx.getTextureCoords(corner);
 					setTerrainTile(cell, pcx.atlas, texCoords);
 				}
@@ -131,7 +131,6 @@ namespace C7.Map {
 		}
 
 		public MapView(Game game, GameData data) {
-			textures = terrainPcxFiles.ConvertAll(path => Util.LoadTextureFromPCX(path));
 			gameMap = data.map;
 			width = gameMap.numTilesWide / 2;
 			height = gameMap.numTilesTall;
@@ -175,6 +174,11 @@ namespace C7.Map {
 			return new Vector2I(column, row);
 		}
 
+		private void setCell(MapLayer mapLayer, Vector2I coords, Vector2I atlasCoords) {
+			(int layer, int atlas) = mapLayer.LayerAndAtlas();
+			tilemap.SetCell(layer, coords, atlas, atlasCoords);
+		}
+
 		private void updateRoadLayer(Tile tile, bool center) {
 			if (!tile.overlays.road) {
 				return;
@@ -200,10 +204,9 @@ namespace C7.Map {
 					}
 				}
 				if (roadIndex != 0) {
-					setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 0, roadIndexTo2D(roadIndex));
+					setCell(MapLayer.Road, stackedCoords(tile.xCoordinate, tile.yCoordinate), roadIndexTo2D(roadIndex));
 				}
-				// TODO: this needs to go on a different layer in the tilemap
-				setTile(stackedCoords(tile.xCoordinate, tile.yCoordinate), 1, roadIndexTo2D(railIndex));
+				setCell(MapLayer.Rail, stackedCoords(tile.xCoordinate, tile.yCoordinate), roadIndexTo2D(railIndex));
 			}
 
 			if (center) {
