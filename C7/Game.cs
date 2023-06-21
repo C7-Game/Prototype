@@ -344,7 +344,6 @@ public partial class Game : Node2D {
 								tile.overlays.road = true;
 								mapView.updateTile(tile);
 							}
-							GD.Print("tile updated");
 						}
 					}
 				}
