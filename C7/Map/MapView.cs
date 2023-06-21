@@ -91,13 +91,13 @@ namespace C7.Map {
 			return source;
 		}
 
-		// private void addUniformOffsetsToAtlasSource(ref TileSetAtlasSource source, int width, int height, Vector2I offset) {
-		// 	for (int x = 0; x < width; x++) {
-		// 		for (int y = 0; y < height; y++) {
-		// 			source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = offset;
-		// 		}
-		// 	}
-		// }
+		private void addUniformOffsetsToAtlasSource(ref TileSetAtlasSource source, int width, int height, Vector2I offset) {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = offset;
+				}
+			}
+		}
 
 		private TileSetAtlasSource loadForestSource(string relPath) {
 			TileSetAtlasSource source = new TileSetAtlasSource{
@@ -145,13 +145,20 @@ namespace C7.Map {
 			TileSetAtlasSource rivers = loadAtlasSource("Art/Terrain/mtnRivers.pcx", tileSize, 4, 4);
 
 			TileSetAtlasSource hills = loadAtlasSource("Art/Terrain/xhills.pcx", hillSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref hills, 4, 4, new Vector2I(0, 4));
 			TileSetAtlasSource forestHills = loadAtlasSource("Art/Terrain/hill forests.pcx", hillSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref forestHills, 4, 4, new Vector2I(0, 4));
 			TileSetAtlasSource jungleHills = loadAtlasSource("Art/Terrain/hill jungle.pcx", hillSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref jungleHills, 4, 4, new Vector2I(0, 4));
 
 			TileSetAtlasSource mountain = loadAtlasSource("Art/Terrain/Mountains.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref mountain, 4, 4, new Vector2I(0, 12));
 			TileSetAtlasSource snowMountain = loadAtlasSource("Art/Terrain/Mountains-snow.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref snowMountain, 4, 4, new Vector2I(0, 12));
 			TileSetAtlasSource forestMountain = loadAtlasSource("Art/Terrain/mountain forests.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref forestMountain, 4, 4, new Vector2I(0, 12));
 			TileSetAtlasSource jungleMountain = loadAtlasSource("Art/Terrain/mountain jungles.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref jungleMountain, 4, 4, new Vector2I(0, 12));
 
 			TileSetAtlasSource plainsForest = loadForestSource("Art/Terrain/plains forests.pcx");
 			TileSetAtlasSource grasslandsForest = loadForestSource("Art/Terrain/grassland forests.pcx");
