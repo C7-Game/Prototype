@@ -342,6 +342,9 @@ public partial class Game : Node2D {
 							}
 							if (!tile.IsWater()) {
 								tile.overlays.road = true;
+								if (eventMouseButton.ShiftPressed) {
+									tile.overlays.railroad = true;
+								}
 								mapView.updateTile(tile);
 							}
 						}
