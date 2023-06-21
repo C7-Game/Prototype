@@ -32,6 +32,8 @@ namespace C7.Map {
 		ForestMountain,
 		JungleMountain,
 		Volcano,
+		ForestVolcano,
+		JungleVolcano,
 		PlainsForest,
 		GrasslandsForest,
 		River,
@@ -159,6 +161,12 @@ namespace C7.Map {
 			addUniformOffsetsToAtlasSource(ref forestMountain, 4, 4, new Vector2I(0, 12));
 			TileSetAtlasSource jungleMountain = loadAtlasSource("Art/Terrain/mountain jungles.pcx", mountainSize, 4, 4);
 			addUniformOffsetsToAtlasSource(ref jungleMountain, 4, 4, new Vector2I(0, 12));
+			TileSetAtlasSource volcano = loadAtlasSource("Art/Terrain/Volcanos.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref volcano, 4, 4, new Vector2I(0, 12));
+			TileSetAtlasSource forestVolcano = loadAtlasSource("Art/Terrain/Volcanos forests.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref forestVolcano, 4, 4, new Vector2I(0, 12));
+			TileSetAtlasSource jungleVolcano = loadAtlasSource("Art/Terrain/Volcanos jungles.pcx", mountainSize, 4, 4);
+			addUniformOffsetsToAtlasSource(ref jungleVolcano, 4, 4, new Vector2I(0, 12));
 
 			TileSetAtlasSource plainsForest = loadForestSource("Art/Terrain/plains forests.pcx");
 			TileSetAtlasSource grasslandsForest = loadForestSource("Art/Terrain/grassland forests.pcx");
@@ -177,6 +185,9 @@ namespace C7.Map {
 			tileset.AddSource(jungleMountain, Atlas.JungleMountain.Index());
 			tileset.AddSource(plainsForest, Atlas.PlainsForest.Index());
 			tileset.AddSource(grasslandsForest, Atlas.GrasslandsForest.Index());
+			tileset.AddSource(volcano, Atlas.Volcano.Index());
+			tileset.AddSource(forestVolcano, Atlas.ForestVolcano.Index());
+			tileset.AddSource(jungleVolcano, Atlas.JungleVolcano.Index());
 
 			// create tilemap layers
 			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
@@ -379,25 +390,27 @@ namespace C7.Map {
 			}
 			Vector2I texCoord = getHillTextureCoordinate(tile);
 			TerrainType nearbyVegitation = getDominantVegetationNearHillyTile(tile);
-			switch (tile.overlayTerrainType.Key) {
-			case "hills":
-				Atlas hillAtlas = nearbyVegitation.Key switch {
+			Atlas atlas = tile.overlayTerrainType.Key switch {
+				"hills" => nearbyVegitation.Key switch {
 					"forest" => Atlas.ForestHill,
 					"jungle" => Atlas.JungleHill,
 					_ => Atlas.Hill,
-				};
-				setCell(Layer.Hill, hillAtlas, tile, texCoord);
-				break;
-			case "mountains":
-				Atlas mountainAtlas = nearbyVegitation.Key switch {
+				},
+				"mountains" => nearbyVegitation.Key switch {
+					_ when tile.isSnowCapped => Atlas.SnowMountain,
 					"forest" => Atlas.ForestMountain,
 					"jungle" => Atlas.JungleMountain,
-					_ => tile.isSnowCapped ? Atlas.SnowMountain : Atlas.Mountain,
-				};
-				setCell(Layer.Hill, mountainAtlas, tile, texCoord);
-				break;
-			default:
-				break;
+					_ => Atlas.Mountain,
+				},
+				"volcano" => nearbyVegitation.Key switch {
+					"forest" => Atlas.ForestVolcano,
+					"jungle" => Atlas.JungleVolcano,
+					_ => Atlas.Volcano,
+				},
+				_ => Atlas.Invalid,
+			};
+			if (atlas != Atlas.Invalid) {
+				setCell(Layer.Hill, atlas, tile, texCoord);
 			}
 		}
 
