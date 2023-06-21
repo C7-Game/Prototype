@@ -5,39 +5,35 @@ using Serilog;
 
 namespace C7.Map {
 
-	public enum MapLayer {
+	public enum Layer {
+		River,
 		Road,
 		Rail,
 		Resource,
 		TerrainYield,
-		River,
 		Invalid,
 	};
 
-	public static class MapLayerMethods {
-		public static (int, int) LayerAndAtlas(this MapLayer mapLayer) {
-			return mapLayer switch {
-				// (layer, atlas)
-				// TODO: figure out how many can go on the same layer?
-				MapLayer.River => (0, 0),
-				MapLayer.Road => (1, 1),
-				MapLayer.Rail => (2, 2),
-				MapLayer.Resource => (3, 3),
-				MapLayer.TerrainYield => (4, 4),
-				MapLayer.Invalid => throw new ArgumentException("MapLayer.Invalid has no tilemap layer"),
-				_ => throw new ArgumentException($"unknown MapLayer enum value: ${mapLayer}"),
-			};
+	public static class LayerExtensions {
+		public static int Index(this Layer layer) {
+			return (int)layer;
 		}
-		public static int Layer(this MapLayer mapLayer) {
-			(int layer, _) = mapLayer.LayerAndAtlas();
-			return layer;
-		}
+	}
 
-		public static int Atlas(this MapLayer mapLayer) {
-			(_, int atlas) = mapLayer.LayerAndAtlas();
-			return atlas;
+	public enum Atlas {
+		River,
+		Road,
+		Rail,
+		Resource,
+		TerrainYield,
+		Invalid,
+	}
+
+	public static class AtlasExtensions {
+		public static int Index(this Atlas atlas) {
+			return (int)atlas;
 		}
-	};
+	}
 
 	partial class MapView : Node2D {
 		private string[,]terrain;
@@ -107,16 +103,16 @@ namespace C7.Map {
 			TileSetAtlasSource tnt = loadAtlasSource("Art/Terrain/tnt.pcx", tileSize, 3, 6);
 			TileSetAtlasSource rivers = loadAtlasSource("Art/Terrain/mtnRivers.pcx", tileSize, 4, 4);
 
-			tileset.AddSource(roads, MapLayer.Road.Atlas());
-			tileset.AddSource(rails, MapLayer.Rail.Atlas());
-			tileset.AddSource(resources, MapLayer.Resource.Atlas());
-			tileset.AddSource(tnt, MapLayer.TerrainYield.Atlas());
-			tileset.AddSource(rivers, MapLayer.River.Atlas());
+			tileset.AddSource(roads, Atlas.Road.Index());
+			tileset.AddSource(rails, Atlas.Rail.Index());
+			tileset.AddSource(resources, Atlas.Resource.Index());
+			tileset.AddSource(tnt, Atlas.TerrainYield.Index());
+			tileset.AddSource(rivers, Atlas.River.Index());
 
 			// create tilemap layers
-			foreach (MapLayer mapLayer in Enum.GetValues(typeof(MapLayer))) {
-				if (mapLayer != MapLayer.Invalid) {
-					tilemap.AddLayer(mapLayer.Layer());
+			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
+				if (layer != Layer.Invalid) {
+					tilemap.AddLayer(layer.Index());
 				}
 			}
 
@@ -150,10 +146,6 @@ namespace C7.Map {
 
 		void setTerrainTile(Vector2I cell, int atlas, Vector2I texCoords) {
 			terrainTilemap.SetCell(0, cell, atlas, texCoords);
-		}
-
-		void setTile(Vector2I cell, int atlas, Vector2I texCoords) {
-			tilemap.SetCell(0, cell, atlas, texCoords);
 		}
 
 		private Vector2I stackedCoords(Tile tile) {
@@ -217,35 +209,29 @@ namespace C7.Map {
 			return gameMap.tileAt(x, y);
 		}
 
-		private Vector2I roadIndexTo2D(int index) {
-			return new Vector2I(index & 0xF, index >> 4);
-		}
-
-		private void setCell(MapLayer mapLayer, Vector2I coords, Vector2I atlasCoords) {
-			(int layer, int atlas) = mapLayer.LayerAndAtlas();
-			if (!tileset.HasSource(atlas)) {
+		private void setCell(Layer layer, Atlas atlas, Vector2I coords, Vector2I atlasCoords) {
+			if (!tileset.HasSource(atlas.Index())) {
 				log.Warning($"atlas id {atlas} is not a valid tileset source");
 			}
-			tilemap.SetCell(layer, coords, atlas, atlasCoords);
+			tilemap.SetCell(layer.Index(), coords, atlas.Index(), atlasCoords);
 		}
 
-		private void setCell(MapLayer mapLayer, Tile tile, Vector2I atlasCoords) {
-			setCell(mapLayer, stackedCoords(tile), atlasCoords);
+		private void setCell(Layer layer, Atlas atlas, Tile tile, Vector2I atlasCoords) {
+			setCell(layer, atlas, stackedCoords(tile), atlasCoords);
 		}
 
-		private void eraseCell(MapLayer mapLayer, Vector2I coords) {
-			int layer = mapLayer.Layer();
-			tilemap.EraseCell(layer, coords);
+		private void eraseCell(Layer layer, Vector2I coords) {
+			tilemap.EraseCell(layer.Index(), coords);
 		}
 
-		private void eraseCell(MapLayer mapLayer, Tile tile) {
-			eraseCell(mapLayer, stackedCoords(tile));
+		private void eraseCell(Layer layer, Tile tile) {
+			eraseCell(layer, stackedCoords(tile));
 		}
 
 		private void updateRoadLayer(Tile tile, bool center) {
 			if (!tile.overlays.road) {
-				eraseCell(MapLayer.Road, tile);
-				eraseCell(MapLayer.Rail, tile);
+				eraseCell(Layer.Road, tile);
+				eraseCell(Layer.Rail, tile);
 				return;
 			}
 			if (!tile.overlays.railroad) {
@@ -256,8 +242,8 @@ namespace C7.Map {
 						index |= roadFlag(direction);
 					}
 				}
-				eraseCell(MapLayer.Rail, tile);
-				setCell(MapLayer.Road, tile, roadIndexTo2D(index));
+				eraseCell(Layer.Rail, tile);
+				setCell(Layer.Road, Atlas.Road, tile, roadIndexTo2D(index));
 			} else {
 				// railroad
 				int roadIndex = 0;
@@ -270,11 +256,11 @@ namespace C7.Map {
 					}
 				}
 				if (roadIndex != 0) {
-					setCell(MapLayer.Road, tile, roadIndexTo2D(roadIndex));
+					setCell(Layer.Road, Atlas.Road, tile, roadIndexTo2D(roadIndex));
 				} else {
-					eraseCell(MapLayer.Road, tile);
+					eraseCell(Layer.Road, tile);
 				}
-				setCell(MapLayer.Rail, tile, roadIndexTo2D(railIndex));
+				setCell(Layer.Rail, Atlas.Rail, tile, roadIndexTo2D(railIndex));
 			}
 
 			if (center) {
@@ -283,6 +269,10 @@ namespace C7.Map {
 					updateRoadLayer(neighbor, false);
 				}
 			}
+		}
+
+		private Vector2I roadIndexTo2D(int index) {
+			return new Vector2I(index & 0xF, index >> 4);
 		}
 
 		private static int roadFlag(TileDirection direction) {
@@ -314,9 +304,9 @@ namespace C7.Map {
 			index += southOfPoint.riverNortheast ? 8 : 0;
 
 			if (index == 0) {
-				eraseCell(MapLayer.River, tile);
+				eraseCell(Layer.River, tile);
 			} else {
-				setCell(MapLayer.River, tile, new Vector2I(index % 4, index / 4));
+				setCell(Layer.River, Atlas.River, tile, new Vector2I(index % 4, index / 4));
 			}
 		}
 
@@ -332,15 +322,15 @@ namespace C7.Map {
 			if (tile.Resource != C7GameData.Resource.NONE) {
 				int index = tile.Resource.Index;
 				Vector2I texCoord = new Vector2I(index % 6, index / 6);
-				setCell(MapLayer.Resource, tile, texCoord);
+				setCell(Layer.Resource, Atlas.Resource, tile, texCoord);
 			} else {
-				eraseCell(MapLayer.Resource, tile);
+				eraseCell(Layer.Resource, tile);
 			}
 
 			if (tile.baseTerrainType.Key == "grassland" && tile.isBonusShield) {
-				setCell(MapLayer.TerrainYield, tile, new Vector2I(0, 3));
+				setCell(Layer.TerrainYield, Atlas.TerrainYield, tile, new Vector2I(0, 3));
 			} else {
-				eraseCell(MapLayer.TerrainYield, tile);
+				eraseCell(Layer.TerrainYield, tile);
 			}
 
 			updateRiverLayer(tile);
