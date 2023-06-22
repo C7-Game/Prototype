@@ -6,50 +6,6 @@ using System.Linq;
 
 namespace C7.Map {
 
-	public enum Layer {
-		TerrainOverlay,
-		River,
-		Road,
-		Rail,
-		Resource,
-		TerrainYield,
-		Invalid,
-	};
-
-	public static class LayerExtensions {
-		public static int Index(this Layer layer) {
-			return (int)layer;
-		}
-	}
-
-	public enum Atlas {
-		Hill,
-		ForestHill,
-		JungleHill,
-		Mountain,
-		SnowMountain,
-		ForestMountain,
-		JungleMountain,
-		Volcano,
-		ForestVolcano,
-		JungleVolcano,
-		PlainsForest,
-		GrasslandsForest,
-		TundraForest,
-		River,
-		Road,
-		Rail,
-		Resource,
-		TerrainYield,
-		Invalid,
-	}
-
-	public static class AtlasExtensions {
-		public static int Index(this Atlas atlas) {
-			return (int)atlas;
-		}
-	}
-
 	partial class MapView : Node2D {
 		private string[,]terrain;
 		private TileMap terrainTilemap;
@@ -58,10 +14,6 @@ namespace C7.Map {
 		private TileMap tilemap;
 		private TileSet tileset;
 		private Vector2I tileSize = new Vector2I(128, 64);
-		private Vector2I hillSize = new Vector2I(128, 72);
-		private Vector2I mountainSize = new Vector2I(128, 88);
-		private Vector2I forestSize = new Vector2I(128, 88);
-		private Vector2I resourceSize = new Vector2I(50, 50);
 		private ILogger log = LogManager.ForContext<MapView>();
 		public int worldEdgeRight {get; private set;}
 		public int worldEdgeLeft {get; private set;}
@@ -140,10 +92,10 @@ namespace C7.Map {
 			terrainTilemapShadow.Position = terrainTilemap.Position + (Vector2I.Left * tileSize.X * width);
 
 			tilemap = new TileMap{ YSortEnabled = true };
-			tileset = makeTileSet();
+			tileset = TileSetLoader.LoadCiv3TileSet();
 			tilemap.TileSet = tileset;
-			TileSetAtlasSource roads = loadAtlasSource("Art/Terrain/roads.pcx", tileSize, 16, 16);
-			TileSetAtlasSource rails = loadAtlasSource("Art/Terrain/railroads.pcx", tileSize, 16, 16);
+			// TileSetAtlasSource roads = loadAtlasSource("Art/Terrain/roads.pcx", tileSize, 16, 16);
+			// TileSetAtlasSource rails = loadAtlasSource("Art/Terrain/railroads.pcx", tileSize, 16, 16);
 
 			TileSetAtlasSource resources = new TileSetAtlasSource{
 				Texture = Util.LoadTextureFromPCX("Conquests/Art/resources.pcx"),
