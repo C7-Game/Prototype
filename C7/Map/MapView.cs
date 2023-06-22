@@ -339,7 +339,7 @@ namespace C7.Map {
 					row = 8 + tile.xCoordinate % 2; // pine starts at row 8 in atlas
 					col = tile.xCoordinate % 6;     // pine has 6 columns
 				} else {
-					bool small = tile.getEdgeNeighbors().Any(t => t.IsWater());
+					bool small = tile.numWaterEdges() > 0;
 					// this technically omits one large and one small tile but the math is simpler
 					if (small) {
 						row = 6 + tile.xCoordinate % 2;
@@ -361,26 +361,39 @@ namespace C7.Map {
 				// More research is needed on when to use large vs small jungles. Probably, small is used when neighboring fewer jungles.
 				// For the first pass, we're just always using large jungles.
 				(int row, int col) = (tile.xCoordinate % 2, tile.xCoordinate % 4);
-				if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-					(row, col) = (2 + tile.xCoordinate % 2, 1 + (tile.xCoordinate % 5));
+				if (tile.numWaterEdges() > 0) {
+					(row, col) = (2 + tile.xCoordinate % 2, 1 + tile.xCoordinate % 5);
 				}
 				setCell(Layer.TerrainOverlay, Atlas.GrasslandsForest, tile, new Vector2I(col, row));
 			}
 		}
 
-		private bool isForest(Tile tile) {
+		private void updateMarshLayer(Tile tile) {
+			if (tile.overlayTerrainType.Key != "marsh") {
+				return;
+			}
+			(int row, int col) = (tile.xCoordinate % 2, tile.xCoordinate % 4);
+			if (tile.numWaterEdges() > 0) {
+				(row, col) = (2 + tile.xCoordinate % 2, 1 + tile.xCoordinate % 4);
+			}
+			setCell(Layer.TerrainOverlay, Atlas.Marsh, tile, new Vector2I(col, row));
+		}
+
+		private static bool isForest(Tile tile) {
 			return tile.overlayTerrainType.Key == "forest" || tile.overlayTerrainType.Key == "jungle";
 		}
 
 		private void updateTerrainOverlayLayer(Tile tile) {
-			if (!tile.overlayTerrainType.isHilly() && !isForest(tile)) {
+			if (!tile.overlayTerrainType.isHilly() && !isForest(tile) && tile.overlayTerrainType.Key != "marsh") {
 				eraseCell(Layer.TerrainOverlay, tile);
 				return;
 			}
 			if (tile.overlayTerrainType.isHilly()) {
 				updateHillLayer(tile);
-			} else {
+			} else if (isForest(tile)) {
 				updateForestLayer(tile);
+			} else {
+				updateMarshLayer(tile);
 			}
 		}
 
