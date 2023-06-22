@@ -35,6 +35,7 @@ namespace C7.Map {
 		PlainsForest,
 		GrasslandsForest,
 		TundraForest,
+		Marsh,
 		River,
 		Road,
 		Rail,
@@ -132,7 +133,26 @@ namespace C7.Map {
 		}
 	}
 
+	class MarshAtlasLoader : AtlasLoader {
+		public MarshAtlasLoader(string p, Vector2I rs) : base(p, -1, -1, rs, 12) {}
+
+		protected override void load() {
+			// TODO: incomplete
+			for (int y = 0; y < 4; y++) {
+				for (int x = 0; x < 5; x++) {
+					if (y < 2 && x > 3) {
+						continue;
+					}
+					bool shouldDoOffset = y == 0 || y == 1;
+					createTile(x, y, shouldDoOffset);
+				}
+			}
+		}
+	}
+
 	// TileSetLoader loads tileset atlas sources
+	// In the future, it will be configured to set the path property of each
+	// atlas loader depending on which custom terrain or graphics are used.
 	class TileSetLoader {
 		private static readonly Vector2I tileSize = new Vector2I(128, 64);
 		private static readonly Vector2I hillSize = new Vector2I(128, 72);
@@ -140,6 +160,8 @@ namespace C7.Map {
 		private static readonly Vector2I volcanoSize = new Vector2I(128, 88);
 
 		private static readonly Vector2I forestSize = new Vector2I(128, 88);
+		private static readonly Vector2I marshSize = new Vector2I(128, 88);
+
 		private static readonly Vector2I resourceSize = new Vector2I(50, 50);
 
 		private static readonly Dictionary<Atlas, AtlasLoader> civ3PcxForAtlas = new Dictionary<Atlas, AtlasLoader> {
@@ -168,6 +190,8 @@ namespace C7.Map {
 			{Atlas.PlainsForest, new ForestAtlasLoader("Art/Terrain/plains forests.pcx", forestSize)},
 			{Atlas.GrasslandsForest, new ForestAtlasLoader("Art/Terrain/grassland forests.pcx", forestSize, true)},
 			{Atlas.TundraForest, new ForestAtlasLoader("Art/Terrain/tundra forests.pcx", forestSize)},
+
+			{Atlas.Marsh, new MarshAtlasLoader("Art/Terrain/marsh.pcx", marshSize)},
 		};
 
 		public static TileSet LoadCiv3TileSet() {
