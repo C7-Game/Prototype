@@ -1,5 +1,6 @@
 using Godot;
-using System;
+using C7.Map;
+using C7GameData;
 
 public partial class PlayerCamera : Camera2D
 {
@@ -35,5 +36,10 @@ public partial class PlayerCamera : Camera2D
 	public Rect2 getVisibleWorld() {
 		Transform2D vpToGlobal = (GetViewport().GlobalCanvasTransform * GetCanvasTransform()).AffineInverse();
 		return vpToGlobal * GetViewportRect();
+	}
+
+	public void centerOnTile(Tile tile,  MapView map) {
+		Vector2 target = map.tileToLocal(tile);
+		Position = target;
 	}
 }
