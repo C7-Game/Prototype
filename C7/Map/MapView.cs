@@ -21,63 +21,6 @@ namespace C7.Map {
 		private int height;
 		private GameMap gameMap;
 
-		private TileSet makeTileSet() {
-			return new TileSet {
-				TileShape = TileSet.TileShapeEnum.Isometric,
-				TileLayout = TileSet.TileLayoutEnum.Stacked,
-				TileOffsetAxis = TileSet.TileOffsetAxisEnum.Horizontal,
-				TileSize = tileSize,
-			};
-		}
-
-		private void addUniformTilesToAtlasSource(ref TileSetAtlasSource source, int width, int height) {
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					source.CreateTile(new Vector2I(x, y));
-				}
-			}
-		}
-
-		private TileSetAtlasSource loadAtlasSource(string relPath, Vector2I tileSize, int width, int height) {
-			TileSetAtlasSource source = new TileSetAtlasSource{
-				Texture = Util.LoadTextureFromPCX(relPath),
-				TextureRegionSize = tileSize,
-			};
-			addUniformTilesToAtlasSource(ref source, width, height);
-			return source;
-		}
-
-		private void addUniformOffsetsToAtlasSource(ref TileSetAtlasSource source, int width, int height, Vector2I offset) {
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = offset;
-				}
-			}
-		}
-
-		private TileSetAtlasSource loadForestSource(string relPath, bool jungle = false) {
-			TileSetAtlasSource source = new TileSetAtlasSource{
-				Texture = Util.LoadTextureFromPCX(relPath),
-				TextureRegionSize = forestSize,
-			};
-			for (int x = 0; x < 6; x++) {
-				for (int y = 0; y < 10; y++) {
-					if ((y < 4 && !jungle) || (y < 2 && x > 3)) {
-						continue; // first 4 rows are for jungle tiles
-					}
-					if ((y > 3 && y < 6 && x > 3) || (y > 5 && y < 8 && x > 4)) {
-						continue; // forest tilemap is shaped like this
-					}
-					source.CreateTile(new Vector2I(x, y));
-					if (y == 1 || y == 2 || y == 4 || y == 5) {
-						// offset big textures by 12 pixels
-						source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = new Vector2I(0, 12);
-					}
-				}
-			}
-			return source;
-		}
-
 		public override void _Process(double delta) {
 			base._Process(delta);
 		}
@@ -94,70 +37,6 @@ namespace C7.Map {
 			tilemap = new TileMap{ YSortEnabled = true };
 			tileset = TileSetLoader.LoadCiv3TileSet();
 			tilemap.TileSet = tileset;
-			// TileSetAtlasSource roads = loadAtlasSource("Art/Terrain/roads.pcx", tileSize, 16, 16);
-			// TileSetAtlasSource rails = loadAtlasSource("Art/Terrain/railroads.pcx", tileSize, 16, 16);
-
-			TileSetAtlasSource resources = new TileSetAtlasSource{
-				Texture = Util.LoadTextureFromPCX("Conquests/Art/resources.pcx"),
-				TextureRegionSize = resourceSize,
-			};
-			for (int y = 0; y < 5; y++) {
-				for (int x = 0; x < 6; x++) {
-					if (y == 4 && x > 1) {
-						continue;
-					}
-					resources.CreateTile(new Vector2I(x, y));
-				}
-			}
-
-			TileSetAtlasSource tnt = loadAtlasSource("Art/Terrain/tnt.pcx", tileSize, 3, 6);
-
-			TileSetAtlasSource rivers = loadAtlasSource("Art/Terrain/mtnRivers.pcx", tileSize, 4, 4);
-
-			TileSetAtlasSource hills = loadAtlasSource("Art/Terrain/xhills.pcx", hillSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref hills, 4, 4, new Vector2I(0, 4));
-			TileSetAtlasSource forestHills = loadAtlasSource("Art/Terrain/hill forests.pcx", hillSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref forestHills, 4, 4, new Vector2I(0, 4));
-			TileSetAtlasSource jungleHills = loadAtlasSource("Art/Terrain/hill jungle.pcx", hillSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref jungleHills, 4, 4, new Vector2I(0, 4));
-
-			TileSetAtlasSource mountain = loadAtlasSource("Art/Terrain/Mountains.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref mountain, 4, 4, new Vector2I(0, 12));
-			TileSetAtlasSource snowMountain = loadAtlasSource("Art/Terrain/Mountains-snow.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref snowMountain, 4, 4, new Vector2I(0, 12));
-			TileSetAtlasSource forestMountain = loadAtlasSource("Art/Terrain/mountain forests.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref forestMountain, 4, 4, new Vector2I(0, 12));
-			TileSetAtlasSource jungleMountain = loadAtlasSource("Art/Terrain/mountain jungles.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref jungleMountain, 4, 4, new Vector2I(0, 12));
-			TileSetAtlasSource volcano = loadAtlasSource("Art/Terrain/Volcanos.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref volcano, 4, 4, new Vector2I(0, 12));
-			TileSetAtlasSource forestVolcano = loadAtlasSource("Art/Terrain/Volcanos forests.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref forestVolcano, 4, 4, new Vector2I(0, 12));
-			TileSetAtlasSource jungleVolcano = loadAtlasSource("Art/Terrain/Volcanos jungles.pcx", mountainSize, 4, 4);
-			addUniformOffsetsToAtlasSource(ref jungleVolcano, 4, 4, new Vector2I(0, 12));
-
-			TileSetAtlasSource plainsForest = loadForestSource("Art/Terrain/plains forests.pcx");
-			TileSetAtlasSource grasslandsForest = loadForestSource("Art/Terrain/grassland forests.pcx", true);
-			TileSetAtlasSource tundraForest = loadForestSource("Art/Terrain/tundra forests.pcx");
-
-			tileset.AddSource(roads, Atlas.Road.Index());
-			tileset.AddSource(rails, Atlas.Rail.Index());
-			tileset.AddSource(resources, Atlas.Resource.Index());
-			tileset.AddSource(tnt, Atlas.TerrainYield.Index());
-			tileset.AddSource(rivers, Atlas.River.Index());
-			tileset.AddSource(hills, Atlas.Hill.Index());
-			tileset.AddSource(forestHills, Atlas.ForestHill.Index());
-			tileset.AddSource(jungleHills, Atlas.JungleHill.Index());
-			tileset.AddSource(mountain, Atlas.Mountain.Index());
-			tileset.AddSource(snowMountain, Atlas.SnowMountain.Index());
-			tileset.AddSource(forestMountain, Atlas.ForestMountain.Index());
-			tileset.AddSource(jungleMountain, Atlas.JungleMountain.Index());
-			tileset.AddSource(plainsForest, Atlas.PlainsForest.Index());
-			tileset.AddSource(grasslandsForest, Atlas.GrasslandsForest.Index());
-			tileset.AddSource(tundraForest, Atlas.TundraForest.Index());
-			tileset.AddSource(volcano, Atlas.Volcano.Index());
-			tileset.AddSource(forestVolcano, Atlas.ForestVolcano.Index());
-			tileset.AddSource(jungleVolcano, Atlas.JungleVolcano.Index());
 
 			// create tilemap layers
 			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
@@ -169,7 +48,7 @@ namespace C7.Map {
 			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
 			AddChild(tilemap);
 			AddChild(terrainTilemap);
-			AddChild(terrainTilemapShadow);
+			// AddChild(terrainTilemapShadow);
 		}
 
 		private void setTerrainTiles() {

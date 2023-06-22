@@ -166,7 +166,7 @@ namespace C7.Map {
 			{Atlas.JungleVolcano, new AtlasLoader("Art/Terrain/Volcanos jungles.pcx", 4, 4, mountainSize, 12)},
 
 			{Atlas.PlainsForest, new ForestAtlasLoader("Art/Terrain/plains forests.pcx", forestSize)},
-			{Atlas.GrasslandsForest, new ForestAtlasLoader("Art/Terrain/plains forests.pcx", forestSize, true)},
+			{Atlas.GrasslandsForest, new ForestAtlasLoader("Art/Terrain/grassland forests.pcx", forestSize, true)},
 			{Atlas.TundraForest, new ForestAtlasLoader("Art/Terrain/tundra forests.pcx", forestSize)},
 		};
 
