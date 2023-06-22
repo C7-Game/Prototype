@@ -66,7 +66,7 @@ public partial class Game : Node2D {
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
 			Global.ResetLoadGamePath();
 
-			camera = GetNode("./CanvasLayer/PlayerCamera") as PlayerCamera;
+			camera = GetNode("PlayerCamera") as PlayerCamera;
 
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
@@ -341,6 +341,17 @@ public partial class Game : Node2D {
 									setSelectedUnit(to_select);
 							}
 							GD.Print($"tile: {tile.xCoordinate}, {tile.yCoordinate}: {tile.baseTerrainType.Key} - {tile.overlayTerrainType.Key}");
+							int left = mapView.worldEdgeLeft;
+							int right = mapView.worldEdgeRight;
+							int camLeft = (int)camera.getVisibleWorld().Position.X;
+							int camRight = (int)camera.getVisibleWorld().End.X;
+							GD.Print(camera.getVisibleWorld().End);
+							if (camLeft <= left) {
+								GD.Print($"left is visible - world: {left}, cam: {camLeft}");
+							}
+							if (camRight >= right) {
+								GD.Print($"right is visible - world: {right}, cam: {camRight}");
+							}
 						}
 					}
 				}

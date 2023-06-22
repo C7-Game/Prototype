@@ -61,7 +61,8 @@ namespace C7.Map {
 		private Vector2I forestSize = new Vector2I(128, 88);
 		private Vector2I resourceSize = new Vector2I(50, 50);
 		private ILogger log = LogManager.ForContext<MapView>();
-
+		public int worldEdgeRight {get; private set;}
+		public int worldEdgeLeft {get; private set;}
 		private int width;
 		private int height;
 		private GameMap gameMap;
@@ -269,6 +270,8 @@ namespace C7.Map {
 			height = gameMap.numTilesTall;
 			initializeTileMap();
 			terrain = new string[width, height];
+			worldEdgeRight = (int)ToGlobal(tilemap.MapToLocal(new Vector2I(width - 1, 1))).X + tileSize.X / 2;
+			worldEdgeLeft = (int)ToGlobal(tilemap.MapToLocal(new Vector2I(0, 0))).X - tileSize.X / 2;
 
 			// Convert coordinates from current save coordinates to
 			// stacked coordinates used by Godot's TileMap, and
