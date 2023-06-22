@@ -404,6 +404,7 @@ namespace C7.Map {
 		}
 
 		private void updateBuildingLayer(Tile tile) {
+			// TODO: add goody huts here once they are stored in the save and Tile class
 			if (tile.hasBarbarianCamp) {
 				setCell(Layer.Building, Atlas.TerrainBuilding, tile, new Vector2I(2, 0));
 			} else {

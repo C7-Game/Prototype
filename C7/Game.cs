@@ -55,6 +55,7 @@ public partial class Game : Node2D {
 	// The catch should always catch any error, as it's the general catch
 	// that gives an error if we fail to load for some reason.
 	public override void _Ready() {
+		GetTree().AutoAcceptQuit = false;
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
 			var animSoundPlayer = new AudioStreamPlayer();
@@ -553,9 +554,11 @@ public partial class Game : Node2D {
 	/**
 	 * User quit. We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
 	 **/
-	private void OnQuitTheGame() {
-		log.Information("Goodbye!");
-		GetTree().Quit();
+	public override void _Notification(int what) {
+		if (what == NotificationWMCloseRequest) {
+			log.Information("Goodbye!");
+			GetTree().Quit();
+		}
 	}
 
 	private void OnBuildCity(string name) {

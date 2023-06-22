@@ -4,7 +4,7 @@ using Godot;
 using Serilog;
 
 namespace C7.Map {
-	public class CityLayer : LooseLayer {
+	public class CityLayer {
 
 		private ILogger log = LogManager.ForContext<CityLayer>();
 
@@ -18,7 +18,7 @@ namespace C7.Map {
 		{
 		}
 
-		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
+		public void drawObject(GameData gameData, Tile tile, Vector2 tileCenter)
 		{
 			if (tile.cityAtTile is null) {
 				return;
@@ -27,7 +27,6 @@ namespace C7.Map {
 			City city = tile.cityAtTile;
 			if (!citySceneLookup.ContainsKey(city)) {
 				CityScene cityScene = new CityScene(city, tile, new Vector2I((int)tileCenter.X, (int)tileCenter.Y));
-				looseView.AddChild(cityScene);
 				citySceneLookup[city] = cityScene;
 			} else {
 				CityScene scene = citySceneLookup[city];
