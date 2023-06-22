@@ -24,7 +24,6 @@ public partial class Game : Node2D {
 
 	public Player controller; // Player that's controlling the UI.
 	private MapView mapView;
-	private OldMapView oldMapView;
 	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
 
@@ -72,24 +71,22 @@ public partial class Game : Node2D {
 				GameMap map = gameDataAccess.gameData.map;
 				Util.setModPath(gameDataAccess.gameData.scenarioSearchPath);
 				log.Debug("RelativeModPath ", map.RelativeModPath);
-				oldMapView = new OldMapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
-				AddChild(oldMapView);
 
-				oldMapView.cameraZoom = (float)1.0;
-				oldMapView.gridLayer.visible = false;
+				mapView = new MapView(this, gameDataAccess.gameData);
 
 				// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their
 				// starting settler.
 				if (controller.cities.Count > 0) {
 					City capital = controller.cities.Find(c => c.IsCapital());
-					if (capital != null)
-						oldMapView.centerCameraOnTile(capital.location);
+					if (capital is not null) {
+						camera.centerOnTile(capital.location, mapView);
+					}
 				} else {
 					MapUnit startingSettler = controller.units.Find(u => u.unitType.actions.Contains(C7Action.UnitBuildCity));
-					if (startingSettler != null)
-						oldMapView.centerCameraOnTile(startingSettler.location);
+					if (startingSettler is not null) {
+						camera.centerOnTile(startingSettler.location, mapView);
+					}
 				}
-				mapView = new MapView(this, gameDataAccess.gameData);
 			}
 
 			AddChild(mapView);
@@ -220,10 +217,11 @@ public partial class Game : Node2D {
 
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location) {
+		// TODO: implement
 		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
-			Vector2 relativeScreenLocation = oldMapView.screenLocationOfTile(location, true) / oldMapView.getVisibleAreaSize();
-			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
-				oldMapView.centerCameraOnTile(location);
+			// Vector2 relativeScreenLocation = oldMapView.screenLocationOfTile(location, true) / oldMapView.getVisibleAreaSize();
+			// if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
+			// 	oldMapView.centerCameraOnTile(location);
 		}
 	}
 
@@ -454,7 +452,7 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.ToggleGrid)) {
-			this.oldMapView.gridLayer.visible = !this.oldMapView.gridLayer.visible;
+			mapView.showGrid = !mapView.showGrid;
 		}
 
 		if (Input.IsActionJustPressed(C7Action.Escape) && !this.inUnitGoToMode) {

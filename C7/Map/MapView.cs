@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace C7.Map {
 
-	partial class MapView : Node2D {
+	public partial class MapView : Node2D {
 		private string[,]terrain;
 		private TileMap terrainTilemap;
 		private TileMap terrainTilemapShadow;
@@ -19,6 +19,12 @@ namespace C7.Map {
 		public int worldEdgeLeft {get; private set;}
 		private int width;
 		private int height;
+		public bool showGrid {
+			get => showGrid;
+			set {
+				showGrid = value;
+			}
+		}
 		private GameMap gameMap;
 
 		public override void _Process(double delta) {
@@ -162,6 +168,8 @@ namespace C7.Map {
 			return gameMap.tileAt(x, y);
 		}
 
+		public Vector2 tileToLocal(Tile tile) => tilemap.MapToLocal(stackedCoords(tile));
+
 		private void setCell(Layer layer, Atlas atlas, Tile tile, Vector2I atlasCoords) {
 			if (!tileset.HasSource(atlas.Index())) {
 				log.Warning($"atlas id {atlas} is not a valid tileset source");
@@ -219,9 +227,7 @@ namespace C7.Map {
 			}
 		}
 
-		private Vector2I roadIndexTo2D(int index) {
-			return new Vector2I(index & 0xF, index >> 4);
-		}
+		private Vector2I roadIndexTo2D(int index) => new Vector2I(index & 0xF, index >> 4);
 
 		private static int roadFlag(TileDirection direction) {
 			return direction switch {
