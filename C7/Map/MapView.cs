@@ -58,29 +58,7 @@ namespace C7.Map {
 		}
 
 		private void setTerrainTiles() {
-			for (int x = 0; x < width; x++) {
-				for (int y = 0; y < height; y++) {
-					Vector2I cell = new Vector2I(x, y);
-					string left = terrain[x, y];
-					string right = terrain[(x + 1) % width, y];
-					bool even = y % 2 == 0;
-					string top = "coast";
-					if (y > 0) {
-						top = even ? terrain[x, y - 1] : terrain[(x + 1) % width, y - 1];
-					}
-					string bottom = "coast";
-					if (y < height - 1) {
-						bottom = even ? terrain[x, y + 1] : terrain[(x + 1) % width, y + 1];
-					}
-					string[] corner = new string[4]{top, right, bottom, left};
-					TerrainPcx pcx = Civ3TerrainTileSet.GetPcxFor(corner);
-					Vector2I texCoords = pcx.getTextureCoords(corner);
-					setTerrainTile(cell, pcx.atlas, texCoords);
-				}
-			}
-			for (int y = 0; y < height; y++) {
-				Vector2I cell = new Vector2I(-1, y);
-				int x = width - 1;
+			string[] corners(int x, int y) {
 				string left = terrain[x, y];
 				string right = terrain[(x + 1) % width, y];
 				bool even = y % 2 == 0;
@@ -92,10 +70,22 @@ namespace C7.Map {
 				if (y < height - 1) {
 					bottom = even ? terrain[x, y + 1] : terrain[(x + 1) % width, y + 1];
 				}
-				string[] corner = new string[4]{top, right, bottom, left};
+				return new string[4]{top, right, bottom, left};
+			}
+			void lookupAndSetTerrainTile(int x, int y, int cellX, int cellY) {
+				Vector2I cell = new Vector2I(cellX, cellY);
+				string[] corner = corners(x, y);
 				TerrainPcx pcx = Civ3TerrainTileSet.GetPcxFor(corner);
 				Vector2I texCoords = pcx.getTextureCoords(corner);
 				setTerrainTile(cell, pcx.atlas, texCoords);
+			}
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < height; y++) {
+					lookupAndSetTerrainTile(x, y, x, y);
+				}
+			}
+			for (int y = 0; y < height; y++) {
+				lookupAndSetTerrainTile(width - 1, y, -1, y);
 			}
 		}
 
