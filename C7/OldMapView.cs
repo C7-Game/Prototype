@@ -1,13 +1,9 @@
 using System.Collections.Generic;
-using System;
-using System.Linq;
 using C7.Map;
 using Godot;
 using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
-using Serilog;
-using Serilog.Events;
 
 // Loose layers are for drawing things on the map on a per-tile basis. (Historical aside: There used to be another kind of layer called a TileLayer
 // that was intended to draw regularly tiled objects like terrain sprites but using LooseLayers for everything was found to be a prefereable
@@ -29,40 +25,6 @@ public abstract class LooseLayer {
 
 	// The layer will be skipped during map drawing if visible is false
 	public bool visible = true;
-}
-
-public partial class MarshLayer : LooseLayer {
-	public static readonly Vector2 marshSize = new Vector2(128, 88);
-	//Because the marsh graphics are 88 pixels tall instead of the 64 of a tile, we also need an addition 12 pixel offset to the top
-	//88 - 64 = 24; 24/2 = 12.  This keeps the marsh centered with half the extra 24 pixels above the tile and half below.
-	readonly Vector2 MARSH_OFFSET = (float)0.5 * marshSize + new Vector2(0, -12);
-
-	private ImageTexture largeMarshTexture;
-	private ImageTexture smallMarshTexture;
-
-	public MarshLayer() {
-		largeMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0,   0, 512, 176);
-		smallMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0, 176, 640, 176);
-	}
-
-	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
-		if (tile.overlayTerrainType.Key == "marsh") {
-			int randomJungleRow = tile.yCoordinate % 2;
-			int randomMarshColumn;
-			ImageTexture marshTexture;
-			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-				randomMarshColumn = tile.xCoordinate % 5;
-				marshTexture = smallMarshTexture;
-			}
-			else {
-				randomMarshColumn = tile.xCoordinate % 4;
-				marshTexture = largeMarshTexture;
-			}
-			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.X, randomJungleRow * marshSize.Y, marshSize);
-			Rect2 screenTarget = new Rect2(tileCenter - MARSH_OFFSET, marshSize);
-			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);
-		}
-	}
 }
 
 public partial class GridLayer : LooseLayer {
@@ -231,7 +193,6 @@ public partial class OldMapView : Node2D {
 		this.wrapVertically = wrapVertically;
 
 		looseView = new LooseView(this);
-		looseView.layers.Add(new MarshLayer());
 		this.gridLayer = new GridLayer();
 		looseView.layers.Add(this.gridLayer);
 		looseView.layers.Add(new BuildingLayer());

@@ -403,6 +403,14 @@ namespace C7.Map {
 			}
 		}
 
+		private void updateBuildingLayer(Tile tile) {
+			if (tile.hasBarbarianCamp) {
+				setCell(Layer.Building, Atlas.TerrainBuilding, tile, new Vector2I(2, 0));
+			} else {
+				eraseCell(Layer.Building, tile);
+			}
+		}
+
 		public void updateTile(Tile tile) {
 			if (tile == Tile.NONE || tile is null) {
 				string msg = tile is null ? "null tile" : "Tile.NONE";
@@ -427,6 +435,8 @@ namespace C7.Map {
 			}
 
 			updateTerrainOverlayLayer(tile);
+
+			updateBuildingLayer(tile);
 		}
 	}
 }

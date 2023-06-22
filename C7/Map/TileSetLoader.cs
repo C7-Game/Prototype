@@ -12,6 +12,7 @@ namespace C7.Map {
 		Rail,
 		Resource,
 		TerrainYield,
+		Building,
 		Invalid,
 	};
 
@@ -41,6 +42,7 @@ namespace C7.Map {
 		Rail,
 		Resource,
 		TerrainYield,
+		TerrainBuilding,
 		Invalid,
 	}
 
@@ -163,6 +165,7 @@ namespace C7.Map {
 		private static readonly Vector2I marshSize = new Vector2I(128, 88);
 
 		private static readonly Vector2I resourceSize = new Vector2I(50, 50);
+		private static readonly Vector2I buildingSize = new Vector2I(128, 64);
 
 		private static readonly Dictionary<Atlas, AtlasLoader> civ3PcxForAtlas = new Dictionary<Atlas, AtlasLoader> {
 			{Atlas.Resource, new ResourceAtlasLoader("Conquests/Art/resources.pcx", resourceSize)},
@@ -192,6 +195,8 @@ namespace C7.Map {
 			{Atlas.TundraForest, new ForestAtlasLoader("Art/Terrain/tundra forests.pcx", forestSize)},
 
 			{Atlas.Marsh, new MarshAtlasLoader("Art/Terrain/marsh.pcx", marshSize)},
+
+			{Atlas.TerrainBuilding, new AtlasLoader("Art/Terrain/TerrainBuildings.pcx", 4, 4, buildingSize)},
 		};
 
 		public static TileSet LoadCiv3TileSet() {
