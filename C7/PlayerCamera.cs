@@ -33,7 +33,7 @@ public partial class PlayerCamera : Camera2D
 	}
 
 	public Rect2 getVisibleWorld() {
-		Transform2D vpToGlobal = (GetViewport().GlobalCanvasTransform * this.GetCanvasTransform()).AffineInverse();
+		Transform2D vpToGlobal = (GetViewport().GlobalCanvasTransform * GetCanvasTransform()).AffineInverse();
 		return vpToGlobal * GetViewportRect();
 	}
 }
