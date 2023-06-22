@@ -260,7 +260,6 @@ script = ExtResource("11_pkhac")
 [connection signal="TurnStarted" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnStarted"]
 [connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
 [connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]
-[connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
 [connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
 [connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/Control/GameStatus" to="." method="OnPlayerEndTurn"]
 [connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]

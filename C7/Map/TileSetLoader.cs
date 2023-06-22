@@ -43,6 +43,7 @@ namespace C7.Map {
 		Resource,
 		TerrainYield,
 		TerrainBuilding,
+		GoodyHut,
 		Invalid,
 	}
 
@@ -54,8 +55,8 @@ namespace C7.Map {
 
 	class AtlasLoader {
 		string path;
-		int width;
-		int height;
+		protected int width;
+		protected int height;
 		Vector2I regionSize;
 		Vector2I textureOrigin;
 		protected TileSetAtlasSource source;
@@ -120,13 +121,16 @@ namespace C7.Map {
 		}
 	};
 
-	class ResourceAtlasLoader : AtlasLoader {
-		public ResourceAtlasLoader(string p, Vector2I rs) : base(p, -1, -1, rs) {}
+	class NonSquareAtlasLoader : AtlasLoader {
+		int lastRowWidth;
+		public NonSquareAtlasLoader(string p, int w, int h, int lastRowWidth, Vector2I rs) : base(p, w, h, rs) {
+			this.lastRowWidth = lastRowWidth;
+		}
 
 		protected override void load() {
-			for (int y = 0; y < 5; y++) {
-				for (int x = 0; x < 6; x++) {
-					if (y == 4 && x > 1) {
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					if (y == height - 1 && x >= lastRowWidth) {
 						continue;
 					}
 					createTile(x, y);
@@ -168,7 +172,7 @@ namespace C7.Map {
 		private static readonly Vector2I buildingSize = new Vector2I(128, 64);
 
 		private static readonly Dictionary<Atlas, AtlasLoader> civ3PcxForAtlas = new Dictionary<Atlas, AtlasLoader> {
-			{Atlas.Resource, new ResourceAtlasLoader("Conquests/Art/resources.pcx", resourceSize)},
+			{Atlas.Resource, new NonSquareAtlasLoader("Conquests/Art/resources.pcx", 6, 4, 4, resourceSize)},
 
 			{Atlas.Road, new AtlasLoader("Art/Terrain/roads.pcx", 16, 16, tileSize)},
 			{Atlas.Rail, new AtlasLoader("Art/Terrain/railroads.pcx", 16, 16, tileSize)},
@@ -197,6 +201,7 @@ namespace C7.Map {
 			{Atlas.Marsh, new MarshAtlasLoader("Art/Terrain/marsh.pcx", marshSize)},
 
 			{Atlas.TerrainBuilding, new AtlasLoader("Art/Terrain/TerrainBuildings.pcx", 4, 4, buildingSize)},
+			{Atlas.GoodyHut, new NonSquareAtlasLoader("Art/Terrain/goodyhuts.pcx", 3, 3, 2, buildingSize)},
 		};
 
 		public static TileSet LoadCiv3TileSet() {

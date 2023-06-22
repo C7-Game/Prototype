@@ -3,7 +3,7 @@ using ConvertCiv3Media;
 using Godot;
 
 namespace C7.Map {
-	public partial class FogOfWarLayer : LooseLayer {
+	public partial class FogOfWarLayer {
 
 		private readonly ImageTexture fogOfWarTexture;
 		private readonly Vector2 tileSize;
@@ -14,7 +14,7 @@ namespace C7.Map {
 			tileSize = fogOfWarTexture.GetSize() / 9;
 		}
 
-		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
+		public void drawObject(GameData gameData, Tile tile, Vector2 tileCenter) {
 			Rect2 screenTarget = new Rect2(tileCenter - tileSize / 2, tileSize);
 			TileKnowledge tileKnowledge = gameData.GetHumanPlayers()[0].tileKnowledge;
 			//N.B. FogOfWar.pcx handles both totally unknown and fogged tiles, indexed in the same file.
@@ -30,7 +30,7 @@ namespace C7.Map {
 				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTH]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST]))
 					sum += 27 * 2;
 				if (sum != 0) {
-					looseView.DrawTextureRectRegion(fogOfWarTexture, screenTarget, getRect(sum));
+					// DrawTextureRectRegion(fogOfWarTexture, screenTarget, getRect(sum));
 				}
 			}
 			//do nothing if the tile is known (equiv to the lower-right)

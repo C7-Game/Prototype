@@ -63,7 +63,7 @@ public partial class UnitSprite : Node2D {
 	}
 }
 
-public partial class UnitLayer : LooseLayer {
+public partial class UnitLayer {
 	private ImageTexture unitIcons;
 	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
@@ -109,7 +109,7 @@ public partial class UnitLayer : LooseLayer {
 	private int nextBlankAnimInst = 0;
 
 	// Returns the next unused AnimationInstance or creates & returns a new one if none are available.
-	public UnitSprite getBlankAnimationInstance(LooseView looseView) {
+	public UnitSprite getBlankAnimationInstance() {
 		if (nextBlankAnimInst >= animInsts.Count) {
 			// animInsts.Add(new AnimationInstance(looseView));
 		}
@@ -118,9 +118,9 @@ public partial class UnitLayer : LooseLayer {
 		return inst;
 	}
 
-	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
-		UnitSprite inst = getBlankAnimationInstance(looseView);
-		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
+	public void drawUnitAnimFrame(MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
+		UnitSprite inst = getBlankAnimationInstance();
+		// mapView.game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
 		string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
 
 		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
@@ -137,7 +137,7 @@ public partial class UnitLayer : LooseLayer {
 		inst.Show();
 	}
 
-	public void drawEffectAnimFrame(LooseView looseView, C7Animation anim, float progress, Vector2 tileCenter) {
+	public void drawEffectAnimFrame(C7Animation anim, float progress, Vector2 tileCenter) {
 		// var flicSheet = anim.getFlicSheet();
 		// var inst = getBlankAnimationInstance(looseView);
 		// setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
@@ -149,7 +149,7 @@ public partial class UnitLayer : LooseLayer {
 
 	private AnimatedSprite2D cursorSprite = null;
 
-	public void drawCursor(LooseView looseView, Vector2 position) {
+	public void drawCursor(Vector2 position) {
 		// Initialize cursor if necessary
 		if (cursorSprite == null) {
 			cursorSprite = new AnimatedSprite2D();
@@ -157,7 +157,6 @@ public partial class UnitLayer : LooseLayer {
 			cursorSprite.SpriteFrames = frames;
 			AnimationManager.loadCursorAnimation("Art/Animations/Cursor/Cursor.flc", ref frames);
 			cursorSprite.Animation = "cursor"; // hardcoded in loadCursorAnimation
-			looseView.AddChild(cursorSprite);
 		}
 
 		const double period = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
@@ -171,7 +170,7 @@ public partial class UnitLayer : LooseLayer {
 		cursorSprite.Show();
 	}
 
-	public override void onBeginDraw(LooseView looseView, GameData gameData) {
+	public void onBeginDraw(GameData gameData) {
 		// Reset animation instances
 		for (int n = 0; n < nextBlankAnimInst; n++) {
 			animInsts[n].Hide();
@@ -181,37 +180,37 @@ public partial class UnitLayer : LooseLayer {
 		// Hide cursor if it's been initialized
 		cursorSprite?.Hide();
 
-		looseView.mapView.game.updateAnimations(gameData);
+		// looseView.mapView.game.updateAnimations(gameData);
 	}
 
 	// Returns which unit should be drawn from among a list of units. The list is assumed to be non-empty.
-	public MapUnit selectUnitToDisplay(LooseView looseView, List<MapUnit> units) {
+	public MapUnit selectUnitToDisplay(List<MapUnit> units) {
 		// From the list, pick out which units are (1) the strongest defender vs the currently selected unit, (2) the currently selected unit
 		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
 		MapUnit bestDefender = units[0],
 			selected = null,
 			doingInterestingAnimation = null;
-		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
+		MapUnit currentlySelectedUnit = null; // looseView.mapView.game.CurrentlySelectedUnit;
 		foreach (var u in units) {
 			if (u == currentlySelectedUnit)
 				selected = u;
 			if (u.HasPriorityAsDefender(bestDefender, currentlySelectedUnit))
 				bestDefender = u;
-			if (looseView.mapView.game.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
-				doingInterestingAnimation = u;
+			// if (looseView.mapView.game.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
+			// 	doingInterestingAnimation = u;
 		}
 
 		// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
 		return selected != null ? selected : (doingInterestingAnimation != null ? doingInterestingAnimation : bestDefender);
 	}
 
-	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
+	public void drawObject(GameData gameData, Tile tile, Vector2 tileCenter) {
 		// First draw animated effects. These will always appear over top of units regardless of draw order due to z-index.
-		C7Animation tileEffect = looseView.mapView.game.animTracker.getTileEffect(tile);
-		if (tileEffect != null) {
-			(_, float progress) = looseView.mapView.game.animTracker.getCurrentActionAndProgress(tile);
-			drawEffectAnimFrame(looseView, tileEffect, progress, tileCenter);
-		}
+		// C7Animation tileEffect = looseView.mapView.game.animTracker.getTileEffect(tile);
+		// if (tileEffect != null) {
+		// 	(_, float progress) = looseView.mapView.game.animTracker.getCurrentActionAndProgress(tile);
+		// 	drawEffectAnimFrame(looseView, tileEffect, progress, tileCenter);
+		// }
 
 		if (tile.unitsOnTile.Count == 0) {
 			return;
@@ -219,50 +218,50 @@ public partial class UnitLayer : LooseLayer {
 
 		var white = Color.Color8(255, 255, 255);
 
-		MapUnit unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
-		MapUnit.Appearance appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
-		Vector2 animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * OldMapView.cellSize;
+		// MapUnit unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
+		// MapUnit.Appearance appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
+		// Vector2 animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * OldMapView.cellSize;
 
-		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
-		if ((unit != MapUnit.NONE) && (unit == looseView.mapView.game.CurrentlySelectedUnit)) {
-			drawCursor(looseView, tileCenter + animOffset);
-		}
+		// // If the unit we're about to draw is currently selected, draw the cursor first underneath it
+		// if ((unit != MapUnit.NONE) && (unit == looseView.mapView.game.CurrentlySelectedUnit)) {
+		// 	drawCursor(looseView, tileCenter + animOffset);
+		// }
 
-		drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
+		// drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
 
-		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
+		// Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
 
-		int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
-		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
-		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
-		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+		// int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
+		// Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
+		// Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
+		// var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
+		// looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
 
-		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5), hpIndWidth = 6;
-		Rect2 hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
-		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
-			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
-			looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
-			float hpHeight = hpFraction * (hpIndHeight - 2);
-			if (hpHeight < 1)
-				hpHeight = 1;
-			var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
-										   new Vector2(hpIndWidth - 2, hpHeight)); // size
-			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
-			if (unit.isFortified)
-				looseView.DrawRect(hpIndBackgroundRect, white, false);
-		}
+		// int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5), hpIndWidth = 6;
+		// Rect2 hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
+		// if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
+		// 	float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
+		// 	looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
+		// 	float hpHeight = hpFraction * (hpIndHeight - 2);
+		// 	if (hpHeight < 1)
+		// 		hpHeight = 1;
+		// 	var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
+		// 								   new Vector2(hpIndWidth - 2, hpHeight)); // size
+		// 	looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
+		// 	if (unit.isFortified)
+		// 		looseView.DrawRect(hpIndBackgroundRect, white, false);
+		// }
 
-		// Draw lines to show that there are more units on this tile
-		if (tile.unitsOnTile.Count > 1) {
-			int lineCount = tile.unitsOnTile.Count;
-			if (lineCount > 5)
-				lineCount = 5;
-			for (int n = 0; n < lineCount; n++) {
-				var lineStart = indicatorLoc + new Vector2(-2, hpIndHeight + 12 + 4 * n);
-				looseView.DrawLine(lineStart, lineStart + new Vector2(8, 0), white);
-				looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
-			}
-		}
+		// // Draw lines to show that there are more units on this tile
+		// if (tile.unitsOnTile.Count > 1) {
+		// 	int lineCount = tile.unitsOnTile.Count;
+		// 	if (lineCount > 5)
+		// 		lineCount = 5;
+		// 	for (int n = 0; n < lineCount; n++) {
+		// 		var lineStart = indicatorLoc + new Vector2(-2, hpIndHeight + 12 + 4 * n);
+		// 		looseView.DrawLine(lineStart, lineStart + new Vector2(8, 0), white);
+		// 		looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
+		// 	}
+		// }
 	}
 }
