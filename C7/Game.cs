@@ -553,7 +553,7 @@ public partial class Game : Node2D {
 	}
 
 	/**
-	 * User quit.  We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
+	 * User quit. We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
 	 **/
 	private void OnQuitTheGame() {
 		log.Information("Goodbye!");

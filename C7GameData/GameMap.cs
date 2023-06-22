@@ -87,14 +87,13 @@ namespace C7GameData
 		public bool isTileAt(int x, int y)
 		{
 			bool evenRow = y%2 == 0;
-			bool xInBounds; {
-				if (wrapHorizontally)
-					xInBounds = true;
-				else if (evenRow)
-					xInBounds = (x >= 0) && (x <= numTilesWide - 2);
-				else
-					xInBounds = (x >= 1) && (x <= numTilesWide - 1);
-			}
+			bool xInBounds;
+			if (wrapHorizontally)
+				xInBounds = true;
+			else if (evenRow)
+				xInBounds = (x >= 0) && (x <= numTilesWide - 2);
+			else
+				xInBounds = (x >= 1) && (x <= numTilesWide - 1);
 			return xInBounds && isRowAt(y) && (evenRow ? (x%2 == 0) : (x%2 != 0));
 		}
 
