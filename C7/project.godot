@@ -196,5 +196,7 @@ limits/debugger_stdout/max_chars_per_second=65535
 
 textures/canvas_textures/default_texture_filter=0
 environment/defaults/default_clear_color=Color(0.301961, 0.301961, 0.301961, 1)
+2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_2d_vertices_to_pixel=true
+lights_and_shadows/positional_shadow/atlas_quadrant_2_subdiv=0
 environment/default_environment="res://default_env.tres"
