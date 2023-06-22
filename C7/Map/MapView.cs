@@ -35,6 +35,7 @@ namespace C7.Map {
 		JungleVolcano,
 		PlainsForest,
 		GrasslandsForest,
+		TundraForest,
 		River,
 		Road,
 		Rail,
@@ -52,6 +53,7 @@ namespace C7.Map {
 	partial class MapView : Node2D {
 		private string[,]terrain;
 		private TileMap terrainTilemap;
+		private TileMap terrainTilemapShadow;
 		private TileSet terrainTileset;
 		private TileMap tilemap;
 		private TileSet tileset;
@@ -101,18 +103,21 @@ namespace C7.Map {
 			}
 		}
 
-		private TileSetAtlasSource loadForestSource(string relPath) {
+		private TileSetAtlasSource loadForestSource(string relPath, bool jungle = false) {
 			TileSetAtlasSource source = new TileSetAtlasSource{
 				Texture = Util.LoadTextureFromPCX(relPath),
 				TextureRegionSize = forestSize,
 			};
 			for (int x = 0; x < 6; x++) {
-				for (int y = 4; y < 10; y++) {
-					if ((y < 6 && x > 3) || (y < 8 && x > 4)) {
+				for (int y = 0; y < 10; y++) {
+					if ((y < 4 && !jungle) || (y < 2 && x > 3)) {
+						continue; // first 4 rows are for jungle tiles
+					}
+					if ((y > 3 && y < 6 && x > 3) || (y > 5 && y < 8 && x > 4)) {
 						continue; // forest tilemap is shaped like this
 					}
 					source.CreateTile(new Vector2I(x, y));
-					if (y == 4 || y == 5) {
+					if (y == 1 || y == 2 || y == 4 || y == 5) {
 						// offset big textures by 12 pixels
 						source.GetTileData(new Vector2I(x, y), 0).TextureOrigin = new Vector2I(0, 12);
 					}
@@ -121,11 +126,18 @@ namespace C7.Map {
 			return source;
 		}
 
+		public override void _Process(double delta) {
+			base._Process(delta);
+		}
+
 		private void initializeTileMap() {
 			terrainTilemap = new TileMap();
+			terrainTilemapShadow = new TileMap();
 			terrainTileset = Civ3TerrainTileSet.Generate();
 			terrainTilemap.TileSet = terrainTileset;
 			terrainTilemap.Position += Vector2I.Right * (tileSize.X / 2);
+			terrainTilemapShadow.TileSet = terrainTileset;
+			terrainTilemapShadow.Position = terrainTilemap.Position + (Vector2I.Left * tileSize.X * width);
 
 			tilemap = new TileMap{ YSortEnabled = true };
 			tileset = makeTileSet();
@@ -134,13 +146,13 @@ namespace C7.Map {
 			TileSetAtlasSource rails = loadAtlasSource("Art/Terrain/railroads.pcx", tileSize, 16, 16);
 
 			TileSetAtlasSource resources = new TileSetAtlasSource{
-				Texture = Util.LoadTextureFromPCX("Art/resources.pcx"),
+				Texture = Util.LoadTextureFromPCX("Conquests/Art/resources.pcx"),
 				TextureRegionSize = resourceSize,
 			};
-			for (int y = 0; y < 4; y++) {
+			for (int y = 0; y < 5; y++) {
 				for (int x = 0; x < 6; x++) {
-					if (x == 4 && y == 3) {
-						break;
+					if (y == 4 && x > 1) {
+						continue;
 					}
 					resources.CreateTile(new Vector2I(x, y));
 				}
@@ -173,7 +185,8 @@ namespace C7.Map {
 			addUniformOffsetsToAtlasSource(ref jungleVolcano, 4, 4, new Vector2I(0, 12));
 
 			TileSetAtlasSource plainsForest = loadForestSource("Art/Terrain/plains forests.pcx");
-			TileSetAtlasSource grasslandsForest = loadForestSource("Art/Terrain/grassland forests.pcx");
+			TileSetAtlasSource grasslandsForest = loadForestSource("Art/Terrain/grassland forests.pcx", true);
+			TileSetAtlasSource tundraForest = loadForestSource("Art/Terrain/tundra forests.pcx");
 
 			tileset.AddSource(roads, Atlas.Road.Index());
 			tileset.AddSource(rails, Atlas.Rail.Index());
@@ -189,6 +202,7 @@ namespace C7.Map {
 			tileset.AddSource(jungleMountain, Atlas.JungleMountain.Index());
 			tileset.AddSource(plainsForest, Atlas.PlainsForest.Index());
 			tileset.AddSource(grasslandsForest, Atlas.GrasslandsForest.Index());
+			tileset.AddSource(tundraForest, Atlas.TundraForest.Index());
 			tileset.AddSource(volcano, Atlas.Volcano.Index());
 			tileset.AddSource(forestVolcano, Atlas.ForestVolcano.Index());
 			tileset.AddSource(jungleVolcano, Atlas.JungleVolcano.Index());
@@ -203,6 +217,7 @@ namespace C7.Map {
 			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
 			AddChild(tilemap);
 			AddChild(terrainTilemap);
+			AddChild(terrainTilemapShadow);
 		}
 
 		private void setTerrainTiles() {
@@ -249,6 +264,7 @@ namespace C7.Map {
 
 		void setTerrainTile(Vector2I cell, int atlas, Vector2I texCoords) {
 			terrainTilemap.SetCell(0, cell, atlas, texCoords);
+			terrainTilemapShadow.SetCell(0, cell, atlas, texCoords);
 		}
 
 		private Vector2I stackedCoords(Tile tile) {
@@ -318,6 +334,9 @@ namespace C7.Map {
 		private void setCell(Layer layer, Atlas atlas, Tile tile, Vector2I atlasCoords) {
 			if (!tileset.HasSource(atlas.Index())) {
 				log.Warning($"atlas id {atlas} is not a valid tileset source");
+			}
+			if (!tileset.GetSource(atlas.Index()).HasTile(atlasCoords)) {
+				log.Warning($"atlas id {atlas} does not have tile at {atlasCoords}");
 			}
 			tilemap.SetCell(layer.Index(), stackedCoords(tile), atlas.Index(), atlasCoords);
 		}
@@ -487,7 +506,7 @@ namespace C7.Map {
 				(int row, int col) = (0, 0);
 				if (tile.isPineForest) {
 					row = 8 + tile.xCoordinate % 2; // pine starts at row 8 in atlas
-					col = tile.xCoordinate % 7;     // pine has 6 columns
+					col = tile.xCoordinate % 6;     // pine has 6 columns
 				} else {
 					bool small = tile.getEdgeNeighbors().Any(t => t.IsWater());
 					// this technically omits one large and one small tile but the math is simpler
@@ -502,9 +521,19 @@ namespace C7.Map {
 				Atlas atlas = tile.baseTerrainType.Key switch {
 					"plains" => Atlas.PlainsForest,
 					"grassland" => Atlas.GrasslandsForest,
+					"tundra" => Atlas.TundraForest,
 					_ => Atlas.PlainsForest,
 				};
 				setCell(Layer.TerrainOverlay, atlas, tile, new Vector2I(col, row));
+			} else if (tile.overlayTerrainType.Key == "jungle") {
+				// Randomly, but predictably, choose a large jungle graphic
+				// More research is needed on when to use large vs small jungles. Probably, small is used when neighboring fewer jungles.
+				// For the first pass, we're just always using large jungles.
+				(int row, int col) = (tile.xCoordinate % 2, tile.xCoordinate % 4);
+				if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
+					(row, col) = (2 + tile.xCoordinate % 2, 1 + (tile.xCoordinate % 5));
+				}
+				setCell(Layer.TerrainOverlay, Atlas.GrasslandsForest, tile, new Vector2I(col, row));
 			}
 		}
 
@@ -534,7 +563,7 @@ namespace C7.Map {
 			updateRoadLayer(tile, true);
 
 			if (tile.Resource != C7GameData.Resource.NONE) {
-				int index = tile.Resource.Index;
+				int index = tile.Resource.Icon;
 				Vector2I texCoord = new Vector2I(index % 6, index / 6);
 				setCell(Layer.Resource, Atlas.Resource, tile, texCoord);
 			} else {
