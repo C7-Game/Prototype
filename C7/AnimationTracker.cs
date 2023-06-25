@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using C7GameData;
-using C7Engine;
 
 public partial class AnimationTracker {
 	private AnimationManager civ3AnimData;
@@ -22,7 +21,7 @@ public partial class AnimationTracker {
 		public C7Animation anim;
 	}
 
-	private Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
+	public Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
 
 	public long getCurrentTimeMS()
 	{
@@ -45,8 +44,9 @@ public partial class AnimationTracker {
 		if (activeAnims.TryGetValue(id, out aa)) {
 			// If there's already an animation playing for this unit, end it first before replacing it
 			// TODO: Consider instead queueing up the new animation until after the first one is completed
-			if (aa.completionEvent != null)
+			if (aa.completionEvent is not null) {
 				aa.completionEvent.Set();
+			}
 		}
 		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, completionEvent = completionEvent,
 			ending = ending, anim = anim };
@@ -158,9 +158,6 @@ public partial class AnimationTracker {
 	public C7Animation getTileEffect(Tile tile)
 	{
 		ActiveAnimation aa;
-		if (activeAnims.TryGetValue(getTileID(tile), out aa))
-			return aa.anim;
-		else
-			return null;
+		return activeAnims.TryGetValue(getTileID(tile), out aa) ? aa.anim : null;
 	}
 }

@@ -25,7 +25,17 @@ namespace C7.Map {
 				showGrid = value;
 			}
 		}
+		private Game game;
 		private GameMap gameMap;
+
+		public override void _Draw() {
+			GD.Print("draw...");
+			game.animTracker.update();
+			foreach ((string id, AnimationTracker.ActiveAnimation anim) in game.animTracker.activeAnims) {
+				GD.Print($"{id}: {anim.ToString()}");
+			}
+			base._Draw();
+		}
 
 		public override void _Process(double delta) {
 			base._Process(delta);
@@ -48,6 +58,7 @@ namespace C7.Map {
 			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
 				if (layer != Layer.Invalid) {
 					tilemap.AddLayer(layer.Index());
+					tilemap.SetLayerYSortEnabled(layer.Index(), true);
 				}
 			}
 
@@ -108,6 +119,7 @@ namespace C7.Map {
 		}
 
 		public MapView(Game game, GameData data) {
+			this.game = game;
 			gameMap = data.map;
 			width = gameMap.numTilesWide / 2;
 			height = gameMap.numTilesTall;
