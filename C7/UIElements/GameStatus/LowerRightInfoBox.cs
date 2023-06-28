@@ -31,6 +31,7 @@ public partial class LowerRightInfoBox : TextureRect
 		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
 		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
 		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
+		boxRight.GetImage().SavePng("./box.png");
 		TextureRect boxRightRectangle = new TextureRect();
 		boxRightRectangle.Texture = boxRight;
 		boxRightRectangle.SetPosition(new Vector2(0, 0));
@@ -159,12 +160,6 @@ public partial class LowerRightInfoBox : TextureRect
 	///But for now it'll show the changing turn number, providing some interactivity
 	public void SetTurn(int turnNumber)
 	{
-		yearAndGold.Text = "Turn " + turnNumber + "  10 Gold (+0 per turn)";
+		yearAndGold.Text = $"Turn {turnNumber}  10 Gold (+0 per turn)";
 	}
-
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//
-//  }
 }
