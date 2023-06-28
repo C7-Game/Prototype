@@ -31,7 +31,6 @@ public partial class LowerRightInfoBox : TextureRect
 		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
 		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
 		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
-		boxRight.GetImage().SavePng("./box.png");
 		TextureRect boxRightRectangle = new TextureRect();
 		boxRightRectangle.Texture = boxRight;
 		boxRightRectangle.SetPosition(new Vector2(0, 0));
