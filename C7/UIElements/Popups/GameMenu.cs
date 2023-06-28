@@ -28,7 +28,6 @@ public partial class GameMenu : Popup
 
 	private void quit()
 	{
-		GD.Print("quitting...");
 		GetParent().EmitSignal("Quit");
 	}
 
