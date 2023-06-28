@@ -19,4 +19,4 @@ jobs:
           lfs: true
       - name: Compile
         run: |
-          /usr/share/dotnet build -m
+          dotnet build -m
