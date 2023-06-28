@@ -5,6 +5,7 @@ env:
   GODOT_VERSION: 4.0.3
   EXPORT_NAME: C7
   PROJECT_PATH: C7
+  DOTNET_INSTALL_DIR: /home
 
 jobs:
   build-dotnet-project:
@@ -19,4 +20,4 @@ jobs:
           lfs: true
       - name: Compile
         run: |
-          dotnet build -m
+          /home/dotnet build -m
