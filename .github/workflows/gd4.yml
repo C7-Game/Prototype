@@ -1,0 +1,22 @@
+name: Godot 4
+on: push
+
+env:
+  GODOT_VERSION: 4.0.3
+  EXPORT_NAME: C7
+  PROJECT_PATH: C7
+
+jobs:
+  build-dotnet-project:
+    name: Build C#
+    runs-on: ubuntu-20.04
+    container:
+      image: barichello/godot-ci:4.0.3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Compile
+        run: |
+          dotnet build -m
