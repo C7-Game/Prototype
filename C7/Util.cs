@@ -9,6 +9,7 @@ using C7GameData;
 using QueryCiv3;
 
 public partial class Util {
+	private static readonly string civ3RegistryKeyName = @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III";
 	static public string Civ3Root = Civ3Location.GetCiv3Path();
 	public partial class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
@@ -48,11 +49,11 @@ public partial class Util {
 		path = C7Settings.GetSettingValue("locations", "civ3InstallDir");
 		if (path != null) return path;
 
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+		if (OperatingSystem.IsWindows()) {
 			// Look up in Windows registry if present
 			path = Civ3PathFromRegistry();
 			if (path != null) { return path; }
-		} else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+		} else if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux()) {
 			// Check for a civ3 folder in steamapps/common
 			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(Util.SteamCommonDir());
 			foreach (System.IO.DirectoryInfo di in root.GetDirectories()) {
@@ -68,8 +69,10 @@ public partial class Util {
 	static public string Civ3PathFromRegistry() {
 		// Assuming 64-bit platform, get vanilla Civ3 install folder from registry
 		// Return null if value not present or if key not found
-		object path = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", null);
-		return path == null ? null : (string)path;
+		if (OperatingSystem.IsWindows()) {
+			return (string)Microsoft.Win32.Registry.GetValue(civ3RegistryKeyName, "install_path", null);
+		}
+		return null;
 	}
 
 	// Checks if a file exists ignoring case on the latter parts of its path. If the file is found, returns its full path re-capitalized as
