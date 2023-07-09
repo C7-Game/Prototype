@@ -7,28 +7,19 @@ using Godot;
  * easily.
  * Taken from https://github.com/godotengine/godot/issues/16706#issuecomment-394605337
  * Example sending:
- * 		ParameterWrapper wrappedUnit = new ParameterWrapper(SelectedUnit);
- *      EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
+ *     ParameterWrapper<MapUnit> wrappedUnit = new ParameterWrapper<MapUnit>(SelectedUnit);
+ *     EmitSignal(nameof(NewAutoselectedUnit), wrappedUnit);
  * Example receiving:
- *      public void OnNewUnitSelected(ParameterWrapper mapUnitThing) {
- *          MapUnit unwrappedUnit = mapUnitThing.GetValue<MapUnit>();
- *          //Do whatever you like with unwrappedUnit...
- *      }
+ *    public void OnNewUnitSelected(ParameterWrapper<MapUnit> mapUnitThing) {
+ *        MapUnit unwrappedUnit = mapUnitThing.Value;
+ *        // Do whatever you like with unwrappedUnit...
+ *    }
  **/
 
-// TODO(pcen): migrating to Godot 4 come back and check if this workaround is still needed
+public partial class ParameterWrapper<T> : RefCounted {
+	public T Value { get; private set; }
 
-public partial class ParameterWrapper : GodotObject
-{
-	private readonly object value;
-
-	public ParameterWrapper(object value)
-	{
-		this.value = value;
-	}
-
-	public T GetValue<T>()
-	{
-		return (T)this.value;
+	public ParameterWrapper(T value) {
+		Value = value;
 	}
 }

@@ -252,7 +252,7 @@ public partial class Game : Node2D {
 
 		// Also emit the signal for a new unit being selected, so other areas such as Game Status and Unit Buttons can update
 		if (CurrentlySelectedUnit != MapUnit.NONE) {
-			ParameterWrapper wrappedUnit = new ParameterWrapper(CurrentlySelectedUnit);
+			ParameterWrapper<MapUnit> wrappedUnit = new ParameterWrapper<MapUnit>(CurrentlySelectedUnit);
 			EmitSignal("NewAutoselectedUnit", wrappedUnit);
 		} else {
 			EmitSignal("NoMoreAutoselectableUnits");
