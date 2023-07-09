@@ -66,7 +66,9 @@ public partial class MainMenu : Node2D
 
 			// Hide select home folder if valid path is present as proven by reaching this point in code
 			SetCiv3Home.Visible = false;
-		} catch(Exception ex) {
+		}
+		catch(Exception ex)
+		{
 			log.Error(ex, "Could not set up the main menu");
 			GetNode<Label>("CanvasLayer/Label").Visible = true;
 			GetNode<ColorRect>("CanvasLayer/ColorRect").Visible = true;
@@ -88,14 +90,14 @@ public partial class MainMenu : Node2D
 		newButton.TextureHover = HoverButton;
 		newButton.SetPosition(new Vector2(MENU_OFFSET_FROM_LEFT, MENU_OFFSET_FROM_TOP + verticalPosition));
 		MainMenuBackground.AddChild(newButton);
-		newButton.Connect("pressed",new Callable(this, actionName));
+		newButton.Connect("pressed",new Callable(this,actionName));
 
 		Button newButtonLabel = new Button();
 		newButtonLabel.Text = label;
 
 		newButtonLabel.SetPosition(new Vector2(MENU_OFFSET_FROM_LEFT + 25, MENU_OFFSET_FROM_TOP + verticalPosition + BUTTON_LABEL_OFFSET));
 		MainMenuBackground.AddChild(newButtonLabel);
-		newButtonLabel.Connect("pressed", new Callable(this, actionName));
+		newButtonLabel.Connect("pressed",new Callable(this,actionName));
 	}
 
 	public void StartGame()
@@ -132,12 +134,13 @@ public partial class MainMenu : Node2D
 
 	public void Preferences()
 	{
+
 		PlayButtonPressedSound();
 	}
 
 	public void _on_Exit_pressed()
 	{
-		GetTree().Quit(); // no need to notify the scene tree
+		GetTree().Notification(111/*MainLoop.NotificationWmQuitRequest*/);
 	}
 
 	private void PlayButtonPressedSound()
@@ -150,7 +153,7 @@ public partial class MainMenu : Node2D
 
 	private void _on_FileDialog_file_selected(string path)
 	{
-		log.Information($"loading {path}");
+		log.Information("loading {path}", path);
 		Global.LoadGamePath = path;
 		GetTree().ChangeSceneToFile("res://C7Game.tscn");
 	}
