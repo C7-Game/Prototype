@@ -20,7 +20,7 @@ public partial class PCXToGodot : GodotObject
 	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
 	 **/
 	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
-		int[] ColorData = loadPalette(pcx.Palette);
+		int[] ColorData = loadPalette(pcx.Palette, true);
 		int[] BufferData = new int[croppedWidth * croppedHeight];
 
 		int DataIndex = 0;
@@ -64,7 +64,7 @@ public partial class PCXToGodot : GodotObject
 	//Combines two PCXs, one used for the alpha, to produce a final output image.
 	//Some files, such as Art/interface/menuButtons.pcx and Art/interface/menuButtonsAlpha.pcx, use this method.
 	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight, int alphaRowOffset = 0) {
-		int[] ColorData = loadPalette(imagePcx.Palette);
+		int[] ColorData = loadPalette(imagePcx.Palette, false);
 		int[] AlphaData = loadAlphaPalette(alphaPcx.Palette, ColorData);
 		int[] BufferData = new int[croppedWidth * croppedHeight];
 
@@ -136,7 +136,7 @@ public partial class PCXToGodot : GodotObject
 		return ImageTexture.CreateFromImage(image);
 	}
 
-	private static int[] loadPalette(byte[,] palette, bool shadows = true) {
+	private static int[] loadPalette(byte[,] palette, bool shadows) {
 		int Red, Green, Blue;
 		int Alpha = 255 << 24;
 		int[] ColorData = new int[256];
