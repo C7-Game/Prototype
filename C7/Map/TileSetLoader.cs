@@ -13,6 +13,7 @@ namespace C7.Map {
 		Resource,
 		TerrainYield,
 		Building,
+		Grid,
 		Invalid,
 	};
 
@@ -44,6 +45,7 @@ namespace C7.Map {
 		TerrainYield,
 		TerrainBuilding,
 		GoodyHut,
+		Grid,
 		Invalid,
 	}
 
@@ -68,7 +70,7 @@ namespace C7.Map {
 			height = h;
 			regionSize = rs;
 			textureOrigin = new Vector2I(0, y);
-			source = new TileSetAtlasSource{
+			source = new TileSetAtlasSource {
 				Texture = Util.LoadTextureFromPCX(path),
 				TextureRegionSize = regionSize,
 			};
@@ -140,7 +142,7 @@ namespace C7.Map {
 	}
 
 	class MarshAtlasLoader : AtlasLoader {
-		public MarshAtlasLoader(string p, Vector2I rs) : base(p, -1, -1, rs, 12) {}
+		public MarshAtlasLoader(string p, Vector2I rs) : base(p, -1, -1, rs, 12) { }
 
 		protected override void load() {
 			// TODO: incomplete
@@ -216,6 +218,13 @@ namespace C7.Map {
 				TileSetAtlasSource source = loader.Load();
 				tileset.AddSource(source, atlas.Index());
 			}
+
+			TileSetAtlasSource gridSource = new TileSetAtlasSource{
+				Texture = Util.LoadTextureFromC7JPG("Art/grid.png"),
+				TextureRegionSize = tileSize,
+			};
+			gridSource.CreateTile(Vector2I.Zero);
+			tileset.AddSource(gridSource, Atlas.Grid.Index());
 
 			return tileset;
 		}
