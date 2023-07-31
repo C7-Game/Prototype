@@ -1,4 +1,6 @@
-[gd_resource type="Theme" load_steps=6 format=3 uid="uid://c1jpmssnhvodi"]
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://c1jpmssnhvodi"]
+
+[ext_resource type="FontFile" uid="uid://c1qd602n7xu3h" path="res://Fonts/NotoSans-Regular.ttf" id="1_6qeon"]
 
 [sub_resource type="StyleBoxEmpty" id="3"]
 
@@ -25,13 +27,19 @@ Button/colors/font_color = Color(0, 0, 0, 1)
 Button/colors/font_color_focus = Color(0, 0.45098, 0.741176, 1)
 Button/colors/font_color_hover = Color(0.709804, 0.352941, 0, 1)
 Button/colors/font_color_pressed = Color(0, 0.45098, 0.741176, 1)
+Button/font_sizes/font_size = 13
+Button/fonts/font = ExtResource("1_6qeon")
 Button/styles/focus = SubResource("3")
 Button/styles/hover = SubResource("4")
 Button/styles/normal = SubResource("6")
 Button/styles/pressed = SubResource("5")
 Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 14
+Label/fonts/font = ExtResource("1_6qeon")
 LineEdit/colors/cursor_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_color = Color(0, 0, 0, 1)
 LineEdit/colors/selection_color = Color(0.709804, 0.807843, 0.709804, 1)
+LineEdit/font_sizes/font_size = 14
+LineEdit/fonts/font = ExtResource("1_6qeon")
 LineEdit/styles/focus = SubResource("7")
 LineEdit/styles/normal = SubResource("7")
