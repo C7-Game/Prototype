@@ -274,7 +274,9 @@ namespace C7Engine {
 
 		public static void OnEnterTile(this MapUnit unit, Tile tile) {
 			//Add to player knowledge of tiles
-			unit.owner.tileKnowledge.AddTilesToKnown(tile);
+			if (unit.owner.tileKnowledge.AddTilesToKnown(tile)) {
+				new MsgTileDiscovered(tile).send();
+			}
 
 			// Disperse barb camp
 			if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {

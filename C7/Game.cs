@@ -138,9 +138,7 @@ public partial class Game : Node2D {
 					}
 					break;
 				case MsgStartEffectAnimation mSEA:
-					int x, y;
-					gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
-					Tile tile = gameData.map.tileAt(x, y);
+					Tile tile = gameData.map.tileAtIndex(mSEA.tileIndex);
 					if (tile != Tile.NONE && controller.tileKnowledge.isTileKnown(tile))
 						animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
 					else {
@@ -151,10 +149,16 @@ public partial class Game : Node2D {
 				case MsgStartTurn mST:
 					OnPlayerStartTurn();
 					break;
+
 				case MsgCityBuilt mBC:
 					Tile cityTile = gameData.map.tiles[mBC.tileIndex];
 					City city = cityTile.cityAtTile;
 					mapView.addCity(city, cityTile);
+					break;
+
+				case MsgTileDiscovered mTD:
+					Tile discoveredTile = gameData.map.tileAtIndex(mTD.tileIndex);
+					mapView.discoverTile(discoveredTile, controller.tileKnowledge);
 					break;
 			}
 		}
