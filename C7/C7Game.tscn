@@ -92,8 +92,6 @@ script = ExtResource("9")
 
 [node name="PopupSound" type="AudioStreamPlayer" parent="CanvasLayer/PopupOverlay"]
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 [node name="Control" type="Control" parent="CanvasLayer"]
 layout_mode = 3
 anchors_preset = 15
