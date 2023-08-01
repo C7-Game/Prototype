@@ -268,9 +268,6 @@ libraries = {
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
-<<<<<<< HEAD
-[connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]
-[connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
 [connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/Control/GameStatus" to="." method="OnPlayerEndTurn"]
 [connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
@@ -281,8 +278,6 @@ libraries = {
 [connection signal="pressed" from="CanvasLayer/Control/SlideOutBar/VBoxContainer/UpButton" to="." method="_on_UpButton_pressed"]
 [connection signal="value_changed" from="CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom" to="." method="_on_Zoom_value_changed"]
 [connection signal="pressed" from="CanvasLayer/Control/SlideOutBar/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
-=======
 [connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="CloseCurrentPopup"]
 [connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
 [connection signal="SaveGame" from="CanvasLayer/PopupOverlay" to="." method="OnSaveGame"]
->>>>>>> e0c33c8 (add Camera2D)

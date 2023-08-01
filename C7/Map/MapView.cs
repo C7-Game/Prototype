@@ -207,7 +207,7 @@ namespace C7.Map {
 				string[] corner = corners(x, y);
 				TerrainPcx pcx = Civ3TerrainTileSet.GetPcxFor(corner);
 				Vector2I texCoords = pcx.getTextureCoords(corner);
-				this.setTerrainTile(cell, pcx.atlas, texCoords);
+				setTerrainMapTile(cell, pcx.atlas, texCoords);
 			}
 			// Start with left tile of terrain intersection being x = 0,
 			// and end at x = width - 2, since the edges of the tilemap
@@ -256,7 +256,7 @@ namespace C7.Map {
 			}
 		}
 
-		void setTerrainTile(Vector2I cell, int atlas, Vector2I texCoords) {
+		void setTerrainMapTile(Vector2I cell, int atlas, Vector2I texCoords) {
 			terrainTilemap.SetCell(0, cell, atlas, texCoords);
 			terrainTilemapShadow.SetCell(0, cell, atlas, texCoords);
 		}
