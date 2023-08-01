@@ -43,7 +43,7 @@ project.lock.json
 *.sln.docstates
 C7.ini
 log.txt
-*.csproj.old
+*.csproj.old*
 
 # Build results
 [Dd]ebug/
