@@ -221,6 +221,8 @@ public partial class Util {
 		return texture;
 	}
 
+	static public ImageTexture LoadFogOfWarPCX(string relPath) => PCXToGodot.getImageTextureFromFogOfWarPCX(LoadPCX(relPath));
+
 	private static Dictionary<string, Pcx> PcxCache = new Dictionary<string, Pcx>();
 
 	/**

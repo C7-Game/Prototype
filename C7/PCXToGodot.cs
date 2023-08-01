@@ -16,6 +16,20 @@ public partial class PCXToGodot : GodotObject
 		return getImageTextureFromImage(image);
 	}
 
+	public static ImageTexture getImageTextureFromFogOfWarPCX(Pcx pcx) {
+ 		Image ImgTxtr = ByteArrayToImage(pcx.ColorIndices, pcx.Palette, pcx.Width, pcx.Height);
+ 		for (int x = 0; x < ImgTxtr.GetWidth(); x++) {
+ 			for (int y = 0; y < ImgTxtr.GetHeight(); y++) {
+ 				Color pixel = ImgTxtr.GetPixel(x, y);
+ 				if (pixel.A > 0) {
+ 					Color transparent = new Color(pixel.R, pixel.G, pixel.B, 1f - pixel.R);
+ 					ImgTxtr.SetPixel(x, y, transparent);
+ 				}
+ 			}
+ 		}
+ 		return getImageTextureFromImage(ImgTxtr);
+ 	}
+
 	/**
 	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
 	 **/

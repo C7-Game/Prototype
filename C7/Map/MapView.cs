@@ -155,6 +155,11 @@ namespace C7.Map {
 				if (layer != Layer.Invalid) {
 					tilemap.AddLayer(layer.Index());
 					tilemap.SetLayerYSortEnabled(layer.Index(), true);
+					if (layer != Layer.FogOfWar) {
+ 						tilemap.SetLayerYSortEnabled(layer.Index(), true);
+ 					} else {
+ 						tilemap.SetLayerZIndex(layer.Index(), 15);
+ 					}
 				}
 			}
 
@@ -241,8 +246,9 @@ namespace C7.Map {
 			setTerrainTiles();
 
 			// update each tile once to add all initial layers
+			TileKnowledge tk = data.GetHumanPlayers().First()?.tileKnowledge;
 			foreach (Tile tile in gameMap.tiles) {
-				updateTile(tile);
+				updateTile(tile, tk);
 			}
 		}
 
@@ -496,11 +502,41 @@ namespace C7.Map {
 			}
 		}
 
-		public void updateTile(Tile tile) {
+		// updateFogOfWarLayer returns true if the tile is visible or
+ 		// semi-visible, indicating other layers should be updated.
+ 		private bool updateFogOfWarLayer(Tile tile, TileKnowledge tk) {
+ 			if (!tk.isTileKnown(tile)) {
+ 				int sum = 0;
+ 				if (tk.isTileKnown(tile.neighbors[TileDirection.NORTH]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST])) {
+ 					sum += 1 * 2;
+ 				}
+ 				if (tk.isTileKnown(tile.neighbors[TileDirection.WEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST])) {
+ 					sum += 3 * 2;
+ 				}
+ 				if (tk.isTileKnown(tile.neighbors[TileDirection.EAST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+ 					sum += 9 * 2;
+ 				}
+ 				if (tk.isTileKnown(tile.neighbors[TileDirection.SOUTH]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+ 					sum += 27 * 2;
+ 				}
+ 				setCell(Layer.FogOfWar, Atlas.FogOfWar, tile, new Vector2I(sum % 9, sum / 9));
+ 				return sum != 0; // if the sum is not 0, parts of the tile may be visible
+ 			}
+ 			return true; // no fog of war, tile
+ 		}
+
+		public void updateTile(Tile tile, TileKnowledge tk) {
 			if (tile == Tile.NONE || tile is null) {
 				string msg = tile is null ? "null tile" : "Tile.NONE";
 				log.Warning($"attempting to update {msg}");
 				return;
+			}
+
+			if (tk is not null) {
+				bool isTileVisibile = updateFogOfWarLayer(tile, tk);
+				if (!isTileVisibile) {
+					return;
+				}
 			}
 
 			updateRoadLayer(tile, true);
