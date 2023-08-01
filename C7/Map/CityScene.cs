@@ -13,7 +13,7 @@ namespace C7.Map {
 		private CityLabelScene cityLabelScene;
 
 		public CityScene(City city, Tile tile) {
-			ZIndex = 20;
+			ZIndex = MapZIndex.Cities;
 			cityLabelScene = new CityLabelScene(city, tile);
 
 			//TODO: Generalize, support multiple city types, etc.
