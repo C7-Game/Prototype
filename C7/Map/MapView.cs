@@ -8,6 +8,14 @@ using C7Engine;
 
 namespace C7.Map {
 
+	public static class MapZIndex {
+		public static readonly int Tiles = 10;
+		public static readonly int Cities = 20;
+		public static readonly int Cursor = 29;
+		public static readonly int Units = 30;
+		public static readonly int FogOfWar = 100;
+	}
+
 	public partial class MapView : Node2D {
 		private string[,]terrain;
 		private TileMap terrainTilemap;
@@ -158,12 +166,12 @@ namespace C7.Map {
 					if (layer != Layer.FogOfWar) {
  						tilemap.SetLayerYSortEnabled(layer.Index(), true);
  					} else {
- 						tilemap.SetLayerZIndex(layer.Index(), 15);
+ 						tilemap.SetLayerZIndex(layer.Index(), MapZIndex.FogOfWar);
  					}
 				}
 			}
 
-			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
+			tilemap.ZIndex = MapZIndex.Tiles;
 			AddChild(tilemap);
 			AddChild(terrainTilemap);
 			// AddChild(terrainTilemapShadow);

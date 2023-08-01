@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using C7GameData;
-using C7Engine;
 using ConvertCiv3Media;
 using Godot;
+using C7.Map;
 
 // UnitSprite represents an animated unit. It's specific to a unit, action, and direction.
 // UnitSprite comprises two sprites: a base sprite and a civ color-tinted sprite. The
@@ -12,7 +11,7 @@ using Godot;
 //       use a single instance of a material and UnitSprite use a per instance uniform
 public partial class UnitSprite : Node2D {
 
-	private readonly int unitAnimZIndex = 100;
+	private readonly int unitAnimZIndex = MapZIndex.Units;
 	private readonly string unitShaderPath = "res://UnitTint.gdshader";
 	private readonly string unitColorShaderParameter = "tintColor";
 	private Shader unitShader;
@@ -76,7 +75,7 @@ public partial class CursorSprite : Node2D {
 	private readonly string animationPath = "Art/Animations/Cursor/Cursor.flc";
 	private readonly string animationName = "cursor";
 	private readonly double period = 2.5;
-	private readonly int cursorAnimZIndex = 50;
+	private readonly int cursorAnimZIndex = MapZIndex.Cursor;
 	private AnimatedSprite2D sprite;
 	private int frameCount;
 
