@@ -23,17 +23,6 @@ namespace C7.Map {
 		private int height;
 		bool wrapHorizontally;
 		bool wrapVertically;
-		private bool showGrid = false;
-		private void setShowGrid(bool value) {
-			bool update = showGrid != value;
-			showGrid = value;
-			if (update) {
-				updateGridLayer();
-			}
-		}
-		public void toggleGrid() {
-			setShowGrid(!showGrid);
-		}
 		private Game game;
 		private GameData data;
 		private GameMap gameMap;
@@ -305,7 +294,6 @@ namespace C7.Map {
 			foreach (Tile tile in gameMap.tiles) {
 				updateTile(tile);
 			}
-			setShowGrid(true);
 		}
 
 		public Tile tileAt(GameMap gameMap, Vector2 globalMousePosition) {
@@ -590,16 +578,6 @@ namespace C7.Map {
 				if (!cityScenes.ContainsKey(city)) {
 					addCity(city, tile);
 				}
-			}
-		}
-
-		private void updateGridLayer() {
-			if (showGrid) {
-				foreach (Tile tile in data.map.tiles) {
-					setCell(Layer.Grid, Atlas.Grid, tile, Vector2I.Zero);
-				}
-			} else {
-				tilemap.ClearLayer(Layer.Grid.Index());
 			}
 		}
 	}
