@@ -80,7 +80,7 @@ namespace C7.Map {
 			cityScenes.Add(city, scene);
 		}
 
-		private void animateUnit(Tile tile, MapUnit unit) {
+		private void animateUnit(Tile tile, MapUnit unit, HorizontalWrapState wrap) {
 			// TODO: simplify AnimationManager and drawing animations it is unnecessarily complex
 			// - also investigate if the custom offset tracking and SetFrame can be replaced by
 			//   engine functionality
@@ -99,8 +99,17 @@ namespace C7.Map {
 			sprite.SetFrame(frame);
 			sprite.Show();
 
+			Vector2 wrapOffset = wrap switch {
+				HorizontalWrapState.Left => Vector2.Left,
+				HorizontalWrapState.Right => Vector2.Right,
+				_ => Vector2.Zero,
+			} * pixelWidth;
+			sprite.Translate(wrapOffset);
+
 			if (unit == game.CurrentlySelectedUnit) {
-				cursor.Position = position;
+				// TODO: just noticed cursor position maybe should not be
+				// on sprite position which has a potential offset?
+				cursor.Position = position + wrapOffset;
 				cursor.Show();
 			}
 		}
@@ -126,15 +135,20 @@ namespace C7.Map {
 			return selected ?? interesting ?? bestDefender;
 		}
 
-		public List<Tile> getVisibleTiles() {
-			List<Tile> tiles = new List<Tile>();
+		public List<(Tile, HorizontalWrapState)> getVisibleTiles() {
+			List<(Tile, HorizontalWrapState)> tiles = new List<(Tile, HorizontalWrapState)>();
 			Rect2 bounds = game.camera.getVisibleWorld();
 			Vector2I topLeft = tilemap.LocalToMap(ToLocal(bounds.Position));
 			Vector2I bottomRight = tilemap.LocalToMap(ToLocal(bounds.End));
 			for (int x = topLeft.X - 1; x < bottomRight.X + 1; x++) {
 				for (int y = topLeft.Y - 1; y < bottomRight.Y + 1; y++) {
 					(int usX, int usY) = unstackedCoords(new Vector2I(x, y));
-					tiles.Add(data.map.tileAt(usX, usY));
+					HorizontalWrapState wrap = x switch {
+						_ when x < 0 => HorizontalWrapState.Left,
+						_ when x >= width => HorizontalWrapState.Right,
+						_ => HorizontalWrapState.None,
+					};
+					tiles.Add((data.map.tileAt(usX, usY), wrap));
 				}
 			}
 			return tiles;
@@ -145,11 +159,12 @@ namespace C7.Map {
 				s.Hide();
 			}
 			cursor.Hide();
-			foreach (Tile tile in getVisibleTiles()) {
+			foreach ((Tile tile, HorizontalWrapState wrap) in getVisibleTiles()) {
 				MapUnit unit = selectUnitToDisplay(tile.unitsOnTile);
 				if (unit != MapUnit.NONE) {
-					animateUnit(tile, unit);
+					animateUnit(tile, unit, wrap);
 				}
+				// TODO: shift city scenes here?
 			}
 		}
 
