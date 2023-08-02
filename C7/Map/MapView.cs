@@ -19,9 +19,10 @@ namespace C7.Map {
 	public partial class MapView : Node2D {
 		private string[,]terrain;
 		private TileMap terrainTilemap;
-		private TileMap terrainTilemapShadow;
+		private TileMap wrappingTerrainTilemap;
 		private TileSet terrainTileset;
 		private TileMap tilemap;
+		private TileMap wrappingTilemap;
 		private TileSet tileset;
 		private Vector2I tileSize = new Vector2I(128, 64);
 		private ILogger log = LogManager.ForContext<MapView>();
@@ -40,6 +41,7 @@ namespace C7.Map {
  		public void toggleGrid() {
  			setShowGrid(!showGrid);
  		}
+		public int pixelWidth {get; private set;}
 		private Game game;
 		private GameData data;
 		private GameMap gameMap;
@@ -145,36 +147,61 @@ namespace C7.Map {
 			}
 		}
 
+		public enum WrapSide
+		{
+			Left,
+			Right,
+		}
+
+		public void setWrapSide(WrapSide side) {
+			if (side == WrapSide.Left) {
+				wrappingTerrainTilemap.Position = terrainTilemap.Position + (Vector2I.Left * pixelWidth);
+				wrappingTilemap.Position = tilemap.Position + (Vector2I.Left * pixelWidth);
+			} else {
+				wrappingTerrainTilemap.Position = terrainTilemap.Position + (Vector2I.Right * pixelWidth);
+				wrappingTilemap.Position = tilemap.Position + (Vector2I.Right * pixelWidth);
+			}
+		}
+
 		private void initializeTileMap() {
 			terrainTilemap = new TileMap();
-			terrainTilemapShadow = new TileMap();
+			wrappingTerrainTilemap = new TileMap();
 			terrainTileset = Civ3TerrainTileSet.Generate();
 			terrainTilemap.TileSet = terrainTileset;
 			terrainTilemap.Position += Vector2I.Right * (tileSize.X / 2);
-			terrainTilemapShadow.TileSet = terrainTileset;
-			terrainTilemapShadow.Position = terrainTilemap.Position + (Vector2I.Left * tileSize.X * width);
+			wrappingTerrainTilemap.TileSet = terrainTileset;
 
 			tilemap = new TileMap{ YSortEnabled = true };
+			wrappingTilemap = new TileMap { YSortEnabled = true };
+
 			tileset = TileSetLoader.LoadCiv3TileSet();
 			tilemap.TileSet = tileset;
+			wrappingTilemap.TileSet = tileset;
 
 			// create tilemap layers
 			foreach (Layer layer in Enum.GetValues(typeof(Layer))) {
 				if (layer != Layer.Invalid) {
 					tilemap.AddLayer(layer.Index());
-					tilemap.SetLayerYSortEnabled(layer.Index(), true);
+					wrappingTilemap.AddLayer(layer.Index());
 					if (layer != Layer.FogOfWar) {
  						tilemap.SetLayerYSortEnabled(layer.Index(), true);
+						wrappingTilemap.SetLayerYSortEnabled(layer.Index(), true);
  					} else {
  						tilemap.SetLayerZIndex(layer.Index(), MapZIndex.FogOfWar);
+						wrappingTilemap.SetLayerZIndex(layer.Index(), MapZIndex.FogOfWar);
  					}
 				}
 			}
 
-			tilemap.ZIndex = MapZIndex.Tiles;
+			// put the wrapping tilemaps somewhere
+			setWrapSide(WrapSide.Right);
+
+			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
+			wrappingTilemap.ZIndex = 10;
 			AddChild(tilemap);
+			AddChild(wrappingTilemap);
 			AddChild(terrainTilemap);
-			// AddChild(terrainTilemapShadow);
+			AddChild(wrappingTerrainTilemap);
 		}
 
 		private void setTerrainTiles() {
@@ -211,7 +238,7 @@ namespace C7.Map {
 
 		void setTerrainTile(Vector2I cell, int atlas, Vector2I texCoords) {
 			terrainTilemap.SetCell(0, cell, atlas, texCoords);
-			terrainTilemapShadow.SetCell(0, cell, atlas, texCoords);
+			wrappingTerrainTilemap.SetCell(0, cell, atlas, texCoords);
 		}
 
 		private Vector2I stackedCoords(Tile tile) {
@@ -235,6 +262,7 @@ namespace C7.Map {
 			cursor = new CursorSprite();
 			AddChild(cursor);
 			width = gameMap.numTilesWide / 2;
+			pixelWidth = width * tileSize.X;
 			height = gameMap.numTilesTall;
 			initializeTileMap();
 			terrain = new string[width, height];
@@ -276,10 +304,12 @@ namespace C7.Map {
 				log.Warning($"atlas id {atlas} does not have tile at {atlasCoords}");
 			}
 			tilemap.SetCell(layer.Index(), stackedCoords(tile), atlas.Index(), atlasCoords);
+			wrappingTilemap.SetCell(layer.Index(), stackedCoords(tile), atlas.Index(), atlasCoords);
 		}
 
 		private void eraseCell(Layer layer, Tile tile) {
 			tilemap.EraseCell(layer.Index(), stackedCoords(tile));
+			wrappingTilemap.EraseCell(layer.Index(), stackedCoords(tile));
 		}
 
 		private void updateRoadLayer(Tile tile, bool center) {
