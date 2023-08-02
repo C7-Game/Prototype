@@ -173,7 +173,44 @@ public partial class Game : Node2D {
 		mapView.updateAnimations();
 	}
 
+	private bool onRight = false;
+	private bool onLeft = false;
+
+	private void checkMapWrap() {
+		var w2d = camera.getVisibleWorld();
+
+		// detect leaving original map
+		if (!onRight && w2d.End.X >= mapView.worldEdgeRight) {
+			onRight = true;
+			mapView.setWrapSide(MapView.WrapSide.Right);
+			GD.Print("world edge right visible");
+		} else if (onRight && w2d.End.X < mapView.worldEdgeRight) {
+			onRight = false;
+			GD.Print("world edge right no longer visible");
+		}
+		if (!onLeft && w2d.Position.X <= mapView.worldEdgeLeft) {
+			onLeft = true;
+			mapView.setWrapSide(MapView.WrapSide.Left);
+			GD.Print("world edge left visible");
+		} else if (onLeft && w2d.Position.X > mapView.worldEdgeLeft) {
+			onLeft = false;
+			GD.Print("world edge left no longer visible");
+		}
+
+		// detect teleporting back into original map
+		if (onRight && w2d.Position.X > mapView.worldEdgeRight) {
+			// completely off right side of map
+			GD.Print("jumping left back into map");
+			camera.Translate(Vector2.Left * mapView.pixelWidth);
+		} else if (onLeft && w2d.End.X < mapView.worldEdgeLeft) {
+			// completely off left side of map
+			GD.Print("jumping right back into map");
+			camera.Translate(Vector2.Right * mapView.pixelWidth);
+		}
+	}
+
 	public override void _Process(double delta) {
+		checkMapWrap();
 		processActions();
 
 		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
