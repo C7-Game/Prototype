@@ -173,36 +173,40 @@ public partial class Game : Node2D {
 		mapView.updateAnimations();
 	}
 
-	private bool onRight = false;
-	private bool onLeft = false;
+	private HorizontalWrapState horizontalWrap;
 
+	// TODO: pass the camera's visible world rect into MapView and let MapView
+	// update its apperance... then MapView can move camera or return something
+	// indicating Game should move the camera?
 	private void checkMapWrap() {
 		var w2d = camera.getVisibleWorld();
 
 		// detect leaving original map
-		if (!onRight && w2d.End.X >= mapView.worldEdgeRight) {
-			onRight = true;
-			mapView.setWrapSide(MapView.WrapSide.Right);
+		// TODO: do we need to worry about both left and right sides of the
+		// map wrapping at the same time? (ie. on a huge monitor)
+		if (horizontalWrap != HorizontalWrapState.Right && w2d.End.X >= mapView.worldEdgeRight) {
+			horizontalWrap = HorizontalWrapState.Right;
+			mapView.setHorizontalWrap(horizontalWrap);
 			GD.Print("world edge right visible");
-		} else if (onRight && w2d.End.X < mapView.worldEdgeRight) {
-			onRight = false;
+		} else if (horizontalWrap == HorizontalWrapState.Right && w2d.End.X < mapView.worldEdgeRight) {
+			horizontalWrap = HorizontalWrapState.None;
 			GD.Print("world edge right no longer visible");
 		}
-		if (!onLeft && w2d.Position.X <= mapView.worldEdgeLeft) {
-			onLeft = true;
-			mapView.setWrapSide(MapView.WrapSide.Left);
+		if (horizontalWrap != HorizontalWrapState.Left && w2d.Position.X <= mapView.worldEdgeLeft) {
+			horizontalWrap = HorizontalWrapState.Left;
+			mapView.setHorizontalWrap(horizontalWrap);
 			GD.Print("world edge left visible");
-		} else if (onLeft && w2d.Position.X > mapView.worldEdgeLeft) {
-			onLeft = false;
+		} else if (horizontalWrap == HorizontalWrapState.Left && w2d.Position.X > mapView.worldEdgeLeft) {
+			horizontalWrap = HorizontalWrapState.None;
 			GD.Print("world edge left no longer visible");
 		}
 
 		// detect teleporting back into original map
-		if (onRight && w2d.Position.X > mapView.worldEdgeRight) {
+		if (horizontalWrap == HorizontalWrapState.Right && w2d.Position.X > mapView.worldEdgeRight) {
 			// completely off right side of map
 			GD.Print("jumping left back into map");
 			camera.Translate(Vector2.Left * mapView.pixelWidth);
-		} else if (onLeft && w2d.End.X < mapView.worldEdgeLeft) {
+		} else if (horizontalWrap == HorizontalWrapState.Left && w2d.End.X < mapView.worldEdgeLeft) {
 			// completely off left side of map
 			GD.Print("jumping right back into map");
 			camera.Translate(Vector2.Right * mapView.pixelWidth);
