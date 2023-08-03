@@ -15,12 +15,12 @@ namespace C7.Map {
 		private readonly float minZoom = 0.2f;
 		public float zoomFactor { get; private set; } = 1.0f;
 		private MapView map;
-		private int wrapLeeway = 2; // leeway in number of tiles to consider camera at map edge
+		private int wrapEdgeTileMargin = 2; // margin in number of tiles to trigger map wrapping
 		private HorizontalWrapState hwrap = HorizontalWrapState.None;
 
 		public void attachToMapView(MapView map) {
 			this.map = map;
-			worldWrapLeeway = wrapLeeway * map.tileSize.X;
+			wrapEdgeMargin = wrapEdgeTileMargin * map.tileSize.X;
 			map.updateAnimations();
 			checkWorldWrap();
 		}
@@ -47,15 +47,22 @@ namespace C7.Map {
 			Position = position;
 			checkWorldWrap();
 		}
-		private int worldWrapLeeway = 0;
-
-		private bool enteringRightWrap(Rect2 v) => hwrap != HorizontalWrapState.Right && v.End.X >= map.worldEdgeRight - worldWrapLeeway;
-		private bool enteringLeftWrap(Rect2 v) => hwrap != HorizontalWrapState.Left && v.Position.X <= map.worldEdgeLeft + worldWrapLeeway;
-		private bool atEdgeOfRightWrap(Rect2 v) => hwrap == HorizontalWrapState.Right && v.End.X >= map.worldEdgeRight + map.pixelWidth;
-		private bool atEdgeOfLeftWrap(Rect2 v) => hwrap == HorizontalWrapState.Left && v.Position.X <= map.worldEdgeLeft - map.pixelWidth;
+		private float wrapEdgeMargin = 0;
+		float wrapRightEdge {get => map.worldEdgeRight - wrapEdgeMargin; }
+		float wrapLeftEdge {get => map.worldEdgeLeft + wrapEdgeMargin; }
+		private bool enteringRightWrap(Rect2 v) => hwrap != HorizontalWrapState.Right && v.End.X >= wrapRightEdge;
+		private bool enteringLeftWrap(Rect2 v) => hwrap != HorizontalWrapState.Left && v.Position.X <= wrapLeftEdge;
+		private bool atEdgeOfRightWrap(Rect2 v) => hwrap == HorizontalWrapState.Right && v.End.X >= wrapRightEdge + map.pixelWidth;
+		private bool atEdgeOfLeftWrap(Rect2 v) => hwrap == HorizontalWrapState.Left && v.Position.X <= wrapLeftEdge - map.pixelWidth;
 		private HorizontalWrapState currentHwrap(Rect2 v) {
-			return v.Position.X <= map.worldEdgeLeft + worldWrapLeeway ? HorizontalWrapState.Left : (v.End.X >= map.worldEdgeRight - worldWrapLeeway ? HorizontalWrapState.Right : HorizontalWrapState.None);
+			return v.Position.X <= wrapLeftEdge ? HorizontalWrapState.Left : (v.End.X >= wrapRightEdge ? HorizontalWrapState.Right : HorizontalWrapState.None);
 		}
+
+		// checkWorldWrap determines if the camera is about to spill over the world map and will:
+		// - move the second "wrap" tilemap to the appropriate edge
+		//   to give the illusion of true wrapping tilemap
+		// - teleport the camera one world-width to the left or right when
+		//   only the "wrap" tilemap is in view
 
 		private void checkWorldWrap() {
 			if (map is null || !map.wrapHorizontally) {
@@ -64,10 +71,8 @@ namespace C7.Map {
 			}
 			Rect2 visibleWorld = getVisibleWorld();
 			if (enteringRightWrap(visibleWorld)) {
-				GD.Print("moving wrap to right");
 				map.setHorizontalWrap(HorizontalWrapState.Right);
 			} else if (enteringLeftWrap(visibleWorld)) {
-				GD.Print("moving wrap to left");
 				map.setHorizontalWrap(HorizontalWrapState.Left);
 			}
 			if (atEdgeOfRightWrap(visibleWorld)) {
@@ -76,10 +81,6 @@ namespace C7.Map {
 				Translate(Vector2.Right * map.pixelWidth);
 			}
 			hwrap = currentHwrap(visibleWorld);
-		}
-
-		public override void _Process(double delta) {
-			checkWorldWrap();
 		}
 
 		public override void _UnhandledInput(InputEvent @event) {
