@@ -9,7 +9,7 @@ public class CityTest
 		UnitPrototype warrior = new UnitPrototype();
 		warrior.shieldCost = 10;
 
-		City city = new City(Tile.NONE, null, "Fighter Town, USA");
+		City city = new City(Tile.NONE, null, "Fighter Town, USA", ID.None("city"));
 		city.itemBeingProduced = warrior;
 		city.shieldsStored = 9;
 
@@ -29,7 +29,7 @@ public class CityTest
 
 	[Fact]
 	public void CityWith2ProductionPerTurn_ShouldReturn1TurnIf19_of_20FoodDone() {
-		City city = new City(Tile.NONE, null, "Gotham");
+		City city = new City(Tile.NONE, null, "Gotham", ID.None("city"));
 		city.foodStored = 19;
 		city.size = 1;
 

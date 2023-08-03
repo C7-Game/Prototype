@@ -179,7 +179,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 }
 
 public partial class RightClickChooseProductionMenu : RightClickMenu {
-	private string cityGUID;
+	private ID cityID;
 
 	private ImageTexture GetProducibleIcon(IProducible producible) {
 		if (producible is UnitPrototype proto) {
@@ -192,7 +192,7 @@ public partial class RightClickChooseProductionMenu : RightClickMenu {
 	}
 
 	public RightClickChooseProductionMenu(Game game, City city) : base(game) {
-		cityGUID = city.guid;
+		cityID = city.id;
 		foreach (IProducible option in city.ListProductionOptions()) {
 			int buildTime = city.TurnsToProduce(option);
 			AddItem($"{option.name} ({buildTime} turns)", () => ChooseProduction(option.name), GetProducibleIcon(option));
@@ -200,7 +200,7 @@ public partial class RightClickChooseProductionMenu : RightClickMenu {
 	}
 
 	public void ChooseProduction(string producibleName) {
-		new MsgChooseProduction(cityGUID, producibleName).send();
+		new MsgChooseProduction(cityID, producibleName).send();
 		CloseAndDelete();
 	}
 }

@@ -1,12 +1,12 @@
+using System;
 using System.Collections.Generic;
 using Serilog;
 
 namespace C7GameData
 {
-    using System;
     public class City
     {
-        public string guid {get;}
+        public ID id {get;}
         public Tile location {get;}
         public string name;
         public int size = 1;
@@ -22,11 +22,11 @@ namespace C7GameData
         public Player owner {get; set;}
         public List<CityResident> residents = new List<CityResident>();
 
-        public static City NONE = new City(Tile.NONE, null, "Dummy City");
+        public static City NONE = new City(Tile.NONE, null, "Dummy City", ID.None("city"));
 
-        public City(Tile location, Player owner, string name)
+        public City(Tile location, Player owner, string name, ID id)
         {
-            guid = Guid.NewGuid().ToString();
+            this.id = id;
             this.location = location;
             this.owner = owner;
             this.name = name;

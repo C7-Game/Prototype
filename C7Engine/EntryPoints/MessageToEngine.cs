@@ -150,18 +150,18 @@ namespace C7Engine
 	}
 
 	public class MsgChooseProduction : MessageToEngine {
-		private string cityGUID;
+		private ID cityID;
 		private string producibleName;
 
-		public MsgChooseProduction(string cityGUID, string producibleName)
+		public MsgChooseProduction(ID cityID, string producibleName)
 		{
-			this.cityGUID = cityGUID;
+			this.cityID = cityID;
 			this.producibleName = producibleName;
 		}
 
 		public override void process()
 		{
-			City city = EngineStorage.gameData.cities.Find(c => c.guid == cityGUID);
+			City city = EngineStorage.gameData.cities.Find(c => c.id == cityID);
 			if (city != null) {
 				foreach (IProducible producible in city.ListProductionOptions()) {
 					if (producible.name == producibleName) {

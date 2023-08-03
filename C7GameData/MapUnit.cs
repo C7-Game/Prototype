@@ -10,7 +10,7 @@ namespace C7GameData {
 	 * A unit on the map.  Not to be confused with a unit prototype.
 	 **/
 	public class MapUnit {
-		public string guid { get; }
+		public ID id { get; }
 		public UnitPrototype unitType { get; set; }
 		public Player owner { get; set; }
 		public Tile previousLocation { get; private set; }
