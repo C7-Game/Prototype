@@ -73,8 +73,6 @@ public partial class Game : Node2D {
 				log.Debug("RelativeModPath ", map.RelativeModPath);
 
 				mapView = new MapView(this, gameDataAccess.gameData);
-				AddChild(mapView);
-				camera.attachToMapView(mapView);
 
 				// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their
 				// starting settler.
@@ -89,6 +87,8 @@ public partial class Game : Node2D {
 						camera.centerOnTile(startingSettler.location, mapView);
 					}
 				}
+				camera.attachToMapView(mapView);
+				AddChild(mapView);
 			}
 
 			Toolbar = GetNode<Control>("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer");

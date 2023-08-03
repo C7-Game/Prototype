@@ -19,6 +19,8 @@ namespace C7.Map {
 
 		public void attachToMapView(MapView map) {
 			this.map = map;
+			map.updateAnimations();
+			checkWorldWrap();
 		}
 
 		public override void _Ready() {
@@ -46,6 +48,7 @@ namespace C7.Map {
 
 		private void checkWorldWrap() {
 			if (map is null || !map.wrapHorizontally) {
+				// TODO: for maps that do not wrap horizontally restrict movement
 				return;
 			}
 			Rect2 visible = getVisibleWorld();
@@ -54,21 +57,22 @@ namespace C7.Map {
 			if (hwrap != HorizontalWrapState.Right && rhs >= map.worldEdgeRight) {
 				hwrap = HorizontalWrapState.Right;
 				map.setHorizontalWrap(hwrap); // move wrapping map
-			} else if (hwrap == HorizontalWrapState.Right && rhs < map.worldEdgeRight) {
-				hwrap = HorizontalWrapState.None;
+			} else if (hwrap == HorizontalWrapState.Right) {
+				if (rhs < map.worldEdgeRight) {
+					hwrap = HorizontalWrapState.None; // back within main map
+				} else if (rhs >= map.worldEdgeRight + map.pixelWidth) {
+					Translate(Vector2.Left * map.pixelWidth); // at rhs of wrapping map
+				}
 			}
 			if (hwrap != HorizontalWrapState.Left && lhs <= map.worldEdgeLeft) {
 				hwrap = HorizontalWrapState.Left;
 				map.setHorizontalWrap(hwrap); // move wrapping map
-			} else if (hwrap == HorizontalWrapState.Left && lhs > map.worldEdgeLeft) {
-				hwrap = HorizontalWrapState.None;
-			}
-
-			// jump back into original map
-			if (hwrap == HorizontalWrapState.Right && rhs >= map.worldEdgeRight + map.pixelWidth) {
-				Translate(Vector2.Left * map.pixelWidth); // at rhs of wrapping map
-			} else if (hwrap == HorizontalWrapState.Left && lhs <= map.worldEdgeLeft - map.pixelWidth) {
-				Translate(Vector2.Right * map.pixelWidth); // at lhs of wrapping map
+			} else if (hwrap == HorizontalWrapState.Left) {
+				if (lhs > map.worldEdgeLeft) {
+					hwrap = HorizontalWrapState.None; // back within main map
+				} else if (rhs >= map.worldEdgeRight + map.pixelWidth) {
+					Translate(Vector2.Right * map.pixelWidth); // at lhs of wrapping map
+				}
 			}
 		}
 
