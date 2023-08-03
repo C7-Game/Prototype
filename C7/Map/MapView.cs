@@ -32,6 +32,7 @@ namespace C7.Map {
 		private TileSet tileset;
 		private Vector2I tileSize = new Vector2I(128, 64);
 		private ILogger log = LogManager.ForContext<MapView>();
+		public bool wrapHorizontally {get; private set;}
 		public int worldEdgeRight {get; private set;}
 		public int worldEdgeLeft {get; private set;}
 		private int width;
@@ -286,6 +287,7 @@ namespace C7.Map {
 			pixelWidth = width * tileSize.X;
 			height = gameMap.numTilesTall;
 			initializeTileMap();
+			wrapHorizontally = gameMap.wrapHorizontally;
 			terrain = new string[width, height];
 			worldEdgeRight = (int)ToGlobal(tilemap.MapToLocal(new Vector2I(width - 1, 1))).X + tileSize.X / 2;
 			worldEdgeLeft = (int)ToGlobal(tilemap.MapToLocal(new Vector2I(0, 0))).X - tileSize.X / 2;
