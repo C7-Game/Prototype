@@ -70,7 +70,7 @@ namespace C7.Map {
 			} else if (hwrap == HorizontalWrapState.Left) {
 				if (lhs > map.worldEdgeLeft) {
 					hwrap = HorizontalWrapState.None; // back within main map
-				} else if (rhs >= map.worldEdgeRight + map.pixelWidth) {
+				} else if (lhs <= map.worldEdgeLeft - map.pixelWidth) {
 					Translate(Vector2.Right * map.pixelWidth); // at lhs of wrapping map
 				}
 			}
