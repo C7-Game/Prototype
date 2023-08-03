@@ -1,6 +1,7 @@
 [gd_scene load_steps=15 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" path="res://Game.cs" id="1"]
+[ext_resource type="Script" path="res://Map/MapViewCamera.cs" id="2_xrlqh"]
 [ext_resource type="Script" path="res://UIElements/Advisors/Advisors.cs" id="3"]
 [ext_resource type="Script" path="res://UIElements/UpperLeftNav/MenuButton.cs" id="4"]
 [ext_resource type="Script" path="res://UIElements/UpperLeftNav/CivilopediaButton.cs" id="5"]
@@ -9,7 +10,6 @@
 [ext_resource type="Script" path="res://UIElements/UnitButtons/RenameButton.cs" id="8"]
 [ext_resource type="Script" path="res://UIElements/Popups/PopupOverlay.cs" id="9"]
 [ext_resource type="Theme" uid="uid://c1jpmssnhvodi" path="res://C7Theme.tres" id="10"]
-[ext_resource type="Script" path="res://PlayerCamera.cs" id="11_pkhac"]
 [ext_resource type="Script" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
 
 [sub_resource type="Animation" id="2"]
@@ -62,166 +62,11 @@ _data = {
 [node name="C7Game" type="Node2D"]
 script = ExtResource("1")
 
-[node name="PlayerCamera" type="Camera2D" parent="."]
-script = ExtResource("11_pkhac")
+[node name="MapViewCamera" type="Camera2D" parent="."]
+script = ExtResource("2_xrlqh")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-<<<<<<< HEAD
-=======
-[node name="GameStatus" type="MarginContainer" parent="CanvasLayer"]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -619.0
-offset_top = -357.0
-offset_right = -579.0
-offset_bottom = -317.0
-grow_horizontal = 0
-grow_vertical = 0
-script = ExtResource("7")
-
-[node name="SlideOutBar" type="Control" parent="CanvasLayer"]
-layout_mode = 3
-anchors_preset = 11
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 1024.0
-offset_top = 80.0
-offset_right = 1024.0
-offset_bottom = 728.0
-grow_horizontal = 0
-grow_vertical = 2
-
-[node name="SlideToggle" type="Button" parent="CanvasLayer/SlideOutBar"]
-layout_mode = 0
-offset_left = -124.27
-offset_right = -91.27
-offset_bottom = 20.0
-toggle_mode = true
-text = "<->"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/SlideOutBar"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 1.0
-anchor_bottom = 0.958
-offset_right = 1.0
-grow_horizontal = 0
-grow_vertical = 2
-
-[node name="DownButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-layout_mode = 2
-text = "Down"
-
-[node name="RightButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-layout_mode = 2
-text = "Right"
-
-[node name="LeftButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-layout_mode = 2
-text = "Left"
-
-[node name="UpButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-layout_mode = 2
-text = "Up"
-
-[node name="Label" type="Label" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-layout_mode = 2
-text = "Zoom"
-
-[node name="Zoom" type="VSlider" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 1
-size_flags_vertical = 3
-min_value = 0.1
-max_value = 1.0
-step = 0.1
-value = 1.0
-
-[node name="QuitButton" type="Button" parent="CanvasLayer/SlideOutBar/VBoxContainer"]
-layout_mode = 2
-text = "Quit"
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CanvasLayer/SlideOutBar"]
-libraries = {
-"": SubResource("AnimationLibrary_bowxq")
-}
-
-[node name="ToolBar" type="Control" parent="CanvasLayer"]
-layout_mode = 3
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = -579.0
-offset_top = -317.0
-offset_right = -579.0
-offset_bottom = -317.0
-grow_horizontal = 2
-mouse_filter = 1
-
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/ToolBar"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 80.0
-grow_horizontal = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ToolBar/MarginContainer"]
-layout_mode = 2
-
-[node name="MenuButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-script = ExtResource("4")
-
-[node name="CivilopediaButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-script = ExtResource("5")
-
-[node name="AdvisorButton" type="TextureButton" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-script = ExtResource("6")
-
-[node name="UiBarEndTurnButton" type="Button" parent="CanvasLayer/ToolBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "End Turn"
-
-[node name="UnitButtons" type="VBoxContainer" parent="CanvasLayer"]
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -579.0
-offset_top = -429.0
-offset_right = -579.0
-offset_bottom = -317.0
-grow_horizontal = 2
-grow_vertical = 0
-size_flags_vertical = 0
-script = ExtResource("12")
-
-[node name="AdvancedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
-layout_mode = 2
-size_flags_vertical = 0
-alignment = 1
-
-[node name="RenameButton" type="TextureButton" parent="CanvasLayer/UnitButtons/AdvancedUnitControls"]
-layout_mode = 2
-script = ExtResource("8")
-
-[node name="SpecializedUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
-layout_mode = 2
-size_flags_vertical = 0
-alignment = 1
-
-[node name="PrimaryUnitControls" type="HBoxContainer" parent="CanvasLayer/UnitButtons"]
-layout_mode = 2
-size_flags_vertical = 0
-alignment = 1
-
->>>>>>> 83be7c1 (rendering terrain)
 [node name="Advisor" type="CenterContainer" parent="CanvasLayer"]
 anchors_preset = 15
 anchor_right = 1.0
@@ -410,23 +255,8 @@ libraries = {
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/GameStatus" method="OnNoMoreAutoselectableUnits"]
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/UnitButtons" method="OnNoMoreAutoselectableUnits"]
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
-<<<<<<< HEAD
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnStarted"]
-=======
-[connection signal="TurnEnded" from="." to="CanvasLayer/GameStatus" method="OnTurnEnded"]
-[connection signal="TurnStarted" from="." to="CanvasLayer/GameStatus" method="OnTurnStarted"]
-[connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/GameStatus" to="." method="OnPlayerEndTurn"]
-[connection signal="toggled" from="CanvasLayer/SlideOutBar/SlideToggle" to="." method="_on_SlideToggle_toggled"]
-[connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/DownButton" to="." method="_on_DownButton_pressed"]
-[connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/RightButton" to="." method="_on_RightButton_pressed"]
-[connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/LeftButton" to="." method="_on_LeftButton_pressed"]
-[connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/UpButton" to="." method="_on_UpButton_pressed"]
-[connection signal="value_changed" from="CanvasLayer/SlideOutBar/VBoxContainer/Zoom" to="." method="onSliderZoomChanged"]
-[connection signal="pressed" from="CanvasLayer/SlideOutBar/VBoxContainer/QuitButton" to="." method="_on_QuitButton_pressed"]
-[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
-[connection signal="pressed" from="CanvasLayer/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
->>>>>>> 83be7c1 (rendering terrain)
 [connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
 [connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]
 [connection signal="UnitDisbanded" from="CanvasLayer/PopupOverlay" to="." method="OnUnitDisbanded"]
