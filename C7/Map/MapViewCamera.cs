@@ -46,34 +46,31 @@ namespace C7.Map {
 			checkWorldWrap();
 		}
 
+		private bool enteringRightWrap(Rect2 v) => hwrap != HorizontalWrapState.Right && v.End.X >= map.worldEdgeRight;
+		private bool enteringLeftWrap(Rect2 v) => hwrap != HorizontalWrapState.Left && v.Position.X <= map.worldEdgeLeft;
+		private bool atEdgeOfRightWrap(Rect2 v) => hwrap == HorizontalWrapState.Right && v.End.X >= map.worldEdgeRight + map.pixelWidth;
+		private bool atEdgeOfLeftWrap(Rect2 v) => hwrap == HorizontalWrapState.Left && v.Position.X <= map.worldEdgeLeft - map.pixelWidth;
+		private HorizontalWrapState currentHwrap(Rect2 v) {
+			return v.Position.X <= map.worldEdgeLeft ? HorizontalWrapState.Left : (v.End.X >= map.worldEdgeRight ? HorizontalWrapState.Right : HorizontalWrapState.None);
+		}
+
 		private void checkWorldWrap() {
 			if (map is null || !map.wrapHorizontally) {
 				// TODO: for maps that do not wrap horizontally restrict movement
 				return;
 			}
-			Rect2 visible = getVisibleWorld();
-			float rhs = visible.End.X;
-			float lhs = visible.Position.X;
-			if (hwrap != HorizontalWrapState.Right && rhs >= map.worldEdgeRight) {
-				hwrap = HorizontalWrapState.Right;
-				map.setHorizontalWrap(hwrap); // move wrapping map
-			} else if (hwrap == HorizontalWrapState.Right) {
-				if (rhs < map.worldEdgeRight) {
-					hwrap = HorizontalWrapState.None; // back within main map
-				} else if (rhs >= map.worldEdgeRight + map.pixelWidth) {
-					Translate(Vector2.Left * map.pixelWidth); // at rhs of wrapping map
-				}
+			Rect2 visibleWorld = getVisibleWorld();
+			if (enteringRightWrap(visibleWorld)) {
+				map.setHorizontalWrap(HorizontalWrapState.Right);
+			} else if (enteringLeftWrap(visibleWorld)) {
+				map.setHorizontalWrap(HorizontalWrapState.Left);
 			}
-			if (hwrap != HorizontalWrapState.Left && lhs <= map.worldEdgeLeft) {
-				hwrap = HorizontalWrapState.Left;
-				map.setHorizontalWrap(hwrap); // move wrapping map
-			} else if (hwrap == HorizontalWrapState.Left) {
-				if (lhs > map.worldEdgeLeft) {
-					hwrap = HorizontalWrapState.None; // back within main map
-				} else if (lhs <= map.worldEdgeLeft - map.pixelWidth) {
-					Translate(Vector2.Right * map.pixelWidth); // at lhs of wrapping map
-				}
+			if (atEdgeOfRightWrap(visibleWorld)) {
+				Translate(Vector2.Left * map.pixelWidth);
+			} else if (atEdgeOfLeftWrap(visibleWorld)) {
+				Translate(Vector2.Right * map.pixelWidth);
 			}
+			hwrap = currentHwrap(visibleWorld);
 		}
 
 		public override void _UnhandledInput(InputEvent @event) {
