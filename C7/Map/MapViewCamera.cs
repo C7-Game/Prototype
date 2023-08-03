@@ -3,6 +3,13 @@ using C7GameData;
 
 namespace C7.Map {
 
+	// MapViewCamera position and zoom should only be modified through the
+	// following methods:
+	// - scaleZoom
+	// - setZoom
+	// - setPosition
+	// This is because these methods will ensure that MapViewCamera handles
+	// world wrapping on the MapView automatically.
 	public partial class MapViewCamera : Camera2D {
 		private readonly float maxZoom = 3.0f;
 		private readonly float minZoom = 0.2f;
@@ -32,8 +39,13 @@ namespace C7.Map {
 			checkWorldWrap();
 		}
 
+		public void setPosition(Vector2 position) {
+			Position = position;
+			checkWorldWrap();
+		}
+
 		private void checkWorldWrap() {
-			if (map is null) {
+			if (map is null || !map.wrapHorizontally) {
 				return;
 			}
 			Rect2 visible = getVisibleWorld();
@@ -41,33 +53,23 @@ namespace C7.Map {
 			float lhs = visible.Position.X;
 			if (hwrap != HorizontalWrapState.Right && rhs >= map.worldEdgeRight) {
 				hwrap = HorizontalWrapState.Right;
-				map.setHorizontalWrap(hwrap);
+				map.setHorizontalWrap(hwrap); // move wrapping map
 			} else if (hwrap == HorizontalWrapState.Right && rhs < map.worldEdgeRight) {
 				hwrap = HorizontalWrapState.None;
 			}
 			if (hwrap != HorizontalWrapState.Left && lhs <= map.worldEdgeLeft) {
 				hwrap = HorizontalWrapState.Left;
-				map.setHorizontalWrap(hwrap);
+				map.setHorizontalWrap(hwrap); // move wrapping map
 			} else if (hwrap == HorizontalWrapState.Left && lhs > map.worldEdgeLeft) {
 				hwrap = HorizontalWrapState.None;
 			}
 
-			// detect jumping back into original map
-			if (hwrap == HorizontalWrapState.Right && lhs > map.worldEdgeRight) {
-				// completely off right side of map
-				map.setHorizontalWrap(HorizontalWrapState.Left); // will be on left edge after jump
-				Translate(Vector2.Left * map.pixelWidth);
-			} else if (hwrap == HorizontalWrapState.Left && rhs < map.worldEdgeLeft) {
-				// completely off left side of map
-				map.setHorizontalWrap(HorizontalWrapState.Right); // will be on right edge after jump
-				Translate(Vector2.Right * map.pixelWidth);
+			// jump back into original map
+			if (hwrap == HorizontalWrapState.Right && rhs >= map.worldEdgeRight + map.pixelWidth) {
+				Translate(Vector2.Left * map.pixelWidth); // at rhs of wrapping map
+			} else if (hwrap == HorizontalWrapState.Left && lhs <= map.worldEdgeLeft - map.pixelWidth) {
+				Translate(Vector2.Right * map.pixelWidth); // at lhs of wrapping map
 			}
-
-		}
-
-		public void setPosition(Vector2 position) {
-			Position = position;
-			checkWorldWrap();
 		}
 
 		public override void _UnhandledInput(InputEvent @event) {
