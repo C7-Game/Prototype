@@ -43,9 +43,9 @@ namespace C7GameData
 			}
 		}
 
-		public MapUnit GetInstance()
+		public MapUnit GetInstance(GameData gameData)
 		{
-			MapUnit instance = new MapUnit();
+			MapUnit instance = new MapUnit(gameData.ids.CreateID(this.name));
 			instance.unitType = this;
 			instance.hitPointsRemaining = 3;    //todo: make this configurable
 			instance.movementPoints.reset(movement);

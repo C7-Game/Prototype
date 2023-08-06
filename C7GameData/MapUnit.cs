@@ -46,8 +46,8 @@ namespace C7GameData {
 		public List<string> availableActions = new List<string>();
 		public UnitAIData currentAIData;
 
-		public MapUnit() {
-			guid = Guid.NewGuid().ToString();
+		public MapUnit(ID id) {
+			this.id = id;
 		}
 
 		public bool IsBusy() {
@@ -56,7 +56,7 @@ namespace C7GameData {
 
 		public override string ToString() {
 			if (this != MapUnit.NONE) {
-				return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP, guid = " + guid;
+				return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.remaining + " MP and " + hitPointsRemaining + " HP, id = " + id;
 			} else {
 				return "This is the NONE unit";
 			}
@@ -114,6 +114,6 @@ namespace C7GameData {
 			}
 		}
 
-		public static MapUnit NONE = new MapUnit();
+		public static MapUnit NONE = new MapUnit(ID.None("unit"));
 	}
 }

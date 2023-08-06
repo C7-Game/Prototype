@@ -48,6 +48,9 @@ namespace C7GameData {
 		public override int GetHashCode() => ToString().GetHashCode();
 
 		public static bool operator ==(ID lhs, ID rhs) {
+			if (lhs is null && rhs is null) {
+				return true; // null == null, no footguns
+			}
 			if (lhs is null || rhs is null) {
 				return false;
 			}

@@ -15,7 +15,7 @@ start:
 			switch (settlerAi.goal) {
 				case SettlerAIData.SettlerGoal.BUILD_CITY:
 					if (IsInvalidCityLocation(settlerAi.destination)) {
-						log.Information("Seeking new destination for settler " + unit.guid + "headed to " + settlerAi.destination);
+						log.Information("Seeking new destination for settler " + unit.id + "headed to " + settlerAi.destination);
 						PlayerAI.SetAIForUnit(unit, player);
 						//Make sure we're using the new settler AI going forward, including this turn
 						settlerAi = (SettlerAIData)unit.currentAIData;
@@ -35,7 +35,7 @@ start:
 					else {
 						//If the settler has no destination, then disband rather than crash later.
 						if (settlerAi.destination == Tile.NONE) {
-							log.Information("Disbanding settler " + unit.guid + " with no valid destination");
+							log.Information("Disbanding settler " + unit.id + " with no valid destination");
 							unit.disband();
 							return false;
 						}

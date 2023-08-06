@@ -100,11 +100,11 @@ public partial class RightClickTileMenu : RightClickMenu {
 		ResetItems(tile);
 	}
 
-	private bool isUnitFortified(MapUnit unit, Dictionary<string, bool> uiStates) {
-		if (uiStates is null || !uiStates.ContainsKey(unit.guid)) {
+	private bool isUnitFortified(MapUnit unit, Dictionary<ID, bool> uiStates) {
+		if (uiStates is null || !uiStates.ContainsKey(unit.id)) {
 			return unit.isFortified;
 		}
-		return uiStates[unit.guid];
+		return uiStates[unit.id];
 	}
 
 	private string getUnitAction(MapUnit unit, bool isFortified) {
@@ -118,7 +118,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 	// and false if they were selected in the previous action. This is to update the UI
 	// since the actions update the engine asynchronously and otherwise the UI may not
 	// reflect these changes immediately.
-	public void ResetItems(Tile tile, Dictionary<string, bool> uiUpdatedUnitStates = null) {
+	public void ResetItems(Tile tile, Dictionary<ID, bool> uiUpdatedUnitStates = null) {
 		RemoveAll();
 
 		int fortifiedCount = 0;
@@ -128,7 +128,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 			bool isFortified = isUnitFortified(unit, uiUpdatedUnitStates);
 			fortifiedCount += isFortified ? 1 : 0;
 			string actionName = getUnitAction(unit, isFortified);
-			AddItem($"{actionName} {unit.Describe()}", () => SelectUnit(unit.guid));
+			AddItem($"{actionName} {unit.Describe()}", () => SelectUnit(unit.id));
 		}
 		int unfortifiedCount = units.Count - fortifiedCount;
 
@@ -140,13 +140,13 @@ public partial class RightClickTileMenu : RightClickMenu {
 		}
 	}
 
-	public void SelectUnit(string guid) {
+	public void SelectUnit(ID id) {
 		using (var gameDataAccess = new UIGameDataAccess()) {
-			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.guid == guid);
+			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.id == id);
 			if (toSelect != null && toSelect.owner == game.controller) {
 				game.setSelectedUnit(toSelect);
-				new MsgSetFortification(toSelect.guid, false).send();
-				ResetItems(toSelect.location, new Dictionary<string, bool>() { { toSelect.guid, false } });
+				new MsgSetFortification(toSelect.id, false).send();
+				ResetItems(toSelect.location, new Dictionary<ID, bool>() { { toSelect.id, false } });
 			}
 		}
 		if (!Input.IsKeyPressed(Godot.Key.Shift)) {
@@ -158,11 +158,11 @@ public partial class RightClickTileMenu : RightClickMenu {
 		using (var gameDataAccess = new UIGameDataAccess()) {
 			bool hasSelectedUnit = false;
 			Tile tile = gameDataAccess.gameData.map.tileAt(tileX, tileY);
-			Dictionary<string, bool> modified = new Dictionary<string, bool>();
+			Dictionary<ID, bool> modified = new Dictionary<ID, bool>();
 			foreach (MapUnit unit in tile.unitsOnTile) {
 				if (unit.isFortified != isFortify) {
-					modified[unit.guid] = isFortify;
-					new MsgSetFortification(unit.guid, isFortify).send();
+					modified[unit.id] = isFortify;
+					new MsgSetFortification(unit.id, isFortify).send();
 
 					if (!hasSelectedUnit && !isFortify) {
 						game.setSelectedUnit(unit);

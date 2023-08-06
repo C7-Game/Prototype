@@ -121,7 +121,7 @@ public partial class Game : Node2D {
 		while (EngineStorage.messagesToUI.TryDequeue(out msg)) {
 			switch (msg) {
 				case MsgStartUnitAnimation mSUA:
-					MapUnit unit = gameData.GetUnit(mSUA.unitGUID);
+					MapUnit unit = gameData.GetUnit(mSUA.unitID);
 					if (unit != null && (controller.tileKnowledge.isTileKnown(unit.location) || controller.tileKnowledge.isTileKnown(unit.previousLocation))) {
 						// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 						// (optionally, depending on preferences) and generalized so that modders can specify whether custom
@@ -333,7 +333,7 @@ public partial class Game : Node2D {
 						using (var gameDataAccess = new UIGameDataAccess()) {
 							var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
 							if (tile != null) {
-								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
+								new MsgSetUnitPath(CurrentlySelectedUnit.id, tile).send();
 							}
 						}
 					} else {
@@ -441,7 +441,7 @@ public partial class Game : Node2D {
 				moveUnit = false;
 			}
 			if (moveUnit) {
-				new MsgMoveUnit(CurrentlySelectedUnit.guid, dir).send();
+				new MsgMoveUnit(CurrentlySelectedUnit.id, dir).send();
 				setSelectedUnit(CurrentlySelectedUnit); //also triggers updating the lower-left info box
 			}
 		}
@@ -468,18 +468,18 @@ public partial class Game : Node2D {
 
 		// actions with unit buttons
 		if (Input.IsActionJustPressed(C7Action.UnitHold)) {
-			new MsgSkipUnitTurn(CurrentlySelectedUnit.guid).send();
+			new MsgSkipUnitTurn(CurrentlySelectedUnit.id).send();
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitWait)) {
 			using (var gameDataAccess = new UIGameDataAccess()) {
-				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.guid);
+				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.id);
 				GetNextAutoselectedUnit(gameDataAccess.gameData);
 			}
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitFortify)) {
-			new MsgSetFortification(CurrentlySelectedUnit.guid, true).send();
+			new MsgSetFortification(CurrentlySelectedUnit.id, true).send();
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitDisband)) {
@@ -508,7 +508,7 @@ public partial class Game : Node2D {
 
 		if (Input.IsActionJustPressed(C7Action.UnitBuildCity) && CurrentlySelectedUnit.canBuildCity()) {
 			using (var gameDataAccess = new UIGameDataAccess()) {
-				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
+				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.id);
 				log.Debug(currentUnit.Describe());
 				if (currentUnit.canBuildCity()) {
 					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
@@ -519,7 +519,7 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitBuildRoad) && CurrentlySelectedUnit.canBuildRoad()) {
-			new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
+			new MsgBuildRoad(CurrentlySelectedUnit.id).send();
 		}
 	}
 
@@ -541,7 +541,7 @@ public partial class Game : Node2D {
 
 	// Called by the disband popup
 	private void OnUnitDisbanded() {
-		new MsgDisbandUnit(CurrentlySelectedUnit.guid).send();
+		new MsgDisbandUnit(CurrentlySelectedUnit.id).send();
 	}
 
 	/**
@@ -555,6 +555,6 @@ public partial class Game : Node2D {
 	}
 
 	private void OnBuildCity(string name) {
-		new MsgBuildCity(CurrentlySelectedUnit.guid, name).send();
+		new MsgBuildCity(CurrentlySelectedUnit.id, name).send();
 	}
 }

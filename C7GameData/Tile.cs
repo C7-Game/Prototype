@@ -6,6 +6,7 @@ namespace C7GameData
 	using System.Linq;
 	public class Tile
 	{
+		public ID id {get; private set;}
 		// ExtraInfo will eventually be type object and use a type descriminator in JSON to determine
 		//   how to deserialze. See https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-polymorphism
 		//   and https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-converters-how-to?pivots=dotnet-5-0#support-polymorphic-deserialization
@@ -24,7 +25,6 @@ namespace C7GameData
 		public bool HasCity => cityAtTile != null && cityAtTile != City.NONE;
 		public CityResident personWorkingTile = null;	//allows us to see if another city is working this tile
 		public bool hasBarbarianCamp = false;
-
 		//One thing to decide is do we want to have a tile have a list of units on it,
 		//or a unit have reference to the tile it is on, or both?
 		//The downside of both is that both have to be updated (and it uses a miniscule amount
@@ -55,8 +55,9 @@ namespace C7GameData
 
 		public TileOverlays overlays = new TileOverlays();
 
-		public Tile()
+		public Tile(ID id)
 		{
+			this.id = id;
 			unitsOnTile = new List<MapUnit>();
 			Resource = Resource.NONE;
 		}
@@ -69,7 +70,7 @@ namespace C7GameData
 			return overlayTerrainType.movementCost;
 		}
 
-		public static Tile NONE = new Tile() {
+		public static Tile NONE = new Tile(ID.None("tile")) {
 			xCoordinate = -1,
 			yCoordinate = -1,
 		};

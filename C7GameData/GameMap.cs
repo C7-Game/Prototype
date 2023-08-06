@@ -201,7 +201,7 @@ namespace C7GameData
 		 * implement a more sophisticated generator in the engine.
 		 **/
 		// TerrainType declarations here have been copied to ImportCiv3, and all loaded terrain is set with one of them
-		public static GameMap Generate(Random rng)
+		public static GameMap Generate(GameData gameData)
 		{
 			TerrainType grassland = new TerrainType();
 			grassland.DisplayName = "Grassland";
@@ -238,10 +238,10 @@ namespace C7GameData
 
 			for (int y = 0; y < m.numTilesTall; y++) {
 				for (int x = y%2; x < m.numTilesWide; x += 2) {
-					Tile newTile = new Tile();
+					Tile newTile = new Tile(gameData.ids.CreateID("tile"));
 					newTile.xCoordinate = x;
 					newTile.yCoordinate = y;
-					newTile.baseTerrainType = m.terrainTypes[rng.Next() % m.terrainTypes.Count];
+					newTile.baseTerrainType = m.terrainTypes[GameData.rng.Next() % m.terrainTypes.Count];
 					m.tiles.Add(newTile);
 				}
 			}

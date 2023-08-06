@@ -11,13 +11,14 @@ namespace EngineTests
 		[Fact]
 		public void ConstructPath_CreatesASamplePathProperly()
 		{
+			ID id = ID.None("test-tile");
 			Dictionary<Tile, Tile> predecessors = new Dictionary<Tile, Tile>();
-			Tile start = new Tile { xCoordinate = 34, yCoordinate = 18 };
-			Tile tileTwo = new Tile { xCoordinate = 34, yCoordinate = 20 };
-			Tile tileThree = new Tile { xCoordinate = 34, yCoordinate = 22 };
-			Tile tileFour = new Tile { xCoordinate = 33, yCoordinate = 23 };
-			Tile tileFive = new Tile { xCoordinate = 33, yCoordinate = 25 };
-			Tile destination = new Tile { xCoordinate = 35, yCoordinate = 25 };
+			Tile start = new Tile(id) { xCoordinate = 34, yCoordinate = 18 };
+			Tile tileTwo = new Tile(id) { xCoordinate = 34, yCoordinate = 20 };
+			Tile tileThree = new Tile(id) { xCoordinate = 34, yCoordinate = 22 };
+			Tile tileFour = new Tile(id) { xCoordinate = 33, yCoordinate = 23 };
+			Tile tileFive = new Tile(id) { xCoordinate = 33, yCoordinate = 25 };
+			Tile destination = new Tile(id) { xCoordinate = 35, yCoordinate = 25 };
 			predecessors[destination] = tileFive;
 			predecessors[tileFive] = tileFour;
 			predecessors[tileFour] = tileThree;

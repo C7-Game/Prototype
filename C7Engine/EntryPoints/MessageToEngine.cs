@@ -26,18 +26,18 @@ namespace C7Engine
 
 	public class MsgSetFortification : MessageToEngine
 	{
-		private string unitGUID;
+		private ID unitID;
 		private bool fortifyElseWake;
 
-		public MsgSetFortification(string unitGUID, bool fortifyElseWake)
+		public MsgSetFortification(ID unitID, bool fortifyElseWake)
 		{
-			this.unitGUID = unitGUID;
+			this.unitID = unitID;
 			this.fortifyElseWake = fortifyElseWake;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
 
 			// Simply do nothing if we weren't given a valid GUID. TODO: Maybe this is an error we need to handle? In an MP game, we should reject
 			// invalid actions at the server level but at the client level an invalid action received from the server indicates a desync.
@@ -52,99 +52,99 @@ namespace C7Engine
 
 	public class MsgMoveUnit : MessageToEngine
 	{
-		private string unitGUID;
+		private ID unitID;
 		private TileDirection dir;
 
-		public MsgMoveUnit(string unitGUID, TileDirection dir)
+		public MsgMoveUnit(ID unitID, TileDirection dir)
 		{
-			this.unitGUID = unitGUID;
+			this.unitID = unitID;
 			this.dir = dir;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
 			unit?.move(dir);
 		}
 	}
 
 	public class MsgSetUnitPath : MessageToEngine
 	{
-		private string unitGUID;
+		private ID unitID;
 		private int destX;
 		private int destY;
 
-		public MsgSetUnitPath(string unitGUID, Tile tile)
+		public MsgSetUnitPath(ID unitID, Tile tile)
 		{
-			this.unitGUID = unitGUID;
+			this.unitID = unitID;
 			this.destX = tile.xCoordinate;
 			this.destY = tile.yCoordinate;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
 			unit?.setUnitPath(EngineStorage.gameData.map.tileAt(destX, destY));
 		}
 	}
 
 	public class MsgSkipUnitTurn : MessageToEngine
 	{
-		private string unitGUID;
+		private ID unitID;
 
-		public MsgSkipUnitTurn(string unitGUID)
+		public MsgSkipUnitTurn(ID unitID)
 		{
-			this.unitGUID = unitGUID;
+			this.unitID = unitID;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
 			unit?.skipTurn();
 		}
 	}
 
 	public class MsgDisbandUnit : MessageToEngine {
-		private string unitGUID;
+		private ID unitID;
 
-		public MsgDisbandUnit(string unitGUID)
+		public MsgDisbandUnit(ID unitID)
 		{
-			this.unitGUID = unitGUID;
+			this.unitID = unitID;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
 			unit?.disband();
 		}
 	}
 
 	public class MsgBuildCity : MessageToEngine {
-		private string unitGUID;
+		private ID unitID;
 		private string cityName;
 
-		public MsgBuildCity(string unitGUID, string cityName)
+		public MsgBuildCity(ID unitID, string cityName)
 		{
-			this.unitGUID = unitGUID;
+			this.unitID = unitID;
 			this.cityName = cityName;
 		}
 
 		public override void process()
 		{
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
 			unit?.buildCity(cityName);
 		}
 	}
 
 	public class MsgBuildRoad : MessageToEngine {
-		private string unitGUID;
+		private ID unitID;
 
-		public MsgBuildRoad(string unitGUID) {
-			this.unitGUID = unitGUID;
+		public MsgBuildRoad(ID unitID) {
+			this.unitID = unitID;
 		}
 
 		public override void process() {
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitGUID);
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
 			unit?.buildRoad();
 		}
 	}

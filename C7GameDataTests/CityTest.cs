@@ -16,7 +16,7 @@ public class CityTest
 		TerrainType oneShield = new TerrainType();
 		oneShield.baseShieldProduction = 1;
 
-		Tile workedTile = new Tile();
+		Tile workedTile = new Tile(ID.None("tile"));
 		workedTile.overlayTerrainType = oneShield;
 
 		CityResident maverick = new CityResident();
@@ -36,7 +36,7 @@ public class CityTest
 		TerrainType grassland = new TerrainType();
 		grassland.baseFoodProduction = 2;
 
-		Tile workedTile = new Tile();
+		Tile workedTile = new Tile(ID.None("test-tile"));
 		workedTile.overlayTerrainType = grassland;
 
 		CityResident robin = new CityResident();

@@ -58,9 +58,9 @@ namespace C7GameData
 			return players.FindAll(p => p.isHuman);
 		}
 
-		public MapUnit GetUnit(string guid)
+		public MapUnit GetUnit(ID id)
 		{
-			return mapUnits.Find(u => u.guid == guid);
+			return mapUnits.Find(u => u.id == id);
 		}
 
 		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel)
@@ -260,7 +260,7 @@ namespace C7GameData
 			//TODO: The fact that we have to check for this makes me wonder why...
 			if (tile != Tile.NONE) {
 				//TODO: Generate unit from its prototype
-				MapUnit unit = new MapUnit();
+				MapUnit unit = new MapUnit(this.ids.CreateID(proto.name));
 				unit.unitType = proto;
 				unit.owner = owner;
 				unit.location = tile;
