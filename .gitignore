@@ -20,7 +20,6 @@ data_*/
 
 # Below here are ignores imported from Puppeteer's project
 sav/
-*.png
 *.pcx
 *.flc
 *.mp4

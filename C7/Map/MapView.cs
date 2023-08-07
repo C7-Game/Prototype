@@ -19,13 +19,19 @@ namespace C7.Map {
 		public int worldEdgeLeft {get; private set;}
 		private int width;
 		private int height;
-		public bool showGrid {
-			get => showGrid;
-			set {
-				showGrid = value;
-			}
-		}
+		private bool showGrid = false;
+		private void setShowGrid(bool value) {
+ 			bool update = showGrid != value;
+ 			showGrid = value;
+ 			if (update) {
+ 				updateGridLayer();
+ 			}
+ 		}
+ 		public void toggleGrid() {
+ 			setShowGrid(!showGrid);
+ 		}
 		private Game game;
+		private GameData data;
 		private GameMap gameMap;
 
 		public override void _Draw() {
@@ -119,8 +125,9 @@ namespace C7.Map {
 		}
 
 		public MapView(Game game, GameData data) {
+			this.data = data;
 			this.game = game;
-			gameMap = data.map;
+			this.gameMap = data.map;
 			width = gameMap.numTilesWide / 2;
 			height = gameMap.numTilesTall;
 			initializeTileMap();
@@ -441,5 +448,15 @@ namespace C7.Map {
 
 			updateBuildingLayer(tile);
 		}
+
+		private void updateGridLayer() {
+ 			if (showGrid) {
+ 				foreach (Tile tile in data.map.tiles) {
+ 					setCell(Layer.Grid, Atlas.Grid, tile, Vector2I.Zero);
+ 				}
+ 			} else {
+ 				tilemap.ClearLayer(Layer.Grid.Index());
+ 			}
+ 		}
 	}
 }
