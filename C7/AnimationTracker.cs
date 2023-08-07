@@ -1,14 +1,8 @@
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using C7GameData;
-<<<<<<< HEAD
-=======
-using C7Engine;
-using Godot;
->>>>>>> 7b18d7e (unit and tile IDs, having issues with updating save json when changing format)
 
 public partial class AnimationTracker {
 	private AnimationManager civ3AnimData;
