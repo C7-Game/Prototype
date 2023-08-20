@@ -23,10 +23,7 @@ public partial class AnimationTracker {
 
 	public Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
 
-	public long getCurrentTimeMS()
-	{
-		return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-	}
+	public long getCurrentTimeMS() => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
 	private string getTileID(Tile tile)
 	{
@@ -110,19 +107,19 @@ public partial class AnimationTracker {
 
 	public void update()
 	{
-		long currentTimeMS = (! endAllImmediately) ? getCurrentTimeMS() : long.MaxValue;
+		long currentTimeMS = !endAllImmediately ? getCurrentTimeMS() : long.MaxValue;
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (id, aa) = (guidAAPair.Key, guidAAPair.Value);
-			if (aa.completionEvent != null) {
+			if (aa.completionEvent is not null) {
 				aa.completionEvent.Set();
 				aa.completionEvent = null; // So event is only triggered once
 			}
-			if (aa.ending == AnimationEnding.Stop)
+			if (aa.ending == AnimationEnding.Stop) {
 				keysToRemove.Add(id);
+			}
 		}
-		foreach (var key in keysToRemove)
-			activeAnims.Remove(key);
+		keysToRemove.ForEach(key => activeAnims.Remove(key));
 	}
 
 	public MapUnit.Appearance getUnitAppearance(MapUnit unit)

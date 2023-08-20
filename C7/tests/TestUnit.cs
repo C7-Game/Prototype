@@ -11,20 +11,16 @@ public partial class TestUnit : Node2D
 		manager.forUnit(prototype, MapUnit.AnimatedAction.RUN).loadSpriteAnimation();
 		string name = AnimationManager.AnimationKey(prototype, MapUnit.AnimatedAction.RUN, TileDirection.EAST);
 		AddChild(sprite);
+		sprite.Play(name);
 
 		float scale = 6;
 		this.Scale = new Vector2(scale, scale);
 
-		sprite.material.SetShaderParameter("tintColor", new Vector3(1f,1f,1f));
+		sprite.SetColor(new Color(1, 1, 1));
 		sprite.Position = new Vector2(30, 30);
-		sprite.Play(name);
 
-		AnimatedSprite2D cursor = new AnimatedSprite2D();
-		SpriteFrames cursorFrames = new SpriteFrames();
-		cursor.SpriteFrames = cursorFrames;
-		AnimationManager.loadCursorAnimation("Art/Animations/Cursor/Cursor.flc", ref cursorFrames);
+		CursorSprite cursor = new CursorSprite();
 		cursor.Position = new Vector2(120, 30);
-		cursor.Play("cursor");
 		AddChild(cursor);
 	}
 }
