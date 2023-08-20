@@ -98,7 +98,7 @@ namespace C7.Map {
 				}
 			}
 			// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
-			return selected is not null ? selected : (interesting is not null ? interesting : bestDefender);
+			return selected ?? interesting ?? bestDefender;
 		}
 
 		public List<Tile> getVisibleTiles() {
