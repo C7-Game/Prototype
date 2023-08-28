@@ -1,7 +1,8 @@
+using System.Threading;
+using C7GameData;
+
 namespace C7Engine
 {
-	using System.Threading;
-	using C7GameData;
 
 	public class MessageToUI {
 		public void send()
@@ -37,6 +38,14 @@ namespace C7Engine
 			this.effect = effect;
 			this.completionEvent = completionEvent;
 			this.ending = ending;
+		}
+	}
+
+	public class MsgCityBuilt : MessageToUI {
+		public int tileIndex;
+
+		public MsgCityBuilt(Tile tile) {
+			this.tileIndex = EngineStorage.gameData.map.tileCoordsToIndex(tile.xCoordinate, tile.yCoordinate);
 		}
 	}
 
