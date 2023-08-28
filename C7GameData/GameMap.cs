@@ -117,10 +117,13 @@ namespace C7GameData
 
 		public Tile tileAt(int x, int y)
 		{
-			if (isTileAt(x, y))
-				return tiles[tileCoordsToIndex(wrapTileX(x), wrapTileY(y))];
-			else
-				return Tile.NONE;
+			return isTileAt(x, y) ? tiles[tileCoordsToIndex(wrapTileX(x), wrapTileY(y))] : Tile.NONE;
+		}
+
+		public Tile tileAtIndex(int index) {
+			int x, y;
+			tileIndexToCoords(index, out x, out y);
+			return tileAt(x, y);
 		}
 
 		/**

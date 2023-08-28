@@ -1,7 +1,5 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace C7.Map {
 
@@ -14,6 +12,7 @@ namespace C7.Map {
 		TerrainYield,
 		Building,
 		Grid,
+		FogOfWar,
 		Invalid,
 	};
 
@@ -46,6 +45,7 @@ namespace C7.Map {
 		TerrainBuilding,
 		GoodyHut,
 		Grid,
+		FogOfWar,
 		Invalid,
 	}
 
@@ -70,8 +70,8 @@ namespace C7.Map {
 			height = h;
 			regionSize = rs;
 			textureOrigin = new Vector2I(0, y);
-			source = new TileSetAtlasSource {
-				Texture = Util.LoadTextureFromPCX(path),
+			source = new TileSetAtlasSource{
+				Texture = p.EndsWith("FogOfWar.pcx") ? Util.LoadFogOfWarPCX(path) : Util.LoadTextureFromPCX(path),
 				TextureRegionSize = regionSize,
 			};
 		}
@@ -204,6 +204,8 @@ namespace C7.Map {
 
 			{Atlas.TerrainBuilding, new AtlasLoader("Art/Terrain/TerrainBuildings.pcx", 4, 4, buildingSize)},
 			{Atlas.GoodyHut, new NonSquareAtlasLoader("Art/Terrain/goodyhuts.pcx", 3, 3, 2, buildingSize)},
+
+			{Atlas.FogOfWar, new NonSquareAtlasLoader("Art/Terrain/FogOfWar.pcx", 9, 9, 8, tileSize)},
 		};
 
 		public static TileSet LoadCiv3TileSet() {

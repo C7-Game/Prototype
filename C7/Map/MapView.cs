@@ -8,6 +8,14 @@ using C7Engine;
 
 namespace C7.Map {
 
+	public static class MapZIndex {
+		public static readonly int Tiles = 10;
+		public static readonly int Cities = 20;
+		public static readonly int Cursor = 29;
+		public static readonly int Units = 30;
+		public static readonly int FogOfWar = 100;
+	}
+
 	public partial class MapView : Node2D {
 		private string[,]terrain;
 		private TileMap terrainTilemap;
@@ -155,10 +163,15 @@ namespace C7.Map {
 				if (layer != Layer.Invalid) {
 					tilemap.AddLayer(layer.Index());
 					tilemap.SetLayerYSortEnabled(layer.Index(), true);
+					if (layer != Layer.FogOfWar) {
+ 						tilemap.SetLayerYSortEnabled(layer.Index(), true);
+ 					} else {
+ 						tilemap.SetLayerZIndex(layer.Index(), MapZIndex.FogOfWar);
+ 					}
 				}
 			}
 
-			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
+			tilemap.ZIndex = MapZIndex.Tiles;
 			AddChild(tilemap);
 			AddChild(terrainTilemap);
 			// AddChild(terrainTilemapShadow);
@@ -241,8 +254,9 @@ namespace C7.Map {
 			setTerrainTiles();
 
 			// update each tile once to add all initial layers
+			TileKnowledge tk = data.GetHumanPlayers().First()?.tileKnowledge;
 			foreach (Tile tile in gameMap.tiles) {
-				updateTile(tile);
+				updateTile(tile, tk);
 			}
 		}
 
@@ -496,11 +510,55 @@ namespace C7.Map {
 			}
 		}
 
-		public void updateTile(Tile tile) {
+		// updateFogOfWarLayer returns true if the tile is visible or
+ 		// semi-visible, indicating other layers should be updated.
+
+		private static int fogOfWarIndex(Tile tile, TileKnowledge tk) {
+			if (tk.isTileKnown(tile)) {
+				return 0;
+			}
+			int sum = 0;
+			// HACK: edge tiles have missing directions in neighbors map
+			if (tile.neighbors.Values.Count != 8) {
+				return sum;
+			}
+			if (tk.isTileKnown(tile.neighbors[TileDirection.NORTH]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST])) {
+				sum += 1 * 2;
+			}
+			if (tk.isTileKnown(tile.neighbors[TileDirection.WEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST])) {
+				sum += 3 * 2;
+			}
+			if (tk.isTileKnown(tile.neighbors[TileDirection.EAST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+				sum += 9 * 2;
+			}
+			if (tk.isTileKnown(tile.neighbors[TileDirection.SOUTH]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+				sum += 27 * 2;
+			}
+			return sum;
+		}
+
+		private bool updateFogOfWarLayer(Tile tile, TileKnowledge tk) {
+			if (tk.isTileKnown(tile)) {
+				eraseCell(Layer.FogOfWar, tile);
+				return true;
+			}
+			int index = fogOfWarIndex(tile, tk);
+			setCell(Layer.FogOfWar, Atlas.FogOfWar, tile, new Vector2I(index % 9, index / 9));
+			return index > 0; // partially visible
+		}
+
+		public void updateTile(Tile tile, TileKnowledge tk) {
 			if (tile == Tile.NONE || tile is null) {
 				string msg = tile is null ? "null tile" : "Tile.NONE";
 				log.Warning($"attempting to update {msg}");
 				return;
+			}
+
+			if (tk is not null) {
+				bool visible = updateFogOfWarLayer(tile, tk);
+				if (!visible) {
+					return;
+				}
 			}
 
 			updateRoadLayer(tile, true);
@@ -533,5 +591,17 @@ namespace C7.Map {
  				tilemap.ClearLayer(Layer.Grid.Index());
  			}
  		}
+
+		public void discoverTile(Tile tile, TileKnowledge tk) {
+			HashSet<Tile> update = new HashSet<Tile>(tile.neighbors.Values);
+			foreach (Tile n in tile.neighbors.Values) {
+				foreach (Tile nn in n.neighbors.Values) {
+					update.Add(nn);
+				}
+			}
+			foreach (Tile t in update) {
+				updateTile(t, tk);
+			}
+		}
 	}
 }
