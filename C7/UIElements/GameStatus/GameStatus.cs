@@ -21,9 +21,9 @@ public partial class GameStatus : MarginContainer
 		AddChild(LowerRightInfoBox);
 	}
 
-	public void OnNewUnitSelected(ParameterWrapper wrappedMapUnit)
+	public void OnNewUnitSelected(ParameterWrapper<MapUnit> wrappedMapUnit)
 	{
-		MapUnit newUnit = wrappedMapUnit.GetValue<MapUnit>();
+		MapUnit newUnit = wrappedMapUnit.Value;
 		log.Information("Selected unit: " + newUnit + " at " + newUnit.location);
 		LowerRightInfoBox.UpdateUnitInfo(newUnit, newUnit.location.overlayTerrainType);
 	}
