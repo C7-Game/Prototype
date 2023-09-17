@@ -28,7 +28,7 @@ public partial class PopupOverlay : HBoxContainer
 		Hide();
 	}
 
-	public bool ShowingPopup() => currentChild is not null;
+	public bool ShowingPopup => currentChild is not null;
 
 	public void PlaySound(AudioStreamWav wav)
 	{

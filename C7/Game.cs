@@ -442,7 +442,7 @@ public partial class Game : Node2D {
 
 	// Handle Godot keybind actions
 	private void processActions() {
-		if (Input.IsActionJustPressed(C7Action.Escape) && popupOverlay.Visible) {
+		if (Input.IsActionJustPressed(C7Action.Escape) && popupOverlay.ShowingPopup) {
 			popupOverlay.OnHidePopup();
 			return;
 		}
