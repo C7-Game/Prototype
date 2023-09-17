@@ -217,8 +217,8 @@ namespace C7.Map {
 
 			setHorizontalWrap(HorizontalWrapState.Right); // just put it somewhere
 
-			tilemap.ZIndex = 10; // need to figure out a good way to order z indices
-			wrappingTilemap.ZIndex = 10;
+			tilemap.ZIndex = MapZIndex.Tiles; // need to figure out a good way to order z indices
+			wrappingTilemap.ZIndex = MapZIndex.Tiles;
 			AddChild(tilemap);
 			AddChild(wrappingTilemap);
 			AddChild(terrainTilemap);
@@ -297,7 +297,7 @@ namespace C7.Map {
 			// TODO in the future convert civ3 coordinates to stacked
 			// coordinates when reading from the civ3 save so Tile has
 			// stacked coordinates
-			foreach (C7GameData.Tile t in gameMap.tiles) {
+			foreach (Tile t in gameMap.tiles) {
 				Vector2I coords = stackedCoords(t);
 				terrain[coords.X, coords.Y] = t.baseTerrainTypeKey;
 			}

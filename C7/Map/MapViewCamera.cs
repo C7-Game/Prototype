@@ -18,10 +18,18 @@ namespace C7.Map {
 		private int wrapEdgeTileMargin = 2; // margin in number of tiles to trigger map wrapping
 		private HorizontalWrapState hwrap = HorizontalWrapState.None;
 
-		public void attachToMapView(MapView map) {
+		public async void attachToMapView(MapView map) {
 			this.map = map;
 			wrapEdgeMargin = wrapEdgeTileMargin * map.tileSize.X;
 			map.updateAnimations();
+
+			// Awaiting a 0 second timer is a workaround to force GlobalCanvasTransform to be updated.
+			// This is necessary when the camera's starting position is close to the edge of the map.
+			// Without it, the GlobalCanvasTransform will not be updated until the camera is moved,
+			// resulting in broken map wrapping. I tried awaiting "process_frame" but it does not seem
+			// to work, although I believe that is what we want to do here. GPT-4 suggested waiting for
+			// a 0 second timer, which seems to work.
+			await ToSignal(GetTree().CreateTimer(0), "timeout");
 			checkWorldWrap();
 		}
 
@@ -63,7 +71,6 @@ namespace C7.Map {
 		//   to give the illusion of true wrapping tilemap
 		// - teleport the camera one world-width to the left or right when
 		//   only the "wrap" tilemap is in view
-
 		private void checkWorldWrap() {
 			if (map is null || !map.wrapHorizontally) {
 				// TODO: for maps that do not wrap horizontally restrict movement
@@ -94,10 +101,9 @@ namespace C7.Map {
 			}
 		}
 
-		public Rect2 getVisibleWorld() {
-			Transform2D vpToGlobal = (GetViewport().GlobalCanvasTransform * GetCanvasTransform()).AffineInverse();
-			return vpToGlobal * GetViewportRect();
-		}
+		private Transform2D viewportToGlobalTransform => (GetViewport().GlobalCanvasTransform * GetCanvasTransform()).AffineInverse();
+
+		public Rect2 getVisibleWorld() => viewportToGlobalTransform * GetViewportRect();
 
 		public void centerOnTile(Tile tile, MapView map) {
 			Vector2 target = map.tileToLocal(tile);
