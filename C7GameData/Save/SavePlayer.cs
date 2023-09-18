@@ -28,7 +28,7 @@ namespace C7GameData.Save {
 				tileKnowledge = new TileKnowledge(),
 			};
 			foreach (TileLocation tile in tileKnowledge) {
-				player.tileKnowledge.AddTilesToKnown(map.tileAt(tile.x, tile.y));
+				player.tileKnowledge.AddTileToKnown(map.tileAt(tile.x, tile.y));
 			}
 			return player;
 		}
