@@ -29,7 +29,7 @@ start:
 					if (unit.location == settlerAi.destination) {
 						log.Information("Building city with " + unit);
 						//TODO: This should use a message, and the message handler should cause the disbanding to happen.
-						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.guid, unit.owner.GetNextCityName());
+						CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, player.id, unit.owner.GetNextCityName());
 						unit.disband();
 					}
 					else {

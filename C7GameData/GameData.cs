@@ -17,7 +17,7 @@ namespace C7GameData
 		public List<Player> players = new List<Player>();
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
 		public List<Resource> Resources = new List<Resource>();
-		public List<MapUnit> mapUnits {get;} = new List<MapUnit>();
+		public List<MapUnit> mapUnits {get; set;} = new List<MapUnit>();
 		public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
 		public List<City> cities = new List<City>();
 
@@ -63,6 +63,10 @@ namespace C7GameData
 			return mapUnits.Find(u => u.id == id);
 		}
 
+		public Player GetPlayer(ID id) {
+			return players.Find(p => p.id == id);
+		}
+
 		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel)
 		{
 			int n = experienceLevels.IndexOf(experienceLevel);
@@ -100,7 +104,7 @@ namespace C7GameData
 			this.turn = 0;
 
 			uint white = 0xFFFFFFFF;
-			Player barbarianPlayer = new Player(white);
+			Player barbarianPlayer = new Player(ids.CreateID("player"), white);
 			barbarianPlayer.isBarbarians = true;
 			players.Add(barbarianPlayer);
 
@@ -117,7 +121,7 @@ namespace C7GameData
 			carthage.cityNames.Add("Thabraca");
 			carthage.cityNames.Add("Panormus");
 			uint grey = 0xA0A0A0FF;
-			Player carthagePlayer = new Player(carthage, grey);
+			Player carthagePlayer = new Player(ids.CreateID("player"), carthage, grey);
 			carthagePlayer.isHuman = true;
 			players.Add(carthagePlayer);
 
@@ -134,7 +138,7 @@ namespace C7GameData
 			rome.cityNames.Add("Pompeii");
 			rome.cityNames.Add("Arettium");
 			uint romanRed = 0xE00000FF;
-			Player romePlayer = new Player(rome, romanRed);
+			Player romePlayer = new Player(ids.CreateID("player"), rome, romanRed);
 			players.Add(romePlayer);
 
 			Civilization babylon = new Civilization();
@@ -155,7 +159,7 @@ namespace C7GameData
 			babylon.cityNames.Add("Nineveh");
 
 			uint blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-			Player babylonPlayer = new Player(babylon, blue);
+			Player babylonPlayer = new Player(ids.CreateID("player"), babylon, blue);
 			babylonPlayer.isHuman = false;
 			players.Add(babylonPlayer);
 
@@ -173,7 +177,7 @@ namespace C7GameData
 			greece.cityNames.Add("Miletus");
 
 			uint green = 0x00EE00FF;
-			Player computerPlayOne = new Player(greece, green);
+			Player computerPlayOne = new Player(ids.CreateID("player"), greece, green);
 			players.Add(computerPlayOne);
 
 			Civilization america = new Civilization();
@@ -194,7 +198,7 @@ namespace C7GameData
 			america.cityNames.Add("Louisville");
 
 			uint teal = 0x40EEEEFF;
-			Player computerPlayerTwo = new Player(america, teal);
+			Player computerPlayerTwo = new Player(ids.CreateID("player"), america, teal);
 			players.Add(computerPlayerTwo);
 
 			Civilization theNetherlands = new Civilization();
@@ -209,7 +213,7 @@ namespace C7GameData
 			theNetherlands.cityNames.Add("Maastricht");
 
 			uint orange = 0xFFAB12FF;
-			Player computerPlayerThree = new Player(theNetherlands, orange);
+			Player computerPlayerThree = new Player(ids.CreateID("player"), theNetherlands, orange);
 			players.Add(computerPlayerThree);
 
 			List<Tile> startingLocations = map.generateStartingLocations(players.Count, 10);

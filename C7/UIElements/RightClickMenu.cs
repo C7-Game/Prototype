@@ -122,7 +122,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 		RemoveAll();
 
 		int fortifiedCount = 0;
-		List<MapUnit> units = tile.unitsOnTile.FindAll(unit => unit.owner.guid == game.controller.guid);
+		List<MapUnit> units = tile.unitsOnTile.FindAll(unit => unit.owner.id == game.controller.id);
 
 		foreach (MapUnit unit in units) {
 			bool isFortified = isUnitFortified(unit, uiUpdatedUnitStates);
