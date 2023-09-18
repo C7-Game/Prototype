@@ -68,7 +68,7 @@ namespace C7GameData
 				};
 				int x, y;
 				(x, y) = GetMapCoordinates(i, civ3Save.Wrld.Width);
-				Tile c7Tile = new Tile
+				Tile c7Tile = new Tile(c7Save.GameData.ids.CreateID("tile"))
 				{
 					xCoordinate = x,
 					yCoordinate = y,
@@ -134,7 +134,7 @@ namespace C7GameData
 				};
 				int x, y;
 				(x, y) = GetMapCoordinates(i, theBiq.Wmap[0].Width);
-				Tile c7Tile = new Tile
+				Tile c7Tile = new Tile(c7Save.GameData.ids.CreateID("tile"))
 				{
 					xCoordinate = x,
 					yCoordinate = y,

@@ -75,17 +75,17 @@ namespace C7Engine
 			waitQueue.Clear();
 		}
 
-		public static void waitUnit(GameData gameData, string guid)
+		public static void waitUnit(GameData gameData, ID id)
 		{
 			foreach (MapUnit unit in gameData.mapUnits)
 			{
-				if (unit.guid == guid)
+				if (unit.id == id)
 				{
-					log.Verbose("Found matching unit with guid " + guid + " of type " + unit.GetType().Name + "; adding it to the wait queue");
+					log.Verbose("Found matching unit with id " + id + " of type " + unit.GetType().Name + "; adding it to the wait queue");
 					waitQueue.Enqueue(unit);
 				}
 			}
-			log.Warning("Failed to find a matching unit with guid " + guid);
+			log.Warning("Failed to find a matching unit with id " + id);
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace C7Engine
 			GameData gameData = EngineStorage.gameData;
 			Player owner = gameData.players.Find(player => player.guid == playerGuid);
 			Tile tileWithNewCity = gameData.map.tileAt(x, y);
-			City newCity = new City(tileWithNewCity, owner, name);
+			City newCity = new City(tileWithNewCity, owner, name, gameData.ids.CreateID("city"));
 			CityResident firstResident = new CityResident();
 			CityTileAssignmentAI.AssignNewCitizenToTile(newCity, firstResident);
 			newCity.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(newCity, null));

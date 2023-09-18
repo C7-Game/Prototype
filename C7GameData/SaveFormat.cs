@@ -128,7 +128,8 @@ namespace C7GameData
 
 				Converters = {
 					// Serialize 2D array types
-					new Json2DArrayConverter()
+					new Json2DArrayConverter(),
+					new IDJsonConverter(),
 				},
 			};
 		}

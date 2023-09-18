@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -21,18 +20,11 @@ public partial class AnimationTracker {
 		public C7Animation anim;
 	}
 
-	public Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
+	private Dictionary<ID, ActiveAnimation> activeAnims = new Dictionary<ID, ActiveAnimation>();
 
 	public long getCurrentTimeMS() => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-	private string getTileID(Tile tile)
-	{
-		// Generate a string to ID this tile that won't conflict with the unit GUIDs. TODO: Eventually we'll implement a common way of ID'ing
-		// all game objects. Use that here instead.
-		return String.Format("Tile.{0}.{1}", tile.xCoordinate, tile.yCoordinate);
-	}
-
-	private void startAnimation(string id, C7Animation anim, AutoResetEvent completionEvent, AnimationEnding ending)
+	private void startAnimation(ID id, C7Animation anim, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
 		long currentTimeMS = getCurrentTimeMS();
 		long animDurationMS = (long)(1000.0 * anim.getDuration());
@@ -55,30 +47,30 @@ public partial class AnimationTracker {
 
 	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
-		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType, action), completionEvent, ending);
+		startAnimation(unit.id, civ3AnimData.forUnit(unit.unitType, action), completionEvent, ending);
 	}
 
 	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
-		startAnimation(getTileID(tile), civ3AnimData.forEffect(effect), completionEvent, ending);
+		startAnimation(tile.id, civ3AnimData.forEffect(effect), completionEvent, ending);
 	}
 
 	public void endAnimation(MapUnit unit)
 	{
 		ActiveAnimation aa;
-		if (activeAnims.TryGetValue(unit.guid, out aa)) {
+		if (activeAnims.TryGetValue(unit.id, out aa)) {
 			if (aa.completionEvent != null)
 				aa.completionEvent.Set();
-			activeAnims.Remove(unit.guid);
+			activeAnims.Remove(unit.id);
 		}
 	}
 
 	public bool hasCurrentAction(MapUnit unit)
 	{
-		return activeAnims.ContainsKey(unit.guid);
+		return activeAnims.ContainsKey(unit.id);
 	}
 
-	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(string id)
+	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(ID id)
 	{
 		ActiveAnimation aa = activeAnims[id];
 
@@ -97,18 +89,18 @@ public partial class AnimationTracker {
 
 	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(MapUnit unit)
 	{
-		return getCurrentActionAndProgress(unit.guid);
+		return getCurrentActionAndProgress(unit.id);
 	}
 
 	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(Tile tile)
 	{
-		return getCurrentActionAndProgress(getTileID(tile));
+		return getCurrentActionAndProgress(tile.id);
 	}
 
 	public void update()
 	{
-		long currentTimeMS = !endAllImmediately ? getCurrentTimeMS() : long.MaxValue;
-		var keysToRemove = new List<string>();
+		long currentTimeMS = (! endAllImmediately) ? getCurrentTimeMS() : long.MaxValue;
+		List<ID> keysToRemove = new List<ID>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (id, aa) = (guidAAPair.Key, guidAAPair.Value);
 			if (aa.completionEvent is not null) {
@@ -155,6 +147,6 @@ public partial class AnimationTracker {
 	public C7Animation getTileEffect(Tile tile)
 	{
 		ActiveAnimation aa;
-		return activeAnims.TryGetValue(getTileID(tile), out aa) ? aa.anim : null;
+		return activeAnims.TryGetValue(tile.id, out aa) ? aa.anim : null;
 	}
 }
