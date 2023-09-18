@@ -14,6 +14,12 @@ namespace C7GameData
 			}
 		}
 
+		// neighboring tiles should not be added when loading tile knowledge
+		// from a .sav file
+		internal bool AddTileToKnown(Tile unitLocation) {
+			return knownTiles.Add(unitLocation);
+		}
+
 		public bool isTileKnown(Tile t) {
 			return knownTiles.Contains(t);
 		}
