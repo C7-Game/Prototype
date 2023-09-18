@@ -48,6 +48,7 @@ namespace C7GameData.Save {
 				movementPoints = new MovementPoints(),
 				isFortified = action == "fortified",
 			};
+			unit.location.unitsOnTile.Add(unit);
 			unit.movementPoints.reset(movePointsRemaining);
 			return unit;
 		}

@@ -77,12 +77,14 @@ namespace C7GameData
 			}
 
 			// Inflate experience levels
-			var levelsByKey = new Dictionary<string, ExperienceLevel>();
-			foreach (ExperienceLevel eL in save.GameData.experienceLevels)
+			Dictionary<string, ExperienceLevel> levelsByKey = new Dictionary<string, ExperienceLevel>();
+			foreach (ExperienceLevel eL in save.GameData.experienceLevels) {
 				levelsByKey.Add(eL.key, eL);
+			}
 			save.GameData.defaultExperienceLevel = levelsByKey[save.GameData.defaultExperienceLevelKey];
-			foreach (MapUnit unit in save.GameData.mapUnits)
+			foreach (MapUnit unit in save.GameData.mapUnits) {
 				unit.experienceLevel = levelsByKey[unit.experienceLevelKey];
+			}
 
 			//Inflate barbarian info
 			List<UnitPrototype> prototypes = save.GameData.unitPrototypes.Values.ToList();
