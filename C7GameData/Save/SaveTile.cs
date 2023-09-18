@@ -17,9 +17,6 @@ namespace C7GameData.Save {
 			if (tile.Resource != Resource.NONE) {
 				resource = tile.ResourceKey;
 			}
-			if (tile.cityAtTile is not null) {
-				city = tile.cityAtTile.id;
-			}
 			foreach (FieldInfo fi in tile.GetType().GetFields()) {
 				if (fi.Name.StartsWith("river") && fi.FieldType == typeof(bool) && (bool)fi.GetValue(tile)) {
 					features.Add(fi.Name);
@@ -53,7 +50,6 @@ namespace C7GameData.Save {
 				baseTerrainType = terrainTypes.Find(tt => tt.Key == baseTerrain),
 				overlayTerrainTypeKey = overlayTerrain,
 				overlayTerrainType = terrainTypes.Find(tt => tt.Key == overlayTerrain),
-				cityAtTile = cities.Find(c => c.id == city),
 				hasBarbarianCamp = features.Contains("barbarianCamp"),
 				// TODO: load working tile
 				ResourceKey = resource is null ? Resource.NONE.Key : resource,
@@ -85,7 +81,6 @@ namespace C7GameData.Save {
 		public string baseTerrain;
 		public string overlayTerrain;
 		public string resource;
-		public ID city;
 		public List<string> features = new List<string>();
 		public List<string> overlays = new List<string>();
 	}
