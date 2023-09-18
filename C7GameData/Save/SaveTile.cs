@@ -20,9 +20,6 @@ namespace C7GameData.Save {
 			if (tile.cityAtTile is not null) {
 				city = tile.cityAtTile.id;
 			}
-			foreach (MapUnit unit in tile.unitsOnTile) {
-				units.Add(unit.id);
-			}
 			foreach (FieldInfo fi in tile.GetType().GetFields()) {
 				if (fi.Name.StartsWith("river") && fi.FieldType == typeof(bool) && (bool)fi.GetValue(tile)) {
 					features.Add(fi.Name);
@@ -59,7 +56,6 @@ namespace C7GameData.Save {
 				cityAtTile = cities.Find(c => c.id == city),
 				hasBarbarianCamp = features.Contains("barbarianCamp"),
 				// TODO: load working tile
-				unitsOnTile = mapUnits.Where(u => units.Contains(u.id)).ToList(),
 				ResourceKey = resource is null ? Resource.NONE.Key : resource,
 				riverNorth = features.Contains("riverNorth"),
 				riverNortheast = features.Contains("riverNortheast"),
@@ -90,7 +86,6 @@ namespace C7GameData.Save {
 		public string overlayTerrain;
 		public string resource;
 		public ID city;
-		public List<ID> units = new List<ID>();
 		public List<string> features = new List<string>();
 		public List<string> overlays = new List<string>();
 	}

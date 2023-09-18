@@ -70,6 +70,7 @@ namespace C7GameData.Save {
 			save.HealRates["hostile_field"] = data.healRateInHostileField;
 			save.HealRates["city"] = data.healRateInCity;
 			save.ScenarioSearchPath = data.scenarioSearchPath;
+			save.DefaultExperienceLevel = data.defaultExperienceLevelKey;
 			return save;
 		}
 
