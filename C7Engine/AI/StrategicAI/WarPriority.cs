@@ -41,7 +41,7 @@ namespace C7GameData.AIData {
 							int rnd = GameData.rng.Next(opponentCount);
 							if (rnd == 0) {
 								//Let's fight this nation!
-								properties["opponent"] = nation.guid;
+								properties["opponent"] = nation.id.ToString();
 								calculatedWeight = TEMP_WAR_PRIORITY_WEIGHT;
 							} else {
 								opponentCount--;	//guarantees we'll eventually get an opponent selected

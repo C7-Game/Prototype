@@ -1,7 +1,10 @@
+using System;
+using System.Linq;
+using C7GameData;
+using C7GameData.Save;
+
 namespace C7Engine
 {
-	using System;
-	using C7GameData;
 
 	public class CreateGame
 	{
@@ -16,12 +19,24 @@ namespace C7Engine
 			EngineStorage.createThread();
 			EngineStorage.gameDataMutex.WaitOne();
 
-			C7SaveFormat save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
-			EngineStorage.gameData = save.GameData;
-			// Consider if we have any need to keep a reference to the save object handy...probably not
+			SaveGame save = SaveGame.Load(loadFilePath);
+			GameData gameData = save.ToGameData();
 
-			var humanPlayer = save.GameData.CreateDummyGameData();
-			EngineStorage.uiControllerID = humanPlayer.guid;
+			EngineStorage.gameData = gameData;
+
+			// TODO: (pcen) initially, in the false branch I assigned gameData.CreateDummyGameData
+			// to humanPlayer, but this is not correct since there are already players and units in
+			// the .sav - instead, we should remove CreateDummyGameData and implement simple save
+			// generation using the new SaveGame class. This would be difficult before due to GameData's
+			// members containing numerous references to eachother, but with SaveGame, each entity is
+			// only defined once in the save file, and references to it are stored as IDs making it easy
+			// to generate and modify valid save files.
+			Player humanPlayer = gameData.players.Any(p => p.isHuman) switch {
+				true => gameData.players.Find(p => p.isHuman),
+				false => throw new Exception($"{loadFilePath} does not contain a human player"),
+			};
+
+			EngineStorage.uiControllerID = humanPlayer.id;
 			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();
 

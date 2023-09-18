@@ -179,7 +179,7 @@ namespace C7Engine
 
 		public override void process()
 		{
-			Player controller = EngineStorage.gameData.players.Find(p => p.guid == EngineStorage.uiControllerID);
+			Player controller = EngineStorage.gameData.GetPlayer(EngineStorage.uiControllerID);
 
 			foreach (MapUnit unit in controller.units) {
 				log.Debug($"{unit}, path length: {unit.path?.PathLength() ?? 0}");

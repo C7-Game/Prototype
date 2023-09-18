@@ -18,7 +18,7 @@ namespace C7Engine
 	{
 		public static Mutex gameDataMutex = new Mutex();
 		internal static GameData gameData {get; set;}
-		public static string uiControllerID;
+		public static ID uiControllerID;
 		internal static bool animationsEnabled = true;
 
 		private static Thread engineThread = null;

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using C7Engine.AI.StrategicAI;
-using C7GameData.AIData;
 
 namespace C7GameData
 {
@@ -9,7 +8,7 @@ using System;
 
 public class Player
 {
-	public string guid { get; set; }
+	public ID id { get; internal set; }
 	public uint color { get; set; }
 	public bool isBarbarians = false;
 	//TODO: Refactor front-end so it sends player GUID with requests.
@@ -18,7 +17,7 @@ public class Player
 	public bool hasPlayedThisTurn = false;
 
 	public Civilization civilization;
-	private int cityNameIndex = 0;
+	internal int cityNameIndex = 0;
 
 	public List<MapUnit> units = new List<MapUnit>();
 	public List<City> cities = new List<City>();
@@ -28,16 +27,16 @@ public class Player
 	public List<StrategicPriority> strategicPriorityData = new List<StrategicPriority>();
 	public int turnsUntilPriorityReevaluation = 0;
 
-	public Player(uint color)
+	public Player(ID id, uint color)
 	{
-		guid = Guid.NewGuid().ToString();
+		this.id = id;
 		this.color = color & 0xFFFFFFFF;
 	}
 
-	public Player(Civilization civilization, uint color)
+	public Player(ID id, Civilization civilization, uint color)
 	{
 		this.civilization = civilization;
-		guid = Guid.NewGuid().ToString();
+		this.id = id;
 		this.color = color & 0xFFFFFFFF;
 	}
 

@@ -2,6 +2,7 @@
 {
 	using System.IO;
 	using C7GameData;
+	using C7GameData.Save;
 
 	enum SaveFileFormat {
 		Sav,
@@ -16,46 +17,31 @@
 	{
 		private static SaveFileFormat getFileFormat(string path)
 		{
-			var ext = Path.GetExtension(path);
-			if (ext.Equals(".SAV", System.StringComparison.CurrentCultureIgnoreCase))
-			{
-				return SaveFileFormat.Sav;
-			}
-			else if (ext.Equals(".BIQ", System.StringComparison.CurrentCultureIgnoreCase))
-			{
-				return SaveFileFormat.Biq;
-			}
-			else if (ext.Equals(".JSON", System.StringComparison.CurrentCultureIgnoreCase)
-			         || ext.Equals(".ZIP", System.StringComparison.CurrentCultureIgnoreCase))
-			{
-				return SaveFileFormat.C7;
-			}
-			return SaveFileFormat.Invalid;
+			return Path.GetExtension(path).ToUpper() switch {
+				".SAV" => SaveFileFormat.Sav,
+				".BIQ" => SaveFileFormat.Biq,
+				".JSON" => SaveFileFormat.C7,
+				".ZIP" => SaveFileFormat.C7,
+				_ => SaveFileFormat.Invalid,
+			};
 		}
 
 		// Load and initialize a save
-		public static C7SaveFormat LoadSave(string path, string bicPath)
+		public static SaveGame LoadSave(string path, string bicPath)
 		{
-			C7SaveFormat save = null;
-			switch (getFileFormat(path))
-			{
-			case SaveFileFormat.Sav:
-				save = ImportCiv3.ImportSav(path, bicPath);
-				break;
-			case SaveFileFormat.Biq:
-				save = ImportCiv3.ImportBiq(path, bicPath);
-				break;
-			case SaveFileFormat.C7:
-				save = C7SaveFormat.Load(path);
-				break;
-			default:
-				throw new FileLoadException("invalid save format");
-			}
-			if (save.PostLoadProcess())
-			{
-				return save;
-			}
-			throw new FileLoadException("could not process save file");
+			SaveGame save = getFileFormat(path) switch {
+				SaveFileFormat.Sav => ImportCiv3.ImportSav(path, bicPath),
+				SaveFileFormat.Biq => ImportCiv3.ImportBiq(path, bicPath),
+				SaveFileFormat.C7 => SaveGame.Load(path),
+				_ => throw new FileLoadException("invalid save format"),
+			};
+			return save;
+		}
+
+		public static void Save(string path) {
+			GameData gameData = EngineStorage.gameData;
+			SaveGame save = SaveGame.FromGameData(gameData);
+			save.Save(path);
 		}
 
 	}

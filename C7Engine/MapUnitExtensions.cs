@@ -436,7 +436,7 @@ namespace C7Engine {
 
 			// TODO: Need to check somewhere that this unit is allowed to build a city on its current tile. Either do that here or in every caller
 			// (probably best to just do it here).
-			CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, unit.owner.guid, cityName);
+			CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, unit.owner.id, cityName);
 
 			// TODO: Should directly delete the unit instead of disbanding it. Disbanding in a city will eventually award shields, which we
 			// obviously don't want to do here.

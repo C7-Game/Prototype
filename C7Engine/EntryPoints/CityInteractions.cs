@@ -7,10 +7,10 @@ namespace C7Engine
 
 	public class CityInteractions
 	{
-		public static void BuildCity(int x, int y, string playerGuid, string name)
+		public static void BuildCity(int x, int y, ID playerID, string name)
 		{
 			GameData gameData = EngineStorage.gameData;
-			Player owner = gameData.players.Find(player => player.guid == playerGuid);
+			Player owner = gameData.GetPlayer(playerID);
 			Tile tileWithNewCity = gameData.map.tileAt(x, y);
 			City newCity = new City(tileWithNewCity, owner, name, gameData.ids.CreateID("city"));
 			CityResident firstResident = new CityResident();
