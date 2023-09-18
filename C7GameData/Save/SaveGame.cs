@@ -81,6 +81,9 @@ namespace C7GameData.Save {
 			}
 		}
 
+		// TODO: GameData should store Civilizations, otherwise the round trip from
+		// SaveGame to GameData and back loses Civilization instances that are not
+		// assigned to a player.
 		public GameData ToGameData() {
 			// copy data without references
 			GameData data = new GameData{
