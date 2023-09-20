@@ -42,12 +42,12 @@ public class SaveTests
 
 		string developerSave = getBasePath("../C7/Text/c7-static-map-save.json");
 
-		SaveGame saveNeverGameData = SaveGame.Load(developerSave);
+		SaveGame saveNeverGameData = SaveGame.Load(developerSave, SaveCompression.None);
 
-		saveNeverGameData.Save(outputNeverGameDataPath);
+		saveNeverGameData.Save(outputNeverGameDataPath, SaveCompression.None);
 		GameData gameData = saveNeverGameData.ToGameData();
 		SaveGame saveWasGameData = SaveGame.FromGameData(gameData);
-		saveWasGameData.Save(outputWasGameDataPath);
+		saveWasGameData.Save(outputWasGameDataPath, SaveCompression.None);
 
 		byte[] original = File.ReadAllBytes(developerSave);
 		byte[] savedNeverGameData = File.ReadAllBytes(outputNeverGameDataPath);
@@ -60,11 +60,25 @@ public class SaveTests
 		// saved files should be the same as the original
 		Assert.Equal(original, savedNeverGameData);
 
-		// TODO: Currently the order of the properties in the json is different,
-		// so this fails. For testing, it would be convenient to sort SaveGame
-		// fields alphabetically before serializing to json.
-
 		Assert.Equal(original, savedWasGameData);
+	}
+
+	[Fact]
+	public void RoundTripZip() {
+		string zipOutput = getDataPath("output/round-trip-zip.zip");
+		string decompressedOutput = getDataPath("output/round-trip-zip.json");
+		string developerSave = getBasePath("../C7/Text/c7-static-map-save.json");
+		SaveGame saveGame = SaveGame.Load(developerSave, SaveCompression.None);
+		saveGame.Save(zipOutput, SaveCompression.Zip);
+		SaveGame loadedFromZip = SaveGame.Load(zipOutput, SaveCompression.Zip);
+		loadedFromZip.Save(decompressedOutput, SaveCompression.None);
+
+		byte[] original = File.ReadAllBytes(developerSave);
+		byte[] decompressed = File.ReadAllBytes(decompressedOutput);
+
+		Assert.NotEmpty(original);
+		Assert.NotEmpty(decompressed);
+		Assert.Equal(original, decompressed);
 	}
 
 	[Fact]
@@ -90,7 +104,7 @@ public class SaveTests
 			Assert.Null(ex);
 			Assert.NotNull(game);
 			Assert.NotNull(gd);
-			game.Save(Path.Combine(testDirectory, "data", "output", $"gotm_save_{i}.json"));
+			game.Save(Path.Combine(testDirectory, "data", "output", $"gotm_save_{i}.json"), SaveCompression.None);
 			i++;
 		}
 	}
@@ -122,7 +136,7 @@ public class SaveTests
 			Assert.Null(ex);
 			Assert.NotNull(game);
 			Assert.NotNull(gd);
-			game.Save(Path.Combine(testDirectory, "data", "output", $"conquest_{name[0]}.json"));
+			game.Save(Path.Combine(testDirectory, "data", "output", $"conquest_{name[0]}.json"), SaveCompression.None);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -23,9 +24,12 @@ namespace C7GameData.Save {
 			}
 		}
 	}
+	public enum SaveCompression {
+		None,
+		Zip,
+	}
 
 	public class SaveGame {
-
 		private static JsonSerializerOptions JsonOptions {
 			get => new JsonSerializerOptions {
 				PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -59,18 +63,22 @@ namespace C7GameData.Save {
 				Players = data.players.ConvertAll(player => new SavePlayer(player)),
 				Cities = data.cities.ConvertAll(city => new SaveCity(city)),
 				ExperienceLevels = data.experienceLevels,
+				StrengthBonuses = new(){
+					data.fortificationBonus,
+					data.riverCrossingBonus,
+					data.cityLevel1DefenseBonus,
+					data.cityLevel2DefenseBonus,
+					data.cityLevel3DefenseBonus,
+				},
+				HealRates = new(){
+					{"friendly_field", data.healRateInFriendlyField},
+					{"neutral_field", data.healRateInNeutralField},
+					{"hostile_field", data.healRateInHostileField},
+					{"city", data.healRateInCity},
+				},
+				ScenarioSearchPath = data.scenarioSearchPath,
+				DefaultExperienceLevel = data.defaultExperienceLevelKey,
 			};
-			save.StrengthBonuses.Add(data.fortificationBonus);
-			save.StrengthBonuses.Add(data.riverCrossingBonus);
-			save.StrengthBonuses.Add(data.cityLevel1DefenseBonus);
-			save.StrengthBonuses.Add(data.cityLevel2DefenseBonus);
-			save.StrengthBonuses.Add(data.cityLevel3DefenseBonus);
-			save.HealRates["friendly_field"] = data.healRateInFriendlyField;
-			save.HealRates["neutral_field"] = data.healRateInNeutralField;
-			save.HealRates["hostile_field"] = data.healRateInHostileField;
-			save.HealRates["city"] = data.healRateInCity;
-			save.ScenarioSearchPath = data.scenarioSearchPath;
-			save.DefaultExperienceLevel = data.defaultExperienceLevelKey;
 			return save;
 		}
 
@@ -177,13 +185,44 @@ namespace C7GameData.Save {
 		public List<StrengthBonus> StrengthBonuses = new List<StrengthBonus>();
 		public Dictionary<string, int> HealRates = new Dictionary<string, int>();
 		public string ScenarioSearchPath; // TODO: what is this
-		public void Save(string path) {
-			byte[] json = JsonSerializer.SerializeToUtf8Bytes(this, JsonOptions);
+
+		private void SaveJson(SaveGame save, string path) {
+			byte[] json = JsonSerializer.SerializeToUtf8Bytes(save, JsonOptions);
 			File.WriteAllBytes(path, json);
 		}
 
-		public static SaveGame Load(string path) {
+		private void SaveZip(SaveGame save, string path) {
+			byte[] json = JsonSerializer.SerializeToUtf8Bytes(save, JsonOptions);
+			using MemoryStream zipStream = new();
+			using ZipArchive archive = new(zipStream, ZipArchiveMode.Create);
+			ZipArchiveEntry entry = archive.CreateEntry("save");
+			using Stream stream = entry.Open();
+			stream.Write(json, 0, json.Length);
+			archive.Dispose();
+			File.WriteAllBytes(path, zipStream.ToArray());
+		}
+
+		public void Save(string path, SaveCompression compression) {
+			if (compression == SaveCompression.None) {
+				SaveJson(this, path);
+			} else {
+				SaveZip(this, path);
+			}
+		}
+
+		private static SaveGame LoadJson(string path) {
 			return JsonSerializer.Deserialize<SaveGame>(File.ReadAllText(path), JsonOptions);
+		}
+
+		private static SaveGame LoadZip(string path) {
+			using ZipArchive archive = new(new FileStream(path, FileMode.Open), ZipArchiveMode.Read);
+			ZipArchiveEntry entry = archive.GetEntry("save");
+			using Stream stream = entry.Open();
+			return JsonSerializer.Deserialize<SaveGame>(stream, JsonOptions);
+		}
+
+		public static SaveGame Load(string path, SaveCompression compression) {
+			return compression == SaveCompression.None ? LoadJson(path) : LoadZip(path);
 		}
 	}
 }
