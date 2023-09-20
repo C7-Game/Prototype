@@ -17,7 +17,7 @@ namespace C7GameData {
 		private BiqData biq;
 		private BiqData defaultBiq;
 		private SavData savData;
-		private IDFactory ids;
+		private readonly IDFactory ids;
 
 		private static ILogger log = Log.ForContext<ImportCiv3>();
 

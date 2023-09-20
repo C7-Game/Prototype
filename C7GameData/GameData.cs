@@ -1,12 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Serilog;
 
 namespace C7GameData
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Text.Json.Serialization;
 	public class GameData {
-		[JsonIgnore]
 		private static ILogger log = Log.ForContext<GameData>();
 
 		public int seed = -1;	//change here to set a hard-coded seed
@@ -25,7 +24,6 @@ namespace C7GameData
 
 		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();
 		public string defaultExperienceLevelKey;
-		[JsonIgnore]
 		public ExperienceLevel defaultExperienceLevel;
 
 		public BarbarianInfo barbarianInfo = new BarbarianInfo();
@@ -106,8 +104,9 @@ namespace C7GameData
 			this.turn = 0;
 
 			uint white = 0xFFFFFFFF;
-			Player barbarianPlayer = new Player(ids.CreateID("player"), white);
-			barbarianPlayer.isBarbarians = true;
+			Player barbarianPlayer = new Player(ids.CreateID("player"), white) {
+				isBarbarians = true
+			};
 			players.Add(barbarianPlayer);
 
 			Civilization carthage = new Civilization();
@@ -123,8 +122,9 @@ namespace C7GameData
 			carthage.cityNames.Add("Thabraca");
 			carthage.cityNames.Add("Panormus");
 			uint grey = 0xA0A0A0FF;
-			Player carthagePlayer = new Player(ids.CreateID("player"), carthage, grey);
-			carthagePlayer.isHuman = true;
+			Player carthagePlayer = new Player(ids.CreateID("player"), carthage, grey) {
+				isHuman = true
+			};
 			players.Add(carthagePlayer);
 
 			Civilization rome = new Civilization();
@@ -161,8 +161,9 @@ namespace C7GameData
 			babylon.cityNames.Add("Nineveh");
 
 			uint blue = 0x4040FFFF; // R:64, G:64, B:255, A:255
-			Player babylonPlayer = new Player(ids.CreateID("player"), babylon, blue);
-			babylonPlayer.isHuman = false;
+			Player babylonPlayer = new Player(ids.CreateID("player"), babylon, blue) {
+				isHuman = false
+			};
 			players.Add(babylonPlayer);
 
 			Civilization greece = new Civilization();
