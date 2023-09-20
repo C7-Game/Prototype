@@ -71,11 +71,11 @@ namespace C7Engine
 						PlayerAI.PlayTurn(player, GameData.rng);
 						player.hasPlayedThisTurn = true;
 					}
-					else if (player.guid != EngineStorage.uiControllerID) {
+					else if (player.id != EngineStorage.uiControllerID) {
 						player.hasPlayedThisTurn = true;
 					}
 					//Human player check.  Let the human see what's going on even if they are in observer mode.
-					if (player.guid == EngineStorage.uiControllerID) {
+					if (player.id == EngineStorage.uiControllerID) {
 						new MsgStartTurn().send();
 						return true;
 					}

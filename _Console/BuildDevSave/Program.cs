@@ -2,26 +2,34 @@
 using System.IO;
 using QueryCiv3;
 using C7GameData;
+using C7GameData.Save;
 
 namespace BuildDevSave {
 	class Program {
 
 		static string GetCiv3Path { get => Civ3Location.GetCiv3Path(); }
-		static string C7DefaultSavePath { get => @"../../C7/Text/c7-static-map-save.json"; }
+		static string C7DefaultSaveDir { get => @"../../C7/Text"; }
+
+		static void Info(string path, SaveGame save) {
+			Console.WriteLine($"generated save file from {path}:");
+			Console.WriteLine($"\tmap dimensions: with = {save.Map.tilesWide}, height = {save.Map.tilesTall}");
+			Console.WriteLine($"\tfound {save.Civilizations.Count} civilizations");
+			Console.WriteLine($"\tfound {save.Players.Count} players");
+			Console.WriteLine($"\tfound {save.Cities.Count} cities");
+			Console.WriteLine($"\tfound {save.UnitPrototypes.Count} unit prototypes");
+			Console.WriteLine($"\tfound {save.Units.Count} units");
+		}
 
 		static void Main(string[] args) {
 			if (args.Length < 1) {
-				Console.Out.WriteLine("provide civ3 SAV relative path as command line argument");
+				Console.WriteLine("provide civ3 SAV absolute path as command line argument");
 				return;
 			}
-			string saveFilePath = args[0];
-			string fullSavePath = Path.Join(GetCiv3Path, saveFilePath);
-			byte[] defaultBicBytes = QueryCiv3.Util.ReadFile(GetCiv3Path + @"/Conquests/conquests.biq");
-			SavData mapReader = new QueryCiv3.SavData(QueryCiv3.Util.ReadFile(fullSavePath), defaultBicBytes);
-
-			C7SaveFormat output = ImportCiv3.ImportSav(fullSavePath, GetCiv3Path + @"/Conquests/conquests.biq");
-
-			C7SaveFormat.Save(output, C7DefaultSavePath);
+			string fullSavePath = args[0];
+			string outputPath = Path.Combine(C7DefaultSaveDir, "c7-static-map-save.json");
+			SaveGame output = ImportCiv3.ImportSav(fullSavePath, GetCiv3Path + @"/Conquests/conquests.biq");
+			output.Save(outputPath);
+			Info(outputPath, output);
 		}
 	}
 }

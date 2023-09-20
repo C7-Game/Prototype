@@ -1,19 +1,16 @@
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using C7GameData.AIData;
 
 namespace C7GameData {
-
-	using System;
-	using System.Collections.Generic;
-	using System.Text.Json.Serialization;
-
 	/**
 	 * A unit on the map.  Not to be confused with a unit prototype.
 	 **/
 	public class MapUnit {
-		public ID id { get; }
+		public ID id { get; internal set; }
 		public UnitPrototype unitType { get; set; }
 		public Player owner { get; set; }
-		public Tile previousLocation { get; private set; }
+		public Tile previousLocation { get; internal set; }
 		private Tile currentLocation;
 
 		public Tile location {
@@ -49,6 +46,8 @@ namespace C7GameData {
 		public MapUnit(ID id) {
 			this.id = id;
 		}
+
+		internal MapUnit() {}
 
 		public bool IsBusy() {
 			return isFortified || (path != null && path.PathLength() > 0);

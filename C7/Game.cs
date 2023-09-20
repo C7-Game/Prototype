@@ -399,7 +399,7 @@ public partial class Game : Node2D {
 						}
 					} else {
 						foreach (Player player in gameDataAccess.gameData.players) {
-							if (player.guid == EngineStorage.uiControllerID) {
+							if (player.id == EngineStorage.uiControllerID) {
 								player.isHuman = true;
 							}
 						}
