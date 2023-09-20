@@ -9,9 +9,9 @@ namespace C7GameData {
 		// compared to other IDs by -0xC7C7
 		private static readonly int magicNoneIdNumber = -0xC7C7;
 
-		private string key;
+		private readonly string key;
 
-		private int n;
+		private readonly int n;
 
 		public override string ToString() {
 			return n != magicNoneIdNumber ? $"{key}-{n}" : $"{key}-none";
@@ -54,7 +54,7 @@ namespace C7GameData {
 			if (lhs is null || rhs is null) {
 				return false;
 			}
-			return lhs.n == rhs.n ? lhs.key == rhs.key : false;
+			return lhs.n == rhs.n && lhs.key == rhs.key;
 		}
 
 		public static bool operator !=(ID lhs, ID rhs) {
