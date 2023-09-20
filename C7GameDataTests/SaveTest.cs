@@ -64,7 +64,7 @@ public class SaveTests
 		// so this fails. For testing, it would be convenient to sort SaveGame
 		// fields alphabetically before serializing to json.
 
-		// Assert.Equal(original, savedWasGameData);
+		Assert.Equal(original, savedWasGameData);
 	}
 
 	[Fact]

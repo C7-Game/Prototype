@@ -21,6 +21,8 @@ namespace C7GameData
 		public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
 		public List<City> cities = new List<City>();
 
+		internal List<Civilization> civilizations = new List<Civilization>();
+
 		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();
 		public string defaultExperienceLevelKey;
 		[JsonIgnore]
