@@ -17,14 +17,6 @@ namespace C7GameData.Save {
 			if (tile.Resource != Resource.NONE) {
 				resource = tile.ResourceKey;
 			}
-			foreach (FieldInfo fi in tile.GetType().GetFields()) {
-				if (fi.Name.StartsWith("river") && fi.FieldType == typeof(bool) && (bool)fi.GetValue(tile)) {
-					features.Add(fi.Name);
-				}
-			}
-			if (tile.hasBarbarianCamp) {
-				features.Add("barbarianCamp");
-			}
 			if (tile.isBonusShield) {
 				features.Add("bonusShield");
 			}
@@ -33,6 +25,14 @@ namespace C7GameData.Save {
 			}
 			if (tile.isPineForest) {
 				features.Add("pineForest");
+			}
+			foreach (FieldInfo fi in tile.GetType().GetFields()) {
+				if (fi.Name.StartsWith("river") && fi.FieldType == typeof(bool) && (bool)fi.GetValue(tile)) {
+					features.Add(fi.Name);
+				}
+			}
+			if (tile.hasBarbarianCamp) {
+				features.Add("barbarianCamp");
 			}
 			if (tile.overlays.road) {
 				overlays.Add("road");

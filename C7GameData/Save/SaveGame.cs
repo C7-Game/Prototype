@@ -49,7 +49,7 @@ namespace C7GameData.Save {
 		public static SaveGame FromGameData(GameData data) {
 			SaveGame save = new SaveGame{
 				Seed = data.seed,
-				Civilizations = data.players.Where(player => player.civilization is not null).ToList().ConvertAll(player => player.civilization),
+				Civilizations = data.civilizations,
 				Map = new SaveMap(data.map),
 				TerrainTypes = data.terrainTypes,
 				Resources = data.Resources,
@@ -92,6 +92,7 @@ namespace C7GameData.Save {
 				Resources = Resources,
 				unitPrototypes = UnitPrototypes.ToDictionary(up => up.name),
 				scenarioSearchPath = ScenarioSearchPath,
+				civilizations = Civilizations,
 			};
 			// units and cities are empty
 			data.map = Map.ToGameMap(data);
