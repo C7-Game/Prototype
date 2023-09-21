@@ -3,8 +3,10 @@ using Godot;
 using Serilog;
 using Serilog.Templates;
 
-public partial class LogManager : Node {
-	public override void _Ready() {
+public partial class LogManager {
+
+	// static constructor runs before any other code in the class
+	static LogManager() {
 		// Format looks like:
 		// timestamp [level] context: message
 		//		Exception: exception
@@ -33,13 +35,18 @@ public partial class LogManager : Node {
 		Log.ForContext<LogManager>().Debug("Hello!");
 	}
 
-	public override void _Notification(int what) {
-		if (what == ((long)DisplayServer.WindowEvent.CloseRequest)) {
-			GD.Print("Goodbye logger!");
-			Log.ForContext<LogManager>().Debug("Goodbye!");
-			Log.CloseAndFlush();
-			GetTree().Quit();
-		}
+	// TODO (pcen): need a better way to ensure this gets called
+	// or, when the Godot autoloader issue is resolved, go back to using the autoloader
+	private static readonly Lazy<int> lazyShutDown = new(() => {
+		GD.Print("Goodbye logger!");
+		Log.ForContext<LogManager>().Debug("Goodbye!");
+		Log.CloseAndFlush();
+		return 0; // Lazy<T> must return a value
+	}, System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
+
+	public static void ShutDown() {
+		// accessing the Value property invokes the lazy method
+		int _ = lazyShutDown.Value;
 	}
 
 	public static ILogger ForContext<T>() {

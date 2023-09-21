@@ -16,11 +16,6 @@ config/features=PackedStringArray("4.1", "C#")
 boot_splash/image="res://icon.png"
 config/icon="res://icon.png"
 
-[autoload]
-
-GlobalSingleton="*res://GlobalSingleton.cs"
-LogManager="*res://LogManager.cs"
-
 [display]
 
 window/size/window_width_override=1152

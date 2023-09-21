@@ -16,7 +16,7 @@ public partial class MainMenu : Node2D
 	Button SetCiv3Home;
 	FileDialog SetCiv3HomeDialog;
 	Util.Civ3FileDialog LoadScenarioDialog;
-	GlobalSingleton Global;
+	readonly GlobalSingleton Global = GlobalSingleton.Instance;
 
 	readonly int MENU_OFFSET_FROM_TOP = 180;
 	readonly int MENU_OFFSET_FROM_LEFT = 180;
@@ -28,13 +28,14 @@ public partial class MainMenu : Node2D
 		log.Debug("enter MainMenu._Ready");
 
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame
-		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		Global.ResetLoadGamePath();
-		LoadDialog = new Util.Civ3FileDialog();
-		LoadDialog.RelPath = @"Conquests/Saves";
+		LoadDialog = new Util.Civ3FileDialog {
+			RelPath = @"Conquests/Saves"
+		};
 		LoadDialog.Connect("file_selected",new Callable(this,nameof(_on_FileDialog_file_selected)));
-		LoadScenarioDialog = new Util.Civ3FileDialog();
-		LoadScenarioDialog.RelPath = @"Conquests/Scenarios";
+		LoadScenarioDialog = new Util.Civ3FileDialog {
+			RelPath = @"Conquests/Scenarios"
+		};
 		LoadScenarioDialog.Connect("file_selected",new Callable(this,nameof(_on_FileDialog_file_selected)));
 		GetNode<CanvasLayer>("CanvasLayer").AddChild(LoadDialog);
 		SetCiv3Home = GetNode<Button>("CanvasLayer/SetCiv3Home");
@@ -133,6 +134,10 @@ public partial class MainMenu : Node2D
 	public void Preferences()
 	{
 		PlayButtonPressedSound();
+	}
+
+	public override void _ExitTree() {
+		LogManager.ShutDown();
 	}
 
 	public void _on_Exit_pressed()

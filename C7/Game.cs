@@ -45,7 +45,11 @@ public partial class Game : Node2D {
 	private Vector2 OldPosition;
 
 	Stopwatch loadTimer = new Stopwatch();
-	GlobalSingleton Global;
+	readonly GlobalSingleton Global = GlobalSingleton.Instance;
+
+	public override void _ExitTree() {
+		LogManager.ShutDown();
+	}
 
 	bool errorOnLoad = false;
 
@@ -57,7 +61,6 @@ public partial class Game : Node2D {
 	// The catch should always catch any error, as it's the general catch
 	// that gives an error if we fail to load for some reason.
 	public override void _Ready() {
-		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
 			var animSoundPlayer = new AudioStreamPlayer();
 			AddChild(animSoundPlayer);
