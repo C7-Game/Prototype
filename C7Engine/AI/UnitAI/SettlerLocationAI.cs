@@ -55,14 +55,16 @@ namespace C7Engine
 				//For simplicity's sake, I'm only going to look at immediate neighbors here, but
 				//a lot more things should be considered over time.
 				foreach (Tile nt in t.neighbors.Values) {
+					double improvementScore = GetTileImprovementScore(nt, player);
 					double yieldScore = GetTileYieldScore(nt, player);
 					log.Information("Neighbor tile has score of " + yieldScore);
+					log.Information("Neighbor tile has improvement score of " + improvementScore);
 					score += yieldScore;
 				}
 				//Also look at the next ring out, with lower weights.
 				foreach (Tile outerTile in t.neighbors.Values)
 				{
-					double outerTileScore = GetTileYieldScore(outerTile, player) / 3;
+					double outerTileScore = (GetTileYieldScore(outerTile, player) + GetTileImprovementScore(outerTile, player)) / 3;
 					score += outerTileScore;
 					log.Information("Outer ring tile has yield score of " + outerTileScore);
 				}
@@ -104,6 +106,19 @@ namespace C7Engine
 				score += LUXURY_RESOURCE_BONUS;
 			}
 			return score;
+		}
+
+		private static double GetTileImprovementScore (Tile t, Player owner)
+		{
+			double irrigationBonus = t.irrigationYield(owner);
+			double mineBonus = t.miningYield();
+
+			// Food is more important than production 
+			double irrigationValue = irrigationBonus * 5;
+			double mineValue = mineBonus * 3;
+
+			// Since we can only irrigate OR mine, we just return the max of the two
+			return Math.Max(irrigationValue,mineValue);
 		}
 
 		public static bool IsInvalidCityLocation(Tile tile) {

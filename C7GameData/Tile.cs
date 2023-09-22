@@ -211,6 +211,26 @@ namespace C7GameData
 			return yield;
 		}
 
+		public int irrigationYield(Player player)
+		{
+			int yield = overlayTerrainType.irrigationBonus;
+			// Only applies if we border freshwater OR have unlocked irrigation everywhere
+			if(BordersRiver())
+			{
+				return yield;
+			}
+			else
+			{
+				// Player can not irrigate this. We really need a more rigorous freshwater system since lakes and chain irrigation exist. That's not within the scope of this pr though so this logic will be a placeholder
+				return 0;
+			}
+		}
+		
+		public int miningYield()
+		{
+			return overlayTerrainType.miningBonus;
+		}
+
 		private bool BordersRiver() {
 			return riverNorth || riverNortheast || riverEast || riverSoutheast || riverSouth || riverSouthwest || riverWest || riverNorthwest;
 		}
