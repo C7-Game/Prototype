@@ -13,12 +13,12 @@ namespace C7Engine.AI.StrategicAI {
 		private static readonly int POSSIBLE_CITY_LOCATION_SCORE = 2;	//how much weight to give to each possible city location
 		private static readonly int TILE_SCORE_DIVIDER = 10;	//how much to divide each location's tile score by
 
-		public static int CalculateAvailableLandScore(Player player)
+		public static double CalculateAvailableLandScore(Player player)
 		{
 			//Figure out if there's land to settle, and how much
-			Dictionary<Tile, int> possibleLocations = SettlerLocationAI.GetScoredSettlerCandidates(player.cities[0].location, player);
-			int score = possibleLocations.Count * POSSIBLE_CITY_LOCATION_SCORE;
-			foreach (int i in possibleLocations.Values) {
+			Dictionary<Tile, double> possibleLocations = SettlerLocationAI.GetScoredSettlerCandidates(player.cities[0].location, player);
+			double score = possibleLocations.Count * POSSIBLE_CITY_LOCATION_SCORE;
+			foreach (double i in possibleLocations.Values) {
 				score += i / TILE_SCORE_DIVIDER;
 			}
 			return score;

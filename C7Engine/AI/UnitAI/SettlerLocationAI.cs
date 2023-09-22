@@ -19,15 +19,15 @@ namespace C7Engine
 
 		//Figures out where to plant Settlers
 		public static Tile findSettlerLocation(Tile start, Player player) {
-			Dictionary<Tile, int> scores = GetScoredSettlerCandidates(start, player);
+			Dictionary<Tile, double> scores = GetScoredSettlerCandidates(start, player);
 			if (scores.Count == 0 || scores.Values.Max() <= 0) {
 				return Tile.NONE;	//nowhere to settle
 			}
 
-			IOrderedEnumerable<KeyValuePair<Tile, int> > orderedScores = scores.OrderByDescending(t => t.Value);
+			IOrderedEnumerable<KeyValuePair<Tile, double> > orderedScores = scores.OrderByDescending(t => t.Value);
 			log.Debug("Top city location candidates from " + start + ":");
 			Tile returnValue = null;
-			foreach (KeyValuePair<Tile, int> kvp in orderedScores.Take(5))
+			foreach (KeyValuePair<Tile, double> kvp in orderedScores.Take(5))
 			{
 				if (returnValue == null) {
 					returnValue = kvp.Key;
@@ -39,36 +39,42 @@ namespace C7Engine
 			return returnValue;
 		}
 
-		public static Dictionary<Tile, int> GetScoredSettlerCandidates(Tile start, Player player) {
+		public static Dictionary<Tile, double> GetScoredSettlerCandidates(Tile start, Player player) {
 			List<MapUnit> playerUnits = player.units;
 			IEnumerable<Tile> candidates = player.tileKnowledge.AllKnownTiles().Where(t => !IsInvalidCityLocation(t));
-			Dictionary<Tile, int> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
+			Dictionary<Tile, double> scores = AssignTileScores(start, player, candidates, playerUnits.FindAll(u => u.unitType.name == "Settler"));
 			return scores;
 		}
 
-		private static Dictionary<Tile, int> AssignTileScores(Tile startTile, Player player, IEnumerable<Tile> candidates, List<MapUnit> playerSettlers)
+		private static Dictionary<Tile, double> AssignTileScores(Tile startTile, Player player, IEnumerable<Tile> candidates, List<MapUnit> playerSettlers)
 		{
-			Dictionary<Tile, int> scores = new Dictionary<Tile, int>();
+			Dictionary<Tile, double> scores = new Dictionary<Tile, double>();
 			candidates = candidates.Where(t => !SettlerAlreadyMovingTowardsTile(t, playerSettlers) && t.IsAllowCities());
 			foreach (Tile t in candidates) {
-				int score = GetTileYieldScore(t, player);
+				double score = GetTileYieldScore(t, player);
 				//For simplicity's sake, I'm only going to look at immediate neighbors here, but
 				//a lot more things should be considered over time.
 				foreach (Tile nt in t.neighbors.Values) {
-					score += GetTileYieldScore(nt, player);
+					double yieldScore = GetTileYieldScore(nt, player);
+					log.Information("Neighbor tile has score of " + yieldScore);
+					score += yieldScore;
 				}
-				//TODO: Also look at the next ring out, with lower weights.
+				//Also look at the next ring out, with lower weights.
+				foreach (Tile outerTile in t.neighbors.Values)
+				{
+					double outerTileScore = GetTileYieldScore(outerTile, player) / 3;
+					score += outerTileScore;
+					log.Information("Outer ring tile has yield score of " + outerTileScore);
+				}
 
 				//Prefer hills for defense, and coast for boats and such.
-				if (t.baseTerrainType.Key == "hills") {
-					score += 10;
-				}
-				if (t.NeighborsWater()) {
-					score += 10;
-				}
+				// In this scale, the defense bonus of hills adds up to a bonus of +10, which is equivalent to the previous hardcoded bonus. This just opens up possibilities with editing terrain.
+				score += t.baseTerrainType.defenseBonus.amount * 20.0;
+				
+				// Need to add a way to check freshwater source, and separately to check if coast is lake or coast tile. This score would not apply if the city only borders a lake, although we still need a freshwater bonus
 
 				//Lower scores if they are far away
-				int preDistanceScore = score;
+				double preDistanceScore = score;
 				int distance = startTile.distanceTo(t);
 				if (distance > 4) {
 					score -= distance * 2;
@@ -80,14 +86,17 @@ namespace C7Engine
 				}
 				if (score > 0)
 					scores[t] = score;
+				log.Information("Tile score for settling is " + score);
 			}
 			return scores;
 		}
-		private static int GetTileYieldScore(Tile t, Player owner)
+		private static double GetTileYieldScore(Tile t, Player owner)
 		{
-			int score = t.foodYield(owner) * 5;
+			double score = t.foodYield(owner) * 5;
 			score += t.productionYield(owner) * 3;
 			score += t.commerceYield(owner) * 2;
+
+			// TODO: Add multipliers for resource rarity, utility, and whether this player has a surplus
 			if (t.Resource.Category == ResourceCategory.STRATEGIC) {
 				score += STRATEGIC_RESOURCE_BONUS;
 			}

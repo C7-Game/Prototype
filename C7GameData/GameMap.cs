@@ -57,6 +57,32 @@ namespace C7GameData
 			}
 		}
 
+		// Compute the outer ring of the BFC of tiles. Might not be necessary for tiles which can't be settled?
+		public void computeOuterRing()
+		{
+			// List of all the BFC tiles NOT including direct Neighbors
+			// Essentially, this is every outer tile except North->North, South->South, West->West,East->East
+			(TileDirection direction1, TileDirection direction2) [] outerRingDirections = {(TileDirection.NORTHWEST, TileDirection.NORTH),(TileDirection.NORTHWEST, TileDirection.NORTHWEST),(TileDirection.NORTHWEST, TileDirection.WEST),(TileDirection.SOUTHWEST, TileDirection.WEST),(TileDirection.SOUTHWEST, TileDirection.SOUTHWEST),(TileDirection.SOUTHWEST, TileDirection.SOUTH),(TileDirection.SOUTHEAST, TileDirection.EAST),(TileDirection.SOUTHEAST, TileDirection.SOUTHEAST),(TileDirection.SOUTHEAST, TileDirection.SOUTH),(TileDirection.NORTHEAST, TileDirection.NORTH),(TileDirection.NORTHEAST, TileDirection.NORTHEAST),(TileDirection.NORTHEAST, TileDirection.EAST)};
+
+			foreach (Tile tile in tiles)
+			{
+				Dictionary<(TileDirection,TileDirection), Tile> outerRing = new Dictionary<(TileDirection,TileDirection), Tile>();
+				foreach((TileDirection dir1, TileDirection dir2) directions in outerRingDirections)
+				{
+					Tile inner = tileNeighbor(tile,directions.dir1);
+					if(inner != Tile.NONE)
+					{
+						Tile outer = tileNeighbor(inner, directions.dir2);
+						if(outer != Tile.NONE)
+						{
+							outerRing[(directions.dir1,directions.dir2)] = outer;
+						}
+					}
+				}
+				tile.outerRing = outerRing;
+			}
+		}
+
 		// This method verifies that the conversion between tile index and coords is consistent for all possible valid inputs. It's not called
 		// anywhere but I'm keeping it around in case we ever need to work on the conversion methods again.
 		public void testTileIndexComputation()

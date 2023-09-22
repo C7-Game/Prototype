@@ -28,7 +28,7 @@ namespace C7GameData.AIData {
 			if (player.cities.Count < 2) {
 				this.calculatedWeight = 0;
 			} else {
-				int landScore = UtilityCalculations.CalculateAvailableLandScore(player);
+				double landScore = UtilityCalculations.CalculateAvailableLandScore(player);
 				//N.B. Eventually this won't be an all-or-nothing proposition; if land is getting tight but not quite zero,
 				//the AI may decide it's time for the next phrase of the game, especially if it's aggressive.
 				if (landScore == 0) {	//nowhere else to expand
