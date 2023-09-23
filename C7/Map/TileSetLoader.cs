@@ -6,6 +6,7 @@ namespace C7.Map {
 	public enum Layer {
 		TerrainOverlay,
 		River,
+		RiverDelta,
 		Road,
 		Rail,
 		Resource,
@@ -38,6 +39,7 @@ namespace C7.Map {
 		TundraForest,
 		Marsh,
 		River,
+		RiverDelta,
 		Road,
 		Rail,
 		Resource,
@@ -182,6 +184,7 @@ namespace C7.Map {
 			{Atlas.TerrainYield, new AtlasLoader("Art/Terrain/tnt.pcx", 3, 6, tileSize)},
 
 			{Atlas.River, new AtlasLoader("Art/Terrain/mtnRivers.pcx", 4, 4, tileSize)},
+			{Atlas.RiverDelta, new AtlasLoader("Art/Terrain/deltaRivers.pcx", 4, 4, tileSize)},
 
 			{Atlas.Hill, new AtlasLoader("Art/Terrain/xhills.pcx", 4, 4, hillSize, 4)},
 			{Atlas.ForestHill, new AtlasLoader("Art/Terrain/hill forests.pcx", 4, 4, hillSize, 4)},

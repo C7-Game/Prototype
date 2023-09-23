@@ -396,10 +396,17 @@ namespace C7.Map {
 		private void updateRiverLayer(Tile tile) {
 			// The "point" is the easternmost point of the current tile.
 			// The river graphic is determined by the tiles neighboring that point.
+
+			
+
 			Tile northOfPoint = tile.neighbors[TileDirection.NORTHEAST];
 			Tile eastOfPoint = tile.neighbors[TileDirection.EAST];
 			Tile westOfPoint = tile;
 			Tile southOfPoint = tile.neighbors[TileDirection.SOUTHEAST];
+
+			List<Tile> riverNeighbors = new List<Tile> () {northOfPoint, eastOfPoint, westOfPoint, southOfPoint};
+
+			int coastCount = riverNeighbors.Sum(tile => tile.IsWater()== true ? 1 : 0);
 
 			int index = 0;
 			index += northOfPoint.riverSouthwest ? 1 : 0;
@@ -410,7 +417,15 @@ namespace C7.Map {
 			if (index == 0) {
 				eraseCell(Layer.River, tile);
 			} else {
-				setCell(Layer.River, Atlas.River, tile, new Vector2I(index % 4, index / 4));
+				// We might eventually want a more sophisticated delta algorithm. Maybe check if *all four* are coastal and then delete the river entirely? Maybe check if the river is *ending* at a coast, etc. Might also want deltas in wetland tiles like marshes. Just sticking with this as it was the issue spec.
+				if(coastCount >= 2)
+				{
+					setCell(Layer.RiverDelta, Atlas.RiverDelta, tile, new Vector2I(index % 4, index / 4));
+				}
+				else
+				{
+					setCell(Layer.River, Atlas.River, tile, new Vector2I(index % 4, index / 4));
+				}
 			}
 		}
 
@@ -630,6 +645,8 @@ namespace C7.Map {
 			}
 
 			updateTerrainOverlayLayer(tile);
+
+			updateRiverLayer(tile);
 
 			updateBuildingLayer(tile);
 		}
