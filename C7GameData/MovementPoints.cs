@@ -38,55 +38,63 @@ namespace C7GameData
 		{
 			// Modified from Stack overflow https://stackoverflow.com/a/32903747
 			// Only supports positive values
-			double absolute_accuracy=0.01;
+			// Might need to mess with accuracy; I want to avoid a movement of 1 resulting in 99/100
+			double absoluteAccuracy=0.005;
 			double val = remaining;
 			if(val < 0)
 			{
 				return "0";
 			}
 
-			int whole_num = (int) Math.Floor(val);
-			val -= whole_num;
+			int wholeNum = (int) Math.Round(val,0);
+			
 
-
-			if(val <= absolute_accuracy)
+			// This is important for important cases like 0.999. We have to round (possibly up) and then check if the whole number is close enough. Otherwise, we'll floor and create a mixed number 
+			if(Math.Abs(wholeNum - val) <= absoluteAccuracy)
 			{
-				return whole_num.ToString();
+				return wholeNum.ToString();
+			}
+			
+			wholeNum = (int) Math.Floor(val);
+			val -= wholeNum;
+			if(val <= absoluteAccuracy)
+			{
+				return wholeNum.ToString();
 			}
 
 			// The lower fraction is 0/1
-			int lower_n = 0;
-			int lower_d = 1;
+			int lowerN = 0;
+			int lowerD = 1;
 
 			// The upper fraction is 1/1
 			// Start with an upper guess of 1 and a lower guess of 0, then converge through a binary search
-			int upper_n = 1;
-			int upper_d = 1;
+			int upperN = 1;
+			int upperD = 1;
 			while (true)
 			{
-				// The middle fraction is (lower_n + upper_n) / (lower_d + upper_d)
-				int middle_n = lower_n + upper_n;
-				int middle_d = lower_d + upper_d;
+				// The middle fraction is (lowerN + upperN) / (lowerD + upperD)
+				int middleN = lowerN + upperN;
+				int middleD = lowerD + upperD;
 
-				if (middle_d * (val + absolute_accuracy) < middle_n)
+				if (middleD * (val + absoluteAccuracy) < middleN)
 				{
 					// real + error < middle : middle is our new upper
-					Seek(ref upper_n, ref upper_d, lower_n, lower_d, (un, ud) => (lower_d + ud) * (val + absolute_accuracy) < (lower_n + un));
+					(upperD, upperD) = Seek(upperN, upperD, lowerN, lowerD, (un, ud) => (lowerD + ud) * (val + absoluteAccuracy) < (lowerN + un));
 				}
-				else if (middle_n < (val - absolute_accuracy) * middle_d)
+				else if (middleN < (val - absoluteAccuracy) * middleD)
 				{
 					// middle < real - error : middle is our new lower
 					// middle < real - error : middle is our new lower
-					Seek(ref lower_n, ref lower_d, upper_n, upper_d, (ln, ld) => (ln + upper_n) < (val - absolute_accuracy) * (ld + upper_d));
+					(lowerN, lowerD) = Seek(lowerN, lowerD, upperN, upperD, (ln, ld) => (ln + upperN) < (val - absoluteAccuracy) * (ld + upperD));
 				}
 				else
 				{
 					// Middle is our best fraction
-					if(whole_num == 0)
+					if(wholeNum == 0)
 					{
-						return "(" + middle_n.ToString() + "/" + middle_d.ToString() + ")";
+						return "(" + middleN.ToString() + "/" + middleD.ToString() + ")";
 					}
-					return "(" + whole_num.ToString() + " " + middle_n.ToString() + "/" + middle_d.ToString() + ")";
+					return "(" + wholeNum.ToString() + " " + middleN.ToString() + "/" + middleD.ToString() + ")";
 				}
 			}
 
@@ -94,10 +102,10 @@ namespace C7GameData
 
 		/// Binary seek for the value where f() becomes false.
 		/// Used for mixed number calculation. Taken from https://stackoverflow.com/a/32903747
-		void Seek(ref int a, ref int b, int ainc, int binc, Func<int, int, bool> f)
+		(int, int) Seek(int a, int b, int aInc, int bInc, Func<int, int, bool> f)
 		{
-			a += ainc;
-			b += binc;
+			a += aInc;
+			b += bInc;
 
 			if (f(a, b))
 			{
@@ -106,8 +114,8 @@ namespace C7GameData
 				do
 				{
 					weight *= 2;
-					a += ainc * weight;
-					b += binc * weight;
+					a += aInc * weight;
+					b += bInc * weight;
 				}
 				while (f(a, b));
 
@@ -115,17 +123,18 @@ namespace C7GameData
 				{
 					weight /= 2;
 
-					int adec = ainc * weight;
-					int bdec = binc * weight;
+					int aDec = aInc * weight;
+					int bDec = bInc * weight;
 
-					if (!f(a - adec, b - bdec))
+					if (!f(a - aDec, b - bDec))
 					{
-						a -= adec;
-						b -= bdec;
+						a -= aDec;
+						b -= bDec;
 					}
 				}
 				while (weight > 1);
 			}
+			return (a,b);
 		}
 
 	}
