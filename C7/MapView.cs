@@ -408,9 +408,11 @@ public partial class RiverLayer : LooseLayer
 	public static readonly Vector2 riverSize = new Vector2(128, 64);
 	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.X / 2, 0);
 	private ImageTexture riverTexture;
+	private ImageTexture riverDeltaTexture;
 
 	public RiverLayer() {
 		riverTexture = Util.LoadTextureFromPCX("Art/Terrain/mtnRivers.pcx");
+		riverDeltaTexture = Util.LoadTextureFromPCX("Art/Terrain/deltaRivers.pcx");
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
@@ -422,6 +424,10 @@ public partial class RiverLayer : LooseLayer
 		Tile eastOfPoint = tile.neighbors[TileDirection.EAST];
 		Tile westOfPoint = tile;
 		Tile southOfPoint = tile.neighbors[TileDirection.SOUTHEAST];
+
+		List<Tile> neighbors = new List <Tile> () {northOfPoint, eastOfPoint, westOfPoint, southOfPoint};
+
+		int coastCount =neighbors.Sum(tile => tile.IsWater()== true ? 1 : 0);
 
 		int riverGraphicsIndex = 0;
 
@@ -445,7 +451,15 @@ public partial class RiverLayer : LooseLayer
 
 		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.X, riverRow * riverSize.Y, riverSize);
 		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize + riverCenterOffset, riverSize);
-		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);
+		if(coastCount < 2 )
+		{
+			looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);
+		}
+		else
+		{
+			looseView.DrawTextureRectRegion(riverDeltaTexture, screenTarget, riverRectangle);
+		}
+		
 	}
 }
 
