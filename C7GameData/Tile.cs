@@ -4,6 +4,7 @@ namespace C7GameData
 	using System.Text.Json.Serialization;
 	using System.Collections.Generic;
 	using System.Linq;
+
 	public class Tile
 	{
 		// ExtraInfo will eventually be type object and use a type descriminator in JSON to determine
@@ -57,10 +58,146 @@ namespace C7GameData
 
 		public TileOverlays overlays = new TileOverlays();
 
+
+		// -1 = not initialized. 0 = false, 1 = true
+		public int isLake = -1;
+
 		public Tile()
 		{
 			unitsOnTile = new List<MapUnit>();
 			Resource = Resource.NONE;
+		}
+
+		public bool IsLake()
+		{
+			// If the isLake value has been initialized, we should return that
+			if(isLake != -1)
+			{
+				return (isLake == 1);
+			}
+
+			if(!IsWater())
+			{
+				isLake = 0;
+				return false;
+			}
+
+			int contiguousWater = 0;
+			List<Tile> contiguous = new List<Tile>();
+			List<Tile> searchedWater = new List<Tile>();
+			contiguous.Add(this);
+
+			// Default is that this *is* a lake because other conditions will assure we only get water tiles. If the lake is under size 21, we want to default to it being a lake
+			bool lake = true;
+
+			int i = 0;
+			while(i < contiguous.Count())
+			{
+				Tile currentTile = contiguous[i];
+
+				// Skip land tiles and remove from the stack. This should be checked before they're added but just in case
+				if(!currentTile.IsWater())
+				{
+					currentTile.isLake = 0;
+					contiguous.Remove(currentTile);
+					continue;
+				}
+				contiguousWater += 1;
+				if(contiguousWater > 20)
+				{
+					lake = false;
+					break;
+				}
+
+				// If a contiguous tile is a lake, this (and all contiguous water) is too. This works because contiguousness is transitive. If it is *not* a lake (and is a water tile), then this isn't either.
+				if(currentTile.isLake == 1)
+				{
+					lake = true;
+					break;
+				}
+				if(currentTile.isLake == 0)
+				{
+					lake = false;
+					break;
+				}
+				// If we haven't found out one way or the other, add all of this tile's water neighbors to the stack and then remove this tile
+				foreach((TileDirection dir, Tile neighbor) in currentTile.neighbors)
+				{
+					if(!neighbor.IsWater())
+					{
+						continue;
+					}
+					else if(contiguous.Contains(neighbor) || searchedWater.Contains(neighbor))
+					{
+						continue;
+					}
+					else
+					{
+						// Add neighbor to tiles we should search as long as there's no isthmus blocking
+						if(currentTile.isthmusAt(dir))
+						{
+							continue;
+						}
+						else
+						{
+							contiguous.Add(neighbor);
+						}
+					}
+				}
+				i ++;
+			}
+			if(lake)
+			{
+				// Update all the contiguous water tiles we've looked at. It won't be the whole body of water but it'll save us some repeats.
+				foreach(Tile currentTile in contiguous)
+				{
+					if(currentTile.IsWater())
+					{
+						currentTile.isLake = 1;
+					}
+				}
+				return true;
+			}
+			else
+			{
+				// Update searched water as non-lake.
+				foreach(Tile currentTile in contiguous)
+				{
+					currentTile.isLake = 0;
+				}
+				/*foreach(Tile currentTile in searchedWater)
+				{
+					currentTile.isLake = 0;
+				}*/
+				return false;
+			}
+		}
+
+		public bool providesFreshWater ()
+		{
+			return IsLake() || BordersRiver() || NeighborsLake();
+		}
+
+		// Check for an isthmus that can separate lakes from oceans, affect navigability, etc.
+		// Might want to store this for efficiency? Not sure how important this is in terms of runtime. Should only be run on two water tiles during IsLake
+		public bool isthmusAt (TileDirection dir)
+		{
+			
+			Tile adjacent = neighbors[dir];
+
+			if(adjacent != Tile.NONE && IsWater() && adjacent.IsWater() && dir.isDiagonal())
+			{
+				(TileDirection d1, TileDirection d2) = dir.diagonalComplementary();
+				Tile t1 = neighbors[d1];
+				Tile t2 = neighbors[d2];
+
+				if(!t1.IsWater() && !t2.IsWater())
+				{
+					// An isthmus separates diagonal water tiles with coastal tiles in both complementary directions
+					return true;
+				}
+			}
+			return false;
 		}
 
 		// TODO: this should be either an extension in C7Engine, or otherwise
@@ -83,6 +220,29 @@ namespace C7GameData
 		public bool NeighborsWater() {
 			foreach (Tile neighbor in neighbors.Values) {
 				if (neighbor.baseTerrainType.isWater()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public bool NeighborsLake()
+		{
+			foreach (Tile neighbor in neighbors.Values)
+			{
+				if (neighbor.IsLake())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		// Check if the tile is coastal, as differentiated from being on a lake.
+		public bool Coastal()
+		{
+			foreach (Tile neighbor in neighbors.Values) {
+				if (neighbor.IsWater() && !neighbor.IsLake()) {
 					return true;
 				}
 			}
@@ -280,6 +440,32 @@ namespace C7GameData
 			case TileDirection.WEST:      return (-2,  0);
 			case TileDirection.NORTHWEST: return (-1, -1);
 			default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
+		}
+
+		// Essentially finds the two other tiles that neighbor BOTH diagonal tiles
+		public static (TileDirection, TileDirection) diagonalComplementary(this TileDirection dir)
+		{
+			switch(dir)
+			{
+				case TileDirection.NORTH: return (TileDirection.NORTHEAST, TileDirection.NORTHWEST);
+				case TileDirection.EAST: return (TileDirection.SOUTHEAST, TileDirection.NORTHWEST);
+				case TileDirection.SOUTH: return (TileDirection.SOUTHEAST, TileDirection.SOUTHWEST);
+				case TileDirection.WEST: return (TileDirection.NORTHWEST, TileDirection.SOUTHWEST);
+				default: throw new ArgumentOutOfRangeException("TileDirection is not Diagonal");
+			}
+		}
+
+		public static bool isDiagonal(this TileDirection dir)
+		{
+			switch(dir)
+			{
+				case TileDirection.NORTH:
+				case TileDirection.EAST:
+				case TileDirection.SOUTH:
+				case TileDirection.WEST:
+				return true;
+				default: return false;
 			}
 		}
 

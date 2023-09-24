@@ -113,8 +113,10 @@ namespace C7Engine
 			double irrigationBonus = t.irrigationYield(owner);
 			double mineBonus = t.miningYield();
 
-			// Food is more important than production 
-			double irrigationValue = irrigationBonus * 5;
+			// Food is more important than production
+			// Irrigation only applies to freshwater tiles, although we should add a check for electricity later.
+			// Also this doesn't account for the ability to chain irrigation.
+			double irrigationValue = irrigationBonus * 5 * (t.providesFreshWater() ? 1 : 0);
 			double mineValue = mineBonus * 3;
 
 			// Since we can only irrigate OR mine, we just return the max of the two
