@@ -55,10 +55,120 @@ namespace C7GameData
 
 		public TileOverlays overlays = new TileOverlays();
 
+
+		// -1 = not initialized. 0 = false, 1 = true
+		public int isLake = -1;
+
 		public Tile()
 		{
 			unitsOnTile = new List<MapUnit>();
 			Resource = Resource.NONE;
+		}
+
+				public bool IsLake()
+		{
+			// If the isLake value has been initialized, we should return that
+			if(isLake != -1)
+			{
+				return (isLake == 1);
+			}
+
+			if(!IsWater())
+			{
+				isLake = 0;
+				return false;
+			}
+
+			int contiguousWater = 1;
+			List<Tile> contiguous = new List<Tile>();
+			List<Tile> searchedWater = new List<Tile>();
+			contiguous.Add(this);
+			bool lake = false;
+
+
+			while(contiguous.Count != 0)
+			{
+				Tile currentTile = contiguous[0];
+
+				// Skip land tiles and remove from the stack. This should be checked before they're added but just in case
+				if(!currentTile.IsWater())
+				{
+					currentTile.isLake = 0;
+					contiguous.Remove(currentTile);
+					continue;
+				}
+				contiguousWater += 1;
+				if(contiguousWater > 20)
+				{
+					lake = true;
+					break;
+				}
+
+				// If a contiguous tile is a lake, this (and all contiguous water) is too. This works because contiguousness is transitive. If it is *not* a lake (and is a water tile), then this isn't either.
+				if(currentTile.isLake == 1)
+				{
+					lake = true;
+					break;
+				}
+				if(currentTile.isLake == 0)
+				{
+					lake = false;
+					break;
+				}
+				// If we haven't found out one way or the other, add all of this tile's water neighbors to the stack and then remove this tile
+				foreach((TileDirection dir, Tile neighbor) in currentTile.neighbors)
+				{
+					if(!neighbor.IsWater())
+					{
+						continue;
+					}
+					else if(contiguous.Contains(neighbor) || searchedWater.Contains(neighbor))
+					{
+						continue;
+					}
+					else
+					{
+						// Add neighbor to tiles we should search
+						contiguous.Add(neighbor);
+					}
+				}
+				contiguous.Remove(currentTile);
+				searchedWater.Add(currentTile);
+			}
+			if(lake)
+			{
+				// Update all the contiguous water tiles we've looked at. It won't be the whole body of water but it'll save us some repeats.
+				foreach(Tile currentTile in contiguous)
+				{
+					if(currentTile.IsWater())
+					{
+						currentTile.isLake = 1;
+					}
+				}
+				foreach(Tile currentTile in searchedWater)
+				{
+					currentTile.isLake = 1;
+				}
+				return true;
+			}
+			else
+			{
+				// Update searched water as non-lake.
+				foreach(Tile currentTile in contiguous)
+				{
+					currentTile.isLake = 0;
+				}
+				foreach(Tile currentTile in searchedWater)
+				{
+					currentTile.isLake = 0;
+				}
+				return false;
+			}
+		}
+
+		public bool providesFreshWater ()
+		{
+			return IsLake() || BordersRiver();
 		}
 
 		// TODO: this should be either an extension in C7Engine, or otherwise
@@ -81,6 +191,17 @@ namespace C7GameData
 		public bool NeighborsWater() {
 			foreach (Tile neighbor in neighbors.Values) {
 				if (neighbor.baseTerrainType.isWater()) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		// Check if the tile is coastal, as differentiated from being on a lake. Uses the check for isLake to its advantage
+		public bool Coastal()
+		{
+			foreach (Tile neighbor in neighbors.Values) {
+				if (neighbor.baseTerrainType.isWater() && !neighbor.IsLake()) {
 					return true;
 				}
 			}
