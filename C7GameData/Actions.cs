@@ -10,6 +10,7 @@ namespace C7GameData {
 		public static readonly string MoveUnitNorthwest = "move_unit_northwest";
 		public static readonly string MoveUnitNorth = "move_unit_north";
 		public static readonly string MoveUnitNortheast = "move_unit_northeast";
+		public static readonly string SaveGame = "save_game";
 		public static readonly string ToggleAnimations = "toggle_animations";
 		public static readonly string ToggleGrid = "toggle_grid";
 		public static readonly string ToggleZoom = "toggle_zoom";

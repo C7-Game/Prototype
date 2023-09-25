@@ -59,4 +59,6 @@ namespace C7Engine
 		}
 	}
 
+	public class MsgFinishSave : MessageToUI {}
+
 }

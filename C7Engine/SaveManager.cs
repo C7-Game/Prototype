@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using C7GameData;
 using C7GameData.Save;
-using QueryCiv3.Sav;
 
 namespace C7Engine {
 

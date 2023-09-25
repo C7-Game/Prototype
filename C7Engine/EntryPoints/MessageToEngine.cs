@@ -1,10 +1,9 @@
 using Serilog;
+using C7GameData;
+using C7GameData.Save;
 
 namespace C7Engine
 {
-	using System;
-	using C7GameData;
-
 	public abstract class MessageToEngine {
 		public abstract void process();
 
@@ -204,6 +203,18 @@ namespace C7Engine
 		public override void process()
 		{
 			EngineStorage.animationsEnabled = enabled;
+		}
+	}
+
+	public class MsgSaveGame : MessageToEngine {
+		private string path;
+
+		public MsgSaveGame(string path) {
+			this.path = path;
+		}
+
+		public override void process() {
+			SaveManager.Save(this.path, SaveCompression.None);
 		}
 	}
 }
