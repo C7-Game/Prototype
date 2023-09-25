@@ -5,41 +5,42 @@ using System.Runtime.InteropServices;
 using C7Engine;
 using Godot;
 using ConvertCiv3Media;
-using C7GameData;
 using QueryCiv3;
+using System.IO;
 
 public partial class Util {
-	static public string Civ3Root = Civ3Location.GetCiv3Path();
-	public partial class Civ3FileDialog : FileDialog
-	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
-	// While instantiated it will return to the last-accessed folder when reopened
-	{
-		public string RelPath= "";
-		public Civ3FileDialog(FileDialog.FileModeEnum mode = FileDialog.FileModeEnum.OpenFile) {
+	public static string Civ3Root = Civ3Location.GetCiv3Path();
+	public partial class Civ3FileDialog : FileDialog {
+		// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
+		// While instantiated it will return to the last-accessed folder when reopened
+		public string AbsPath = "";
+		public string RelPath = "";
+		public Civ3FileDialog(FileModeEnum mode = FileModeEnum.OpenFile) {
 			FileMode = mode;
 		}
 
 		public override void _Ready() {
 			Access = AccessEnum.Filesystem;
-			CurrentDir = Civ3Root + "/" + RelPath;
-			// Resizable = true;
-			// OffsetRight = 550;
-			// OffsetBottom = 750;
+			CurrentDir = AbsPath != "" ? AbsPath : Path.Join(Civ3Root, RelPath);
+			Vector2I windowSize = DisplayServer.WindowGetSize();
+			Vector2I windowMiddle = windowSize / 2;
+			Size = new Vector2I(windowSize.X / 2, windowSize.Y / 2);
+			Position = windowMiddle - Size / 2;
 			base._Ready();
 		}
 	}
 
-	static private string SteamCommonDir() {
+	private static string SteamCommonDir() {
 		string home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
 		if (home == null) { return null; }
-		return System.IO.Path.Combine(home, "Library/Application Support/Steam/steamapps/common");
+		return Path.Combine(home, "Library/Application Support/Steam/steamapps/common");
 	}
 
-	static private bool FolderIsCiv3(System.IO.DirectoryInfo di) {
+	private static bool FolderIsCiv3(System.IO.DirectoryInfo di) {
 		return di.EnumerateFiles().Any(f => f.Name == "civ3id.mb");
 	}
 
-	static public string GetCiv3Path() {
+	public static string GetCiv3Path() {
 		// Use CIV3_HOME env var if present
 		string path = System.Environment.GetEnvironmentVariable("CIV3_HOME");
 		if (path != null) { return path; }
@@ -65,7 +66,7 @@ public partial class Util {
 		return "/civ3/path/not/found";
 	}
 
-	static public string Civ3PathFromRegistry() {
+	public static string Civ3PathFromRegistry() {
 		// Assuming 64-bit platform, get vanilla Civ3 install folder from registry
 		// Return null if value not present or if key not found
 		object path = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", null);
@@ -173,7 +174,7 @@ public partial class Util {
 	}
 
 	//Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
-	static public ImageTexture LoadTextureFromPCX(string relPath) {
+	public static ImageTexture LoadTextureFromPCX(string relPath) {
 		if (textureCache.ContainsKey(relPath)) {
 			return textureCache[relPath];
 		}
@@ -183,16 +184,16 @@ public partial class Util {
 		return texture;
 	}
 
-	static public (ImageTexture, ImageTexture) LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
-		var (baseImage, tintImage) = PCXToGodot.ByteArrayWithTintToImage(image, pallete, width, height, shadows: true);
+	public static (ImageTexture, ImageTexture) LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
+		(Image baseImage, Image tintImage) = PCXToGodot.ByteArrayWithTintToImage(image, pallete, width, height, shadows: true);
 		return (ImageTexture.CreateFromImage(baseImage), ImageTexture.CreateFromImage(tintImage));
 	}
 
-	static public Flic LoadFlic(string path) {
-		return new ConvertCiv3Media.Flic(Util.Civ3MediaPath(path));
+	public static Flic LoadFlic(string path) {
+		return new Flic(Civ3MediaPath(path));
 	}
 
-	static private string getProjectDirectoryPath() {
+	private static string getProjectDirectoryPath() {
 		// see issue https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
 		// - use local resource folder in debug mode
 		// - use executable folder in release mode
@@ -202,7 +203,7 @@ public partial class Util {
 	// Send this function a path (e.g. Title_Screen.jpg) and it will
 	// load it up and convert it in both debug and release modes.
 	// Note: We probably will need variants of this for other file types, too.
-	static public ImageTexture LoadTextureFromC7JPG(string relPath) {
+	public static ImageTexture LoadTextureFromC7JPG(string relPath) {
 		Image img = Image.LoadFromFile(Util.getProjectDirectoryPath().PathJoin(relPath));
 		return ImageTexture.CreateFromImage(img);
 	}
@@ -210,7 +211,7 @@ public partial class Util {
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
 	//Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
 	//file, and it'll load it up and return you what you need.
-	static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height) {
+	public static ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height) {
 		string key = relPath + "-" + leftStart + "-" + topStart + "-" + width + "-" + height;
 		if (textureCache.ContainsKey(key)) {
 			return textureCache[key];
@@ -221,14 +222,14 @@ public partial class Util {
 		return texture;
 	}
 
-	static public ImageTexture LoadFogOfWarPCX(string relPath) => PCXToGodot.getImageTextureFromFogOfWarPCX(LoadPCX(relPath));
+	public static ImageTexture LoadFogOfWarPCX(string relPath) => PCXToGodot.getImageTextureFromFogOfWarPCX(LoadPCX(relPath));
 
 	private static Dictionary<string, Pcx> PcxCache = new Dictionary<string, Pcx>();
 
 	/**
 	 * Utility method for loading PCX files that will cache them, so we don't have to load them from disk so often.
 	 **/
-	static public Pcx LoadPCX(string relPath) {
+	public static Pcx LoadPCX(string relPath) {
 		if (PcxCache.ContainsKey(relPath)) {
 			return PcxCache[relPath];
 		}
@@ -248,16 +249,16 @@ public partial class Util {
 			for (int k = 0; k < 3; k++)
 				flatPalette[k + 3 * n] = raw[n, k];
 
-		var img = Image.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
+		Image img = Image.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
 		return ImageTexture.CreateFromImage(img);
 	}
 
 	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
 	// color palette and the second is the size of the image itself and contains the indices in R8 format.
 	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string filePath) {
-		var pcx = LoadPCX(filePath);
+		Pcx pcx = LoadPCX(filePath);
 
-		var imgIndices = Image.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
+		Image imgIndices = Image.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
 		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (createPaletteTexture(pcx.Palette), texIndices);
@@ -271,41 +272,44 @@ public partial class Util {
 
 	// Loads a Flic and also converts it into a sprite sheet
 	public static (FlicSheet, Flic) loadFlicSheet(string filePath) {
-		var flic = new Flic(Util.Civ3MediaPath(filePath));
+		Flic flic = new Flic(Civ3MediaPath(filePath));
 
-		var texPalette = Util.createPaletteTexture(flic.Palette);
+		ImageTexture texPalette = createPaletteTexture(flic.Palette);
 
-		var countColumns = flic.Images.GetLength(1); // Each column contains one frame
-		var countRows = flic.Images.GetLength(0); // Each row contains one animation
-		var countImages = countColumns * countRows;
+		int countColumns = flic.Images.GetLength(1); // Each column contains one frame
+		int countRows = flic.Images.GetLength(0); // Each row contains one animation
 
 		byte[] allIndices = new byte[countRows * countColumns * flic.Width * flic.Height];
 		// row, col loop over the sprites, each one a frame of the animation
-		for (int row = 0; row < countRows; row++)
-			for (int col = 0; col < countColumns; col++)
+		for (int row = 0; row < countRows; row++) {
+			for (int col = 0; col < countColumns; col++) {
 				// x, y loop over pixels within each sprite
-				for (int y = 0; y < flic.Height; y++)
+				for (int y = 0; y < flic.Height; y++) {
 					for (int x = 0; x < flic.Width; x++) {
 						int pixelRow = row * flic.Height + y,
 							pixelCol = col * flic.Width + x,
 							pixelIndex = pixelRow * countColumns * flic.Width + pixelCol;
 						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
 					}
-
-		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
+				}
+			}
+		}
+		Image imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
 		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);
 	}
 
-	static public AudioStreamWav LoadWAVFromDisk(string path) {
-		FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+	public static AudioStreamWav LoadWAVFromDisk(string path) {
+		Godot.FileAccess file = Godot.FileAccess.Open(path, Godot.FileAccess.ModeFlags.Read);
 
 		string riffString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
 		if (riffString != "RIFF") {
 			throw new Exception("Unsupported file");
 		}
-		uint fileSize = file.Get32();   //minus 8 bytes
+
+		// file size:
+		_ = file.Get32(); // minus 8 bytes
 
 		string waveString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
 		if (waveString != "WAVE") {
@@ -336,15 +340,12 @@ public partial class Util {
 				//to match up with the current FormatEnum.  I'm going to go out on
 				//a limb and say the GDScript is probably more current relative
 				//to what AudioStreamWAV supports.  But that could be wrong.
-				ushort compressionCode = file.Get16();
-				if (compressionCode == 1) {
-					wav.Format = AudioStreamWav.FormatEnum.Format16Bits;
-				} else if (compressionCode == 0) {
-					wav.Format = AudioStreamWav.FormatEnum.Format8Bits;
-				} else if (compressionCode == 2) {
-					wav.Format = AudioStreamWav.FormatEnum.ImaAdpcm;
-				}
-
+				wav.Format = file.Get16() switch {
+					1 => AudioStreamWav.FormatEnum.Format16Bits,
+					0 => AudioStreamWav.FormatEnum.Format8Bits,
+					2 => AudioStreamWav.FormatEnum.ImaAdpcm,
+					_ => wav.Format, // whatever the default was
+				};
 				ushort channels = file.Get16();
 				if (channels == 2) {
 					wav.Stereo = true;

@@ -19,7 +19,7 @@ namespace C7Engine
 			EngineStorage.createThread();
 			EngineStorage.gameDataMutex.WaitOne();
 
-			SaveGame save = SaveGame.Load(loadFilePath, SaveCompression.None);
+			SaveGame save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
 			GameData gameData = save.ToGameData();
 
 			EngineStorage.gameData = gameData;
