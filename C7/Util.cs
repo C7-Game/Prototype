@@ -13,7 +13,6 @@ public partial class Util {
 	public partial class Civ3FileDialog : FileDialog {
 		// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 		// While instantiated it will return to the last-accessed folder when reopened
-		public string AbsPath = "";
 		public string RelPath = "";
 		public Civ3FileDialog(FileModeEnum mode = FileModeEnum.OpenFile) {
 			FileMode = mode;
@@ -21,7 +20,7 @@ public partial class Util {
 
 		public override void _Ready() {
 			Access = AccessEnum.Filesystem;
-			CurrentDir = AbsPath != "" ? AbsPath : Path.Join(Civ3Root, RelPath);
+			CurrentDir = Path.Join(Civ3Root, RelPath);
 			Vector2I windowSize = DisplayServer.WindowGetSize();
 			Vector2I windowMiddle = windowSize / 2;
 			Size = new Vector2I(windowSize.X / 2, windowSize.Y / 2);
