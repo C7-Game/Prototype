@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using ConvertCiv3Media;
 using C7GameData;
 using Serilog;
@@ -17,14 +16,31 @@ public partial class LowerRightInfoBox : TextureRect
 	Label attackDefenseMovement = new Label();
 	Label terrainType = new Label();
 	Label yearAndGold = new Label();
+	Label civAndGovt = new Label(){
+		Position = new Vector2(0, 90),
+		AnchorLeft = 0.5f,
+		AnchorRight = 0.5f,
+		HorizontalAlignment = HorizontalAlignment.Center,
+	};
 
 	Timer blinkingTimer = new Timer();
-	Boolean timerStarted = false;	//This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
+
+	bool timerStarted = false; //This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		this.CreateUI();
+	}
+
+	private string displayCiv;
+	public string PlayerCivilization {
+		get => displayCiv;
+		set {
+			displayCiv = value;
+			civAndGovt.Text = $"{displayCiv} - Despotism (5.5.0)";
+			civAndGovt.OffsetLeft = -1 * (civAndGovt.Size.X/2.0f);
+		}
 	}
 
 	private void CreateUI() {
@@ -75,14 +91,8 @@ public partial class LowerRightInfoBox : TextureRect
 		//Then, when they are visible, we add a left margin that's negative and equal to half
 		//their width.
 		//Seems like there probably is an easier way, but I haven't found it yet.
-		Label civAndGovt = new Label();
-		civAndGovt.Text = "Carthage - Despotism (5.5.0)";
-		civAndGovt.HorizontalAlignment = HorizontalAlignment.Center;
-		civAndGovt.SetPosition(new Vector2(0, 90));
-		civAndGovt.AnchorLeft = 0.5f;
-		civAndGovt.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(civAndGovt);
-		civAndGovt.OffsetLeft = -1 * (civAndGovt.Size.X/2.0f);
+		PlayerCivilization = ""; // set empty string as placeholder
 
 		yearAndGold.Text = "Turn 0  10 Gold (+0 per turn)";
 		yearAndGold.HorizontalAlignment = HorizontalAlignment.Center;

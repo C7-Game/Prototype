@@ -58,16 +58,18 @@ public partial class Game : Node2D {
 		GetTree().AutoAcceptQuit = false;
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
-			var animSoundPlayer = new AudioStreamPlayer();
+			AudioStreamPlayer animSoundPlayer = new();
 			AddChild(animSoundPlayer);
 			civ3AnimData = new AnimationManager(animSoundPlayer);
 			animTracker = new AnimationTracker(civ3AnimData);
 
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
+			GetNode<GameStatus>("CanvasLayer/Control/GameStatus").CurrentPlayer = controller;
+
 			Global.ResetLoadGamePath();
 			camera = GetNode<MapViewCamera>("MapViewCamera");
 
-			using (var gameDataAccess = new UIGameDataAccess()) {
+			using (UIGameDataAccess gameDataAccess = new()) {
 				GameMap map = gameDataAccess.gameData.map;
 				Util.setModPath(gameDataAccess.gameData.scenarioSearchPath);
 				log.Debug("RelativeModPath ", map.RelativeModPath);
