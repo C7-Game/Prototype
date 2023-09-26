@@ -58,16 +58,18 @@ public partial class Game : Node2D {
 		GetTree().AutoAcceptQuit = false;
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
-			var animSoundPlayer = new AudioStreamPlayer();
+			AudioStreamPlayer animSoundPlayer = new();
 			AddChild(animSoundPlayer);
 			civ3AnimData = new AnimationManager(animSoundPlayer);
 			animTracker = new AnimationTracker(civ3AnimData);
 
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
+			GetNode<GameStatus>("CanvasLayer/Control/GameStatus").CurrentPlayer = controller;
+
 			Global.ResetLoadGamePath();
 			camera = GetNode<MapViewCamera>("MapViewCamera");
 
-			using (var gameDataAccess = new UIGameDataAccess()) {
+			using (UIGameDataAccess gameDataAccess = new()) {
 				GameMap map = gameDataAccess.gameData.map;
 				Util.setModPath(gameDataAccess.gameData.scenarioSearchPath);
 				log.Debug("RelativeModPath ", map.RelativeModPath);
@@ -417,6 +419,10 @@ public partial class Game : Node2D {
 			this.OnPlayerEndTurn();
 		}
 
+		if (Input.IsActionJustPressed(C7Action.SaveGame)) {
+			OnSaveGame("./Text/save.json");
+		}
+
 		if (this.HasCurrentlySelectedUnit()) {
 			// TODO: replace bool with an invalid TileDirection enum
 			TileDirection dir = TileDirection.NORTH;
@@ -472,10 +478,9 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitWait)) {
-			using (var gameDataAccess = new UIGameDataAccess()) {
-				UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.id);
-				GetNextAutoselectedUnit(gameDataAccess.gameData);
-			}
+			using UIGameDataAccess gameDataAccess = new();
+			UnitInteractions.waitUnit(gameDataAccess.gameData, CurrentlySelectedUnit.id);
+			GetNextAutoselectedUnit(gameDataAccess.gameData);
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitFortify)) {
@@ -507,14 +512,12 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitBuildCity) && CurrentlySelectedUnit.canBuildCity()) {
-			using (var gameDataAccess = new UIGameDataAccess()) {
-				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.id);
-				log.Debug(currentUnit.Describe());
-				if (currentUnit.canBuildCity()) {
-					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
-						PopupOverlay.PopupCategory.Advisor);
-				}
+			using UIGameDataAccess gameDataAccess = new();
+			MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.id);
+			log.Debug(currentUnit.Describe());
+			if (currentUnit.canBuildCity()) {
+				PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+				popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
 			}
 		}
 
@@ -556,5 +559,10 @@ public partial class Game : Node2D {
 
 	private void OnBuildCity(string name) {
 		new MsgBuildCity(CurrentlySelectedUnit.id, name).send();
+	}
+
+	private void OnSaveGame(string path) {
+		log.Debug($"Saving game to {path}");
+		new MsgSaveGame(path).send();
 	}
 }

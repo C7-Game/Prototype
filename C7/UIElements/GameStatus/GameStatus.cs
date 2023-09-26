@@ -1,15 +1,21 @@
 using Godot;
-using System;
 using C7GameData;
 using Serilog;
 
 public partial class GameStatus : MarginContainer
 {
-
 	private ILogger log = LogManager.ForContext<GameStatus>();
 
 	LowerRightInfoBox LowerRightInfoBox = new LowerRightInfoBox();
-	Timer endTurnAlertTimer;
+
+	private Player player;
+	public Player CurrentPlayer {
+		get => player;
+		set {
+			player = value;
+			LowerRightInfoBox.PlayerCivilization = player.civilization.name;
+		}
+	}
 
 	[Signal] public delegate void BlinkyEndTurnButtonPressedEventHandler();
 

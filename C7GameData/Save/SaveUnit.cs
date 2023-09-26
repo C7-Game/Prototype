@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace C7GameData.Save {
 
@@ -17,7 +19,7 @@ namespace C7GameData.Save {
 		public string experience;
 		public SaveUnit() { }
 
-		public SaveUnit(MapUnit unit, GameMap map) {
+		public SaveUnit(MapUnit unit) {
 			id = unit.id;
 			prototype = unit.unitType.name;
 			owner = unit.owner.id;
@@ -48,8 +50,8 @@ namespace C7GameData.Save {
 				movementPoints = new MovementPoints(),
 				isFortified = action == "fortified",
 			};
-			unit.location.unitsOnTile.Add(unit);
 			unit.movementPoints.reset(movePointsRemaining);
+			unit.location.unitsOnTile.Add(unit);
 			return unit;
 		}
 	}

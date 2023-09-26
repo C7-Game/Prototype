@@ -19,7 +19,7 @@ namespace C7Engine
 			EngineStorage.createThread();
 			EngineStorage.gameDataMutex.WaitOne();
 
-			SaveGame save = SaveGame.Load(loadFilePath);
+			SaveGame save = SaveManager.LoadSave(loadFilePath, defaultBicPath);
 			GameData gameData = save.ToGameData();
 
 			EngineStorage.gameData = gameData;
@@ -37,7 +37,6 @@ namespace C7Engine
 			};
 
 			EngineStorage.uiControllerID = humanPlayer.id;
-			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();
 
 			EngineStorage.gameDataMutex.ReleaseMutex();

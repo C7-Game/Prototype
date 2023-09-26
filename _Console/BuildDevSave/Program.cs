@@ -28,7 +28,7 @@ namespace BuildDevSave {
 			string fullSavePath = args[0];
 			string outputPath = Path.Combine(C7DefaultSaveDir, "c7-static-map-save.json");
 			SaveGame output = ImportCiv3.ImportSav(fullSavePath, GetCiv3Path + @"/Conquests/conquests.biq");
-			output.Save(outputPath);
+			output.Save(outputPath, SaveCompression.None);
 			Info(outputPath, output);
 		}
 	}
