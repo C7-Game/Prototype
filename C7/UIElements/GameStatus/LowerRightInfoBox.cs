@@ -47,9 +47,10 @@ public partial class LowerRightInfoBox : TextureRect
 		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
 		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
 		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
-		TextureRect boxRightRectangle = new TextureRect();
-		boxRightRectangle.Texture = boxRight;
-		boxRightRectangle.SetPosition(new Vector2(0, 0));
+		TextureRect boxRightRectangle = new() {
+			Texture = boxRight,
+			Position = new Vector2(0, 0),
+		};
 		AddChild(boxRightRectangle);
 
 		Pcx nextTurnColor = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states color.pcx"));

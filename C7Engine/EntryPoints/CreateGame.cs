@@ -37,7 +37,6 @@ namespace C7Engine
 			};
 
 			EngineStorage.uiControllerID = humanPlayer.id;
-			TurnHandling.OnBeginTurn(); // Call for the first turn
 			TurnHandling.AdvanceTurn();
 
 			EngineStorage.gameDataMutex.ReleaseMutex();
