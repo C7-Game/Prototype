@@ -4,15 +4,15 @@ using System;
 using System.Diagnostics;
 using Serilog;
 
-public class PopupOverlay : HBoxContainer
+public partial class PopupOverlay : HBoxContainer
 {
 
 	private ILogger log = LogManager.ForContext<PopupOverlay>();
 
-	[Signal] public delegate void UnitDisbanded();
-	[Signal] public delegate void Quit();
-	[Signal] public delegate void BuildCity(string name);
-	[Signal] public delegate void HidePopup();
+	[Signal] public delegate void UnitDisbandedEventHandler();
+	[Signal] public delegate void QuitEventHandler();
+	[Signal] public delegate void BuildCityEventHandler(string name);
+	[Signal] public delegate void HidePopupEventHandler();
 
 	Control currentChild = null;
 
@@ -36,7 +36,7 @@ public class PopupOverlay : HBoxContainer
 		Hide();
 	}
 
-	public void PlaySound(AudioStreamSample wav)
+	public void PlaySound(AudioStreamWav wav)
 	{
 		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("PopupSound");
 		player.Stream = wav;
@@ -52,10 +52,10 @@ public class PopupOverlay : HBoxContainer
 		}
 
 		Alignment = child.alignment;
-		MarginTop = child.margins.top;
-		MarginBottom = child.margins.bottom;
-		MarginLeft = child.margins.left;
-		MarginRight = child.margins.right;
+		OffsetTop = child.margins.top;
+		OffsetBottom = child.margins.bottom;
+		OffsetLeft = child.margins.left;
+		OffsetRight = child.margins.right;
 
 		AddChild(child);
 		currentChild = child;
@@ -76,7 +76,7 @@ public class PopupOverlay : HBoxContainer
 				log.Error("Invalid popup category");
 				break;
 		}
-		AudioStreamSample wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
+		AudioStreamWav wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
 		Visible = true;
 		PlaySound(wav);
 	}
@@ -98,7 +98,7 @@ public class PopupOverlay : HBoxContainer
 				//as most of the global ones should *not* go through here.
 				if (eventKey.Pressed)
 				{
-					GetTree().SetInputAsHandled();
+					GetViewport().SetInputAsHandled();
 				}
 			}
 		}

@@ -10,7 +10,7 @@ using System;
 public class Player
 {
 	public string guid { get; set; }
-	public int color { get; set; }
+	public uint color { get; set; }
 	public bool isBarbarians = false;
 	//TODO: Refactor front-end so it sends player GUID with requests.
 	//We should allow multiple humans, this is a temporary measure.
@@ -31,14 +31,14 @@ public class Player
 	public Player(uint color)
 	{
 		guid = Guid.NewGuid().ToString();
-		this.color = (int)(color & 0xFFFFFFFF);
+		this.color = color & 0xFFFFFFFF;
 	}
 
 	public Player(Civilization civilization, uint color)
 	{
 		this.civilization = civilization;
 		guid = Guid.NewGuid().ToString();
-		this.color = (int)(color & 0xFFFFFFFF);
+		this.color = color & 0xFFFFFFFF;
 	}
 
 	public void AddUnit(MapUnit unit)

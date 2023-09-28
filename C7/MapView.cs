@@ -31,7 +31,7 @@ public abstract class LooseLayer {
 	public bool visible = true;
 }
 
-public class TerrainLayer : LooseLayer {
+public partial class TerrainLayer : LooseLayer {
 
 	public static readonly Vector2 terrainSpriteSize = new Vector2(128, 64);
 
@@ -57,7 +57,7 @@ public class TerrainLayer : LooseLayer {
 			// "other" might be null, in which case we should return a positive value. CompareTo(null) will do this.
 			try {
 				return this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other?.tile.ExtraInfo.BaseTerrainFileID);
-			} catch (Exception ex) {
+			} catch (Exception) {
 				//It also could be Tile.NONE.  In which case, also return a positive value.
 				return 1;
 			}
@@ -73,7 +73,7 @@ public class TerrainLayer : LooseLayer {
 
 	public List<ImageTexture> loadTerrainTripleSheets()
 	{
-		var fileNames = new List<string> {
+		List<string> fileNames = new List<string> {
 			"Art/Terrain/xtgc.pcx",
 			"Art/Terrain/xpgc.pcx",
 			"Art/Terrain/xdgc.pcx",
@@ -84,10 +84,7 @@ public class TerrainLayer : LooseLayer {
 			"Art/Terrain/wSSS.pcx",
 			"Art/Terrain/wOOO.pcx",
 		};
-		var tr = new List<ImageTexture>();
-		foreach (var fileName in fileNames)
-			tr.Add(Util.LoadTextureFromPCX(fileName));
-		return tr;
+		return fileNames.ConvertAll(name => Util.LoadTextureFromPCX(name));
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
@@ -104,9 +101,9 @@ public class TerrainLayer : LooseLayer {
 			if (tTD.tile != Tile.NONE) {
 				int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
 				Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
-				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.y);
-				//Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
-				//Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
+				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.Y);
+				// Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
+				// Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
 				Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
 				looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
 			}
@@ -115,7 +112,7 @@ public class TerrainLayer : LooseLayer {
 	}
 }
 
-public class HillsLayer : LooseLayer {
+public partial class HillsLayer : LooseLayer {
 	public static readonly Vector2 mountainSize = new Vector2(128, 88);
 	public static readonly Vector2 volcanoSize = new Vector2(128, 88);	//same as mountain
 	public static readonly Vector2 hillsSize = new Vector2(128, 72);
@@ -150,7 +147,7 @@ public class HillsLayer : LooseLayer {
 			int row = pcxIndex/4;
 			int column = pcxIndex % 4;
 			if (tile.overlayTerrainType.Key == "mountains") {
-				Rect2 mountainRectangle = new Rect2(column * mountainSize.x, row * mountainSize.y, mountainSize);
+				Rect2 mountainRectangle = new Rect2(column * mountainSize.X, row * mountainSize.Y, mountainSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * mountainSize + new Vector2(0, -12), mountainSize);
 				ImageTexture mountainGraphics;
 				if (tile.isSnowCapped) {
@@ -171,7 +168,7 @@ public class HillsLayer : LooseLayer {
 				looseView.DrawTextureRectRegion(mountainGraphics, screenTarget, mountainRectangle);
 			}
 			else if (tile.overlayTerrainType.Key == "hills") {
-				Rect2 hillsRectangle = new Rect2(column * hillsSize.x, row * hillsSize.y, hillsSize);
+				Rect2 hillsRectangle = new Rect2(column * hillsSize.X, row * hillsSize.Y, hillsSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * hillsSize + new Vector2(0, -4), hillsSize);
 				ImageTexture hillGraphics;
 				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
@@ -187,7 +184,7 @@ public class HillsLayer : LooseLayer {
 				looseView.DrawTextureRectRegion(hillGraphics, screenTarget, hillsRectangle);
 			}
 			else if (tile.overlayTerrainType.Key == "volcano") {
-				Rect2 volcanoRectangle = new Rect2(column * volcanoSize.x, row * volcanoSize.y, volcanoSize);
+				Rect2 volcanoRectangle = new Rect2(column * volcanoSize.X, row * volcanoSize.Y, volcanoSize);
 				Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * volcanoSize + new Vector2(0, -12), volcanoSize);
 				ImageTexture volcanoGraphics;
 				TerrainType dominantVegetation = getDominantVegetationNearHillyTile(tile);
@@ -273,7 +270,7 @@ public class HillsLayer : LooseLayer {
 	}
 }
 
-public class ForestLayer : LooseLayer {
+public partial class ForestLayer : LooseLayer {
 	public static readonly Vector2 forestJungleSize = new Vector2(128, 88);
 
 	private ImageTexture largeJungleTexture;
@@ -318,7 +315,7 @@ public class ForestLayer : LooseLayer {
 				randomJungleColumn = tile.xCoordinate % 4;
 				jungleTexture = largeJungleTexture;
 			}
-			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.x, randomJungleRow * forestJungleSize.y, forestJungleSize);
+			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.X, randomJungleRow * forestJungleSize.Y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
 			looseView.DrawTextureRectRegion(jungleTexture, screenTarget, jungleRectangle);
 		}
@@ -366,13 +363,13 @@ public class ForestLayer : LooseLayer {
 					}
 				}
 			}
-			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.x, forestRow * forestJungleSize.y, forestJungleSize);
+			Rect2 forestRectangle = new Rect2(forestColumn * forestJungleSize.X, forestRow * forestJungleSize.Y, forestJungleSize);
 			Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * forestJungleSize + new Vector2(0, -12), forestJungleSize);
 			looseView.DrawTextureRectRegion(forestTexture, screenTarget, forestRectangle);
 		}
 	}
 }
-public class MarshLayer : LooseLayer {
+public partial class MarshLayer : LooseLayer {
 	public static readonly Vector2 marshSize = new Vector2(128, 88);
 	//Because the marsh graphics are 88 pixels tall instead of the 64 of a tile, we also need an addition 12 pixel offset to the top
 	//88 - 64 = 24; 24/2 = 12.  This keeps the marsh centered with half the extra 24 pixels above the tile and half below.
@@ -399,17 +396,17 @@ public class MarshLayer : LooseLayer {
 				randomMarshColumn = tile.xCoordinate % 4;
 				marshTexture = largeMarshTexture;
 			}
-			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.x, randomJungleRow * marshSize.y, marshSize);
+			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.X, randomJungleRow * marshSize.Y, marshSize);
 			Rect2 screenTarget = new Rect2(tileCenter - MARSH_OFFSET, marshSize);
 			looseView.DrawTextureRectRegion(marshTexture, screenTarget, jungleRectangle);
 		}
 	}
 }
 
-public class RiverLayer : LooseLayer
+public partial class RiverLayer : LooseLayer
 {
 	public static readonly Vector2 riverSize = new Vector2(128, 64);
-	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.x / 2, 0);
+	public static readonly Vector2 riverCenterOffset = new Vector2(riverSize.X / 2, 0);
 	private ImageTexture riverTexture;
 
 	public RiverLayer() {
@@ -446,13 +443,13 @@ public class RiverLayer : LooseLayer
 		int riverRow = riverGraphicsIndex / 4;
 		int riverColumn = riverGraphicsIndex % 4;
 
-		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.x, riverRow * riverSize.y, riverSize);
+		Rect2 riverRectangle = new Rect2(riverColumn * riverSize.X, riverRow * riverSize.Y, riverSize);
 		Rect2 screenTarget = new Rect2(tileCenter - (float)0.5 * riverSize + riverCenterOffset, riverSize);
 		looseView.DrawTextureRectRegion(riverTexture, screenTarget, riverRectangle);
 	}
 }
 
-public class GridLayer : LooseLayer {
+public partial class GridLayer : LooseLayer {
 	public Color color = Color.Color8(50, 50, 50, 150);
 	public float lineWidth = (float)1.0;
 
@@ -460,383 +457,16 @@ public class GridLayer : LooseLayer {
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
-		var cS = MapView.cellSize;
-		var left  = tileCenter + new Vector2(-cS.x,  0   );
-		var top   = tileCenter + new Vector2( 0   , -cS.y);
-		var right = tileCenter + new Vector2( cS.x,  0   );
+		Vector2 cS = MapView.cellSize;
+		Vector2 left  = tileCenter + new Vector2(-cS.X, 0    );
+		Vector2 top   = tileCenter + new Vector2( 0   , -cS.Y);
+		Vector2 right = tileCenter + new Vector2( cS.X, 0    );
 		looseView.DrawLine(left, top  , color, lineWidth);
 		looseView.DrawLine(top , right, color, lineWidth);
 	}
 }
 
-public class UnitLayer : LooseLayer {
-	private ImageTexture unitIcons;
-	private int unitIconsWidth;
-	private ImageTexture unitMovementIndicators;
-
-	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
-	// any particular order so we must use the ZIndex property to ensure they're properly layered.
-	public const int effectAnimZIndex = 150;
-	public const int unitAnimZIndex = 100;
-	public const int cursorZIndex = 50;
-
-	public UnitLayer()
-	{
-		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));
-		unitIcons = PCXToGodot.getImageTextureFromPCX(iconPCX);
-		unitIconsWidth = (unitIcons.GetWidth() - 1) / 33;
-
-		var moveIndPCX = new Pcx(Util.Civ3MediaPath("Art/interface/MovementLED.pcx"));
-		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
-	}
-
-	// Creates a quad mesh with the given shader attached. The quad is 1.0 units long on both sides, intended to be scaled to the appropriate size
-	// when used.
-	public static (ShaderMaterial, MeshInstance2D) createShadedQuad(Shader shader)
-	{
-		var quad = new QuadMesh();
-		quad.Size = new Vector2(1, 1);
-
-		var shaderMat = new ShaderMaterial();
-		shaderMat.Shader = shader;
-
-		var meshInst = new MeshInstance2D();
-		meshInst.Material = shaderMat;
-		meshInst.Mesh = quad;
-
-		return (shaderMat, meshInst);
-	}
-
-	public Color getHPColor(float fractionRemaining)
-	{
-		if (fractionRemaining >= (float)0.67)
-			return Color.Color8(0, 255, 0);
-		else if (fractionRemaining >= (float)0.34)
-			return Color.Color8(255, 255, 0);
-		else
-			return Color.Color8(255, 0, 0);
-	}
-
-	// AnimationInstance represents an animation appearing on the screen. It's specific to a unit, action, and direction. AnimationInstances have
-	// two components: a ShaderMaterial and a MeshInstance2D. The ShaderMaterial runs the unit shader (created by UnitLayer.getShader) with all
-	// the parameters set to a particular texture, civ color, direction, etc. The MeshInstance2D is what's actually drawn by Godot, i.e., what's
-	// added to the node tree. AnimationInstances are only active for one frame at a time but they live as long as the UnitLayer. They are
-	// retrieved or created as needed by getBlankAnimationInstance during the drawing of units and are hidden & requeued for use at the beginning
-	// of each frame.
-	public class AnimationInstance {
-		public ShaderMaterial shaderMat;
-		public MeshInstance2D meshInst;
-
-		public AnimationInstance(LooseView looseView)
-		{
-			(shaderMat, meshInst) = createShadedQuad(getUnitShader());
-			shaderMat.SetShaderParam("civColorWhitePalette", looseView.mapView.civColorWhitePalette);
-
-			looseView.AddChild(meshInst);
-			meshInst.Hide();
-		}
-	}
-
-	private List<AnimationInstance> animInsts = new List<AnimationInstance>();
-	private int nextBlankAnimInst = 0;
-
-	// Returns the next unused AnimationInstance or creates & returns a new one if none are available.
-	public AnimationInstance getBlankAnimationInstance(LooseView looseView)
-	{
-		if (nextBlankAnimInst >= animInsts.Count) {
-			animInsts.Add(new AnimationInstance(looseView));
-		}
-		var tr = animInsts[nextBlankAnimInst];
-		nextBlankAnimInst++;
-		tr.meshInst.Show();
-		return tr;
-	}
-
-	// Sets the palette, indices, relSpriteSize, and spriteXY parameters on a ShaderMaterial to pick a sprite from a FlicSheet. relativeColumn
-	// varies between 0.0 for the first column and 1.0 for the last one.
-	public static void setFlicShaderParams(ShaderMaterial mat, Util.FlicSheet flicSheet, int row, float relativeColumn)
-	{
-		mat.SetShaderParam("palette", flicSheet.palette);
-		mat.SetShaderParam("indices", flicSheet.indices);
-
-		var indicesDims = new Vector2(flicSheet.indices.GetWidth(), flicSheet.indices.GetHeight());
-		var spriteSize = new Vector2(flicSheet.spriteWidth, flicSheet.spriteHeight);
-		mat.SetShaderParam("relSpriteSize", spriteSize / indicesDims);
-
-		int spritesPerRow = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
-		int spriteColumn = (int)(relativeColumn * spritesPerRow);
-		if (spriteColumn >= spritesPerRow)
-			spriteColumn = spritesPerRow - 1;
-		else if (spriteColumn < 0)
-			spriteColumn = 0;
-		mat.SetShaderParam("spriteXY", new Vector2(spriteColumn, row));
-	}
-
-	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter)
-	{
-		var flicSheet = looseView.mapView.game.civ3AnimData.forUnit(unit.unitType.name, appearance.action).getFlicSheet();
-
-		int dirIndex = 0;
-		switch (appearance.direction) {
-		case TileDirection.NORTH:     dirIndex = 5; break;
-		case TileDirection.NORTHEAST: dirIndex = 4; break;
-		case TileDirection.EAST:      dirIndex = 3; break;
-		case TileDirection.SOUTHEAST: dirIndex = 2; break;
-		case TileDirection.SOUTH:     dirIndex = 1; break;
-		case TileDirection.SOUTHWEST: dirIndex = 0; break;
-		case TileDirection.WEST:      dirIndex = 7; break;
-		case TileDirection.NORTHWEST: dirIndex = 6; break;
-		}
-
-		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
-		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
-		var position = tileCenter + animOffset - new Vector2(0, flicSheet.spriteHeight / 4);
-
-		var inst = getBlankAnimationInstance(looseView);
-
-		setFlicShaderParams(inst.shaderMat, flicSheet, dirIndex, appearance.progress);
-		var civColor = new Color(unit.owner.color);
-		inst.shaderMat.SetShaderParam("civColor", new Vector3(civColor.r, civColor.g, civColor.b));
-
-		inst.meshInst.Position = position;
-		// Make y scale negative so the texture isn't drawn upside-down. TODO: Explain more
-		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
-		inst.meshInst.ZIndex = unitAnimZIndex;
-	}
-
-	public void drawEffectAnimFrame(LooseView looseView, Civ3Anim anim, float progress, Vector2 tileCenter)
-	{
-		var flicSheet = anim.getFlicSheet();
-		var inst = getBlankAnimationInstance(looseView);
-		setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
-		inst.shaderMat.SetShaderParam("civColor", new Vector3(1, 1, 1));
-		inst.meshInst.Position = tileCenter;
-		inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
-		inst.meshInst.ZIndex = effectAnimZIndex;
-	}
-
-	private Util.FlicSheet cursorFlicSheet;
-	private ShaderMaterial cursorMat = null;
-	private MeshInstance2D cursorMesh = null;
-
-	public void drawCursor(LooseView looseView, Vector2 position)
-	{
-		// Initialize cursor if necessary
-		if (cursorMesh == null) {
-			(cursorFlicSheet, _) = Util.loadFlicSheet("Art/Animations/Cursor/Cursor.flc");
-			(cursorMat, cursorMesh) = createShadedQuad(getCursorShader());
-			cursorMesh.Scale = new Vector2(cursorFlicSheet.spriteWidth, -1 * cursorFlicSheet.spriteHeight);
-			cursorMesh.ZIndex = cursorZIndex;
-			looseView.AddChild(cursorMesh);
-		}
-
-		const double period = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
-		var repCount = (double)OS.GetTicksMsec() / 1000.0 / period;
-		var progress = (float)(repCount - Math.Floor(repCount));
-
-		setFlicShaderParams(cursorMat, cursorFlicSheet, 0, progress);
-		cursorMesh.Position = position;
-		cursorMesh.Show();
-	}
-
-	public override void onBeginDraw(LooseView looseView, GameData gameData)
-	{
-		// Reset animation instances
-		for (int n = 0; n < nextBlankAnimInst; n++)
-			animInsts[n].meshInst.Hide();
-		nextBlankAnimInst = 0;
-
-		// Hide cursor if it's been initialized
-		if (cursorMesh != null)
-			cursorMesh.Hide();
-
-		looseView.mapView.game.updateAnimations(gameData);
-	}
-
-	// Returns which unit should be drawn from among a list of units. The list is assumed to be non-empty.
-	public MapUnit selectUnitToDisplay(LooseView looseView, List<MapUnit> units)
-	{
-		// From the list, pick out which units are (1) the strongest defender vs the currently selected unit, (2) the currently selected unit
-		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
-		MapUnit bestDefender = units[0],
-			selected = null,
-			doingInterestingAnimation = null;
-		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
-		foreach (var u in units) {
-			if (u == currentlySelectedUnit)
-				selected = u;
-			if (u.HasPriorityAsDefender(bestDefender, currentlySelectedUnit))
-				bestDefender = u;
-			if (looseView.mapView.game.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
-				doingInterestingAnimation = u;
-		}
-
-		// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
-		return selected != null ? selected : (doingInterestingAnimation != null ? doingInterestingAnimation : bestDefender);
-	}
-
-	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
-	{
-		// First draw animated effects. These will always appear over top of units regardless of draw order due to z-index.
-		Civ3Anim tileEffect = looseView.mapView.game.animTracker.getTileEffect(tile);
-		if (tileEffect != null) {
-			(_, float progress) = looseView.mapView.game.animTracker.getCurrentActionAndProgress(tile);
-			drawEffectAnimFrame(looseView, tileEffect, progress, tileCenter);
-		}
-
-		if (tile.unitsOnTile.Count == 0)
-			return;
-
-		var white = Color.Color8(255, 255, 255);
-
-		var unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
-		var appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
-		var animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
-
-		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
-		if ((unit != MapUnit.NONE) && (unit == looseView.mapView.game.CurrentlySelectedUnit))
-			drawCursor(looseView, tileCenter + animOffset);
-
-		drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
-
-		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
-
-		int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
-		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
-		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
-		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
-
-		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5),
-			hpIndWidth = 6;
-		var hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
-		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
-			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
-			looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
-			float hpHeight = hpFraction * (hpIndHeight - 2);
-			if (hpHeight < 1)
-				hpHeight = 1;
-			var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
-										   new Vector2(hpIndWidth - 2, hpHeight)); // size
-			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
-			if (unit.isFortified)
-				looseView.DrawRect(hpIndBackgroundRect, white, false);
-		}
-
-		// Draw lines to show that there are more units on this tile
-		if (tile.unitsOnTile.Count > 1) {
-			int lineCount = tile.unitsOnTile.Count;
-			if (lineCount > 5)
-				lineCount = 5;
-			for (int n = 0; n < lineCount; n++) {
-				var lineStart = indicatorLoc + new Vector2(-2, hpIndHeight + 12 + 4 * n);
-				looseView.DrawLine(lineStart                    , lineStart + new Vector2(8, 0), white);
-				looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
-			}
-		}
-	}
-
-	private static Shader unitShader = null;
-
-	public static Shader getUnitShader()
-	{
-		if (unitShader != null)
-			return unitShader;
-
-		// It would make more sense to use a usampler2D for the indices but that doesn't work. As far as I can tell, (u)int samplers are
-		// broken on Godot because there's no way to create a texture with a compatible format. See:
-		// https://www.khronos.org/opengl/wiki/Sampler_(GLSL)#Sampler_types - Says it's undefined behavior to read from a usampler2d if the
-		// attached texture format is not GL_R8UI.
-		// https://docs.godotengine.org/en/stable/classes/class_image.html#enum-image-format - None of the Godot texture formats correspond to
-		// GL_R8UI. The closest is FORMAT_R8 which corresponds to GL_RED except that won't work since it's a floating point format.
-		string shaderSource = @"
-		shader_type canvas_item;
-
-		uniform sampler2D palette;
-		uniform sampler2D civColorWhitePalette;
-		uniform sampler2D indices;
-		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
-		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
-		uniform vec3 civColor;
-
-		vec4 sampleCivTintedColor(vec2 paletteCoords)
-		{
-			return vec4(civColor, 1.0) * texture(civColorWhitePalette, paletteCoords);
-		}
-
-		void vertex()
-		{
-			UV = (spriteXY + UV) * relSpriteSize;
-		}
-
-		void fragment()
-		{
-			int colorIndex = int(255.0 * texture(indices, UV).r);
-			if (colorIndex >= 254) // indices 254 and 255 are transparent
-				discard;
-			else if (colorIndex >= 240) // indices in [240, 253] are shadows
-				COLOR = vec4(0.0, 0.0, 0.0, float(16 * (255 - colorIndex)) / 255.0);
-			else if (colorIndex >= 224) // indices in [224, 239] are smoke
-				COLOR = vec4(0.0, 0.0, 0.0, 0.1 + 0.032 * float(colorIndex - 224));
-			else {
-				vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
-				bool tintedByCiv = (colorIndex < 16) || ((colorIndex < 64) && (colorIndex % 2 == 0));
-				if (tintedByCiv)
-					COLOR = sampleCivTintedColor(paletteCoords);
-				else
-					COLOR = texture(palette, paletteCoords);
-			}
-		}
-		";
-		var tr = new Shader();
-		tr.Code = shaderSource;
-
-		unitShader = tr;
-		return tr;
-	}
-
-	private static Shader cursorShader = null;
-
-	public static Shader getCursorShader()
-	{
-		if (cursorShader != null)
-			return cursorShader;
-
-		string shaderSource = @"
-		shader_type canvas_item;
-
-		uniform sampler2D palette;
-		uniform sampler2D indices;
-		uniform vec2 relSpriteSize; // sprite size relative to the entire sheet
-		uniform vec2 spriteXY; // coordinates of the sprite to be drawn, in number of sprites not pixels
-
-		void vertex()
-		{
-			UV = (spriteXY + UV) * relSpriteSize;
-		}
-
-		void fragment()
-		{
-			int colorIndex = int(255.0 * texture(indices, UV).r);
-			if ((colorIndex >= 224) && (colorIndex <= 239))
-				COLOR = vec4(1.0, 1.0, 1.0, float(colorIndex - 224) / float(239 - 224));
-			else if (colorIndex >= 254) // indices 254 and 255 are transparent
-				discard;
-			else {
-				vec2 paletteCoords = vec2(float(colorIndex % 16), float(colorIndex / 16)) / 16.0;
-				COLOR = texture(palette, paletteCoords);
-			}
-		}
-		";
-		var tr = new Shader();
-		tr.Code = shaderSource;
-
-		cursorShader = tr;
-		return tr;
-	}
-}
-
-public class BuildingLayer : LooseLayer {
+public partial class BuildingLayer : LooseLayer {
 	private ImageTexture buildingsTex;
 	private Vector2 buildingSpriteSize;
 
@@ -851,7 +481,7 @@ public class BuildingLayer : LooseLayer {
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
 	{
 		if (tile.hasBarbarianCamp) {
-			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize);	//(2, 0) is the offset in the TerrainBuildings.PCX file (top row, third in)
+			var texRect = new Rect2(buildingSpriteSize * new Vector2 (2, 0), buildingSpriteSize); //(2, 0) is the offset in the TerrainBuildings.PCX file (top row, third in)
 			// TODO: Modify this calculation so it doesn't assume buildingSpriteSize is the same as the size of the terrain tiles
 			var screenRect = new Rect2(tileCenter - (float)0.5 * buildingSpriteSize, buildingSpriteSize);
 			looseView.DrawTextureRectRegion(buildingsTex, screenRect, texRect);
@@ -859,7 +489,7 @@ public class BuildingLayer : LooseLayer {
 	}
 }
 
-public class LooseView : Node2D {
+public partial class LooseView : Node2D {
 	public MapView mapView;
 	public List<LooseLayer> layers = new List<LooseLayer>();
 
@@ -885,18 +515,22 @@ public class LooseView : Node2D {
 			// have to reiterate for each layer. Doing this improves framerate significantly.
 			MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
 			List<VisibleTile> visibleTiles = new List<VisibleTile>();
-			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
-				if (gD.map.isRowAt(y))
+			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++) {
+				if (gD.map.isRowAt(y)) {
 					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
 						Tile tile = gD.map.tileAt(x, y);
-						if (IsTileKnown(tile, gameDataAccess))
+						if (IsTileKnown(tile, gameDataAccess)) {
 							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
+						}
 					}
+				}
+			}
 
 			foreach (LooseLayer layer in layers.FindAll(L => L.visible && !(L is FogOfWarLayer))) {
 				layer.onBeginDraw(this, gD);
-				foreach (VisibleTile vT in visibleTiles)
+				foreach (VisibleTile vT in visibleTiles) {
 					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
+				}
 				layer.onEndDraw(this, gD);
 			}
 
@@ -923,7 +557,7 @@ public class LooseView : Node2D {
 	}
 }
 
-public class MapView : Node2D {
+public partial class MapView : Node2D {
 	// cellSize is half the size of the tile sprites, or the amount of space each tile takes up when they are packed on the grid (note tiles are
 	// staggered and half overlap).
 	public static readonly Vector2 cellSize = new Vector2(64, 32);
@@ -990,8 +624,8 @@ public class MapView : Node2D {
 		looseView.layers.Add(new TntLayer());
 		looseView.layers.Add(new RoadLayer());
 		looseView.layers.Add(new ResourceLayer());
-		gridLayer = new GridLayer();
-		looseView.layers.Add(gridLayer);
+		this.gridLayer = new GridLayer();
+		looseView.layers.Add(this.gridLayer);
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new CityLayer());
@@ -1002,18 +636,17 @@ public class MapView : Node2D {
 		AddChild(looseView);
 	}
 
-	public override void _Process(float delta)
+	public override void _Process(double delta)
 	{
 		// Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but long term I think it's
 		// better to redraw everything every frame like a typical modern video game.
-		looseView.Update();
+		looseView.QueueRedraw();
 	}
 
 	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
 	public Vector2 getVisibleAreaSize()
 	{
-		var viewport = GetViewport();
-		return (viewport != null) ? viewport.Size : OS.WindowSize;
+		return GetViewport() != null ? GetViewportRect().Size : DisplayServer.WindowGetSize();
 	}
 
 	public VisibleRegion getVisibleRegion()
@@ -1021,15 +654,15 @@ public class MapView : Node2D {
 		(int x0, int y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
 		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		return new VisibleRegion { upperLeftX = x0 - 2, upperLeftY = y0 - 2,
-			lowerRightX = x0 + (int)mapViewSize.x, lowerRightY = y0 + (int)mapViewSize.y };
+			lowerRightX = x0 + (int)mapViewSize.X, lowerRightY = y0 + (int)mapViewSize.Y };
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
 	// same after the zoom level is changed, and if center is screenSize/2, the tile in the center of the window won't change.
 	public void setCameraZoom(float newScale, Vector2 center)
 	{
-		var v2NewZoom = new Vector2(newScale, newScale);
-		var v2OldZoom = new Vector2(cameraZoom, cameraZoom);
+		Vector2 v2NewZoom = new Vector2(newScale, newScale);
+		Vector2 v2OldZoom = new Vector2(cameraZoom, cameraZoom);
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
 			looseView.Scale = v2NewZoom;
@@ -1054,22 +687,22 @@ public class MapView : Node2D {
 		// larger than the map (if we're zoomed far out) so in that case we must apply the constraint the other way around, i.e. constrain the
 		// map to the viewport rather than the viewport to the map.
 		Vector2 visAreaSize = getVisibleAreaSize();
-		Vector2 mapPixelSize = new Vector2(cameraZoom, cameraZoom) * (new Vector2(cellSize.x * (mapWidth + 1), cellSize.y * (mapHeight + 1)));
+		Vector2 mapPixelSize = new Vector2(cameraZoom, cameraZoom) * (new Vector2(cellSize.X * (mapWidth + 1), cellSize.Y * (mapHeight + 1)));
 		if (!wrapHorizontally) {
 			float leftLim, rightLim;
 			{
-				if (mapPixelSize.x >= visAreaSize.x) {
+				if (mapPixelSize.X >= visAreaSize.X) {
 					leftLim = 0;
-					rightLim = mapPixelSize.x - visAreaSize.x;
+					rightLim = mapPixelSize.X - visAreaSize.X;
 				} else {
-					leftLim = mapPixelSize.x - visAreaSize.x;
+					leftLim = mapPixelSize.X - visAreaSize.X;
 					rightLim = 0;
 				}
 			}
-			if (location.x < leftLim)
-				location.x = leftLim;
-			else if (location.x > rightLim)
-				location.x = rightLim;
+			if (location.X < leftLim)
+				location.X = leftLim;
+			else if (location.X > rightLim)
+				location.X = rightLim;
 		}
 		if (!wrapVertically) {
 			// These margins allow the player to move the camera that far off those map edges so that the UI controls don't cover up the
@@ -1077,18 +710,18 @@ public class MapView : Node2D {
 			float topMargin = 70, bottomMargin = 140;
 			float topLim, bottomLim;
 			{
-				if (mapPixelSize.y >= visAreaSize.y) {
+				if (mapPixelSize.Y >= visAreaSize.Y) {
 					topLim = -topMargin;
-					bottomLim = mapPixelSize.y - visAreaSize.y + bottomMargin;
+					bottomLim = mapPixelSize.Y - visAreaSize.Y + bottomMargin;
 				} else {
-					topLim = mapPixelSize.y - visAreaSize.y;
+					topLim = mapPixelSize.Y - visAreaSize.Y;
 					bottomLim = 0;
 				}
 			}
-			if (location.y < topLim)
-				location.y = topLim;
-			else if (location.y > bottomLim)
-				location.y = bottomLim;
+			if (location.Y < topLim)
+				location.Y = topLim;
+			else if (location.Y > bottomLim)
+				location.Y = bottomLim;
 		}
 
 		internalCameraLocation = location;
@@ -1118,15 +751,15 @@ public class MapView : Node2D {
 		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
-		int x = (int)intMapLoc.x, y = (int)intMapLoc.y;
+		int x = (int)intMapLoc.X, y = (int)intMapLoc.Y;
 		bool evenColumn = x%2 == 0, evenRow = y%2 == 0;
 		if (evenColumn ^ evenRow) {
-			if (fracMapLoc.y > fracMapLoc.x)
+			if (fracMapLoc.Y > fracMapLoc.X)
 				x -= 1;
 			else
 				y -= 1;
 		} else {
-			if (fracMapLoc.y < 1 - fracMapLoc.x) {
+			if (fracMapLoc.Y < 1 - fracMapLoc.X) {
 				x -= 1;
 				y -= 1;
 			}

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ConvertCiv3Media;
 using C7GameData;
 
-public class Civ3Map : Node2D
+public partial class Civ3Map : Node2D
 {
 	public List<Tile> Civ3Tiles;
 	public int[,] Map { get; protected set; }
@@ -26,19 +26,20 @@ public class Civ3Map : Node2D
 		if (TM != null) { RemoveChild(TM); }
 		// Although tiles appear isometric, they are logically laid out as a checkerboard pattern on a square grid
 		TM = new TileMap();
-		TM.CellSize = new Vector2(64,32);
+		TM.TileSet.TileSize = new Vector2I(64,32);
 		// TM.CenteredTextures = true;
-		TS = new TileSet();
-		TM.TileSet = TS;
+		TS = TM.TileSet;
 
 		TileIDLookup = new int[9,81];
 
-		int id = TS.GetLastUnusedTileId();
+		// int id = TS.GetLastUnusedTileId();
+
 		// Make blank default tile
 		// TODO: Make red tile or similar
 		// NOTE: Need an unused tile at 0, anyway, to test to see if real tile has been loaded yet
-		TS.CreateTile(id);
-		id++;
+
+		// TS.CreateTile(id);
+		// id++;
 
 		Map = new int[MapWidth,MapHeight];
 
@@ -48,10 +49,10 @@ public class Civ3Map : Node2D
 			foreach (Tile tile in Civ3Tiles)
 			{
 				// If tile media file not loaded yet
-				if(TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,1] == 0) { LoadTileSet(tile.ExtraInfo.BaseTerrainFileID); }
-				var _ = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
-				Map[tile.xCoordinate,tile.yCoordinate] = 0;
-				Map[tile.xCoordinate,tile.yCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
+				if (TileIDLookup[tile.ExtraInfo.BaseTerrainFileID, 1] == 0) { LoadTileSet(tile.ExtraInfo.BaseTerrainFileID); }
+				// var _ = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID, tile.ExtraInfo.BaseTerrainImageID];
+				Map[tile.xCoordinate, tile.yCoordinate] = 0;
+				Map[tile.xCoordinate, tile.yCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID,tile.ExtraInfo.BaseTerrainImageID];
 			}
 		}
 		/* This code sets the tiles for display, but that is being done by MapView now
@@ -77,21 +78,21 @@ public class Civ3Map : Node2D
 			{ 7, "Art/Terrain/wSSS.pcx" },
 			{ 8, "Art/Terrain/wOOO.pcx" },
 		};
-		int id = TS.GetLastUnusedTileId();
+		// int id = TS.GetLastUnusedTileId();
 		// temp if
-		if(FileNameLookup[fileID] != null)
-		{
-		Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath(FileNameLookup[fileID].ToString()));//, ModRelPath));
-		ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
+		if (FileNameLookup[fileID] != null) {
+			Pcx PcxTxtr = new Pcx(Util.Civ3MediaPath(FileNameLookup[fileID].ToString()));//, ModRelPath));
+			ImageTexture Txtr = PCXToGodot.getImageTextureFromPCX(PcxTxtr);
 
-		for (int y = 0; y < PcxTxtr.Height; y += 64) {
-			for (int x = 0; x < PcxTxtr.Width; x+= 128, id++) {
-				TS.CreateTile(id);
-				TS.TileSetTexture(id, Txtr);
-				TS.TileSetRegion(id, new Rect2(x, y, 128, 64));
-				TileIDLookup[fileID, (x / 128) + (y / 64) * (PcxTxtr.Width / 128)] = id;
+			for (int y = 0; y < PcxTxtr.Height; y += 64) {
+				for (int x = 0; x < PcxTxtr.Width; x+= 128/*, id++*/) {
+					// TS.Create
+					// TS.CreateTile(id);
+					// TS.TileSetTexture(id, Txtr);
+					// TS.TileSetRegion(id, new Rect2(x, y, 128, 64));
+					// TileIDLookup[fileID, (x / 128) + (y / 64) * (PcxTxtr.Width / 128)] = id;
+				}
 			}
-		}
 		}
 	}
 }

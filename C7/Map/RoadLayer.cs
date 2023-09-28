@@ -5,7 +5,7 @@ using Godot;
 
 namespace C7.Map
 {
-	public class RoadLayer : LooseLayer {
+	public partial class RoadLayer : LooseLayer {
 		private readonly ImageTexture roadTexture;
 		private readonly ImageTexture railroadTexture;
 		private readonly Vector2 tileSize;
@@ -52,7 +52,7 @@ namespace C7.Map
 		private Rect2 getRect(int index) {
 			int row = index >> 4;
 			int column = index & 0xF;
-			return new Rect2(column * tileSize.x, row * tileSize.y, tileSize);
+			return new Rect2(column * tileSize.X, row * tileSize.Y, tileSize);
 		}
 
 		private static int getFlag(TileDirection direction) {

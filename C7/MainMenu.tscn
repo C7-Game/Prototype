@@ -1,40 +1,41 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=3 uid="uid://gnt0y3og7nk6"]
 
-[ext_resource path="res://MainMenu.cs" type="Script" id=1]
-[ext_resource path="res://Fonts/NSansFont24Pt.tres" type="DynamicFont" id=2]
-[ext_resource path="res://MainMenuMusicPlayer.cs" type="Script" id=3]
-[ext_resource path="res://MainMenuTheme.tres" type="Theme" id=4]
+[ext_resource type="Script" path="res://MainMenu.cs" id="1"]
+[ext_resource type="Script" path="res://MainMenuMusicPlayer.cs" id="3"]
+[ext_resource type="Theme" uid="uid://b0jisy3avwkxf" path="res://MainMenuTheme.tres" id="4"]
 
 [node name="MainMenu" type="Node2D"]
 z_index = 1
 z_as_relative = false
-script = ExtResource( 1 )
+script = ExtResource("1")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = -1
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
 visible = false
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-color = Color( 0.286275, 0.592157, 0.580392, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+color = Color(0.286275, 0.592157, 0.580392, 1)
 
 [node name="Label" type="Label" parent="CanvasLayer"]
 visible = false
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -160.0
-margin_top = -54.0
-margin_right = 160.0
-margin_bottom = 54.0
-custom_fonts/font = ExtResource( 2 )
+offset_left = -160.0
+offset_top = -54.0
+offset_right = 160.0
+offset_bottom = 54.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Civfanatics Creation &
 Customization Community's
 Civ3 Conquests Clone
@@ -44,44 +45,36 @@ the Registry if Civ3 is installed.
 On Mac and Linux, set the environment variable
 CIV3_HOME to the Civ install location.
 Then restart C7."
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="MainMenuMusicPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
-script = ExtResource( 3 )
+script = ExtResource("3")
 
 [node name="SoundEffectPlayer" type="AudioStreamPlayer" parent="CanvasLayer"]
 
 [node name="MainMenuBackground" type="TextureRect" parent="CanvasLayer"]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource( 4 )
-expand = true
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("4")
 stretch_mode = 1
 
 [node name="SetCiv3Home" type="Button" parent="CanvasLayer"]
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -84.5
-margin_top = -93.7225
-margin_right = 84.5
-margin_bottom = -73.7225
+offset_left = -84.5
+offset_top = -93.7225
+offset_right = 84.5
+offset_bottom = -73.7225
+grow_horizontal = 2
+grow_vertical = 2
 text = "Select Civ3 Home Folder"
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="SetCiv3HomeDialog" type="FileDialog" parent="CanvasLayer"]
-margin_right = 550.0
-margin_bottom = 750.0
-rect_min_size = Vector2( 400, 140 )
-window_title = "Open a File or Directory"
-resizable = true
 mode = 3
 access = 2
 

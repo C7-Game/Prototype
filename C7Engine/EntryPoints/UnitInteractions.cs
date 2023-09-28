@@ -4,7 +4,6 @@ using Serilog;
 namespace C7Engine
 {
 	using C7GameData;
-	using System;
 	using System.Collections.Generic;
 
 	public class UnitInteractions
@@ -15,17 +14,13 @@ namespace C7Engine
 
 		public static MapUnit getNextSelectedUnit(GameData gameData)
 		{
-			foreach (Player player in gameData.players) {
+			foreach (Player player in gameData.players.Where(p => p.isHuman)) {
 				//TODO: Should pass in a player GUID instead of checking for human
 				//This current limits us to one human player, although it's better
 				//than the old limit of one non-barbarian player.
-				if (player.isHuman) {
-					foreach (MapUnit unit in player.units) {
-						if (unit.movementPoints.canMove && !unit.IsBusy()) {
-							if (!waitQueue.Contains(unit)) {
-								return unit;
-							}
-						}
+				foreach (MapUnit unit in player.units.Where(u => u.movementPoints.canMove && !u.IsBusy())) {
+					if (!waitQueue.Contains(unit)) {
+						return unit;
 					}
 				}
 			}
@@ -54,7 +49,7 @@ namespace C7Engine
 
 			// Eventually, we should look this up somewhere to see what all actions we have (and mods might add more)
 			// For now, this is still an improvement over the last iteration.
-			string[] implementedActions = { "hold", "wait", "fortify", "disband", "goTo", "bombard"};
+			string[] implementedActions = { C7Action.UnitHold, C7Action.UnitWait, C7Action.UnitFortify, C7Action.UnitDisband, C7Action.UnitGoto, C7Action.UnitBombard };
 			foreach (string action in implementedActions) {
 				if (unit.unitType.actions.Contains(action)) {
 					unit.availableActions.Add(action);
@@ -62,11 +57,11 @@ namespace C7Engine
 			}
 
 			if (unit.canBuildCity()) {
-				unit.availableActions.Add("buildCity");
+				unit.availableActions.Add(C7Action.UnitBuildCity);
 			}
 
 			if (unit.canBuildRoad()) {
-				unit.availableActions.Add("buildRoad");
+				unit.availableActions.Add(C7Action.UnitBuildRoad);
 			}
 
 			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.

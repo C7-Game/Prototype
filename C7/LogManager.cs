@@ -3,10 +3,8 @@ using Godot;
 using Serilog;
 using Serilog.Templates;
 
-public class LogManager : Node
-{
-	public override void _Ready()
-	{
+public partial class LogManager : Node {
+	public override void _Ready() {
 		// Format looks like:
 		// timestamp [level] context: message
 		//		Exception: exception
@@ -24,10 +22,10 @@ public class LogManager : Node
 		// the C7Engine.AI namespace regardless of log level.
 		Log.Logger = new LoggerConfiguration()
 			// .WriteTo.GodotSink(formatter: consoleTemplate)	//Writing to console can slow the game down considerably (see #278).  Thus it is disabled by default.
-			.WriteTo.File("log.txt", buffered: true, flushToDiskInterval: TimeSpan.FromMilliseconds(250), fileSizeLimitBytes: 52428800,	//50 MB
-			              outputTemplate: "[{Level:u3}] {Timestamp:HH:mm:ss} {SourceContext}: {Message:lj} {NewLine}{Exception}")
+			.WriteTo.File("log.txt", buffered: true, flushToDiskInterval: TimeSpan.FromMilliseconds(250), fileSizeLimitBytes: 52428800, //50 MB
+						  outputTemplate: "[{Level:u3}] {Timestamp:HH:mm:ss} {SourceContext}: {Message:lj} {NewLine}{Exception}")
 
-			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information')")	//suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
+			.Filter.ByIncludingOnly("(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information')")   //suggested:  OR SourceContext like 'C7Engine.AI.%' (insert the namespace you need to debug)
 			.MinimumLevel.Debug()
 			.CreateLogger();
 
@@ -35,10 +33,8 @@ public class LogManager : Node
 		Log.ForContext<LogManager>().Debug("Hello!");
 	}
 
-	public override void _Notification(int what)
-	{
-		if (what == MainLoop.NotificationWmQuitRequest)
-		{
+	public override void _Notification(int what) {
+		if (what == ((long)DisplayServer.WindowEvent.CloseRequest)) {
 			GD.Print("Goodbye logger!");
 			Log.ForContext<LogManager>().Debug("Goodbye!");
 			Log.CloseAndFlush();
@@ -46,8 +42,7 @@ public class LogManager : Node
 		}
 	}
 
-	public static ILogger ForContext<T>()
-	{
+	public static ILogger ForContext<T>() {
 		return Log.ForContext<T>();
 	}
 }

@@ -1,8 +1,8 @@
-<Project Sdk="Godot.NET.Sdk/3.3.0">
+<Project Sdk="Godot.NET.Sdk/4.1.1">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <LangVersion>8.0</LangVersion>
+    <TargetFramework>net7.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ConvertCiv3Media\ConvertCiv3Media.csproj" />
@@ -14,9 +14,9 @@
     <ProjectReference Include="..\C7Engine\C7Engine.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="Serilog.Expressions" Version="3.3.0" />
+    <PackageReference Include="Serilog.Expressions" Version="3.4.1" />
   </ItemGroup>
 </Project>

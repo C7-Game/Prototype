@@ -1,10 +1,7 @@
-﻿using System;
 using System.Collections.Generic;
 using C7GameData;
-using ConvertCiv3Media;
 using Godot;
 using Serilog;
-using Serilog.Events;
 
 namespace C7.Map {
 	public class CityLayer : LooseLayer {
@@ -19,7 +16,6 @@ namespace C7.Map {
 
 		public CityLayer()
 		{
-
 		}
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)
@@ -30,7 +26,7 @@ namespace C7.Map {
 
 			City city = tile.cityAtTile;
 			if (!citySceneLookup.ContainsKey(city)) {
-				CityScene cityScene = new CityScene(city, tile, tileCenter);
+				CityScene cityScene = new CityScene(city, tile, new Vector2I((int)tileCenter.X, (int)tileCenter.Y));
 				looseView.AddChild(cityScene);
 				citySceneLookup[city] = cityScene;
 			} else {

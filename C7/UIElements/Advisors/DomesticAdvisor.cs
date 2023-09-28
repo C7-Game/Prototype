@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class DomesticAdvisor : TextureRect
+public partial class DomesticAdvisor : TextureRect
 {
 	// Declare member variables here. Examples:
 	// private int a = 2;
@@ -40,13 +40,13 @@ public class DomesticAdvisor : TextureRect
 		DialogBoxAdvise.Text = "You are running C7!";
 		DialogBoxAdvise.SetPosition(new Vector2(815, 119));
 		AddChild(DialogBoxAdvise);
-		
+
 		ImageTexture GoBackTexture = Util.LoadTextureFromPCX("Art/exitBox-backgroundStates.pcx", 0, 0, 72, 48);
 		TextureButton GoBackButton = new TextureButton();
 		GoBackButton.TextureNormal = GoBackTexture;
 		GoBackButton.SetPosition(new Vector2(952, 720));
 		AddChild(GoBackButton);
-		GoBackButton.Connect("pressed", this, "ReturnToMenu");
+		GoBackButton.Connect("pressed",new Callable(this,"ReturnToMenu"));
 	}
 
 	private void ReturnToMenu()

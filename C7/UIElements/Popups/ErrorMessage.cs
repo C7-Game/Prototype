@@ -1,12 +1,12 @@
 using Godot;
 
-public class ErrorMessage : Popup
+public partial class ErrorMessage : Popup
 {
 	private string message = "";
 
 	public ErrorMessage(string message) {
 		this.message = message;
-		alignment = BoxContainer.AlignMode.Center;
+		alignment = BoxContainer.AlignmentMode.Center;
 		margins = new Margins(top: 100);
 	}
 
@@ -27,12 +27,12 @@ public class ErrorMessage : Popup
 		errorDescription.Text = "Not a valid save file\n" + message;
 		errorDescription.SetPosition(new Vector2(25, 162));
 		AddChild(errorDescription);
-		
+
 		AddButton("Return to Menu", 290, "quit");
 	}
 
 	private void quit()
 	{
-		GetTree().ChangeScene("res://MainMenu.tscn");
+		GetTree().ChangeSceneToFile("res://MainMenu.tscn");
 	}
 }

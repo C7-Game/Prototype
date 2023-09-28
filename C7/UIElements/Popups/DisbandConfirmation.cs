@@ -4,7 +4,7 @@ using System.Diagnostics;
 using C7GameData;
 using Serilog;
 
-public class DisbandConfirmation : Popup
+public partial class DisbandConfirmation : Popup
 {
 	private ILogger log = LogManager.ForContext<DisbandConfirmation>();
 
@@ -18,7 +18,7 @@ public class DisbandConfirmation : Popup
 
 	public DisbandConfirmation(MapUnit unit)
 	{
-		alignment = BoxContainer.AlignMode.End;
+		alignment = BoxContainer.AlignmentMode.End;
 		margins = new Margins(right: 10);
 		unitType = unit.unitType.name;
 	}

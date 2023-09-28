@@ -1,12 +1,10 @@
-using System;
 using C7GameData;
 using ConvertCiv3Media;
 using Godot;
 using Serilog;
-using Serilog.Events;
 
 namespace C7.Map {
-	public class CityScene : Node2D {
+	public partial class CityScene : Node2D {
 		private ILogger log = LogManager.ForContext<CityScene>();
 
 		private readonly Vector2 citySpriteSize;
@@ -15,7 +13,7 @@ namespace C7.Map {
 		private TextureRect cityGraphics = new TextureRect();
 		private CityLabelScene cityLabelScene;
 
-		public CityScene(City city, Tile tile, Vector2 tileCenter) {
+		public CityScene(City city, Tile tile, Vector2I tileCenter) {
 			cityLabelScene = new CityLabelScene(city, tile, tileCenter);
 
 			//TODO: Generalize, support multiple city types, etc.
@@ -25,8 +23,8 @@ namespace C7.Map {
 			cityTexture = Util.LoadTextureFromPCX("Art/Cities/rMIDEAST.PCX", 0, 0, width, height);
 			citySpriteSize = new Vector2(width, height);
 
-			cityGraphics.MarginLeft = tileCenter.x - (float)0.5 * citySpriteSize.x;
-			cityGraphics.MarginTop = tileCenter.y - (float)0.5 * citySpriteSize.y;
+			cityGraphics.OffsetLeft = tileCenter.X - (float)0.5 * citySpriteSize.X;
+			cityGraphics.OffsetTop = tileCenter.Y - (float)0.5 * citySpriteSize.Y;
 			cityGraphics.MouseFilter = Control.MouseFilterEnum.Ignore;
 			cityGraphics.Texture = cityTexture;
 

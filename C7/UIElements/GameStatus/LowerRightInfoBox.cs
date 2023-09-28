@@ -4,7 +4,7 @@ using ConvertCiv3Media;
 using C7GameData;
 using Serilog;
 
-public class LowerRightInfoBox : TextureRect
+public partial class LowerRightInfoBox : TextureRect
 {
 	private ILogger log = LogManager.ForContext<LowerRightInfoBox>();
 
@@ -46,29 +46,29 @@ public class LowerRightInfoBox : TextureRect
 		nextTurnButton.TextureHover = nextTurnOnTexture;
 		nextTurnButton.SetPosition(new Vector2(0, 0));
 		AddChild(nextTurnButton);
-		nextTurnButton.Connect("pressed", this, "turnEnded");
+		nextTurnButton.Connect("pressed",new Callable(this,"turnEnded"));
 
 
 		//Labels and whatnot in this text box
 		lblUnitSelected.Text = "Settler";
-		lblUnitSelected.Align = Label.AlignEnum.Right;
+		lblUnitSelected.HorizontalAlignment = HorizontalAlignment.Right;
 		lblUnitSelected.SetPosition(new Vector2(0, 20));
 		lblUnitSelected.AnchorRight = 1.0f;
-		lblUnitSelected.MarginRight = -35;
+		lblUnitSelected.OffsetRight = -35;
 		boxRightRectangle.AddChild(lblUnitSelected);
 
 		attackDefenseMovement.Text = "0.0. 1/1";
-		attackDefenseMovement.Align = Label.AlignEnum.Right;
+		attackDefenseMovement.HorizontalAlignment = HorizontalAlignment.Right;
 		attackDefenseMovement.SetPosition(new Vector2(0, 35));
 		attackDefenseMovement.AnchorRight = 1.0f;
-		attackDefenseMovement.MarginRight = -35;
+		attackDefenseMovement.OffsetRight = -35;
 		boxRightRectangle.AddChild(attackDefenseMovement);
 
 		terrainType.Text = "Grassland";
-		terrainType.Align = Label.AlignEnum.Right;
+		terrainType.HorizontalAlignment = HorizontalAlignment.Right;
 		terrainType.SetPosition(new Vector2(0, 50));
 		terrainType.AnchorRight = 1.0f;
-		terrainType.MarginRight = -35;
+		terrainType.OffsetRight = -35;
 		boxRightRectangle.AddChild(terrainType);
 
 		//For the centered labels, we anchor them center, with equal weight on each side.
@@ -77,25 +77,25 @@ public class LowerRightInfoBox : TextureRect
 		//Seems like there probably is an easier way, but I haven't found it yet.
 		Label civAndGovt = new Label();
 		civAndGovt.Text = "Carthage - Despotism (5.5.0)";
-		civAndGovt.Align = Label.AlignEnum.Center;
+		civAndGovt.HorizontalAlignment = HorizontalAlignment.Center;
 		civAndGovt.SetPosition(new Vector2(0, 90));
 		civAndGovt.AnchorLeft = 0.5f;
 		civAndGovt.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(civAndGovt);
-		civAndGovt.MarginLeft = -1 * (civAndGovt.RectSize.x/2.0f);
+		civAndGovt.OffsetLeft = -1 * (civAndGovt.Size.X/2.0f);
 
 		yearAndGold.Text = "Turn 0  10 Gold (+0 per turn)";
-		yearAndGold.Align = Label.AlignEnum.Center;
+		yearAndGold.HorizontalAlignment = HorizontalAlignment.Center;
 		yearAndGold.SetPosition(new Vector2(0, 105));
 		yearAndGold.AnchorLeft = 0.5f;
 		yearAndGold.AnchorRight = 0.5f;
 		boxRightRectangle.AddChild(yearAndGold);
-		yearAndGold.MarginLeft = -1 * (yearAndGold.RectSize.x/2.0f);
+		yearAndGold.OffsetLeft = -1 * (yearAndGold.Size.X/2.0f);
 
 		//Setup up, but do not start, the timer.
 		blinkingTimer.OneShot = false;
 		blinkingTimer.WaitTime = 0.6f;
-		blinkingTimer.Connect("timeout", this, "toggleEndTurnButton");
+		blinkingTimer.Connect("timeout",new Callable(this,"toggleEndTurnButton"));
 		AddChild(blinkingTimer);
 	}
 
@@ -145,7 +145,7 @@ public class LowerRightInfoBox : TextureRect
 		terrainType.Visible = true;
 		lblUnitSelected.Text = NewUnit.unitType.name;
 		lblUnitSelected.Visible = true;
-		string movementPointsRemaining = NewUnit.movementPoints.canMove ? "" + NewUnit.movementPoints.remaining : "0";
+		string movementPointsRemaining = NewUnit.movementPoints.canMove ? "" + $"{(NewUnit.movementPoints.getMixedNumber())}" : "0";
 		string bombardText = "";
 		if (NewUnit.unitType.bombard > 0)
 		{
@@ -159,12 +159,6 @@ public class LowerRightInfoBox : TextureRect
 	///But for now it'll show the changing turn number, providing some interactivity
 	public void SetTurn(int turnNumber)
 	{
-		yearAndGold.Text = "Turn " + turnNumber + "  10 Gold (+0 per turn)";
+		yearAndGold.Text = $"Turn {turnNumber}  10 Gold (+0 per turn)";
 	}
-
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//
-//  }
 }

@@ -5,26 +5,28 @@ using System.Runtime.InteropServices;
 using C7Engine;
 using Godot;
 using ConvertCiv3Media;
+using C7GameData;
+using QueryCiv3;
 
-public class Util {
-	static public string Civ3Root = GetCiv3Path();
-	public class Civ3FileDialog : FileDialog
+public partial class Util {
+	static public string Civ3Root = Civ3Location.GetCiv3Path();
+	public partial class Civ3FileDialog : FileDialog
 	// Use this instead of a scene-based FileDialog to avoid it saving the local dev's last browsed folder in the repo
 	// While instantiated it will return to the last-accessed folder when reopened
 	{
 		public string RelPath= "";
-		public Civ3FileDialog(FileDialog.ModeEnum mode = FileDialog.ModeEnum.OpenFile) {
-			Mode = mode;
+		public Civ3FileDialog(FileDialog.FileModeEnum mode = FileDialog.FileModeEnum.OpenFile) {
+			FileMode = mode;
 		}
+
 		public override void _Ready() {
 			Access = AccessEnum.Filesystem;
 			CurrentDir = Civ3Root + "/" + RelPath;
-			Resizable = true;
-			MarginRight = 550;
-			MarginBottom = 750;
+			// Resizable = true;
+			// OffsetRight = 550;
+			// OffsetBottom = 750;
 			base._Ready();
 		}
-
 	}
 
 	static private string SteamCommonDir() {
@@ -181,25 +183,28 @@ public class Util {
 		return texture;
 	}
 
-	//Send this function a path (e.g. Title_Screen.jpg) and it will
-	//load it up and convert it in both debug and release modes.
-	//Note: We probably will need variants of this for other file types, too.
+	static public (ImageTexture, ImageTexture) LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
+		var (baseImage, tintImage) = PCXToGodot.ByteArrayWithTintToImage(image, pallete, width, height, shadows: true);
+		return (ImageTexture.CreateFromImage(baseImage), ImageTexture.CreateFromImage(tintImage));
+	}
+
+	static public Flic LoadFlic(string path) {
+		return new ConvertCiv3Media.Flic(Util.Civ3MediaPath(path));
+	}
+
+	static private string getProjectDirectoryPath() {
+		// see issue https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
+		// - use local resource folder in debug mode
+		// - use executable folder in release mode
+		return OS.IsDebugBuild() ? "res://" : OS.GetExecutablePath().GetBaseDir();
+	}
+
+	// Send this function a path (e.g. Title_Screen.jpg) and it will
+	// load it up and convert it in both debug and release modes.
+	// Note: We probably will need variants of this for other file types, too.
 	static public ImageTexture LoadTextureFromC7JPG(string relPath) {
-		Image backgroundImage = new Image();
-		if (OS.IsDebugBuild()) {
-			//This loads it from the local resource folder in debug mode.
-			//Doesn't work in release mode, which according to https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
-			//is due to a design issue in Godot's import pipeline
-			backgroundImage.Load("res://" + relPath);
-		} else {
-			//This loads it from the folder where the executable is in release mode.
-			//Doesn't work in debug mode because the executable will be where Godot is installed,
-			//not where our project is located.
-			backgroundImage.Load(OS.GetExecutablePath().GetBaseDir().PlusFile(relPath));
-		}
-		ImageTexture texture = new ImageTexture();
-		texture.CreateFromImage(backgroundImage);
-		return texture;
+		Image img = Image.LoadFromFile(Util.getProjectDirectoryPath().PathJoin(relPath));
+		return ImageTexture.CreateFromImage(img);
 	}
 
 	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
@@ -241,11 +246,8 @@ public class Util {
 			for (int k = 0; k < 3; k++)
 				flatPalette[k + 3 * n] = raw[n, k];
 
-		var img = new Image();
-		img.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
-		var tex = new ImageTexture();
-		tex.CreateFromImage(img, 0);
-		return tex;
+		var img = Image.CreateFromData(16, 16, false, Image.Format.Rgb8, flatPalette);
+		return ImageTexture.CreateFromImage(img);
 	}
 
 	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
@@ -253,10 +255,8 @@ public class Util {
 	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string filePath) {
 		var pcx = LoadPCX(filePath);
 
-		var imgIndices = new Image();
-		imgIndices.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
-		var texIndices = new ImageTexture();
-		texIndices.CreateFromImage(imgIndices, 0);
+		var imgIndices = Image.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
+		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (createPaletteTexture(pcx.Palette), texIndices);
 	}
@@ -290,18 +290,14 @@ public class Util {
 						allIndices[pixelIndex] = flic.Images[row, col][y * flic.Width + x];
 					}
 
-		var imgIndices = new Image();
-		imgIndices.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
-		var texIndices = new ImageTexture();
-		texIndices.CreateFromImage(imgIndices, 0);
+		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
+		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
 		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);
 	}
 
-
-	static public AudioStreamSample LoadWAVFromDisk(string path) {
-		File file = new File();
-		file.Open(path, Godot.File.ModeFlags.Read);
+	static public AudioStreamWav LoadWAVFromDisk(string path) {
+		FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
 		string riffString = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
 		if (riffString != "RIFF") {
@@ -317,7 +313,7 @@ public class Util {
 		bool formatFound = false;
 		bool dataFound = false;
 
-		AudioStreamSample wav = new AudioStreamSample();
+		AudioStreamWav wav = new AudioStreamWav();
 
 		while (!file.EofReached()) {
 			string chunk = System.Text.Encoding.UTF8.GetString(file.GetBuffer(4));
@@ -337,14 +333,14 @@ public class Util {
 				//formats are not supported in its importer.  The GDScript seems
 				//to match up with the current FormatEnum.  I'm going to go out on
 				//a limb and say the GDScript is probably more current relative
-				//to what AudioStreamSample supports.  But that could be wrong.
+				//to what AudioStreamWAV supports.  But that could be wrong.
 				ushort compressionCode = file.Get16();
 				if (compressionCode == 1) {
-					wav.Format = Godot.AudioStreamSample.FormatEnum.Format16Bits;
+					wav.Format = AudioStreamWav.FormatEnum.Format16Bits;
 				} else if (compressionCode == 0) {
-					wav.Format = Godot.AudioStreamSample.FormatEnum.Format8Bits;
+					wav.Format = AudioStreamWav.FormatEnum.Format8Bits;
 				} else if (compressionCode == 2) {
-					wav.Format = Godot.AudioStreamSample.FormatEnum.ImaAdpcm;
+					wav.Format = AudioStreamWav.FormatEnum.ImaAdpcm;
 				}
 
 				ushort channels = file.Get16();
@@ -371,7 +367,7 @@ public class Util {
 				dataFound = true;
 			}
 
-			file.Seek((long)(position + chunkSize));
+			file.Seek(position + chunkSize);
 		}
 
 		if (!formatFound || !dataFound) {

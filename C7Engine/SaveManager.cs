@@ -39,17 +39,17 @@
 			C7SaveFormat save = null;
 			switch (getFileFormat(path))
 			{
-				case SaveFileFormat.Sav:
-					save = ImportCiv3.ImportSav(path, bicPath);
-					break;
-				case SaveFileFormat.Biq:
-					save = ImportCiv3.ImportBiq(path, bicPath);
-					break;
-				case SaveFileFormat.C7:
-					save = C7SaveFormat.Load(path);
-					break;
-				default:
-					throw new FileLoadException("invalid save format");
+			case SaveFileFormat.Sav:
+				save = ImportCiv3.ImportSav(path, bicPath);
+				break;
+			case SaveFileFormat.Biq:
+				save = ImportCiv3.ImportBiq(path, bicPath);
+				break;
+			case SaveFileFormat.C7:
+				save = C7SaveFormat.Load(path);
+				break;
+			default:
+				throw new FileLoadException("invalid save format");
 			}
 			if (save.PostLoadProcess())
 			{

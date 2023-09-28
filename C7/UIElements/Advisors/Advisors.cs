@@ -7,7 +7,7 @@ using Serilog;
  * Showing them, hiding them... maybe some other things eventually.
  * This is part of the effort to de-centralize from Game.cs and be more event driven.
  */
-public class Advisors : CenterContainer
+public partial class Advisors : CenterContainer
 {
 	private ILogger log = LogManager.ForContext<Advisors>();
 
@@ -25,7 +25,6 @@ public class Advisors : CenterContainer
 //  {
 //
 //  }
-
 
 	private void ShowLatestAdvisor()
 	{
@@ -64,13 +63,13 @@ public class Advisors : CenterContainer
 				//as most of the global ones should *not* go through here.
 				if (eventKey.Pressed)
 				{
-					if (eventKey.Scancode == (int)Godot.KeyList.Escape) {
+					if (eventKey.Keycode == Godot.Key.Escape) {
 						this.Hide();
-						GetTree().SetInputAsHandled();
+						GetViewport().SetInputAsHandled();
 					}
 					else {
 						log.Debug("Advisor received a key press; stopping propagation.");
-						GetTree().SetInputAsHandled();
+						GetViewport().SetInputAsHandled();
 					}
 				}
 			}

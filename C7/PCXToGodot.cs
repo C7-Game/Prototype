@@ -2,7 +2,7 @@ using Godot;
 using System;
 using ConvertCiv3Media;
 
-public class PCXToGodot : Godot.Object
+public partial class PCXToGodot : GodotObject
 {
 	private readonly static byte CIV3_TRANSPARENCY_START = 254;
 
@@ -20,7 +20,7 @@ public class PCXToGodot : Godot.Object
 	 * This method is for cases where we want to use components of multiple PCXs in a texture, such as for the popup background.
 	 **/
 	public static Image getImageFromPCX(Pcx pcx, int leftStart, int topStart, int croppedWidth, int croppedHeight) {
-		int[] ColorData = loadPalette(pcx.Palette);
+		int[] ColorData = loadPalette(pcx.Palette, true);
 		int[] BufferData = new int[croppedWidth * croppedHeight];
 
 		int DataIndex = 0;
@@ -45,7 +45,7 @@ public class PCXToGodot : Godot.Object
 		for (int y = 0; y < alphaPcx.Height; y++) {
 			for (int x = 0; x < alphaPcx.Width; x++, dataIndex++) {
 				int index = alphaPcx.ColorIndexAt(x, y);
-				if (index >= 254) {
+				if (index >= CIV3_TRANSPARENCY_START) {
 					bufferData[dataIndex] = 0;
 				} else {
 					bufferData[dataIndex] = alphaData[index] << 24;
@@ -64,7 +64,7 @@ public class PCXToGodot : Godot.Object
 	//Combines two PCXs, one used for the alpha, to produce a final output image.
 	//Some files, such as Art/interface/menuButtons.pcx and Art/interface/menuButtonsAlpha.pcx, use this method.
 	public static ImageTexture getImageFromPCXWithAlphaBlend(Pcx imagePcx, Pcx alphaPcx, int leftStart, int topStart, int croppedWidth, int croppedHeight, int alphaRowOffset = 0) {
-		int[] ColorData = loadPalette(imagePcx.Palette);
+		int[] ColorData = loadPalette(imagePcx.Palette, false);
 		int[] AlphaData = loadAlphaPalette(alphaPcx.Palette, ColorData);
 		int[] BufferData = new int[croppedWidth * croppedHeight];
 
@@ -84,7 +84,7 @@ public class PCXToGodot : Godot.Object
 		return getImageTextureFromImage(OutImage);
 	}
 
-	private static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
+	public static Image ByteArrayToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
 		int[] ColorData = loadPalette(palette, shadows);
 		int[] BufferData = new int[width * height];
 
@@ -95,21 +95,48 @@ public class PCXToGodot : Godot.Object
 		return getImageFromBufferData(width, height, BufferData);
 	}
 
+	// ByteArrayWithTintToImage is used to load create images from flic frames
+	// that contain a tinted layer such as unit animations, where the unit's
+	// clothing is tinted by their civ color.
+	public static (Image, Image) ByteArrayWithTintToImage(byte[] colorIndices, byte[,] palette, int width, int height, int[] transparent = null, bool shadows = false) {
+		int[] colorData = loadPalette(palette, shadows);
+		int[] baseLayer = new int[width * height];
+		int[] tintLayer = new int[width * height];
+
+		var whitePcx = Util.LoadPCX("Art/Units/Palettes/ntp00.pcx");
+		int[] whiteColorData = loadPalette(whitePcx.Palette, true);
+
+		for (int i = 0; i < width * height; i++) {
+			int index = colorIndices[i];
+			bool tinted = index < 16 || (index < 64 && index % 2 == 0);
+			bool shadow = index >= 224 && index <= 239;
+			if (tinted) {
+				tintLayer[i] = whiteColorData[index];
+				baseLayer[i] = 0; // transparent
+			} else if (shadow) {
+				// shadow belongs to the base texture
+				baseLayer[i] = ((int)new Color(1.0f, 1.0f, 1.0f, (float)index - 224f / 239f - 224f).ToArgb32());
+				tintLayer[i] = 0; // transparent
+			} else {
+				baseLayer[i] = colorData[index];
+				tintLayer[i] = 0; // transparent
+			}
+		}
+		return (getImageFromBufferData(width, height, baseLayer), getImageFromBufferData(width, height, tintLayer));
+	}
+
 	private static Image getImageFromBufferData(int width, int height, int[] bufferData) {
-		Image image = new Image();
 		var Data = new byte[4 * width * height];
 		Buffer.BlockCopy(bufferData, 0, Data, 0, 4 * width * height);
-		image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
+		Image image = Image.CreateFromData(width, height, false, Image.Format.Rgba8, Data);
 		return image;
 	}
 
 	private static ImageTexture getImageTextureFromImage(Image image) {
-		ImageTexture Txtr = new ImageTexture();
-		Txtr.CreateFromImage(image, 0);
-		return Txtr;
+		return ImageTexture.CreateFromImage(image);
 	}
 
-	private static int[] loadPalette(byte[,] palette, bool shadows = false) {
+	private static int[] loadPalette(byte[,] palette, bool shadows) {
 		int Red, Green, Blue;
 		int Alpha = 255 << 24;
 		int[] ColorData = new int[256];

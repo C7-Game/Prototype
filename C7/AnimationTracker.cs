@@ -6,11 +6,11 @@ using System.Linq;
 using C7GameData;
 using C7Engine;
 
-public class AnimationTracker {
-	private Civ3AnimData civ3AnimData;
+public partial class AnimationTracker {
+	private AnimationManager civ3AnimData;
 	public bool endAllImmediately = false; // If true, update() ends all running animations regardless of time remaining.
 
-	public AnimationTracker(Civ3AnimData civ3AnimData)
+	public AnimationTracker(AnimationManager civ3AnimData)
 	{
 		this.civ3AnimData = civ3AnimData;
 	}
@@ -19,7 +19,7 @@ public class AnimationTracker {
 		public long startTimeMS, endTimeMS;
 		public AutoResetEvent completionEvent;
 		public AnimationEnding ending;
-		public Civ3Anim anim;
+		public C7Animation anim;
 	}
 
 	private Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
@@ -36,7 +36,7 @@ public class AnimationTracker {
 		return String.Format("Tile.{0}.{1}", tile.xCoordinate, tile.yCoordinate);
 	}
 
-	private void startAnimation(string id, Civ3Anim anim, AutoResetEvent completionEvent, AnimationEnding ending)
+	private void startAnimation(string id, C7Animation anim, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
 		long currentTimeMS = getCurrentTimeMS();
 		long animDurationMS = (long)(1000.0 * anim.getDuration());
@@ -58,7 +58,7 @@ public class AnimationTracker {
 
 	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
-		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType.name, action), completionEvent, ending);
+		startAnimation(unit.guid, civ3AnimData.forUnit(unit.unitType, action), completionEvent, ending);
 	}
 
 	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent, AnimationEnding ending)
@@ -143,18 +143,19 @@ public class AnimationTracker {
 				progress = progress,
 				offsetX = offsetX,
 				offsetY = offsetY
-				};
-		} else
+			};
+		} else {
 			return new MapUnit.Appearance {
 				action = unit.isFortified ? MapUnit.AnimatedAction.FORTIFY : MapUnit.AnimatedAction.DEFAULT,
 				direction = unit.facingDirection,
 				progress = 1f,
 				offsetX = 0f,
 				offsetY = 0f
-				};
+			};
+		}
 	}
 
-	public Civ3Anim getTileEffect(Tile tile)
+	public C7Animation getTileEffect(Tile tile)
 	{
 		ActiveAnimation aa;
 		if (activeAnims.TryGetValue(getTileID(tile), out aa))
