@@ -175,13 +175,13 @@ namespace C7Engine
 			}
 			//Calculate whether it, and its neighbors are in known tiles.
 			int discoverableTiles = 0;
-			if (!player.tileKnowledge.isTileKnown(t))
+			if (!player.tileKnowledge.isKnown(t))
 			{
 				discoverableTiles++;
 			}
 			foreach (Tile n in t.neighbors.Values)
 			{
-				if (!player.tileKnowledge.isTileKnown(n))
+				if (!player.tileKnowledge.isKnown(n))
 				{
 					discoverableTiles++;
 				}

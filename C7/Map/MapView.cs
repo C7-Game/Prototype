@@ -566,34 +566,39 @@ namespace C7.Map {
  		// semi-visible, indicating other layers should be updated.
 
 		private static int fogOfWarIndex(Tile tile, TileKnowledge tk) {
-			if (tk.isTileKnown(tile)) {
-				return 0;
-			}
 			int sum = 0;
 			// HACK: edge tiles have missing directions in neighbors map
-			if (tile.neighbors.Values.Count != 8) {
-				return sum;
-			}
-			if (tk.isTileKnown(tile.neighbors[TileDirection.NORTH]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST])) {
+			// if (tile.neighbors.Values.Count != 8) {
+			// 	return sum;
+			// }
+			if (tk.isVisible(tile.neighbors[TileDirection.NORTH]) || tk.isVisible(tile.neighbors[TileDirection.NORTHWEST]) || tk.isVisible(tile.neighbors[TileDirection.NORTHEAST])) {
 				sum += 1 * 2;
+			} else if (tk.isKnown(tile.neighbors[TileDirection.NORTH]) || tk.isKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isKnown(tile.neighbors[TileDirection.NORTHEAST])) {
+				sum += 1;
 			}
-			if (tk.isTileKnown(tile.neighbors[TileDirection.WEST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST])) {
+			if (tk.isVisible(tile.neighbors[TileDirection.WEST]) || tk.isVisible(tile.neighbors[TileDirection.NORTHWEST]) || tk.isVisible(tile.neighbors[TileDirection.SOUTHWEST])) {
 				sum += 3 * 2;
+			} else if (tk.isKnown(tile.neighbors[TileDirection.WEST]) || tk.isKnown(tile.neighbors[TileDirection.NORTHWEST]) || tk.isKnown(tile.neighbors[TileDirection.SOUTHWEST])) {
+				sum += 3;
 			}
-			if (tk.isTileKnown(tile.neighbors[TileDirection.EAST]) || tk.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+			if (tk.isVisible(tile.neighbors[TileDirection.EAST]) || tk.isVisible(tile.neighbors[TileDirection.NORTHEAST]) || tk.isVisible(tile.neighbors[TileDirection.SOUTHEAST])) {
 				sum += 9 * 2;
+			} else if (tk.isKnown(tile.neighbors[TileDirection.EAST]) || tk.isKnown(tile.neighbors[TileDirection.NORTHEAST]) || tk.isKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+				sum += 9;
 			}
-			if (tk.isTileKnown(tile.neighbors[TileDirection.SOUTH]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tk.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+			if (tk.isVisible(tile.neighbors[TileDirection.SOUTH]) || tk.isVisible(tile.neighbors[TileDirection.SOUTHWEST]) || tk.isVisible(tile.neighbors[TileDirection.SOUTHEAST])) {
 				sum += 27 * 2;
+			} else if (tk.isKnown(tile.neighbors[TileDirection.SOUTH]) || tk.isKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tk.isKnown(tile.neighbors[TileDirection.SOUTHEAST])) {
+				sum += 27;
 			}
 			return sum;
 		}
 
 		private bool updateFogOfWarLayer(Tile tile, TileKnowledge tk) {
-			if (tk.isTileKnown(tile)) {
-				eraseCell(Layer.FogOfWar, tile);
-				return true;
-			}
+			// if (tk.isVisible(tile)) {
+			// 	eraseCell(Layer.FogOfWar, tile);
+			// 	return true;
+			// }
 			int index = fogOfWarIndex(tile, tk);
 			setCell(Layer.FogOfWar, Atlas.FogOfWar, tile, new Vector2I(index % 9, index / 9));
 			return index > 0; // partially visible
@@ -644,7 +649,7 @@ namespace C7.Map {
  			}
  		}
 
-		public void discoverTile(Tile tile, TileKnowledge tk) {
+		public void onTileVisibilityChanged(Tile tile, TileKnowledge tk) {
 			HashSet<Tile> update = new HashSet<Tile>(tile.neighbors.Values);
 			foreach (Tile n in tile.neighbors.Values) {
 				foreach (Tile nn in n.neighbors.Values) {

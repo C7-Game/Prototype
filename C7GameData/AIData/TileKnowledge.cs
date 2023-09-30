@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace C7GameData
 {
@@ -15,14 +17,30 @@ namespace C7GameData
 			return added;
 		}
 
+		public void ComputeVisibleTiles(List<MapUnit> units) {
+			visibleTiles.Clear();
+			Console.WriteLine($"computing visible tiles based on {units.Count} units");
+			foreach (MapUnit unit in units) {
+				visibleTiles.Add(unit.location);
+				foreach (Tile t in unit.location.neighbors.Values) {
+					visibleTiles.Add(t);
+				}
+			}
+			Console.WriteLine($"Visible tiles: {visibleTiles.Count}");
+		}
+
 		// neighboring tiles should not be added when loading tile knowledge
 		// from a .sav file
 		internal bool AddTileToKnown(Tile unitLocation) {
 			return knownTiles.Add(unitLocation);
 		}
 
-		public bool isTileKnown(Tile t) {
+		public bool isKnown(Tile t) {
 			return knownTiles.Contains(t);
+		}
+
+		public bool isVisible(Tile t) {
+			return visibleTiles.Contains(t);
 		}
 
 		/**

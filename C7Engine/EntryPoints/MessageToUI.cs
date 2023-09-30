@@ -51,10 +51,10 @@ namespace C7Engine
 
 	public class MsgStartTurn : MessageToUI {}
 
-	public class MsgTileDiscovered : MessageToUI {
+	public class MsgTileVisibilityChanged : MessageToUI {
 		public int tileIndex;
 
-		public MsgTileDiscovered(Tile tile) {
+		public MsgTileVisibilityChanged(Tile tile) {
 			this.tileIndex = EngineStorage.gameData.map.tileCoordsToIndex(tile.xCoordinate, tile.yCoordinate);
 		}
 	}
