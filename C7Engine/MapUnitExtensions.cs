@@ -272,12 +272,27 @@ namespace C7Engine {
 			unit.defensiveBombardsRemaining = 1;
 		}
 
-		public static void OnEnterTile(this MapUnit unit, Tile tile) {
-			//Add to player knowledge of tiles
-			if (unit.owner.tileKnowledge.AddTilesToKnown(tile)) {
-				new MsgTileDiscovered(tile).send();
-			}
+		// public static void OnLeaveTile(this MapUnit unit, Tile tile) {
+		// 	// the tile that was just left should always still be visible
+		// 	foreach (Tile t in tile.neighbors.Values) {
+		// 		if (t.unitsOnTile.Find(u => u.owner.id == unit.owner.id) is not null) {
+		// 			continue;
+		// 		}
+		// 		bool visible = false;
+		// 		foreach (Tile n in t.neighbors.Values) {
+		// 			if (t.unitsOnTile.Find(u => u.owner.id == unit.owner.id) is not null) {
+		// 				visible = true;
+		// 				break;
+		// 			}
+		// 		}
+		// 		if (!visible) {
+		// 			unit.owner.tileKnowledge.RemoveTileFromVisible(t);
+		// 			new MsgTileVisibilityChanged(t).send();
+		// 		}
+		// 	}
+		// }
 
+		public static void OnEnterTile(this MapUnit unit, Tile tile) {
 			// Disperse barb camp
 			if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
 				tile.DisbandNonDefendingUnits();
@@ -371,6 +386,11 @@ namespace C7Engine {
 				unit.animate(MapUnit.AnimatedAction.RUN, wait);
 				unit.location = newLoc;
 				unit.movementPoints.onUnitMove(movementCost);
+
+				//Add to player knowledge of tiles
+				if (unit.owner.tileKnowledge.AddTilesToKnown(unit.location)) {
+					new MsgTileVisibilityChanged(unit.location).send();
+				}
 			}
 			return true;
 		}

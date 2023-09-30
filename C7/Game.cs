@@ -124,7 +124,7 @@ public partial class Game : Node2D {
 			switch (msg) {
 				case MsgStartUnitAnimation mSUA:
 					MapUnit unit = gameData.GetUnit(mSUA.unitID);
-					if (unit != null && (controller.tileKnowledge.isTileKnown(unit.location) || controller.tileKnowledge.isTileKnown(unit.previousLocation))) {
+					if (unit != null && (controller.tileKnowledge.isKnown(unit.location) || controller.tileKnowledge.isKnown(unit.previousLocation))) {
 						// TODO: This needs to be extended so that the player is shown when AIs found cities, when they move units
 						// (optionally, depending on preferences) and generalized so that modders can specify whether custom
 						// animations should be shown to the player.
@@ -140,14 +140,13 @@ public partial class Game : Node2D {
 					break;
 				case MsgStartEffectAnimation mSEA:
 					Tile tile = gameData.map.tileAtIndex(mSEA.tileIndex);
-					if (tile != Tile.NONE && controller.tileKnowledge.isTileKnown(tile))
+					if (tile != Tile.NONE && controller.tileKnowledge.isKnown(tile)) {
 						animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
-					else {
-						if (mSEA.completionEvent != null)
-							mSEA.completionEvent.Set();
+					} else {
+						mSEA.completionEvent?.Set();
 					}
 					break;
-				case MsgStartTurn mST:
+				case MsgStartTurn:
 					OnPlayerStartTurn();
 					break;
 
@@ -157,9 +156,15 @@ public partial class Game : Node2D {
 					mapView.addCity(city, cityTile);
 					break;
 
-				case MsgTileDiscovered mTD:
-					Tile discoveredTile = gameData.map.tileAtIndex(mTD.tileIndex);
-					mapView.discoverTile(discoveredTile, controller.tileKnowledge);
+				case MsgTileVisibilityChanged mTVC:
+					controller.tileKnowledge.ComputeVisibleTiles(controller.units);
+					Tile visibilityChangedTile = gameData.map.tileAtIndex(mTVC.tileIndex);
+					int i = 0;
+					foreach (Tile t in controller.tileKnowledge.AllKnownTiles()) {
+						i++;
+						mapView.onTileVisibilityChanged(t, controller.tileKnowledge);
+					}
+					GD.Print($"updated {i} tiles.");
 					break;
 			}
 		}
@@ -227,7 +232,7 @@ public partial class Game : Node2D {
 
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location) {
-		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
+		if (controller.tileKnowledge.isKnown(location) && location != Tile.NONE) {
 			if (!camera.isTileInView(location, mapView)) {
 				camera.centerOnTile(location, mapView);
 			}
@@ -339,6 +344,7 @@ public partial class Game : Node2D {
 							}
 						}
 					} else {
+
 						// Select unit on tile at mouse location
 						using (var gameDataAccess = new UIGameDataAccess()) {
 							var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
@@ -346,6 +352,9 @@ public partial class Game : Node2D {
 								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
 								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
+								var known = controller.tileKnowledge.isKnown(tile);
+								var vis = controller.tileKnowledge.isVisible(tile);
+								GD.Print($"known: {known}, visible: {vis}");
 							}
 						}
 					}
