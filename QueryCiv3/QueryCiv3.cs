@@ -35,16 +35,7 @@ namespace QueryCiv3
         }
         public Boolean SectionExists(string sectionName)
         {
-            bool result = false;
-            foreach (Civ3Section section in Sections)
-            {
-                if (section.Name == sectionName)
-                {
-                    result = true;
-                    break;
-                }
-            }
-            return result;
+            return Array.Exists(Sections, section => section.Name == sectionName);
         }
         protected internal Civ3Section[] PopulateSections(byte[] Data)
         {

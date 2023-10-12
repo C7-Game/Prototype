@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using C7GameData;
-using C7Engine;
 
 public partial class AnimationTracker {
 	private AnimationManager civ3AnimData;
@@ -22,12 +21,9 @@ public partial class AnimationTracker {
 		public C7Animation anim;
 	}
 
-	private Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
+	public Dictionary<string, ActiveAnimation> activeAnims = new Dictionary<string, ActiveAnimation>();
 
-	public long getCurrentTimeMS()
-	{
-		return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-	}
+	public long getCurrentTimeMS() => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
 	private string getTileID(Tile tile)
 	{
@@ -45,8 +41,9 @@ public partial class AnimationTracker {
 		if (activeAnims.TryGetValue(id, out aa)) {
 			// If there's already an animation playing for this unit, end it first before replacing it
 			// TODO: Consider instead queueing up the new animation until after the first one is completed
-			if (aa.completionEvent != null)
+			if (aa.completionEvent is not null) {
 				aa.completionEvent.Set();
+			}
 		}
 		aa = new ActiveAnimation { startTimeMS = currentTimeMS, endTimeMS = currentTimeMS + animDurationMS, completionEvent = completionEvent,
 			ending = ending, anim = anim };
@@ -110,19 +107,19 @@ public partial class AnimationTracker {
 
 	public void update()
 	{
-		long currentTimeMS = (! endAllImmediately) ? getCurrentTimeMS() : long.MaxValue;
+		long currentTimeMS = !endAllImmediately ? getCurrentTimeMS() : long.MaxValue;
 		var keysToRemove = new List<string>();
 		foreach (var guidAAPair in activeAnims.Where(guidAAPair => guidAAPair.Value.endTimeMS <= currentTimeMS)) {
 			var (id, aa) = (guidAAPair.Key, guidAAPair.Value);
-			if (aa.completionEvent != null) {
+			if (aa.completionEvent is not null) {
 				aa.completionEvent.Set();
 				aa.completionEvent = null; // So event is only triggered once
 			}
-			if (aa.ending == AnimationEnding.Stop)
+			if (aa.ending == AnimationEnding.Stop) {
 				keysToRemove.Add(id);
+			}
 		}
-		foreach (var key in keysToRemove)
-			activeAnims.Remove(key);
+		keysToRemove.ForEach(key => activeAnims.Remove(key));
 	}
 
 	public MapUnit.Appearance getUnitAppearance(MapUnit unit)
@@ -158,9 +155,6 @@ public partial class AnimationTracker {
 	public C7Animation getTileEffect(Tile tile)
 	{
 		ActiveAnimation aa;
-		if (activeAnims.TryGetValue(getTileID(tile), out aa))
-			return aa.anim;
-		else
-			return null;
+		return activeAnims.TryGetValue(getTileID(tile), out aa) ? aa.anim : null;
 	}
 }

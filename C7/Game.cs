@@ -5,6 +5,7 @@ using System.Diagnostics;
 using C7Engine;
 using C7GameData;
 using Serilog;
+using C7.Map;
 
 public partial class Game : Node2D {
 	[Signal] public delegate void TurnStartedEventHandler();
@@ -22,7 +23,6 @@ public partial class Game : Node2D {
 	}
 
 	public Player controller; // Player that's controlling the UI.
-
 	private MapView mapView;
 	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
@@ -41,12 +41,10 @@ public partial class Game : Node2D {
 	public bool KeepCSUWhenFortified = false;
 
 	Control Toolbar;
-	private bool IsMovingCamera;
-	private Vector2 OldPosition;
 
 	Stopwatch loadTimer = new Stopwatch();
 	GlobalSingleton Global;
-
+	public MapViewCamera camera;
 	bool errorOnLoad = false;
 
 	public override void _EnterTree() {
@@ -57,6 +55,7 @@ public partial class Game : Node2D {
 	// The catch should always catch any error, as it's the general catch
 	// that gives an error if we fail to load for some reason.
 	public override void _Ready() {
+		GetTree().AutoAcceptQuit = false;
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		try {
 			var animSoundPlayer = new AudioStreamPlayer();
@@ -66,34 +65,33 @@ public partial class Game : Node2D {
 
 			controller = CreateGame.createGame(Global.LoadGamePath, Global.DefaultBicPath); // Spawns engine thread
 			Global.ResetLoadGamePath();
+			camera = GetNode<MapViewCamera>("MapViewCamera");
 
 			using (var gameDataAccess = new UIGameDataAccess()) {
 				GameMap map = gameDataAccess.gameData.map;
 				Util.setModPath(gameDataAccess.gameData.scenarioSearchPath);
 				log.Debug("RelativeModPath ", map.RelativeModPath);
-				mapView = new MapView(this, map.numTilesWide, map.numTilesTall, map.wrapHorizontally, map.wrapVertically);
-				AddChild(mapView);
 
-				mapView.cameraZoom = (float)1.0;
-				mapView.gridLayer.visible = false;
+				mapView = new MapView(this, gameDataAccess.gameData);
 
 				// Set initial camera location. If the UI controller has any cities, focus on their capital. Otherwise, focus on their
 				// starting settler.
 				if (controller.cities.Count > 0) {
 					City capital = controller.cities.Find(c => c.IsCapital());
-					if (capital != null)
-						mapView.centerCameraOnTile(capital.location);
+					if (capital is not null) {
+						camera.centerOnTile(capital.location, mapView);
+					}
 				} else {
 					MapUnit startingSettler = controller.units.Find(u => u.unitType.actions.Contains(C7Action.UnitBuildCity));
-					if (startingSettler != null)
-						mapView.centerCameraOnTile(startingSettler.location);
+					if (startingSettler is not null) {
+						camera.centerOnTile(startingSettler.location, mapView);
+					}
 				}
+				camera.attachToMapView(mapView);
+				AddChild(mapView);
 			}
 
 			Toolbar = GetNode<Control>("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer");
-
-			//TODO: What was this supposed to do?  It throws errors and occasinally causes crashes now, because _OnViewportSizeChanged doesn't exist
-			// GetTree().Root.Connect("size_changed",new Callable(this,"_OnViewportSizeChanged"));
 
 			// Hide slideout bar on startup
 			_on_SlideToggle_toggled(false);
@@ -139,9 +137,7 @@ public partial class Game : Node2D {
 					}
 					break;
 				case MsgStartEffectAnimation mSEA:
-					int x, y;
-					gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
-					Tile tile = gameData.map.tileAt(x, y);
+					Tile tile = gameData.map.tileAtIndex(mSEA.tileIndex);
 					if (tile != Tile.NONE && controller.tileKnowledge.isTileKnown(tile))
 						animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
 					else {
@@ -152,21 +148,32 @@ public partial class Game : Node2D {
 				case MsgStartTurn mST:
 					OnPlayerStartTurn();
 					break;
+
+				case MsgCityBuilt mBC:
+					Tile cityTile = gameData.map.tiles[mBC.tileIndex];
+					City city = cityTile.cityAtTile;
+					mapView.addCity(city, cityTile);
+					break;
+
+				case MsgTileDiscovered mTD:
+					Tile discoveredTile = gameData.map.tileAtIndex(mTD.tileIndex);
+					mapView.discoverTile(discoveredTile, controller.tileKnowledge);
+					break;
 			}
 		}
 	}
 
-	// Instead of Game calling animTracker.update periodically (this used to happen in _Process), this method gets called as necessary to bring
-	// the animations up to date. Right now it's called from UnitLayer right before it draws the units on the map. This method also processes all
-	// waiting messages b/c some of them might pertain to animations. TODO: Consider processing only the animation messages here.
-	// Must only be called while holding the game data mutex
+	// updateAnimations updates animation states in the tracker and then their corresponding
+	// sprites in the MapView. It must be called when holding the game data mutex.
+	// TODO: before switching to tilemap, this was only called by the old UnitLayer _Draw
+	// method. It only really needs to be called as frequently as animations update...
 	public void updateAnimations(GameData gameData) {
-		processEngineMessages(gameData);
 		animTracker.update();
+		mapView.updateAnimations();
 	}
 
 	public override void _Process(double delta) {
-		this.processActions();
+		processActions();
 
 		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
 		using (var gameDataAccess = new UIGameDataAccess()) {
@@ -188,13 +195,13 @@ public partial class Game : Node2D {
 						 (CurrentlySelectedUnit.isFortified && !KeepCSUWhenFortified)))
 						GetNextAutoselectedUnit(gameData);
 				}
-				//Listen to keys.  There is a C# Mono Godot bug where e.g. Godot.Key.F1 (etc.) doesn't work
-				//without a manual cast to int.
-				//https://github.com/godotengine/godot/issues/16388
+				// Listen to keys. TODO: move this
 				if (Input.IsKeyPressed(Godot.Key.F1)) {
 					EmitSignal("ShowSpecificAdvisor", "F1");
 				}
 			}
+
+			updateAnimations(gameDataAccess.gameData);
 		}
 	}
 
@@ -219,9 +226,9 @@ public partial class Game : Node2D {
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
 	public void ensureLocationIsInView(Tile location) {
 		if (controller.tileKnowledge.isTileKnown(location) && location != Tile.NONE) {
-			Vector2 relativeScreenLocation = mapView.screenLocationOfTile(location, true) / mapView.getVisibleAreaSize();
-			if (relativeScreenLocation.DistanceTo(new Vector2((float)0.5, (float)0.5)) > 0.30)
-				mapView.centerCameraOnTile(location);
+			if (!camera.isTileInView(location, mapView)) {
+				camera.centerOnTile(location, mapView);
+			}
 		}
 	}
 
@@ -289,42 +296,23 @@ public partial class Game : Node2D {
 	}
 
 	public void _on_QuitButton_pressed() {
-		// This apparently exits the whole program
-		// GetTree().Quit();
-
 		// ChangeSceneToFile deletes the current scene and frees its memory, so this is quitting to main menu
 		GetTree().ChangeSceneToFile("res://MainMenu.tscn");
-	}
-
-	public void _on_Zoom_value_changed(float value) {
-		mapView.setCameraZoomFromMiddle(value);
 	}
 
 	public void AdjustZoomSlider(int numSteps, Vector2 zoomCenter) {
 		VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
 		double newScale = slider.Value + slider.Step * (double)numSteps;
-		if (newScale < slider.MinValue)
-			newScale = slider.MinValue;
-		else if (newScale > slider.MaxValue)
-			newScale = slider.MaxValue;
+		newScale = Mathf.Clamp(newScale, slider.MinValue, slider.MaxValue);
 
 		// Note we must set the camera zoom before setting the new slider value since setting the value will trigger the callback which will
 		// adjust the zoom around a center we don't want.
-		mapView.setCameraZoom((float)newScale, zoomCenter);
+		// camera.scaleZoom(zoom)
 		slider.Value = newScale;
 	}
 
-	public void _on_RightButton_pressed() {
-		mapView.cameraLocation += new Vector2(128, 0);
-	}
-	public void _on_LeftButton_pressed() {
-		mapView.cameraLocation += new Vector2(-128, 0);
-	}
-	public void _on_UpButton_pressed() {
-		mapView.cameraLocation += new Vector2(0, -64);
-	}
-	public void _on_DownButton_pressed() {
-		mapView.cameraLocation += new Vector2(0, 64);
+	private void onSliderZoomChanged(float value) {
+		camera.setZoom(value);
 	}
 
 	public override void _Input(InputEvent @event) {
@@ -336,13 +324,14 @@ public partial class Game : Node2D {
 	public override void _UnhandledInput(InputEvent @event) {
 		// Control node must not be in the way and/or have mouse pass enabled
 		if (@event is InputEventMouseButton eventMouseButton) {
+			Vector2 globalMousePosition = GetGlobalMousePosition();
 			if (eventMouseButton.ButtonIndex == MouseButton.Left) {
 				GetViewport().SetInputAsHandled();
 				if (eventMouseButton.IsPressed()) {
 					if (inUnitGoToMode) {
 						setGoToMode(false);
 						using (var gameDataAccess = new UIGameDataAccess()) {
-							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
 							if (tile != null) {
 								new MsgSetUnitPath(CurrentlySelectedUnit.guid, tile).send();
 							}
@@ -350,19 +339,14 @@ public partial class Game : Node2D {
 					} else {
 						// Select unit on tile at mouse location
 						using (var gameDataAccess = new UIGameDataAccess()) {
-							var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+							var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
 							if (tile != null) {
 								MapUnit to_select = tile.unitsOnTile.Find(u => u.movementPoints.canMove);
 								if (to_select != null && to_select.owner == controller)
 									setSelectedUnit(to_select);
 							}
 						}
-
-						OldPosition = eventMouseButton.Position;
-						IsMovingCamera = true;
 					}
-				} else {
-					IsMovingCamera = false;
 				}
 			} else if (eventMouseButton.ButtonIndex == MouseButton.WheelUp) {
 				GetViewport().SetInputAsHandled();
@@ -370,10 +354,10 @@ public partial class Game : Node2D {
 			} else if (eventMouseButton.ButtonIndex == MouseButton.WheelDown) {
 				GetViewport().SetInputAsHandled();
 				AdjustZoomSlider(-1, GetViewport().GetMousePosition());
-			} else if ((eventMouseButton.ButtonIndex == MouseButton.Right) && (!eventMouseButton.IsPressed())) {
+			} else if (eventMouseButton.ButtonIndex == MouseButton.Right && !eventMouseButton.IsPressed()) {
 				setGoToMode(false);
 				using (var gameDataAccess = new UIGameDataAccess()) {
-					var tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
+					var tile = mapView.tileAt(gameDataAccess.gameData.map, globalMousePosition);
 					if (tile != null) {
 						bool shiftDown = Input.IsKeyPressed(Godot.Key.Shift);
 						if (shiftDown && tile.cityAtTile?.owner == controller)
@@ -403,10 +387,8 @@ public partial class Game : Node2D {
 					}
 				}
 			}
-		} else if (@event is InputEventMouseMotion eventMouseMotion && IsMovingCamera) {
+		} else if (@event is InputEventMouseMotion eventMouseMotion) {
 			GetViewport().SetInputAsHandled();
-			mapView.cameraLocation += OldPosition - eventMouseMotion.Position;
-			OldPosition = eventMouseMotion.Position;
 		} else if (@event is InputEventKey eventKeyDown && eventKeyDown.Pressed) {
 			if (eventKeyDown.Keycode == Godot.Key.O && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 				using (UIGameDataAccess gameDataAccess = new UIGameDataAccess()) {
@@ -424,17 +406,6 @@ public partial class Game : Node2D {
 					}
 				}
 			}
-		} else if (@event is InputEventMagnifyGesture magnifyGesture) {
-			// UI slider has the min/max zoom settings for now
-			VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
-			double newScale = mapView.cameraZoom * magnifyGesture.Factor;
-			if (newScale < slider.MinValue)
-				newScale = slider.MinValue;
-			else if (newScale > slider.MaxValue)
-				newScale = slider.MaxValue;
-			mapView.setCameraZoom((float)newScale, magnifyGesture.Position);
-			// Update the UI slider
-			slider.Value = newScale;
 		}
 	}
 
@@ -476,7 +447,7 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.ToggleGrid)) {
-			this.mapView.gridLayer.visible = !this.mapView.gridLayer.visible;
+			mapView.toggleGrid();
 		}
 
 		if (Input.IsActionJustPressed(C7Action.Escape) && !this.inUnitGoToMode) {
@@ -486,15 +457,7 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.ToggleZoom)) {
-			if (mapView.cameraZoom != 1) {
-				mapView.setCameraZoomFromMiddle(1.0f);
-				VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
-				slider.Value = 1.0f;
-			} else {
-				mapView.setCameraZoomFromMiddle(0.5f);
-				VSlider slider = GetNode<VSlider>("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom");
-				slider.Value = 0.5f;
-			}
+			camera.setZoom(camera.zoomFactor != 1 ? 1.0f : 0.5f);
 		}
 
 		if (Input.IsActionJustPressed(C7Action.ToggleAnimations)) {
@@ -558,7 +521,6 @@ public partial class Game : Node2D {
 		if (Input.IsActionJustPressed(C7Action.UnitBuildRoad) && CurrentlySelectedUnit.canBuildRoad()) {
 			new MsgBuildRoad(CurrentlySelectedUnit.guid).send();
 		}
-
 	}
 
 	private void GetNextAutoselectedUnit(GameData gameData) {
@@ -583,11 +545,13 @@ public partial class Game : Node2D {
 	}
 
 	/**
-	 * User quit.  We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
+	 * User quit. We *may* want to do some things here like make a back-up save, or call the server and let it know we're bailing (esp. in MP).
 	 **/
-	private void OnQuitTheGame() {
-		log.Information("Goodbye!");
-		GetTree().Quit();
+	public override void _Notification(int what) {
+		if (what == NotificationWMCloseRequest) {
+			log.Information("Goodbye!");
+			GetTree().Quit();
+		}
 	}
 
 	private void OnBuildCity(string name) {
