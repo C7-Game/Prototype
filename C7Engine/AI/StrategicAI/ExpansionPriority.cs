@@ -22,11 +22,11 @@ namespace C7GameData.AIData {
 			if (player.cities.Count < 2) {
 				this.calculatedWeight = 1000;
 			} else {
-				int score = UtilityCalculations.CalculateAvailableLandScore(player);
+				double score = UtilityCalculations.CalculateAvailableLandScore(player);
 				score = ApplyEarlyGameMultiplier(score);
 				score = ApplyNationTraitMultiplier(score, player);
 
-				this.calculatedWeight = score;
+				this.calculatedWeight = (float) score;
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace C7GameData.AIData {
 			return "ExpansionPriority";
 		}
 
-		private int ApplyEarlyGameMultiplier(int score)
+		private double ApplyEarlyGameMultiplier(double score)
 		{
 			//If it's early game, multiply this score.
 			//TODO: We haven't implemented the part for "how many turns does the game have?" yet.  So this is hard-coded.
@@ -72,7 +72,7 @@ namespace C7GameData.AIData {
 			return score;
 		}
 
-		private int ApplyNationTraitMultiplier(int score, Player player) {
+		private double ApplyNationTraitMultiplier(double score, Player player) {
 			// TODO: The "Expansionist" trait should give a higher priority to this strategic priority.
 			return score;
 		}

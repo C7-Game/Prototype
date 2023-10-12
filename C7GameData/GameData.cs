@@ -81,6 +81,8 @@ namespace C7GameData
 		{
 			//Let each tile know who its neighbors are.  It needs to know this so its graphics can be selected appropriately.
 			map.computeNeighbors();
+			// Compute outer ring for settler ai
+			map.computeOuterRing();
 		}
 
 		/**

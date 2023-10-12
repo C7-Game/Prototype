@@ -17,7 +17,11 @@ namespace C7GameData
         public int baseShieldProduction {get; set; }
         public int baseCommerceProduction {get; set; }
         public int movementCost {get; set; }
-        public bool allowCities { get; set; } = true;
+        public bool allowCities {get; set; } = true;
+
+		public int miningBonus {get; set; }
+
+		public int irrigationBonus {get; set; }
         public StrengthBonus defenseBonus;
 
         //some stuff about graphics would probably make sense, too
@@ -51,6 +55,8 @@ namespace C7GameData
             c7Terrain.baseFoodProduction = civ3Terrain.Food;
             c7Terrain.baseShieldProduction = civ3Terrain.Shields;
             c7Terrain.baseCommerceProduction = civ3Terrain.Commerce;
+			c7Terrain.irrigationBonus = civ3Terrain.IrrigationBonus;
+			c7Terrain.miningBonus = civ3Terrain.MiningBonus;
             c7Terrain.movementCost = civ3Terrain.MovementCost;
             c7Terrain.allowCities = civ3Terrain.AllowCities != 0;
 	        c7Terrain.defenseBonus = new StrengthBonus {
