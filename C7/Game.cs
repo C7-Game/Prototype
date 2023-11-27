@@ -27,7 +27,6 @@ public partial class Game : Node2D {
 	public AnimationManager civ3AnimData;
 	public AnimationTracker animTracker;
 
-	Hashtable Terrmask = new Hashtable();
 	GameState CurrentState = GameState.PreGame;
 
 	// CurrentlySelectedUnit is a reference directly into the game state so be careful of race conditions. TODO: Consider storing a GUID instead.
@@ -47,6 +46,8 @@ public partial class Game : Node2D {
 	Stopwatch loadTimer = new Stopwatch();
 	GlobalSingleton Global;
 
+	private PopupOverlay popupOverlay;
+
 	bool errorOnLoad = false;
 
 	public override void _EnterTree() {
@@ -58,6 +59,8 @@ public partial class Game : Node2D {
 	// that gives an error if we fail to load for some reason.
 	public override void _Ready() {
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
+		popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
+
 		try {
 			var animSoundPlayer = new AudioStreamPlayer();
 			AddChild(animSoundPlayer);
@@ -105,7 +108,6 @@ public partial class Game : Node2D {
 			log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
 		} catch (Exception ex) {
 			errorOnLoad = true;
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			string message = ex.Message;
 			string[] stack = ex.StackTrace.Split("\r\n");   //for some reason it is returned with \r\n in the string as one line.  let's make it readable!
 			foreach (string line in stack) {
@@ -166,7 +168,7 @@ public partial class Game : Node2D {
 	}
 
 	public override void _Process(double delta) {
-		this.processActions();
+		processActions();
 
 		// TODO: Is it necessary to keep the game data mutex locked for this entire method?
 		using (var gameDataAccess = new UIGameDataAccess()) {
@@ -440,6 +442,15 @@ public partial class Game : Node2D {
 
 	// Handle Godot keybind actions
 	private void processActions() {
+		if (Input.IsActionJustPressed(C7Action.Escape) && popupOverlay.ShowingPopup) {
+			popupOverlay.OnHidePopup();
+			return;
+		}
+
+		// never poll for actions if UI elements are visible
+		if (popupOverlay.Visible) {
+			return;
+		}
 
 		if (Input.IsActionJustPressed(C7Action.EndTurn) && !this.HasCurrentlySelectedUnit()) {
 			log.Verbose("end_turn key pressed");
@@ -481,7 +492,6 @@ public partial class Game : Node2D {
 
 		if (Input.IsActionJustPressed(C7Action.Escape) && !this.inUnitGoToMode) {
 			log.Debug("Got request for escape/quit");
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
 		}
 
@@ -520,7 +530,6 @@ public partial class Game : Node2D {
 		}
 
 		if (Input.IsActionJustPressed(C7Action.UnitDisband)) {
-			PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
 			popupOverlay.ShowPopup(new DisbandConfirmation(CurrentlySelectedUnit), PopupOverlay.PopupCategory.Advisor);
 		}
 
@@ -548,9 +557,7 @@ public partial class Game : Node2D {
 				MapUnit currentUnit = gameDataAccess.gameData.GetUnit(CurrentlySelectedUnit.guid);
 				log.Debug(currentUnit.Describe());
 				if (currentUnit.canBuildCity()) {
-					PopupOverlay popupOverlay = GetNode<PopupOverlay>(PopupOverlay.NodePath);
-					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()),
-						PopupOverlay.PopupCategory.Advisor);
+					popupOverlay.ShowPopup(new BuildCityDialog(controller.GetNextCityName()), PopupOverlay.PopupCategory.Advisor);
 				}
 			}
 		}

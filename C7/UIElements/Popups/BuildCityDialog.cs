@@ -100,17 +100,4 @@ public partial class BuildCityDialog : Popup
 		GetParent().EmitSignal("HidePopup");
 	}
 
-	public override void _UnhandledInput(InputEvent @event)
-	{
-		if (this.Visible) {
-			if (@event is InputEventKey eventKey && eventKey.Pressed)
-			{
-				if (eventKey.Keycode == Godot.Key.Escape)
-				{
-					GetViewport().SetInputAsHandled();
-					GetParent().EmitSignal("HidePopup");
-				}
-			}
-		}
-	}
 }

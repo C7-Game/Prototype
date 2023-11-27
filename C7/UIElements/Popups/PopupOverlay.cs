@@ -1,7 +1,4 @@
 using Godot;
-using ConvertCiv3Media;
-using System;
-using System.Diagnostics;
 using Serilog;
 
 public partial class PopupOverlay : HBoxContainer
@@ -16,7 +13,7 @@ public partial class PopupOverlay : HBoxContainer
 
 	Control currentChild = null;
 
-	public const string NodePath = "/root/C7Game/CanvasLayer/PopupOverlay";
+	public static readonly string NodePath = "/root/C7Game/CanvasLayer/PopupOverlay";
 
 	public enum PopupCategory {
 		Advisor,
@@ -24,17 +21,14 @@ public partial class PopupOverlay : HBoxContainer
 		Info	//Sounds similar to the above, but lower-pitched in the second half
 	}
 
-	public override void _Ready()
+	public void OnHidePopup()
 	{
-		base._Ready();
-	}
-
-	private void OnHidePopup()
-	{
-		log.Debug("Hiding popup");
 		RemoveChild(currentChild);
+		currentChild = null;
 		Hide();
 	}
+
+	public bool ShowingPopup => currentChild is not null;
 
 	public void PlaySound(AudioStreamWav wav)
 	{
@@ -45,8 +39,8 @@ public partial class PopupOverlay : HBoxContainer
 
 	public void ShowPopup(Popup child, PopupCategory category)
 	{
-		if (child == null) // not necessary if we don't pass null?
-		{
+		if (child is null) {
+			// not necessary if we don't pass null?
 			log.Error("Received request to show null popup");
 			return;
 		}
@@ -60,24 +54,17 @@ public partial class PopupOverlay : HBoxContainer
 		AddChild(child);
 		currentChild = child;
 
-		string soundFile = "";
-		switch (category)
-		{
-			case PopupCategory.Advisor:
-				soundFile = "Sounds/PopupAdvisor.wav";
-				break;
-			case PopupCategory.Console:
-				soundFile = "Sounds/PopupConsole.wav";
-				break;
-			case PopupCategory.Info:
-				soundFile = "Sounds/PopupInfo.wav";
-				break;
-			default:
-				log.Error("Invalid popup category");
-				break;
+		string soundFile = category switch {
+			PopupCategory.Advisor => "Sounds/PopupAdvisor.wav",
+			PopupCategory.Console => "Sounds/PopupConsole.wav",
+			PopupCategory.Info => "Sounds/PopupInfo.wav",
+			_ => "",
+		};
+		if (soundFile == "") {
+			log.Error("Invalid popup category");
 		}
 		AudioStreamWav wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
-		Visible = true;
+		Show();
 		PlaySound(wav);
 	}
 
