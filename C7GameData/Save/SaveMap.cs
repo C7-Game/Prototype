@@ -22,7 +22,7 @@ namespace C7GameData.Save {
 				numTilesTall = tilesTall,
 				wrapHorizontally = wrapHorizontally,
 				wrapVertically = wrapVertically,
-				tiles = tiles.ConvertAll(tile => tile.ToTile(gd.terrainTypes, gd.cities, gd.mapUnits, gd.Resources)),
+				tiles = tiles.ConvertAll(tile => tile.ToTile(gd.terrainTypes, gd.Resources)),
 			};
 			gameMap.computeNeighbors();
 			gameMap.barbarianCamps = gameMap.tiles.Where(tile => tile.hasBarbarianCamp).ToList();

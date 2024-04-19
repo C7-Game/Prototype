@@ -6,7 +6,7 @@ namespace C7GameData
 	using System.Linq;
 	public class Tile
 	{
-		public ID id {get; private set;}
+		public ID Id {get; internal set;}
 		public Civ3ExtraInfo ExtraInfo;
 		public int xCoordinate;
 		public int yCoordinate;
@@ -53,7 +53,7 @@ namespace C7GameData
 
 		public Tile(ID id)
 		{
-			this.id = id;
+			this.Id = id;
 			unitsOnTile = new List<MapUnit>();
 			Resource = Resource.NONE;
 		}

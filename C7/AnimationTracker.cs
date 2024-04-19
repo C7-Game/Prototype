@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
 using C7GameData;
+using Godot;
 
 public partial class AnimationTracker {
 	private AnimationManager civ3AnimData;
@@ -55,7 +56,7 @@ public partial class AnimationTracker {
 
 	public void startAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent, AnimationEnding ending)
 	{
-		startAnimation(tile.id, civ3AnimData.forEffect(effect), completionEvent, ending);
+		startAnimation(tile.Id, civ3AnimData.forEffect(effect), completionEvent, ending);
 	}
 
 	public void endAnimation(MapUnit unit)
@@ -97,7 +98,7 @@ public partial class AnimationTracker {
 
 	public (MapUnit.AnimatedAction, float) getCurrentActionAndProgress(Tile tile)
 	{
-		return getCurrentActionAndProgress(tile.id);
+		return getCurrentActionAndProgress(tile.Id);
 	}
 
 	public void update()
@@ -149,7 +150,6 @@ public partial class AnimationTracker {
 
 	public C7Animation getTileEffect(Tile tile)
 	{
-		ActiveAnimation aa;
-		return activeAnims.TryGetValue(tile.id, out aa) ? aa.anim : null;
+		return activeAnims.TryGetValue(tile.Id, out ActiveAnimation aa) ? aa.anim : null;
 	}
 }

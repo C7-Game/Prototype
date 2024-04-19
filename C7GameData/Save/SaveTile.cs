@@ -10,6 +10,7 @@ namespace C7GameData.Save {
 		public SaveTile() { }
 
 		public SaveTile(Tile tile) {
+			id = tile.Id;
 			extraInfo = tile.ExtraInfo;
 			x = tile.xCoordinate;
 			y = tile.yCoordinate;
@@ -43,8 +44,10 @@ namespace C7GameData.Save {
 			}
 		}
 
-		public Tile ToTile(List<TerrainType> terrainTypes, List<City> cities, List<MapUnit> mapUnits, List<Resource> resources) {
+		// TODO: if this is slow, features can be read from JSON and then hashed so the Contains check is faster
+		public Tile ToTile(List<TerrainType> terrainTypes, List<Resource> resources) {
 			Tile tile = new Tile{
+				Id = id,
 				ExtraInfo = extraInfo,
 				xCoordinate = x,
 				yCoordinate = y,
@@ -78,6 +81,7 @@ namespace C7GameData.Save {
 		}
 		public Civ3ExtraInfo extraInfo;
 
+		public ID id;
 		public int x;
 		public int y;
 		[JsonRequired]

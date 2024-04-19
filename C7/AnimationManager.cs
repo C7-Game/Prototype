@@ -54,10 +54,9 @@ public partial class AnimationManager {
 	}
 
 	public IniData getINIData(string pathKey) {
-		IniData tr;
-		if (!iniDatas.TryGetValue(pathKey, out tr)) {
+		if (!iniDatas.TryGetValue(pathKey, out IniData tr)) {
 			string fullPath = Util.Civ3MediaPath(pathKey);
-			tr = (new FileIniDataParser()).ReadFile(fullPath);
+			tr = new FileIniDataParser().ReadFile(fullPath);
 			iniDatas.Add(pathKey, tr);
 		}
 		return tr;
@@ -67,7 +66,7 @@ public partial class AnimationManager {
 	// returns instead the file name for the default action, and if that's missing too, throws an exception.
 	public string getFlicFileName(IniData iniData, MapUnit.AnimatedAction action) {
 		string fileName = iniData["Animations"][action.ToString()];
-		if (fileName != null && fileName != "") {
+		if (!string.IsNullOrEmpty(fileName)) {
 			return fileName;
 		} else if (action != MapUnit.AnimatedAction.DEFAULT) {
 			return getFlicFileName(iniData, MapUnit.AnimatedAction.DEFAULT);
@@ -77,11 +76,11 @@ public partial class AnimationManager {
 	}
 
 	public IniData getUnitINIData(string unitTypeName) {
-		return getINIData(String.Format("Art/Units/{0}/{0}.INI", unitTypeName));
+		return getINIData(string.Format("Art/Units/{0}/{0}.INI", unitTypeName));
 	}
 
 	public string getUnitFlicFilepath(UnitPrototype unit, MapUnit.AnimatedAction action) {
-		string directory = String.Format("Art/Units/{0}", unit.name);
+		string directory = string.Format("Art/Units/{0}", unit.name);
 		IniData ini = getUnitINIData(unit.name);
 		string filename = getFlicFileName(ini, action);
 		return directory.PathJoin(filename);
@@ -131,7 +130,7 @@ public partial class AnimationManager {
 
 		for (int col = 0; col < flic.Images.GetLength(1); col++) {
 			byte[] frame = flic.Images[row,col];
-			(ImageTexture bl, ImageTexture tl) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
+			(ImageTexture bl, _) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
 			frames.AddFrame(name, bl, 0.5f); // TODO: frame duration is controlled by .ini
 		}
 	}
@@ -165,7 +164,7 @@ public partial class AnimationManager {
 		string fileName = iniData["Sound Effects"][action.ToString()];
 		if (fileName.EndsWith(".WAV", StringComparison.CurrentCultureIgnoreCase)) {
 			AudioStreamWav wav;
-			var pathKey = rootPath + "/" + fileName;
+			string pathKey = rootPath + "/" + fileName;
 			if (!wavs.TryGetValue(pathKey, out wav)) {
 				wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(pathKey));
 				wavs.Add(pathKey, wav);

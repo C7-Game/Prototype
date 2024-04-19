@@ -84,6 +84,8 @@ namespace C7GameData {
 
 				(int x, int y) = GetMapCoordinates(i, savData.Wrld.Width);
 				SaveTile tile = new SaveTile{
+					id = ids.CreateID("tile"),
+					extraInfo = extra,
 					x = x,
 					y = y,
 					baseTerrain = save.TerrainTypes[civ3Tile.BaseTerrain].Key,

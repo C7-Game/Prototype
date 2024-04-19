@@ -25,11 +25,15 @@ namespace BuildDevSave {
 				Console.WriteLine("provide civ3 SAV absolute path as command line argument");
 				return;
 			}
+			DateTime start = DateTime.Now;
 			string fullSavePath = args[0];
 			string outputPath = Path.Combine(C7DefaultSaveDir, "c7-static-map-save.json");
 			SaveGame output = ImportCiv3.ImportSav(fullSavePath, GetCiv3Path + @"/Conquests/conquests.biq");
 			output.Save(outputPath);
-			Info(outputPath, output);
+			DateTime stop = DateTime.Now;
+			int elapsed = (stop - start).Milliseconds;
+			Console.WriteLine($"finished generating save in {elapsed} milliseconds");
+			Info(fullSavePath, output);
 		}
 	}
 }
