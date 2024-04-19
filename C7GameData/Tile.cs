@@ -7,6 +7,7 @@ namespace C7GameData
 	public class Tile
 	{
 		public ID id {get; private set;}
+		public Civ3ExtraInfo ExtraInfo;
 		public int xCoordinate;
 		public int yCoordinate;
 		public string baseTerrainTypeKey { get; set; }

@@ -10,6 +10,7 @@ namespace C7GameData.Save {
 		public SaveTile() { }
 
 		public SaveTile(Tile tile) {
+			extraInfo = tile.ExtraInfo;
 			x = tile.xCoordinate;
 			y = tile.yCoordinate;
 			baseTerrain = tile.baseTerrainTypeKey;
@@ -44,6 +45,7 @@ namespace C7GameData.Save {
 
 		public Tile ToTile(List<TerrainType> terrainTypes, List<City> cities, List<MapUnit> mapUnits, List<Resource> resources) {
 			Tile tile = new Tile{
+				ExtraInfo = extraInfo,
 				xCoordinate = x,
 				yCoordinate = y,
 				baseTerrainTypeKey = baseTerrain,
@@ -74,6 +76,7 @@ namespace C7GameData.Save {
 
 			return tile;
 		}
+		public Civ3ExtraInfo extraInfo;
 
 		public int x;
 		public int y;

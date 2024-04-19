@@ -12,6 +12,12 @@ using C7GameData.Save;
 
 namespace C7GameData {
 
+	public class Civ3ExtraInfo
+	{
+		public int BaseTerrainFileID;
+		public int BaseTerrainImageID;
+	}
+
 	public class ImportCiv3 {
 		private SaveGame save;
 		private BiqData biq;
@@ -69,6 +75,13 @@ namespace C7GameData {
 			// Import tiles.  This is similar to, but different from the BIQ version as tile contents may have changed in-game.
 			int i = 0;
 			foreach (QueryCiv3.Sav.TILE civ3Tile in savData.Tile) {
+				// TODO: Civ3ExtraInfo can be removed when migrating to rendering via tilemap
+				Civ3ExtraInfo extra = new Civ3ExtraInfo
+				{
+					BaseTerrainFileID = civ3Tile.TextureFile,
+					BaseTerrainImageID = civ3Tile.TextureLocation,
+				};
+
 				(int x, int y) = GetMapCoordinates(i, savData.Wrld.Width);
 				SaveTile tile = new SaveTile{
 					x = x,
