@@ -14,6 +14,9 @@ mono_crash.*.blob
 C7/Exports
 Exports/
 
+# Test runtime files
+C7GameDataTests/data/
+
 # Mono-specific ignores
 .mono/
 data_*/

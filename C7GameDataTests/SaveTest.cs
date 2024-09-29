@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 
 using Xunit;
 
@@ -68,14 +69,16 @@ public class SaveTests
 	}
 
 	[Fact]
-	public void LoadGOTMWinners() {
-		string path = getDataPath("gotm");
-		try {
-			Directory.CreateDirectory(getDataPath("output"));
-		} catch {}
+	public async void LoadSampleSaves() {
+		string savesPath = getDataPath("saves");
+		Directory.CreateDirectory(savesPath);
+		using (var client = new HttpClient())
+		{
+			byte[] fileData = await client.GetByteArrayAsync("https://drive.usercontent.google.com/download?id=1QlIavkLtPZEIv1kHK9sO0fY2yp3o2si7&confirm=y");
+			File.WriteAllBytes(Path.Combine(testDirectory, "data", "12345.SAV"), fileData);
+		}
 
-		DirectoryInfo directoryInfo = new DirectoryInfo(path);
-		IEnumerable<FileInfo> saveFiles = directoryInfo.EnumerateFiles();
+		IEnumerable<FileInfo> saveFiles = new DirectoryInfo(savesPath).EnumerateFiles("*.SAV");
 		int i = 0;
 		foreach (FileInfo saveFileInfo in saveFiles) {
 			SaveGame game = null;
