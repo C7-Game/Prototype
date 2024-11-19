@@ -1,4 +1,3 @@
-using System.Linq;
 using C7Engine.AI;
 
 namespace C7Engine
@@ -23,6 +22,7 @@ namespace C7Engine
 			owner.cities.Add(newCity);
 			tileWithNewCity.cityAtTile = newCity;
 			tileWithNewCity.overlays.road = true;
+			new MsgCityBuilt(tileWithNewCity).send(); // UI will add city to the map view
 		}
 
 		public static void DestroyCity(int x, int y) {

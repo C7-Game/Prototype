@@ -89,19 +89,19 @@ public partial class AnimationManager {
 	// The flic loading code parses the animations into a 2D array, where each row is an animation
 	// corresponding to a tile direction. flicRowToAnimationDirection maps row number -> direction.
 	private static TileDirection flicRowToAnimationDirection(int row) {
-		switch (row) {
-			case 0: return TileDirection.SOUTHWEST;
-			case 1: return TileDirection.SOUTH;
-			case 2: return TileDirection.SOUTHEAST;
-			case 3: return TileDirection.EAST;
-			case 4: return TileDirection.NORTHEAST;
-			case 5: return TileDirection.NORTH;
-			case 6: return TileDirection.NORTHWEST;
-			case 7: return TileDirection.WEST;
-		}
 		// TODO: I wanted to add a TileDirection.INVALID enum value when implementing this,
 		// but adding an INVALID value broke stuff: https://github.com/C7-Game/Prototype/issues/397
-		return TileDirection.NORTH;
+		return row switch {
+			0 => TileDirection.SOUTHWEST,
+			1 => TileDirection.SOUTH,
+			2 => TileDirection.SOUTHEAST,
+			3 => TileDirection.EAST,
+			4 => TileDirection.NORTHEAST,
+			5 => TileDirection.NORTH,
+			6 => TileDirection.NORTHWEST,
+			7 => TileDirection.WEST,
+			_ => TileDirection.NORTH,
+		};
 	}
 
 	public static void loadFlicAnimation(string path, string name, ref SpriteFrames frames, ref SpriteFrames tint) {
@@ -122,10 +122,9 @@ public partial class AnimationManager {
 		}
 	}
 
-	public static void loadCursorAnimation(string path, ref SpriteFrames frames) {
+	public static void loadCursorAnimation(string path, string name, ref SpriteFrames frames) {
 		Flic flic = Util.LoadFlic(path);
 		int row = 0;
-		string name = "cursor";
 		frames.AddAnimation(name);
 
 		for (int col = 0; col < flic.Images.GetLength(1); col++) {
@@ -245,5 +244,9 @@ public partial class C7Animation {
 		Util.FlicSheet flicSheet = getFlicSheet();
 		double frameCount = flicSheet.indices.GetWidth() / flicSheet.spriteWidth;
 		return frameCount / 20.0; // Civ 3 anims often run at 20 FPS   TODO: Do they all? How could we tell? Is it exactly 20 FPS?
+	}
+
+	public override string ToString() {
+		return $"{unit.name}: {action}";
 	}
 }

@@ -38,7 +38,6 @@ public partial class LogManager : Node {
 			GD.Print("Goodbye logger!");
 			Log.ForContext<LogManager>().Debug("Goodbye!");
 			Log.CloseAndFlush();
-			GetTree().Quit();
 		}
 	}
 

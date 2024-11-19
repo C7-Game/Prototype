@@ -1,53 +1,26 @@
 using Godot;
-using System;
-using ConvertCiv3Media;
+using C7GameData;
 
 public partial class TestUnit : Node2D
 {
-
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		//AudioStreamPlayer player = GetNode<AudioStreamPlayer>("CanvasLayer/SoundEffectPlayer");
-
-		AnimatedSprite2D sprite = new AnimatedSprite2D();
-		SpriteFrames frames = new SpriteFrames();
-		sprite.SpriteFrames = frames;
-
-		AnimatedSprite2D spriteTint = new AnimatedSprite2D();
-		SpriteFrames framesTint = new SpriteFrames();
-		spriteTint.SpriteFrames = framesTint;
-
-		AnimationManager.loadFlicAnimation("Art/Units/warrior/warriorRun.flc", "run", ref frames, ref framesTint);
-
-		ShaderMaterial material = new ShaderMaterial();
-		material.Shader = GD.Load<Shader>("res://UnitTint.gdshader");
-		material.SetShaderParameter("tintColor", new Vector3(1f,1f,1f));
-		spriteTint.Material = material;
-
+		AnimationManager manager = new AnimationManager(null);
+		UnitSprite sprite = new UnitSprite(manager);
+		UnitPrototype prototype = new UnitPrototype{name="warrior"};
+		manager.forUnit(prototype, MapUnit.AnimatedAction.RUN).loadSpriteAnimation();
+		string name = AnimationManager.AnimationKey(prototype, MapUnit.AnimatedAction.RUN, TileDirection.EAST);
 		AddChild(sprite);
-		AddChild(spriteTint);
+		sprite.Play(name);
 
-		sprite.Play("run_EAST");
-		spriteTint.Play("run_EAST");
+		float scale = 6;
+		this.Scale = new Vector2(scale, scale);
+
+		sprite.SetColor(new Color(1, 1, 1));
 		sprite.Position = new Vector2(30, 30);
-		spriteTint.Position = new Vector2(30, 30);
 
-		float SCALE = 6;
-		this.Scale = new Vector2(SCALE, SCALE);
-
-
-		AnimatedSprite2D cursor = new AnimatedSprite2D();
-		SpriteFrames cursorFrames = new SpriteFrames();
-		cursor.SpriteFrames = cursorFrames;
-		AnimationManager.loadCursorAnimation("Art/Animations/Cursor/Cursor.flc", ref cursorFrames);
+		CursorSprite cursor = new CursorSprite();
 		cursor.Position = new Vector2(120, 30);
-		cursor.Play("cursor");
 		AddChild(cursor);
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
 	}
 }

@@ -96,6 +96,10 @@ namespace C7GameData
 			return edgeNeighbors;
 		}
 
+		public int numWaterEdges() {
+			return getEdgeNeighbors().Count(t => t.IsWater());
+		}
+
 		public override string ToString()
 		{
 			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.DisplayName + " on " + baseTerrainType.DisplayName + ")";

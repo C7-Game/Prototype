@@ -274,7 +274,9 @@ namespace C7Engine {
 
 		public static void OnEnterTile(this MapUnit unit, Tile tile) {
 			//Add to player knowledge of tiles
-			unit.owner.tileKnowledge.AddTilesToKnown(tile);
+			if (unit.owner.tileKnowledge.AddTilesToKnown(tile)) {
+				new MsgTileDiscovered(tile).send();
+			}
 
 			// Disperse barb camp
 			if (tile.hasBarbarianCamp && (!unit.owner.isBarbarians)) {
@@ -366,9 +368,9 @@ namespace C7Engine {
 					throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 				unit.OnEnterTile(newLoc);
 				newLoc.unitsOnTile.Add(unit);
+				unit.animate(MapUnit.AnimatedAction.RUN, wait);
 				unit.location = newLoc;
 				unit.movementPoints.onUnitMove(movementCost);
-				unit.animate(MapUnit.AnimatedAction.RUN, wait);
 			}
 			return true;
 		}

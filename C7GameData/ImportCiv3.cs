@@ -168,7 +168,7 @@ namespace C7GameData {
 
 			// Import tiles
 			int i = 0;
-			foreach (QueryCiv3.Biq.TILE civ3Tile in biq.Tile) {
+			foreach (TILE civ3Tile in biq.Tile) {
 				(int x, int y) = GetMapCoordinates(i, biq.Wmap[0].Width);
 				SaveTile tile = new SaveTile{
 					x = x,

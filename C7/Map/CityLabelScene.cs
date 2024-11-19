@@ -11,7 +11,6 @@ namespace C7.Map {
 
 		private City city;
 		private Tile tile;
-		private Vector2I tileCenter;
 
 		private ImageTexture cityTexture;
 
@@ -37,6 +36,11 @@ namespace C7.Map {
 		private static Theme popSizeTheme = new Theme();
 
 		private int lastLabelWidth = 0;
+		private int lastTurnsUntilGrowth;
+		private int lastTurnsUntilProductFinished;
+		private int lastCitySize;
+		private string lastProductionName;
+		private bool wasCapital;
 
 		static CityLabelScene() {
 			smallFontTheme.DefaultFont = smallFont;
@@ -60,94 +64,105 @@ namespace C7.Map {
 			nonEmbassyStar = PCXToGodot.getImageFromPCX(cityIcons, 20, 1, 18, 18);
 		}
 
-		public CityLabelScene(City city, Tile tile, Vector2I tileCenter) {
+		public CityLabelScene(City city, Tile tile) {
 			this.city = city;
 			this.tile = tile;
-			this.tileCenter = tileCenter;
-
 
 			labelTextureRect.MouseFilter = Control.MouseFilterEnum.Ignore;
 			cityNameLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
 			productionLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
 			popSizeLabel.MouseFilter = Control.MouseFilterEnum.Ignore;
 
+			cityNameLabel.Text = city.name;
 			AddChild(labelTextureRect);
 			AddChild(cityNameLabel);
 			AddChild(productionLabel);
 			AddChild(popSizeLabel);
+
+			cityNameLabel.Theme = smallFontTheme;
+			cityNameLabel.OffsetTop = 24;
+
+			productionLabel.Theme = smallFontTheme;
+			productionLabel.OffsetTop = 36;
+
+			popSizeLabel.Theme = popSizeTheme;
+			popSizeLabel.OffsetTop = 28;
+
+			lastTurnsUntilGrowth = city.TurnsUntilGrowth();
+			lastTurnsUntilProductFinished = city.TurnsUntilProductionFinished();
+			lastCitySize = city.size;
+			lastProductionName = city.itemBeingProduced.name;
+			wasCapital = city.IsCapital();
+
+			resize(lastTurnsUntilGrowth, lastTurnsUntilProductFinished, lastCitySize, lastProductionName, wasCapital);
 		}
 
-		public override void _Draw() {
-			base._Draw();
+		private string getCityNameAndGrowthString(int turnsUntilGrowth) {
+			string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue || turnsUntilGrowth < 0 ? "- -" : turnsUntilGrowth.ToString();
+			return $"{city.name} : {turnsUntilGrowthText}";
+		}
 
-			int turnsUntilGrowth = city.TurnsUntilGrowth();
-			string turnsUntilGrowthText = turnsUntilGrowth == int.MaxValue || turnsUntilGrowth < 0 ? "- -" : "" + turnsUntilGrowth;
-			string cityNameAndGrowth = $"{city.name} : {turnsUntilGrowthText}";
-			string productionDescription = city.itemBeingProduced.name + " : " + city.TurnsUntilProductionFinished();
-
-			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).X;
+		private void resize(int turnsUntilGrowth, int turnsUntilProductionFinished, int citySize, string productionName, bool isCapital) {
+			string productionDescription = $"{productionName} : {turnsUntilProductionFinished}";
 			int productionDescriptionWidth = (int)smallFont.GetStringSize(productionDescription).X;
-			int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
 
-			int cityLabelWidth = maxTextWidth + (city.IsCapital()? 70 : 45);	//TODO: Is 65 right?  70?  Will depend on whether it's capital, too
-			int textAreaWidth = cityLabelWidth - (city.IsCapital() ? 50 : 25);
+			string cityNameAndGrowth = getCityNameAndGrowthString(turnsUntilGrowth);
+			int cityNameAndGrowthWidth = (int)smallFont.GetStringSize(cityNameAndGrowth).X;
+			int maxTextWidth = Math.Max(cityNameAndGrowthWidth, productionDescriptionWidth);
+			int cityLabelWidth = maxTextWidth + (isCapital? 70 : 45); //TODO: Is 65 right?  70?  Will depend on whether it's capital, too
+
+			int textAreaWidth = cityLabelWidth - (isCapital ? 50 : 25);
 			if (log.IsEnabled(LogEventLevel.Verbose)) {
-				log.Verbose("Width of city name = " + maxTextWidth);
 				log.Verbose("City label width: " + cityLabelWidth);
 				log.Verbose("Text area width: " + textAreaWidth);
 			}
-
 			if (cityLabelWidth != lastLabelWidth) {
 				Image labelBackground = CreateLabelBackground(cityLabelWidth, city, textAreaWidth);
-				cityLabel =  ImageTexture.CreateFromImage(labelBackground);
+				cityLabel = ImageTexture.CreateFromImage(labelBackground);
 				lastLabelWidth = cityLabelWidth;
+				labelTextureRect.Texture = cityLabel;
+				labelTextureRect.OffsetLeft = (cityLabelWidth / -2);
+				labelTextureRect.OffsetTop = 24;
 			}
-
-			DrawLabelOnScreen(tileCenter, cityLabelWidth, city, cityLabel);
-			DrawTextOnLabel(tileCenter, cityNameAndGrowthWidth, productionDescriptionWidth, city, cityNameAndGrowth, productionDescription, cityLabelWidth);
-		}
-
-		private void DrawLabelOnScreen(Vector2I tileCenter, int cityLabelWidth, City city, ImageTexture cityLabel)
-		{
-			labelTextureRect.OffsetLeft = tileCenter.X + (cityLabelWidth / -2);
-			labelTextureRect.OffsetTop = tileCenter.Y + 24;
-			labelTextureRect.Texture = cityLabel;
-		}
-
-		private void DrawTextOnLabel(Vector2I tileCenter, int cityNameAndGrowthWidth, int productionDescriptionWidth, City city, string cityNameAndGrowth, string productionDescription, int cityLabelWidth) {
-
-			//Destination for font is based on lower-left of baseline of font, not upper left as for blitted rectangles
-			int cityNameOffset = cityNameAndGrowthWidth / -2;
-			int prodDescriptionOffset = productionDescriptionWidth / -2;
-			if (!city.IsCapital()) {
+			int cityNameOffset = cityNameAndGrowthWidth / -2 - 8;
+			int prodDescriptionOffset = productionDescriptionWidth / -2 - 8;
+			if (!isCapital) {
 				cityNameOffset += 12;
 				prodDescriptionOffset += 12;
 			}
-
-			cityNameLabel.Theme = smallFontTheme;
 			cityNameLabel.Text = cityNameAndGrowth;
-			cityNameLabel.OffsetLeft = tileCenter.X + cityNameOffset;
-			cityNameLabel.OffsetTop = tileCenter.Y + 22;
+			cityNameLabel.OffsetLeft = cityNameOffset;
 
-			productionLabel.Theme = smallFontTheme;
 			productionLabel.Text = productionDescription;
-			productionLabel.OffsetLeft = tileCenter.X + prodDescriptionOffset;
-			productionLabel.OffsetTop = tileCenter.Y + 32;
+			productionLabel.OffsetLeft = prodDescriptionOffset;
 
-			//City pop size
-			string popSizeString = "" + city.size;
+			string popSizeString = citySize.ToString();
 			int popSizeWidth = (int)midSizedFont.GetStringSize(popSizeString).X;
 			int popSizeOffset = LEFT_RIGHT_BOXES_WIDTH / 2 - popSizeWidth / 2;
 
-			popSizeLabel.Theme = popSizeTheme;
-
-			if (city.TurnsUntilGrowth() < 0) {
+			if (turnsUntilGrowth < 0) {
 				popSizeLabel.Theme = popThemeRed;
 			}
 
 			popSizeLabel.Text = popSizeString;
-			popSizeLabel.OffsetLeft = tileCenter.X + cityLabelWidth / -2 + popSizeOffset;
-			popSizeLabel.OffsetTop = tileCenter.Y + 22;
+			popSizeLabel.OffsetLeft = cityLabelWidth / -2 + popSizeOffset;
+		}
+
+		public override void _Process(double delta) {
+			int turnsUntilGrowth = city.TurnsUntilGrowth();
+			int turnsUntilProductionFinished = city.TurnsUntilProductionFinished();
+			int citySize = city.size;
+			string productionName = city.itemBeingProduced.name;
+			bool isCaptial = city.IsCapital();
+
+			if (turnsUntilGrowth != lastTurnsUntilGrowth || turnsUntilProductionFinished != lastTurnsUntilProductFinished || citySize != lastCitySize || productionName != lastProductionName || isCaptial != wasCapital) {
+				lastTurnsUntilGrowth = turnsUntilGrowth;
+				lastTurnsUntilProductFinished = turnsUntilProductionFinished;
+				lastCitySize = citySize;
+				lastProductionName = productionName;
+				wasCapital = isCaptial;
+				resize(turnsUntilGrowth, turnsUntilProductionFinished, citySize, productionName, isCaptial);
+			}
 		}
 
 		private Image CreateLabelBackground(int cityLabelWidth, City city, int textAreaWidth)

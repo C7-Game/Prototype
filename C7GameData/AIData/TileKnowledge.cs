@@ -7,11 +7,12 @@ namespace C7GameData
 		HashSet<Tile> knownTiles = new HashSet<Tile>();
 		HashSet<Tile> visibleTiles = new HashSet<Tile>();
 
-		public void AddTilesToKnown(Tile unitLocation) {
-			knownTiles.Add(unitLocation);
+		public bool AddTilesToKnown(Tile unitLocation) {
+			bool added = knownTiles.Add(unitLocation);
 			foreach (Tile t in unitLocation.neighbors.Values) {
-				knownTiles.Add(t);
+				added |= knownTiles.Add(t);
 			}
+			return added;
 		}
 
 		// neighboring tiles should not be added when loading tile knowledge
