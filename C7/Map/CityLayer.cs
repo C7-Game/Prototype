@@ -5,14 +5,7 @@ using Serilog;
 
 namespace C7.Map {
 	public class CityLayer : LooseLayer {
-
-		private ILogger log = LogManager.ForContext<CityLayer>();
-
-		private ImageTexture cityTexture;
-		private Dictionary<string, ImageTexture> cityLabels = new Dictionary<string, ImageTexture>();
-
-		private List<City> citiesWithScenes = new List<City>();
-		private Dictionary<City, CityScene> citySceneLookup = new Dictionary<City, CityScene>();
+		public Dictionary<City, CityScene> citySceneLookup { get; set; } = new();
 
 		public CityLayer()
 		{

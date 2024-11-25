@@ -7,6 +7,7 @@ using C7GameData;
 using Serilog;
 using C7Engine.Pathing;
 using System.Collections.Generic;
+using C7.Map;
 
 public partial class Game : Node2D {
 	[Signal] public delegate void TurnStartedEventHandler();
@@ -164,6 +165,10 @@ public partial class Game : Node2D {
 					break;
 				case MsgStartTurn mST:
 					OnPlayerStartTurn();
+					break;
+				case MsgCityDestroyed mCD:
+					mapView.cityLayer.citySceneLookup.Remove(mCD.city, out CityScene cityScene);
+					cityScene.Hide();
 					break;
 			}
 		}

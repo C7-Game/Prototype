@@ -604,6 +604,7 @@ public partial class MapView : Node2D {
 	}
 
 	public GridLayer gridLayer { get; private set; }
+	public CityLayer cityLayer { get; private set; }
 
 	public ImageTexture civColorWhitePalette = null;
 
@@ -629,7 +630,8 @@ public partial class MapView : Node2D {
 		looseView.layers.Add(new BuildingLayer());
 		looseView.layers.Add(new UnitLayer());
 		looseView.layers.Add(new GotoLayer());
-		looseView.layers.Add(new CityLayer());
+		this.cityLayer = new();
+		looseView.layers.Add(this.cityLayer);
 		looseView.layers.Add(new FogOfWarLayer());
 
 		(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");

@@ -42,4 +42,14 @@ namespace C7Engine
 
 	public class MsgStartTurn : MessageToUI {}
 
+
+	public class MsgCityDestroyed : MessageToUI {
+		public City city;
+
+		public MsgCityDestroyed(City city)
+		{
+			this.city = city;
+		}
+	}
+
 }
