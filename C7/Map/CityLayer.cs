@@ -5,10 +5,15 @@ using Serilog;
 
 namespace C7.Map {
 	public class CityLayer : LooseLayer {
-		public Dictionary<City, CityScene> citySceneLookup { get; set; } = new();
+		private Dictionary<City, CityScene> citySceneLookup = new();
 
 		public CityLayer()
 		{
+		}
+
+		public void UpdateAfterCityDestruction(City city) {
+			citySceneLookup.Remove(city, out CityScene cityScene);
+			cityScene.Hide();
 		}
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter)

@@ -167,8 +167,7 @@ public partial class Game : Node2D {
 					OnPlayerStartTurn();
 					break;
 				case MsgCityDestroyed mCD:
-					mapView.cityLayer.citySceneLookup.Remove(mCD.city, out CityScene cityScene);
-					cityScene.Hide();
+					mapView.cityLayer.UpdateAfterCityDestruction(mCD.city);
 					break;
 			}
 		}
