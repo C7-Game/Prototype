@@ -216,6 +216,41 @@ namespace C7GameData
 		public string YieldString(Player player) {
 			return $"{foodYield(player)}/{productionYield(player)}/{commerceYield(player)})";
 		}
+
+		// Returns the x and y coordinates of the neighbor in the specified direction.
+		public static Tuple<int, int> NeighborCoordinate(int x, int y, TileDirection direction) {
+			switch (direction) {
+				case TileDirection.NORTH:
+					y-=2;
+					break;
+				case TileDirection.NORTHEAST:
+					y--;
+					x++;
+					break;
+				case TileDirection.EAST:
+					x+=2;
+					break;
+				case TileDirection.SOUTHEAST:
+					y++;
+					x++;
+					break;
+				case TileDirection.SOUTH:
+					y+=2;
+					break;
+				case TileDirection.SOUTHWEST:
+					y++;
+					x--;
+					break;
+				case TileDirection.WEST:
+					x-=2;
+					break;
+				case TileDirection.NORTHWEST:
+					x--;
+					y--;
+					break;
+			}
+			return Tuple.Create(x, y);
+		}
 	}
 
 	public enum TileDirection {

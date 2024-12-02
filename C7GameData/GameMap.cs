@@ -129,40 +129,9 @@ namespace C7GameData
 		 * or the NONE tile if there is no neighbor in said direction.
 		 **/
 		public Tile tileNeighbor(Tile center, TileDirection direction) {
-			int x = center.xCoordinate;
-			int y = center.yCoordinate;
-			switch (direction) {
-				case TileDirection.NORTH:
-					y-=2;
-					break;
-				case TileDirection.NORTHEAST:
-					y--;
-					x++;
-					break;
-				case TileDirection.EAST:
-					x+=2;
-					break;
-				case TileDirection.SOUTHEAST:
-					y++;
-					x++;
-					break;
-				case TileDirection.SOUTH:
-					y+=2;
-					break;
-				case TileDirection.SOUTHWEST:
-					y++;
-					x--;
-					break;
-				case TileDirection.WEST:
-					x-=2;
-					break;
-				case TileDirection.NORTHWEST:
-					x--;
-					y--;
-					break;
-			}
+			Tuple<int, int> neighbor = Tile.NeighborCoordinate(center.xCoordinate, center.yCoordinate, direction);
 			//TODO: World wrap should also be accounted for.
-			return tileAt(x, y);
+			return tileAt(neighbor.Item1, neighbor.Item2);
 		}
 
 		public delegate int[,] TerrainNoiseMapGenerator(int rng, int width, int height);
