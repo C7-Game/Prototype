@@ -61374,11 +61374,11 @@
     },
     {
       "id": "player-2",
-      "colorIndex": 1,
+      "colorIndex": 9,
       "barbarian": false,
       "human": true,
       "hasPlayedCurrentTurn": false,
-      "civilization": "Rome",
+      "civilization": "Carthage",
       "cityNameIndex": 0,
       "tileKnowledge": [
         {
