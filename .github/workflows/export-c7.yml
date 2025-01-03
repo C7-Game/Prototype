@@ -66,6 +66,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
+        dotnet build
         godot -v --headless --export${BUILD_SUFFIX} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
     - name: Copy Static Files
       run: |
