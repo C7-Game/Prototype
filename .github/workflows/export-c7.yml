@@ -37,6 +37,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
+        dotnet build
         godot -v --headless --export${BUILD_SUFFIX} "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
     - name: Copy Static Files
       run: |
@@ -99,6 +100,7 @@ jobs:
       run: |
         mkdir -v -p build/${FOLDER_NAME}
         cd ${EXPORT_NAME}
+        dotnet build
         godot -v --headless --export${BUILD_SUFFIX} "macOS" ../build/${FOLDER_NAME}.zip
     - name: Copy Static Files
       run: |
