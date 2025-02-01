@@ -7,8 +7,8 @@ namespace C7GameData {
 	public class Tile {
 		public ID Id { get; internal set; }
 		public Civ3ExtraInfo ExtraInfo;
-		public int xCoordinate;
-		public int yCoordinate;
+		public int XCoordinate;
+		public int YCoordinate;
 		public Player owner; // Represents a civilization within which border the tile is located
 		public string baseTerrainTypeKey { get; set; }
 		[JsonIgnore]
@@ -68,8 +68,8 @@ namespace C7GameData {
 		}
 
 		public static Tile NONE = new Tile(ID.None("tile")) {
-			xCoordinate = -1,
-			yCoordinate = -1,
+			XCoordinate = -1,
+			YCoordinate = -1,
 		};
 
 		//This should be used when we want to check if land tiles are next to water tiles.
@@ -96,7 +96,7 @@ namespace C7GameData {
 		}
 
 		public override string ToString() {
-			return "[" + xCoordinate + ", " + yCoordinate + "] (" + overlayTerrainType.DisplayName + " on " + baseTerrainType.DisplayName + ")";
+			return "[" + XCoordinate + ", " + YCoordinate + "] (" + overlayTerrainType.DisplayName + " on " + baseTerrainType.DisplayName + ")";
 		}
 
 		public List<Tile> GetLandNeighbors() {
@@ -149,8 +149,8 @@ namespace C7GameData {
 				throw new System.Exception("Can't get direction toward NONE Tile since it doesn't have a meaningful location");
 
 			// y calculation is reversed so dy is in typical Cartesian coords instead of tile coords, where y is inverted
-			int dx = other.xCoordinate - this.xCoordinate;
-			int dy = this.yCoordinate - other.yCoordinate;
+			int dx = other.XCoordinate - this.XCoordinate;
+			int dy = this.YCoordinate - other.YCoordinate;
 			double angle = Math.Atan2(dy, dx); // angle is in interval [-pi, pi]
 
 			if (angle > 7.0 / 8.0 * Math.PI) return TileDirection.WEST;
@@ -169,7 +169,7 @@ namespace C7GameData {
 		 * This is a rough metric only.
 		 */
 		public int distanceTo(Tile other) {
-			return (Math.Abs(other.xCoordinate - this.xCoordinate) + Math.Abs(other.yCoordinate - this.yCoordinate)) / 2;
+			return (Math.Abs(other.XCoordinate - this.XCoordinate) + Math.Abs(other.YCoordinate - this.YCoordinate)) / 2;
 		}
 
 		public int foodYield(Player player) {
@@ -217,39 +217,39 @@ namespace C7GameData {
 			return $"{foodYield(player)}/{productionYield(player)}/{commerceYield(player)})";
 		}
 
-		// Returns the x and y coordinates of the neighbor in the specified direction.
-		public static Tuple<int, int> NeighborCoordinate(int x, int y, TileDirection direction) {
+		// Returns the X and Y coordinates of the neighbor in the specified direction.
+		public static Tuple<int, int> NeighborCoordinate(int X, int Y, TileDirection direction) {
 			switch (direction) {
 				case TileDirection.NORTH:
-					y -= 2;
+					Y -= 2;
 					break;
 				case TileDirection.NORTHEAST:
-					y--;
-					x++;
+					Y--;
+					X++;
 					break;
 				case TileDirection.EAST:
-					x += 2;
+					X += 2;
 					break;
 				case TileDirection.SOUTHEAST:
-					y++;
-					x++;
+					Y++;
+					X++;
 					break;
 				case TileDirection.SOUTH:
-					y += 2;
+					Y += 2;
 					break;
 				case TileDirection.SOUTHWEST:
-					y++;
-					x--;
+					Y++;
+					X--;
 					break;
 				case TileDirection.WEST:
-					x -= 2;
+					X -= 2;
 					break;
 				case TileDirection.NORTHWEST:
-					x--;
-					y--;
+					X--;
+					Y--;
 					break;
 			}
-			return Tuple.Create(x, y);
+			return Tuple.Create(X, Y);
 		}
 	}
 

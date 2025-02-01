@@ -72,8 +72,8 @@ namespace C7Engine {
 
 		public MsgSetUnitPath(ID unitID, Tile tile) {
 			this.unitID = unitID;
-			this.destX = tile.xCoordinate;
-			this.destY = tile.yCoordinate;
+			this.destX = tile.XCoordinate;
+			this.destY = tile.YCoordinate;
 		}
 
 		public override void process() {

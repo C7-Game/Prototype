@@ -59,7 +59,7 @@ namespace C7GameData {
 
 		public override string ToString() {
 			if (this != MapUnit.NONE) {
-				return this.owner + " " + unitType.name + "at (" + location.xCoordinate + ", " + location.yCoordinate + ") with " + movementPoints.getMixedNumber() + " MP and " + hitPointsRemaining + " HP, id = " + id;
+				return this.owner + " " + unitType.name + "at (" + location.XCoordinate + ", " + location.YCoordinate + ") with " + movementPoints.getMixedNumber() + " MP and " + hitPointsRemaining + " HP, id = " + id;
 			} else {
 				return "This is the NONE unit";
 			}

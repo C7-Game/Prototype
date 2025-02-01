@@ -80,7 +80,7 @@ public partial class GotoLayer : LooseLayer {
 		if (looseView.mapView.game.gotoInfo?.destinationTile == tile && looseView.mapView.game.gotoInfo.moveCost >= 0) {
 			drawGotoCursor(looseView, tileCenter, looseView.mapView.game.gotoInfo.moveCost);
 		} else if (looseView.mapView.game.gotoInfo?.pathCoords
-				?.Contains(new System.Numerics.Vector2(tile.xCoordinate, tile.yCoordinate)) == true) {
+				?.Contains(new System.Numerics.Vector2(tile.XCoordinate, tile.YCoordinate)) == true) {
 			// If this tile is part of the path, draw a little dot to represent that.
 			looseView.DrawCircle(tileCenter, 5, Color.Color8(255, 255, 255));
 		}

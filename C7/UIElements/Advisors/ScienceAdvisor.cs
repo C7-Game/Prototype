@@ -29,7 +29,7 @@ public partial class ScienceAdvisor : TextureRect {
 
 		// TODO: Age-based background.  Only use Ancient for now.
 		// TODO: Consider moving this to an advisor utility, since we're copying
-		// these x,y coordinates in multiple places.
+		// these X,Y coordinates in multiple places.
 		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupSCIENCE.pcx", 1, 40, 149, 110);
 		ImageTexture AdvisorAngry = Util.LoadTextureFromPCX("Art/SmallHeads/popupSCIENCE.pcx", 151, 40, 149, 110);
 		ImageTexture AdvisorSad = Util.LoadTextureFromPCX("Art/SmallHeads/popupSCIENCE.pcx", 301, 40, 149, 110);

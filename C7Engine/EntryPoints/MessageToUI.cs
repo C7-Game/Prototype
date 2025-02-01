@@ -29,7 +29,7 @@ namespace C7Engine {
 		public AnimationEnding ending;
 
 		public MsgStartEffectAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent, AnimationEnding ending) {
-			this.tileIndex = EngineStorage.gameData.map.tileCoordsToIndex(tile.xCoordinate, tile.yCoordinate);
+			this.tileIndex = EngineStorage.gameData.map.tileCoordsToIndex(tile.XCoordinate, tile.YCoordinate);
 			this.effect = effect;
 			this.completionEvent = completionEvent;
 			this.ending = ending;

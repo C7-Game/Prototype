@@ -30,7 +30,7 @@ public partial class TechBox : TextureButton {
 		//
 		// NOTE: this pcx has 16 rows, 4 per era, with different sizes.
 		//
-		// NOTE: the x coordinates of each column were found via guess+check.
+		// NOTE: the X coordinates of each column were found via guess+check.
 		ImageTexture knownTechBox = Util.LoadTextureFromPCX("Art/Advisors/techboxes.pcx",
 			1, 1, 180, 80);
 		ImageTexture inProgressTechBox = Util.LoadTextureFromPCX("Art/Advisors/techboxes.pcx",

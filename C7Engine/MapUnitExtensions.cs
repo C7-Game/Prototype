@@ -285,7 +285,7 @@ namespace C7Engine {
 
 			// Destroy enemy city on tile
 			if (tile.HasCity && !unit.owner.IsAtPeaceWith(tile.cityAtTile.owner)) {
-				CityInteractions.DestroyCity(tile.xCoordinate, tile.yCoordinate);
+				CityInteractions.DestroyCity(tile.XCoordinate, tile.YCoordinate);
 			}
 		}
 
@@ -321,7 +321,7 @@ namespace C7Engine {
 		/// <exception cref="Exception"></exception>
 		public static bool move(this MapUnit unit, TileDirection dir, bool wait = false) {
 			(int dx, int dy) = dir.toCoordDiff();
-			Tile newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.xCoordinate, dy + unit.location.yCoordinate);
+			Tile newLoc = EngineStorage.gameData.map.tileAt(dx + unit.location.XCoordinate, dy + unit.location.YCoordinate);
 			if ((newLoc != Tile.NONE) && unit.CanEnterTile(newLoc, true) && (unit.movementPoints.canMove)) {
 				unit.facingDirection = dir;
 				unit.wake();
@@ -430,7 +430,7 @@ namespace C7Engine {
 
 			// TODO: Need to check somewhere that this unit is allowed to build a city on its current tile. Either do that here or in every caller
 			// (probably best to just do it here).
-			CityInteractions.BuildCity(unit.location.xCoordinate, unit.location.yCoordinate, unit.owner.id, cityName);
+			CityInteractions.BuildCity(unit.location.XCoordinate, unit.location.YCoordinate, unit.owner.id, cityName);
 
 			// TODO: Should directly delete the unit instead of disbanding it. Disbanding in a city will eventually award shields, which we
 			// obviously don't want to do here.

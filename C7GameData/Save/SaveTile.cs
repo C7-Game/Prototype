@@ -12,8 +12,8 @@ namespace C7GameData.Save {
 		public SaveTile(Tile tile) {
 			id = tile.Id;
 			extraInfo = tile.ExtraInfo;
-			x = tile.xCoordinate;
-			y = tile.yCoordinate;
+			X = tile.XCoordinate;
+			Y = tile.YCoordinate;
 			baseTerrain = tile.baseTerrainTypeKey;
 			overlayTerrain = tile.overlayTerrainTypeKey;
 			if (tile.Resource != Resource.NONE) {
@@ -49,8 +49,8 @@ namespace C7GameData.Save {
 			Tile tile = new Tile{
 				Id = id,
 				ExtraInfo = extraInfo,
-				xCoordinate = x,
-				yCoordinate = y,
+				XCoordinate = X,
+				YCoordinate = Y,
 				baseTerrainTypeKey = baseTerrain,
 				baseTerrainType = terrainTypes.Find(tt => tt.Key == baseTerrain),
 				overlayTerrainTypeKey = overlayTerrain,
@@ -84,8 +84,8 @@ namespace C7GameData.Save {
 		public Civ3ExtraInfo extraInfo;
 
 		public ID id;
-		public int x;
-		public int y;
+		public int X;
+		public int Y;
 		[JsonRequired]
 		public string baseTerrain;
 		public string overlayTerrain;

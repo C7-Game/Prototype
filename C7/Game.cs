@@ -170,9 +170,9 @@ public partial class Game : Node2D {
 					}
 					break;
 				case MsgStartEffectAnimation mSEA:
-					int x, y;
-					gameData.map.tileIndexToCoords(mSEA.tileIndex, out x, out y);
-					Tile tile = gameData.map.tileAt(x, y);
+					int X, Y;
+					gameData.map.tileIndexToCoords(mSEA.tileIndex, out X, out Y);
+					Tile tile = gameData.map.tileAt(X, Y);
 					if (tile != Tile.NONE && controller.tileKnowledge.isTileKnown(tile))
 						animTracker.startAnimation(tile, mSEA.effect, mSEA.completionEvent, mSEA.ending);
 					else {
@@ -275,11 +275,11 @@ public partial class Game : Node2D {
 		Godot.FastNoiseLite noise = new Godot.FastNoiseLite();
 		noise.Seed = seed;
 		// Populate map values
-		for (int y = 0; y < mapHeight; y++) {
-			for (int x = 0; x < mapWidth; x++) {
-				// Multiplying x & y for noise coordinate sampling
-				float n = noise.GetNoise2D(x*2,y*2);
-				tr[x, y] = n < 0.1 ? 2 : n < 0.4 ? 1 : 0;
+		for (int Y = 0; Y < mapHeight; Y++) {
+			for (int X = 0; X < mapWidth; X++) {
+				// Multiplying X & Y for noise coordinate sampling
+				float n = noise.GetNoise2D(X*2,Y*2);
+				tr[X, Y] = n < 0.1 ? 2 : n < 0.4 ? 1 : 0;
 			}
 		}
 		return tr;
@@ -458,7 +458,7 @@ public partial class Game : Node2D {
 							new RightClickCityMenu(this, tile).Open(eventMouseButton.Position);
 
 						string yield = tile.YieldString(controller);
-						log.Debug($"({tile.xCoordinate}, {tile.yCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
+						log.Debug($"({tile.XCoordinate}, {tile.YCoordinate}): {tile.overlayTerrainType.DisplayName} {yield}");
 
 						if (tile.cityAtTile != null) {
 							City city = tile.cityAtTile;

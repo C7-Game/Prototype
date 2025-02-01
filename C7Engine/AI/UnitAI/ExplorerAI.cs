@@ -75,8 +75,8 @@ namespace C7Engine {
 				validExplorerTiles.Add(t);
 			}
 
-			int CrowFliesDistance(Tile x, Tile y) {
-				return x.distanceTo(unit.location) - y.distanceTo(unit.location);
+			int CrowFliesDistance(Tile X, Tile Y) {
+				return X.distanceTo(unit.location) - Y.distanceTo(unit.location);
 			};
 
 			validExplorerTiles.Sort(CrowFliesDistance);

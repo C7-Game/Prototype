@@ -71,7 +71,7 @@ namespace C7GameData {
 			HashSet<Vector2> result = new();
 
 			foreach (Tile tile in path) {
-				result.Add(new Vector2(tile.xCoordinate, tile.yCoordinate));
+				result.Add(new Vector2(tile.XCoordinate, tile.YCoordinate));
 			}
 
 			return result;

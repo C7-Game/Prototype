@@ -128,9 +128,9 @@ public partial class Civ3Unit : Civ3UnitSprite {
 			int c = 0;
 			//The BMP data is stored bottom-to-top, whereas our data is top-to-bottom
 			//Thus we'll use c to calculate the index for each row
-			for (int y = height - 1; y > -1; y--) {
-				c = width * y;
-				for (int x = 0; x < width; x++) {
+			for (int Y = height - 1; Y > -1; Y--) {
+				c = width * Y;
+				for (int X = 0; X < width; X++) {
 					if (shadows && colorIndices[c] > 239) {
 						// using black and transparency
 						iPtr[0] = ((255 - colorIndices[c]) << 4) << 24;

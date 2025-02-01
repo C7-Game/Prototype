@@ -47,7 +47,7 @@ namespace C7GameData.Save {
 				gold = gold,
 			};
 			foreach (TileLocation tile in tileKnowledge) {
-				player.tileKnowledge.AddTileToKnown(map.tileAt(tile.x, tile.y));
+				player.tileKnowledge.AddTileToKnown(map.tileAt(tile.X, tile.Y));
 			}
 			foreach (ID techId in player.civilization.startingTechs) {
 				if (!player.knownTechs.Contains(techId)) {

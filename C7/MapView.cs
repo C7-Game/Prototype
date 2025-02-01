@@ -227,7 +227,7 @@ public partial class HillsLayer : LooseLayer {
 		}
 
 		//If we get here, it's a tie between forest and jungle.  Deterministically choose one so it doesn't change on every render
-		if (center.xCoordinate % 2 == 0) {
+		if (center.XCoordinate % 2 == 0) {
 			return forest;
 		}
 		return jungle;
@@ -285,14 +285,14 @@ public partial class ForestLayer : LooseLayer {
 			//Randomly, but predictably, choose a large jungle graphic
 			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
 			//For the first pass, we're just always using large jungles.
-			int randomJungleRow = tile.yCoordinate % 2;
+			int randomJungleRow = tile.YCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
 			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-				randomJungleColumn = tile.xCoordinate % 6;
+				randomJungleColumn = tile.XCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			} else {
-				randomJungleColumn = tile.xCoordinate % 4;
+				randomJungleColumn = tile.XCoordinate % 4;
 				jungleTexture = largeJungleTexture;
 			}
 			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.X, randomJungleRow * forestJungleSize.Y, forestJungleSize);
@@ -304,8 +304,8 @@ public partial class ForestLayer : LooseLayer {
 			int forestColumn = 0;
 			ImageTexture forestTexture;
 			if (tile.isPineForest) {
-				forestRow = tile.yCoordinate % 2;
-				forestColumn = tile.xCoordinate % 6;
+				forestRow = tile.YCoordinate % 2;
+				forestColumn = tile.XCoordinate % 6;
 				if (tile.baseTerrainType.Key == "grassland") {
 					forestTexture = pineForestTexture;
 				} else if (tile.baseTerrainType.Key == "plains") {
@@ -314,9 +314,9 @@ public partial class ForestLayer : LooseLayer {
 					forestTexture = pineTundraTexture;
 				}
 			} else {
-				forestRow = tile.yCoordinate % 2;
+				forestRow = tile.YCoordinate % 2;
 				if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-					forestColumn = tile.xCoordinate % 5;
+					forestColumn = tile.XCoordinate % 5;
 					if (tile.baseTerrainType.Key == "grassland") {
 						forestTexture = smallForestTexture;
 					} else if (tile.baseTerrainType.Key == "plains") {
@@ -325,7 +325,7 @@ public partial class ForestLayer : LooseLayer {
 						forestTexture = smallTundraForestTexture;
 					}
 				} else {
-					forestColumn = tile.xCoordinate % 4;
+					forestColumn = tile.XCoordinate % 4;
 					if (tile.baseTerrainType.Key == "grassland") {
 						forestTexture = largeForestTexture;
 					} else if (tile.baseTerrainType.Key == "plains") {
@@ -357,14 +357,14 @@ public partial class MarshLayer : LooseLayer {
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		if (tile.overlayTerrainType.Key == "marsh") {
-			int randomJungleRow = tile.yCoordinate % 2;
+			int randomJungleRow = tile.YCoordinate % 2;
 			int randomMarshColumn;
 			ImageTexture marshTexture;
 			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-				randomMarshColumn = tile.xCoordinate % 5;
+				randomMarshColumn = tile.XCoordinate % 5;
 				marshTexture = smallMarshTexture;
 			} else {
-				randomMarshColumn = tile.xCoordinate % 4;
+				randomMarshColumn = tile.XCoordinate % 4;
 				marshTexture = largeMarshTexture;
 			}
 			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.X, randomJungleRow * marshSize.Y, marshSize);
@@ -479,12 +479,12 @@ public partial class LooseView : Node2D {
 			// have to reiterate for each layer. Doing this improves framerate significantly.
 			MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
 			List<VisibleTile> visibleTiles = new List<VisibleTile>();
-			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++) {
-				if (gD.map.isRowAt(y)) {
-					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
-						Tile tile = gD.map.tileAt(x, y);
+			for (int Y = visRegion.upperLeftY; Y < visRegion.lowerRightY; Y++) {
+				if (gD.map.isRowAt(Y)) {
+					for (int X = visRegion.getRowStartX(Y); X < visRegion.lowerRightX; X += 2) {
+						Tile tile = gD.map.tileAt(X, Y);
 						if (IsTileKnown(tile, gameDataAccess)) {
-							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
+							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(X + 1, Y + 1) });
 						}
 					}
 				}
@@ -500,12 +500,12 @@ public partial class LooseView : Node2D {
 
 			if (!gD.observerMode) {
 				foreach (LooseLayer layer in layers.FindAll(layer => layer is FogOfWarLayer)) {
-					for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
-						if (gD.map.isRowAt(y))
-							for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
-								Tile tile = gD.map.tileAt(x, y);
+					for (int Y = visRegion.upperLeftY; Y < visRegion.lowerRightY; Y++)
+						if (gD.map.isRowAt(Y))
+							for (int X = visRegion.getRowStartX(Y); X < visRegion.lowerRightX; X += 2) {
+								Tile tile = gD.map.tileAt(X, Y);
 								if (tile != Tile.NONE) {
-									VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) };
+									VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(X + 1, Y + 1) };
 									layer.drawObject(this, gD, tile, invisibleTile.tileCenter);
 								}
 							}
@@ -614,13 +614,13 @@ public partial class MapView : Node2D {
 	}
 
 	public VisibleRegion getVisibleRegion() {
-		(int x0, int y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
+		(int X0, int Y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
 		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		return new VisibleRegion {
-			upperLeftX = x0 - 2,
-			upperLeftY = y0 - 2,
-			lowerRightX = x0 + (int)mapViewSize.X,
-			lowerRightY = y0 + (int)mapViewSize.Y
+			upperLeftX = X0 - 2,
+			upperLeftY = Y0 - 2,
+			lowerRightX = X0 + (int)mapViewSize.X,
+			lowerRightY = Y0 + (int)mapViewSize.Y
 		};
 	}
 
@@ -691,18 +691,18 @@ public partial class MapView : Node2D {
 		looseView.Position = -location;
 	}
 
-	public Vector2 screenLocationOfTileCoords(int x, int y, bool center = true) {
-		// Add one to x & y to get the tile center b/c in Civ 3 the tile at (x, y) is a diamond centered on (x+1, y+1).
+	public Vector2 screenLocationOfTileCoords(int X, int Y, bool center = true) {
+		// Add one to X & Y to get the tile center b/c in Civ 3 the tile at (X, Y) is a diamond centered on (x+1, y+1).
 		Vector2 centeringOffset = center ? new Vector2(1, 1) : new Vector2(0, 0);
 
-		var mapLoc = (new Vector2(x, y) + centeringOffset) * cellSize;
+		var mapLoc = (new Vector2(X, Y) + centeringOffset) * cellSize;
 		return mapLoc * cameraZoom - cameraLocation;
 	}
 
-	// Returns the location of tile (x, y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the
-	// upper left. Works even if (x, y) is off screen or out of bounds.
+	// Returns the location of tile (X, Y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the
+	// upper left. Works even if (X, Y) is off screen or out of bounds.
 	public Vector2 screenLocationOfTile(Tile tile, bool center = true) {
-		return screenLocationOfTileCoords(tile.xCoordinate, tile.yCoordinate, center);
+		return screenLocationOfTileCoords(tile.XCoordinate, tile.YCoordinate, center);
 	}
 
 	// Returns the virtual tile coordinates on screen at the given location. "Virtual" meaning the coordinates are unwrapped and there isn't
@@ -711,29 +711,29 @@ public partial class MapView : Node2D {
 		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
-		int x = (int)intMapLoc.X, y = (int)intMapLoc.Y;
-		bool evenColumn = x % 2 == 0, evenRow = y % 2 == 0;
+		int X = (int)intMapLoc.X, Y = (int)intMapLoc.Y;
+		bool evenColumn = X % 2 == 0, evenRow = Y % 2 == 0;
 		if (evenColumn ^ evenRow) {
 			if (fracMapLoc.Y > fracMapLoc.X)
-				x -= 1;
+				X -= 1;
 			else
-				y -= 1;
+				Y -= 1;
 		} else {
 			if (fracMapLoc.Y < 1 - fracMapLoc.X) {
-				x -= 1;
-				y -= 1;
+				X -= 1;
+				Y -= 1;
 			}
 		}
-		return (x, y);
+		return (X, Y);
 	}
 
 	public Tile tileOnScreenAt(GameMap map, Vector2 screenLocation) {
-		(int x, int y) = tileCoordsOnScreenAt(screenLocation);
-		return map.tileAt(x, y);
+		(int X, int Y) = tileCoordsOnScreenAt(screenLocation);
+		return map.tileAt(X, Y);
 	}
 
 	public void centerCameraOnTile(Tile t) {
-		var tileCenter = new Vector2(t.xCoordinate + 1, t.yCoordinate + 1) * scaledCellSize;
+		var tileCenter = new Vector2(t.XCoordinate + 1, t.YCoordinate + 1) * scaledCellSize;
 		setCameraLocation(tileCenter - (float)0.5 * getVisibleAreaSize());
 	}
 }

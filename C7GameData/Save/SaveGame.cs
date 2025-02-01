@@ -118,7 +118,7 @@ namespace C7GameData.Save {
 			});
 
 			foreach (City city in data.cities) {
-				data.map.tileAt(city.location.xCoordinate, city.location.yCoordinate).cityAtTile = city;
+				data.map.tileAt(city.location.XCoordinate, city.location.YCoordinate).cityAtTile = city;
 			}
 
 			// add references to map tiles after units and cities are defined

@@ -140,10 +140,10 @@ public partial class RightClickTileMenu : RightClickMenu {
 		int unfortifiedCount = playerUnits.Count - fortifiedCount;
 
 		if (fortifiedCount > 1) {
-			AddItem($"Wake All ({fortifiedCount} units)", () => ForAll(tile.xCoordinate, tile.yCoordinate, false));
+			AddItem($"Wake All ({fortifiedCount} units)", () => ForAll(tile.XCoordinate, tile.YCoordinate, false));
 		}
 		if (unfortifiedCount > 1) {
-			AddItem($"Fortify All ({unfortifiedCount} units)", () => ForAll(tile.xCoordinate, tile.yCoordinate, true));
+			AddItem($"Fortify All ({unfortifiedCount} units)", () => ForAll(tile.XCoordinate, tile.YCoordinate, true));
 		}
 		if (tile.cityAtTile?.owner == game.controller) {
 			AddItem("Change Production (Shift+right click)", () => {

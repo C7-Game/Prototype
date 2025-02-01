@@ -24,19 +24,19 @@ namespace C7GameData {
 			this.tiles = new List<Tile>();
 		}
 
-		public int tileCoordsToIndex(int x, int y) {
-			return y * numTilesWide / 2 + (y % 2 == 0 ? x / 2 : (x - 1) / 2);
+		public int tileCoordsToIndex(int X, int Y) {
+			return Y * numTilesWide / 2 + (Y % 2 == 0 ? X / 2 : (X - 1) / 2);
 		}
 
-		public void tileIndexToCoords(int index, out int x, out int y) {
+		public void tileIndexToCoords(int index, out int X, out int Y) {
 			int doubleRow = index / numTilesWide;
 			int doubleRowRem = index % numTilesWide;
 			if (doubleRowRem < numTilesWide / 2) {
-				x = 2 * doubleRowRem;
-				y = 2 * doubleRow;
+				X = 2 * doubleRowRem;
+				Y = 2 * doubleRow;
 			} else {
-				x = 1 + 2 * (doubleRowRem - numTilesWide / 2);
-				y = 2 * doubleRow + 1;
+				X = 1 + 2 * (doubleRowRem - numTilesWide / 2);
+				Y = 2 * doubleRow + 1;
 			}
 		}
 
@@ -53,61 +53,61 @@ namespace C7GameData {
 		// This method verifies that the conversion between tile index and coords is consistent for all possible valid inputs. It's not called
 		// anywhere but I'm keeping it around in case we ever need to work on the conversion methods again.
 		public void testTileIndexComputation() {
-			for (int y = 0; y < numTilesTall; y++)
-				for (int x = y % 2; x < numTilesWide; x += 2) {
-					int rx, ry;
-					int index = tileCoordsToIndex(x, y);
-					tileIndexToCoords(index, out rx, out ry);
-					if ((rx != x) || (ry != y))
-						throw new Exception(String.Format("Error computing tile index/coords: ({0}, {1}) -> {2} -> ({3}, {4})", x, y, index, rx, ry));
+			for (int Y = 0; Y < numTilesTall; Y++)
+				for (int X = Y % 2; X < numTilesWide; X += 2) {
+					int rX, rY;
+					int index = tileCoordsToIndex(X, Y);
+					tileIndexToCoords(index, out rX, out rY);
+					if ((rX != X) || (rY != Y))
+						throw new Exception(String.Format("Error computing tile index/coords: ({0}, {1}) -> {2} -> ({3}, {4})", X, Y, index, rX, rY));
 				}
 
 			for (int i = 0; i < numTilesWide * numTilesTall / 2; i++) {
-				int x, y;
-				tileIndexToCoords(i, out x, out y);
-				int ri = tileCoordsToIndex(x, y);
+				int X, Y;
+				tileIndexToCoords(i, out X, out Y);
+				int ri = tileCoordsToIndex(X, Y);
 				if (ri != i)
-					throw new Exception(String.Format("Error computing tile index/coords: {0} -> ({1}, {2}) -> {3}", i, x, y, ri));
+					throw new Exception(String.Format("Error computing tile index/coords: {0} -> ({1}, {2}) -> {3}", i, X, Y, ri));
 			}
 		}
 
-		public bool isRowAt(int y) {
-			return wrapVertically || ((y >= 0) && (y < numTilesTall));
+		public bool isRowAt(int Y) {
+			return wrapVertically || ((Y >= 0) && (Y < numTilesTall));
 		}
 
-		public bool isTileAt(int x, int y) {
-			bool evenRow = y%2 == 0;
-			bool xInBounds;
+		public bool isTileAt(int X, int Y) {
+			bool evenRow = Y%2 == 0;
+			bool XInBounds;
 			{
 				if (wrapHorizontally)
-					xInBounds = true;
+					XInBounds = true;
 				else if (evenRow)
-					xInBounds = (x >= 0) && (x <= numTilesWide - 2);
+					XInBounds = (X >= 0) && (X <= numTilesWide - 2);
 				else
-					xInBounds = (x >= 1) && (x <= numTilesWide - 1);
+					XInBounds = (X >= 1) && (X <= numTilesWide - 1);
 			}
-			return xInBounds && isRowAt(y) && (evenRow ? (x % 2 == 0) : (x % 2 != 0));
+			return XInBounds && isRowAt(Y) && (evenRow ? (X % 2 == 0) : (X % 2 != 0));
 		}
 
-		public int wrapTileX(int x) {
+		public int wrapTileX(int X) {
 			if (wrapHorizontally) {
-				int tr = x % numTilesWide;
-				return (tr >= 0) ? tr : tr + numTilesWide;
+				int wrappedX = X % numTilesWide;
+				return (wrappedX >= 0) ? wrappedX : wrappedX + numTilesWide;
 			} else
-				return x;
+				return X;
 		}
 
-		public int wrapTileY(int y) {
+		public int wrapTileY(int Y) {
 			if (wrapVertically) {
-				int tr = y % numTilesTall;
-				return (tr >= 0) ? tr : tr + numTilesTall;
+				int wrappedY = Y % numTilesTall;
+				return (wrappedY >= 0) ? wrappedY : wrappedY + numTilesTall;
 			} else
-				return y;
+				return Y;
 		}
 
-		public Tile tileAt(int x, int y) {
-			if (isTileAt(x, y))
-				return tiles[tileCoordsToIndex(wrapTileX(x), wrapTileY(y))];
+		public Tile tileAt(int X, int Y) {
+			if (isTileAt(X, Y))
+				return tiles[tileCoordsToIndex(wrapTileX(X), wrapTileY(Y))];
 			else
 				return Tile.NONE;
 		}
@@ -117,7 +117,7 @@ namespace C7GameData {
 		 * or the NONE tile if there is no neighbor in said direction.
 		 **/
 		public Tile tileNeighbor(Tile center, TileDirection direction) {
-			Tuple<int, int> neighbor = Tile.NeighborCoordinate(center.xCoordinate, center.yCoordinate, direction);
+			Tuple<int, int> neighbor = Tile.NeighborCoordinate(center.XCoordinate, center.YCoordinate, direction);
 			//TODO: World wrap should also be accounted for.
 			return tileAt(neighbor.Item1, neighbor.Item2);
 		}
@@ -137,7 +137,7 @@ namespace C7GameData {
 						// TODO: This distance calculation is just a placeholder. Eventually we'll need to write an proper
 						// function to find the distance between two tiles. This placeholder is not even very accurate, e.g. it
 						// would say that a tile and its east neighbor are at distance 2.
-						int dist = Math.Abs(sL.xCoordinate - randTile.xCoordinate) + Math.Abs(sL.yCoordinate - randTile.yCoordinate);
+						int dist = Math.Abs(sL.XCoordinate - randTile.XCoordinate) + Math.Abs(sL.YCoordinate - randTile.YCoordinate);
 						if (dist < distToNearestOtherLoc)
 							distToNearestOtherLoc = dist;
 					}
@@ -189,11 +189,11 @@ namespace C7GameData {
 			m.terrainTypes.Add(grassland);
 			m.terrainTypes.Add(coast);
 
-			for (int y = 0; y < m.numTilesTall; y++) {
-				for (int x = y % 2; x < m.numTilesWide; x += 2) {
+			for (int Y = 0; Y < m.numTilesTall; Y++) {
+				for (int X = Y % 2; X < m.numTilesWide; X += 2) {
 					Tile newTile = new Tile(gameData.ids.CreateID("tile"));
-					newTile.xCoordinate = x;
-					newTile.yCoordinate = y;
+					newTile.XCoordinate = X;
+					newTile.YCoordinate = Y;
 					newTile.baseTerrainType = m.terrainTypes[GameData.rng.Next() % m.terrainTypes.Count];
 					m.tiles.Add(newTile);
 				}

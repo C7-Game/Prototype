@@ -84,12 +84,12 @@ namespace C7GameData {
 					BaseTerrainImageID = civ3Tile.TextureLocation,
 				};
 
-				(int x, int y) = GetMapCoordinates(i, savData.Wrld.Width);
+				(int X, int Y) = GetMapCoordinates(i, savData.Wrld.Width);
 				SaveTile tile = new SaveTile{
 					id = ids.CreateID("tile"),
 					extraInfo = extra,
-					x = x,
-					y = y,
+					X = X,
+					Y = Y,
 					baseTerrain = save.TerrainTypes[civ3Tile.BaseTerrain].Key,
 					overlayTerrain = save.TerrainTypes[civ3Tile.OverlayTerrain].Key,
 				};
@@ -146,7 +146,7 @@ namespace C7GameData {
 				for (int playerIndex = 0; playerIndex < save.Players.Count; playerIndex++) {
 					if (civ3Tile.ExploredBy[playerIndex]) {
 						SavePlayer player = save.Players[playerIndex];
-						player.tileKnowledge.Add(new TileLocation(x, y));
+						player.tileKnowledge.Add(new TileLocation(X, Y));
 					}
 				}
 				i++;
@@ -180,7 +180,7 @@ namespace C7GameData {
 			// Import tiles
 			int i = 0;
 			foreach (QueryCiv3.Biq.TILE civ3Tile in biq.Tile) {
-				(int x, int y) = GetMapCoordinates(i, biq.Wmap[0].Width);
+				(int X, int Y) = GetMapCoordinates(i, biq.Wmap[0].Width);
 				Civ3ExtraInfo extra = new Civ3ExtraInfo
 				{
 					BaseTerrainFileID = civ3Tile.TextureFile,
@@ -189,8 +189,8 @@ namespace C7GameData {
 				SaveTile tile = new SaveTile{
 					id = ids.CreateID("tile"),
 					extraInfo = extra,
-					x = x,
-					y = y,
+					X = X,
+					Y = Y,
 					baseTerrain = save.TerrainTypes[civ3Tile.BaseTerrain].Key,
 					overlayTerrain = save.TerrainTypes[civ3Tile.OverlayTerrain].Key,
 				};
@@ -249,7 +249,7 @@ namespace C7GameData {
 				if (civ3Tile.FogOfWar != 0) {
 					for (int playerIndex = 0; playerIndex < save.Players.Count; playerIndex++) {
 						SavePlayer player = save.Players[playerIndex];
-						player.tileKnowledge.Add(new TileLocation(x, y));
+						player.tileKnowledge.Add(new TileLocation(X, Y));
 					}
 				}
 
@@ -271,7 +271,7 @@ namespace C7GameData {
 				SavePlayer player = playerLookup[unit.owner];
 				player.tileKnowledge.Add(unit.currentLocation);
 				foreach (TileDirection direction in Enum.GetValues(typeof(TileDirection))) {
-					Tuple<int, int> neighbor = Tile.NeighborCoordinate(unit.currentLocation.x, unit.currentLocation.y, direction);
+					Tuple<int, int> neighbor = Tile.NeighborCoordinate(unit.currentLocation.X, unit.currentLocation.Y, direction);
 					player.tileKnowledge.Add(new TileLocation(neighbor.Item1, neighbor.Item2));
 				}
 			}
@@ -279,7 +279,7 @@ namespace C7GameData {
 				SavePlayer player = playerLookup[city.owner];
 				player.tileKnowledge.Add(city.location);
 				foreach (TileDirection direction in Enum.GetValues(typeof(TileDirection))) {
-					Tuple<int, int> neighbor = Tile.NeighborCoordinate(city.location.x, city.location.y, direction);
+					Tuple<int, int> neighbor = Tile.NeighborCoordinate(city.location.X, city.location.Y, direction);
 					player.tileKnowledge.Add(new TileLocation(neighbor.Item1, neighbor.Item2));
 				}
 			}
@@ -288,9 +288,9 @@ namespace C7GameData {
 		}
 
 		static (int, int) GetMapCoordinates(int tileIndex, int mapWidth) {
-			int y = tileIndex / (mapWidth / 2);
-			int x = tileIndex % (mapWidth / 2) * 2 + (y % 2);
-			return (x, y);
+			int Y = tileIndex / (mapWidth / 2);
+			int X = tileIndex % (mapWidth / 2) * 2 + (Y % 2);
+			return (X, Y);
 		}
 
 		private Dictionary<int, Resource> ImportCiv3Resources() {

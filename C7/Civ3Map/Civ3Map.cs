@@ -47,14 +47,14 @@ public partial class Civ3Map : Node2D {
 				// If tile media file not loaded yet
 				if (TileIDLookup[tile.ExtraInfo.BaseTerrainFileID, 1] == 0) { LoadTileSet(tile.ExtraInfo.BaseTerrainFileID); }
 				// var _ = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID, tile.ExtraInfo.BaseTerrainImageID];
-				Map[tile.xCoordinate, tile.yCoordinate] = 0;
-				Map[tile.xCoordinate, tile.yCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID, tile.ExtraInfo.BaseTerrainImageID];
+				Map[tile.XCoordinate, tile.YCoordinate] = 0;
+				Map[tile.XCoordinate, tile.YCoordinate] = TileIDLookup[tile.ExtraInfo.BaseTerrainFileID, tile.ExtraInfo.BaseTerrainImageID];
 			}
 		}
 		/* This code sets the tiles for display, but that is being done by MapView now
-		for (int y = 0; y < MapHeight; y++) {
-			for (int x = y % 2; x < MapWidth; x+=2) {
-				TM.SetCellv(new Vector2(x, y), Map[x,y]);
+		for (int Y = 0; Y < MapHeight; Y++) {
+			for (int X = Y % 2; X < MapWidth; X+=2) {
+				TM.SetCellv(new Vector2(X, Y), Map[X,Y]);
 			}
 		}
 		AddChild(TM);
