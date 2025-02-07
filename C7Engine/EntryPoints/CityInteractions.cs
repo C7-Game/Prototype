@@ -5,7 +5,7 @@ namespace C7Engine {
 	using C7GameData;
 
 	public class CityInteractions {
-		public static void BuildCity(int X, int Y, ID playerID, string name) {
+		public static City BuildCity(int X, int Y, ID playerID, string name) {
 			GameData gameData = EngineStorage.gameData;
 			Player owner = gameData.GetPlayer(playerID);
 			Tile tileWithNewCity = gameData.map.tileAt(X, Y);
