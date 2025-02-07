@@ -24,8 +24,10 @@ namespace C7Engine {
 			// a city is build on a mine, the mine should be removed.
 			tileWithNewCity.overlays.road = true;
 			tileWithNewCity.overlays.mine = false;
+			tileWithNewCity.overlays.irrigation = false;
 
 			gameData.UpdateTileOwners();
+			return newCity;
 		}
 
 		public static void DestroyCity(int X, int Y) {

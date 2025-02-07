@@ -152,7 +152,7 @@ public partial class LowerRightInfoBox : TextureRect {
 	}
 
 	public void UpdateTechProgress(string techName, int turnsRemaining) {
-		if (turnsRemaining > 0) {
+		if (turnsRemaining >= int.MaxValue) {
 			SetTextAndCenterLabel(scienceProgress, $"{techName} (-- turns)");
 		} else {
 			SetTextAndCenterLabel(scienceProgress, $"{techName} ({turnsRemaining} turns)");

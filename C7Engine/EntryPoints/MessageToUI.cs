@@ -42,6 +42,8 @@ namespace C7Engine {
 
 	public class MsgUpdateUiAfterTechSelection : MessageToUI { }
 
+	public class MsgUpdateUiAfterSliderChange : MessageToUI { }
+
 	public class MsgCityDestroyed : MessageToUI {
 		public City city;
 
@@ -50,4 +52,11 @@ namespace C7Engine {
 		}
 	}
 
+	public class MsgCityCreated : MessageToUI {
+		public City city;
+
+		public MsgCityCreated(City city) {
+			this.city = city;
+		}
+	}
 }

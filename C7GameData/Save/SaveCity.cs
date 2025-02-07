@@ -6,8 +6,8 @@ namespace C7GameData.Save {
 		public TileLocation tileWorked;
 	}
 
-	public class SaveCity {
-		public ID id;
+	public class SaveCity : IHasID {
+		public ID id { get; set; }
 		public ID owner;
 		public bool capital;
 		public TileLocation location;

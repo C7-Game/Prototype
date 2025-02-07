@@ -28,8 +28,23 @@ namespace C7GameData.Save {
 
 		public int turnsUntilPriorityReevaluation = 0;
 
+		// The values of the science/happiness/tax sliders (tax is implicit)
+		// A value of 1 => 10%, a value of 10 => 100%.
+		//
+		// INVARIANT: LuxuryRate + ScienceRate + TaxRate = 10
+		public int luxuryRate = 0;
+		public int scienceRate = 5;
+		public int taxRate = 5;
+
 		// The amount of gold this player has.
 		public int gold = 0;
+
+		// The number of "beakers" (gold) spent on the currently researched
+		// tech.
+		public int beakers = 0;
+
+		// The number of turns the player has been researching the current tech.
+		public int turnsResearched = 0;
 
 		public Player ToPlayer(GameMap map, List<Civilization> civilizations) {
 			Player player = new Player{
@@ -42,8 +57,10 @@ namespace C7GameData.Save {
 				cityNameIndex = cityNameIndex,
 				tileKnowledge = new TileKnowledge(),
 				knownTechs = knownTechs,
-				currentlyResearchedTech = currentlyResearchedTech,
 				eraCivilopediaName = eraCivilopediaName,
+				luxuryRate = luxuryRate,
+				scienceRate = scienceRate,
+				taxRate = taxRate,
 				gold = gold,
 			};
 			foreach (TileLocation tile in tileKnowledge) {
@@ -54,6 +71,14 @@ namespace C7GameData.Save {
 					player.knownTechs.Add(techId);
 				}
 			}
+
+			// Because of the custom setter we need to set the researched tech
+			// and then set the beakers and turns researched - otherwise they'd
+			// be reset by the setter.
+			player.SetCurrentlyResearchedTech(currentlyResearchedTech);
+			player.beakers = beakers;
+			player.turnsResearched = turnsResearched;
+
 			return player;
 		}
 
@@ -74,7 +99,12 @@ namespace C7GameData.Save {
 			knownTechs = player.knownTechs;
 			currentlyResearchedTech = player.currentlyResearchedTech;
 			eraCivilopediaName = player.eraCivilopediaName;
+			luxuryRate = player.luxuryRate;
+			scienceRate = player.scienceRate;
+			taxRate = player.taxRate;
 			gold = player.gold;
+			beakers = player.beakers;
+			turnsResearched = player.turnsResearched;
 		}
 	}
 }

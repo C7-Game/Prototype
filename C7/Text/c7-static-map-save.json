@@ -61525,7 +61525,12 @@
       "civilization": "A Barbarian Chiefdom",
       "cityNameIndex": 0,
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     },
     {
       "id": "player-2",
@@ -61595,7 +61600,12 @@
       ],
       "eraCivilopediaName": "ERAS_Ancient_Times",
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     },
     {
       "id": "player-3",
@@ -61665,7 +61675,12 @@
       ],
       "eraCivilopediaName": "ERAS_Ancient_Times",
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     },
     {
       "id": "player-4",
@@ -61731,7 +61746,12 @@
       ],
       "eraCivilopediaName": "ERAS_Ancient_Times",
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     },
     {
       "id": "player-5",
@@ -61801,7 +61821,12 @@
       ],
       "eraCivilopediaName": "ERAS_Ancient_Times",
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     },
     {
       "id": "player-6",
@@ -61875,7 +61900,12 @@
       ],
       "eraCivilopediaName": "ERAS_Ancient_Times",
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     },
     {
       "id": "player-7",
@@ -61945,7 +61975,12 @@
       ],
       "eraCivilopediaName": "ERAS_Ancient_Times",
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     },
     {
       "id": "player-8",
@@ -62011,7 +62046,12 @@
       ],
       "eraCivilopediaName": "ERAS_Ancient_Times",
       "turnsUntilPriorityReevaluation": 0,
-      "gold": 10
+      "luxuryRate": 0,
+      "scienceRate": 5,
+      "taxRate": 5,
+      "gold": 10,
+      "beakers": 0,
+      "turnsResearched": 0
     }
   ],
   "barbarianInfo": {

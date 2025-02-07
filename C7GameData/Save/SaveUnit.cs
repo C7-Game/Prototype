@@ -3,8 +3,8 @@ using System.Linq;
 
 namespace C7GameData.Save {
 
-	public class SaveUnit {
-		public ID id;
+	public class SaveUnit : IHasID {
+		public ID id { get; set; }
 		public string prototype;
 		public ID owner;
 		public TileLocation previousLocation = new TileLocation();

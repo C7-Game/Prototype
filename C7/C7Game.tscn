@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://UIElements/Popups/PopupOverlay.cs" id="9"]
 [ext_resource type="Theme" uid="uid://c1jpmssnhvodi" path="res://C7Theme.tres" id="10"]
 [ext_resource type="Script" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
+[ext_resource type="Script" path="res://UIElements/CityScreen/CityScreen.cs" id="13"]
 
 [sub_resource type="Animation" id="2"]
 length = 0.001
@@ -58,12 +59,14 @@ _data = {
 "SlideOutAnimation": SubResource("1")
 }
 
-[node name="C7Game" type="Node2D" node_paths=PackedStringArray("Toolbar", "popupOverlay", "slider", "animationPlayer")]
+[node name="C7Game" type="Node2D" node_paths=PackedStringArray("Toolbar", "popupOverlay", "slider", "animationPlayer", "cityScreen", "advisor")]
 script = ExtResource("1")
 Toolbar = NodePath("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer")
 popupOverlay = NodePath("CanvasLayer/PopupOverlay")
 slider = NodePath("CanvasLayer/Control/SlideOutBar/VBoxContainer/Zoom")
 animationPlayer = NodePath("CanvasLayer/Control/SlideOutBar/AnimationPlayer")
+cityScreen = NodePath("CanvasLayer/CityScreen")
+advisor = NodePath("CanvasLayer/Advisor")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -252,11 +255,21 @@ grow_vertical = 2
 theme = ExtResource("10")
 script = ExtResource("3")
 
+[node name="CityScreen" type="CenterContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("10")
+script = ExtResource("13")
+
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/Control/GameStatus" method="OnNewUnitSelected"]
 [connection signal="NewAutoselectedUnit" from="." to="CanvasLayer/Control/UnitButtons" method="OnNewUnitSelected"]
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/GameStatus" method="OnNoMoreAutoselectableUnits"]
 [connection signal="NoMoreAutoselectableUnits" from="." to="CanvasLayer/Control/UnitButtons" method="OnNoMoreAutoselectableUnits"]
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
+[connection signal="ShowCityScreen" from="." to="CanvasLayer/CityScreen" method="OnShowCityScreen"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnEnded"]
 [connection signal="TurnStarted" from="." to="CanvasLayer/Control/GameStatus" method="OnTurnStarted"]
 [connection signal="UpdateTechProgress" from="." to="CanvasLayer/Control/GameStatus" method="OnUpdateTechProgress"]
