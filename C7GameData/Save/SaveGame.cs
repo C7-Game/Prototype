@@ -94,6 +94,7 @@ namespace C7GameData.Save {
 				unitPrototypes = UnitPrototypes.ToDictionary(up => up.name),
 				scenarioSearchPath = ScenarioSearchPath,
 				civilizations = Civilizations,
+				ids = new ID.Factory(this),
 			};
 			// units and cities are empty
 			data.map = Map.ToGameMap(data);

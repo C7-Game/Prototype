@@ -3,6 +3,7 @@ using C7Engine.AI;
 using Serilog;
 
 namespace C7Engine {
+	using System;
 	using C7GameData;
 
 	public class TurnHandling {
@@ -40,10 +41,30 @@ namespace C7Engine {
 				UnitInteractions.ClearWaitQueue();
 
 				SpawnBarbarians(gameData);
+
+				// TODO: Should we be iterating over players, and then over each
+				// player's city, instead of over all cities, irrespective of
+				// player order? See also https://github.com/C7-Game/Prototype/pull/529#discussion_r1935006632
 				HandleCityResults(gameData);
 				gameData.UpdateTileOwners();
 
 				gameData.turn++;
+				foreach (Player player in gameData.players) {
+					// TODO: This isn't quite accurate. This should only be
+					// incremented if the player is actually spending money on
+					// research, or has a science specialist.
+					player.turnsResearched++;
+
+					// Check to see if the player has finished researching their
+					// tech, and if they have, add it to the list of known techs
+					if (player.currentlyResearchedTech != null) {
+						Tech tech = gameData.techs.Find(x => x.id == player.currentlyResearchedTech);
+						if (player.EstimateTurnsToResearch(tech) <= 0) {
+							player.knownTechs.Add(player.currentlyResearchedTech);
+							player.SetCurrentlyResearchedTech(null);
+						}
+					}
+				}
 				OnBeginTurn();
 			}
 		}
@@ -160,7 +181,8 @@ namespace C7Engine {
 					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
 				}
 
-				city.owner.gold += city.CurrentCommerceYield();
+				city.owner.gold += (int)Math.Floor(city.CurrentCommerceYield() * city.owner.taxRate / 10.0);
+				city.owner.beakers += (int)Math.Floor(city.CurrentCommerceYield() * city.owner.scienceRate / 10.0);
 			}
 		}
 

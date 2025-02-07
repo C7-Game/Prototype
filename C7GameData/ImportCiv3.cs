@@ -23,13 +23,13 @@ namespace C7GameData {
 		private BiqData defaultBiq;
 		private SavData savData;
 		private PediaIcons pediaIcons;
-		private readonly IDFactory ids;
+		private readonly ID.Factory ids;
 
 		private static ILogger log = Log.ForContext<ImportCiv3>();
 
 		private ImportCiv3() {
 			save = new SaveGame();
-			ids = new IDFactory();
+			ids = new ID.Factory();
 		}
 
 		/// <summary>
@@ -372,6 +372,12 @@ namespace C7GameData {
 				// Give the correct amount of starting gold.
 				player.gold = lead.StartCash;
 
+				// The game starts out with 50% on the science slider and 0% on
+				// the luxury slider.
+				player.scienceRate = 5;
+				player.taxRate = 5;
+				player.luxuryRate = 0;
+
 				// Add the starting techs for scenarios.
 				if (theBiq.LeadTech != null) {
 					for (int j = 0; j < theBiq.LeadTech[leadIndex].Length; ++j) {
@@ -416,6 +422,11 @@ namespace C7GameData {
 				}
 
 				player.gold = leader.Gold;
+				player.beakers = leader.Beakers;
+				player.turnsResearched = leader.TurnsResearched;
+				player.scienceRate = leader.ScienceRate;
+				player.luxuryRate = leader.LuxuryRate;
+				player.taxRate = leader.TaxRate;
 
 				save.Players.Add(player);
 				i++;

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using Serilog;
 
 namespace C7GameData {
@@ -10,7 +9,7 @@ namespace C7GameData {
 		public int seed = -1;   //change here to set a hard-coded seed
 		public int turn { get; set; }
 		public static Random rng; // TODO: Is GameData really the place for this?
-		public IDFactory ids { get; private set; } = new IDFactory();
+		public ID.Factory ids = new();
 		public GameMap map { get; set; }
 		public List<Player> players = new List<Player>();
 		public List<TerrainType> terrainTypes = new List<TerrainType>();

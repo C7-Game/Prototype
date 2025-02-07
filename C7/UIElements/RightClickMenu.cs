@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using C7GameData;
 using C7Engine;
+using System;
 
 public partial class RightClickMenu : VBoxContainer {
 	protected Game game;
@@ -151,6 +152,10 @@ public partial class RightClickTileMenu : RightClickMenu {
 				this.CloseAndDelete();
 				new RightClickChooseProductionMenu(game, tile.cityAtTile).Open(this.position);
 			});
+			AddItem("Zoom to city", () => {
+				this.CloseAndDelete();
+				game.ShowCityScreenForCity(tile.cityAtTile);
+			});
 		}
 
 		// If we're looking at an enemy tile, then the behavior depends on whether the units
@@ -223,6 +228,10 @@ public partial class RightClickCityMenu : RightClickMenu {
 				// Close the first menu before opening the second menu.
 				this.CloseAndDelete();
 				new RightClickChooseProductionMenu(game, tile.cityAtTile).Open(this.position);
+			});
+			AddItem("Zoom to city", () => {
+				this.CloseAndDelete();
+				game.ShowCityScreenForCity(tile.cityAtTile);
 			});
 		}
 	}

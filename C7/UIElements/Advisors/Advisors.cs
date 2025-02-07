@@ -44,13 +44,14 @@ public partial class Advisors : CenterContainer {
 		}
 
 		if (advisorType.Equals("F1")) {
-			if (domesticAdvisor == null) {
-				domesticAdvisor = new DomesticAdvisor();
-				advisors.Add(domesticAdvisor);
-				AddChild(domesticAdvisor);
-			} else {
-				domesticAdvisor.Show();
+			if (domesticAdvisor != null) {
+				RemoveChild(domesticAdvisor);
+				domesticAdvisor = null;
 			}
+
+			domesticAdvisor = new DomesticAdvisor();
+			advisors.Add(domesticAdvisor);
+			AddChild(domesticAdvisor);
 			this.Show();
 		}
 		if (advisorType.Equals("F6")) {
@@ -65,25 +66,6 @@ public partial class Advisors : CenterContainer {
 			advisors.Add(scienceAdvisor);
 			AddChild(scienceAdvisor);
 			this.Show();
-		}
-	}
-
-	public override void _UnhandledInput(InputEvent @event) {
-		if (this.Visible) {
-			if (@event is InputEventKey eventKey) {
-				//As I've added more shortcuts, I've realized checking all of them here could be irksome.
-				//For now, I'm thinking it would make more sense to process or allow through the ones that should go through,
-				//as most of the global ones should *not* go through here.
-				if (eventKey.Pressed) {
-					if (eventKey.Keycode == Godot.Key.Escape) {
-						this.Hide();
-						GetViewport().SetInputAsHandled();
-					} else {
-						log.Debug("Advisor received a key press; stopping propagation.");
-						GetViewport().SetInputAsHandled();
-					}
-				}
-			}
 		}
 	}
 }

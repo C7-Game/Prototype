@@ -420,21 +420,23 @@ namespace C7Engine {
 			return unit.location.neighbors.Values.All(tile => !tile.HasCity);
 		}
 
-		public static void buildCity(this MapUnit unit, string cityName) {
+		public static City? buildCity(this MapUnit unit, string cityName) {
 			if (!unit.canBuildCity()) {
 				log.Warning($"can't build city at {unit.location}");
-				return;
+				return null;
 			}
 
 			unit.animate(MapUnit.AnimatedAction.BUILD, true);
 
 			// TODO: Need to check somewhere that this unit is allowed to build a city on its current tile. Either do that here or in every caller
 			// (probably best to just do it here).
-			CityInteractions.BuildCity(unit.location.XCoordinate, unit.location.YCoordinate, unit.owner.id, cityName);
+			City city = CityInteractions.BuildCity(unit.location.XCoordinate, unit.location.YCoordinate, unit.owner.id, cityName);
 
 			// TODO: Should directly delete the unit instead of disbanding it. Disbanding in a city will eventually award shields, which we
 			// obviously don't want to do here.
 			unit.disband();
+
+			return city;
 		}
 
 		public static bool canBuildRoad(this MapUnit unit) {
@@ -485,7 +487,7 @@ namespace C7Engine {
 				unit.location.overlays.mine ||
 				unit.location.overlays.irrigation ||
 				unit.location.cityAtTile != null) {
-					return false;
+				return false;
 			}
 
 			// If a tile borders a river, it has fresh water access.

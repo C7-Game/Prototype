@@ -149,8 +149,69 @@ namespace C7Engine {
 			}
 
 			// Start researching this tech and update the UI.
-			player.currentlyResearchedTech = requestedTech.id;
+			player.SetCurrentlyResearchedTech(requestedTech.id);
 			new MsgUpdateUiAfterTechSelection().send();
+		}
+	}
+
+	public class MsgChangeSliders : MessageToEngine {
+		private bool moreScience;
+		private bool lessScience;
+		private bool moreLuxury;
+		private bool lessLuxury;
+
+		public MsgChangeSliders(bool moreScience, bool lessScience, bool moreLuxury, bool lessLuxury) {
+			this.moreScience = moreScience;
+			this.lessScience = lessScience;
+			this.moreLuxury = moreLuxury;
+			this.lessLuxury = lessLuxury;
+		}
+
+		public override void process() {
+			Player player = EngineStorage.gameData.GetHumanPlayers()[0];
+
+			if (moreScience && player.scienceRate == 10 || lessScience && player.scienceRate == 0) {
+				return;
+			}
+			if (moreLuxury && player.luxuryRate == 10 || lessLuxury && player.luxuryRate == 0) {
+				return;
+			}
+
+			// Increase our science rate, taking away from tax rate if we can,
+			// otherwise decrease the luxury rate.
+			if (moreScience) {
+				player.scienceRate++;
+				if (player.taxRate > 0) {
+					player.taxRate--;
+				} else {
+					player.luxuryRate--;
+				}
+			}
+
+			// Ditto for luxury.
+			if (moreLuxury) {
+				player.luxuryRate++;
+				if (player.taxRate > 0) {
+					player.taxRate--;
+				} else {
+					player.scienceRate--;
+				}
+			}
+
+			// Decreasing is easier, we decrease the requested slider and bump
+			// up the tax rate.
+			if (lessScience) {
+				player.scienceRate--;
+				player.taxRate++;
+			}
+
+			if (lessLuxury) {
+				player.luxuryRate--;
+				player.taxRate++;
+			}
+
+			// Update the ui to reflect our changes.
+			new MsgUpdateUiAfterSliderChange().send();
 		}
 	}
 
