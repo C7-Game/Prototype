@@ -11,6 +11,9 @@ namespace C7GameData.Save {
 
 		public SaveTile(Tile tile) {
 			id = tile.Id;
+			if (tile.owner != null) {
+				owner = tile.owner.id;
+			}
 			extraInfo = tile.ExtraInfo;
 			X = tile.XCoordinate;
 			Y = tile.YCoordinate;
@@ -84,6 +87,7 @@ namespace C7GameData.Save {
 		public Civ3ExtraInfo extraInfo;
 
 		public ID id;
+		public ID owner;
 		public int X;
 		public int Y;
 		[JsonRequired]

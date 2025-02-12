@@ -125,6 +125,13 @@ namespace C7GameData.Save {
 			// add references to map tiles after units and cities are defined
 			populateGameDataTileUnitsAndCities(data);
 
+			// Add references to tile owners once players are defined.
+			foreach (SaveTile st in Map.tiles) {
+				if (st.owner != null) {
+					data.map.tileAt(st.X, st.Y).owner = data.players.Find(x => x.id == st.owner);
+				}
+			}
+
 			// Fill in the list of techs and then backfill the prereqs.
 			//
 			// This is an N^2 approach, but doing a topological sort of the

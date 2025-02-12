@@ -93,6 +93,9 @@ namespace C7GameData {
 					baseTerrain = save.TerrainTypes[civ3Tile.BaseTerrain].Key,
 					overlayTerrain = save.TerrainTypes[civ3Tile.OverlayTerrain].Key,
 				};
+				if (civ3Tile.Owner > 0) {
+					tile.owner = save.Players[(int)civ3Tile.Owner].id;
+				}
 				if (civ3Tile.BonusShield) {
 					tile.features.Add("bonusShield");
 				}
