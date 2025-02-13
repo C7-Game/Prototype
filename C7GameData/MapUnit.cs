@@ -39,6 +39,9 @@ namespace C7GameData {
 
 		public TileDirection facingDirection;
 
+		public int WorkerProgressTowardsJob { get; set; }
+		public string WorkerJob { get; set; }
+
 		[JsonIgnore]
 		public List<string> availableActions = new List<string>();
 		public UnitAIData currentAIData;

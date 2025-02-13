@@ -46,6 +46,8 @@ namespace C7GameData {
 			instance.unitType = this;
 			instance.hitPointsRemaining = 3;    //todo: make this configurable
 			instance.movementPoints.reset(movement);
+			instance.WorkerProgressTowardsJob = 0;
+
 			return instance;
 		}
 	}
