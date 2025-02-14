@@ -84,8 +84,10 @@ namespace C7Engine {
 					continue;
 				}
 
-				if (currentWorkerJob.Equals(unit.WorkerJob) && unit.movementPoints.canMove) {
-					unit.updateWorkerJob();
+				if (currentWorkerJob.Equals(unit.WorkerJob)) {
+					if (unit.movementPoints.canMove) {
+						unit.updateWorkerJob();
+					}
 					totalProgress += unit.WorkerProgressTowardsJob;
 				} else {
 					// reset Unit working on other jobs
