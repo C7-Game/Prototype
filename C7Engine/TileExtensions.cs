@@ -68,6 +68,37 @@ namespace C7Engine {
 			}
 			return totalProgress;
 		}
+		/// <summary>
+		/// After a new WorkerJob has started, checks for workers working on different jobs and resets them
+		/// </summary>
+		/// <param name="tile">the current tile</param>
+		/// <param name="currentWorkerJob">the worker job currently started</param>
+		public static void UpdateAllWorkerJobs(this Tile tile, string currentWorkerJob) {
+			if (currentWorkerJob == null) {
+				Log.Error($"can't call method FinishWorkerJob without WorkerJob");
+				return;
+			}
+			int totalProgress = 0;
+			foreach (MapUnit unit in tile.unitsOnTile) {
+				if (unit.WorkerJob == null) {
+					continue;
+				}
+
+				if (currentWorkerJob.Equals(unit.WorkerJob) && unit.movementPoints.canMove) {
+					unit.updateWorkerJob();
+					totalProgress += unit.WorkerProgressTowardsJob;
+				} else {
+					// reset Unit working on other jobs
+					Log.Error($"Workers working om different WorkerJobs on the same tile");
+					unit.WorkerJob = null;
+					unit.WorkerProgressTowardsJob = 0;
+				}
+			}
+			if (totalProgress >= MapUnitExtensions.JOB_COST_IRRIGATION) {
+				tile.FinishWorkerJob(currentWorkerJob);
+			}
+
+		}
 
 		/// <summary>
 		/// After a WorkerJob has finished, Clean up all the WorkerJobs and set the correct overlay

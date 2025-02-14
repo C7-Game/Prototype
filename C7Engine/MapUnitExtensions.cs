@@ -14,7 +14,7 @@ namespace C7Engine {
 		private static ILogger log = Log.ForContext<MapUnit>();
 
 		// TODO: Read from scenario info
-		private const int JOB_COST_IRRIGATION = 2;
+		public const int JOB_COST_IRRIGATION = 8;
 		private const int JOB_PROGRESS_WORKER = 2;
 		private const int JOB_PROGRESS_SLAVE = 1;
 
@@ -533,16 +533,20 @@ namespace C7Engine {
 			}
 
 			// TODO add animation and long process of building
-			unit.WorkerProgressTowardsJob += JOB_PROGRESS_WORKER;
 			unit.WorkerJob = C7Action.UnitIrrigate;
-			unit.movementPoints.onConsumeAll();
+			unit.updateWorkerJob();
 
-			int totalprogress = unit.location.AddTotalProgressAndResetOtherJobs(unit.WorkerJob);
+			int totalProgress = unit.location.AddTotalProgressAndResetOtherJobs(unit.WorkerJob);
 
-			if (totalprogress >= JOB_COST_IRRIGATION) {
+			if (totalProgress >= JOB_COST_IRRIGATION) {
 				unit.location.FinishWorkerJob(unit.WorkerJob);
 			}
 
+		}
+
+		public static void updateWorkerJob(this MapUnit unit) {
+			unit.WorkerProgressTowardsJob += JOB_PROGRESS_WORKER;
+			unit.movementPoints.onConsumeAll();
 		}
 
 	}

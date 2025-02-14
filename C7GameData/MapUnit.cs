@@ -53,7 +53,7 @@ namespace C7GameData {
 		internal MapUnit() { }
 
 		public bool IsBusy() {
-			return isFortified || (path != null && path.PathLength() > 0);
+			return isFortified || (path != null && path.PathLength() > 0) || WorkerJob != null;
 		}
 
 		public bool IsLandUnit() {
