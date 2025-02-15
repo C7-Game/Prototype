@@ -14,10 +14,12 @@ public partial class CityScreen : CenterContainer {
 	private ILogger log = LogManager.ForContext<CityScreen>();
 	public TileAssignmentLayer tileAssignmentLayer;
 	public MapView mapView;
+	private TextureRect background;
+	private List<TextureButton> popHeads = new();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
-		TextureRect background = new() {
+		background = new() {
 			Texture = Util.LoadTextureFromPCX("Art/city screen/background.pcx")
 		};
 		AddChild(background);
@@ -48,7 +50,8 @@ public partial class CityScreen : CenterContainer {
 					using (UIGameDataAccess gameDataAccess = new()) {
 						Tile tile = mapView.tileOnScreenAt(gameDataAccess.gameData.map, eventMouseButton.Position);
 						if (tile != null) {
-							HandleReassignment(tile);
+							HandleReassignment(tile, gameDataAccess.gameData.citizenTypes);
+							RenderPopHeads(tileAssignmentLayer.city);
 						}
 					}
 				}
@@ -56,7 +59,7 @@ public partial class CityScreen : CenterContainer {
 		}
 	}
 
-	private void HandleReassignment(Tile tile) {
+	private void HandleReassignment(Tile tile, List<CitizenType> citizenTypes) {
 		City city = tileAssignmentLayer.city;
 
 		// We can't assign citizens to other cities.
@@ -99,6 +102,7 @@ public partial class CityScreen : CenterContainer {
 			worst.tileWorked.personWorkingTile = null;
 			worst.tileWorked = tile;
 			tile.personWorkingTile = worst;
+			worst.citizenType = citizenTypes.Find(x => x.IsDefaultCitizen);
 			return;
 		}
 
@@ -112,6 +116,7 @@ public partial class CityScreen : CenterContainer {
 
 			for (int i = 0; i < numResidents; ++i) {
 				CityResident newResident = new() {
+					citizenType = citizenTypes.Find(x => x.IsDefaultCitizen),
 					nationality = city.owner.civilization,
 					city = city
 				};
@@ -128,5 +133,91 @@ public partial class CityScreen : CenterContainer {
 	private void OnShowCityScreen(ParameterWrapper<City> city) {
 		this.Show();
 		tileAssignmentLayer.city = city.Value;
+		RenderPopHeads(city.Value);
+	}
+
+	private void RenderPopHeads(City city) {
+		// Reset any old heads.
+		foreach (TextureButton head in popHeads) {
+			background.RemoveChild(head);
+			head.QueueFree();
+		}
+		popHeads.Clear();
+
+		int eraNum = 0;
+		if (city.owner.eraCivilopediaName == "ERAS_Ancient_Times") {
+			eraNum = 0;
+		} else if (city.owner.eraCivilopediaName == "ERAS_Middle_Ages") {
+			eraNum = 1;
+		} else if (city.owner.eraCivilopediaName == "ERAS_Industrial_Age") {
+			eraNum = 2;
+		} else if (city.owner.eraCivilopediaName == "ERAS_Modern_Era") {
+			eraNum = 3;
+		}
+
+		// The pop head textures are 50 x 50, but have a 1px border on all sides
+		//
+		// The texture file has 16 rows of the default citizen, in groups of 4
+		// per era (content, happy, resisting, unhappy). There are 10 columns,
+		// the first 5 are male heads of different regions for civs, the other 5
+		// are female heads.
+		//
+		// After the 16 rows of default citizens there is one row per specialist
+		// type, and again 10 columns per row. This time they are
+		// (ancient, middle, industrial, modern, blank) for male and female heads
+		//
+		// TODO: handle citizen moods
+		// TODO: handle per-civ regions
+		// TODO: handle male/female citizens
+
+		// Start by splitting the default residents from the specialists, since
+		// they are spaced apart in the UI.
+		List<CityResident> defaultResidents = city.residents.FindAll(x => x.citizenType.IsDefaultCitizen);
+		List<CityResident> specialists = city.residents.FindAll(x => !x.citizenType.IsDefaultCitizen);
+
+		// Each head is 48px, so leave a 1 head gap if we have specialists.
+		int width = city.residents.Count * 48;
+		if (specialists.Count > 0) {
+			width += 48;
+		}
+
+		// Track the x position of each head so that we're centered in the screen
+		int xPos = background.Texture.GetWidth() / 2 + -width / 2;
+
+		// Add each of the default citizens. These are buttons with the idea that
+		// we can eventually support clicking on the heads to view details, such
+		// as the reason for unhappiness.
+		foreach (CityResident cr in defaultResidents) {
+			TextureButton tb = new();
+			tb.TextureNormal = Util.LoadTextureFromPCX("Art/SmallHeads/popHeads.pcx",
+														0 + 1, 200 * eraNum + 1, 48, 48);
+			tb.SetPosition(new Vector2(xPos, 440));
+			background.AddChild(tb);
+			popHeads.Add(tb);
+			xPos += 48;
+		}
+
+		// Add space before specialists.
+		xPos += 48;
+
+		// Add each of the specialists.
+		//
+		// TODO: When clicking a specialist, have it iterate through the types
+		// of specialists known to the player.
+		//
+		// TODO: Render the specialist effect (like a smiley for entertainers)
+		// in the corner of the head.
+		foreach (CityResident cr in specialists) {
+			TextureButton tb = new();
+			int textX = 50 * eraNum;
+			int numRowsOfLaborers = 16;
+			int textY = 50 * numRowsOfLaborers + 50 * (cr.citizenType.SpecialistIndex - 1);
+			tb.TextureNormal = Util.LoadTextureFromPCX("Art/SmallHeads/popHeads.pcx",
+														textX + 1, textY + 1, 48, 48);
+			tb.SetPosition(new Vector2(xPos, 440));
+			background.AddChild(tb);
+			popHeads.Add(tb);
+			xPos += 48;
+		}
 	}
 }

@@ -64533,5 +64533,87 @@
         "tech-44"
       ]
     }
+  ],
+  "citizenTypes": [
+    {
+      "id": "CitizenType-1",
+      "isDefaultCitizen": true,
+      "specialistIndex": 0,
+      "singularName": "Laborer",
+      "civilopediaEntry": "CTZN_Laborer",
+      "pluralName": "Laborers",
+      "luxuries": 0,
+      "research": 0,
+      "taxes": 0,
+      "corruption": 0,
+      "construction": 0
+    },
+    {
+      "id": "CitizenType-2",
+      "isDefaultCitizen": false,
+      "specialistIndex": 1,
+      "singularName": "Entertainer",
+      "civilopediaEntry": "CTZN_Entertainer",
+      "pluralName": "Entertainers",
+      "luxuries": 1,
+      "research": 0,
+      "taxes": 0,
+      "corruption": 0,
+      "construction": 0
+    },
+    {
+      "id": "CitizenType-3",
+      "isDefaultCitizen": false,
+      "specialistIndex": 2,
+      "singularName": "Tax Collector",
+      "civilopediaEntry": "CTZN_Tax_Collector",
+      "pluralName": "Tax Collectors",
+      "luxuries": 0,
+      "research": 0,
+      "taxes": 2,
+      "corruption": 0,
+      "construction": 0
+    },
+    {
+      "id": "CitizenType-4",
+      "isDefaultCitizen": false,
+      "specialistIndex": 3,
+      "singularName": "Scientist",
+      "civilopediaEntry": "CTZN_Scientist",
+      "pluralName": "Scientists",
+      "luxuries": 0,
+      "research": 3,
+      "taxes": 0,
+      "corruption": 0,
+      "construction": 0
+    },
+    {
+      "id": "CitizenType-5",
+      "isDefaultCitizen": false,
+      "specialistIndex": 4,
+      "singularName": "Policeman",
+      "civilopediaEntry": "CTZN_Laborer",
+      "pluralName": "Policemen",
+      "prerequisiteTech": "tech-44",
+      "luxuries": 0,
+      "research": 0,
+      "taxes": 0,
+      "corruption": 1,
+      "construction": 0
+    },
+    {
+      "id": "CitizenType-6",
+      "isDefaultCitizen": false,
+      "specialistIndex": 5,
+      "singularName": "Civil Engineer",
+      "civilopediaEntry": "CTZN_Laborer",
+      "pluralName": "Civil Engineers",
+      "prerequisiteTech": "tech-58",
+      "luxuries": 0,
+      "research": 0,
+      "taxes": 0,
+      "corruption": 0,
+      "construction": 2
+    }
   ]
 }

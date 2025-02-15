@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace C7GameData.Save {
 	public class SaveCityResident {
+		public ID citizenType;
 		public string nationality;
 		public ID city;
 		public TileLocation tileWorked;
@@ -42,7 +43,7 @@ namespace C7GameData.Save {
 			});
 		}
 
-		public City ToCity(GameMap gameMap, List<Player> players, List<UnitPrototype> unitPrototypes, List<Civilization> civilizations) {
+		public City ToCity(GameMap gameMap, List<Player> players, List<UnitPrototype> unitPrototypes, List<Civilization> civilizations, List<CitizenType> citizenTypes) {
 			City city = new City{
 				id = id,
 				location = gameMap.tileAt(location.X, location.Y),
@@ -58,11 +59,17 @@ namespace C7GameData.Save {
 
 			city.residents = residents.ConvertAll(resident => {
 				return new CityResident {
+					citizenType = citizenTypes.Find(x => x.Id == resident.citizenType),
 					nationality = civilizations.Find(civ => civ.name == resident.nationality),
 					tileWorked = gameMap.tileAt(resident.tileWorked.X, resident.tileWorked.Y),
 					city = city,
 				};
 			});
+
+			// Fill in the back pointers.
+			foreach (CityResident cr in city.residents) {
+				cr.tileWorked.personWorkingTile = cr;
+			}
 			return city;
 		}
 	}

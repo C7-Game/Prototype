@@ -151,6 +151,7 @@ namespace C7Engine {
 					CityResident newResident = new CityResident();
 					newResident.nationality = city.owner.civilization;
 					newResident.city = city;
+					newResident.citizenType = gameData.citizenTypes.Find(x => x.IsDefaultCitizen);
 					CityTileAssignmentAI.AssignNewCitizenToTile(newResident);
 				} else if (newSize < initialSize) {
 					int diff = initialSize - newSize;

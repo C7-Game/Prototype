@@ -7,6 +7,8 @@ namespace QueryCiv3.Sav {
 		private fixed byte HeaderText[4];
 		public int Length;
 		private fixed byte UnknownBuffer[1];
+
+		// See ImportCiv3::GetTileFromSpiral for details on this field.
 		public byte TileWorked;
 
 		private fixed byte Text[262];

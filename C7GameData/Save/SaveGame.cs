@@ -72,6 +72,7 @@ namespace C7GameData.Save {
 			save.ScenarioSearchPath = data.scenarioSearchPath;
 			save.DefaultExperienceLevel = data.defaultExperienceLevelKey;
 			save.Techs = data.techs.ConvertAll(t => t.ToSaveTech());
+			save.CitizenTypes = data.citizenTypes;
 			return save;
 		}
 
@@ -94,6 +95,7 @@ namespace C7GameData.Save {
 				unitPrototypes = UnitPrototypes.ToDictionary(up => up.name),
 				scenarioSearchPath = ScenarioSearchPath,
 				civilizations = Civilizations,
+				citizenTypes = CitizenTypes,
 				ids = new ID.Factory(this),
 			};
 			// units and cities are empty
@@ -111,7 +113,7 @@ namespace C7GameData.Save {
 			});
 
 			// cities require game map for location and players for city owner
-			data.cities = Cities.ConvertAll(city => city.ToCity(data.map, data.players, UnitPrototypes, Civilizations));
+			data.cities = Cities.ConvertAll(city => city.ToCity(data.map, data.players, UnitPrototypes, Civilizations, CitizenTypes));
 
 			// Once cities are known, players can reference cities.
 			data.players.ForEach(player => {
@@ -198,6 +200,7 @@ namespace C7GameData.Save {
 		public List<StrengthBonus> StrengthBonuses = new List<StrengthBonus>();
 		public Dictionary<string, int> HealRates = new Dictionary<string, int>();
 		public List<SaveTech> Techs = new();
+		public List<CitizenType> CitizenTypes = new();
 		public string ScenarioSearchPath; // TODO: what is this
 		public void Save(string path) {
 			byte[] json = JsonSerializer.SerializeToUtf8Bytes(this, JsonOptions);

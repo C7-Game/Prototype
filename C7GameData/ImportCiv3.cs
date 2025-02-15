@@ -51,6 +51,7 @@ namespace C7GameData {
 			// save.ScenarioSearchPath = biq?.Game[0].ScenarioSearchFolders;
 			ImportBarbarianInfo();
 			ImportTechs();
+			ImportCitizenTypes();
 		}
 
 		public static SaveGame ImportSav(string savePath, string defaultBicPath, Func<string, string> getPediaIconsPath) {
@@ -245,8 +246,10 @@ namespace C7GameData {
 				}
 
 				// Some tiles are known ahead of time, like all of europe in age of
-				// discovery. Add those tiles ahead of time.
-				if (civ3Tile.FogOfWar != 0) {
+				// discovery. Other scenarios set the entire map to be visible.
+				//
+				// Add those tiles ahead of time.
+				if (civ3Tile.FogOfWar != 0 || biq.Game[0].MapVisible == 1) {
 					for (int playerIndex = 0; playerIndex < save.Players.Count; playerIndex++) {
 						SavePlayer player = save.Players[playerIndex];
 						player.tileKnowledge.Add(new TileLocation(X, Y));
@@ -514,8 +517,26 @@ namespace C7GameData {
 					shieldsStored = city.ShieldsCollected,
 					foodStored = city.TotalFood,
 					foodNeededToGrow = 20, // HACK: don't know where to find this
-					// residents = city.Ppod // TODO: load tiles worked from PPOD
 				};
+
+				foreach (QueryCiv3.Sav.CTZN ctzn in savData.CityCtzn[i]) {
+					if (ctzn.Type == 4) {  // Specialist
+						SaveCityResident scr = new();
+						scr.city = saveCity.id;
+						scr.nationality = save.Civilizations[ctzn.Nationality].name;
+						scr.citizenType = save.CitizenTypes.Find(x => x.SpecialistIndex == ctzn.SpecialistType).Id;
+						saveCity.residents.Add(scr);
+					} else if (ctzn.TileWorked == 0) {
+						// TODO: handle resistors
+					} else {
+						SaveCityResident scr = new();
+						scr.city = saveCity.id;
+						scr.tileWorked = GetTileFromSpiral(saveCity.location, ctzn.TileWorked);
+						scr.nationality = save.Civilizations[ctzn.Nationality].name;
+						scr.citizenType = save.CitizenTypes.Find(x => x.IsDefaultCitizen).Id;
+						saveCity.residents.Add(scr);
+					}
+				}
 				save.Cities.Add(saveCity);
 			}
 		}
@@ -540,8 +561,12 @@ namespace C7GameData {
 					shieldsStored = 0,
 					foodStored = 0,
 					foodNeededToGrow = 20, // HACK: don't know where to find this
-					// residents = city.Ppod // TODO: load tiles worked from PPOD
 				};
+
+				// TODO: figure out how residents are assigned in scenarios - is
+				// it just the default assignment? If so maybe we can just use
+				// our tile assignment ai.
+
 				save.Cities.Add(saveCity);
 			}
 		}
@@ -751,6 +776,35 @@ namespace C7GameData {
 			}
 		}
 
+		private void ImportCitizenTypes() {
+			BiqData theBiq = biq.Ctzn is null ? defaultBiq : biq;
+
+			for (int i = 0; i < theBiq.Ctzn.Length; ++i) {
+				CTZN c = theBiq.Ctzn[i];
+
+				CitizenType ct = new() {
+					Id = ids.CreateID("CitizenType"),
+					IsDefaultCitizen = c.DefaultCitizen == 1,
+					SingularName = c.SingularName,
+					CivilopediaEntry = c.CivilopediaEntry,
+					PluralName = c.PluralName,
+					Luxuries = c.Luxuries,
+					Research = c.Research,
+					Taxes = c.Taxes,
+					Corruption = c.Corruption,
+					Construction = c.Construction
+				};
+				if (!ct.IsDefaultCitizen) {
+					ct.SpecialistIndex = i;
+				}
+				if (c.Prerequisite > -1) {
+					ct.PrerequisiteTech = save.Techs[c.Prerequisite].id;
+				}
+
+				save.CitizenTypes.Add(ct);
+			}
+		}
+
 		private static void SetWorldWrap(SavData civ3Save, SaveGame save) {
 			if (civ3Save is not null && civ3Save.Wrld.Height > 0 && civ3Save.Wrld.Width > 0) {
 				save.Map.wrapHorizontally = civ3Save.Wrld.XWrapping;
@@ -777,6 +831,61 @@ namespace C7GameData {
 				save.Map.tilesTall = biq.Wmap[0].Height;
 				save.Map.tilesWide = biq.Wmap[0].Width;
 			}
+		}
+
+		// The position of citizens is encoded in a single byte as positions in
+		// a spiral around the city, starting with the NE tile and going
+		// clockwise. After the inner spiral, it continues with the top of the
+		// NE outer spiral. Here's a crude ASCII diagram of this.
+		//
+		//                      <   8  >
+		//                  <   7  ><   1  >
+		//              <   6  >< City ><   2  >
+		//                  <   5  ><   3  >
+		//                      <   4  >
+		//
+		//                  <  20  ><  9  >
+		//              <  19  >        <  10  >
+		//          <  18  >                <  11 >
+		//                      < City >
+		//          <  17  >                <  12  >
+		//              <  16  >        <  13  >
+		//                  <  15  ><  14  >
+		private static TileLocation GetTileFromSpiral(TileLocation start, int spiral) {
+			return spiral switch {
+				// Inner circle.
+				1 => Tile.NeighborCoordinate(start, TileDirection.NORTHEAST),
+				2 => Tile.NeighborCoordinate(start, TileDirection.EAST),
+				3 => Tile.NeighborCoordinate(start, TileDirection.SOUTHEAST),
+				4 => Tile.NeighborCoordinate(start, TileDirection.SOUTH),
+				5 => Tile.NeighborCoordinate(start, TileDirection.SOUTHWEST),
+				6 => Tile.NeighborCoordinate(start, TileDirection.WEST),
+				7 => Tile.NeighborCoordinate(start, TileDirection.NORTHWEST),
+				8 => Tile.NeighborCoordinate(start, TileDirection.NORTH),
+
+				// Outer circle, to the NE
+				9 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.NORTHEAST), TileDirection.NORTH),
+				10 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.NORTHEAST), TileDirection.NORTHEAST),
+				11 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.NORTHEAST), TileDirection.EAST),
+
+				// Outer circle, to the SE
+				12 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.SOUTHEAST), TileDirection.EAST),
+				13 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.SOUTHEAST), TileDirection.SOUTHEAST),
+				14 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.SOUTHEAST), TileDirection.SOUTH),
+
+				// Outer circle, to the SW
+				15 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.SOUTHWEST), TileDirection.SOUTH),
+				16 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.SOUTHWEST), TileDirection.SOUTHWEST),
+				17 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.SOUTHWEST), TileDirection.WEST),
+
+				// Outer circle, to the NW
+				18 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.NORTHWEST), TileDirection.WEST),
+				19 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.NORTHWEST), TileDirection.NORTHWEST),
+				20 => Tile.NeighborCoordinate(Tile.NeighborCoordinate(start, TileDirection.NORTHWEST), TileDirection.NORTH),
+
+				_ => throw new ArgumentOutOfRangeException("Invalid spiral value" + spiral),
+			};
+
 		}
 	}
 }

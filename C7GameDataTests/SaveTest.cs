@@ -80,14 +80,22 @@ public class SaveTests {
 
 	[Fact]
 	public async void LoadSampleSaves() {
+		// When running the tests via github actions, civ3 isn't installed so we
+		// can't load the default bic.
+		//
+		// See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
+		// for a full list of env vars.
+		string is_on_github = System.Environment.GetEnvironmentVariable("CI");
+		if (is_on_github != null) { return; }
+
 		string savesPath = getDataPath("saves");
 		Directory.CreateDirectory(savesPath);
 
-		string sampleSavPath = Path.Combine(testDirectory, "data", "12345.SAV");
+		string sampleSavPath = Path.Combine(savesPath, "12345.SAV");
 		if (GetMd5FileHash(sampleSavPath) != "d34dd19a76eaebe26d29d73132c2fa60") {
 			using HttpClient client = new();
 			byte[] fileData = await client.GetByteArrayAsync("https://drive.usercontent.google.com/download?id=1QlIavkLtPZEIv1kHK9sO0fY2yp3o2si7&confirm=y");
-			File.WriteAllBytes(Path.Combine(testDirectory, "data", "12345.SAV"), fileData);
+			File.WriteAllBytes(Path.Combine(savesPath, "12345.SAV"), fileData);
 		}
 
 		IEnumerable<FileInfo> saveFiles = new DirectoryInfo(savesPath).EnumerateFiles("*.SAV");
@@ -110,6 +118,7 @@ public class SaveTests {
 			game.Save(Path.Combine(testDirectory, "data", "output", $"gotm_save_{i}.json"));
 			i++;
 		}
+		Assert.True(i > 0);
 	}
 
 	[Fact]
