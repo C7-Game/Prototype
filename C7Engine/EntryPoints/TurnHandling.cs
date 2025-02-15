@@ -70,7 +70,6 @@ namespace C7Engine {
 			}
 		}
 
-
 		/// <summary>
 		/// Plays the turns for all the players in the game (including barbarians).
 		/// </summary>

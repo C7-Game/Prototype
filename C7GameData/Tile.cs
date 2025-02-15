@@ -251,7 +251,6 @@ namespace C7GameData {
 			}
 			return Tuple.Create(X, Y);
 		}
-
 	}
 
 	public enum TileDirection {

@@ -46,12 +46,9 @@ namespace C7Engine {
 		/// </summary>
 		/// <param name="tile">the current tile</param>
 		/// <param name="currentWorkerJob">the worker job currently started</param>
-		/// <returns>total progress towards that workerjob</returns>
+		/// <returns>total progress towards that workerjob, must not be null</returns>
 		public static int AddTotalProgressAndResetOtherJobs(this Tile tile, string currentWorkerJob) {
-			if (currentWorkerJob == null) {
-				Log.Error($"can't call method FinishWorkerJob without WorkerJob");
-				return 0;
-			}
+
 			int totalProgress = 0;
 			foreach (MapUnit unit in tile.unitsOnTile) {
 				if (unit.WorkerJob == null) {
@@ -68,23 +65,20 @@ namespace C7Engine {
 			}
 			return totalProgress;
 		}
+
 		/// <summary>
 		/// After a new WorkerJob has started, checks for workers working on different jobs and resets them
 		/// </summary>
 		/// <param name="tile">the current tile</param>
-		/// <param name="currentWorkerJob">the worker job currently started</param>
+		/// <param name="currentWorkerJob">the worker job currently started, nust not be null</param>
 		public static void UpdateAllWorkerJobs(this Tile tile, string currentWorkerJob) {
-			if (currentWorkerJob == null) {
-				Log.Error($"can't call method FinishWorkerJob without WorkerJob");
-				return;
-			}
 			int totalProgress = 0;
 			foreach (MapUnit unit in tile.unitsOnTile) {
 				if (unit.WorkerJob == null) {
 					continue;
 				}
 
-				if (currentWorkerJob.Equals(unit.WorkerJob)) {
+				if (currentWorkerJob==(unit.WorkerJob)) {
 					if (unit.movementPoints.canMove) {
 						unit.updateWorkerJob();
 					}
@@ -99,22 +93,17 @@ namespace C7Engine {
 			if (totalProgress >= MapUnitExtensions.JOB_COST_IRRIGATION) {
 				tile.FinishWorkerJob(currentWorkerJob);
 			}
-
 		}
 
 		/// <summary>
-		/// After a WorkerJob has finished, Clean up all the WorkerJobs and set the correct overlay
+		/// After a WorkerJob has finished, Cclean up all the WorkerJobs and set the correct overlay
 		/// </summary>
 		/// <param name="tile">the current tile</param>
-		/// <param name="currentWorkerJob">the worker job currently finished</param>
+		/// <param name="currentWorkerJob">the worker job currently finished, must not be null</param>
 		public static void FinishWorkerJob(this Tile tile, string currentWorkerJob) {
-			if (currentWorkerJob == null) {
-				Log.Error($"can't call method FinishWorkerJob without WorkerJob");
-				return;
-			}
 			// Reset All Workers working on the finished Job
 			foreach (MapUnit unit in tile.unitsOnTile) {
-				if (currentWorkerJob.Equals(unit.WorkerJob)) {
+				if (currentWorkerJob==(unit.WorkerJob)) {
 					unit.WorkerJob = null;
 					unit.WorkerProgressTowardsJob = 0;
 				}
@@ -125,7 +114,6 @@ namespace C7Engine {
 					tile.overlays.irrigation = true;
 					break;
 			}
-
 		}
 
 		public static void Animate(this Tile tile, AnimatedEffect effect, bool wait) {
