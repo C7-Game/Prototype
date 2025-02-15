@@ -3,6 +3,7 @@ namespace C7GameData {
 	using System.Text.Json.Serialization;
 	using System.Collections.Generic;
 	using System.Linq;
+	using C7GameData.Save;
 
 	public class Tile {
 		public ID Id { get; internal set; }
@@ -172,6 +173,7 @@ namespace C7GameData {
 			return (Math.Abs(other.XCoordinate - this.XCoordinate) + Math.Abs(other.YCoordinate - this.YCoordinate)) / 2;
 		}
 
+		// TODO: This is innacurate for city centers.
 		public int foodYield(Player player) {
 			int yield = overlayTerrainType.baseFoodProduction;
 			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
@@ -183,6 +185,7 @@ namespace C7GameData {
 			return yield;
 		}
 
+		// TODO: This is innacurate for city centers.
 		public int productionYield(Player player) {
 			int yield = overlayTerrainType.baseShieldProduction;
 			if (overlayTerrainType.Key == "grassland" && this.isBonusShield) {
@@ -197,6 +200,7 @@ namespace C7GameData {
 			return yield;
 		}
 
+		// TODO: This is innacurate for city centers.
 		public int commerceYield(Player player) {
 			int yield = overlayTerrainType.baseCommerceProduction;
 			if (this.Resource != Resource.NONE && player.KnowsAboutResource(Resource)) {
@@ -218,38 +222,38 @@ namespace C7GameData {
 		}
 
 		// Returns the X and Y coordinates of the neighbor in the specified direction.
-		public static Tuple<int, int> NeighborCoordinate(int X, int Y, TileDirection direction) {
+		public static TileLocation NeighborCoordinate(TileLocation location, TileDirection direction) {
 			switch (direction) {
 				case TileDirection.NORTH:
-					Y -= 2;
+					location.Y -= 2;
 					break;
 				case TileDirection.NORTHEAST:
-					Y--;
-					X++;
+					location.Y--;
+					location.X++;
 					break;
 				case TileDirection.EAST:
-					X += 2;
+					location.X += 2;
 					break;
 				case TileDirection.SOUTHEAST:
-					Y++;
-					X++;
+					location.Y++;
+					location.X++;
 					break;
 				case TileDirection.SOUTH:
-					Y += 2;
+					location.Y += 2;
 					break;
 				case TileDirection.SOUTHWEST:
-					Y++;
-					X--;
+					location.Y++;
+					location.X--;
 					break;
 				case TileDirection.WEST:
-					X -= 2;
+					location.X -= 2;
 					break;
 				case TileDirection.NORTHWEST:
-					X--;
-					Y--;
+					location.X--;
+					location.Y--;
 					break;
 			}
-			return Tuple.Create(X, Y);
+			return location;
 		}
 	}
 

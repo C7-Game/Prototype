@@ -551,7 +551,7 @@ public partial class MapView : Node2D {
 		set { setCameraZoomFromMiddle(value); }
 	}
 
-	private LooseView looseView;
+	private List<LooseView> looseViews = new();
 
 	// Specifies a rectangular block of tiles that are currently potentially on screen. Accessible through getVisibleRegion(). Tile coordinates
 	// are "virtual", i.e. "unwrapped", so there isn't necessarily a tile at each location. The region is intended to include the upper left
@@ -568,6 +568,7 @@ public partial class MapView : Node2D {
 
 	public GridLayer gridLayer { get; private set; }
 	public CityLayer cityLayer { get; private set; }
+	public TileAssignmentLayer tileAssignmentLayer { get; private set; }
 
 	public ImageTexture civColorWhitePalette = null;
 
@@ -578,34 +579,68 @@ public partial class MapView : Node2D {
 		this.wrapHorizontally = wrapHorizontally;
 		this.wrapVertically = wrapVertically;
 
-		looseView = new LooseView(this);
-		looseView.layers.Add(new TerrainLayer());
-		looseView.layers.Add(new RiverLayer());
-		looseView.layers.Add(new ForestLayer());
-		looseView.layers.Add(new MarshLayer());
-		looseView.layers.Add(new HillsLayer());
-		looseView.layers.Add(new TntLayer());
-		looseView.layers.Add(new TileOverlayLayer());
-		looseView.layers.Add(new ResourceLayer());
+		// Set up our set of views, and the layers within each view.
+		//
+		// The drawing order within a view matches the order of `layers`, so
+		// here borders will be drawn on top of the terrain.
+		//
+		// However, because cities and units use child nodes, we need separate
+		// LooseView objects to get the ordering correct between textures and
+		// nodes. Without this unit health bars (which are textures) would
+		// be drawn behind cities (which are child nodes).
+		LooseView terrainView = new(this);
+		terrainView.layers.Add(new TerrainLayer());
+		terrainView.layers.Add(new RiverLayer());
+		terrainView.layers.Add(new ForestLayer());
+		terrainView.layers.Add(new MarshLayer());
+		terrainView.layers.Add(new HillsLayer());
+		terrainView.layers.Add(new TntLayer());
+		terrainView.layers.Add(new TileOverlayLayer());
+		terrainView.layers.Add(new ResourceLayer());
 		this.gridLayer = new GridLayer();
-		looseView.layers.Add(this.gridLayer);
-		looseView.layers.Add(new BuildingLayer());
-		looseView.layers.Add(new BorderLayer());
-		looseView.layers.Add(new UnitLayer());
-		looseView.layers.Add(new GotoLayer());
+		terrainView.layers.Add(this.gridLayer);
+		terrainView.layers.Add(new BuildingLayer());
+		terrainView.layers.Add(new BorderLayer());
+
+		LooseView cityView = new(this);
 		this.cityLayer = new();
-		looseView.layers.Add(this.cityLayer);
-		looseView.layers.Add(new FogOfWarLayer());
+		cityView.layers.Add(this.cityLayer);
+
+		LooseView unitView = new(this);
+		unitView.layers.Add(new UnitLayer());
+		unitView.layers.Add(new GotoLayer());
+
+		LooseView tileAssignmentView = new(this);
+		this.tileAssignmentLayer = new();
+		tileAssignmentView.layers.Add(this.tileAssignmentLayer);
+
+		LooseView fogOfWarView = new(this);
+		fogOfWarView.layers.Add(new FogOfWarLayer());
 
 		(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
 
-		AddChild(looseView);
+		AddChild(terrainView);
+		looseViews.Add(terrainView);
+
+		AddChild(cityView);
+		looseViews.Add(cityView);
+
+		AddChild(unitView);
+		looseViews.Add(unitView);
+
+		AddChild(tileAssignmentView);
+		looseViews.Add(tileAssignmentView);
+
+		AddChild(fogOfWarView);
+		looseViews.Add(fogOfWarView);
 	}
 
 	public override void _Process(double delta) {
 		// Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but long term I think it's
 		// better to redraw everything every frame like a typical modern video game.
-		looseView.QueueRedraw();
+		foreach (LooseView looseView in looseViews) {
+			looseView.QueueRedraw();
+		}
 	}
 
 	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
@@ -631,7 +666,9 @@ public partial class MapView : Node2D {
 		Vector2 v2OldZoom = new Vector2(cameraZoom, cameraZoom);
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
-			looseView.Scale = v2NewZoom;
+			foreach (LooseView looseView in looseViews) {
+				looseView.Scale = v2NewZoom;
+			}
 			setCameraLocation((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
 		}
 	}
@@ -688,7 +725,9 @@ public partial class MapView : Node2D {
 		}
 
 		internalCameraLocation = location;
-		looseView.Position = -location;
+		foreach (LooseView looseView in looseViews) {
+			looseView.Position = -location;
+		}
 	}
 
 	public Vector2 screenLocationOfTileCoords(int X, int Y, bool center = true) {

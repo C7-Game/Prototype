@@ -12,9 +12,9 @@ public partial class UnitLayer : LooseLayer {
 
 	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
 	// any particular order so we must use the ZIndex property to ensure they're properly layered.
-	public const int effectAnimZIndex = 150;
-	public const int unitAnimZIndex = 100;
-	public const int cursorZIndex = 50;
+	public const int effectAnimZIndex = 1;
+	public const int unitAnimZIndex = 0;
+	public const int cursorZIndex = -1;
 
 	public UnitLayer() {
 		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));

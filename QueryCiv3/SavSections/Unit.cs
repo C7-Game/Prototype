@@ -24,13 +24,21 @@ namespace QueryCiv3.Sav {
 
 		public int Damage;
 		public int MovementUsed; // In thirds of a point
-		private fixed byte UnknownBuffer[4];
-		public int WorkerJob;
+
+		// The amount of progress the worker has made towards its job.
+		//
+		// This goes up by 2 each turn for a native worker, and 1 each turn for
+		// a foreign worker (configurable via PRTO::WorkerStrength).
+		public int WorkerProgressTowardsJob;
+		public int WorkerJob; // Index into TFRM, -1 if idle
 		private fixed byte UnknownBuffer2[4];
 		public int LoadedOnUnitId;
 
 		private fixed byte Flags2[12];
 		public bool Fortified { get => Util.GetFlag(Flags2[0], 0); }
+
+		// Note: this doesn't appear to correlate with whether a worker is
+		// performing an action - use `WorkerJob != -1` for that.
 		public bool Working { get => Util.GetFlag(Flags2[0], 3); }
 		public bool GoTo { get => Util.GetFlag(Flags2[0], 4); }
 

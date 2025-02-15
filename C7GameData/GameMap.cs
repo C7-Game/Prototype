@@ -1,6 +1,8 @@
 namespace C7GameData {
 	using System;
 	using System.Collections.Generic;
+	using C7GameData.Save;
+
 	/**
 	 * The game map, at the top level.
 	 */
@@ -117,9 +119,9 @@ namespace C7GameData {
 		 * or the NONE tile if there is no neighbor in said direction.
 		 **/
 		public Tile tileNeighbor(Tile center, TileDirection direction) {
-			Tuple<int, int> neighbor = Tile.NeighborCoordinate(center.XCoordinate, center.YCoordinate, direction);
+			TileLocation neighbor = Tile.NeighborCoordinate(new TileLocation(center), direction);
 			//TODO: World wrap should also be accounted for.
-			return tileAt(neighbor.Item1, neighbor.Item2);
+			return tileAt(neighbor.X, neighbor.Y);
 		}
 
 		public delegate int[,] TerrainNoiseMapGenerator(int rng, int width, int height);

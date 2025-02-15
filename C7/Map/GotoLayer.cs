@@ -8,8 +8,6 @@ using Godot;
 // The layer responsible for drawing the cursor when the player is selecting a
 // move via the "goto" command.
 public partial class GotoLayer : LooseLayer {
-	public const int cursorZIndex = UnitLayer.cursorZIndex - 1;
-
 	public GotoLayer() {
 		// Load the font we'll use for the goto move counter.
 		//
