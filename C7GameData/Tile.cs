@@ -340,7 +340,6 @@ namespace C7GameData {
 			}
 			return location;
 		}
-
 	}
 
 	public enum TileDirection {
