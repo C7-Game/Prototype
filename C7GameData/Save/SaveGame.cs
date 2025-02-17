@@ -53,9 +53,10 @@ namespace C7GameData.Save {
 				Map = new SaveMap(data.map),
 				TerrainTypes = data.terrainTypes,
 				Resources = data.Resources,
+				Buildings = data.Buildings,
 				BarbarianInfo = data.barbarianInfo,
 				Units = data.mapUnits.ConvertAll(unit => new SaveUnit(unit, data.map)),
-				UnitPrototypes = data.unitPrototypes.Values.ToList(),
+				UnitPrototypes = data.unitPrototypes,
 				Players = data.players.ConvertAll(player => new SavePlayer(player)),
 				Cities = data.cities.ConvertAll(city => new SaveCity(city)),
 				ExperienceLevels = data.experienceLevels,
@@ -92,7 +93,8 @@ namespace C7GameData.Save {
 				seed = Seed,
 				terrainTypes = TerrainTypes,
 				Resources = Resources,
-				unitPrototypes = UnitPrototypes.ToDictionary(up => up.name),
+				Buildings = Buildings,
+				unitPrototypes = UnitPrototypes,
 				scenarioSearchPath = ScenarioSearchPath,
 				civilizations = Civilizations,
 				citizenTypes = CitizenTypes,
@@ -113,7 +115,7 @@ namespace C7GameData.Save {
 			});
 
 			// cities require game map for location and players for city owner
-			data.cities = Cities.ConvertAll(city => city.ToCity(data.map, data.players, UnitPrototypes, Civilizations, CitizenTypes));
+			data.cities = Cities.ConvertAll(city => city.ToCity(data.map, data.players, UnitPrototypes, Civilizations, Buildings, CitizenTypes));
 
 			// Once cities are known, players can reference cities.
 			data.players.ForEach(player => {
@@ -191,6 +193,7 @@ namespace C7GameData.Save {
 		public List<Resource> Resources = new List<Resource>();
 		public List<SaveUnit> Units = new List<SaveUnit>();
 		public List<UnitPrototype> UnitPrototypes = new List<UnitPrototype>();
+		public List<Building> Buildings = new();
 		public List<SavePlayer> Players = new List<SavePlayer>();
 		public List<SaveCity> Cities = new List<SaveCity>();
 		public BarbarianInfo BarbarianInfo = new BarbarianInfo();

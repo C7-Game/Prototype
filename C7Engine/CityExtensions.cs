@@ -6,7 +6,7 @@ namespace C7Engine {
 
 	public static class CityExtensions {
 		public static IEnumerable<IProducible> ListProductionOptions(this City city) {
-			return EngineStorage.gameData.unitPrototypes.Values.Where(u => city.CanBuildUnit(u));
+			return EngineStorage.gameData.unitPrototypes.Where(u => city.CanBuildUnit(u));
 		}
 	}
 

@@ -95,7 +95,7 @@ public class SaveTests {
 		if (GetMd5FileHash(sampleSavPath) != "d34dd19a76eaebe26d29d73132c2fa60") {
 			using HttpClient client = new();
 			byte[] fileData = await client.GetByteArrayAsync("https://drive.usercontent.google.com/download?id=1QlIavkLtPZEIv1kHK9sO0fY2yp3o2si7&confirm=y");
-			File.WriteAllBytes(Path.Combine(savesPath, "12345.SAV"), fileData);
+			File.WriteAllBytes(sampleSavPath, fileData);
 		}
 
 		IEnumerable<FileInfo> saveFiles = new DirectoryInfo(savesPath).EnumerateFiles("*.SAV");

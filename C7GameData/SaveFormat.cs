@@ -87,7 +87,7 @@ namespace C7GameData
 			}
 
 			//Inflate barbarian info
-			List<UnitPrototype> prototypes = save.GameData.unitPrototypes.Values.ToList();
+			List<UnitPrototype> prototypes = save.GameData.unitPrototypes;
 			save.GameData.barbarianInfo.basicBarbarian =
 				prototypes[save.GameData.barbarianInfo.basicBarbarianIndex];
 			save.GameData.barbarianInfo.advancedBarbarian =

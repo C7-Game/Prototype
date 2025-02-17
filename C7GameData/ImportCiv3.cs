@@ -41,6 +41,7 @@ namespace C7GameData {
 		private void ImportSharedBiqData() {
 			ImportRaces();
 			ImportUnitPrototypes();
+			ImportBuildings();
 			ImportCiv3TerrainTypes();
 			ImportCiv3ExperienceLevels();
 			ImportCiv3DefensiveBonuses();
@@ -505,13 +506,16 @@ namespace C7GameData {
 			for (int i = 0; i < savData.City.Length; ++i) {
 				QueryCiv3.Sav.CITY city = savData.City[i];
 				SavePlayer owner = save.Players[city.Owner];
+
+				var (producible, producibleType) = CityToProducible(city);
+
 				SaveCity saveCity = new SaveCity{
 					id = ids.CreateID("city"),
 					owner = owner.id,
 					location = new TileLocation(city.X, city.Y),
 					capital = i == savData.Lead[city.Owner].CapitalCity,
-					// producible = city.Constructing // TODO: lookup building or unit prototype
-					producible = "Warrior",
+					producible = producible,
+					producibleType = producibleType,
 					name = city.Name,
 					size = city.Popd.CitizenCount,
 					shieldsStored = city.ShieldsCollected,
@@ -541,6 +545,17 @@ namespace C7GameData {
 			}
 		}
 
+		private (string, ProducibleType) CityToProducible(QueryCiv3.Sav.CITY city) {
+			PRTO[] unitPrototypes = biq.Prto ?? defaultBiq.Prto;
+
+			return city.ConstructingType switch {
+				0 => ("Worker", ProducibleType.UNIT), // TODO: Wealth production is not implemented yet
+				1 => (save.Buildings[city.Constructing].name, ProducibleType.BUILDING),
+				2 => (unitPrototypes[city.Constructing].Name, ProducibleType.UNIT),
+				_ => throw new NotImplementedException()
+			};
+		}
+
 		private void ImportBicCities() {
 			BiqData theBiq = biq.City is null ? defaultBiq : biq;
 
@@ -556,6 +571,7 @@ namespace C7GameData {
 					capital = city.HasPalace != 0,
 					// TODO: try and get this from the unit prototype
 					producible = "Worker",
+					producibleType = ProducibleType.UNIT,
 					name = city.Name,
 					size = city.Size,
 					shieldsStored = 0,
@@ -625,6 +641,19 @@ namespace C7GameData {
 				if (!save.UnitPrototypes.Where(p => p.name == prototype.name).Any()) {
 					save.UnitPrototypes.Add(prototype);
 				}
+			}
+		}
+
+		private void ImportBuildings() {
+			BLDG[] Bldg = biq.Bldg ?? defaultBiq.Bldg;
+
+			foreach (BLDG bldg in Bldg) {
+				Building building = new() {
+					name=bldg.Name,
+					shieldCost=bldg.Cost * 10, // In Civ3 files, building costs are stored at 1/10th of their actual value
+					populationCost=0, // In Civ3, a building cannot have a population cost
+				};
+				save.Buildings.Add(building);
 			}
 		}
 

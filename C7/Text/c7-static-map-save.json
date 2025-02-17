@@ -61515,6 +61515,423 @@
       ]
     }
   ],
+  "buildings": [
+    {
+      "name": "Palace",
+      "shieldCost": 100,
+      "populationCost": 0
+    },
+    {
+      "name": "Barracks",
+      "shieldCost": 40,
+      "populationCost": 0
+    },
+    {
+      "name": "Granary",
+      "shieldCost": 60,
+      "populationCost": 0
+    },
+    {
+      "name": "Temple",
+      "shieldCost": 60,
+      "populationCost": 0
+    },
+    {
+      "name": "Marketplace",
+      "shieldCost": 100,
+      "populationCost": 0
+    },
+    {
+      "name": "Library",
+      "shieldCost": 80,
+      "populationCost": 0
+    },
+    {
+      "name": "Courthouse",
+      "shieldCost": 80,
+      "populationCost": 0
+    },
+    {
+      "name": "Walls",
+      "shieldCost": 20,
+      "populationCost": 0
+    },
+    {
+      "name": "Aqueduct",
+      "shieldCost": 100,
+      "populationCost": 0
+    },
+    {
+      "name": "Bank",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "Cathedral",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "University",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "Colosseum",
+      "shieldCost": 120,
+      "populationCost": 0
+    },
+    {
+      "name": "Factory",
+      "shieldCost": 240,
+      "populationCost": 0
+    },
+    {
+      "name": "Manufacturing Plant",
+      "shieldCost": 320,
+      "populationCost": 0
+    },
+    {
+      "name": "Recycling Center",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "Coal Plant",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "Hydro Plant",
+      "shieldCost": 240,
+      "populationCost": 0
+    },
+    {
+      "name": "Nuclear Plant",
+      "shieldCost": 240,
+      "populationCost": 0
+    },
+    {
+      "name": "Hospital",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "Research Lab",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "Mass Transit System",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "SAM Missile Battery",
+      "shieldCost": 80,
+      "populationCost": 0
+    },
+    {
+      "name": "Coastal Fortress",
+      "shieldCost": 40,
+      "populationCost": 0
+    },
+    {
+      "name": "Solar Plant",
+      "shieldCost": 320,
+      "populationCost": 0
+    },
+    {
+      "name": "Harbor",
+      "shieldCost": 60,
+      "populationCost": 0
+    },
+    {
+      "name": "Offshore Platform",
+      "shieldCost": 240,
+      "populationCost": 0
+    },
+    {
+      "name": "Airport",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "Police Station",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "Wealth",
+      "shieldCost": 0,
+      "populationCost": 0
+    },
+    {
+      "name": "The Pyramids",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "The Hanging Gardens",
+      "shieldCost": 300,
+      "populationCost": 0
+    },
+    {
+      "name": "The Colossus",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "The Great Lighthouse",
+      "shieldCost": 300,
+      "populationCost": 0
+    },
+    {
+      "name": "The Great Library",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "The Oracle",
+      "shieldCost": 300,
+      "populationCost": 0
+    },
+    {
+      "name": "The Great Wall",
+      "shieldCost": 300,
+      "populationCost": 0
+    },
+    {
+      "name": "Sun Tzu\u0027s Art of War",
+      "shieldCost": 600,
+      "populationCost": 0
+    },
+    {
+      "name": "Sistine Chapel",
+      "shieldCost": 600,
+      "populationCost": 0
+    },
+    {
+      "name": "Magellan\u0027s Voyage",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "Copernicus\u0027 Observatory",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "Shakespeare\u0027s Theater",
+      "shieldCost": 450,
+      "populationCost": 0
+    },
+    {
+      "name": "Leonardo\u0027s Workshop",
+      "shieldCost": 600,
+      "populationCost": 0
+    },
+    {
+      "name": "JS Bach\u0027s Cathedral",
+      "shieldCost": 600,
+      "populationCost": 0
+    },
+    {
+      "name": "Newton\u0027s University",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "Smith\u0027s Trading Company",
+      "shieldCost": 600,
+      "populationCost": 0
+    },
+    {
+      "name": "Universal Suffrage",
+      "shieldCost": 800,
+      "populationCost": 0
+    },
+    {
+      "name": "Hoover Dam",
+      "shieldCost": 800,
+      "populationCost": 0
+    },
+    {
+      "name": "Theory of Evolution",
+      "shieldCost": 600,
+      "populationCost": 0
+    },
+    {
+      "name": "The United Nations",
+      "shieldCost": 1000,
+      "populationCost": 0
+    },
+    {
+      "name": "The Manhattan Project",
+      "shieldCost": 800,
+      "populationCost": 0
+    },
+    {
+      "name": "Cure for Cancer",
+      "shieldCost": 1000,
+      "populationCost": 0
+    },
+    {
+      "name": "Longevity",
+      "shieldCost": 1000,
+      "populationCost": 0
+    },
+    {
+      "name": "SETI program",
+      "shieldCost": 1000,
+      "populationCost": 0
+    },
+    {
+      "name": "Heroic Epic",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "Iron Works",
+      "shieldCost": 300,
+      "populationCost": 0
+    },
+    {
+      "name": "Forbidden Palace",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "Military Academy",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "The Pentagon",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "Wall Street",
+      "shieldCost": 300,
+      "populationCost": 0
+    },
+    {
+      "name": "Apollo Program",
+      "shieldCost": 500,
+      "populationCost": 0
+    },
+    {
+      "name": "Strategic Missile Defense",
+      "shieldCost": 500,
+      "populationCost": 0
+    },
+    {
+      "name": "Intelligence Agency",
+      "shieldCost": 400,
+      "populationCost": 0
+    },
+    {
+      "name": "Battlefield Medicine",
+      "shieldCost": 500,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Thrusters",
+      "shieldCost": 320,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Engine",
+      "shieldCost": 640,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Docking Bay",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Cockpit",
+      "shieldCost": 320,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Fuel Cells",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Life Support System",
+      "shieldCost": 320,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Stasis Chamber",
+      "shieldCost": 320,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Storage/Supply",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Planetary Party Lounge",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "SS Exterior Casing",
+      "shieldCost": 640,
+      "populationCost": 0
+    },
+    {
+      "name": "The Internet",
+      "shieldCost": 1000,
+      "populationCost": 0
+    },
+    {
+      "name": "Civil Defense",
+      "shieldCost": 120,
+      "populationCost": 0
+    },
+    {
+      "name": "Stock Exchange",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "Commercial Dock",
+      "shieldCost": 160,
+      "populationCost": 0
+    },
+    {
+      "name": "The Temple of Artemis",
+      "shieldCost": 500,
+      "populationCost": 0
+    },
+    {
+      "name": "The Statue of Zeus",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "The Mausoleum of Mausollos",
+      "shieldCost": 200,
+      "populationCost": 0
+    },
+    {
+      "name": "Knights Templar",
+      "shieldCost": 300,
+      "populationCost": 0
+    },
+    {
+      "name": "Secret Police HQ",
+      "shieldCost": 200,
+      "populationCost": 0
+    }
+  ],
   "players": [
     {
       "id": "player-1",

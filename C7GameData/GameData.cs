@@ -15,7 +15,8 @@ namespace C7GameData {
 		public List<TerrainType> terrainTypes = new List<TerrainType>();
 		public List<Resource> Resources = new List<Resource>();
 		public List<MapUnit> mapUnits { get; set; } = new List<MapUnit>();
-		public Dictionary<string, UnitPrototype> unitPrototypes = new Dictionary<string, UnitPrototype>();
+		public List<UnitPrototype> unitPrototypes = new();
+		public List<Building> Buildings = new();
 		public List<City> cities = new List<City>();
 
 		internal List<Civilization> civilizations = new List<Civilization>();
