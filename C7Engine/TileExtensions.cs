@@ -59,8 +59,7 @@ namespace C7Engine {
 					totalProgress += unit.WorkerProgressTowardsJob;
 				} else {
 					// reset Unit working on other jobs
-					unit.WorkerJob = null;
-					unit.WorkerProgressTowardsJob = 0;
+					unit.resetWorkerJob();
 				}
 			}
 			return totalProgress;
@@ -86,11 +85,11 @@ namespace C7Engine {
 				} else {
 					// reset Unit working on other jobs
 					Log.Error($"Workers working om different WorkerJobs on the same tile");
-					unit.WorkerJob = null;
-					unit.WorkerProgressTowardsJob = 0;
+					unit.resetWorkerJob();
 				}
 			}
-			if (totalProgress >= MapUnitExtensions.JOB_COST_IRRIGATION) {
+
+			if (tile.IsWorkerJobFinished(currentWorkerJob, totalProgress)) {
 				tile.FinishWorkerJob(currentWorkerJob);
 			}
 		}
@@ -104,8 +103,7 @@ namespace C7Engine {
 			// Reset All Workers working on the finished Job
 			foreach (MapUnit unit in tile.unitsOnTile) {
 				if (currentWorkerJob==(unit.WorkerJob)) {
-					unit.WorkerJob = null;
-					unit.WorkerProgressTowardsJob = 0;
+					unit.resetWorkerJob();
 				}
 			}
 			// Set the correct Overlay
@@ -114,6 +112,14 @@ namespace C7Engine {
 					tile.overlays.irrigation = true;
 					break;
 			}
+		}
+
+		public static bool IsWorkerJobFinished(this Tile tile, string currentWorkerJob, int totalProgress)
+		{
+			//TODO Make that dynamic
+			int requiredProgress = MapUnitExtensions.JOB_COST_IRRIGATION;
+
+			return totalProgress >= requiredProgress;
 		}
 
 		public static void Animate(this Tile tile, AnimatedEffect effect, bool wait) {

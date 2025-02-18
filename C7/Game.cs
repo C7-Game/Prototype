@@ -347,6 +347,11 @@ public partial class Game : Node2D {
 			unit.path = TilePath.NONE;
 		}
 
+		// clear the current WorkerJob
+		if (unit.WorkerJob != null) {
+			unit.resetWorkerJob();
+		}
+
 		this.CurrentlySelectedUnit = unit;
 		this.KeepCSUWhenFortified = unit.isFortified; // If fortified, make sure the autoselector doesn't immediately skip past the unit
 
