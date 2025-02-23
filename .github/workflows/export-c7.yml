@@ -45,15 +45,15 @@ jobs:
     - name: Windows Build
       run: |
         mkdir -v -p build/${FOLDER_NAME}
-        cd ${EXPORT_NAME}
+        cd src/C7
         dotnet build
-        godot -v --headless --export${BUILD_SUFFIX} "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
+        godot -v --headless --export${BUILD_SUFFIX} "Windows Desktop" ../../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
     - name: Run tests
       run: |
-        dotnet test C7
+        dotnet test
     - name: Copy Static Files
       run: |
-        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp -r ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
+        if cp -r src/C7/Text build/${FOLDER_NAME}/Text && cp -r src/C7/Art build/${FOLDER_NAME}/Art
         then
           echo "successfully copied static files to build"
         else
@@ -78,15 +78,15 @@ jobs:
     - name: Linux Build
       run: |
         mkdir -v -p build/${FOLDER_NAME}
-        cd ${EXPORT_NAME}
+        cd src/C7
         dotnet build
-        godot -v --headless --export${BUILD_SUFFIX} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
+        godot -v --headless --export${BUILD_SUFFIX} "Linux/X11" ../../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
     - name: Run tests
       run: |
-        dotnet test C7
+        dotnet test
     - name: Copy Static Files
       run: |
-        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp -r ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
+        if cp -r src/C7/Text build/${FOLDER_NAME}/Text && cp -r src/C7/Art build/${FOLDER_NAME}/Art
         then
           echo "successfully copied static files to build"
         else
@@ -114,16 +114,15 @@ jobs:
     - name: Mac Build
       run: |
         mkdir -v -p build/${FOLDER_NAME}
-        cd ${EXPORT_NAME}
+        cd src/C7
         dotnet build
-        godot -v --headless --export${BUILD_SUFFIX} "macOS" ../build/${FOLDER_NAME}.zip
+        godot -v --headless --export${BUILD_SUFFIX} "macOS" ../../build/${FOLDER_NAME}.zip
     - name: Run tests
       run: |
-        dotnet test C7
+        dotnet test
     - name: Copy Static Files
       run: |
-        cd ${EXPORT_NAME}
-        if zip -r ../build/${FOLDER_NAME}.zip Art Text
+        if zip -r ./build/${FOLDER_NAME}.zip Art Text
         then
           echo "successfully copied static files to build"
         else
