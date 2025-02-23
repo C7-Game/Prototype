@@ -483,13 +483,11 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-
 ### Godot ###
 .import/
 export.cfg
 logs/
 .godot
-
 
 ### C7 ###
 C7.ini
@@ -499,3 +497,6 @@ log.txt
 # Exports folder ignores
 C7/Exports
 Exports/
+
+# Test runtime files
+C7GameDataTests/data/

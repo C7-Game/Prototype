@@ -56,7 +56,7 @@ public class SaveTests {
 		// load SaveGame but convert to and from GameData before saving to file:
 		string outputWasGameDataPath = getDataPath("output/static-save-was-game-data.json");
 
-		string developerSave = getBasePath("../C7/Text/c7-static-map-save.json");
+		string developerSave = getBasePath("../../src/C7/Text/c7-static-map-save.json");
 
 		SaveGame saveNeverGameData = SaveGame.Load(developerSave);
 
