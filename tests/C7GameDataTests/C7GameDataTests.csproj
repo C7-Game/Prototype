@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\C7GameData\C7GameData.csproj" />
+      <ProjectReference Include="..\..\src\C7GameData\C7GameData.csproj" />
     </ItemGroup>
 
 </Project>

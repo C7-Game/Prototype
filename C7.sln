@@ -1,30 +1,34 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C7", "C7.csproj", "{5DF4328C-C326-46C6-8718-320FF6071871}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C7", "src\C7\C7.csproj", "{5DF4328C-C326-46C6-8718-320FF6071871}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C7Engine", "..\C7Engine\C7Engine.csproj", "{FD440E96-DAB8-48DF-85FD-72F75384CA62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C7Engine", "src\C7Engine\C7Engine.csproj", "{FD440E96-DAB8-48DF-85FD-72F75384CA62}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C7GameData", "..\C7GameData\C7GameData.csproj", "{4ECB5932-6D85-4953-B3D8-BD8334D792DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "C7GameData", "src\C7GameData\C7GameData.csproj", "{4ECB5932-6D85-4953-B3D8-BD8334D792DE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertCiv3Media", "..\ConvertCiv3Media\ConvertCiv3Media.csproj", "{A1DD1E87-6D05-49CA-8B41-5404D3727174}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertCiv3Media", "src\ConvertCiv3Media\ConvertCiv3Media.csproj", "{A1DD1E87-6D05-49CA-8B41-5404D3727174}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryCiv3", "..\QueryCiv3\QueryCiv3.csproj", "{8A49BFFF-265B-4A0A-BCF1-0E75E9EFC82F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryCiv3", "src\QueryCiv3\QueryCiv3.csproj", "{8A49BFFF-265B-4A0A-BCF1-0E75E9EFC82F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blast", "..\Blast\Blast.csproj", "{C758B0EB-9F8F-45CF-9ACB-B04705CD7FEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blast", "src\Blast\Blast.csproj", "{C758B0EB-9F8F-45CF-9ACB-B04705CD7FEC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EngineTests", "..\EngineTests\EngineTests.csproj", "{270876A6-0DC8-4150-B374-0BC9E4CC2113}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EngineTests", "tests\EngineTests\EngineTests.csproj", "{270876A6-0DC8-4150-B374-0BC9E4CC2113}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildDevSave", "..\_Console\BuildDevSave\BuildDevSave.csproj", "{E66928C1-157B-42D3-AEC5-88F41C7A7846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BuildDevSave", "tools\BuildDevSave\BuildDevSave.csproj", "{E66928C1-157B-42D3-AEC5-88F41C7A7846}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C7GameDataTests", "..\C7GameDataTests\C7GameDataTests.csproj", "{8053F185-AA52-4876-8CF4-D08907FCA61A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "C7GameDataTests", "tests\C7GameDataTests\C7GameDataTests.csproj", "{8053F185-AA52-4876-8CF4-D08907FCA61A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8C955B11-CC6A-4BED-BE2A-89DB985A3A18}"
 	ProjectSection(SolutionItems) = preProject
-		..\.editorconfig = ..\.editorconfig
+		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{104425F1-31A7-4CF6-BCB4-C1439367EA5B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{3A73670F-497F-4C9E-B567-8B68092ED73D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -120,5 +124,10 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB9956D5-E3A9-4D2B-87FE-443D688F89AA}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8053F185-AA52-4876-8CF4-D08907FCA61A} = {104425F1-31A7-4CF6-BCB4-C1439367EA5B}
+		{270876A6-0DC8-4150-B374-0BC9E4CC2113} = {104425F1-31A7-4CF6-BCB4-C1439367EA5B}
+		{E66928C1-157B-42D3-AEC5-88F41C7A7846} = {3A73670F-497F-4C9E-B567-8B68092ED73D}
 	EndGlobalSection
 EndGlobal
