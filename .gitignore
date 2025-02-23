@@ -499,4 +499,4 @@ C7/Exports
 Exports/
 
 # Test runtime files
-C7GameDataTests/data/
+tests/C7GameDataTests/data/
