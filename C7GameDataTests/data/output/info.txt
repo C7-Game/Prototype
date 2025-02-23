@@ -1,1 +1,0 @@
-Tests may create files in this directory but they are ignored and should not be checked in.

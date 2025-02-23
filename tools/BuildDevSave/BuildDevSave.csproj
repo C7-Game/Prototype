@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\QueryCiv3\QueryCiv3.csproj" />
-    <ProjectReference Include="..\..\C7GameData\C7GameData.csproj" />
+    <ProjectReference Include="..\..\src\QueryCiv3\QueryCiv3.csproj" />
+    <ProjectReference Include="..\..\src\C7GameData\C7GameData.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
