@@ -122,7 +122,8 @@ jobs:
         dotnet test
     - name: Copy Static Files
       run: |
-        if zip -r ./build/${FOLDER_NAME}.zip Art Text
+        cd src/C7
+        if zip -r ../../build/${FOLDER_NAME}.zip Art Text
         then
           echo "successfully copied static files to build"
         else
