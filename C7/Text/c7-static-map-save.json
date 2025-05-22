@@ -67748,7 +67748,8 @@
       "isSmallWonder": false,
       "culturePerTurn": 4,
       "contentFacesInCity": 0,
-      "iconRowIndex": 30
+      "iconRowIndex": 30,
+      "buildingGainedInEveryCityOnContinent": "Granary"
     },
     {
       "name": "The Hanging Gardens",
@@ -67826,7 +67827,8 @@
       "culturePerTurn": 2,
       "contentFacesInCity": 0,
       "iconRowIndex": 36,
-      "renderedObsoleteBy": "tech-21"
+      "renderedObsoleteBy": "tech-21",
+      "buildingGainedInEveryCityOnContinent": "Walls"
     },
     {
       "name": "Sun Tzu\u0027s Art of War",
@@ -67837,7 +67839,8 @@
       "isSmallWonder": false,
       "culturePerTurn": 2,
       "contentFacesInCity": 0,
-      "iconRowIndex": 37
+      "iconRowIndex": 37,
+      "buildingGainedInEveryCityOnContinent": "Barracks"
     },
     {
       "name": "Sistine Chapel",
@@ -67954,6 +67957,7 @@
       "culturePerTurn": 2,
       "contentFacesInCity": 0,
       "iconRowIndex": 47,
+      "buildingGainedInEveryCityOnContinent": "Hydro Plant",
       "flags": [
         "mustBeNearRiver"
       ]
@@ -68295,7 +68299,8 @@
       "isSmallWonder": false,
       "culturePerTurn": 4,
       "contentFacesInCity": 0,
-      "iconRowIndex": 74
+      "iconRowIndex": 74,
+      "buildingGainedInEveryCityOnContinent": "Research Lab"
     },
     {
       "name": "Civil Defense",
@@ -68346,7 +68351,8 @@
       "culturePerTurn": 4,
       "contentFacesInCity": 0,
       "iconRowIndex": 78,
-      "renderedObsoleteBy": "tech-17"
+      "renderedObsoleteBy": "tech-17",
+      "buildingGainedInEveryCityOnContinent": "Temple"
     },
     {
       "name": "The Statue of Zeus",

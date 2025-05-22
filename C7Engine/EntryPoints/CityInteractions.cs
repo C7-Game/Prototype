@@ -11,8 +11,17 @@ namespace C7Engine {
 			City newCity = new City(tileWithNewCity, owner, name, gameData.ids.CreateID("city"));
 			if (owner.cities.Count == 0) {
 				newCity.capital = true;
-				newCity.AddBuilding(gameData.Buildings.Find(x => x.isCenterOfEmpire));
+				newCity.AddBuilding(gameData.Buildings.Find(x => x.isCenterOfEmpire), CityBuilding.Source.Built);
 			}
+
+			// Apply any wonder effects to the new city (like adding a granary
+			// if we already have the pyramids).
+			foreach (City c in owner.cities) {
+				foreach (CityBuilding cb in c.buildings) {
+					cb.building.EffectsOnNewCities(c, newCity);
+				}
+			}
+
 			gameData.cities.Add(newCity);
 			owner.cities.Add(newCity);
 			tileWithNewCity.cityAtTile = newCity;
@@ -41,6 +50,13 @@ namespace C7Engine {
 			Tile tile = EngineStorage.gameData.map.tileAt(X, Y);
 			tile.DisbandNonDefendingUnits();
 			Player owner = tile.cityAtTile.owner;
+
+			// If this city had a wonder that was providing buildings in other
+			// cities, ensure everything gets updated properly.
+			foreach (CityBuilding cb in tile.cityAtTile.buildings) {
+				cb.building.DestructionEffects(tile.cityAtTile);
+			}
+
 			tile.cityAtTile.RemoveAllCitizens();
 			tile.cityAtTile.owner.cities.Remove(tile.cityAtTile);
 			EngineStorage.gameData.cities.Remove(tile.cityAtTile);

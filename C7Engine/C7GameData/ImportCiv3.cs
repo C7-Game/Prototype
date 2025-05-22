@@ -25,6 +25,7 @@ namespace C7GameData {
 		private SavData savData;
 		private PediaIcons pediaIcons;
 		private readonly ID.Factory ids;
+		private Dictionary<TileLocation, int> continentLookup = new();
 
 		private static ILogger log = Log.ForContext<ImportCiv3>();
 
@@ -601,6 +602,24 @@ namespace C7GameData {
 				}
 				save.Cities.Add(saveCity);
 			}
+
+			// Save which continent each tile is on, to avoid expensive scans
+			// for wonders that grant a building to all tiles on the same
+			// continent.
+			int tileIndex = 0;
+			foreach (QueryCiv3.Sav.TILE civ3Tile in savData.Tile) {
+				(int X, int Y) = GetMapCoordinates(tileIndex, savData.Wrld.Width);
+				continentLookup[new TileLocation(X, Y)] = civ3Tile.Continent;
+				++tileIndex;
+			}
+
+			// Now that we have all the normal city buildings loaded, we can go
+			// through and add any buildings that are the result of wonders.
+			foreach (SaveCity sc in save.Cities) {
+				for (int i = 0; i < sc.buildings.Count; ++i) {
+					AddBuildingsGrantedByWonders(sc, sc.buildings[i]);
+				}
+			}
 		}
 
 		List<SaveCityBuilding> ImportCityBuildingsFromSav(int cityIndex) {
@@ -694,6 +713,93 @@ namespace C7GameData {
 
 				save.Cities.Add(saveCity);
 			}
+
+			// Save which continent each tile is on, to avoid expensive scans
+			// for wonders that grant a building to all tiles on the same
+			// continent.
+			int tileIndex = 0;
+			foreach (QueryCiv3.Biq.TILE civ3Tile in biq.Tile) {
+				(int X, int Y) = GetMapCoordinates(tileIndex, biq.Wmap[0].Width);
+				continentLookup[new TileLocation(X, Y)] = civ3Tile.Continent;
+				++tileIndex;
+			}
+
+			// Now that we have all the normal city buildings loaded, we can go
+			// through and add any buildings that are the result of wonders.
+			foreach (SaveCity sc in save.Cities) {
+				for (int i = 0; i < sc.buildings.Count; ++i) {
+					AddBuildingsGrantedByWonders(sc, sc.buildings[i]);
+				}
+			}
+		}
+
+		// Add any buildings granted by wonders (like how the Pyramids give
+		// granaries to all cities on the continent).
+		private void AddBuildingsGrantedByWonders(SaveCity sc, SaveCityBuilding scb) {
+			BiqData theBiq = biq.City is null ? defaultBiq : biq;
+			SaveBuilding sb = save.Buildings.Find(x => x.name == scb.building);
+
+			if (sb.buildingGainedInEveryCity != null) {
+				SaveCityBuilding newBuilding = new() {
+					building = sb.buildingGainedInEveryCity,
+					builtByPlayer = scb.builtByPlayer,
+					year = scb.year,
+					// TODO: Could this be calculated by the year the wonder
+					// was built multiplied by the culture per turn of the
+					// added building?
+					totalCulture = 0,
+					source = CityBuilding.Source.ProvidedByWonder,
+				};
+
+				foreach (SaveCity c in save.Cities) {
+					// Ignore cities owned by other players.
+					if (c.owner != sc.owner) {
+						continue;
+					}
+
+					// Add the appropriate building, specifying it came from a
+					// wonder or upgrading an existing building of the same type.
+					AddSaveCityBuildingOrUpgradeSource(c, newBuilding);
+				}
+			}
+			if (sb.buildingGainedInEveryCityOnContinent != null) {
+				SaveCityBuilding newBuilding = new() {
+					building = sb.buildingGainedInEveryCityOnContinent,
+					builtByPlayer = scb.builtByPlayer,
+					year = scb.year,
+					// TODO: Could this be calculated by the year the wonder
+					// was built multiplied by the culture per turn of the
+					// added building?
+					totalCulture = 0,
+					source = CityBuilding.Source.ProvidedByWonder,
+				};
+
+				foreach (SaveCity c in save.Cities) {
+					// Ignore cities owned by other players.
+					if (c.owner != sc.owner) {
+						continue;
+					}
+
+					// Ignore cities on other continents.
+					if (continentLookup[c.location] != continentLookup[sc.location]) {
+						continue;
+					}
+
+					// Add the appropriate building, specifying it came from a
+					// wonder or upgrading an existing building of the same type.
+					AddSaveCityBuildingOrUpgradeSource(c, newBuilding);
+				}
+			}
+		}
+
+		private void AddSaveCityBuildingOrUpgradeSource(SaveCity sc, SaveCityBuilding scb) {
+			foreach (SaveCityBuilding b in sc.buildings) {
+				if (b.building == scb.building) {
+					b.source = CityBuilding.Source.BuiltAndThenProvidedByWonder;
+					return;
+				}
+			}
+			sc.buildings.Add(scb);
 		}
 
 		private static IEnumerable<UnitAction> GetUnitActions(PRTO prto) {
@@ -928,6 +1034,13 @@ namespace C7GameData {
 
 				if (bldg.RenderedObsoleteBy != -1) {
 					building.renderedObsoleteBy = save.Techs[bldg.RequiredAdvance].id;
+				}
+
+				if (bldg.GainInEveryCity >= 0) {
+					building.buildingGainedInEveryCity = Bldg[bldg.GainInEveryCity].Name;
+				}
+				if (bldg.GainInEveryCityOnContinent >= 0) {
+					building.buildingGainedInEveryCityOnContinent = Bldg[bldg.GainInEveryCityOnContinent].Name;
 				}
 
 				building.flags = LoadBuildingFlags(bldg).ToHashSet();

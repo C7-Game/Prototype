@@ -196,6 +196,57 @@ namespace C7GameData {
 			return true;
 		}
 
+		public void CreationEffects(City owningCity) {
+			if (dataSource.buildingGainedInEveryCity != null) {
+				Building b = EngineStorage.gameData.Buildings.Find(x => x.name == dataSource.buildingGainedInEveryCity);
+				foreach (City c in owningCity.owner.cities) {
+					c.AddBuilding(b, CityBuilding.Source.ProvidedByWonder);
+				}
+			}
+			if (dataSource.buildingGainedInEveryCityOnContinent != null) {
+				Building b = EngineStorage.gameData.Buildings.Find(x => x.name == dataSource.buildingGainedInEveryCityOnContinent);
+				foreach (City c in owningCity.owner.cities) {
+					if (c.location.continent != owningCity.location.continent) {
+						continue;
+					}
+
+					c.AddBuilding(b, CityBuilding.Source.ProvidedByWonder);
+				}
+			}
+		}
+
+		public void EffectsOnNewCities(City owningCity, City newCity) {
+			if (dataSource.buildingGainedInEveryCity != null) {
+				Building b = EngineStorage.gameData.Buildings.Find(x => x.name == dataSource.buildingGainedInEveryCity);
+				newCity.AddBuilding(b, CityBuilding.Source.ProvidedByWonder);
+			}
+			if (dataSource.buildingGainedInEveryCityOnContinent != null) {
+				Building b = EngineStorage.gameData.Buildings.Find(x => x.name == dataSource.buildingGainedInEveryCityOnContinent);
+				if (newCity.location.continent == owningCity.location.continent) {
+					newCity.AddBuilding(b, CityBuilding.Source.ProvidedByWonder);
+				}
+			}
+		}
+
+		public void DestructionEffects(City previouslyOwningCity) {
+			if (dataSource.buildingGainedInEveryCity != null) {
+				Building b = EngineStorage.gameData.Buildings.Find(x => x.name == dataSource.buildingGainedInEveryCity);
+				foreach (City c in previouslyOwningCity.owner.cities) {
+					c.RemoveBuilding(b, CityBuilding.Source.ProvidedByWonder);
+				}
+			}
+			if (dataSource.buildingGainedInEveryCityOnContinent != null) {
+				Building b = EngineStorage.gameData.Buildings.Find(x => x.name == dataSource.buildingGainedInEveryCityOnContinent);
+				foreach (City c in previouslyOwningCity.owner.cities) {
+					if (c.location.continent != previouslyOwningCity.location.continent) {
+						continue;
+					}
+
+					c.RemoveBuilding(b, CityBuilding.Source.ProvidedByWonder);
+				}
+			}
+		}
+
 		public SaveBuilding ToSaveBuilding() {
 			return dataSource;
 		}

@@ -31,6 +31,11 @@ namespace C7GameData.Save {
 		public int iconRowIndex;
 		public ID? renderedObsoleteBy;
 
+		// The name of the building this building gives to every city in the
+		// empire on on the continent (like the pyramids or the internet).
+		public string buildingGainedInEveryCity;
+		public string buildingGainedInEveryCityOnContinent;
+
 		// Assorted boolean flags for the building. They're stored in this set
 		// rather than as booleans to avoid bloating the json file.
 		public HashSet<Flag> flags = new();

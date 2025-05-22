@@ -11,6 +11,18 @@ namespace C7GameData {
 		public int year;
 		public int totalCulture; // This represents the total culture produced by the building. 
 								 // In Civ3, this value is displayed in the cultural advisor tab
+
+		public enum Source {
+			Built,
+
+			// Options other than Built have no maintenance costs.
+			ProvidedByWonder,
+
+			// This option allows selling the building and downgrading to just
+			// Built.
+			BuiltAndThenProvidedByWonder,
+		}
+		public Source source = Source.Built;
 	}
 
 	public struct CommerceBreakdown {
@@ -54,6 +66,7 @@ namespace C7GameData {
 		public bool capital = false;
 		public Player owner { get; set; }
 		public List<CityResident> residents = new List<CityResident>();
+
 		public List<CityBuilding> buildings = [];
 
 		// The order of this city within all the cities of a player for the
@@ -246,7 +259,7 @@ namespace C7GameData {
 			if (producedItem is UnitPrototype prototype) {
 				AddUnit(prototype, gameData);
 			} else if (producedItem is Building building) {
-				AddBuilding(building);
+				AddBuilding(building, CityBuilding.Source.Built);
 
 				// If we completed a great wonder, mark it as completed so no
 				// other civ can build it. If any other cities are building the
@@ -517,13 +530,48 @@ namespace C7GameData {
 			return (int)Math.Floor(Math.Log10(culture)) + 1;
 		}
 
-		public void AddBuilding(Building building) {
+		public void AddBuilding(Building building, CityBuilding.Source source) {
+			// If we already have this building, then as long as we didn't
+			// somehow build it twice this is a case where we built a building
+			// and then a wonder provided it. Update the building.
+			foreach (CityBuilding cb in buildings) {
+				if (cb.building.name == building.name) {
+					if (cb.source == source) {
+						throw new Exception($"Built a building twice or it was awarded by two wonders: {source}");
+					}
+					cb.source = CityBuilding.Source.BuiltAndThenProvidedByWonder;
+					return;
+				}
+			}
+
+			// Otherwise add the building.
 			buildings.Add(new CityBuilding {
 				building = building,
 				builtByPlayer = owner,
 				year = 1, // TODO: Implement in-game year tracking
-				totalCulture = 0
+				totalCulture = 0,
+				source = source,
 			});
+			building.CreationEffects(this);
+		}
+
+		public void RemoveBuilding(Building building, CityBuilding.Source source) {
+			// Remove this building unless it was provided by a wonder and was
+			// built. In that case just downgrade the source.
+			for (int i = 0; i < buildings.Count;) {
+				CityBuilding cb = buildings[i];
+				if (cb.building.name == building.name) {
+					if (cb.source != CityBuilding.Source.BuiltAndThenProvidedByWonder) {
+						buildings.RemoveAt(i);
+					} else if (source == CityBuilding.Source.Built) {
+						cb.source = CityBuilding.Source.ProvidedByWonder;
+					} else {
+						cb.source = CityBuilding.Source.Built;
+					}
+					return;
+				}
+				++i;
+			}
 		}
 
 		public void AddUnit(UnitPrototype prototype, GameData gameData) {
