@@ -249,6 +249,31 @@ namespace C7GameData {
 			return isBarbarians;
 		}
 
+		// TODO : This is a placeholder so that we can factor this in when calculating movement costs
+		// since multiturn deals are not yet implemented
+		public bool HasRightOfPassageAgreementWith(Player other) {
+			return false;
+		}
+
+		public static bool CanMoveFreely(Player player, Tile sourceTile, Tile targetTile) {
+			Player targetTileOwner = targetTile.OwningPlayer();
+			Player sourceTileOwner = sourceTile.OwningPlayer();
+
+			// any to any && any to own && own to any && own to own
+			if ((sourceTileOwner == null || sourceTileOwner == player)
+			    && (targetTileOwner == player || targetTileOwner == null))
+				return true;
+
+			// All the other cases are either from or to "enemy" tiles
+			// and without a RoP agreement the cost is never reduced.
+			// check other && RoP
+			if (player.HasRightOfPassageAgreementWith(targetTileOwner)) {
+				return true;
+			}
+
+			return false;
+		}
+
 		public bool KnowsAboutResource(Resource resource) {
 			if (resource.Prerequisite == null) {
 				return true;
@@ -804,6 +829,11 @@ namespace C7GameData {
 		public bool HasRequiredTechnology(IProducible producible) {
 			return producible.requiredTech == null ||
 				   knownTechs.Contains(producible.requiredTech.id);
+		}
+
+		public bool CanBridgeRoads() {
+			ID engineeringTechId = EngineStorage.gameData.techs.FirstOrDefault(tech => tech.EnablesBridges)?.id;
+			return knownTechs?.FirstOrDefault(tech => tech == engineeringTechId) != null;
 		}
 
 		public int ShieldCost(IProducible producible) {

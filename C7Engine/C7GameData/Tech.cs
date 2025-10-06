@@ -10,6 +10,7 @@ namespace C7GameData {
 		public int Cost;
 		public bool RequiredForEraAdvancement;
 		public bool BonusTechToFirstCivThatResearches;
+		public bool EnablesBridges;
 
 		// The civilopedia name of the era this tech is part of
 		// (like ERA_Ancient_Times). This is what art lookups are based on.

@@ -1252,6 +1252,7 @@ namespace C7GameData {
 		private static IEnumerable<SaveTech.Flag> LoadTechFlags(TECH t) {
 			return new[] {
 				(t.BonusTechToFirstCivThatResearches, SaveTech.Flag.BonusTechToFirstCivThatResearches),
+				(t.EnablesBridges, SaveTech.Flag.EnablesBridges),
 			}
 			.Where(t => t.Item1)
 			.Select(t => t.Item2);

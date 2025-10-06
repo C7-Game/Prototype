@@ -567,7 +567,7 @@ namespace C7GameData {
 					}
 				}
 
-				float movementCost = TilePath.getMovementCost(location, dir, newLoc);
+				float movementCost = TilePath.GetMovementCost(this, location, dir, newLoc);
 				if (!location.unitsOnTile.Remove(this))
 					throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 				// Make sure the unit is on the new location before claiming we have entered the tile

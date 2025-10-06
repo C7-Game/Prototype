@@ -76366,7 +76366,10 @@
       "requiredForEraAdvancement": true,
       "smallIconPath": "Art\\tech chooser\\Icons\\22-engineering-small.pcx",
       "x": 73,
-      "y": 610
+      "y": 610,
+	  "flags": [
+        "enablesBridges"
+      ]
     },
     {
       "name": "Theology",
