@@ -261,7 +261,7 @@ namespace C7GameData {
 
 			// any to any && any to own && own to any && own to own
 			if ((sourceTileOwner == null || sourceTileOwner == player)
-			    && (targetTileOwner == player || targetTileOwner == null))
+				&& (targetTileOwner == player || targetTileOwner == null))
 				return true;
 
 			// All the other cases are either from or to "enemy" tiles
