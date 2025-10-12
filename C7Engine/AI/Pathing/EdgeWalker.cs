@@ -34,7 +34,7 @@ namespace C7Engine.Pathing {
 					continue;
 				}
 
-				float tileMovementCost = TilePath.GetMovementCost(this.unit, node, direction, neighbor);
+				float tileMovementCost = TilePath.GetMovementCost(unit.owner, node, direction, neighbor);
 				float unitMovementPoints = unit.unitType.movement;
 
 				// If this tile would consume all of the movement points of this

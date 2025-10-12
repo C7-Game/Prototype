@@ -33,7 +33,7 @@ namespace C7GameData {
 			return path != null ? path.Count : -1;
 		}
 
-		public int PathCost(MapUnit unit, Tile from, float perTurnMovePoints, float remainingMovementPoints) {
+		public int PathCost(Player player, Tile from, float perTurnMovePoints, float remainingMovementPoints) {
 			// If we have no path (such as if we are a land unit trying to move to the water)
 			// return -1 so we don't display a goto cursor.
 			if (path == null || path.Count == 0) { return -1; }
@@ -46,7 +46,7 @@ namespace C7GameData {
 
 			foreach (Tile tile in path) {
 				// Subtract the cost of the next move.
-				float cost = GetMovementCost(unit, from, from.directionTo(tile), tile);
+				float cost = GetMovementCost(player, from, from.directionTo(tile), tile);
 				movementPoints.onUnitMove(cost);
 
 				// If we can't do any more moves, bump up the turn cost and reset
@@ -88,18 +88,16 @@ namespace C7GameData {
 			return new TilePath(destination, new Queue<Tile>());
 		}
 
-		public static float GetMovementCost(MapUnit unit, Tile from, TileDirection dir, Tile newLocation) {
-
-			Player unitOwner = unit.owner;
+		public static float GetMovementCost(Player player, Tile from, TileDirection dir, Tile newLocation) {
 
 			// River crossings disrupt roads, so check that first.
 			if (from.HasRiverCrossing(dir)) {
-				if (!unitOwner.CanBridgeRoads()) {
+				if (!player.CanBridgeRoads()) {
 					return newLocation.MovementCost();
 				}
 			}
 
-			if (!Player.CanMoveFreely(unitOwner, from, newLocation)) {
+			if (!Player.CanMoveFreely(player, from, newLocation)) {
 				return newLocation.MovementCost();
 			}
 

@@ -259,7 +259,9 @@ namespace C7GameData {
 			Player targetTileOwner = targetTile.OwningPlayer();
 			Player sourceTileOwner = sourceTile.OwningPlayer();
 
-			// any to any && any to own && own to any && own to own
+			// We are free to move if:
+			// - the tile we are on is unowned, or we own the tile
+			// - and the tile we are moving to is unowned, or we own the tile
 			if ((sourceTileOwner == null || sourceTileOwner == player)
 				&& (targetTileOwner == player || targetTileOwner == null))
 				return true;
