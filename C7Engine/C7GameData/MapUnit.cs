@@ -185,6 +185,10 @@ namespace C7GameData {
 
 				yield return location.overlayTerrainType.defenseBonus;
 
+				foreach (StrengthBonus sb in location.overlays.GetDefenseBonuses()) {
+					yield return sb;
+				}
+
 				if ((!role.Bombarding()) && (attackDirection is TileDirection dir) && location.HasRiverCrossing(dir.reversed()))
 					yield return gD.riverCrossingBonus;
 

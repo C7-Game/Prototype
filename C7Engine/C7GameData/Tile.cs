@@ -825,6 +825,13 @@ namespace C7GameData {
 			return terrainImprovementByLayer.Count > 0;
 		}
 
+		public IEnumerable<StrengthBonus> GetDefenseBonuses() {
+			return terrainImprovementByLayer.Values
+				.Select(ti => ti.defenseBonus)
+				.Where(v => v.HasValue)
+				.Select(v => v.Value);
+		}
+
 		public void Clear() {
 			terrainImprovementByLayer.Clear();
 		}
