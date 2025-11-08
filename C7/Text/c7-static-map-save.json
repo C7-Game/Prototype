@@ -73891,7 +73891,6 @@
     {
       "id": "player-1",
       "colorIndex": 0,
-      "barbarian": true,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -73910,7 +73909,6 @@
     {
       "id": "player-2",
       "colorIndex": 9,
-      "barbarian": false,
       "human": true,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -73988,7 +73986,6 @@
     {
       "id": "player-3",
       "colorIndex": 5,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -74066,7 +74063,6 @@
     {
       "id": "player-4",
       "colorIndex": 4,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -74140,7 +74136,6 @@
     {
       "id": "player-5",
       "colorIndex": 7,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -74218,7 +74213,6 @@
     {
       "id": "player-6",
       "colorIndex": 10,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -74300,7 +74294,6 @@
     {
       "id": "player-7",
       "colorIndex": 6,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -74378,7 +74371,6 @@
     {
       "id": "player-8",
       "colorIndex": 8,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
@@ -74571,7 +74563,8 @@
         "Toltec",
         "Kushite",
         "Barbarian"
-      ]
+      ],
+      "isBarbarian": true
     },
     {
       "name": "Rome",
@@ -74633,7 +74626,8 @@
       "traits": [
         "militaristic",
         "commercial"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Egypt",
@@ -74680,7 +74674,8 @@
       "traits": [
         "religious",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Greece",
@@ -74727,7 +74722,8 @@
       "traits": [
         "commercial",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Babylon",
@@ -74772,7 +74768,8 @@
       "traits": [
         "scientific",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Germany",
@@ -74806,7 +74803,8 @@
       "traits": [
         "militaristic",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Russia",
@@ -74863,7 +74861,8 @@
       "traits": [
         "expansionist",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "China",
@@ -74899,7 +74898,8 @@
       "traits": [
         "militaristic",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "America",
@@ -74957,7 +74957,8 @@
       "traits": [
         "expansionist",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Japan",
@@ -75001,7 +75002,8 @@
       "traits": [
         "militaristic",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "France",
@@ -75040,7 +75042,8 @@
       "traits": [
         "commercial",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "India",
@@ -75075,7 +75078,8 @@
       "traits": [
         "commercial",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Persia",
@@ -75122,7 +75126,8 @@
       "traits": [
         "scientific",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Aztecs",
@@ -75176,7 +75181,8 @@
       "traits": [
         "militaristic",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Zululand",
@@ -75210,7 +75216,8 @@
       "traits": [
         "militaristic",
         "expansionist"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Iroquois",
@@ -75257,7 +75264,8 @@
       "traits": [
         "commercial",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "England",
@@ -75304,7 +75312,8 @@
       "traits": [
         "commercial",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Mongols",
@@ -75352,7 +75361,8 @@
       "traits": [
         "militaristic",
         "expansionist"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Spain",
@@ -75401,7 +75411,8 @@
       "traits": [
         "religious",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Scandinavia",
@@ -75452,7 +75463,8 @@
       "traits": [
         "militaristic",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Ottomans",
@@ -75499,7 +75511,8 @@
       "traits": [
         "scientific",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Celts",
@@ -75547,7 +75560,8 @@
       "traits": [
         "religious",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Arabia",
@@ -75593,7 +75607,8 @@
       "traits": [
         "expansionist",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Carthage",
@@ -75641,7 +75656,8 @@
       "traits": [
         "industrious",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Korea",
@@ -75689,7 +75705,8 @@
       "traits": [
         "commercial",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Sumeria",
@@ -75732,7 +75749,8 @@
       "traits": [
         "scientific",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Hittites",
@@ -75775,7 +75793,8 @@
       "traits": [
         "commercial",
         "expansionist"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Netherlands",
@@ -75818,7 +75837,8 @@
       "traits": [
         "agricultural",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Portugal",
@@ -75872,7 +75892,8 @@
       "traits": [
         "expansionist",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Byzantines",
@@ -75915,7 +75936,8 @@
       "traits": [
         "scientific",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Inca",
@@ -75958,7 +75980,8 @@
       "traits": [
         "expansionist",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Maya",
@@ -76002,7 +76025,8 @@
       "traits": [
         "industrious",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     }
   ],
   "strengthBonuses": [

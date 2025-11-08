@@ -7,6 +7,7 @@ using Serilog;
 using C7Engine.Pathing;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class Game : Node {
 	[Signal] public delegate void TurnEndedEventHandler();
@@ -93,44 +94,7 @@ public partial class Game : Node {
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 
 		try {
-			// Ensure we clear out our image caches, as scenarios and games will
-			// use the same filenames but have different content for them.
-			Util.ClearCaches();
-
-			controller = await CreateGame.createGame(
-				Global.LoadGamePath,
-				GamePaths.LuaRulesDir,
-				GamePaths.DefaultBicPath,
-				(scenarioSearchPath) => {
-					// When the game loading logic tries to load the PediaIcons file, set the
-					// scenario search path and then use our Civ3MediaPath searching logic to
-					// find the correct version of the file.
-					//
-					// This weird bit of indirection is necessary because the C7GameData project
-					// can't depend on the C7 project without a circular dependency, and the
-					// search logic has a Godot dependency, so it doesn't make sense to live
-					// in the C7GameData project.
-					//
-					// This also helps ensure the weird stateful behavior of the Util class works,
-					// since the search path/mod path is a static global variable - we want to
-					// be sure it is always set properly, so doing it during game creation
-					// is reasonable.
-					Util.setModPath(scenarioSearchPath);
-					log.Debug("RelativeModPath ", scenarioSearchPath);
-					return Util.Civ3MediaPath("Text/PediaIcons.txt");
-				}); // Spawns engine thread
-
-			Global.ResetLoadGamePath();
-
-			InitializeMapView();
-
-			log.Information("Now in game!");
-
-			loadTimer.Stop();
-			TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-			log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
-
-			EmitSignal(SignalName.GameInitialized);
+			await LoadGame();
 		} catch (Exception ex) {
 			errorOnLoad = true;
 			string message = ex.Message;
@@ -142,6 +106,54 @@ public partial class Game : Node {
 			popupOverlay.ShowPopup(new ErrorMessage(message), PopupOverlay.PopupCategory.Advisor);
 			log.Error(ex, "Unexpected error in Game.cs _Ready");
 		}
+	}
+
+	private async Task LoadGame() {
+		// Ensure we clear out our image caches, as scenarios and games will
+		// use the same filenames but have different content for them.
+		Util.ClearCaches();
+
+		CreateGameParams options = new(GamePaths.LuaRulesDir, GamePaths.DefaultBicPath)
+			{
+			GetPediaIconsPath = (scenarioSearchPath) => {
+				// When the game loading logic tries to load the PediaIcons file, set the
+				// scenario search path and then use our Civ3MediaPath searching logic to
+				// find the correct version of the file.
+				//
+				// This weird bit of indirection is necessary because the C7GameData project
+				// can't depend on the C7 project without a circular dependency, and the
+				// search logic has a Godot dependency, so it doesn't make sense to live
+				// in the C7GameData project.
+				//
+				// This also helps ensure the weird stateful behavior of the Util class works,
+				// since the search path/mod path is a static global variable - we want to
+				// be sure it is always set properly, so doing it during game creation
+				// is reasonable.
+				Util.setModPath(scenarioSearchPath);
+				log.Debug("RelativeModPath ", scenarioSearchPath);
+				return Util.Civ3MediaPath("Text/PediaIcons.txt");
+			}
+		};
+
+		if (Global.SaveGame != null) {
+			controller = await CreateGame.createGame(Global.SaveGame, options);
+		} else if (Global.LoadGamePath != null) {
+			controller = await CreateGame.createGame(Global.LoadGamePath, options);
+		} else {
+			throw new InvalidOperationException("Save data was not set");
+		}
+
+		Global.ResetLoadGameFields();
+
+		InitializeMapView();
+
+		log.Information("Now in game!");
+
+		loadTimer.Stop();
+		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
+		log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+
+		EmitSignal(SignalName.GameInitialized);
 	}
 
 	private void InitializeMapView() {

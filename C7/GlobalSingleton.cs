@@ -1,6 +1,6 @@
 using Godot;
-using QueryCiv3;
 using C7Engine;
+using C7GameData.Save;
 
 /****
 	Need to pass values from one scene to another, particularly when loading
@@ -12,6 +12,9 @@ public partial class GlobalSingleton : Node {
 	// which then should blank it again to prevent reloading same if going back to main menu
 	// and back to game
 	public string LoadGamePath;
+
+	// Generated game data used when starting a new game
+	public SaveGame SaveGame;
 
 	public bool ModernGraphicsActive { get; private set; }
 
@@ -26,8 +29,9 @@ public partial class GlobalSingleton : Node {
 	// setup screen, which is what actually kicks off the world generation.
 	public WorldCharacteristics WorldCharacteristics;
 
-	public void ResetLoadGamePath() {
+	public void ResetLoadGameFields() {
 		LoadGamePath = GamePaths.DefaultGamePath;
+		SaveGame = null;
 	}
 
 	public void ToggleModernGraphics() {

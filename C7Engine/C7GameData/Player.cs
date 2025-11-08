@@ -13,7 +13,7 @@ namespace C7GameData {
 
 		public ID id { get; internal set; }
 		public int colorIndex;
-		public bool isBarbarians = false;
+		public bool isBarbarians { get => civilization.isBarbarian; }
 		//TODO: Refactor front-end so it sends player GUID with requests.
 		//We should allow multiple humans, this is a temporary measure.
 		public bool isHuman = false;

@@ -22,7 +22,6 @@ namespace C7GameData.Save {
 	public class SavePlayer {
 		public ID id;
 		public int colorIndex;
-		public bool barbarian;
 		public bool human = false;
 		public bool hasPlayedCurrentTurn = false;
 		public bool defeated = false;
@@ -80,7 +79,6 @@ namespace C7GameData.Save {
 		public Player ToPlayer(GameMap map, List<Civilization> civilizations, List<Government> governments, List<Tech> techs, Rules rules) {
 			Player player = new Player{
 				id = id,
-				isBarbarians = barbarian,
 				isHuman = human,
 				hasPlayedThisTurn = hasPlayedCurrentTurn,
 				defeated = defeated,
@@ -130,7 +128,6 @@ namespace C7GameData.Save {
 		public SavePlayer(Player player) {
 			id = player.id;
 			colorIndex = player.colorIndex;
-			barbarian = player.isBarbarians;
 			human = player.isHuman;
 			hasPlayedCurrentTurn = player.hasPlayedThisTurn;
 			defeated = player.defeated;

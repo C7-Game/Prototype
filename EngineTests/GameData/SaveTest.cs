@@ -108,11 +108,12 @@ public class SaveTests {
 	}
 
 	private Player CreateHeadlessGame(string path, string biqPath = "", Func<string, string> getPediaIconsPath = null) {
-		if (getPediaIconsPath == null) {
-			getPediaIconsPath = (string unused) => { return unused; };
+		CreateGameParams options = new(luaRulesDir, biqPath);
+		if (getPediaIconsPath != null) {
+			options.GetPediaIconsPath = getPediaIconsPath;
 		}
 
-		return CreateGame.createGame(path, luaRulesDir, biqPath, getPediaIconsPath).Result;
+		return CreateGame.createGame(path, options).Result;
 	}
 
 	private C7GameData.GameData ToGameData(SaveGame game) {
