@@ -9,7 +9,7 @@ public partial class MainMenu : Node {
 	[Export]
 	Civ3FileDialog LoadDialog;
 	[Export]
-	Button SetCiv3Home;
+	Control NoCiv3Options;
 	[Export]
 	FileDialog SetCiv3HomeDialog;
 	[Export]
@@ -18,14 +18,12 @@ public partial class MainMenu : Node {
 	MenuButtonContainer ButtonContainer;
 	[Export]
 	AudioStreamPlayer player;
-	[Export] Button UseStandaloneMode;
 
 	GlobalSingleton Global;
 
 	public override void _Ready() {
 		log = LogManager.ForContext<MainMenu>();
 		log.Debug("enter MainMenu._Ready");
-		UseStandaloneMode.Pressed += UseStandaloneModePressed;
 
 		DisplayServer.WindowSetTitle("C7 - Godot 4");
 
@@ -74,9 +72,8 @@ public partial class MainMenu : Node {
 			ButtonContainer.ToggleGraphics.Visible = false;
 		}
 
-		// Hide select home folder if valid path is present as proven by reaching this point in code
-		SetCiv3Home.Visible = false;
-		UseStandaloneMode.Visible = false;
+		// Hide if valid path is present as proven by reaching this point in code
+		NoCiv3Options.Visible = false;
 	}
 
 	private void SetToggleGraphicsText() {
