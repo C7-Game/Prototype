@@ -19,8 +19,12 @@ namespace C7.Map {
 				return;
 			}
 
-			var texture = TextureLoader.Load("resources.large", resource, useCache: true);
+			if (!looseView.mapView.game.Global.ModernGraphicsActive) {
+				ImageTexture shadows = TextureLoader.Load("resources.shadows", resource, useCache: true);
+				looseView.DrawTexture(shadows, tileCenter - 0.5f * shadows.GetSize());
+			}
 
+			ImageTexture texture = TextureLoader.Load("resources.large", resource, useCache: true);
 			looseView.DrawTexture(texture, tileCenter - 0.5f * texture.GetSize());
 		}
 
