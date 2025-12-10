@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using C7GameData;
 using Godot;
@@ -8,7 +9,7 @@ public partial class UnitLayer : LooseLayer {
 	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
 	// any particular order so we must use the ZIndex property to ensure they're properly layered.
 	public const int effectAnimZIndex = 1;
-	public const int unitAnimZIndex = 0;
+	public const int unitAnimZIndex = 1;
 	public const int cursorZIndex = -1;
 
 	public UnitLayer() {
@@ -220,7 +221,7 @@ public partial class UnitLayer : LooseLayer {
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
-		if (!UnitsVisible(gameData, tile)) {
+		if (!UnitsVisible(gameData, looseView.mapView.game.controller, tile)) {
 			return;
 		}
 
@@ -248,49 +249,91 @@ public partial class UnitLayer : LooseLayer {
 
 		drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
 
-		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
+		// TODO: Figure out how we can draw the unit's HP bar above the unit and the cursor
 
-		int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
-		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
-		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
-		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+		// Option A: Support all kind of zoom levels. The downside is at large zoom distances, the HP indicators dominate the screen
+		// float cameraZoom = Math.Min(looseView.mapView.cameraZoom, 1.0f);
 
-		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5), hpIndWidth = 6;
-		Rect2 hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
-		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
+		// Option B: 2 Zoom levels regular, and double size.
+		// At larger distances it stays relatively small, but at this point I don't think we need to see the HP
+		float cameraZoom = Math.Clamp(looseView.mapView.cameraZoom, 0.5f, 1.0f);
+
+		float offsetXFromCenter = 26;
+		Vector2 hpStartingLocation = tileCenter - new Vector2(offsetXFromCenter, 0) + animOffset;
+
+		int maxHp = unit.maxHitPoints;
+		float hpIndHeight = GetHpFractionHeight(maxHp) / cameraZoom;
+		float hpIndWidth = 2 / cameraZoom;
+		float hpBarTotal = (hpIndHeight * maxHp + (maxHp - 1)/cameraZoom);
+		Vector2 movementLedCropping = new Vector2(6, 6);
+		Vector2 movementLedSize = movementLedCropping / cameraZoom;
+		float fortifiedLineExpand = 0.5f / cameraZoom;
+		float lineWidth = 1 / cameraZoom;
+
+		int offsetYFromCenter = 8;
+		Rect2 hpIndBackgroundRect = new Rect2(hpStartingLocation - new Vector2(0, offsetXFromCenter), Vector2.One);
+		if (unit.unitType.attack > 0 || unit.unitType.defense > 0) {
+			hpIndBackgroundRect = new Rect2((hpStartingLocation - new Vector2(0, hpBarTotal) - new Vector2(0, offsetYFromCenter)), new Vector2(hpIndWidth, hpBarTotal));
 			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
 			looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
-			float hpHeight = hpFraction * (hpIndHeight - 2);
-			if (hpHeight < 1)
-				hpHeight = 1;
-			var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
-										   new Vector2(hpIndWidth - 2, hpHeight)); // size
-			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
-			if (unit.isFortified)
-				looseView.DrawRect(hpIndBackgroundRect, white, false);
+			Color hpColor = getHPColor(hpFraction);
+			for (int i = 0; i < unit.hitPointsRemaining; i++) {
+				Rect2 hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(0, hpBarTotal) - new Vector2(0, hpIndHeight + (hpIndHeight+lineWidth)*i), new Vector2(hpIndWidth, hpIndHeight));
+				looseView.DrawRect(hpContentsRect, hpColor);
+			}
+			if (unit.isFortified) {
+				Rect2 fortifiedRect = hpIndBackgroundRect.Grow(fortifiedLineExpand);
+				looseView.DrawRect(fortifiedRect, white, false, width: lineWidth);
+			}
 		}
+
+		// TODO: Maybe add this is as a player configuration for a "harder" mode,
+		// where players can't see how many enemy units there are even in tiles that don't have a city.
+		// RightClickMenu functionality would need to be made configurable if this gets implemented in the future.
+		if (unit.location.HasCity && unit.owner != looseView.mapView.game.controller)
+			return;
+
+		// Draw movement indicator for our units
+		if (looseView.mapView.game.controller == unit.owner) {
+			int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
+			Vector2 moveIndUpperLeft = new Vector2((1 + 7 * moveIndIndex), 1);
+			Rect2 moveIndRect = new Rect2(moveIndUpperLeft, movementLedCropping);
+			Rect2 screenRect = new Rect2(hpIndBackgroundRect.Position - (new Vector2(2, 6) / cameraZoom), movementLedSize);
+			looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+		}
+
+		float lineMarginFromBar = 3 / cameraZoom;
 
 		// Draw lines to show that there are more units on this tile
 		if (tile.unitsOnTile.Count > 1) {
 			int lineCount = tile.unitsOnTile.Count;
-			if (lineCount > 5)
-				lineCount = 5;
+			// TODO: Make configurable to taste, with cap of 8?
+			if (lineCount > 8)
+				lineCount = 8;
 			for (int n = 0; n < lineCount; n++) {
-				var lineStart = indicatorLoc + new Vector2(-2, hpIndHeight + 12 + 4 * n);
-				looseView.DrawLine(lineStart, lineStart + new Vector2(8, 0), white);
-				looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
+				Vector2 lineStart = hpStartingLocation - new Vector2(lineWidth, offsetYFromCenter - lineMarginFromBar - lineMarginFromBar*n);
+				looseView.DrawLine(lineStart, lineStart + new Vector2(4, 0) / cameraZoom, white, width: lineWidth);
+				looseView.DrawLine(lineStart + new Vector2(0, 1) / cameraZoom, lineStart + new Vector2(4, 1) / cameraZoom, Color.Color8(75, 75, 75));
 			}
 		}
 	}
 
-	private bool UnitsVisible(GameData gameData, Tile t) {
+	// Draw smaller pixels for the hp fractions as the max hp grows
+	private int GetHpFractionHeight(int h) {
+		if (h <= 6)
+			return 4;
+		if (h <= 12)
+			return 2;
+		return 1;
+	}
+
+	private bool UnitsVisible(GameData gameData, Player player, Tile t) {
 		if (gameData.observerMode) {
 			return true;
 		}
 
 		// Only draw units on active tiles - otherwise if the tile is only known
 		// but not actively seen, we can't see units.
-		return gameData.GetFirstHumanPlayer().tileKnowledge.isActiveTile(t);
+		return player.tileKnowledge.isActiveTile(t);
 	}
 }

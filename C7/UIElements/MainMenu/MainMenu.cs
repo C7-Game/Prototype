@@ -9,7 +9,7 @@ public partial class MainMenu : Node {
 	[Export]
 	Civ3FileDialog LoadDialog;
 	[Export]
-	Button SetCiv3Home;
+	Control NoCiv3Options;
 	[Export]
 	FileDialog SetCiv3HomeDialog;
 	[Export]
@@ -18,16 +18,14 @@ public partial class MainMenu : Node {
 	MenuButtonContainer ButtonContainer;
 	[Export]
 	AudioStreamPlayer player;
-	[Export] Button UseStandaloneMode;
 
 	GlobalSingleton Global;
 
 	public override void _Ready() {
 		log = LogManager.ForContext<MainMenu>();
 		log.Debug("enter MainMenu._Ready");
-		UseStandaloneMode.Pressed += UseStandaloneModePressed;
 
-		DisplayServer.WindowSetTitle("C7 - Godot 4");
+		DisplayServer.WindowSetTitle((string)ProjectSettings.GetSetting("application/config/name"));
 
 		try {
 			DisplayTitleScreen();
@@ -52,14 +50,19 @@ public partial class MainMenu : Node {
 		if (ButtonContainer.NewGame == null) {
 			ButtonContainer.CreateButtons();
 		}
+		// TODO: enable buttons are features are implemented
 		ButtonContainer.NewGame.Pressed += GoToWorldSetup;
-		ButtonContainer.QuickStart.Pressed += GoToWorldSetup;
+		ButtonContainer.QuickStart.Pressed += StartGame;
 		ButtonContainer.Tutorial.Pressed += StartGame;
+		ButtonContainer.Tutorial.Visible = false;
 		ButtonContainer.LoadGame.Pressed += LoadGame;
 		ButtonContainer.LoadScenario.Pressed += LoadScenario;
 		ButtonContainer.HallOfFame.Pressed += HallOfFame;
+		ButtonContainer.HallOfFame.Visible = false;
 		ButtonContainer.Preferences.Pressed += Preferences;
+		ButtonContainer.Preferences.Visible = false;
 		ButtonContainer.AudioPreferences.Pressed += Preferences;
+		ButtonContainer.AudioPreferences.Visible = false;
 		ButtonContainer.Credits.Pressed += showCredits;
 		ButtonContainer.Exit.Pressed += _on_Exit_pressed;
 
@@ -74,16 +77,15 @@ public partial class MainMenu : Node {
 			ButtonContainer.ToggleGraphics.Visible = false;
 		}
 
-		// Hide select home folder if valid path is present as proven by reaching this point in code
-		SetCiv3Home.Visible = false;
-		UseStandaloneMode.Visible = false;
+		// Hide if valid path is present as proven by reaching this point in code
+		NoCiv3Options.Visible = false;
 	}
 
 	private void SetToggleGraphicsText() {
 		if (Global.ModernGraphicsActive) {
-			ButtonContainer.ToggleGraphics.Text = "Turn on Civ3 Graphics";
+			ButtonContainer.ToggleGraphics.Text = "Import Civilization III Graphics";
 		} else {
-			ButtonContainer.ToggleGraphics.Text = "Turn on C7 Graphics";
+			ButtonContainer.ToggleGraphics.Text = "Use OpenCiv3 Graphics";
 		}
 	}
 

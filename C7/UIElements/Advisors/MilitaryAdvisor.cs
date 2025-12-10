@@ -23,7 +23,7 @@ public partial class MilitaryAdvisor : TextureRect {
 
 		//TODO: Multi-line capabilities
 		Label DialogBoxAdvise = new Label();
-		DialogBoxAdvise.Text = "You are running C7!";
+		DialogBoxAdvise.Text = "You are running OpenCiv3!";
 		DialogBoxAdvise.SetPosition(new Vector2(815, 119));
 		AddChild(DialogBoxAdvise);
 

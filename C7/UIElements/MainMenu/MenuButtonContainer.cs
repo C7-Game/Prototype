@@ -38,7 +38,7 @@ public partial class MenuButtonContainer : VBoxContainer {
 		HallOfFame = new Civ3MenuButton() { Text = "Hall of Fame" };
 		AddChild(HallOfFame);
 
-		ToggleGraphics = new Civ3MenuButton() { Text = "Turn on C7 Graphics" };
+		ToggleGraphics = new Civ3MenuButton() { Text = "Use OpenCiv3 Graphics" };
 		AddChild(ToggleGraphics);
 
 		Preferences = new Civ3MenuButton() { Text = "Preferences" };

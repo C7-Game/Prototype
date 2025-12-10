@@ -142,7 +142,7 @@ namespace C7GameData {
 
 				Tech tech = EngineStorage.gameData.techs.Find(x => x.id == id);
 				log.Information($"Awarding {tech.Name} to player {this}");
-				CompleteResearchingTech(EngineStorage.gameData, tech);
+				CompleteResearchAndBeginNew(EngineStorage.gameData, tech);
 				return;
 			}
 
@@ -363,13 +363,8 @@ namespace C7GameData {
 				other.gold -= theirOffer.gold.Value;
 			}
 
-			foreach (Tech t in ourOffer.techs) {
-				other.knownTechs.Add(t.id);
-			}
-
-			foreach (Tech t in theirOffer.techs) {
-				this.knownTechs.Add(t.id);
-			}
+			other.CompleteResearchAndBeginNew(gameData, ourOffer.techs);
+			this.CompleteResearchAndBeginNew(gameData, theirOffer.techs);
 		}
 
 		public int EstimateTurnsToResearch(GameData gameData, Tech tech) {
@@ -444,9 +439,7 @@ namespace C7GameData {
 				return new Queue<Tech>();
 			}
 
-			// TODO: maybe sort these on some other score, perhaps the order the AI would have picked them
-			// Right now the tech with the highest cost comes first
-			List<Tech> requiredTechs = tech.Prerequisites.OrderBy(t => t.Cost).ToList();
+			List<Tech> requiredTechs = OrderTechs(tech.Prerequisites).ToList();
 
 			// first, add the tech the user clicked
 			if (!tempQueue.Contains(tech)) {
@@ -473,9 +466,14 @@ namespace C7GameData {
 			return tempQueue;
 		}
 
-		public HashSet<Tech> GetAvailableTechsToResearch(GameData gameData) {
+		/// <summary>
+		/// Takes all the techs in the game and keeps only what could be researched next at a particular point in the game.
+		/// </summary>
+		/// <param name="allTechs"></param>
+		/// <returns></returns>
+		public HashSet<Tech> GetAvailableTechsToResearch(List<Tech> allTechs) {
 			HashSet<Tech> result = new();
-			foreach (Tech tech in gameData.techs) {
+			foreach (Tech tech in allTechs) {
 				if (knownTechs.Contains(tech.id)) {
 					continue;
 				}
@@ -494,7 +492,17 @@ namespace C7GameData {
 					result.Add(tech);
 				}
 			}
-			return result;
+			return OrderTechs(result.ToList());
+		}
+
+		// Placeholder ordering of techs
+		private HashSet<Tech> OrderTechs(List<Tech> techs) {
+			if (techs == null || techs.Count == 0) {
+				return new HashSet<Tech>();
+			}
+			// TODO: We would want to eventually order them based on how the AI would do it
+			// Details on how Civ3 does it: https://forums.civfanatics.com/threads/what-will-the-ai-research-next.45559/
+			return techs.OrderBy(t => t.Cost).ToHashSet();
 		}
 
 		public List<Government> GetAvailableGovernments(GameData gameData) {
@@ -679,7 +687,18 @@ namespace C7GameData {
 				return;
 			}
 
+			CompleteResearchAndBeginNew(gameData, tech);
+		}
+
+		private void CompleteResearchAndBeginNew(GameData gameData, IEnumerable<Tech> techs) {
+			foreach (Tech tech in techs) {
+				CompleteResearchingTech(gameData, tech);
+			}
+			PlayerAI.MaybePickTechToResearch(this, gameData.techs);
+		}
+		private void CompleteResearchAndBeginNew(GameData gameData, Tech tech) {
 			CompleteResearchingTech(gameData, tech);
+			PlayerAI.MaybePickTechToResearch(this, gameData.techs);
 		}
 
 		private void CompleteResearchingTech(GameData gameData, Tech tech) {

@@ -40,6 +40,13 @@ public partial class AnimationManager {
 		return AnimationKey(BaseAnimationKey(unit, action), direction);
 	}
 
+	public static readonly Dictionary<string, ImageTexture> AnimationThumbnails = new();
+	public static readonly Dictionary<string, ImageTexture> AnimationTintThumbnails = new();
+
+	private const int thumbnailFrame = 0;
+	private const TileDirection thumbnailDirection = TileDirection.SOUTHEAST;
+	private const MapUnit.AnimatedAction thumbnailAction = MapUnit.AnimatedAction.DEFAULT;
+
 	private AudioStreamPlayer audioPlayer;
 
 	public SpriteFrames spriteFrames;
@@ -60,6 +67,32 @@ public partial class AnimationManager {
 			iniDatas.Add(pathKey, tr);
 		}
 		return tr;
+	}
+
+	public static string GetUnitDefaultThumbnailKey(UnitPrototype unit) {
+		return $"{unit.artName}_{thumbnailDirection}_{thumbnailAction}_{thumbnailFrame}";
+	}
+
+	public (ImageTexture baseFrame, ImageTexture tintFrame) GetAnimationFrameAndTintTextures(UnitPrototype unit) {
+
+		string key = GetUnitDefaultThumbnailKey(unit);
+
+		if (AnimationThumbnails.TryGetValue(key, out ImageTexture baseImage)
+		   && AnimationTintThumbnails.TryGetValue(key, out ImageTexture tintImage)) {
+			return (baseImage, tintImage);
+		}
+
+		string filepath = getUnitFlicFilepath(unit, thumbnailAction);
+
+		Flic flic = Util.LoadFlic(filepath);
+
+		byte[] rawFrame = flic.Images[flicAnimationDirectionToRow(thumbnailDirection), thumbnailFrame];
+		// This actually doesn't return the tint frame with the civ color applied. The shader still needs to be applied.
+		(ImageTexture baseFrame, ImageTexture tintFrame) = Util.LoadTextureFromFlicData(rawFrame, flic.Palette, flic.Width, flic.Height);
+		AnimationThumbnails[key] = baseFrame;
+		AnimationTintThumbnails[key] = tintFrame;
+
+		return (baseFrame, tintFrame);
 	}
 
 	// Looks up the name of the flic file associated with a given action in an animation INI. If there is no flic file listed for the action,
@@ -102,6 +135,20 @@ public partial class AnimationManager {
 		// TODO: I wanted to add a TileDirection.INVALID enum value when implementing this,
 		// but adding an INVALID value broke stuff: https://github.com/C7-Game/Prototype/issues/397
 		return TileDirection.NORTH;
+	}
+
+	private static int flicAnimationDirectionToRow(TileDirection tileDirection) {
+		switch (tileDirection) {
+			case TileDirection.SOUTHWEST: return 0;
+			case TileDirection.SOUTH: return 1;
+			case TileDirection.SOUTHEAST: return 2;
+			case TileDirection.EAST: return 3;
+			case TileDirection.NORTHEAST: return 4;
+			case TileDirection.NORTH: return 5;
+			case TileDirection.NORTHWEST: return 6;
+			case TileDirection.WEST: return 7;
+		}
+		return 2;
 	}
 
 	public static void loadFlicAnimation(string path, string name, ref SpriteFrames frames, ref SpriteFrames tint) {
@@ -169,6 +216,11 @@ public partial class AnimationManager {
 
 	public C7Animation forEffect(AnimatedEffect effect) {
 		return new C7Animation(this, effect);
+	}
+
+	public static void ClearCache() {
+		AnimationThumbnails.Clear();
+		AnimationTintThumbnails.Clear();
 	}
 }
 

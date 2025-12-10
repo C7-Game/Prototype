@@ -115,8 +115,14 @@ public partial class UnitButtons : VBoxContainer {
 	}
 
 	private void OnNewUnitSelected(ParameterWrapper<MapUnit> wrappedMapUnit) {
-		MapUnit unit = wrappedMapUnit.Value;
+		UpdateButtons(wrappedMapUnit.Value);
+	}
 
+	private void OnUnitMoved(ParameterWrapper<MapUnit> wrappedMapUnit) {
+		UpdateButtons(wrappedMapUnit.Value);
+	}
+
+	private void UpdateButtons(MapUnit unit) {
 		// Reset the visibility and tooltip whenever the unit changes.
 		foreach (ButtonAndTooltip btt in buttonMap.Values) {
 			btt.button.Visible = false;

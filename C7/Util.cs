@@ -392,5 +392,6 @@ public partial class Util {
 	public static void ClearCaches() {
 		flicCache.Clear();
 		TextureLoader.ClearCache();
+		AnimationManager.ClearCache();
 	}
 }

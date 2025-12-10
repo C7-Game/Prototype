@@ -18,6 +18,7 @@ public class SaveTerraform {
 	// Lua functions
 	public List<string> Validators = [];
 	public List<string> Effects = [];
+	public string AIScore;
 
 	public MapUnit.AnimatedAction? Animation;
 
@@ -91,16 +92,34 @@ public class SaveTerraform {
 			_ => null,
 		};
 
-		if (actionPath == null)
-			return;
-
-		Validators.Add($"terraforms.{actionPath}.validator");
+		if (actionPath != null)
+			Validators.Add($"terraforms.validators.{actionPath}");
 
 		// Add effect
 		switch (tfKey) {
 			case TerraformKey.ClearWetlands:
 			case TerraformKey.ClearForest:
-				Effects.Add($"terraforms.{actionPath}.effect");
+				Effects.Add($"terraforms.effects.{actionPath}");
+				break;
+		}
+
+		// Add AI-scoring function
+		switch (tfKey) {
+			case TerraformKey.ClearWetlands:
+				AIScore = "terraforms.ai_score.clear_wetlands";
+				break;
+			case TerraformKey.ClearForest:
+				AIScore = "terraforms.ai_score.clear_forest";
+				break;
+			case TerraformKey.BuildMine:
+			case TerraformKey.Irrigate:
+				AIScore = "terraforms.ai_score.yield_improvement";
+				break;
+			case TerraformKey.BuildRoad:
+				AIScore = "terraforms.ai_score.road";
+				break;
+			default:
+				AIScore = "terraforms.ai_score.default";
 				break;
 		}
 	}

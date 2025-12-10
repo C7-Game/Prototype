@@ -68,17 +68,20 @@ namespace C7Engine {
 			}
 		}
 
-		private static void MaybePickTechToResearch(Player player, List<Tech> techs) {
-			while (player.currentlyResearchedTech == null) {
-				Tech toResearch = PickTechToResearch(player, techs);
+		public static void MaybePickTechToResearch(Player player, List<Tech> techs) {
+			while (player.currentlyResearchedTech == null || player.knownTechs.Contains(player.currentlyResearchedTech)) {
+				Tech toResearch = player.GetAvailableTechsToResearch(techs).FirstOrDefault();
 				if (toResearch == null) {
 					log.Information($"Player {player.civilization.name} has no techs available to research.");
 					player.SetCurrentlyResearchedTech(null);
 					break;
-				} else {
-					log.Information($"Player {player.civilization.name} is researching {toResearch.Name}.");
-					player.SetCurrentlyResearchedTech(toResearch.id);
 				}
+
+				if (player.ResearchQueue.Count <= 0) {
+					player.AddTechItemToResearchQueue(toResearch);
+				}
+				player.SetCurrentlyResearchedTech(player.ResearchQueue.Peek().id);
+				log.Information($"Player {player.civilization.name} is researching {player.ResearchQueue.Peek().Name}.");
 			}
 		}
 
@@ -266,39 +269,6 @@ namespace C7Engine {
 				return new CombatAI(caid);
 			}
 			return null;
-		}
-
-		private static Tech PickTechToResearch(Player player, List<Tech> techs) {
-			List<Tech> possibleTechs = new();
-
-			// Figure out what techs we're allowed to research.
-			foreach (Tech tech in techs) {
-				if (tech.EraCivilopediaName != player.eraCivilopediaName) {
-					continue;
-				}
-				if (player.knownTechs.Contains(tech.id)) {
-					continue;
-				}
-
-				bool prereqsKnown = true;
-				foreach (Tech prereq in tech.Prerequisites) {
-					if (!player.knownTechs.Contains(prereq.id)) {
-						prereqsKnown = false;
-						break;
-					}
-				}
-				if (!prereqsKnown) {
-					continue;
-				}
-				possibleTechs.Add(tech);
-			}
-
-			if (possibleTechs.Count == 0) {
-				return null;
-			}
-
-			// Details on how Civ3 does it: https://forums.civfanatics.com/threads/what-will-the-ai-research-next.45559/
-			return possibleTechs[(int)GameData.rng.NextInt64(possibleTechs.Count)];
 		}
 
 		private static async Task AttemptTrading(Player us) {

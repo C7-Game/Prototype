@@ -43,10 +43,8 @@ public partial class PlayerSetup : Control {
 		save = GetSave();
 
 		// Set up buttons for the civs the player can play as.
-		//
-		// TODO: Bump this to Dutch once we bump the release.
 		playerListContainer.Columns = (int)Math.Ceiling(save.Civilizations.Count / 12.0);
-		string initiallySelectedCiv = save.Civilizations.Any(x => x.name == "Carthage") ? "Carthage" : save.Civilizations[1].name;
+		string initiallySelectedCiv = save.Civilizations.Any(x => x.name == "Netherlands") ? "Netherlands" : save.Civilizations[1].name;
 		foreach (Civilization civ in save.Civilizations) {
 			if (civ.isBarbarian) {
 				continue;
@@ -129,6 +127,7 @@ public partial class PlayerSetup : Control {
 			PopupMenu popup = optionButton.GetPopup();
 			popup.AddThemeStyleboxOverride("panel", styleBox);
 			popup.MaxSize = new Vector2I(popup.MaxSize.X, 300);
+			popup.SetTransparentBackground(false);
 			opponentSelectors.Add(optionButton);
 
 			CenterContainer container = new();

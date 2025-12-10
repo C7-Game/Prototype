@@ -137,6 +137,8 @@ public class LuaRulesEngine {
 	public T ImportFunc<T>(string functionPath) where T : Delegate {
 		if (script == null || rules == null)
 			throw new InvalidOperationException("Engine is not initialized");
+		if (functionPath == null)
+			throw new InvalidOperationException("Non-null function path expected");
 
 		Closure closure = ResolveFunctionPath(functionPath);
 		Delegate del = LuaDelegateConverter.CreateDelegate(script, closure, typeof(T));

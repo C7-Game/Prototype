@@ -76,6 +76,7 @@ public static class TextureLoader {
 	private static Dictionary<string, Pcx> PcxCache = [];
 	private static Dictionary<string, Image> PngCache = [];
 	private static Dictionary<string, Color> colorCache = [];
+	private static Dictionary<int, ShaderMaterial> materialCache = [];
 
 	private static Dictionary<string, ImageTexture> configKeyCache = [];
 	private static Dictionary<(string configKey, object obj), ImageTexture> objectMappingCache = [];
@@ -458,6 +459,18 @@ public static class TextureLoader {
 		return png;
 	}
 
+	public static ShaderMaterial GetShaderMaterialForUnit(int civIndex) {
+		if (materialCache.TryGetValue(civIndex, out ShaderMaterial material)) {
+			return material;
+		}
+		material = new();
+		material.Shader = GD.Load<Shader>("res://UnitTint.gdshader");
+		Color civColor = LoadColor(civIndex);
+		material.SetShaderParameter("tintColor", new Vector3(civColor.R, civColor.G, civColor.B));
+		materialCache[civIndex] = material;
+		return material;
+	}
+
 	public static void ClearCache() {
 		PcxCache.Clear();
 		PngCache.Clear();
@@ -466,5 +479,6 @@ public static class TextureLoader {
 		objectMappingCache.Clear();
 		animationCache.Clear();
 		colorCache.Clear();
+		materialCache.Clear();
 	}
 }

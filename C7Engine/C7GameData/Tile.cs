@@ -649,14 +649,18 @@ namespace C7GameData {
 		/// Eventually, we should also have a method to make relevant units (workers, artillery, etc.) be captured.
 		/// </summary>
 		/// <param name="tile"></param>
-		public void DisbandNonDefendingUnits() {
+		public void DisbandNonDefendingUnits(Player owner) {
 			//There may have been naval units, if so, disband them
 			if (unitsOnTile.Count > 0) {
 				//Copy to a separate array so we don't crash due to concurrent modification exceptions
 				MapUnit[] unitsOnTile = new MapUnit[this.unitsOnTile.Count];
 				this.unitsOnTile.CopyTo(unitsOnTile);
 				foreach (MapUnit destroyedUnit in unitsOnTile) {
-					destroyedUnit.disband();
+					// Ensure we only destroy units of the losing side of the
+					// combat, not the unit entering the city.
+					if (destroyedUnit.owner == owner) {
+						destroyedUnit.disband();
+					}
 				}
 			}
 		}
@@ -694,12 +698,6 @@ namespace C7GameData {
 
 		public void ClearTerrainOverlay() {
 			overlayTerrainType = baseTerrainType;
-		}
-
-		public Tile Copy() {
-			Tile clone = (Tile)MemberwiseClone();
-			clone.overlays = new TileOverlays(overlays);
-			return clone;
 		}
 	}
 
@@ -752,11 +750,6 @@ namespace C7GameData {
 			this.tile = tile;
 		}
 
-		public TileOverlays(TileOverlays other)
-			: this(other.tile) {
-			terrainImprovementByLayer = new(other.terrainImprovementByLayer);
-		}
-
 		public void Add(TerrainImprovement improvement) {
 			if (!CanAdd(improvement))
 				throw new InvalidOperationException($"Cannot add {improvement.key} to the tile");
@@ -779,6 +772,12 @@ namespace C7GameData {
 			return ti;
 		}
 
+		public TerrainImprovement ImprovementAtLayer(Terraform terraform) {
+			TerrainImprovement.Layer currentLayer = terraform.Improvement.layer;
+			terrainImprovementByLayer.TryGetValue(currentLayer, out TerrainImprovement ti);
+			return ti;
+		}
+
 		public bool HasImprovement(TerrainImprovement improvement) {
 			return terrainImprovementByLayer.TryGetValue(improvement.layer, out TerrainImprovement val) && val == improvement;
 		}
@@ -794,10 +793,7 @@ namespace C7GameData {
 			if (!terrainImprovementByLayer.TryGetValue(improvement.layer, out var current))
 				return improvement.upgradesFrom == null;
 
-			if (current == improvement || current.upgradesFrom == improvement)
-				return false;
-
-			return improvement.upgradesFrom == current;
+			return current.CanBeReplacedBy(improvement);
 		}
 
 		public bool HasRoad() {

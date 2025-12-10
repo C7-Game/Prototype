@@ -104,50 +104,15 @@ namespace C7Engine {
 				return buildRoad;
 			}
 
-			int initialCommerce = t.commerceYield(player).yield;
-			int initialShields = t.productionYield(player).yield;
-			int initialFood = t.foodYield(player).yield;
+			var best = (
+				from at in accessibleTerraforms
+				let aiScore = at.CalculateAIScore(player, t)
+				where aiScore > 0
+				orderby aiScore descending, at.TurnsToComplete
+				select at
+			).FirstOrDefault();
 
-			int bestScore = 0;
-			Terraform? bestTerraform = null;
-
-			const int CommercePoints = 1;
-			const int ShieldPoints = 3;
-			const int FoodPoints = 5;
-			const int ResourcePoints = 20;
-
-			foreach (Terraform terraform in accessibleTerraforms) {
-				Tile tAfterImprovement = t.Copy();
-				terraform.OnComplete(unit.owner, tAfterImprovement);
-
-				int newCommerce = tAfterImprovement.commerceYield(player).yield;
-				int newShields = tAfterImprovement.productionYield(player).yield;
-				int newFood = tAfterImprovement.foodYield(player).yield;
-
-				int commerceDiff = newCommerce - initialCommerce;
-				int shieldDiff = newShields - initialShields;
-				int foodDiff = newFood - initialFood;
-
-				int currentScore = commerceDiff * CommercePoints +
-						  shieldDiff * ShieldPoints +
-						  foodDiff * FoodPoints;
-
-				// Provide an additional bonus for roading resources. In despotism
-				// some resources may already have 2 commerce, so roading would
-				// seem to have no effect - but we want to encourage hooking up
-				// luxuries.
-				if ((t.Resource.Category == ResourceCategory.LUXURY || t.Resource.Category == ResourceCategory.STRATEGIC)
-					&& terraform.ProvidesRoad() && player.KnowsAboutResource(t.Resource)) {
-					currentScore += ResourcePoints;
-				}
-
-				if (currentScore > bestScore) {
-					bestScore = currentScore;
-					bestTerraform = terraform;
-				}
-			}
-
-			return bestTerraform;
+			return best;
 		}
 
 		private UnitAI.Result PerformWorkerMove(MapUnit unit, Terraform workerMove) {

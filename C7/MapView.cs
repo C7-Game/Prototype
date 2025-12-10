@@ -3,11 +3,9 @@ using System;
 using System.Linq;
 using C7.Map;
 using Godot;
-using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
 using Serilog;
-using Serilog.Events;
 using System.Diagnostics;
 
 // Loose layers are for drawing things on the map on a per-tile basis. (Historical aside: There used to be another kind of layer called a TileLayer
@@ -556,6 +554,8 @@ public partial class MapView : Node2D {
 
 	public Game game;
 
+	public MapView() { }
+
 	public int mapWidth { get; private set; }
 	public int mapHeight { get; private set; }
 	public bool wrapHorizontally { get; private set; }
@@ -597,6 +597,16 @@ public partial class MapView : Node2D {
 
 	const float MIN_SCALE = 0.1f;
 	const float MAX_SCALE = 4.0f;
+
+	private LowerRightInfoBox lowerRightInfoBox;
+	public override void _Ready() {
+		lowerRightInfoBox = GetNode<LowerRightInfoBox>("/root/C7Game/CanvasLayer/Control/GameStatus/LowerRightInfoBox");
+		lowerRightInfoBox.CenterCameraOnActiveUnit += OnCenterCameraOnUnit;
+	}
+
+	public override void _ExitTree() {
+		lowerRightInfoBox.CenterCameraOnActiveUnit -= OnCenterCameraOnUnit;
+	}
 
 	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically) {
 		this.game = game;
@@ -803,5 +813,12 @@ public partial class MapView : Node2D {
 	public void centerCameraOnTile(Tile t) {
 		var tileCenter = new Vector2(t.XCoordinate + 1, t.YCoordinate + 1) * scaledCellSize;
 		setCameraLocation(tileCenter - (float)0.5 * getVisibleAreaSize());
+	}
+
+	public void OnCenterCameraOnUnit() {
+		MapUnit currentlySelectedUnit = game.CurrentlySelectedUnit;
+		if (currentlySelectedUnit == MapUnit.NONE || currentlySelectedUnit == null)
+			return;
+		centerCameraOnTile(currentlySelectedUnit.location);
 	}
 }

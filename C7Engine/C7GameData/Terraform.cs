@@ -25,6 +25,7 @@ public class Terraform {
 
 	private Action<ScriptContext> Effect;
 	private List<Func<ScriptContext, bool>> ActionValidators = [];
+	private Func<ScriptContext, int> AIScore;
 
 	public readonly MapUnit.AnimatedAction? Animation;
 
@@ -66,6 +67,8 @@ public class Terraform {
 		foreach (string functionPath in dataSource.Validators) {
 			ActionValidators.Add(engine.ImportFunc<Func<ScriptContext, bool>>(functionPath));
 		}
+
+		AIScore = engine.ImportFunc<Func<ScriptContext, int>>(dataSource.AIScore);
 	}
 
 	public bool MeetsRequirements(Player player, Tile tile) {
@@ -87,6 +90,10 @@ public class Terraform {
 		if (Improvement != null) {
 			tile.overlays.Add(Improvement);
 		}
+	}
+
+	public int CalculateAIScore(Player player, Tile tile) {
+		return AIScore(new(player, tile, this));
 	}
 
 	public SaveTerraform ToSaveTerraform() {

@@ -74,6 +74,14 @@ namespace C7GameData {
 			return IsLandUnit() && unitType.defense > 0;
 		}
 
+		public bool HasRank() {
+			return this.unitType.attack > 0 || this.unitType.defense > 0;
+		}
+
+		public bool CanBeActive() {
+			return !this.IsBusy() && this.movementPoints.canMove;
+		}
+
 		public override string ToString() {
 			if (this != MapUnit.NONE) {
 				return this.owner + " " + unitType.name + " at (" + location.XCoordinate + ", " + location.YCoordinate + ") with " + movementPoints.getMixedNumber() + " MP and " + hitPointsRemaining + " HP, id = " + id;
@@ -157,12 +165,14 @@ namespace C7GameData {
 		}
 
 		public async Task animateAsync(MapUnit.AnimatedAction action, AnimationEnding ending = AnimationEnding.Stop) {
-			if (!EngineStorage.animationsEnabled) return;
+			if (EngineStorage.animationsEnabled) {
+				var msg = new MsgStartUnitAnimation(this, action, ending);
+				msg.send();
 
-			var msg = new MsgStartUnitAnimation(this, action, ending);
-			msg.send();
-
-			await EngineStorage.WaitForAnimationFinished(msg.animationId);
+				await EngineStorage.WaitForAnimationFinished(msg.animationId);
+			}
+			if (this.owner.isHuman)
+				new MsgUnitMoved(this).send();
 		}
 
 		public void animate(MapUnit.AnimatedAction action, AnimationEnding ending = AnimationEnding.Stop) {

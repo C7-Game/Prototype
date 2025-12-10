@@ -16,13 +16,14 @@ public partial class GameMenu : Popup {
 
 		AddHeader("Main Menu", 10);
 
+		// TODO: enable buttons as the features are implemented
 		AddButton("Map", 60, map);
-		AddButton("Load Game (Ctrl-L)", 85, load);
-		AddButton("New Game (Ctrl-Shift-Q)", 110, newGame);
-		AddButton("Preferences (Ctrl-P)", 135, preferences);
-		AddButton("Retire (Ctrl-Q)", 160, retire);
-		AddButton("Save Game (Ctrl-S)", 185, save);
-		AddButton("Quit Game (ESC)", 210, quit);
+		AddButton("Load Game", 85, load);
+		//AddButton("New Game (Ctrl-Shift-Q)", 110, newGame);
+		//AddButton("Preferences (Ctrl-P)", 135, preferences);
+		AddButton("Retire", 110, retire);
+		AddButton("Save Game", 135, save);
+		AddButton("Quit Game (ESC)", 160, quit);
 
 	}
 

@@ -16,8 +16,9 @@ public partial class Game : Node {
 
 	[Signal] public delegate void PlayerTurnStartEventHandler();
 	[Signal] public delegate void PlayerTurnEndEventHandler();
-
 	[Signal] public delegate void GameInitializedEventHandler();
+
+	[Signal] public delegate void UnitMovedEventHandler();
 
 	private ILogger log = LogManager.ForContext<Game>();
 
@@ -282,6 +283,9 @@ public partial class Game : Node {
 				AddChild(popup);
 				popup.ShowPopup();
 				break;
+			case MsgUnitMoved mUUAAB:
+				EmitSignal(SignalName.UnitMoved, new ParameterWrapper<MapUnit>(mUUAAB.Unit));
+				break;
 		}
 	}
 
@@ -330,10 +334,14 @@ public partial class Game : Node {
 			// once they have a city.
 			if (controller.cities.Count > 0
 					&& controller.currentlyResearchedTech == null
-					&& controller.GetAvailableTechsToResearch(gameData).Count > 0) {
+					&& controller.GetAvailableTechsToResearch(gameData.techs).Count > 0) {
 				popupOverlay.ShowPopup(
 						new ScienceSelection(controller),
 						PopupOverlay.PopupCategory.Info);
+
+				if (controller.currentlyResearchedTech == null && controller.GetAvailableTechsToResearch(gameData.techs).Count > 0) {
+					PlayerAI.MaybePickTechToResearch(controller, gameData.techs);
+				}
 			}
 
 			// Allow fast forwarding in observer mode.
@@ -809,11 +817,24 @@ public partial class Game : Node {
 
 		Terraform terraform = C7Action.ToTerraform(currentAction);
 
-		if (terraform != null
-			&& CurrentlySelectedUnit != MapUnit.NONE
-			&& CurrentlySelectedUnit.canPerformTerraformAction(terraform)) {
-			new MsgStartWorkerJob(CurrentlySelectedUnit?.id, terraform).send();
+		if (CurrentlySelectedUnit == MapUnit.NONE || CurrentlySelectedUnit == null
+			|| terraform == null || !CurrentlySelectedUnit.canPerformTerraformAction(terraform))
+			return;
+
+		TerrainImprovement currentImprovement = CurrentlySelectedUnit.location.overlays.ImprovementAtLayer(terraform);
+		if (currentImprovement != null && terraform.Improvement.upgradesFrom != currentImprovement) {
+			popupOverlay.ShowPopup(
+				new ConfirmationPopup(
+					$"A previous terrain enhancement ({currentImprovement.key.Capitalize()}) will be replaced \nby this operation. Do you wish to continue?",
+					"Continue.",
+					"Cancel action.",
+					() => {
+						new MsgStartWorkerJob(CurrentlySelectedUnit.id, terraform).send();
+					}),
+				PopupOverlay.PopupCategory.Advisor);
+			return;
 		}
+		new MsgStartWorkerJob(CurrentlySelectedUnit.id, terraform).send();
 	}
 
 	private void setGotoMode(bool isOn) {

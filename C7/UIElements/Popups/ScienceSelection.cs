@@ -79,7 +79,7 @@ public partial class ScienceSelection : Popup {
 				AddItem(gameData, player.ResearchQueue.Peek(), optionButton);
 			}
 			// then the rest
-			foreach (Tech tech in player.GetAvailableTechsToResearch(gameData)) {
+			foreach (Tech tech in player.GetAvailableTechsToResearch(gameData.techs)) {
 				if (!options.Contains(tech)) {
 					AddItem(gameData, tech, optionButton);
 				}

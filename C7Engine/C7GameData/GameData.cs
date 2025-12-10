@@ -106,6 +106,10 @@ namespace C7GameData {
 			return players.Find(p => p.id == id);
 		}
 
+		public Tech GetTech(ID id) {
+			return techs.Find(p => p.id == id);
+		}
+
 		public ExperienceLevel GetExperienceLevelAfter(ExperienceLevel experienceLevel) {
 			int n = experienceLevels.IndexOf(experienceLevel);
 			if (n + 1 < experienceLevels.Count)

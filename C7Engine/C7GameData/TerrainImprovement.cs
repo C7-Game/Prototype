@@ -84,5 +84,12 @@ namespace C7GameData {
 
 			return 0;
 		}
+
+		public bool CanBeReplacedBy(TerrainImprovement replacement) {
+			if (this.key == replacement.key) return false;       // mine-mine
+			if (this.upgradesFrom == replacement) return false;  // railroad upgrades from road so road cannot replace railroad
+			if (replacement.upgradesFrom == this) return true;   // railroad upgrades from road so railroad can replace road
+			return this.layer == replacement.layer;              // irrigation can replace mine and vice versa, an outpost a radar tower, etc
+		}
 	}
 }

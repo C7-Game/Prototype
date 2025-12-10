@@ -74734,8 +74734,9 @@
       "turnsToComplete": 12,
       "improvement": "mine",
       "validators": [
-        "terraforms.mine.validator"
+        "terraforms.validators.mine"
       ],
+      "aiScore": "terraforms.ai_score.yield_improvement",
       "animation": "mine",
       "uiAction": "unit_build_mine",
       "buttonTexture": "ui.unit_control.unit_build_mine"
@@ -74747,8 +74748,9 @@
       "turnsToComplete": 8,
       "improvement": "irrigation",
       "validators": [
-        "terraforms.irrigate.validator"
+        "terraforms.validators.irrigate"
       ],
+      "aiScore": "terraforms.ai_score.yield_improvement",
       "animation": "irrigate",
       "uiAction": "unit_irrigate",
       "buttonTexture": "ui.unit_control.unit_irrigate"
@@ -74760,6 +74762,7 @@
       "turnsToComplete": 16,
       "requiredTech": "tech-21",
       "improvement": "fortress",
+      "aiScore": "terraforms.ai_score.default",
       "animation": "fortress",
       "uiAction": "unit_build_fortress",
       "buttonTexture": "ui.unit_control.unit_build_fortress"
@@ -74770,6 +74773,7 @@
       "civilopediaEntry": "TFRM_Road",
       "turnsToComplete": 6,
       "improvement": "road",
+      "aiScore": "terraforms.ai_score.road",
       "animation": "road",
       "uiAction": "unit_build_road",
       "buttonTexture": "ui.unit_control.unit_build_road"
@@ -74785,6 +74789,7 @@
         "Coal"
       ],
       "improvement": "railroad",
+      "aiScore": "terraforms.ai_score.railroad",
       "animation": "road",
       "uiAction": "unit_build_railroad",
       "buttonTexture": "ui.unit_control.unit_build_railroad"
@@ -74795,6 +74800,7 @@
       "civilopediaEntry": "TFRM_Plant_Forest",
       "turnsToComplete": 18,
       "requiredTech": "tech-24",
+      "aiScore": "terraforms.ai_score.default",
       "animation": "plant",
       "uiAction": "unit_plant_forest",
       "buttonTexture": "ui.unit_control.unit_plant_forest"
@@ -74805,11 +74811,12 @@
       "civilopediaEntry": "TFRM_Clear_Forest",
       "turnsToComplete": 4,
       "validators": [
-        "terraforms.clear_forest.validator"
+        "terraforms.validators.clear_forest"
       ],
       "effects": [
-        "terraforms.clear_forest.effect"
+        "terraforms.effects.clear_forest"
       ],
+      "aiScore": "terraforms.ai_score.clear_forest",
       "animation": "forest",
       "uiAction": "unit_clear_forest",
       "buttonTexture": "ui.unit_control.unit_clear_forest"
@@ -74820,11 +74827,12 @@
       "civilopediaEntry": "TFRM_Clear_Wetlands",
       "turnsToComplete": 16,
       "validators": [
-        "terraforms.clear_wetlands.validator"
+        "terraforms.validators.clear_wetlands"
       ],
       "effects": [
-        "terraforms.clear_wetlands.effect"
+        "terraforms.effects.clear_wetlands"
       ],
+      "aiScore": "terraforms.ai_score.clear_wetlands",
       "animation": "jungle",
       "uiAction": "unit_clear_wetlands",
       "buttonTexture": "ui.unit_control.unit_clear_wetlands"
@@ -74834,6 +74842,7 @@
       "name": "Clear Damage",
       "civilopediaEntry": "TFRM_Clear_Damage",
       "turnsToComplete": 24,
+      "aiScore": "terraforms.ai_score.default",
       "uiAction": "unit_clear_damage",
       "buttonTexture": "ui.unit_control.unit_clear_damage"
     },
@@ -74843,6 +74852,7 @@
       "civilopediaEntry": "TFRM_Airfield",
       "turnsToComplete": 1,
       "requiredTech": "tech-59",
+      "aiScore": "terraforms.ai_score.default",
       "uiAction": "unit_build_airfield",
       "buttonTexture": "ui.unit_control.unit_build_airfield"
     },
@@ -74852,6 +74862,7 @@
       "civilopediaEntry": "TFRM_Radar_Tower",
       "turnsToComplete": 1,
       "requiredTech": "tech-64",
+      "aiScore": "terraforms.ai_score.default",
       "uiAction": "unit_build_radar_tower",
       "buttonTexture": "ui.unit_control.unit_build_radar_tower"
     },
@@ -74861,6 +74872,7 @@
       "civilopediaEntry": "TFRM_Outpost",
       "turnsToComplete": 1,
       "requiredTech": "tech-2",
+      "aiScore": "terraforms.ai_score.default",
       "uiAction": "unit_build_outpost",
       "buttonTexture": "ui.unit_control.unit_build_outpost"
     },
@@ -74871,6 +74883,7 @@
       "turnsToComplete": 16,
       "requiredTech": "tech-21",
       "improvement": "barricade",
+      "aiScore": "terraforms.ai_score.default",
       "animation": "fortress",
       "uiAction": "unit_build_barricade",
       "buttonTexture": "ui.unit_control.unit_build_barricade"

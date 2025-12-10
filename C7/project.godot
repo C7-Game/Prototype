@@ -10,10 +10,11 @@ config_version=5
 
 [application]
 
-config/name="C7"
+config/name="OpenCiv3"
 run/main_scene="res://UIElements/MainMenu/main_menu.tscn"
 config/features=PackedStringArray("4.4", "C#")
-boot_splash/image="res://icon.png"
+boot_splash/fullsize=false
+boot_splash/image="uid://ovwv08a53d7k"
 config/icon="res://icon.png"
 
 [autoload]

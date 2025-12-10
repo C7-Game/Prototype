@@ -141,4 +141,11 @@ namespace C7Engine {
 			this.aiGive = aiGive;
 		}
 	}
+
+	public class MsgUnitMoved : MessageToUI {
+		public MapUnit Unit;
+		public MsgUnitMoved(MapUnit unit) {
+			this.Unit = unit;
+		}
+	}
 }

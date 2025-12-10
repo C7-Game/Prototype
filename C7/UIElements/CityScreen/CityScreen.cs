@@ -594,25 +594,9 @@ public partial class CityScreen : Control {
 		}
 
 		if (city.itemBeingProduced is UnitPrototype up) {
-			// Get the flic data for the unit we're producing.
-			string path = new AnimationManager(null).getUnitFlicFilepath(up, MapUnit.AnimatedAction.DEFAULT);
-			ConvertCiv3Media.Flic flic = Util.LoadFlic(path);
-
-			// Set up a shader we can use to color the "tint" portion of the
-			// animation frame below.
-			ShaderMaterial material = new();
-			material.Shader = GD.Load<Shader>("res://UnitTint.gdshader");
-			Color civColor = TextureLoader.LoadColor(city.owner.colorIndex);
-			material.SetShaderParameter("tintColor", new Vector3(civColor.R, civColor.G, civColor.B));
-
-			// See flicRowToAnimationDirection for the mapping, row 2 is facing
-			// southeast, and we're just grabbing frame 0.
-			byte[] frame = flic.Images[2, 0];
-
-			// Each frame is split in two parts, the base image, and the "tint"
-			// of the image, which is the part of the unit that has civ-specific
-			// colors.
-			(ImageTexture baseImage, ImageTexture imageTint) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
+			AnimationManager animationManager = mapView.game.animationController.civ3AnimData.forUnit(up, MapUnit.AnimatedAction.DEFAULT).animationManager;
+			ShaderMaterial material = TextureLoader.GetShaderMaterialForUnit(city.owner.colorIndex);
+			(ImageTexture baseImage, ImageTexture imageTint) = animationManager.GetAnimationFrameAndTintTextures(up);
 
 			// Add the base sprite.
 			Sprite2D baseImageSprite = new();
