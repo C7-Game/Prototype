@@ -809,11 +809,11 @@ public partial class Game : Node {
 			|| terraform == null || !CurrentlySelectedUnit.canPerformTerraformAction(terraform))
 			return;
 
-		TerrainImprovement currentImprovement = CurrentlySelectedUnit.location.overlays.ImprovementAtLayer(terraform);
-		if (currentImprovement != null && terraform.Improvement.upgradesFrom != currentImprovement) {
+		TerrainImprovement replacementTarget = CurrentlySelectedUnit.location.overlays.GetReplacementTarget(terraform);
+		if (replacementTarget != null) {
 			popupOverlay.ShowPopup(
 				new ConfirmationPopup(
-					$"A previous terrain enhancement ({currentImprovement.key.Capitalize()}) will be replaced \nby this operation. Do you wish to continue?",
+					$"A previous terrain enhancement ({replacementTarget.key.Capitalize()}) will be replaced \nby this operation. Do you wish to continue?",
 					"Continue.",
 					"Cancel action.",
 					() => {

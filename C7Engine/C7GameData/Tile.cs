@@ -772,8 +772,19 @@ namespace C7GameData {
 			return ti;
 		}
 
-		public TerrainImprovement ImprovementAtLayer(Terraform terraform) {
-			return terraform.Improvement == null ? null : ImprovementAtLayer(terraform.Improvement.layer);
+		// Returns an existing improvement that would be replaced by the given terraform.
+		// Returns null if there is no such improvement,
+		// or the new improvement upgrades from the existing one (upgrades don't count as replacements)
+		public TerrainImprovement GetReplacementTarget(Terraform terraform) {
+			var newImp = terraform.Improvement;
+			if (newImp == null)
+				return null;
+
+			var current = ImprovementAtLayer(newImp.layer);
+			if (current == null)
+				return null;
+
+			return newImp.upgradesFrom != current ? current : null;
 		}
 
 		public bool HasImprovement(TerrainImprovement improvement) {
