@@ -773,9 +773,7 @@ namespace C7GameData {
 		}
 
 		public TerrainImprovement ImprovementAtLayer(Terraform terraform) {
-			TerrainImprovement.Layer currentLayer = terraform.Improvement.layer;
-			terrainImprovementByLayer.TryGetValue(currentLayer, out TerrainImprovement ti);
-			return ti;
+			return terraform.Improvement == null ? null : ImprovementAtLayer(terraform.Improvement.layer);
 		}
 
 		public bool HasImprovement(TerrainImprovement improvement) {

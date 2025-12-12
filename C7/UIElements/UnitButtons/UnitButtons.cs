@@ -123,6 +123,7 @@ public partial class UnitButtons : VBoxContainer {
 	}
 
 	private void UpdateButtons(MapUnit unit) {
+		if (!unit.CanBeActive()) return;
 		// Reset the visibility and tooltip whenever the unit changes.
 		foreach (ButtonAndTooltip btt in buttonMap.Values) {
 			btt.button.Visible = false;
