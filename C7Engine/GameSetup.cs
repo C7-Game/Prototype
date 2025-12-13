@@ -14,39 +14,41 @@ public struct SelectedOpponent {
 public class GameSetup {
 	private static ILogger log = Log.ForContext<GameSetup>();
 
-	public Civilization civilization;
-	public Difficulty difficulty;
+	public Civilization playerCivilization { get; init; }
+	public Difficulty difficulty { get; init; }
+	public WorldCharacteristics worldCharacteristics { get; init; }
+	public List<SelectedOpponent> opponents { get; init; } = [];
 
 	ID.Factory ids;
 
-	public void Populate(SaveGame save, WorldCharacteristics WorldCharacteristics, List<SelectedOpponent> opponents) {
-		log.Information("Starting map generation");
-		save.Map = new SaveMap(MapGenerator.GenerateMap(WorldCharacteristics));
-		save.Seed = WorldCharacteristics.mapSeed;
-		log.Information("Done with map generation");
-		Random rand = new(WorldCharacteristics.mapSeed + 0x531);
-		ids = new(save);
+	public void Populate(SaveGame save) {
+		save.GameDifficulty = difficulty;
 
-		// Hack: reuse the save but clear out the non-barbarian players.
-		//
-		// Longer term we'll need to split out our own
-		// "conquests.bic" type file and load that - until then we'll use this
-		// hack of reusing the static save.
-		//
-		// Start at index 1 to skip the barbarians.
-		save.Players.RemoveRange(1, save.Players.Count - 1);
+		if (save.Map.tiles.Count == 0) {
+			log.Information("Starting map generation");
+			save.Map = new SaveMap(MapGenerator.GenerateMap(worldCharacteristics));
+			save.Seed = worldCharacteristics.mapSeed;
+			log.Information("Done with map generation");
+		}
 
-		// Clear out the units, we'll add new ones.
-		save.Units.Clear();
+		if (save.Players.Count == 0) {
+			ids = new(save);
+			PopulatePlayers(save);
+		}
+	}
+
+	private void PopulatePlayers(SaveGame save) {
+		Random rand = new(worldCharacteristics.mapSeed + 0x531);
+
+		// Add barbarian
+		AddPlayer(save, save.Civilizations.Find(c => c.isBarbarian), isHuman: false);
 
 		// Add the human player.
-		AddPlayer(save, this.civilization,
-					WorldCharacteristics.defaultGovernment.id,
-					isHuman: true);
+		AddPlayer(save, this.playerCivilization, isHuman: true);
 
 		// Add the opponents.
 		HashSet<string> taken = new();
-		taken.Add(this.civilization.name);
+		taken.Add(this.playerCivilization.name);
 
 		foreach (SelectedOpponent opponent in opponents) {
 			bool isRandom = opponent.isRandom;
@@ -64,15 +66,11 @@ public class GameSetup {
 			taken.Add(selectedName);
 
 			Civilization civ = save.Civilizations.Find(x => x.name == selectedName);
-			AddPlayer(save, civ,
-						WorldCharacteristics.defaultGovernment.id,
-						isHuman: false);
+			AddPlayer(save, civ, isHuman: false);
 		}
-
-		save.GameDifficulty = difficulty;
 	}
 
-	private void AddPlayer(SaveGame save, Civilization civ, ID defaultGovernment, bool isHuman) {
+	private void AddPlayer(SaveGame save, Civilization civ, bool isHuman) {
 		SavePlayer player = new() {
 			human = isHuman,
 			id = ids.CreateID("Player"),
@@ -83,9 +81,13 @@ public class GameSetup {
 			eraCivilopediaName = "ERAS_Ancient_Times",
 			// TODO: load this from the rules
 			gold = 10,
-			governmentId = defaultGovernment,
+			governmentId = worldCharacteristics.defaultGovernment.id,
 		};
 		save.Players.Add(player);
+
+		if (civ.isBarbarian) {
+			return;
+		}
 
 		SaveTile startingTile = save.Map.startingLocations[save.Players.Count - 2];
 		TileLocation startingLocation = new TileLocation(startingTile.X, startingTile.Y);

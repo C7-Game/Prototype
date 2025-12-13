@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using C7GameData;
 using C7Engine;
+using C7Engine.Lua;
 using C7GameData.Save;
 using Serilog;
 
@@ -30,17 +31,18 @@ public partial class PlayerSetup : Control {
 
 	[Export] Label loadingLabel;
 
-	ID.Factory ids;
-
 	SaveGame save;
-	GameSetup gameSetup = new();
+
+	Civilization selectedCivilization;
+	Difficulty selectedDifficulty;
 
 	// TODO: read this from the rules based on the world size
 	const int NUM_OPPONENTS = 7;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
-		save = GetSave();
+		GlobalSingleton global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
+		save = global.SaveGame;
 
 		// Set up buttons for the civs the player can play as.
 		playerListContainer.Columns = (int)Math.Ceiling(save.Civilizations.Count / 12.0);
@@ -58,7 +60,7 @@ public partial class PlayerSetup : Control {
 				ToggleMode = true,
 			};
 			button.Pressed += () => {
-				gameSetup.civilization = civ;
+				selectedCivilization = civ;
 				UpdateOpponentSelectors();
 				DisplaySelectedLeader();
 			};
@@ -66,7 +68,7 @@ public partial class PlayerSetup : Control {
 
 			if (civ.name == initiallySelectedCiv) {
 				button.ButtonPressed = true;
-				gameSetup.civilization = civ;
+				selectedCivilization = civ;
 			}
 		}
 		background.AddChild(leaderHead);
@@ -87,11 +89,11 @@ public partial class PlayerSetup : Control {
 				ButtonGroup = difficultyButtonGroup,
 				ToggleMode = true,
 			};
-			button.Pressed += () => { gameSetup.difficulty = difficulty; };
+			button.Pressed += () => { selectedDifficulty = difficulty; };
 			container.AddChild(button);
 			if (difficulty.Name == initiallySelectedDifficulty) {
 				button.ButtonPressed = true;
-				gameSetup.difficulty = difficulty;
+				selectedDifficulty = difficulty;
 			}
 			container.CustomMinimumSize = new Vector2(843.0f / difficultyContainer.Columns, 0);
 		}
@@ -161,7 +163,7 @@ public partial class PlayerSetup : Control {
 
 	private void UpdateOpponentSelectors() {
 		HashSet<string> civsTaken = new();
-		civsTaken.Add(gameSetup.civilization.name);
+		civsTaken.Add(selectedCivilization.name);
 
 		foreach (OptionButton ob in opponentSelectors) {
 			string selection = ob.GetItemText(ob.Selected);
@@ -182,7 +184,7 @@ public partial class PlayerSetup : Control {
 	}
 
 	private void DisplaySelectedLeader() {
-		Civilization civilization = gameSetup.civilization;
+		Civilization civilization = selectedCivilization;
 
 		leaderHead.Texture = TextureLoader.Load("leader_heads", civilization);
 		leaderHead.Scale = new Vector2(1.7f, 1.7f);
@@ -193,7 +195,7 @@ public partial class PlayerSetup : Control {
 	}
 
 	private SaveGame GetSave() {
-		return SaveManager.LoadSave(GamePaths.DefaultGamePath, GamePaths.DefaultBicPath, (string unused) => { return unused; });
+		return GameModeLoader.Load(GamePaths.GameModesDir, GamePaths.GameMode);
 	}
 
 	private List<SelectedOpponent> CollectSelectedOpponents() {
@@ -214,12 +216,20 @@ public partial class PlayerSetup : Control {
 
 	private void CreateGame() {
 		loadingLabel.Visible = true;
+
 		GlobalSingleton global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
+
+		GameSetup gameSetup = new() {
+			playerCivilization = selectedCivilization,
+			difficulty = selectedDifficulty,
+			worldCharacteristics = global.WorldCharacteristics,
+			opponents = CollectSelectedOpponents()
+		};
 
 		// World generation can take a bit of time if multiple attempts are
 		// needed, so we don't want to tie up the UI thread.
 		Thread thread = new(() => {
-			gameSetup.Populate(save, global.WorldCharacteristics, CollectSelectedOpponents());
+			gameSetup.Populate(save);
 			global.SaveGame = save;
 
 			log.Information("opening map");

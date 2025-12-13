@@ -1,81 +1,12 @@
 using System;
 using System.Reflection;
 using System.Linq;
-using System.Linq.Expressions;
 using MoonSharp.Interpreter;
 using Serilog;
 using System.IO;
 using MoonSharp.Interpreter.Loaders;
-using System.Collections.Generic;
-using C7GameData;
 
-namespace C7Engine;
-
-/// Utility class for converting Lua functions into C# delegates.
-public static class LuaDelegateConverter {
-	static readonly ILogger log = Log.ForContext(typeof(LuaDelegateConverter));
-
-	public static Delegate CreateDelegate(Script script, Closure luaFunc, Type delegateType) {
-		if (!typeof(Delegate).IsAssignableFrom(delegateType))
-			throw new ArgumentException("Type must be a delegate.", nameof(delegateType));
-
-		var invoke = delegateType.GetMethod("Invoke")!;
-		var parameters = invoke.GetParameters()
-			.Select(p => Expression.Parameter(p.ParameterType, p.Name))
-			.ToArray();
-
-		var callExpression = CreateLuaCallExpression(script, luaFunc, invoke.ReturnType, parameters);
-		var lambda = Expression.Lambda(delegateType, callExpression, parameters);
-
-		return lambda.Compile();
-	}
-
-	static Expression CreateLuaCallExpression(Script script, Closure luaFunc, Type returnType, ParameterExpression[] parameters) {
-		var genericType = returnType == typeof(void) ? typeof(object) : returnType;
-		var argsArray = Expression.NewArrayInit(typeof(object),
-			parameters.Select(p => Expression.Convert(p, typeof(object))));
-
-		var callLua = Expression.Call(
-			typeof(LuaDelegateConverter),
-			nameof(InvokeLuaFunction),
-			[genericType],
-			Expression.Constant(script),
-			Expression.Constant(luaFunc),
-			argsArray);
-
-		return returnType == typeof(void) ? callLua : Expression.Convert(callLua, returnType);
-	}
-
-	static T InvokeLuaFunction<T>(Script script, Closure luaFunc, object[] args) {
-		var dynArgs = args.Select(arg => DynValue.FromObject(script, arg)).ToArray();
-
-		DynValue result;
-
-		try {
-			result = luaFunc.Call(dynArgs);
-		} catch (ScriptRuntimeException ex) {
-			LogLuaError(ex);
-			throw;
-		}
-
-		if (typeof(T) == typeof(void))
-			return default;
-
-		try {
-			return result.ToObject<T>();
-		} catch (Exception ex) {
-			log.Error("Failed to convert Lua result to type '{TargetType}'. Lua result type: {LuaType}", typeof(T), result.Type);
-			throw;
-		}
-	}
-
-	static void LogLuaError(ScriptRuntimeException ex) {
-		log.Error("Lua runtime error: {Message}", ex.DecoratedMessage);
-
-		foreach (var frame in ex.CallStack)
-			log.Error("Lua frame: Name='{Name}', Location='{Location}'", frame.Name, frame.Location);
-	}
-}
+namespace C7Engine.Lua;
 
 /// A rules engine that loads game behaviors defined in a Lua script.
 ///
@@ -94,12 +25,12 @@ public static class LuaDelegateConverter {
 /// - GAME_DATA(): Function returning the current game data instance.
 /// - ENUMS:  Table containing definitions of public enums from the C7GameData namespace.
 ///   Note that nested enums are registered under a name concatenating the outer class and the enum names (e.g., Tile_YieldType)
-public class LuaRulesEngine {
-	static ILogger log = Log.ForContext<LuaRulesEngine>();
+public class RulesEngine {
+	static ILogger log = Log.ForContext<RulesEngine>();
 	Script script = new();
 	Table rules;
 
-	static LuaRulesEngine() {
+	static RulesEngine() {
 		RegisterTypes();
 	}
 
@@ -124,7 +55,7 @@ public class LuaRulesEngine {
 		string fullScriptPath = Path.Combine(luaRulesDir, rulesScript);
 		log.Information("Loading Lua rules from file: {filePath}", fullScriptPath);
 
-		DynValue res = script.DoFile(fullScriptPath);
+		DynValue res = script.SafeDoFile(fullScriptPath);
 		rules = res.Table;
 	}
 
@@ -141,7 +72,7 @@ public class LuaRulesEngine {
 			throw new InvalidOperationException("Non-null function path expected");
 
 		Closure closure = ResolveFunctionPath(functionPath);
-		Delegate del = LuaDelegateConverter.CreateDelegate(script, closure, typeof(T));
+		Delegate del = DelegateConverter.CreateDelegate(script, closure, typeof(T));
 		return (T)(object)del;
 	}
 

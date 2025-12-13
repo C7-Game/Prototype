@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using C7Engine;
+using C7Engine.Lua;
 using C7GameData.Save;
 using System;
 
@@ -48,7 +48,7 @@ namespace C7GameData {
 
 		public TerrainImprovement(
 			SaveTerrainImprovement save,
-			LuaRulesEngine rulesEngine,
+			RulesEngine rulesEngine,
 			Func<string, TerrainType> resolveTerrainType,
 			TerrainImprovement upgradesFrom = null
 		) {

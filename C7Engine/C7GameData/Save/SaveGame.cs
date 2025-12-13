@@ -411,13 +411,17 @@ namespace C7GameData.Save {
 		}
 
 		public static SaveGame Load(string path, Func<string, string> getPediaIconsPath) {
-			SaveGame result = JsonSerializer.Deserialize<SaveGame>(File.ReadAllText(path), JsonOptions);
+			SaveGame result = LoadFromJSON(File.ReadAllText(path));
 
 			// This lambda has side effects in the Game.cs code.
 			if (result.ScenarioSearchPath?.Count() > 0) {
 				getPediaIconsPath(result.ScenarioSearchPath);
 			}
 			return result;
+		}
+
+		internal static SaveGame LoadFromJSON(string json) {
+			return JsonSerializer.Deserialize<SaveGame>(json, JsonOptions);
 		}
 	}
 }

@@ -30,7 +30,7 @@ public partial class GlobalSingleton : Node {
 	public WorldCharacteristics WorldCharacteristics;
 
 	public void ResetLoadGameFields() {
-		LoadGamePath = GamePaths.DefaultGamePath;
+		LoadGamePath = null;
 		SaveGame = null;
 	}
 

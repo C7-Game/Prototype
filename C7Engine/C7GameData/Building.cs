@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using C7GameData.Save;
 using C7Engine;
+using C7Engine.Lua;
 
 namespace C7GameData {
 	public class Building : IProducible {
@@ -178,7 +179,7 @@ namespace C7GameData {
 		}
 
 		private void LoadLuaFunctions(GameData gameData) {
-			LuaRulesEngine luaEngine = gameData.luaRulesEngine;
+			RulesEngine luaEngine = gameData.luaRulesEngine;
 
 			foreach (var path in dataSource.productionPrerequisites) {
 				var rule = luaEngine.ImportFunc<Func<City, bool>>(path);

@@ -3,12 +3,11 @@ using Godot;
 using ConvertCiv3Media;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using MoonSharp.Interpreter;
 using Script = MoonSharp.Interpreter.Script;
 using MoonSharp.Interpreter.Loaders;
 using C7.Map;
-using C7GameData;
+using C7Engine.Lua;
 
 public readonly record struct CropRegion(int LeftStart, int TopStart, int CroppedWidth, int CroppedHeight);
 
@@ -84,7 +83,7 @@ public static class TextureLoader {
 
 	static TextureLoader() {
 		// Note: classes in the C7GameData namespace are already registered in
-		// the LuaRulesEngine static constructor.
+		// the C7Engine.Lua.RulesEngine static constructor.
 		UserData.RegisterType<CityGraphicsDetails>();
 		UserData.RegisterType<PopHead.TextureKey>();
 		UserData.RegisterType<BorderLayer.TextureDetails>();
@@ -119,7 +118,7 @@ public static class TextureLoader {
 		};
 
 		string fullScriptPath = Path.Combine(configDir, configScript);
-		DynValue res = lua.DoFile(fullScriptPath);
+		DynValue res = lua.SafeDoFile(fullScriptPath);
 		textureConfig = res.Table;
 	}
 
@@ -166,7 +165,7 @@ public static class TextureLoader {
 		if (table["map_object_to_sprite"] is not Closure func)
 			throw new Exception("Custom mapping function expected");
 
-		object result = func.Call(table, DynValue.FromObject(lua, obj)).ToObject();
+		object result = lua.SafeCall(func, table, DynValue.FromObject(lua, obj)).ToObject();
 
 		ImageTexture texture = LoadFromLuaObject(result);
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using C7GameData.Save;
 using C7Engine;
+using C7Engine.Lua;
 
 namespace C7GameData;
 
@@ -59,7 +60,7 @@ public class Terraform {
 		return Name;
 	}
 
-	private void SetRules(LuaRulesEngine engine) {
+	private void SetRules(RulesEngine engine) {
 		foreach (string functionPath in dataSource.Effects) {
 			Effect += engine.ImportFunc<Action<ScriptContext>>(functionPath);
 		}

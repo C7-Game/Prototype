@@ -1,8 +1,7 @@
 using Godot;
 using System;
-using System.Threading;
-using C7GameData;
 using C7Engine;
+using C7Engine.Lua;
 using C7GameData.Save;
 using Serilog;
 
@@ -314,7 +313,7 @@ public partial class WorldSetup : Control {
 	private void CreateGame() {
 		GlobalSingleton Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 		Global.ResetLoadGameFields();
-		SaveGame save = SaveManager.LoadSave(GamePaths.DefaultGamePath, GamePaths.DefaultBicPath, (string unused) => { return unused; });
+		SaveGame save = GameModeLoader.Load(GamePaths.GameModesDir, GamePaths.GameMode);
 
 		Global.WorldCharacteristics = new WorldCharacteristics() {
 			landform = landform,
@@ -337,6 +336,8 @@ public partial class WorldSetup : Control {
 			maxRankOfWorkableTiles = save.Rules.MaxRankOfWorkableTiles,
 			maxRankOfBarbarianCampTiles = save.Rules.MaxRankOfBarbarianCampTiles,
 		};
+
+		Global.SaveGame = save;
 
 		GetTree().ChangeSceneToFile("res://UIElements/NewGame/player_setup.tscn");
 	}
