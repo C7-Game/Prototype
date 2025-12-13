@@ -11,11 +11,6 @@ public static class GamePaths {
 	public const string ModernGraphicsConfig = "c7.lua";
 	public const string ClassicGraphicsConfig = "civ3.lua";
 
-	// The file where a generated map is saved, until we get more advanced ways
-	// to generate new games.
-	// TODO: improve this.
-	public const string DefaultGeneratedGamePath = "./Text/c7-autosave-turn-0.json";
-
 	// For now this needs to get passed to QueryCiv3 when importing.
 	public static string DefaultBicPath { get => Util.GetCiv3Path() + "/Conquests/conquests.biq"; }
 }

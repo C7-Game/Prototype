@@ -132,8 +132,7 @@ public partial class ScenarioSetup : Control {
 		save.GameDifficulty = difficulty;
 
 		log.Information("saving updated scenario");
-		save.Save(GamePaths.DefaultGeneratedGamePath);
-		Global.LoadGamePath = GamePaths.DefaultGeneratedGamePath;
+		Global.SaveGame = save;
 
 		log.Information("opening map");
 		CallDeferred("StartGame");
