@@ -322,15 +322,6 @@ public partial class WorldSetup : Control {
 		billion4Large.Visible = true;
 		billion4.ButtonPressed = true;
 
-		// TODO: handle different map sizes properly (including loading the
-		// optimal city number, etc)
-		tinySize.Visible = true;
-		smallSize.Visible = true;
-		standardSize.Visible = true;
-		largeSize.Visible = true;
-		hugeSize.Visible = true;
-		randomSize.Visible = true;
-
 		tinySize.Pressed += () => {
 			sizeSelected = 0;
 		};
