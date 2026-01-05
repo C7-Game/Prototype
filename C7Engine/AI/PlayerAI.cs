@@ -365,9 +365,8 @@ namespace C7Engine {
 
 				// Finally if the deal is too mismatched or only contains a swap
 				// of gold, abandon it. Otherwise we can execute the deal.
-				// TODO: Figure out how the real trade factor in the difficulty
-				// works.
-				float tradeFactor = them.isHuman ? 1.0f : 1.1f;
+
+				float tradeFactor = them.isHuman ? 1.0f : gD.gameDifficulty.AIToAITradeRate / 100.0f;
 				if (CalculateWeGiveValue() > tradeFactor * CalculateWeWantValue()) {
 					continue;
 				}
