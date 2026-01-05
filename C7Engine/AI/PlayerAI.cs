@@ -6,7 +6,6 @@ using C7Engine.Pathing;
 using C7GameData;
 using C7GameData.Save;
 using C7GameData.AIData;
-using C7GameData.EngineStorage;
 using C7Engine.AI;
 using C7Engine.AI.StrategicAI;
 using C7Engine.AI.UnitAI;
@@ -366,9 +365,8 @@ namespace C7Engine {
 
 				// Finally if the deal is too mismatched or only contains a swap
 				// of gold, abandon it. Otherwise we can execute the deal.
-				// TODO: Figure out how the real trade factor in the difficulty
-				// works.
-				float tradeFactor = them.isHuman ? 1.0f : (float)C7GameData.EngineStorage.gameData.gameDifficulty.AIToAITradeRate / (float)100;
+				
+				float tradeFactor = them.isHuman ? 1.0f : gD.gameDifficulty.AIToAITradeRate / 100.0f;
 				if (CalculateWeGiveValue() > tradeFactor * CalculateWeWantValue()) {
 					continue;
 				}
