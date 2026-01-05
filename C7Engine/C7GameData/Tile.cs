@@ -336,12 +336,16 @@ namespace C7GameData {
 				yield = 1;
 
 				// There is a size bonus for larger cities.
-				if (cityAtTile.residents.Count >= 7 && cityAtTile.residents.Count < 13) {
+				if (cityAtTile.residents.Count > EngineStorage.gameData.rules.MaximumLevel1CitySize
+					&& cityAtTile.residents.Count <= EngineStorage.gameData.rules.MaximumLevel2CitySize) {
 					yield += 1;
-				} else if (cityAtTile.residents.Count >= 13) {
+				} else if (cityAtTile.residents.Count > EngineStorage.gameData.rules.MaximumLevel2CitySize) {
 					yield += 2;
 
-					// TODO: +1 more for industrial civs.
+					// Industrious civs get +1 production in metropolises
+					if (cityAtTile.owner.civilization.traits.Contains(Civilization.Trait.Industrious)) {
+						yield += 1;
+					}
 				}
 			}
 
@@ -378,9 +382,9 @@ namespace C7GameData {
 			// See https://wiki.civforum.de/wiki/Stadtfeldertrag_(Civ3)
 			if (HasCity) {
 				int regularCityYield;
-				if (cityAtTile.residents.Count < 7) {
+				if (cityAtTile.residents.Count <= EngineStorage.gameData.rules.MaximumLevel1CitySize) {
 					regularCityYield = 1;
-				} else if (cityAtTile.residents.Count < 13) {
+				} else if (cityAtTile.residents.Count <= EngineStorage.gameData.rules.MaximumLevel2CitySize) {
 					regularCityYield = 2;
 				} else {
 					regularCityYield = 3;
