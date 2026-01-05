@@ -35,9 +35,6 @@ public partial class PlayerSetup : Control {
 	SaveGame save;
 	GameSetup gameSetup = new();
 
-	// TODO: read this from the rules based on the world size
-	const int NUM_OPPONENTS = 7;
-
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		save = GetSave();
@@ -106,7 +103,9 @@ public partial class PlayerSetup : Control {
 
 	private void AddOpponentSelectors() {
 		// TODO: The number of opponents should come from the rule set.
-		for (int i = 0; i < NUM_OPPONENTS; ++i) {
+		int num_opponents = GetNode<GlobalSingleton>("/root/GlobalSingleton").WorldCharacteristics.worldSize.numberOfCivs - 1;
+
+		for (int i = 0; i < num_opponents; ++i) {
 			OptionButton optionButton = new();
 			StyleBoxFlat styleBox = new() {
 				BorderColor = Color.Color8(150, 150, 150, 220),
@@ -134,7 +133,7 @@ public partial class PlayerSetup : Control {
 			opponentListContainer.AddChild(container);
 			container.AddChild(optionButton);
 
-			container.CustomMinimumSize = new Vector2(312.0f / opponentListContainer.Columns, 315.0f / NUM_OPPONENTS);
+			container.CustomMinimumSize = new Vector2(312.0f / opponentListContainer.Columns, 315.0f / num_opponents);
 			optionButton.CustomMinimumSize = new Vector2(290.0f / opponentListContainer.Columns, optionButton.CustomMinimumSize.Y);
 
 			foreach (Civilization civ in save.Civilizations) {

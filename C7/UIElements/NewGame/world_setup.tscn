@@ -112,7 +112,7 @@ text = "WORLD SIZE"
 horizontal_alignment = 1
 
 [node name="TinySize" type="CheckButton" parent="Background"]
-visible = false
+visible = true
 layout_mode = 0
 offset_left = 167.0
 offset_top = 115.0
@@ -130,7 +130,7 @@ text = "Tiny"
 alignment = 2
 
 [node name="SmallSize" type="CheckButton" parent="Background"]
-visible = false
+visible = true
 layout_mode = 0
 offset_left = 160.0
 offset_top = 137.0
@@ -148,7 +148,7 @@ text = "Small"
 alignment = 2
 
 [node name="StandardSize" type="CheckButton" parent="Background"]
-visible = false
+visible = true
 layout_mode = 0
 offset_left = 136.0
 offset_top = 159.0
@@ -167,7 +167,7 @@ text = "Standard"
 alignment = 2
 
 [node name="LargeSize" type="CheckButton" parent="Background"]
-visible = false
+visible = true
 layout_mode = 0
 offset_left = 162.0
 offset_top = 183.0
@@ -185,7 +185,7 @@ text = "Large"
 alignment = 2
 
 [node name="HugeSize" type="CheckButton" parent="Background"]
-visible = false
+visible = true
 layout_mode = 0
 offset_left = 163.0
 offset_top = 208.0
@@ -203,7 +203,7 @@ text = "Huge"
 alignment = 2
 
 [node name="RandomSize" type="CheckButton" parent="Background"]
-visible = false
+visible = true
 layout_mode = 0
 offset_left = 140.0
 offset_top = 231.0

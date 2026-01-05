@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Threading;
+using System.Collections.Generic;
 using C7GameData;
 using C7Engine;
 using C7GameData.Save;
@@ -75,6 +76,60 @@ public partial class WorldSetup : Control {
 	WorldCharacteristics.Age age = WorldCharacteristics.Age.Billion_4;
 	WorldCharacteristics.Temperature temp = WorldCharacteristics.Temperature.Temperate;
 	WorldCharacteristics.Climate clim = WorldCharacteristics.Climate.Normal;
+
+	// Maybe we refactor all this data later into a separate JSON/config file?
+	// I wasn't sure if it fit well into the MapGenerator.cs enum-style since it's a lot of integer data to store
+
+	private int sizeSelected = 2; // Correlates to standard size being default
+	private readonly Random sizeRandomizer = new Random();
+	private readonly List<WorldSize> sizeOptions = new List<WorldSize>
+	{
+		// Tiny, index 0
+		new WorldSize() {
+				width = 60,
+				height = 60,
+				numberOfCivs = 4,
+				distanceBetweenCivs = 11,
+				techRate = 160,
+				optimalNumberOfCities = 14,
+			},
+		// Small, index 1
+		new WorldSize() {
+				width = 80,
+				height = 80,
+				numberOfCivs = 6,
+				distanceBetweenCivs = 11,
+				techRate = 200,
+				optimalNumberOfCities = 17,
+			},
+		// Standard, index 2
+		new WorldSize() {
+				width = 100,
+				height = 100,
+				numberOfCivs = 8,
+				distanceBetweenCivs = 12,
+				techRate = 240,
+				optimalNumberOfCities = 20,
+			},
+		// Large, index 3
+		new WorldSize() {
+				width = 130,
+				height = 130,
+				numberOfCivs = 12,
+				distanceBetweenCivs = 18,
+				techRate = 320,
+				optimalNumberOfCities = 28,
+			},
+		// Huge, index 4
+		new WorldSize() {
+				width = 160,
+				height = 160,
+				numberOfCivs = 16,
+				distanceBetweenCivs = 24,
+				techRate = 400,
+				optimalNumberOfCities = 36,
+			},
+	};
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
@@ -267,14 +322,30 @@ public partial class WorldSetup : Control {
 		billion4Large.Visible = true;
 		billion4.ButtonPressed = true;
 
-		// TODO: handle different map sizes properly (including loading the
-		// optimal city number, etc)
-		tinySize.Visible = false;
-		smallSize.Visible = false;
-		standardSize.Visible = false;
-		largeSize.Visible = false;
-		hugeSize.Visible = false;
-		randomSize.Visible = false;
+		tinySize.Pressed += () => {
+			sizeSelected = 0;
+		};
+
+		smallSize.Pressed += () => {
+			sizeSelected = 1;
+		};
+
+		standardSize.Pressed += () => {
+			sizeSelected = 2;
+		};
+
+		largeSize.Pressed += () => {
+			sizeSelected = 3;
+		};
+
+		hugeSize.Pressed += () => {
+			sizeSelected = 4;
+		};
+
+		randomSize.Pressed += () => {
+			sizeSelected = sizeRandomizer.Next(sizeOptions.Count);
+		};
+
 	}
 
 	private void ResetLandformGraphics() {
@@ -322,14 +393,7 @@ public partial class WorldSetup : Control {
 			age = age,
 			climate = clim,
 			temperature = temp,
-			worldSize = new WorldSize() {
-				width = 100,
-				height = 100,
-				numberOfCivs = 8,
-				distanceBetweenCivs = 12,
-				techRate = 240,
-				optimalNumberOfCities = 20,
-			},
+			worldSize = sizeOptions[sizeSelected],
 			terrainTypes = save.TerrainTypes,
 			resources = save.Resources,
 			defaultGovernment = save.Governments.Find(x => x.defaultType),
