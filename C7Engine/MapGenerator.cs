@@ -110,13 +110,19 @@ namespace C7Engine {
 			// for resources.
 			AddBonusGrasslands(wc, gameMap);
 
-			// Step 10: Add barb camps. We do this towards the end to make sure
+			// Step 10: Place player starting locations
+			// Placing this before barb camps so barbs don't spawn <5 tiles away from players
+			// Tried placing barbs then players, but caused all players to spawn together
+			DetermineStartingLocations(wc, gameMap);
+
+			// Step 11: Add barb camps. We do this towards the end to make sure
 			// that we don't have barb camps on top of resources.
+			// Previously step 10
 			AddBarbarianCamps(wc, gameMap);
 
 			// TODO: Goody huts, barbarian camps.
 
-			DetermineStartingLocations(wc, gameMap);
+
 
 			// Last step: Assign the terrain file and image ids to each tile so
 			// we know which texture to use when displaying them.
@@ -1338,6 +1344,9 @@ namespace C7Engine {
 					return false;
 				}
 			}
+
+			// No barbarian camps less than 6 tiles away from a player
+			if (m.startingLocations.Any(x => t.distanceTo(x) < 6)) return false;
 
 			return true;
 		}
