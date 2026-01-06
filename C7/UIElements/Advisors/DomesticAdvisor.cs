@@ -148,7 +148,6 @@ public partial class DomesticAdvisor : Control {
 
 			int scienceRate = player.scienceRate;
 			int luxuryRate = player.luxuryRate;
-			(_, _, int unitSupportCost) = player.TotalUnitsAllowedUnitsAndSupportCost();
 
 			scienceSliderIcon.SetPosition(new Vector2(CalculateSliderXPos(scienceRate), scienceSliderY));
 			luxurySliderIcon.SetPosition(new Vector2(CalculateSliderXPos(luxuryRate), luxurySliderY));
