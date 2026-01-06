@@ -20,6 +20,26 @@ namespace C7GameData {
 		public int interest;
 		public int maintenance;
 		public int unitSupport;
+
+		public int Inflows()
+		{
+			return corrupted + taxes + taxmenTaxes + beakers + happiness + fromOtherCivs + interest;
+		}
+
+		public int Outflows()
+		{
+			return corrupted + beakers + happiness + toOtherCivs + maintenance + unitSupport;
+		}
+
+		public int Netflows()
+		{
+			return taxes + taxmenTaxes + fromOtherCivs + interest - maintenance - unitSupport - toOtherCivs;
+		}
+
+		public int CityInflows()
+		{
+			return corrupted + taxes + beakers + happiness;
+		}
 	}
 	public class Player {
 		private static ILogger log = Log.ForContext<Player>();
@@ -329,7 +349,6 @@ namespace C7GameData {
 			return "";
 		}
 
-		// TODO: Separate taxmen commerce from regular taxes
 		public PlayerCommerceBreakdown AggregateFlows()
 		{
 			var result = new PlayerCommerceBreakdown
@@ -340,7 +359,10 @@ namespace C7GameData {
 				beakers = 0,
 				happiness = 0,
 				fromOtherCivs = 0,
-				
+				toOtherCivs = 0,
+				interest = 0,
+				maintenance = 0,
+				unitSupport = TotalUnitsAllowedUnitsAndSupportCost()[2]
 			};
 
 			foreach (City city in cities)
@@ -350,6 +372,7 @@ namespace C7GameData {
 				result.taxes += cityCommerce.taxes;
 				result.beakers += cityCommerce.beakers;
 				result.happiness += cityCommerce.happiness;
+				result.maintenance += city.Maintenance();
 
 				// TODO: Hook this up to .biq or .sav specifications for tax collector income. Using default Conquests value as placeholder.
 				const int TAXMAN_VALUE = 2;
@@ -363,6 +386,23 @@ namespace C7GameData {
 					}
 				}
 			}
+
+			int currentTurn = EngineStorage.gameData.turn;
+
+			foreach (var pr in playerRelationships.Values)
+			{
+				foreach (var mtd in pr.multiTurnDeals)
+				{
+					if (mtd.TurnsRemaining(currentTurn) > 0 && mtd.dealSubType == DealSubType.GoldPerTurn)
+					{
+						if (mtd.dealDetails == DealDetails.Inbound) result.fromOtherCivs += mtd.goldPerTurn;
+						else if (mtd.dealDetails == DealDetails.Outbound) result.toOtherCivs += mtd.goldPerTurn;
+					}
+				}
+			}
+
+			if (hasWallStreet) result.interest = (int)Math.Floor(gold * 0.05);
+
 			return result;
 		}
 
@@ -376,17 +416,7 @@ namespace C7GameData {
 
 		// TODO: Add interest and GPT deals
 		public int CalculateGoldPerTurn() {
-			int result = 0;
-			foreach (City city in cities) {
-				result += city.CurrentCommerceYield().taxes;
-				result -= city.MaintenanceCosts();
-			}
-
-			// Subtract unit support costs, if any.
-			var (_, _, unitSupportCost) = TotalUnitsAllowedUnitsAndSupportCost();
-			result -= unitSupportCost;
-
-			return result;
+			return AggregateFlows().Netflows();
 		}
 
 		public bool WouldAcceptDealFrom(GameData gameData, Player other, TradeOffer theirOffer, TradeOffer ourOffer) {

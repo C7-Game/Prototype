@@ -148,7 +148,6 @@ public partial class DomesticAdvisor : Control {
 
 			int scienceRate = player.scienceRate;
 			int luxuryRate = player.luxuryRate;
-			int maintenanceCosts = player.MaintenanceCosts();
 			(_, _, int unitSupportCost) = player.TotalUnitsAllowedUnitsAndSupportCost();
 
 			scienceSliderIcon.SetPosition(new Vector2(CalculateSliderXPos(scienceRate), scienceSliderY));
@@ -161,10 +160,10 @@ public partial class DomesticAdvisor : Control {
 			treasury.Text = $"Treasury: {player.gold}";
 
 			// TODO: fill these in.
-			incomeDetails.Text = "From cities: +??\nFrom taxmen: +??\nFrom other civs: +??\nFrom interest: +??";
-			expenseDetails.Text = $"-??: Science\n-??: Entertainment\n-??: Corruption\n-{maintenanceCosts}: Maintenance\n-{unitSupportCost}: Unit costs\n-??: To other civs";
-			incomeSummary.Text = "??";
-			expenseSummary.Text = "??";
+			incomeDetails.Text = $"From cities: +{totalIncome.CityInflows()}\nFrom taxmen: +{totalIncome.taxmenTaxes}\nFrom other civs: +{totalIncome.fromOtherCivs}\nFrom interest: +{totalIncome.interest}";
+			expenseDetails.Text = $"-{totalIncome.beakers}: Science\n-{totalIncome.happiness}: Entertainment\n-{totalIncome.corrupted}: Corruption\n-{totalIncome.maintenance}: Maintenance\n-{totalIncome.unitSupport}: Unit costs\n-{totalIncome.toOtherCivs}: To other civs";
+			incomeSummary.Text = $"{totalIncome.Inflows()}";
+			expenseSummary.Text = $"{totalIncome.Outflows()}";
 
 			int goldPerTurn = player.CalculateGoldPerTurn();
 			if (goldPerTurn > 0) {
