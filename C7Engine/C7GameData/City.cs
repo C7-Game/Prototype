@@ -620,6 +620,10 @@ namespace C7GameData {
 				year = 1, // TODO: Implement in-game year tracking
 				totalCulture = 0
 			});
+			
+			// Update player flag if Wall Street is built to accrue interest in gold calculations
+			// TODO: Add logic to make owner.hasWallStreet false if the city holding Wall Street is captured
+			if (building.name == "Wall Street") owner.hasWallStreet = true;
 		}
 
 		public void AddUnit(UnitPrototype prototype, GameData gameData) {

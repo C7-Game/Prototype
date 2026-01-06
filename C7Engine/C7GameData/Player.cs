@@ -8,6 +8,19 @@ using Serilog;
 using static C7GameData.EraUtils;
 
 namespace C7GameData {
+
+	public struct PlayerCommerceBreakdown {
+		public int corrupted;
+		public int taxes;
+		public int taxmenTaxes;
+		public int beakers;
+		public int happiness;
+		public int fromOtherCivs;
+		public int toOtherCivs;
+		public int interest;
+		public int maintenance;
+		public int unitSupport;
+	}
 	public class Player {
 		private static ILogger log = Log.ForContext<Player>();
 
@@ -75,6 +88,8 @@ namespace C7GameData {
 				_gold = value;
 			}
 		}
+
+		public bool hasWallStreet = false;
 
 		// The number of "beakers" (gold) spent on the currently researched
 		// tech.
@@ -314,6 +329,43 @@ namespace C7GameData {
 			return "";
 		}
 
+		// TODO: Separate taxmen commerce from regular taxes
+		public PlayerCommerceBreakdown AggregateFlows()
+		{
+			var result = new PlayerCommerceBreakdown
+			{
+				corrupted = 0,
+				taxes = 0,
+				taxmenTaxes = 0,
+				beakers = 0,
+				happiness = 0,
+				fromOtherCivs = 0,
+				
+			};
+
+			foreach (City city in cities)
+			{
+				CommerceBreakdown cityCommerce = city.CurrentCommerceYield();
+				result.corrupted += cityCommerce.corrupted;
+				result.taxes += cityCommerce.taxes;
+				result.beakers += cityCommerce.beakers;
+				result.happiness += cityCommerce.happiness;
+
+				// TODO: Hook this up to .biq or .sav specifications for tax collector income. Using default Conquests value as placeholder.
+				const int TAXMAN_VALUE = 2;
+				foreach (CityResident cr in city.residents)
+				{
+					// If tax collector
+					if (cr.CitizenType.SpecialistIndex == 2)
+					{
+						result.taxes -= TAXMAN_VALUE;
+						result.taxmenTaxes += TAXMAN_VALUE;
+					}
+				}
+			}
+			return result;
+		}
+
 		public int MaintenanceCosts() {
 			int result = 0;
 			foreach (City c in cities) {
@@ -322,6 +374,7 @@ namespace C7GameData {
 			return result;
 		}
 
+		// TODO: Add interest and GPT deals
 		public int CalculateGoldPerTurn() {
 			int result = 0;
 			foreach (City city in cities) {

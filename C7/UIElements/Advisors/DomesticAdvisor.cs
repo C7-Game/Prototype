@@ -144,6 +144,7 @@ public partial class DomesticAdvisor : Control {
 
 		EngineStorage.ReadGameData((GameData gameData) => {
 			Player player = gameData.GetFirstHumanPlayer();
+			PlayerCommerceBreakdown totalIncome = player.AggregateFlows();
 
 			int scienceRate = player.scienceRate;
 			int luxuryRate = player.luxuryRate;
@@ -167,7 +168,7 @@ public partial class DomesticAdvisor : Control {
 
 			int goldPerTurn = player.CalculateGoldPerTurn();
 			if (goldPerTurn > 0) {
-				sumSummary.Text = $"Net gain: {goldPerTurn}";
+				sumSummary.Text = $"Net gain: +{goldPerTurn}";
 				growth.Text = "Growing!";
 			} else if (goldPerTurn < 0) {
 				sumSummary.Text = $"Net loss: {goldPerTurn}";
