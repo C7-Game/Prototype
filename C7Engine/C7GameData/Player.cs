@@ -21,23 +21,19 @@ namespace C7GameData {
 		public int maintenance;
 		public int unitSupport;
 
-		public int Inflows()
-		{
+		public int Inflows() {
 			return corrupted + taxes + taxmenTaxes + beakers + happiness + fromOtherCivs + interest;
 		}
 
-		public int Outflows()
-		{
+		public int Outflows() {
 			return corrupted + beakers + happiness + toOtherCivs + maintenance + unitSupport;
 		}
 
-		public int Netflows()
-		{
+		public int Netflows() {
 			return taxes + taxmenTaxes + fromOtherCivs + interest - maintenance - unitSupport - toOtherCivs;
 		}
 
-		public int CityInflows()
-		{
+		public int CityInflows() {
 			return corrupted + taxes + beakers + happiness;
 		}
 	}
@@ -349,8 +345,7 @@ namespace C7GameData {
 			return "";
 		}
 
-		public PlayerCommerceBreakdown AggregateFlows()
-		{
+		public PlayerCommerceBreakdown AggregateFlows() {
 			var result = new PlayerCommerceBreakdown
 			{
 				corrupted = 0,
@@ -362,44 +357,44 @@ namespace C7GameData {
 				toOtherCivs = 0,
 				interest = 0,
 				maintenance = 0,
-				unitSupport = TotalUnitsAllowedUnitsAndSupportCost()[2]
+				unitSupport = 0
 			};
 
-			foreach (City city in cities)
-			{
+			int currentTurn = EngineStorage.gameData.turn;
+
+			// If current turn < 10 and player has no cities (hasn't planted yet), apply no expenses or income.
+			// TODO: Come up with a more robust/elegant solution for this
+			if (currentTurn < 10 && cities.Count == 0) return result;
+
+			foreach (City city in cities) {
 				CommerceBreakdown cityCommerce = city.CurrentCommerceYield();
 				result.corrupted += cityCommerce.corrupted;
 				result.taxes += cityCommerce.taxes;
 				result.beakers += cityCommerce.beakers;
 				result.happiness += cityCommerce.happiness;
-				result.maintenance += city.Maintenance();
+				result.maintenance += city.MaintenanceCosts();
 
 				// TODO: Hook this up to .biq or .sav specifications for tax collector income. Using default Conquests value as placeholder.
 				const int TAXMAN_VALUE = 2;
-				foreach (CityResident cr in city.residents)
-				{
+				foreach (CityResident cr in city.residents) {
 					// If tax collector
-					if (cr.CitizenType.SpecialistIndex == 2)
-					{
+					if (cr.citizenType.SpecialistIndex == 2) {
 						result.taxes -= TAXMAN_VALUE;
 						result.taxmenTaxes += TAXMAN_VALUE;
 					}
 				}
 			}
 
-			int currentTurn = EngineStorage.gameData.turn;
-
-			foreach (var pr in playerRelationships.Values)
-			{
-				foreach (var mtd in pr.multiTurnDeals)
-				{
-					if (mtd.TurnsRemaining(currentTurn) > 0 && mtd.dealSubType == DealSubType.GoldPerTurn)
-					{
+			foreach (var pr in playerRelationships.Values) {
+				foreach (var mtd in pr.multiTurnDeals) {
+					if (mtd.TurnsRemaining(currentTurn) > 0 && mtd.dealSubType == DealSubType.GoldPerTurn) {
 						if (mtd.dealDetails == DealDetails.Inbound) result.fromOtherCivs += mtd.goldPerTurn;
 						else if (mtd.dealDetails == DealDetails.Outbound) result.toOtherCivs += mtd.goldPerTurn;
 					}
 				}
 			}
+
+			result.unitSupport = TotalUnitsAllowedUnitsAndSupportCost().Item3;
 
 			if (hasWallStreet) result.interest = (int)Math.Floor(gold * 0.05);
 
