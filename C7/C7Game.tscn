@@ -238,7 +238,6 @@ visible = false
 
 [connection signal="GameInitialized" from="." to="CanvasLayer/Control/UnitButtons" method="SetUpControlButtons"]
 [connection signal="ShowCityScreen" from="." to="CanvasLayer/CityScreen" method="OnShowCityScreen"]
-[connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="StopToggling"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="PleaseWait"]
 [connection signal="UnitMoved" from="." to="CanvasLayer/Control/UnitButtons" method="OnUnitMoved"]
@@ -254,7 +253,6 @@ visible = false
 [connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/Control/GameStatus/LowerRightInfoBox" to="." method="OnPlayerEndTurn"]
 [connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
-[connection signal="DiplomacySelection" from="CanvasLayer/PopupOverlay" to="." method="OnDiplomacySelected"]
-[connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]
+[connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="Hide"]
 [connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
 [connection signal="Retire" from="CanvasLayer/PopupOverlay" to="." method="_on_QuitButton_pressed"]

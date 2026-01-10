@@ -13,8 +13,6 @@ using C7Engine.AI;
 [Tool]
 public partial class CityScreen : Control {
 	private ILogger log = LogManager.ForContext<CityScreen>();
-	public TileAssignmentLayer tileAssignmentLayer;
-	public MapView mapView;
 	public List<CitizenType> citizenTypes;
 	private List<TextureButton> popHeads = new();
 	private List<TextureRect> popHeadEffects = new();
@@ -54,6 +52,9 @@ public partial class CityScreen : Control {
 	[Export] Control shieldRowContainer;
 	[Export] Control foodRowContainer;
 
+	[Export] MapView mapView;
+	TileAssignmentLayer tileAssignmentLayer;
+
 	Theme yieldDetailsFontTheme = new();
 	FontFile yieldDetailsFont = new();
 
@@ -79,8 +80,12 @@ public partial class CityScreen : Control {
 
 	private Dictionary<string, ImageTexture> effectIcons = new();
 
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
+		// Allow the city screen to control whether tile assignments
+		// are visible and map UI locations back to map locations.
+		tileAssignmentLayer = mapView.tileAssignmentLayer;
+		citizenTypes = EngineStorage.gameData.citizenTypes;
+
 		background.Texture = TextureLoader.Load("city_screen.background");
 
 		// The close button.

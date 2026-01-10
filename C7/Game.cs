@@ -64,16 +64,9 @@ public partial class Game : Node {
 	GlobalSingleton Global;
 
 	[Export]
+	private UIOverlayController overlayController;
+	[Export]
 	private PopupOverlay popupOverlay;
-	[Export]
-	private CityScreen cityScreen;
-	[Export]
-	private Advisors advisor;
-	[Export]
-	private Diplomacy diplomacy;
-	[Export]
-	private Control palaceScene;
-
 	[Export]
 	private DoubleClickHandler doubleClickHandler;
 	[Export]
@@ -177,15 +170,6 @@ public partial class Game : Node {
 			} else {
 				mapView.cameraLocation = cameraLocation.Value;
 			}
-
-			// Allow the city screen to control whether tile assignments
-			// are visible and map UI locations back to map locations.
-			cityScreen.tileAssignmentLayer = mapView.tileAssignmentLayer;
-			cityScreen.mapView = mapView;
-			cityScreen.citizenTypes = gameData.citizenTypes;
-
-			// Allow the domestic advisor to trigger popups.
-			advisor.domesticAdvisor.SetPopupOverlay(popupOverlay);
 		});
 	}
 
@@ -408,7 +392,7 @@ public partial class Game : Node {
 
 	public override void _UnhandledInput(InputEvent @event) {
 		// Don't handle mouse actions if UI elements are visible
-		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible || palaceScene.Visible) {
+		if (overlayController.IsOverlayVisible()) {
 			IsMovingCamera = false;
 			return;
 		}
@@ -589,18 +573,6 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.T && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 			ToggleC7Graphics();
 		}
-		if (eventKeyDown.Keycode == Godot.Key.F1) {
-			EmitSignal(SignalName.ShowSpecificAdvisor, "F1");
-		}
-		if (eventKeyDown.Keycode == Godot.Key.F3) {
-			EmitSignal(SignalName.ShowSpecificAdvisor, "F3");
-		}
-		if (eventKeyDown.Keycode == Godot.Key.F6) {
-			EmitSignal(SignalName.ShowSpecificAdvisor, "F6");
-		}
-		if (eventKeyDown.Keycode == Godot.Key.F9) {
-			palaceScene.Show();
-		}
 		if (eventKeyDown.Keycode == Godot.Key.C && HasCurrentlySelectedUnit()) {
 			mapView.centerCameraOnTile(CurrentlySelectedUnit.location);
 		}
@@ -672,33 +644,8 @@ public partial class Game : Node {
 	}
 
 	private void ProcessAction(string currentAction) {
-		if (currentAction == C7Action.Escape && popupOverlay.ShowingPopup) {
-			popupOverlay.OnHidePopup();
-			return;
-		}
-
-		if (currentAction == C7Action.Escape && cityScreen.Visible) {
-			cityScreen.Hide();
-			return;
-		}
-
-		if (currentAction == C7Action.Escape && palaceScene.Visible) {
-			palaceScene.Hide();
-			return;
-		}
-
-		if (currentAction == C7Action.Escape && advisor.Visible) {
-			advisor.Hide();
-			return;
-		}
-
-		if (currentAction == C7Action.Escape && diplomacy.Visible) {
-			diplomacy.Hide();
-			return;
-		}
-
 		// never poll for actions if UI elements are visible
-		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible || palaceScene.Visible) {
+		if (overlayController.IsOverlayVisible()) {
 			return;
 		}
 
@@ -928,9 +875,5 @@ public partial class Game : Node {
 	public void ShowCityScreenForCity(GameData gameData, City city) {
 		city.RecalculateCitizenMoods(gameData);
 		EmitSignal(SignalName.ShowCityScreen, new ParameterWrapper<City>(city));
-	}
-
-	public void OnDiplomacySelected(ParameterWrapper<ID> opponentPlayer) {
-		diplomacy.ShowTalkScreenForPlayer(controller.id, opponentPlayer.Value);
 	}
 }

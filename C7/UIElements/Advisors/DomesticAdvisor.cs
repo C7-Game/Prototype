@@ -2,7 +2,6 @@ using C7Engine;
 using C7GameData;
 using Godot;
 using System.Collections.Generic;
-using System;
 
 [GlobalClass]
 [Tool]
@@ -30,7 +29,7 @@ public partial class DomesticAdvisor : Control {
 	[Export] TextureButton contentFace;
 	[Export] TextureButton beaker;
 	[Export] TextureButton treasuryIcon;
-	PopupOverlay popupOverlay;
+	[Export] PopupOverlay popupOverlay;
 
 	TextureRect scienceSliderIcon = new();
 	Label scienceSliderLabel = new();
@@ -204,10 +203,6 @@ public partial class DomesticAdvisor : Control {
 		int maxX = 725;
 
 		return minX + (int)((maxX - minX) * (sliderRate / 10.0));
-	}
-
-	public void SetPopupOverlay(PopupOverlay po) {
-		popupOverlay = po;
 	}
 
 	private void ChangeGovernments() {
