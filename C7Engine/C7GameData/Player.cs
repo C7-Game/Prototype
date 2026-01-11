@@ -23,7 +23,6 @@ namespace C7GameData {
 		public bool defeated = false;
 
 		public Civilization civilization;
-		internal int cityNameIndex = 0;
 
 		public List<MapUnit> units = new List<MapUnit>();
 		public List<City> cities = new List<City>();
@@ -157,18 +156,29 @@ namespace C7GameData {
 			ResearchQueue.Enqueue(tech);
 		}
 
+		private IEnumerable<string> CityNameGenerator() {
+			List<string> cityNames = civilization.cityNames;
+			int loopCounter = 0;
+
+			// Perpetual generator expression to yield all city names lazily
+			while (true) {
+				foreach (string city in cityNames) {
+					if (loopCounter == 0) yield return city;
+					else if (loopCounter == 1) yield return $"New {city}";
+					else {
+						if (loopCounter % 2 == 0) yield return $"{city} {(loopCounter / 2) + 1}";
+						else yield return $"New {city} {(loopCounter / 2) + 1}";
+					}
+				}
+				loopCounter++;
+			}
+		}
+
 		public string GetNextCityName() {
-			string name = civilization.cityNames[cityNameIndex % civilization.cityNames.Count];
-			int bonusLoops = cityNameIndex / civilization.cityNames.Count;
-			if (bonusLoops % 2 == 1) {
-				name = "New " + name;
-			}
-			int suffix = (bonusLoops / 2) + 1;
-			if (suffix > 1) {
-				name = name + " " + suffix; //e.g. for bonusLoops = 2, we'll have "Athens 2"
-			}
-			cityNameIndex++;
-			return name;
+			// Convert to hashset for faster lookups
+			HashSet<string> cityNameHashSet = cities.Select(city => city.name).ToHashSet();
+
+			return CityNameGenerator().First(x => !cityNameHashSet.Contains(x));
 		}
 
 		public Player() {

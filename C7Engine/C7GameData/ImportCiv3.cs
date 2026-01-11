@@ -406,7 +406,6 @@ namespace C7GameData {
 				save.Players.Add(MakeSavePlayerFromCiv(save.Civilizations[i],
 									   isBarbarian: i == 0,
 									   isHuman: false,
-									   cityNameIndex: 0,
 									   era: ""));
 
 				// Set a government for players not associated with LEAD.
@@ -465,7 +464,6 @@ namespace C7GameData {
 				SavePlayer player = MakeSavePlayerFromCiv(civ,
 										  isBarbarian: i == 0,
 										  isHuman: i == 1,
-										  cityNameIndex: leader.FoundedCities,
 										  era: theBiq.Eras[leader.Era].CivilopediaEntry);
 
 				// Record what the player is currently researching.
@@ -769,7 +767,7 @@ namespace C7GameData {
 			}
 		}
 
-		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isBarbarian, bool isHuman, int cityNameIndex, string era) {
+		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isBarbarian, bool isHuman, string era) {
 			return new SavePlayer {
 				id = ids.CreateID("player"),
 				colorIndex = civ.colorIndex,
@@ -779,7 +777,6 @@ namespace C7GameData {
 				// Never let barbarians play before a real player.
 				hasPlayedCurrentTurn = isBarbarian,
 
-				cityNameIndex = cityNameIndex,
 				eraCivilopediaName = era,
 			};
 		}

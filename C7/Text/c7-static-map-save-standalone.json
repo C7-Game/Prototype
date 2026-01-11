@@ -71322,7 +71322,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "A Barbarian Chiefdom",
-      "cityNameIndex": 0,
       "turnsUntilPriorityReevaluation": 0,
       "luxuryRate": 0,
       "scienceRate": 5,
@@ -71340,7 +71339,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Netherlands",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 57,
@@ -71417,7 +71415,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "America",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 64,
@@ -71494,7 +71491,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Aztecs",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 59,
@@ -71567,7 +71563,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Inca",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 76,
@@ -71644,7 +71639,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Persia",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 30,
@@ -71725,7 +71719,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Maya",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 9,
@@ -71802,7 +71795,6 @@
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Iroquois",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 46,

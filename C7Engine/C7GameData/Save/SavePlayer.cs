@@ -11,7 +11,6 @@ namespace C7GameData.Save {
 		public bool defeated = false;
 
 		public string civilization;
-		public int cityNameIndex = 0;
 
 		public List<TileLocation> tileKnowledge = new List<TileLocation>();
 
@@ -68,7 +67,6 @@ namespace C7GameData.Save {
 				defeated = defeated,
 				colorIndex = colorIndex,
 				civilization = civilization is not null ? civilizations.Find(civ => civ.name == civilization) : null,
-				cityNameIndex = cityNameIndex,
 				knownTechs = knownTechs,
 				eraCivilopediaName = eraCivilopediaName,
 				luxuryRate = luxuryRate,
@@ -118,7 +116,6 @@ namespace C7GameData.Save {
 			civilization = player.civilization?.name;
 			// TODO: this should be computed by looking at cities defined in the save
 			// so that adding cities in the save structure doesn't require updating this value
-			cityNameIndex = player.cityNameIndex;
 			tileKnowledge = player.tileKnowledge.AllKnownTiles().ConvertAll(tile => new TileLocation(tile));
 			turnsUntilPriorityReevaluation = player.turnsUntilPriorityReevaluation;
 			knownTechs = player.knownTechs;
