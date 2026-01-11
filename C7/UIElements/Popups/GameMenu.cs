@@ -35,7 +35,7 @@ public partial class GameMenu : Popup {
 		// TODO: The main menu does sound playing but we don't know our path in
 		// the scene, which makes this hard.
 		// PlayButtonPressedSound();
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 
 		loadDialog.Popup();
 	}
@@ -55,7 +55,7 @@ public partial class GameMenu : Popup {
 		// TODO: The main menu does sound playing but we don't know our path in
 		// the scene, which makes this hard.
 		// PlayButtonPressedSound();
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 
 		loadDialog.Popup();
 	}
@@ -69,6 +69,6 @@ public partial class GameMenu : Popup {
 	}
 
 	private void map() {
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 	}
 }

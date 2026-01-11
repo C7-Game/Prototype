@@ -1,11 +1,7 @@
 using Godot;
-using System;
-using System.Diagnostics;
 using C7GameData;
 using C7Engine;
-using C7GameData.Save;
 using System.Collections.Generic;
-using Serilog;
 
 // The popup for selecting which other civilization to contact.
 public partial class GovernmentSelection : Popup {
@@ -31,9 +27,8 @@ public partial class GovernmentSelection : Popup {
 		int vOffset = 65;
 		foreach (Government g in governments) {
 			AddButton($"{g.name}", vOffset, () => {
-				Node parent = GetParent();
 				new SelectGovernmentMsg(player, g).send();
-				parent.EmitSignal(PopupOverlay.SignalName.HidePopup);
+				GetParent<PopupOverlay>().Hide();
 			});
 			vOffset += 25;
 		}

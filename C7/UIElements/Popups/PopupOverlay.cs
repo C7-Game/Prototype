@@ -10,7 +10,6 @@ public partial class PopupOverlay : HBoxContainer {
 	[Signal] public delegate void QuitEventHandler();
 	[Signal] public delegate void RetireEventHandler();
 	[Signal] public delegate void BuildCityEventHandler(string name);
-	[Signal] public delegate void HidePopupEventHandler();
 
 	Control currentChild = null;
 
@@ -32,7 +31,6 @@ public partial class PopupOverlay : HBoxContainer {
 		MouseFilter = MouseFilterEnum.Pass;
 		RemoveChild(currentChild);
 		currentChild = null;
-		Hide();
 
 		// 2. enable mouse interactions with other UI elements
 		setMouseFilter(control, MouseFilterEnum.Pass);

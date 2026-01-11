@@ -64,7 +64,7 @@ public partial class TextDialog : Popup {
 
 	private void HandleTextInput(string text) {
 		GetViewport().SetInputAsHandled();
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 		handleText(text);
 	}
 }

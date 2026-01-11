@@ -1,6 +1,7 @@
-[gd_scene load_steps=20 format=3 uid="uid://cldl5nk4n61m2"]
+[gd_scene load_steps=22 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" uid="uid://yxhiwx46tety" path="res://Game.cs" id="1"]
+[ext_resource type="Script" uid="uid://b5dgf7fisksxy" path="res://MessageConsumer.cs" id="2_4mx54"]
 [ext_resource type="Script" uid="uid://cfenrvu7tnp40" path="res://DoubleClickHandler.cs" id="2_t735q"]
 [ext_resource type="Script" uid="uid://dflpmvue8o7uo" path="res://UnitSelector.cs" id="2_w8hq2"]
 [ext_resource type="Script" uid="uid://ifoasmoofo6r" path="res://UIElements/Advisors/Advisors.cs" id="3"]
@@ -15,22 +16,24 @@
 [ext_resource type="Theme" uid="uid://c1jpmssnhvodi" path="res://C7Theme.tres" id="10"]
 [ext_resource type="PackedScene" uid="uid://bo4yg85jcbgdx" path="res://UIElements/CityScreen/city_screen.tscn" id="11_12lt4"]
 [ext_resource type="Script" uid="uid://cqbrjccf0k1xx" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
+[ext_resource type="Script" uid="uid://dsbtunsw7sh1b" path="res://UIOverlayController.cs" id="12_4pqcd"]
 [ext_resource type="PackedScene" uid="uid://bvncm1bgcii5e" path="res://UIElements/civ3_file_dialog.tscn" id="12_yjlfl"]
 [ext_resource type="Script" uid="uid://bmfpx37ovqnsx" path="res://UIElements/Diplomacy/Diplomacy.cs" id="14"]
 [ext_resource type="PackedScene" uid="uid://dkcu255o1qrt1" path="res://UIElements/PalaceScreen/palace_screen.tscn" id="14_ud8vi"]
 [ext_resource type="PackedScene" uid="uid://da7hbbufyfllg" path="res://UIElements/Advisors/domestic_advisor.tscn" id="15"]
 
-[node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "popupOverlay", "cityScreen", "advisor", "diplomacy", "palaceScene", "doubleClickHandler", "animationController", "unitSelector")]
+[node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "overlayController", "popupOverlay", "doubleClickHandler", "animationController", "unitSelector", "messageConsumer")]
 script = ExtResource("1")
 Toolbar = NodePath("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer")
-popupOverlay = NodePath("CanvasLayer/PopupOverlay")
-cityScreen = NodePath("CanvasLayer/CityScreen")
-advisor = NodePath("CanvasLayer/Advisor")
-diplomacy = NodePath("CanvasLayer/Diplomacy")
-palaceScene = NodePath("CanvasLayer/PalaceScene")
+overlayController = NodePath("CanvasLayer/Overlays")
+popupOverlay = NodePath("CanvasLayer/Overlays/PopupOverlay")
 doubleClickHandler = NodePath("DoubleClickHandler")
 animationController = NodePath("AnimationController")
 unitSelector = NodePath("UnitSelector")
+messageConsumer = NodePath("MessageConsumer")
+
+[node name="MessageConsumer" type="Node" parent="."]
+script = ExtResource("2_4mx54")
 
 [node name="UnitSelector" type="Node" parent="." node_paths=PackedStringArray("game")]
 script = ExtResource("2_w8hq2")
@@ -56,7 +59,7 @@ offset_right = -10.0
 offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
+mouse_filter = 1
 
 [node name="UnitButtons" type="VBoxContainer" parent="CanvasLayer/Control" node_paths=PackedStringArray("primaryControls", "specializedControls", "advancedControls")]
 layout_mode = 1
@@ -107,20 +110,24 @@ layout_mode = 2
 
 [node name="MenuButton" type="TextureButton" parent="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer" node_paths=PackedStringArray("popupOverlay")]
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("4")
-popupOverlay = NodePath("../../../../../PopupOverlay")
+popupOverlay = NodePath("../../../../../Overlays/PopupOverlay")
 
 [node name="CivilopediaButton" type="TextureButton" parent="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("5")
 
 [node name="AdvisorButton" type="TextureButton" parent="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("6")
 
 [node name="UiBarEndTurnButton" type="Button" parent="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer"]
 visible = false
 layout_mode = 2
+mouse_filter = 1
 text = "End Turn"
 
 [node name="GameStatus" type="Control" parent="CanvasLayer/Control"]
@@ -134,6 +141,7 @@ offset_left = -301.0
 offset_top = -139.0
 grow_horizontal = 0
 grow_vertical = 0
+mouse_filter = 1
 metadata/_edit_use_anchors_ = true
 
 [node name="LowerRightInfoBox" type="TextureRect" parent="CanvasLayer/Control/GameStatus"]
@@ -151,12 +159,13 @@ theme_override_constants/separation = 1
 script = ExtResource("7_yn4xe")
 openDiplomacy = NodePath("Diplomacy")
 openPalaceScreen = NodePath("Palace")
-popupOverlay = NodePath("../../../PopupOverlay")
-palaceScene = NodePath("../../../PalaceScene")
+popupOverlay = NodePath("../../../Overlays/PopupOverlay")
+palaceScene = NodePath("../../../Overlays/PalaceScene")
 
 [node name="Diplomacy" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("8_7a2mf")
 text = "D"
 tooltipText = "Start Diplomacy"
@@ -164,6 +173,7 @@ tooltipText = "Start Diplomacy"
 [node name="Espionage" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("8_7a2mf")
 text = "E"
 tooltipText = "Espionage"
@@ -171,6 +181,7 @@ tooltipText = "Espionage"
 [node name="Palace" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("8_7a2mf")
 text = "P"
 tooltipText = "Palace View"
@@ -178,6 +189,7 @@ tooltipText = "Palace View"
 [node name="Victory" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("8_7a2mf")
 text = "V"
 tooltipText = "Victory Status Screen"
@@ -185,31 +197,36 @@ tooltipText = "Victory Status Screen"
 [node name="Spaceship" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+mouse_filter = 1
 script = ExtResource("8_7a2mf")
 text = "S"
 tooltipText = "Spaceship"
 
-[node name="Advisor" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("domesticAdvisor")]
+[node name="Overlays" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("popupOverlay", "cityScreen", "advisor", "diplomacy", "palaceScene", "messageConsumer")]
+script = ExtResource("12_4pqcd")
+popupOverlay = NodePath("PopupOverlay")
+cityScreen = NodePath("CityScreen")
+advisor = NodePath("Advisor")
+diplomacy = NodePath("DiplomacyOverlay")
+palaceScene = NodePath("PalaceScene")
+messageConsumer = NodePath("../../MessageConsumer")
+
+[node name="PopupOverlay" type="HBoxContainer" parent="CanvasLayer/Overlays" node_paths=PackedStringArray("control")]
+visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("10")
-script = ExtResource("3")
-domesticAdvisor = NodePath("DomesticAdvisor")
+grow_horizontal = 0
+size_flags_horizontal = 3
+alignment = 2
+script = ExtResource("9")
+control = NodePath("../../Control")
 
-[node name="DomesticAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("15")]
+[node name="PopupSound" type="AudioStreamPlayer" parent="CanvasLayer/Overlays/PopupOverlay"]
+
+[node name="DiplomacyOverlay" type="CenterContainer" parent="CanvasLayer/Overlays" node_paths=PackedStringArray("popupOverlay")]
+unique_name_in_owner = true
 visible = false
-layout_mode = 2
-
-[node name="CityScreen" parent="CanvasLayer" instance=ExtResource("11_12lt4")]
-visible = false
-
-[node name="PalaceScene" parent="CanvasLayer" instance=ExtResource("14_ud8vi")]
-visible = false
-
-[node name="Diplomacy" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("popupOverlay")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -219,27 +236,38 @@ theme = ExtResource("10")
 script = ExtResource("14")
 popupOverlay = NodePath("../PopupOverlay")
 
-[node name="PopupOverlay" type="HBoxContainer" parent="CanvasLayer" node_paths=PackedStringArray("control")]
+[node name="PalaceScene" parent="CanvasLayer/Overlays" instance=ExtResource("14_ud8vi")]
+visible = false
+offset_top = -60.0
+offset_bottom = 60.0
+
+[node name="CityScreen" parent="CanvasLayer/Overlays" instance=ExtResource("11_12lt4")]
+visible = false
+
+[node name="Advisor" type="CenterContainer" parent="CanvasLayer/Overlays" node_paths=PackedStringArray("domesticAdvisor")]
 visible = false
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 0
-size_flags_horizontal = 3
-alignment = 2
-script = ExtResource("9")
-control = NodePath("../Control")
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("10")
+script = ExtResource("3")
+domesticAdvisor = NodePath("DomesticAdvisor")
 
-[node name="PopupSound" type="AudioStreamPlayer" parent="CanvasLayer/PopupOverlay"]
+[node name="DomesticAdvisor" parent="CanvasLayer/Overlays/Advisor" node_paths=PackedStringArray("popupOverlay") instance=ExtResource("15")]
+visible = false
+layout_mode = 2
+popupOverlay = NodePath("../../PopupOverlay")
 
 [node name="LoadDialog" parent="." instance=ExtResource("12_yjlfl")]
 unique_name_in_owner = true
 visible = false
 
 [connection signal="GameInitialized" from="." to="CanvasLayer/Control/UnitButtons" method="SetUpControlButtons"]
-[connection signal="ShowCityScreen" from="." to="CanvasLayer/CityScreen" method="OnShowCityScreen"]
-[connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="StopToggling"]
+[connection signal="ShowCityScreen" from="." to="CanvasLayer/Overlays/CityScreen" method="OnShowCityScreen"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="PleaseWait"]
+[connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="StopToggling"]
 [connection signal="UnitMoved" from="." to="CanvasLayer/Control/UnitButtons" method="OnUnitMoved"]
 [connection signal="UnitMoved" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="OnUnitMoved"]
 [connection signal="NewAutoselectedUnit" from="UnitSelector" to="CanvasLayer/Control/UnitButtons" method="OnNewUnitSelected"]
@@ -249,10 +277,9 @@ visible = false
 [connection signal="DoubleClick" from="DoubleClickHandler" to="." method="OnDoubleLeftMouseButtonClick"]
 [connection signal="SingleClick" from="DoubleClickHandler" to="." method="OnSingleLeftMouseButtonClick"]
 [connection signal="ActionRequested" from="CanvasLayer/Control/UnitButtons" to="." method="ProcessAction"]
-[connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
+[connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Overlays/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/Control/GameStatus/LowerRightInfoBox" to="." method="OnPlayerEndTurn"]
-[connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
-[connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="Hide"]
-[connection signal="Quit" from="CanvasLayer/PopupOverlay" to="." method="OnQuitTheGame"]
-[connection signal="Retire" from="CanvasLayer/PopupOverlay" to="." method="_on_QuitButton_pressed"]
+[connection signal="BuildCity" from="CanvasLayer/Overlays/PopupOverlay" to="." method="OnBuildCity"]
+[connection signal="Quit" from="CanvasLayer/Overlays/PopupOverlay" to="." method="OnQuitTheGame"]
+[connection signal="Retire" from="CanvasLayer/Overlays/PopupOverlay" to="." method="_on_QuitButton_pressed"]

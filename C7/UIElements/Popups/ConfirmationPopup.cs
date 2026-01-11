@@ -71,10 +71,10 @@ public partial class ConfirmationPopup : Popup {
 
 	private void confirmed() {
 		yesAction();
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 	}
 
 	private void cancel() {
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 	}
 }

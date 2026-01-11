@@ -173,9 +173,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 			});
 			AddItem("Zoom to city", () => {
 				this.CloseAndDelete();
-				EngineStorage.ReadGameData((GameData gameData) => {
-					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
-				});
+				game.ShowCityScreenForCity(tile.cityAtTile);
 			});
 		}
 
@@ -189,7 +187,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 			Action contactCiv = () => {
 				this.CloseAndDelete();
 				game.controller.EnsureRelationshipExists(opponent);
-				diplomacy.ShowTalkScreenForPlayer(game.controller.id, topUnit);
+				GetNode<Diplomacy>("../%DiplomacyOverlay").ShowTalkScreenForPlayer(game.controller.id, opponent.id);
 			};
 
 			if (tile.cityAtTile == null) {
@@ -276,9 +274,7 @@ public partial class RightClickCityMenu : RightClickMenu {
 			});
 			AddItem("Zoom to city", () => {
 				this.CloseAndDelete();
-				EngineStorage.ReadGameData((GameData gameData) => {
-					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
-				});
+				game.ShowCityScreenForCity(tile.cityAtTile);
 			});
 		}
 	}

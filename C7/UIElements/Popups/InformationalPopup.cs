@@ -39,7 +39,7 @@ public partial class InformationalPopup : Popup {
 		AddChild(messageLabel);
 
 		AddConfirmButton(new Vector2(width - 40, height - 40), () => {
-			GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+			GetParent<PopupOverlay>().Hide();
 		});
 	}
 }

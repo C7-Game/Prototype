@@ -36,12 +36,12 @@ public partial class WarConfirmation : Popup {
 
 		AddButton("I said DO IT!", 215, () => {
 			action();
-			GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+			GetParent<PopupOverlay>().Hide();
 		});
 		AddButton("No. You're right, perhaps we should reconsider.", 245, cancel);
 	}
 
 	private void cancel() {
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 	}
 }

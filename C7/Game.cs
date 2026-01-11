@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 public partial class Game : Node {
 	[Signal] public delegate void TurnEndedEventHandler();
-	[Signal] public delegate void ShowSpecificAdvisorEventHandler();
 	[Signal] public delegate void ShowCityScreenEventHandler();
 
 	[Signal] public delegate void PlayerTurnStartEventHandler();
@@ -30,7 +29,7 @@ public partial class Game : Node {
 
 	public Player controller; // Player that's controlling the UI.
 
-	private MapView mapView;
+	public MapView mapView;
 
 	public GameState CurrentState { get; private set; } = GameState.PreGame;
 
@@ -74,6 +73,8 @@ public partial class Game : Node {
 	public AnimationController animationController;
 	[Export]
 	public UnitSelector unitSelector;
+	[Export]
+	private MessageConsumer messageConsumer;
 
 	bool errorOnLoad = false;
 
@@ -86,6 +87,7 @@ public partial class Game : Node {
 	// that gives an error if we fail to load for some reason.
 	public override async void _Ready() {
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
+		messageConsumer.messageConsumed += HandleEngineMessage;
 
 		try {
 			await LoadGame();
@@ -186,77 +188,21 @@ public partial class Game : Node {
 	}
 
 	public void HandleEngineMessage(MessageToUI msg) {
-		GameData gameData = EngineStorage.gameData;
-
 		switch (msg) {
 			case MsgStartTurn mST:
 				OnPlayerStartTurn();
 				break;
 			case MsgShowCityScreen mSCS:
-				ShowCityScreenForCity(gameData, mSCS.city);
+				ShowCityScreenForCity(mSCS.city);
 				break;
 			case MsgCityCreated mCC:
-				ShowCityScreenForCity(gameData, mCC.city);
+				ShowCityScreenForCity(mCC.city);
 				break;
 			case MsgCityDestroyed mCD:
 				mapView.cityLayer.UpdateAfterCityDestruction(mCD.city);
 				break;
-			case MsgCivilizationDestroyed mCivD:
-				popupOverlay.ShowPopup(new CivilizationDestroyed(mCivD.civilization), PopupOverlay.PopupCategory.Advisor);
-
-				// Break out of fast forward mode after interesting events.
-				turnsLeftToFastForward = 0;
-				break;
-			case MsgShowMilitaryAdvisorPopup mSMAP:
-				if (!popupOverlay.Visible) {
-					popupOverlay.ShowPopup(
-						new InformationalPopup(mSMAP.message, AdvisorHead.Advisor.Military, mSMAP.happy ? AdvisorHead.Mood.Happy : AdvisorHead.Mood.Angry),
-						PopupOverlay.PopupCategory.Advisor);
-				}
-				break;
-			case MsgShowScienceAdvisor mSSA:
-				// F6 is the science advisor.
-				// TODO: Move the F* key strings to a set of constants/enum.
-				EmitSignal(SignalName.ShowSpecificAdvisor, "F6");
-				break;
-			case MsgUpdateUiAfterDomesticChange mUUASC:
-				// F1 is the domestic advisor.
-				// TODO: Move the F* key strings to a set of constants/enum.
-
-				// Ensure the citizen moods are correct before displaying
-				// them.
-				foreach (City c in controller.cities) {
-					c.RecalculateCitizenMoods(gameData);
-				}
-				EmitSignal(SignalName.ShowSpecificAdvisor, "F1");
-				break;
-			case MsgShowTradeOffer mSTO:
-				diplomacy.ShowDealScreenForPlayer(
-					mSTO.humanPlayer.id, mSTO.aiPlayer.id,
-					humanGives: mSTO.aiWant,
-					humanWants: mSTO.aiGive);
-				break;
-			case MsgDisplayHurryProductionPopup mDHPP:
-				if (mDHPP.details.errorMessage != null) {
-					popupOverlay.ShowPopup(
-						new InformationalPopup(mDHPP.details.errorMessage),
-						PopupOverlay.PopupCategory.Advisor);
-				} else {
-					popupOverlay.ShowPopup(
-						new ConfirmationPopup(message: mDHPP.details.costMessage,
-												yesText: "Yes I'm sure!",
-												noText: "Maybe you're right. Nevermind.",
-												yesAction: () => {
-													new MsgDoHurryProduction(mDHPP.city).send();
-												}),
-						PopupOverlay.PopupCategory.Advisor);
-				}
-				break;
-			case MsgWarDeclaration mWD:
-				popupOverlay.ShowPopup(
-					new InformationalPopup($"The {mWD.aggressor.civilization.noun} declared war on the {mWD.opponent.civilization.noun}"),
-					PopupOverlay.PopupCategory.Advisor);
-
+			case MsgWarDeclaration:
+			case MsgCivilizationDestroyed:
 				// Break out of the fast forward mode when something
 				// interesting happens.
 				turnsLeftToFastForward = 0;
@@ -278,9 +224,6 @@ public partial class Game : Node {
 
 		if (!EngineStorage.HasPendingAnimations())
 			EngineStorage.ProcessNextMessageToEngine();
-
-		if (EngineStorage.TryDequeueNextMessageToUI(out MessageToUI msg))
-			HandleEngineMessage(msg);
 	}
 
 	// If "location" is not already near the center of the screen, moves the camera to bring it into view.
@@ -484,9 +427,7 @@ public partial class Game : Node {
 	private void OnDoubleLeftMouseButtonClick(InputEventMouseButton eventMouseButton) {
 		Tile tile = PositionToTile(eventMouseButton.Position);
 		if (tile?.cityAtTile?.owner == controller) {
-			EngineStorage.ReadGameData((GameData gameData) => {
-				ShowCityScreenForCity(gameData, tile.cityAtTile);
-			});
+			ShowCityScreenForCity(tile.cityAtTile);
 		}
 	}
 
@@ -926,7 +867,9 @@ public partial class Game : Node {
 			new MsgBuildCity(CurrentlySelectedUnit, name).send();
 	}
 
-	public void ShowCityScreenForCity(GameData gameData, City city) {
+	public void ShowCityScreenForCity(City city) {
+		GameData gameData = EngineStorage.gameData;
+
 		city.RecalculateCitizenMoods(gameData);
 		EmitSignal(SignalName.ShowCityScreen, new ParameterWrapper<City>(city));
 	}

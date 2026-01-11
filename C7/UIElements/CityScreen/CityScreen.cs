@@ -52,7 +52,8 @@ public partial class CityScreen : Control {
 	[Export] Control shieldRowContainer;
 	[Export] Control foodRowContainer;
 
-	[Export] MapView mapView;
+	Game game;
+	MapView mapView;
 	TileAssignmentLayer tileAssignmentLayer;
 
 	Theme yieldDetailsFontTheme = new();
@@ -81,11 +82,6 @@ public partial class CityScreen : Control {
 	private Dictionary<string, ImageTexture> effectIcons = new();
 
 	public override void _Ready() {
-		// Allow the city screen to control whether tile assignments
-		// are visible and map UI locations back to map locations.
-		tileAssignmentLayer = mapView.tileAssignmentLayer;
-		citizenTypes = EngineStorage.gameData.citizenTypes;
-
 		background.Texture = TextureLoader.Load("city_screen.background");
 
 		// The close button.
@@ -175,6 +171,18 @@ public partial class CityScreen : Control {
 		RenderFoodRow(foodEatenPerTurn: 3, foodSurplus: 1);
 
 		Hidden += OnExit;
+
+		if (!Engine.IsEditorHint()) {
+			game = GetTree().CurrentScene as Game;
+			game.GameInitialized += () => {
+				// Allow the city screen to control whether tile assignments
+				// are visible and map UI locations back to map locations.
+				tileAssignmentLayer = game.mapView.tileAssignmentLayer;
+
+				mapView = game.mapView;
+				citizenTypes = EngineStorage.gameData.citizenTypes;
+			};
+		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event) {
@@ -286,12 +294,6 @@ public partial class CityScreen : Control {
 	}
 
 	private void OnShowCityScreen(ParameterWrapper<City> city) {
-		EngineStorage.ReadGameData((GameData gameData) => {
-			OnShowCityScreenLocked(gameData, city);
-		});
-	}
-
-	private void OnShowCityScreenLocked(GameData gameData, ParameterWrapper<City> city) {
 		this.Show();
 		mapView.centerCameraOnTile(city.Value.location.neighbors[TileDirection.SOUTH]);
 		tileAssignmentLayer.city = city.Value;
@@ -300,10 +302,10 @@ public partial class CityScreen : Control {
 		RenderCulture(city.Value);
 		RenderFoodDetails(city.Value);
 		RenderCommerceDetails(city.Value);
-		RenderProductionDetails(gameData, city.Value);
+		RenderProductionDetails(EngineStorage.gameData, city.Value);
 		RenderExistingBuildings(city.Value.GetBuildings());
-		RenderStrategicResources(gameData, city.Value);
-		RenderLuxuries(gameData, city.Value);
+		RenderStrategicResources(EngineStorage.gameData, city.Value);
+		RenderLuxuries(EngineStorage.gameData, city.Value);
 	}
 
 	private void OnExit() {
@@ -833,23 +835,19 @@ public partial class CityScreen : Control {
 	}
 
 	private void SwitchToNextCity() {
-		EngineStorage.ReadGameData((GameData gameData) => {
-			City currentCity = tileAssignmentLayer.city;
-			List<City> cities = currentCity.owner.cities;
-			City nextCity = cities[(cities.IndexOf(currentCity) + 1) % cities.Count];
-			nextCity.RecalculateCitizenMoods(gameData);
-			OnShowCityScreenLocked(gameData, new ParameterWrapper<City>(nextCity));
-		});
+		City currentCity = tileAssignmentLayer.city;
+		List<City> cities = currentCity.owner.cities;
+		City nextCity = cities[(cities.IndexOf(currentCity) + 1) % cities.Count];
+		nextCity.RecalculateCitizenMoods(EngineStorage.gameData);
+		OnShowCityScreen(new ParameterWrapper<City>(nextCity));
 	}
 
 	private void SwitchToPreviousCity() {
-		EngineStorage.ReadGameData((GameData gameData) => {
-			City currentCity = tileAssignmentLayer.city;
-			List<City> cities = currentCity.owner.cities;
-			City previousCity = cities[(cities.IndexOf(currentCity) + cities.Count - 1) % cities.Count];
-			previousCity.RecalculateCitizenMoods(gameData);
-			OnShowCityScreenLocked(gameData, new ParameterWrapper<City>(previousCity));
-		});
+		City currentCity = tileAssignmentLayer.city;
+		List<City> cities = currentCity.owner.cities;
+		City previousCity = cities[(cities.IndexOf(currentCity) + cities.Count - 1) % cities.Count];
+		previousCity.RecalculateCitizenMoods(EngineStorage.gameData);
+		OnShowCityScreen(new ParameterWrapper<City>(previousCity));
 	}
 
 	private int AddDefaultCitizen(CityResident cr, int xPos, int eraNum) {
