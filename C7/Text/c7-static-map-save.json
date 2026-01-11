@@ -73891,12 +73891,10 @@
     {
       "id": "player-1",
       "colorIndex": 0,
-      "barbarian": true,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "A Barbarian Chiefdom",
-      "cityNameIndex": 0,
       "turnsUntilPriorityReevaluation": 0,
       "luxuryRate": 0,
       "scienceRate": 5,
@@ -73910,12 +73908,10 @@
     {
       "id": "player-2",
       "colorIndex": 2,
-      "barbarian": false,
       "human": true,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Netherlands",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 57,
@@ -73988,12 +73984,10 @@
     {
       "id": "player-3",
       "colorIndex": 5,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "America",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 64,
@@ -74066,12 +74060,10 @@
     {
       "id": "player-4",
       "colorIndex": 4,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Aztecs",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 59,
@@ -74140,12 +74132,10 @@
     {
       "id": "player-5",
       "colorIndex": 7,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Inca",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 76,
@@ -74218,12 +74208,10 @@
     {
       "id": "player-6",
       "colorIndex": 10,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Persia",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 30,
@@ -74300,12 +74288,10 @@
     {
       "id": "player-7",
       "colorIndex": 6,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Maya",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 9,
@@ -74378,12 +74364,10 @@
     {
       "id": "player-8",
       "colorIndex": 8,
-      "barbarian": false,
       "human": false,
       "hasPlayedCurrentTurn": false,
       "defeated": false,
       "civilization": "Iroquois",
-      "cityNameIndex": 0,
       "tileKnowledge": [
         {
           "x": 46,
@@ -74571,7 +74555,8 @@
         "Toltec",
         "Kushite",
         "Barbarian"
-      ]
+      ],
+      "isBarbarian": true
     },
     {
       "name": "Rome",
@@ -74633,7 +74618,8 @@
       "traits": [
         "militaristic",
         "commercial"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Egypt",
@@ -74680,7 +74666,8 @@
       "traits": [
         "religious",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Greece",
@@ -74727,7 +74714,8 @@
       "traits": [
         "commercial",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Babylon",
@@ -74772,7 +74760,8 @@
       "traits": [
         "scientific",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Germany",
@@ -74806,7 +74795,8 @@
       "traits": [
         "militaristic",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Russia",
@@ -74863,7 +74853,8 @@
       "traits": [
         "expansionist",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "China",
@@ -74899,7 +74890,8 @@
       "traits": [
         "militaristic",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "America",
@@ -74957,7 +74949,8 @@
       "traits": [
         "expansionist",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Japan",
@@ -75001,7 +74994,8 @@
       "traits": [
         "militaristic",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "France",
@@ -75040,7 +75034,8 @@
       "traits": [
         "commercial",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "India",
@@ -75075,7 +75070,8 @@
       "traits": [
         "commercial",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Persia",
@@ -75122,7 +75118,8 @@
       "traits": [
         "scientific",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Aztecs",
@@ -75176,7 +75173,8 @@
       "traits": [
         "militaristic",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Zululand",
@@ -75210,7 +75208,8 @@
       "traits": [
         "militaristic",
         "expansionist"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Iroquois",
@@ -75257,7 +75256,8 @@
       "traits": [
         "commercial",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "England",
@@ -75304,7 +75304,8 @@
       "traits": [
         "commercial",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Mongols",
@@ -75352,7 +75353,8 @@
       "traits": [
         "militaristic",
         "expansionist"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Spain",
@@ -75401,7 +75403,8 @@
       "traits": [
         "religious",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Scandinavia",
@@ -75452,7 +75455,8 @@
       "traits": [
         "militaristic",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Ottomans",
@@ -75499,7 +75503,8 @@
       "traits": [
         "scientific",
         "industrious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Celts",
@@ -75547,7 +75552,8 @@
       "traits": [
         "religious",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Arabia",
@@ -75593,7 +75599,8 @@
       "traits": [
         "expansionist",
         "religious"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Carthage",
@@ -75641,7 +75648,8 @@
       "traits": [
         "industrious",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Korea",
@@ -75689,7 +75697,8 @@
       "traits": [
         "commercial",
         "scientific"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Sumeria",
@@ -75732,7 +75741,8 @@
       "traits": [
         "scientific",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Hittites",
@@ -75775,7 +75785,8 @@
       "traits": [
         "commercial",
         "expansionist"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Netherlands",
@@ -75818,7 +75829,8 @@
       "traits": [
         "agricultural",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Portugal",
@@ -75872,7 +75884,8 @@
       "traits": [
         "expansionist",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Byzantines",
@@ -75915,7 +75928,8 @@
       "traits": [
         "scientific",
         "seafaring"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Inca",
@@ -75958,7 +75972,8 @@
       "traits": [
         "expansionist",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     },
     {
       "name": "Maya",
@@ -76002,7 +76017,8 @@
       "traits": [
         "industrious",
         "agricultural"
-      ]
+      ],
+      "isBarbarian": false
     }
   ],
   "strengthBonuses": [
@@ -76050,7 +76066,8 @@
     "startUnitType2": "Worker",
     "scoutUnitType": "Scout",
 	"maxRankOfWorkableTiles": 2,
-	"maxRankOfBarbarianCampTiles": 2
+	"maxRankOfBarbarianCampTiles": 2,
+    "defaultDealDuration": 20
   },
   "techs": [
     {

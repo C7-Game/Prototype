@@ -7,6 +7,7 @@ using Serilog;
 using C7Engine.Pathing;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class Game : Node {
 	[Signal] public delegate void TurnEndedEventHandler();
@@ -87,44 +88,7 @@ public partial class Game : Node {
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 
 		try {
-			// Ensure we clear out our image caches, as scenarios and games will
-			// use the same filenames but have different content for them.
-			Util.ClearCaches();
-
-			controller = await CreateGame.createGame(
-				Global.LoadGamePath,
-				GamePaths.LuaRulesDir,
-				GamePaths.DefaultBicPath,
-				(scenarioSearchPath) => {
-					// When the game loading logic tries to load the PediaIcons file, set the
-					// scenario search path and then use our Civ3MediaPath searching logic to
-					// find the correct version of the file.
-					//
-					// This weird bit of indirection is necessary because the C7GameData project
-					// can't depend on the C7 project without a circular dependency, and the
-					// search logic has a Godot dependency, so it doesn't make sense to live
-					// in the C7GameData project.
-					//
-					// This also helps ensure the weird stateful behavior of the Util class works,
-					// since the search path/mod path is a static global variable - we want to
-					// be sure it is always set properly, so doing it during game creation
-					// is reasonable.
-					Util.setModPath(scenarioSearchPath);
-					log.Debug("RelativeModPath ", scenarioSearchPath);
-					return Util.Civ3MediaPath("Text/PediaIcons.txt");
-				}); // Spawns engine thread
-
-			Global.ResetLoadGamePath();
-
-			InitializeMapView();
-
-			log.Information("Now in game!");
-
-			loadTimer.Stop();
-			TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-			log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
-
-			EmitSignal(SignalName.GameInitialized);
+			await LoadGame();
 		} catch (Exception ex) {
 			errorOnLoad = true;
 			string message = ex.Message;
@@ -136,6 +100,54 @@ public partial class Game : Node {
 			popupOverlay.ShowPopup(new ErrorMessage(message), PopupOverlay.PopupCategory.Advisor);
 			log.Error(ex, "Unexpected error in Game.cs _Ready");
 		}
+	}
+
+	private async Task LoadGame() {
+		// Ensure we clear out our image caches, as scenarios and games will
+		// use the same filenames but have different content for them.
+		Util.ClearCaches();
+
+		CreateGameParams options = new(GamePaths.LuaRulesDir, GamePaths.DefaultBicPath)
+			{
+			GetPediaIconsPath = (scenarioSearchPath) => {
+				// When the game loading logic tries to load the PediaIcons file, set the
+				// scenario search path and then use our Civ3MediaPath searching logic to
+				// find the correct version of the file.
+				//
+				// This weird bit of indirection is necessary because the C7GameData project
+				// can't depend on the C7 project without a circular dependency, and the
+				// search logic has a Godot dependency, so it doesn't make sense to live
+				// in the C7GameData project.
+				//
+				// This also helps ensure the weird stateful behavior of the Util class works,
+				// since the search path/mod path is a static global variable - we want to
+				// be sure it is always set properly, so doing it during game creation
+				// is reasonable.
+				Util.setModPath(scenarioSearchPath);
+				log.Debug("RelativeModPath ", scenarioSearchPath);
+				return Util.Civ3MediaPath("Text/PediaIcons.txt");
+			}
+		};
+
+		if (Global.SaveGame != null) {
+			controller = await CreateGame.createGame(Global.SaveGame, options);
+		} else if (Global.LoadGamePath != null) {
+			controller = await CreateGame.createGame(Global.LoadGamePath, options);
+		} else {
+			throw new InvalidOperationException("Save data was not set");
+		}
+
+		Global.ResetLoadGameFields();
+
+		InitializeMapView();
+
+		log.Information("Now in game!");
+
+		loadTimer.Stop();
+		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
+		log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+
+		EmitSignal(SignalName.GameInitialized);
 	}
 
 	private void InitializeMapView() {
@@ -429,7 +441,9 @@ public partial class Game : Node {
 
 	private void HandleLeftMouseButton(InputEventMouseButton eventMouseButton) {
 		GetViewport().SetInputAsHandled();
-		if (eventMouseButton.IsPressed()) {
+		Control uiHover = GetViewport().GuiGetHoveredControl();
+		// Can't drag the map when the mouse is over a ui element
+		if (eventMouseButton.IsPressed() && uiHover is not TextureButton) {
 			OldPosition = eventMouseButton.Position;
 			IsMovingCamera = true;
 
@@ -567,9 +581,6 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.O && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 			ToggleObserverMode();
 		}
-		if (eventKeyDown.Keycode == Godot.Key.G && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
-			ToggleGridCoordinates();
-		}
 		if (eventKeyDown.Keycode == Godot.Key.T && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 			ToggleC7Graphics();
 		}
@@ -580,6 +591,32 @@ public partial class Game : Node {
 			City capital = controller.cities.Find(c => c.IsCapital());
 			if (capital != null) {
 				mapView.centerCameraOnTile(capital.location);
+			}
+		}
+		// For inputs that have the same keys mapped to multiple actions like G
+		// we need to manually handle what is triggered by adding extra conditions.
+		// Otherwise when pressing CTRL + G for example, both the go-to
+		// and the toggle grid actions are triggered, because godot does not distinguish
+		// single key presses from combos, it sends both signals.
+		// Sometimes even worse, when pressing CTRL + G, it only sends the go-to signal.
+		// We continue to map these to an action and not call them directly,
+		// because we could add a button in the ui that does the same and this would call the action too.
+		if (eventKeyDown.Keycode == Godot.Key.G) {
+			// Toggle Coordinates
+			if (eventKeyDown.IsCommandOrControlPressed()
+				&& eventKeyDown.ShiftPressed
+				&& eventKeyDown.AltPressed) {
+				ProcessAction(C7Action.ToggleCoordinates);
+			}
+			// Toggle Grid
+			else if (eventKeyDown.IsCommandOrControlPressed()) {
+				ProcessAction(C7Action.ToggleGrid);
+			}
+			// Trigger Unit go-to
+			else if (!eventKeyDown.IsCommandOrControlPressed()
+					   && !eventKeyDown.ShiftPressed
+					   && !eventKeyDown.AltPressed) {
+				ProcessAction(C7Action.UnitGoto);
 			}
 		}
 	}
@@ -639,7 +676,15 @@ public partial class Game : Node {
 		foreach (StringName action in actions) {
 			if (Input.IsActionJustPressed(action)) {
 				ProcessAction(action.ToString());
+			} else if (Input.IsActionJustReleased(action)) {
+				ProcessOnReleaseAction(action.ToString());
 			}
+		}
+	}
+
+	private void ProcessOnReleaseAction(string currentAction) {
+		if (currentAction == C7Action.EnableTempAnimations) {
+			animationController.SetAnimationsEnabled(true);
 		}
 	}
 
@@ -666,6 +711,10 @@ public partial class Game : Node {
 			this.mapView.gridLayer.visible = !this.mapView.gridLayer.visible;
 		}
 
+		if (currentAction == C7Action.ToggleCoordinates) {
+			ToggleGridCoordinates();
+		}
+
 		if (currentAction == C7Action.Escape && this.gotoInfo == null) {
 			log.Debug("Got request for escape/quit");
 			popupOverlay.ShowPopup(new EscapeQuitPopup(), PopupOverlay.PopupCategory.Info);
@@ -680,9 +729,11 @@ public partial class Game : Node {
 		}
 
 		if (currentAction == C7Action.ToggleAnimations) {
+			animationController.ToggleAnimationsEnabled();
+		}
+
+		if (currentAction == C7Action.EnableTempAnimations) {
 			animationController.SetAnimationsEnabled(false);
-		} else if (Input.IsActionJustReleased(C7Action.ToggleAnimations)) {
-			animationController.SetAnimationsEnabled(true);
 		}
 
 		// actions with unit buttons, which are only relevant during the player
@@ -705,6 +756,9 @@ public partial class Game : Node {
 		}
 
 		if (currentAction == C7Action.UnitDisband) {
+			if (CurrentlySelectedUnit == null || CurrentlySelectedUnit == MapUnit.NONE) {
+				return;
+			}
 			popupOverlay.ShowPopup(
 				new ConfirmationPopup(
 					$"Disband {CurrentlySelectedUnit.unitType.name}? Pardon me but these are OUR people. Do \nyou really want to disband them?",
@@ -756,11 +810,11 @@ public partial class Game : Node {
 			|| terraform == null || !CurrentlySelectedUnit.canPerformTerraformAction(terraform))
 			return;
 
-		TerrainImprovement currentImprovement = CurrentlySelectedUnit.location.overlays.ImprovementAtLayer(terraform);
-		if (currentImprovement != null && terraform.Improvement.upgradesFrom != currentImprovement) {
+		TerrainImprovement replacementTarget = CurrentlySelectedUnit.location.overlays.GetReplacementTarget(terraform);
+		if (replacementTarget != null) {
 			popupOverlay.ShowPopup(
 				new ConfirmationPopup(
-					$"A previous terrain enhancement ({currentImprovement.key.Capitalize()}) will be replaced \nby this operation. Do you wish to continue?",
+					$"A previous terrain enhancement ({replacementTarget.key.Capitalize()}) will be replaced \nby this operation. Do you wish to continue?",
 					"Continue.",
 					"Cancel action.",
 					() => {

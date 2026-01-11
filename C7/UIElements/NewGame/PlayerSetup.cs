@@ -14,8 +14,6 @@ public partial class PlayerSetup : Control {
 	[Export] TextureRect background;
 
 	[Export] GridContainer playerListContainer;
-	List<Civilization> civilizations = new();
-	Civilization civilization = null;
 	ButtonGroup playerListButtonGroup = new();
 	TextureRect leaderHead = new();
 	[Export] Label civLabel;
@@ -25,7 +23,6 @@ public partial class PlayerSetup : Control {
 
 	[Export] GridContainer difficultyContainer;
 
-	Difficulty difficulty = null;
 	ButtonGroup difficultyButtonGroup = new();
 
 	[Export] TextureButton confirm;
@@ -35,19 +32,21 @@ public partial class PlayerSetup : Control {
 
 	ID.Factory ids;
 
+	SaveGame save;
+	GameSetup gameSetup = new();
+
 	// TODO: read this from the rules based on the world size
 	const int NUM_OPPONENTS = 7;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
-		SaveGame save = GetSave();
+		save = GetSave();
 
 		// Set up buttons for the civs the player can play as.
-		civilizations = save.Civilizations;
 		playerListContainer.Columns = (int)Math.Ceiling(save.Civilizations.Count / 12.0);
 		string initiallySelectedCiv = save.Civilizations.Any(x => x.name == "Netherlands") ? "Netherlands" : save.Civilizations[1].name;
 		foreach (Civilization civ in save.Civilizations) {
-			if (civ.name == "A Barbarian Chiefdom") {
+			if (civ.isBarbarian) {
 				continue;
 			}
 
@@ -59,7 +58,7 @@ public partial class PlayerSetup : Control {
 				ToggleMode = true,
 			};
 			button.Pressed += () => {
-				this.civilization = civ;
+				gameSetup.civilization = civ;
 				UpdateOpponentSelectors();
 				DisplaySelectedLeader();
 			};
@@ -67,7 +66,7 @@ public partial class PlayerSetup : Control {
 
 			if (civ.name == initiallySelectedCiv) {
 				button.ButtonPressed = true;
-				this.civilization = civ;
+				gameSetup.civilization = civ;
 			}
 		}
 		background.AddChild(leaderHead);
@@ -88,11 +87,11 @@ public partial class PlayerSetup : Control {
 				ButtonGroup = difficultyButtonGroup,
 				ToggleMode = true,
 			};
-			button.Pressed += () => { this.difficulty = difficulty; };
+			button.Pressed += () => { gameSetup.difficulty = difficulty; };
 			container.AddChild(button);
 			if (difficulty.Name == initiallySelectedDifficulty) {
 				button.ButtonPressed = true;
-				this.difficulty = difficulty;
+				gameSetup.difficulty = difficulty;
 			}
 			container.CustomMinimumSize = new Vector2(843.0f / difficultyContainer.Columns, 0);
 		}
@@ -138,8 +137,8 @@ public partial class PlayerSetup : Control {
 			container.CustomMinimumSize = new Vector2(312.0f / opponentListContainer.Columns, 315.0f / NUM_OPPONENTS);
 			optionButton.CustomMinimumSize = new Vector2(290.0f / opponentListContainer.Columns, optionButton.CustomMinimumSize.Y);
 
-			foreach (Civilization civ in civilizations) {
-				if (civ.name == "A Barbarian Chiefdom") {
+			foreach (Civilization civ in save.Civilizations) {
+				if (civ.isBarbarian) {
 					continue;
 				}
 				optionButton.AddItem(civ.name);
@@ -162,7 +161,7 @@ public partial class PlayerSetup : Control {
 
 	private void UpdateOpponentSelectors() {
 		HashSet<string> civsTaken = new();
-		civsTaken.Add(civilization.name);
+		civsTaken.Add(gameSetup.civilization.name);
 
 		foreach (OptionButton ob in opponentSelectors) {
 			string selection = ob.GetItemText(ob.Selected);
@@ -183,6 +182,8 @@ public partial class PlayerSetup : Control {
 	}
 
 	private void DisplaySelectedLeader() {
+		Civilization civilization = gameSetup.civilization;
+
 		leaderHead.Texture = TextureLoader.Load("leader_heads", civilization);
 		leaderHead.Scale = new Vector2(1.7f, 1.7f);
 		leaderHead.SetPosition(new Vector2(414, 46));
@@ -195,117 +196,36 @@ public partial class PlayerSetup : Control {
 		return SaveManager.LoadSave(GamePaths.DefaultGamePath, GamePaths.DefaultBicPath, (string unused) => { return unused; });
 	}
 
-	private void CreateGame() {
-		loadingLabel.Visible = true;
-		GlobalSingleton global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
-		SaveGame save = GetSave();
-
-		// World generation can take a bit of time if multiple attempts are
-		// needed, so we don't want to tie up the UI thread.
-		Thread thread = new(() => { DoWorldGenerationAndstartGame(save, global); });
-		thread.Start();
-	}
-
-	private void DoWorldGenerationAndstartGame(SaveGame save, GlobalSingleton Global) {
-		log.Information("Starting map generation");
-		save.Map = new SaveMap(MapGenerator.GenerateMap(Global.WorldCharacteristics));
-		save.Seed = Global.WorldCharacteristics.mapSeed;
-		log.Information("Done with map generation");
-		Random rand = new(Global.WorldCharacteristics.mapSeed + 0x531);
-		ids = new(save);
-
-		// Hack: reuse the save but clear out the non-barbarian players.
-		//
-		// Longer term we'll need to split out our own
-		// "conquests.bic" type file and load that - until then we'll use this
-		// hack of reusing the static save.
-		//
-		// Start at index 1 to skip the barbarians.
-		save.Players.RemoveRange(1, save.Players.Count - 1);
-
-		// Clear out the units, we'll add new ones.
-		save.Units.Clear();
-
-		// Add the human player.
-		AddPlayer(save, this.civilization,
-				  Global.WorldCharacteristics.defaultGovernment.id,
-				  isHuman: true);
-
-		// Add the opponents.
-		HashSet<string> taken = new();
-		taken.Add(this.civilization.name);
+	private List<SelectedOpponent> CollectSelectedOpponents() {
+		List<SelectedOpponent> opponents = [];
 
 		foreach (OptionButton ob in opponentSelectors) {
 			string selectedName = ob.GetItemText(ob.Selected);
-			if (taken.Contains(selectedName)) {
-				selectedName = "Random";
-			}
 
 			if (selectedName == "Random") {
-				do {
-					selectedName = civilizations[rand.Next(1, civilizations.Count)].name;
-				} while (taken.Contains(selectedName));
+				opponents.Add(new SelectedOpponent { isRandom = true });
+			} else {
+				opponents.Add(new SelectedOpponent { isRandom = false, Name = selectedName });
 			}
-			taken.Add(selectedName);
-
-			Civilization civ = civilizations.Find(x => x.name == selectedName);
-			AddPlayer(save, civ,
-					  Global.WorldCharacteristics.defaultGovernment.id,
-					  isHuman: false);
 		}
 
-		save.GameDifficulty = difficulty;
-
-		log.Information("saving generated map");
-		save.Save(GamePaths.DefaultGeneratedGamePath);
-		Global.LoadGamePath = GamePaths.DefaultGeneratedGamePath;
-
-		log.Information("opening map");
-		CallDeferred("StartGame");
+		return opponents;
 	}
 
-	private void AddPlayer(SaveGame save, Civilization civ, ID defaultGovernment, bool isHuman) {
-		SavePlayer player = new() {
-			human = isHuman,
-			id = ids.CreateID("Player"),
-			colorIndex = civ.colorIndex,
-			barbarian = false,
-			civilization = civ.name,
-			knownTechs = civ.startingTechs,
-			// TODO: stop hardcoding this
-			eraCivilopediaName = "ERAS_Ancient_Times",
-			// TODO: load this from the rules
-			gold = 10,
-			governmentId = defaultGovernment,
-		};
-		save.Players.Add(player);
+	private void CreateGame() {
+		loadingLabel.Visible = true;
+		GlobalSingleton global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 
-		SaveTile startingTile = save.Map.startingLocations[save.Players.Count - 2];
-		TileLocation startingLocation = new TileLocation(startingTile.X, startingTile.Y);
+		// World generation can take a bit of time if multiple attempts are
+		// needed, so we don't want to tie up the UI thread.
+		Thread thread = new(() => {
+			gameSetup.Populate(save, global.WorldCharacteristics, CollectSelectedOpponents());
+			global.SaveGame = save;
 
-		AddUnit(save, player, save.Rules.StartUnitType1, startingLocation);
-		AddUnit(save, player, save.Rules.StartUnitType2, startingLocation);
-		if (civ.traits.Contains(Civilization.Trait.Expansionist)) {
-			AddUnit(save, player, save.Rules.ScoutUnitType, startingLocation);
-		}
-	}
-
-	private void AddUnit(SaveGame save, SavePlayer player, string unitType, TileLocation location) {
-		SaveUnit unit = new() {
-			id = ids.CreateID(unitType),
-			prototype = unitType,
-			owner = player.id,
-			previousLocation = new TileLocation(-1, -1),
-			currentLocation = location,
-
-			// TODO: stop hardcoding these
-			hitPointsRemaining = 3,
-			movePointsRemaining = 1,
-			experience = "Regular",
-
-			facingDirection = TileDirection.NORTH,
-		};
-		save.Units.Add(unit);
+			log.Information("opening map");
+			CallDeferred(nameof(StartGame));
+		});
+		thread.Start();
 	}
 
 	private void StartGame() {

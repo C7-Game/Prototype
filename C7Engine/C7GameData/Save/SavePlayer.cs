@@ -2,33 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace C7GameData.Save {
-	// A class holding all the state of the relationship between two civs.
-	public class PlayerRelationship {
-		public bool atWar = false;
-
-		// p1.playerRelationships[p2].warDeclarationCount is the number of times
-		// p2 declared war on p1.
-		public int warDeclarationCount = 0;
-
-		// true if a war declaration happened with units inside the player's
-		// borders.
-		public bool wasSneakAttacked = false;
-
-		// If at war, refuse contact with the relevant player until this turn
-		// has been reached.
-		public int refuseContactUntilTurn = -1;
-	}
 
 	public class SavePlayer {
 		public ID id;
 		public int colorIndex;
-		public bool barbarian;
 		public bool human = false;
 		public bool hasPlayedCurrentTurn = false;
 		public bool defeated = false;
 
 		public string civilization;
-		public int cityNameIndex = 0;
 
 		public List<TileLocation> tileKnowledge = new List<TileLocation>();
 
@@ -80,13 +62,11 @@ namespace C7GameData.Save {
 		public Player ToPlayer(GameMap map, List<Civilization> civilizations, List<Government> governments, List<Tech> techs, Rules rules) {
 			Player player = new Player{
 				id = id,
-				isBarbarians = barbarian,
 				isHuman = human,
 				hasPlayedThisTurn = hasPlayedCurrentTurn,
 				defeated = defeated,
 				colorIndex = colorIndex,
 				civilization = civilization is not null ? civilizations.Find(civ => civ.name == civilization) : null,
-				cityNameIndex = cityNameIndex,
 				knownTechs = knownTechs,
 				eraCivilopediaName = eraCivilopediaName,
 				luxuryRate = luxuryRate,
@@ -130,14 +110,12 @@ namespace C7GameData.Save {
 		public SavePlayer(Player player) {
 			id = player.id;
 			colorIndex = player.colorIndex;
-			barbarian = player.isBarbarians;
 			human = player.isHuman;
 			hasPlayedCurrentTurn = player.hasPlayedThisTurn;
 			defeated = player.defeated;
 			civilization = player.civilization?.name;
 			// TODO: this should be computed by looking at cities defined in the save
 			// so that adding cities in the save structure doesn't require updating this value
-			cityNameIndex = player.cityNameIndex;
 			tileKnowledge = player.tileKnowledge.AllKnownTiles().ConvertAll(tile => new TileLocation(tile));
 			turnsUntilPriorityReevaluation = player.turnsUntilPriorityReevaluation;
 			knownTechs = player.knownTechs;

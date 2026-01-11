@@ -1,4 +1,3 @@
-using System;
 using C7Engine;
 using C7GameData;
 using Godot;
@@ -61,6 +60,11 @@ public partial class AnimationController : Node {
 			HandleEngineMessage(msg);
 
 		animTracker.update();
+	}
+
+	public void ToggleAnimationsEnabled() {
+		new MsgToggleAnimationsEnabled().send();
+		animTracker.endAllImmediately = !animTracker.endAllImmediately;
 	}
 
 	public void SetAnimationsEnabled(bool enabled) {

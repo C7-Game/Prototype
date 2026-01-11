@@ -329,6 +329,16 @@ namespace C7Engine {
 		}
 	}
 
+	public class MsgToggleAnimationsEnabled : MessageToEngine {
+
+		public MsgToggleAnimationsEnabled() {
+		}
+
+		public override void process() {
+			EngineStorage.animationsEnabled = !EngineStorage.animationsEnabled;
+		}
+	}
+
 	public class MsgBuildCity : MessageToEngine {
 		private MapUnit unit;
 		private string name;

@@ -363,6 +363,7 @@ namespace C7GameData {
 					leader = race.LeaderName,
 					leaderGender = race.LeaderGender == 0 ? Gender.Male : Gender.Female,
 					colorIndex = race.DefaultColor,
+					isBarbarian = i == 0 ? true : false,
 				};
 				foreach (RACE_City city in theBiq.RaceCityName[i]) {
 					civ.cityNames.Add(city.Name);
@@ -405,7 +406,6 @@ namespace C7GameData {
 				save.Players.Add(MakeSavePlayerFromCiv(save.Civilizations[i],
 									   isBarbarian: i == 0,
 									   isHuman: false,
-									   cityNameIndex: 0,
 									   era: ""));
 
 				// Set a government for players not associated with LEAD.
@@ -454,6 +454,7 @@ namespace C7GameData {
 
 		private void ImportSavLeaders() {
 			BiqData theBiq = biq.Eras is null ? defaultBiq : biq;
+			int currentTurn = save.TurnNumber;
 			int i = 0;
 			foreach (QueryCiv3.Sav.LEAD leader in savData.Lead) {
 				if (leader.RaceID == -1) {
@@ -463,7 +464,6 @@ namespace C7GameData {
 				SavePlayer player = MakeSavePlayerFromCiv(civ,
 										  isBarbarian: i == 0,
 										  isHuman: i == 1,
-										  cityNameIndex: leader.FoundedCities,
 										  era: theBiq.Eras[leader.Era].CivilopediaEntry);
 
 				// Record what the player is currently researching.
@@ -519,20 +519,264 @@ namespace C7GameData {
 				}
 				++i;
 			}
+
+			// Multi-Turn deals
+
+			#region Multi-turn-deal-binary-documentation
+			// Each player's diplomatic relationship with another player is represented as two arrays in a row.
+			// Well, most of the time, more details on this are further down.
+			// If the diplomacy array is empty, that either means the players are at war, or one/both the players are not in the game.
+			// The data we get from a .SAV file, have all the (potential) diplomatic relationships between all 32 players.
+			// So Player 1 has an array of relationships for players 0-31,
+			// but also Player 31 has an array 0-31, even if they are not in the game.
+
+			// As stated before, each relationship is represented by 2 arrays in a row.
+			// So for example if Player1 is at peace with Player2, there will be 2 arrays inside the diplomacy array of both players
+			// and because peace is the basis for any diplomatic agreement, these arrays are always 0 and 1.
+
+			// Here are some more visual representations of the arrays, so it's easier to understand what's happening
+			// Example Peace between Player1 and Player2
+			//
+			// Player1 LEAD_LEAD_Diplomacy[2] <- size of the diplomacy array is 2,
+			// so it's safe to say only 1 deal is currently active,
+			// and from what we know, it should always be peace
+
+			// This should be the same for Player2's diplomacy array
+			//
+			// [0] =
+			//   Data1 = 1          <-- "Gives" peace to Player2
+			//   Data2 = 0          <-- This deal will end at turn 0 (still active, never at war)
+			//   EntryType = -1
+			// [1] =
+			//   Data1 = 0          <-- Peace (DealSubtype)
+			//   Data2 = 0
+			//   EntryType = 0      <-- Diplomatic Agreement (DealType)
+
+			// Notice that there is no reference to the other player, we know it's Player1 & Player2
+			// because we are specifically looking at Player1's relationship with Player2.
+			// Stating the obvious here, just making sure it's clear what kind of data is (and is not) present in these arrays.
+
+			// Array #0
+			// Array #0 holds information like, who gives (1) and who receives (0) (Data1),
+			// number of remaining turns (Data2); All players in a normal game start at peace, so that value is 0.
+			// If at some point in the future they go at war, and then make peace, this value will hold the turn the peace deal ends.
+			// A value of future turn means a deal is active and will end at that turn in the future.
+			// A value of current/past turn means the deal is still active, even beyond the usual 20 turns.
+			// This is true for all other deals, but usually a Gold per Turn deal doesn't go beyond the 20 turns, it automatically resets,
+			// but a right of passage deal for example sometimes doesn't.
+
+			// Array #1
+			// Array #1 holds the type of deal (DealType enum), so EntryType 0 means a diplomatic agreement, 1 is a military alliance, etc...
+			// Data1 holds what I named, subtype (DealSubType enum). So if it's a diplomatic agreement and Data1 is 0, it means Peace, 1 is a Mutual Protection Pact, and so on.
+			// In a resource per turn deal Data1 will hold the index of the resource being traded (e.x. 0 is Horses, 12 is Spices, etc)
+			// In a military alliance deal Data1 will hold the index of the 3rd player, the player the alliance is against (same for trade embargo)
+			// Data2 is used when for example there is a resource per turn deal, it holds the index of the resource being traded (e.x. 0 is Horses, 12 is Spices, etc)
+			// In the case of a gold per turn deal, Data2 holds the gpt amount.
+			// But there is a caveat here. In some cases, and I am not entirely sure when, but it seems to happen when there are multiple deals that happened on the same turn,
+			// the second array (of the nth deal, not the 1st) is not present. So the information for when the deal ends for example, is taken from the previous deal in the diplomacy array.
+			// That is why in the implementation below the dealStart is outside the main diplomacy for-loop check, it keeps a state for that type of situation.
+			// Another instance of a deal missing parts, is for example, when Player1 gives Player2 5 gpt.
+			// In the Player1's diplomacy info (the one giving), there will be two arrays as described above.
+			// But in the Player2's info (the one receiving), the second array that holds what type of deal and how much gold is being traded can be missing.
+
+			// Example Right of passage (current turn 25)
+			// This should be the same for Player2's diplomacy array
+			// Player1 LEAD_LEAD_Diplomacy[4]
+			// Peace as said is mandatory for any diplomatic agreement
+			// ---------------------- First Deal -------------------------------
+			// [0] =
+			//   Data1 = 1       <- "Gives" peace to Player2
+			//   Data2 = 0       <- This deal will end at turn 0 (still active, never at war)
+			//   EntryType = -1
+			// [1] =
+			//   Data1 = 0       <- Peace (DealSubtype)
+			//   Data2 = 0
+			//   EntryType = 0   <- Diplomatic Agreement (DealType)
+			// ---------------------- Second Deal -------------------------------
+			// [2] =
+			//   Data1 = 1       <- "Gives" ROP to Player2
+			//   Data2 = 40       <- This deal will end at turn 40 (it's been active for 5 turns)
+			//   EntryType = -1
+			// [3] =
+			//   Data1 = 2       <- Right-of-passage (DealSubtype)
+			//   Data2 = 0
+			//   EntryType = 0   <- Diplomatic Agreement (DealType)
+
+
+			// Example Trade luxury (current turn 25)
+			// Player1 LEAD_LEAD_Diplomacy[4]
+			// Peace as said is mandatory for any diplomatic agreement
+			// ---------------------- First Deal -------------------------------
+			// Peace placeholder, so I am not cluttering the screen, it's the same as above
+			// ---------------------- Second Deal -------------------------------
+			// [2] =
+			//   Data1 = 1       <- "Gives" Spices to Player2
+			//   Data2 = 40       <- This deal will end at turn 40 (it's been active for 5 turns)
+			//   EntryType = -1
+			// [3] =
+			//   Data1 = 12      <- Luxury per turn (Spices)
+			//   Data2 = 0
+			//   EntryType = 6   <- Luxury (DealType)
+
+
+			// Example Gold per turn with missing array for receiving player (current turn 25)
+			// Player1 LEAD_LEAD_Diplomacy[4]
+			// ---------------------- First Deal -------------------------------
+			// Peace
+			// ---------------------- Second Deal -------------------------------
+			// [2] =
+			//   Data1 = 1       <- "Gives" 3 gpt to Player2
+			//   Data2 = 40       <- This deal will end at turn 40 (it's been active for 5 turns)
+			//   EntryType = -1
+			// [3] =
+			//   Data1 = 0
+			//   Data2 = 3       <- Gold per turn amount
+			//   EntryType = 7   <- Gold (DealType)
+
+			// in contrast, Player2's diplomacy array might look like this
+
+			// Player2 LEAD_LEAD_Diplomacy[3] <-- 3 instead of 4!
+			// ---------------------- First Deal -------------------------------
+			// Peace
+			// ---------------------- Second Deal -------------------------------
+			// [2] =
+			//   Data1 = 0       <- "Receives" 3 gpt from Player1
+			//   Data2 = 40       <- This deal will end at turn 40 (it's been active for 5 turns)
+			//   EntryType = -1
+			// ---------------------- End ------------------------------
+			//
+			// Notice how Player2 is basically unaware that they receive 3 gpt from Player1,
+			// they only know that they are receiving something up to turn 40
+			#endregion
+
+			i = 0;
+			foreach (QueryCiv3.Sav.LEAD leader in savData.Lead) {
+				int turnsRemaining = 0;
+				int dealStart = 0;
+				int defaultDealDuration = save.Rules.DefaultDealDuration;
+				List<int> contacts = leader.GetContact();
+				for (int j = 0; j < contacts.Count; ++j) {
+					if (contacts[j] > 0) {
+						// skip barbarians, they can't have any diplomatic relationships, they are at war against everyone, at all times
+						if (i <= 0 || j <= 0) continue;
+
+						// skip indexes of players that are not active
+						if (j >= save.Players.Count || i >= save.Players.Count) continue;
+
+						QueryCiv3.Sav.LEAD_LEAD_Diplomacy[] diplomacy = savData.LeadLeadDiplomacy[i, j];
+						// a civ doesn't have any diplomatic relationships with itself, or with another civ they are at war with
+						if (i == j || diplomacy.Length == 0) continue;
+
+						for (int d = 0; d < diplomacy.Length; ++d) {
+							DealType deadType = DealType.None;
+							DealSubType dealSubType = DealSubType.None;
+							DealDetails dealDetails = DealDetails.None;
+							int goldPerTurn = 0;
+							int resourceIndex = -1;
+							string resourcePerTurn = null;
+							ID againstPlayer = null;
+							if (diplomacy[d].EntryType == -1) {
+								turnsRemaining = diplomacy[d].Data2 - currentTurn > 0 ? diplomacy[d].Data2 - currentTurn : 0;
+								dealStart = diplomacy[d].Data2 > 0 ? currentTurn - (defaultDealDuration - turnsRemaining) : 0;
+								// I am pretty sure that is what these values represent, take it with a grain of salt.
+								// We assign these manually anyway in each deal
+								// but still could come handy at some point to know what they are.
+								if (diplomacy[d].Data1 == 0) {
+									dealDetails = DealDetails.Inbound;
+								} else if (diplomacy[d].Data1 == 1) {
+									dealDetails = DealDetails.Outbound;
+								}
+							}
+
+							if (d + 1 <= diplomacy.Length - 1) {
+								deadType = (DealType)diplomacy[d + 1].EntryType;
+								if (deadType == DealType.DiplomaticAgreement) {
+									if (diplomacy[d + 1].Data1 == 0) {
+										dealSubType = DealSubType.Peace;
+									} else if (diplomacy[d + 1].Data1 == 1) {
+										dealSubType = DealSubType.MutualProtectionPact;
+									} else if (diplomacy[d + 1].Data1 == 2) {
+										dealSubType = DealSubType.RightOfPassage;
+									}
+
+									dealDetails = DealDetails.Exchange;
+								} else if (deadType == DealType.Alliance) {
+									dealSubType = DealSubType.MilitaryAlliance;
+									againstPlayer = save.Players[diplomacy[d + 1].Data1].id;
+									dealDetails = DealDetails.Exchange;
+								} else if (deadType == DealType.Embargo) {
+									dealSubType = DealSubType.TradeEmbargo;
+									againstPlayer = save.Players[diplomacy[d + 1].Data1].id;
+									dealDetails = DealDetails.Exchange;
+								}
+								  // These types of deals are only present in full on the civ that gives the gold/resources/luxuries
+								  else if (deadType == DealType.Gold) {
+									dealSubType = DealSubType.GoldPerTurn;
+									goldPerTurn = diplomacy[d + 1].Data2;
+									dealDetails = DealDetails.Outbound;
+								} else if (deadType == DealType.Luxury) {
+									dealSubType = DealSubType.LuxuryPerTurn;
+									resourceIndex = diplomacy[d + 1].Data1;
+									resourcePerTurn = save.Resources[resourceIndex].Key;
+									dealDetails = DealDetails.Outbound;
+								} else if (deadType == DealType.Resource) {
+									dealSubType = DealSubType.ResourcePerTurn;
+									resourceIndex = diplomacy[d + 1].Data1;
+									resourcePerTurn = save.Resources[resourceIndex].Key;
+									dealDetails = DealDetails.Outbound;
+								} else {
+									continue;
+								}
+
+								if (dealSubType != DealSubType.None
+									&& save.Players[i].playerRelationships.TryGetValue(save.Players[j].id.ToString(), out PlayerRelationship pr)) {
+									MultiTurnDeal mtd = new MultiTurnDeal(deadType, dealSubType, dealDetails, goldPerTurn, resourcePerTurn, defaultDealDuration, dealStart, againstPlayer);
+									pr.multiTurnDeals.Add(mtd);
+								}
+
+								// Add inbound info to other player because that info is not exactly present in the binary
+								if (dealDetails == DealDetails.Outbound
+									&& dealSubType != DealSubType.None
+									&& save.Players[j].playerRelationships.TryGetValue(save.Players[i].id.ToString(), out PlayerRelationship prOther)) {
+									MultiTurnDeal mtd = new MultiTurnDeal(deadType, dealSubType, DealDetails.Inbound, goldPerTurn, resourcePerTurn, defaultDealDuration, dealStart, againstPlayer);
+									prOther.multiTurnDeals.Add(mtd);
+								}
+							}
+						}
+					}
+				}
+				++i;
+			}
+
+			foreach (SavePlayer savePlayer in save.Players) {
+				int other = 0;
+				log.Information($"- - - - - - - - - - - - - - - - - - {savePlayer.civilization} - - - - - - - - - - - - - - - - - - ");
+				foreach (PlayerRelationship pr in savePlayer.playerRelationships.Values) {
+					other++;
+					foreach (MultiTurnDeal mtd in pr.multiTurnDeals) {
+						string against = mtd.dealSubType == DealSubType.MilitaryAlliance || mtd.dealSubType == DealSubType.TradeEmbargo ? $"(against: {save.Players.First(p => p.id == mtd.againstPlayer).civilization}({mtd.againstPlayer}))" : "";
+						string gpt = mtd.dealSubType == DealSubType.GoldPerTurn? $"({mtd.goldPerTurn} gold per turn)" : "";
+						string rpt = mtd.dealSubType == DealSubType.LuxuryPerTurn || mtd.dealSubType == DealSubType.ResourcePerTurn ? $"({mtd.resourcePerTurn} per turn)" : "";
+						log.Information($"{savePlayer.civilization}({savePlayer.id}) " +
+										$"has {mtd.dealSubType} " +
+										$"with {save.Players[other].civilization}({save.Players[other].id}) " +
+										$"for another {mtd.TurnsRemaining(save.TurnNumber)} turns {mtd.turnStartDeal}-{mtd.turnEndDeal}" +
+										$" {against} {gpt} {rpt} {mtd.dealDetails}");
+					}
+				}
+			}
 		}
 
-		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isBarbarian, bool isHuman, int cityNameIndex, string era) {
+		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isBarbarian, bool isHuman, string era) {
 			return new SavePlayer {
 				id = ids.CreateID("player"),
 				colorIndex = civ.colorIndex,
-				barbarian = isBarbarian,
 				human = isHuman,
 				civilization = civ.name,
 
 				// Never let barbarians play before a real player.
 				hasPlayedCurrentTurn = isBarbarian,
 
-				cityNameIndex = cityNameIndex,
 				eraCivilopediaName = era,
 			};
 		}
@@ -1453,6 +1697,7 @@ namespace C7GameData {
 			}
 			save.Rules.MaxRankOfWorkableTiles = 2;
 			save.Rules.MaxRankOfBarbarianCampTiles = 2;
+			save.Rules.DefaultDealDuration = 20;
 		}
 
 		private static void SetWorldWrap(SavData civ3Save, SaveGame save) {

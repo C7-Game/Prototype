@@ -313,7 +313,7 @@ public partial class WorldSetup : Control {
 
 	private void CreateGame() {
 		GlobalSingleton Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
-		Global.ResetLoadGamePath();
+		Global.ResetLoadGameFields();
 		SaveGame save = SaveManager.LoadSave(GamePaths.DefaultGamePath, GamePaths.DefaultBicPath, (string unused) => { return unused; });
 
 		Global.WorldCharacteristics = new WorldCharacteristics() {

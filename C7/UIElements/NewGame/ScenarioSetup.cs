@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using C7GameData;
 using C7Engine;
-using ConvertCiv3Media;
 using C7GameData.Save;
 using Serilog;
 
@@ -40,7 +39,7 @@ public partial class ScenarioSetup : Control {
 		playerListContainer.Columns = (int)Math.Ceiling(save.Civilizations.Count / 12.0);
 		string initiallySelectedCiv = save.Civilizations[1].name;
 		foreach (Civilization civ in save.Civilizations) {
-			if (civ.name == "A Barbarian Chiefdom") {
+			if (civ.isBarbarian) {
 				continue;
 			}
 
@@ -133,8 +132,7 @@ public partial class ScenarioSetup : Control {
 		save.GameDifficulty = difficulty;
 
 		log.Information("saving updated scenario");
-		save.Save(GamePaths.DefaultGeneratedGamePath);
-		Global.LoadGamePath = GamePaths.DefaultGeneratedGamePath;
+		Global.SaveGame = save;
 
 		log.Information("opening map");
 		CallDeferred("StartGame");

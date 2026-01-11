@@ -47,6 +47,8 @@ namespace C7GameData {
 		// The traits that this civilization has.
 		public HashSet<Trait> traits = new();
 
+		public bool isBarbarian = false;
+
 		[JsonIgnore]
 		public UnitPrototype uniqueUnit;
 

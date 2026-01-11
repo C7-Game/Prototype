@@ -186,9 +186,13 @@ namespace C7GameData {
 		/// This is used by some graphics algorithms.
 		/// </summary>
 		/// <returns></returns>
-		public Tile[] getEdgeNeighbors() {
-			Tile[] edgeNeighbors =  { neighbors[TileDirection.NORTHEAST], neighbors[TileDirection.NORTHWEST], neighbors[TileDirection.SOUTHEAST], neighbors[TileDirection.SOUTHWEST]};
-			return edgeNeighbors;
+		public Tile[] GetEdgeNeighbors() {
+			List<Tile> edgeNeighbors = new();
+			if (neighbors.TryGetValue(TileDirection.NORTHEAST, out Tile ne)) edgeNeighbors.Add(ne);
+			if (neighbors.TryGetValue(TileDirection.NORTHWEST, out Tile nw)) edgeNeighbors.Add(nw);
+			if (neighbors.TryGetValue(TileDirection.SOUTHEAST, out Tile se)) edgeNeighbors.Add(se);
+			if (neighbors.TryGetValue(TileDirection.SOUTHWEST, out Tile sw)) edgeNeighbors.Add(sw);
+			return edgeNeighbors.ToArray();
 		}
 
 		public override string ToString() {
@@ -332,12 +336,16 @@ namespace C7GameData {
 				yield = 1;
 
 				// There is a size bonus for larger cities.
-				if (cityAtTile.residents.Count >= 7 && cityAtTile.residents.Count < 13) {
+				if (cityAtTile.residents.Count > EngineStorage.gameData.rules.MaximumLevel1CitySize
+					&& cityAtTile.residents.Count <= EngineStorage.gameData.rules.MaximumLevel2CitySize) {
 					yield += 1;
-				} else if (cityAtTile.residents.Count >= 13) {
+				} else if (cityAtTile.residents.Count > EngineStorage.gameData.rules.MaximumLevel2CitySize) {
 					yield += 2;
 
-					// TODO: +1 more for industrial civs.
+					// Industrious civs get +1 production in metropolises
+					if (cityAtTile.owner.civilization.traits.Contains(Civilization.Trait.Industrious)) {
+						yield += 1;
+					}
 				}
 			}
 
@@ -374,9 +382,9 @@ namespace C7GameData {
 			// See https://wiki.civforum.de/wiki/Stadtfeldertrag_(Civ3)
 			if (HasCity) {
 				int regularCityYield;
-				if (cityAtTile.residents.Count < 7) {
+				if (cityAtTile.residents.Count <= EngineStorage.gameData.rules.MaximumLevel1CitySize) {
 					regularCityYield = 1;
-				} else if (cityAtTile.residents.Count < 13) {
+				} else if (cityAtTile.residents.Count <= EngineStorage.gameData.rules.MaximumLevel2CitySize) {
 					regularCityYield = 2;
 				} else {
 					regularCityYield = 3;
@@ -612,6 +620,66 @@ namespace C7GameData {
 			return map.tileAt(XCoordinate + xDelta, YCoordinate + yDelta);
 		}
 
+
+		/// <summary>
+		/// <para>
+		/// Walks clockwise/counter-clockwise the nth ring around
+		/// the specified tile starting on the northmost tile
+		/// and tries to find the first tile that matches our boolean criterion.
+		/// </para>
+		/// <para>
+		/// This differs from <see cref="GetTilesWithinRankDistance"/>,
+		/// because it includes all the tiles regardless of the distance.
+		/// An example would be that GetTilesWithinRankDistance() with a rank of 2
+		/// will not return a NN, SS, WW, or EE tile, whereas this method will.
+		/// </para>
+		/// <para>
+		/// It is mostly used to calculate to whom we should assign tiles
+		/// that are being claimed by more than 1 city or civilization.
+		/// </para>
+		/// </summary>
+		/// <param name="rank"></param>
+		/// <param name="predicate"></param>
+		/// <param name="clockwise"></param>
+		/// <returns></returns>
+		public Tile FindInRing(int rank, Func<Tile, bool> predicate, bool clockwise = true) {
+			int x = this.XCoordinate;
+			int y = this.YCoordinate - (2 * rank);
+
+			Tile currentTile = map.tileAt(x, y);
+			if (currentTile != Tile.NONE && predicate(currentTile)) return currentTile;
+
+			// Going SW(counter-clockwise) or SE(clockwise)
+			for (int _ = 1; _ < (2 * rank) + 1; _++) {
+				if (clockwise) { x++; y++; } else { x--; y++; }
+				currentTile = map.tileAt(x, y);
+				if (currentTile == Tile.NONE || !predicate(currentTile)) continue;
+				return currentTile;
+			}
+			// Going SE(counter-clockwise) or SW(clockwise)
+			for (int _ = 1; _ < (2 * rank) + 1; _++) {
+				if (clockwise) { x--; y++; } else { x++; y++; }
+				currentTile = map.tileAt(x, y);
+				if (currentTile == Tile.NONE || !predicate(currentTile)) continue;
+				return currentTile;
+			}
+			// Going NE(counter-clockwise) or NW(clockwise)
+			for (int _ = 1; _ < (2 * rank) + 1; _++) {
+				if (clockwise) { x--; y--; } else { x++; y--; }
+				currentTile = map.tileAt(x, y);
+				if (currentTile == Tile.NONE || !predicate(currentTile)) continue;
+				return currentTile;
+			}
+			// Going NW(counter-clockwise) or NE(clockwise)
+			for (int _ = 1; _ < (2 * rank); _++) {
+				if (clockwise) { x++; y--; } else { x--; y--; }
+				currentTile = map.tileAt(x, y);
+				if (currentTile == Tile.NONE || !predicate(currentTile)) continue;
+				return currentTile;
+			}
+			return null;
+		}
+
 		// Returns the tiles in the spiral ordering defined by
 		// GetTileAtNeighborIndex(i).
 		public List<Tile> GetTilesWithinRankDistance(int rank) {
@@ -772,8 +840,19 @@ namespace C7GameData {
 			return ti;
 		}
 
-		public TerrainImprovement ImprovementAtLayer(Terraform terraform) {
-			return terraform.Improvement == null ? null : ImprovementAtLayer(terraform.Improvement.layer);
+		// Returns an existing improvement that would be replaced by the given terraform.
+		// Returns null if there is no such improvement,
+		// or the new improvement upgrades from the existing one (upgrades don't count as replacements)
+		public TerrainImprovement GetReplacementTarget(Terraform terraform) {
+			var newImp = terraform.Improvement;
+			if (newImp == null)
+				return null;
+
+			var current = ImprovementAtLayer(newImp.layer);
+			if (current == null)
+				return null;
+
+			return newImp.upgradesFrom != current ? current : null;
 		}
 
 		public bool HasImprovement(TerrainImprovement improvement) {

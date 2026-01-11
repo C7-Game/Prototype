@@ -17,5 +17,6 @@ namespace C7GameData {
 		public string ScoutUnitType;
 		public int MaxRankOfWorkableTiles;
 		public int MaxRankOfBarbarianCampTiles;
+		public int DefaultDealDuration;
 	}
 }

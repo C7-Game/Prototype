@@ -271,7 +271,7 @@ public partial class ForestLayer : LooseLayer {
 			int randomJungleRow = tile.YCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
-			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
+			if (tile.GetEdgeNeighbors().Any(t => t.IsWater())) {
 				randomJungleColumn = tile.XCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			} else {
@@ -298,7 +298,7 @@ public partial class ForestLayer : LooseLayer {
 				}
 			} else {
 				forestRow = tile.YCoordinate % 2;
-				if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
+				if (tile.GetEdgeNeighbors().Any(t => t.IsWater())) {
 					forestColumn = tile.XCoordinate % 5;
 					if (tile.baseTerrainType.Key == "grassland") {
 						forestTexture = smallForestTexture;
@@ -343,7 +343,7 @@ public partial class MarshLayer : LooseLayer {
 			int randomJungleRow = tile.YCoordinate % 2;
 			int randomMarshColumn;
 			ImageTexture marshTexture;
-			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
+			if (tile.GetEdgeNeighbors().Any(t => t.IsWater())) {
 				randomMarshColumn = tile.XCoordinate % 5;
 				marshTexture = smallMarshTexture;
 			} else {

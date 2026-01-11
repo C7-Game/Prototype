@@ -670,8 +670,9 @@ namespace C7GameData {
 		private List<Tile> GetTilesOfRank(int rank) {
 			List<Tile> result = new();
 			foreach (Tile t in location.GetTilesWithinRankDistance(rank)) {
+				// Law II
 				// Ocean tiles may only hold claims of rank 2.
-				if (t.baseTerrainType.Key == "ocean" && rank > 2) {
+				if (t.baseTerrainType.Key == "ocean" && t.rankDistanceTo(location) > 2) {
 					continue;
 				}
 				result.Add(t);

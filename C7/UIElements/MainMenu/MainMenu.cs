@@ -37,7 +37,7 @@ public partial class MainMenu : Node {
 	private void DisplayTitleScreen() {
 		// To pass data between scenes, putting path string in a global singleton and reading it later in createGame
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
-		Global.ResetLoadGamePath();
+		Global.ResetLoadGameFields();
 
 		LoadDialog.SetDirectoryForLoading(@"Conquests/Saves");
 		LoadScenarioDialog.SetDirectoryForLoading(@"Conquests/Scenarios");

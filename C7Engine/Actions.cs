@@ -17,7 +17,9 @@ public static class C7Action {
 	public const string MoveUnitNorth = "move_unit_north";
 	public const string MoveUnitNortheast = "move_unit_northeast";
 	public const string ToggleAnimations = "toggle_animations";
+	public const string EnableTempAnimations = "enable_temp_animations";
 	public const string ToggleGrid = "toggle_grid";
+	public const string ToggleCoordinates = "toggle_coordinates";
 	public const string ToggleZoom = "toggle_zoom";
 	public const string UnitBombard = "unit_bombard";
 	public const string UnitBuildCity = "unit_build_city";

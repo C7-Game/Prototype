@@ -133,8 +133,8 @@ namespace C7GameData {
 				foreach (Tile t in city.GetTilesWithinBorders()) {
 					// If another city has claim to this tile, we need to resolve
 					// that conflict.
-					if (t.owningCity != null) {
-						t.owningCity = ResolveTileOwnershipConflict(t.owningCity, city, t);
+					if (t.owningCity != null && ResolveTileOwnershipConflict(t.owningCity, city, t, out City winnerCity)) {
+						t.owningCity = winnerCity;
 						t.owningCity.owner.tileKnowledge.AddTilesToKnown(t, recomputeActiveTiles);
 						continue;
 					}
@@ -147,7 +147,30 @@ namespace C7GameData {
 			foreach (Player player in players) {
 				player.tileKnowledge.RecomputeActiveTiles();
 				player.UpdateResourcesInBorders(map.tiles.Where(t => t.owningCity?.owner == player));
+
+				foreach (Tile t in player.tileKnowledge.knownTiles.Where(t => t.owningCity == null && t.GetEdgeNeighbors().Any(e => e.owningCity != null)).ToList()) {
+					// Law VII
+					TryResolveOpposingNeighbors(t, TileDirection.NORTHWEST, TileDirection.SOUTHEAST);
+					if (t.owningCity != null) continue;
+					// Law VIII
+					TryResolveOpposingNeighbors(t, TileDirection.NORTHEAST, TileDirection.SOUTHWEST);
+				}
 			}
+		}
+
+		private void TryResolveOpposingNeighbors(Tile t, TileDirection dirA, TileDirection dirB) {
+			if (!t.neighbors.TryGetValue(dirA, out Tile a) || !t.neighbors.TryGetValue(dirB, out Tile b)) return;
+			if (a.owningCity == null || b.owningCity == null) return;
+			if (a.owningCity.owner != b.owningCity.owner) return;
+			if (!ResolveTileOwnershipConflict(a.owningCity, b.owningCity, t, out City winnerCity)) return;
+
+			// Law II
+			if (t.baseTerrainType.Key == "ocean" && t.rankDistanceTo(winnerCity.location) > 2) {
+				t.owningCity = null;
+				return;
+			}
+			t.owningCity = winnerCity;
+			winnerCity.owner.tileKnowledge.AddTilesToKnown(t);
 		}
 
 		public void UpdateTileOwnersOnCityDestruction(City city) {
@@ -255,27 +278,48 @@ namespace C7GameData {
 		}
 
 		// Rules taken from https://forums.civfanatics.com/threads/the-eight-laws-of-border-dynamics.106882/
-		private City ResolveTileOwnershipConflict(City a, City b, Tile t) {
+		private bool ResolveTileOwnershipConflict(City a, City b, Tile t, out City owner) {
+			owner = null;
+			if (a.Equals(b)) { owner = a; return true; }
+
 			int aRank = a.location.rankDistanceTo(t);
 			int bRank = b.location.rankDistanceTo(t);
 
+			// Law I
+			// Cities can claim tiles of rank n+1, where n is the city's expansion level
+			if (a.GetBorderExpansionLevel() + 1 < aRank && b.GetBorderExpansionLevel() + 1 >= bRank) { owner = b; return true; }
+			if (b.GetBorderExpansionLevel() + 1 < bRank && a.GetBorderExpansionLevel() + 1 >= aRank) { owner = a; return true; }
+
+			// Law III
 			// The city with the lowest rank claim gets the tile.
-			if (aRank > bRank) {
-				return b;
-			} else if (aRank < bRank) {
-				return a;
-			}
+			if (aRank > bRank) { owner = b; return true; }
+			if (aRank < bRank) { owner = a; return true; }
 
+			// Law IV
 			// If the ranks are equal, the city with more culture gets the tile.
-			if (a.GetCulture() < b.GetCulture()) {
-				return b;
-			} else if (a.GetCulture() > b.GetCulture()) {
-				return a;
+			if (a.GetCulture() + a.GetCulturePerTurn() < b.GetCulture() + b.GetCulturePerTurn()) { owner = b; return true; }
+			if (a.GetCulture() + a.GetCulturePerTurn() > b.GetCulture() + b.GetCulturePerTurn()) { owner = a; return true; }
+
+			// Law V
+			// If the cultures are equal the oldest city gets the tile.
+			// TODO: track city age - for now we are going to skip this.
+			// return a;
+
+			// Law VI
+			// Starting North of the disputed tile, we go counter-clockwise
+			// trying to find the first tile that has one of the competing cities.
+			// We start at (rank - 1) because the rank distance does not necessarily reflect the actual "ring"
+			// the city tile is in, so a tile at rank 3, could well mean it's in the 2nd ring.
+			for (int r = aRank - 1; r <= aRank; r++) {
+				if (r <= 0) continue;
+				Tile winner = t.FindInRing(r, tile => tile.HasCity && (tile.cityAtTile == a || tile.cityAtTile == b), false);
+				if (winner == null) continue;
+				owner = winner.owningCity;
+				return true;
 			}
 
-			// If the cultures are equal the oldest city gets the tile.
-			// TODO: track city age - for now we just return the first.
-			return a;
+			// should never happen, if it does some part of the algorithm has gone wrong
+			throw new Exception($"Failed to resolve ownership of {t} between {a.name} and {b.name}, something went wrong");
 		}
 	}
 }
