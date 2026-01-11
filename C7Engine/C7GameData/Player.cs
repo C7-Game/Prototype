@@ -10,16 +10,16 @@ using static C7GameData.EraUtils;
 namespace C7GameData {
 
 	public struct PlayerCommerceBreakdown {
-		public int corrupted;
-		public int taxes;
-		public int taxmenTaxes;
-		public int beakers;
-		public int happiness;
-		public int fromOtherCivs;
-		public int toOtherCivs;
-		public int interest;
-		public int maintenance;
-		public int unitSupport;
+		public int corrupted;		// Amount of commerce lost directly to corruption
+		public int taxes;			// Amount of treasury income from REGULAR citizens working tiles
+		public int taxmenTaxes;		// Amount of treasury income from tax collector specialists
+		public int beakers;			// Amount of commerce going to science
+		public int happiness;		// Amount of commerce going to entertainment
+		public int fromOtherCivs;	// Income from other Civ GPT deals
+		public int toOtherCivs;		// Expenses paid to other Civ GPT deals
+		public int interest;		// Interest income from Wall Street-flag small wonder
+		public int maintenance;		// Expenses due to aggregate building maintenance
+		public int unitSupport;		// Expenses due to unit support costs
 
 		public int Inflows() {
 			return corrupted + taxes + taxmenTaxes + beakers + happiness + fromOtherCivs + interest;
@@ -30,7 +30,7 @@ namespace C7GameData {
 		}
 
 		public int Netflows() {
-			return taxes + taxmenTaxes + fromOtherCivs + interest - maintenance - unitSupport - toOtherCivs;
+			return Inflows() - Outflows();
 		}
 
 		public int CityInflows() {
@@ -103,8 +103,6 @@ namespace C7GameData {
 				_gold = value;
 			}
 		}
-
-		public bool hasWallStreet = false;
 
 		// The number of "beakers" (gold) spent on the currently researched
 		// tech.
@@ -370,11 +368,14 @@ namespace C7GameData {
 				unitSupport = 0
 			};
 
-			int currentTurn = EngineStorage.gameData.turn;
+			int currentTurn = TurnHandling.GetTurnNumber();
 
-			// If current turn < 10 and player has no cities (hasn't planted yet), apply no expenses or income.
-			// TODO: Come up with a more robust/elegant solution for this
-			if (currentTurn < 10 && cities.Count == 0) return result;
+			// If player has no cities, apply no expenses or income.
+			// This is how this behaves in regular Civ 3 as well (if you're not defeated, e.g. you still have a King unit or settler)
+			if (cities.Count == 0) return result;
+
+			// Assume player has no buildings that generate interest income until we check
+			int interestBuildings = 0;
 
 			foreach (City city in cities) {
 				CommerceBreakdown cityCommerce = city.CurrentCommerceYield();
@@ -384,14 +385,12 @@ namespace C7GameData {
 				result.happiness += cityCommerce.happiness;
 				result.maintenance += city.MaintenanceCosts();
 
-				// TODO: Hook this up to .biq or .sav specifications for tax collector income. Using default Conquests value as placeholder.
-				const int TAXMAN_VALUE = 2;
+				interestBuildings += city.constructed_buildings.Count(cb => cb.building.treasuryEarnsInterest);
+
 				foreach (CityResident cr in city.residents) {
-					// If tax collector
-					if (cr.citizenType.SpecialistIndex == 2) {
-						result.taxes -= TAXMAN_VALUE;
-						result.taxmenTaxes += TAXMAN_VALUE;
-					}
+					// Split city income into "regular citizen" and "tax collector" buckets
+					result.taxes -= cr.citizenType.Taxes;
+					result.taxmenTaxes += cr.citizenType.Taxes;
 				}
 			}
 
@@ -406,7 +405,7 @@ namespace C7GameData {
 
 			result.unitSupport = TotalUnitsAllowedUnitsAndSupportCost().Item3;
 
-			if (hasWallStreet) result.interest = (int)Math.Floor(gold * 0.05);
+			if (interestBuildings > 0) result.interest = interestBuildings * Math.Min((int)(gold * rules.TreasuryInterestRate), rules.MaxInterest);
 
 			return result;
 		}

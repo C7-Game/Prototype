@@ -18,5 +18,7 @@ namespace C7GameData {
 		public int MaxRankOfWorkableTiles;
 		public int MaxRankOfBarbarianCampTiles;
 		public int DefaultDealDuration;
+		public float TreasuryInterestRate = .05f;
+		public int MaxInterest = 50;
 	}
 }

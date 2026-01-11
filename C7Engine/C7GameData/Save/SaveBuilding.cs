@@ -20,6 +20,7 @@ namespace C7GameData.Save {
 			DoublesCityGrowthRate,
 			ProvidesWalls,
 			CanOnlyBeBuiltInTowns,
+			TreasuryEarnsInterest,
 		}
 
 		public class GreatWonderProperties {
