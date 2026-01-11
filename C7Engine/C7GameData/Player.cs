@@ -10,16 +10,16 @@ using static C7GameData.EraUtils;
 namespace C7GameData {
 
 	public struct PlayerCommerceBreakdown {
-		public int corrupted;		// Amount of commerce lost directly to corruption
-		public int taxes;			// Amount of treasury income from REGULAR citizens working tiles
-		public int taxmenTaxes;		// Amount of treasury income from tax collector specialists
-		public int beakers;			// Amount of commerce going to science
-		public int happiness;		// Amount of commerce going to entertainment
-		public int fromOtherCivs;	// Income from other Civ GPT deals
-		public int toOtherCivs;		// Expenses paid to other Civ GPT deals
-		public int interest;		// Interest income from Wall Street-flag small wonder
-		public int maintenance;		// Expenses due to aggregate building maintenance
-		public int unitSupport;		// Expenses due to unit support costs
+		public int corrupted;       // Amount of commerce lost directly to corruption
+		public int taxes;           // Amount of treasury income from REGULAR citizens working tiles
+		public int taxmenTaxes;     // Amount of treasury income from tax collector specialists
+		public int beakers;         // Amount of commerce going to science
+		public int happiness;       // Amount of commerce going to entertainment
+		public int fromOtherCivs;   // Income from other Civ GPT deals
+		public int toOtherCivs;     // Expenses paid to other Civ GPT deals
+		public int interest;        // Interest income from Wall Street-flag small wonder
+		public int maintenance;     // Expenses due to aggregate building maintenance
+		public int unitSupport;     // Expenses due to unit support costs
 
 		public int Inflows() {
 			return corrupted + taxes + taxmenTaxes + beakers + happiness + fromOtherCivs + interest;
