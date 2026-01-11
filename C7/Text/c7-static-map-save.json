@@ -76069,8 +76069,8 @@
     "startUnitType2": "Worker",
     "scoutUnitType": "Scout",
 	  "maxRankOfWorkableTiles": 2,
-	  "maxRankOfBarbarianCampTiles": 2,
-    "defaultDealDuration": 20,
+	"maxRankOfBarbarianCampTiles": 2,
+  "defaultDealDuration": 20,
     "treasuryInterestRate": 0.05,
     "maxInterest": 50
   },

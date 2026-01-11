@@ -368,8 +368,6 @@ namespace C7GameData {
 				unitSupport = 0
 			};
 
-			int currentTurn = TurnHandling.GetTurnNumber();
-
 			// If player has no cities, apply no expenses or income.
 			// This is how this behaves in regular Civ 3 as well (if you're not defeated, e.g. you still have a King unit or settler)
 			if (cities.Count == 0) return result;
@@ -396,7 +394,7 @@ namespace C7GameData {
 
 			foreach (var pr in playerRelationships.Values) {
 				foreach (var mtd in pr.multiTurnDeals) {
-					if (mtd.TurnsRemaining(currentTurn) > 0 && mtd.dealSubType == DealSubType.GoldPerTurn) {
+					if (mtd.dealSubType == DealSubType.GoldPerTurn) {
 						if (mtd.dealDetails == DealDetails.Inbound) result.fromOtherCivs += mtd.goldPerTurn;
 						else if (mtd.dealDetails == DealDetails.Outbound) result.toOtherCivs += mtd.goldPerTurn;
 					}
