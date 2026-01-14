@@ -22,5 +22,5 @@ open /Applications/Godot_mono.app
 ## What is that?
 
 - Fonts/ - Fonts for Godot text
-- MainMenu.tscn & MainMenu.cs - The startup scene and main menu
+- main_menu.tscn & MainMenu.cs - The startup scene and main menu
 - C7Game.tscn & Game.cs - An early prototype map view accessible from the main menu

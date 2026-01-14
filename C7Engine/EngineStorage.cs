@@ -1,8 +1,8 @@
 namespace C7Engine {
 	using System;
-	using System.Threading;
-	using System.Collections.Concurrent;
 	using C7GameData;
+	using System.Collections.Generic;
+	using System.Threading.Tasks;
 
 	/**
 	 * This class stores references to data that the engine needs between calls from the player.
@@ -14,57 +14,72 @@ namespace C7Engine {
 	 * so we don't forget the state of the game after we create it.
 	 **/
 	public static class EngineStorage {
-		public static Mutex gameDataMutex = new Mutex();
-		internal static GameData gameData { get; set; }
+		public static GameData gameData { get; set; }
+
 		public static ID uiControllerID;
 		internal static bool animationsEnabled = true;
 
-		private static Thread engineThread = null;
-		internal static AutoResetEvent uiEvent = new AutoResetEvent(false); // Used to block engineThread while waiting for the UI, f.e. while
-																			// an animation plays.
+		internal static readonly Queue<MessageToEngine> pendingMessages = new();
+		internal static readonly Queue<MessageToUI> messagesToUI = new();
+		internal static readonly Queue<AnimationMessage> animationMessages = new();
 
-		internal static ConcurrentQueue<MessageToEngine> pendingMessages = new ConcurrentQueue<MessageToEngine>();
-		internal static AutoResetEvent actionAddedToQueue = new AutoResetEvent(false);
+		internal static readonly Dictionary<Guid, TaskCompletionSource<bool>> pendingAnimations = new();
+		static readonly Dictionary<Type, TaskCompletionSource<MessageToEngine>> pendingEngineWaiters = new();
 
-		public static ConcurrentQueue<MessageToUI> messagesToUI = new ConcurrentQueue<MessageToUI>();
+		public static void ProcessNextMessageToEngine() {
+			if (pendingMessages.Count > 0) {
+				var msg = pendingMessages.Dequeue();
+				msg.process();
 
-		private static void processActions() {
-			bool stopProcessing = false;
-			while (!stopProcessing) {
-				actionAddedToQueue.WaitOne();
-				MessageToEngine msg;
-				gameDataMutex.WaitOne();
-				while (pendingMessages.TryDequeue(out msg)) {
-					msg.process();
-					if (msg is MsgShutdownEngine) {
-						stopProcessing = true;
-						break;
-					}
+				var type = msg.GetType();
+				if (pendingEngineWaiters.TryGetValue(type, out var tcs)) {
+					tcs.TrySetResult(msg);
+					pendingEngineWaiters.Remove(type);
 				}
-				gameDataMutex.ReleaseMutex();
 			}
 		}
 
-		internal static void createThread() {
-			// TODO: What if engineThread is not null, i.e. if the thread has already been created? Should we join() it? Does it matter?
-			engineThread = new Thread(processActions);
-			engineThread.Start();
-		}
-	}
-
-	public class UIGameDataAccess : IDisposable {
-		public UIGameDataAccess() {
-			EngineStorage.gameDataMutex.WaitOne();
+		public static bool HasPendingAnimations() {
+			return pendingAnimations.Count > 0;
 		}
 
-		public void Dispose() {
-			EngineStorage.gameDataMutex.ReleaseMutex();
-		}
-
-		public GameData gameData {
-			get {
-				return EngineStorage.gameData;
+		public static bool TryDequeueNextMessageToUI(out MessageToUI message) {
+			if (messagesToUI.Count > 0) {
+				message = messagesToUI.Dequeue();
+				return true;
 			}
+			message = null;
+			return false;
+		}
+
+		public static bool TryDequeueNextAnimationMessage(out AnimationMessage message) {
+			if (animationMessages.Count > 0) {
+				message = animationMessages.Dequeue();
+				return true;
+			}
+			message = null;
+			return false;
+		}
+
+		internal static Task WaitForAnimationFinished(Guid animationId) {
+			var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+			pendingAnimations[animationId] = tcs;
+			return tcs.Task;
+		}
+
+		public static Task<T> WaitForMessageToEngine<T>() where T : MessageToEngine {
+			var tcs = new TaskCompletionSource<MessageToEngine>(TaskCreationOptions.RunContinuationsAsynchronously);
+			pendingEngineWaiters[typeof(T)] = tcs;
+
+			return tcs.Task.ContinueWith(t => (T)t.Result);
+		}
+
+		public static void ReadGameData(Action<GameData> accessor) {
+			accessor(gameData);
+		}
+
+		public static void InitializeGameDataForTests(GameData gD) {
+			gameData = gD;
 		}
 	}
 }

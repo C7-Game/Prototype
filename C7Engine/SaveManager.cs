@@ -1,4 +1,4 @@
-﻿namespace C7Engine {
+namespace C7Engine {
 	using System;
 	using System.IO;
 	using C7GameData;
@@ -29,7 +29,7 @@
 			SaveGame save = getFileFormat(path) switch {
 				SaveFileFormat.Sav => ImportCiv3.ImportSav(path, bicPath, getPediaIconsPath),
 				SaveFileFormat.Biq => ImportCiv3.ImportBiq(path, bicPath, getPediaIconsPath),
-				SaveFileFormat.C7 => SaveGame.Load(path),
+				SaveFileFormat.C7 => SaveGame.Load(path, getPediaIconsPath),
 				_ => throw new FileLoadException("invalid save format"),
 			};
 			return save;

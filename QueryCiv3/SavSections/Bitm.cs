@@ -9,5 +9,13 @@ namespace QueryCiv3.Sav {
 		private fixed byte UsableBuildingBits[32];
 		public int BuildingCount;
 		public int BuildingBytes;
+
+		public bool IsBuildingUsable(int buildingIndex) {
+			int byteIndex = buildingIndex / 8;
+			int bitIndex = buildingIndex % 8;
+			fixed (byte* ptr = UsableBuildingBits) {
+				return (ptr[byteIndex] & (1 << bitIndex)) != 0;
+			}
+		}
 	}
 }

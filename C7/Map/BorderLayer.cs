@@ -2,32 +2,17 @@ using System.Collections.Generic;
 using C7GameData;
 using Godot;
 using ConvertCiv3Media;
+using System;
 
 namespace C7.Map {
 	// The layer responsible for drawing civilization borders.
 	public class BorderLayer : LooseLayer {
-		private readonly string texturePath = "Art/Terrain/Territory.pcx";
-		private readonly ImageTexture[] borderGraphics = new ImageTexture[8];
-		private readonly Dictionary<(int, Color), ImageTexture> textureCache = new();
+		public record struct TextureDetails(
+			TileDirection direction,
+			bool isHilly
+		);
 
-		public BorderLayer() {
-			Pcx texturePcx = Util.LoadPCX(texturePath);
-
-			int textureWidth = 128;
-			int textureHeight = 72;
-
-			// This loops slices the PCX image into separate border textures. 
-			// The PCX image contains 4 rows and 2 columns:
-			// - Each row corresponds to a border direction.
-			// - The first column contains border textures for regular terrain.
-			// - The second column contains border textures for hills and mountains 
-			//   (rendering logic for textures of the second column is not yet implemented).
-			for (int j = 0; j < 4; j++) {
-				for (int k = 0; k < 2; k++) {
-					borderGraphics[j * 2 + k] = PCXToGodot.getImageTextureFromPCX(texturePcx, k * textureWidth, j * textureHeight, textureWidth, textureHeight, true);
-				}
-			}
-		}
+		private readonly Dictionary<(TextureDetails, Color), ImageTexture> textureCache = new();
 
 		// TODO: This method doesn't precisely mirror Civ3 coloring
 		private static Color CalcSecondaryColor(Color mainColor) {
@@ -39,16 +24,21 @@ namespace C7.Map {
 		/// - The color of civilization, passed as an argument to this method.
 		/// - The secondary color, which is derived from the civilization color.
 		/// The resulting texture is cached.
-		private ImageTexture GetBorderTexture(int textureIndex, Color borderColor) {
-			if (textureCache.TryGetValue((textureIndex, borderColor), out ImageTexture res)) {
+		private ImageTexture GetBorderTexture(Tile tile, TileDirection dir, Color borderColor) {
+			TextureDetails textureDetails = new() {
+				direction = dir,
+				isHilly = tile.overlayTerrainType.isHilly() && tile.neighbors[dir].overlayTerrainType.isHilly()
+			};
+
+			if (textureCache.TryGetValue((textureDetails, borderColor), out ImageTexture res)) {
 				return res;
 			}
 
-			ImageTexture texture = borderGraphics[textureIndex];
+			ImageTexture texture = TextureLoader.Load("borders", textureDetails);
 
 			Color secondaryColor = CalcSecondaryColor(borderColor);
 
-			Dictionary<Color, Color> colorReplacements = new Dictionary<Color, Color>
+			Dictionary<Color, Color> colorReplacements = new()
 			{
 				{ Color.Color8(236, 255, 0), borderColor },
 				{ Color.Color8(255, 0, 0), secondaryColor}
@@ -57,30 +47,26 @@ namespace C7.Map {
 			Image image = Util.TransformColors(texture.GetImage(), colorReplacements);
 
 			var newTexture = ImageTexture.CreateFromImage(image);
-			textureCache[(textureIndex, borderColor)] = newTexture;
+			textureCache[(textureDetails, borderColor)] = newTexture;
 
 			return newTexture;
 		}
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
-			if (tile.owner is null) {
+			if (tile.owningCity is null) {
 				return;
 			}
 
-			var directionToTextureIdx = new Dictionary<TileDirection, int>
-				{
-					{ TileDirection.NORTHWEST, 0 },
-					{ TileDirection.NORTHEAST, 2 },
-					{ TileDirection.SOUTHWEST, 4 },
-					{ TileDirection.SOUTHEAST, 6 }
-				};
+			Color borderColor = TextureLoader.LoadColor(tile.owningCity.owner.colorIndex);
+			TileDirection[] borderDirections = [TileDirection.NORTHEAST, TileDirection.NORTHWEST, TileDirection.SOUTHEAST, TileDirection.SOUTHWEST];
 
-			Color borderColor = Util.LoadColor(tile.owner.colorIndex);
-
-			foreach (var entry in directionToTextureIdx) {
-				if (tile.neighbors[entry.Key].owner != tile.owner) {
-					ImageTexture texture = GetBorderTexture(entry.Value, borderColor);
-					Vector2 offset = texture.GetSize() * 0.5f;
+			foreach (TileDirection dir in borderDirections) {
+				if (tile.neighbors[dir].owningCity?.owner != tile.owningCity?.owner) {
+					ImageTexture texture = GetBorderTexture(tile, dir, borderColor);
+					Vector2 size = texture.GetSize();
+					Vector2 offset = size/2;
+					// this value were found experimentally to improve alignment with the grid
+					offset.Y += size.Y * 0.055f;
 
 					looseView.DrawTexture(texture, tileCenter - offset);
 				}

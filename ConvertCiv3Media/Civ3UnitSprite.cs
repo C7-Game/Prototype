@@ -58,7 +58,7 @@ namespace ConvertCiv3Media {
 		void Stop();
 		// public void Move();
 		// public void PlaySound(UnitAction action);
-		// public void SetLocation(int x, int y);
+		// public void SetLocation(int X, int Y);
 	}
 	public class Civ3UnitSprite {
 		protected Flic[] Animations = new Flic[Enum.GetNames(typeof(UnitAction)).Length];

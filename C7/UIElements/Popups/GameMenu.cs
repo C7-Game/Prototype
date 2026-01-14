@@ -1,8 +1,8 @@
 using System;
 using Godot;
+using Serilog;
 
 public partial class GameMenu : Popup {
-
 	public GameMenu() {
 		alignment = BoxContainer.AlignmentMode.Center;
 		margins = new Margins(top: 100);
@@ -16,17 +16,28 @@ public partial class GameMenu : Popup {
 
 		AddHeader("Main Menu", 10);
 
+		// TODO: enable buttons as the features are implemented
 		AddButton("Map", 60, map);
-		AddButton("Load Game (Ctrl-L)", 85, load);
-		AddButton("New Game (Ctrl-Shift-Q)", 110, newGame);
-		AddButton("Preferences (Ctrl-P)", 135, preferences);
-		AddButton("Retire (Ctrl-Q)", 160, retire);
-		AddButton("Save Game (Ctrl-S)", 185, save);
-		AddButton("Quit Game (ESC)", 210, quit);
+		AddButton("Load Game", 85, load);
+		//AddButton("New Game (Ctrl-Shift-Q)", 110, newGame);
+		//AddButton("Preferences (Ctrl-P)", 135, preferences);
+		AddButton("Retire", 110, retire);
+		AddButton("Save Game", 135, save);
+		AddButton("Quit Game (ESC)", 160, quit);
+
 	}
 
 	private void save() {
-		throw new NotImplementedException();
+		var loadDialog = GetNode<Civ3FileDialog>("../%LoadDialog");
+		// TODO: this should go to our own saves directory.
+		loadDialog.SetDirectoryForSaving(@"Conquests/Saves");
+
+		// TODO: The main menu does sound playing but we don't know our path in
+		// the scene, which makes this hard.
+		// PlayButtonPressedSound();
+		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+
+		loadDialog.Popup();
 	}
 
 	private void preferences() {
@@ -38,7 +49,15 @@ public partial class GameMenu : Popup {
 	}
 
 	private void load() {
-		throw new NotImplementedException();
+		var loadDialog = GetNode<Civ3FileDialog>("../%LoadDialog");
+		loadDialog.SetDirectoryForLoading(@"Conquests/Saves");
+
+		// TODO: The main menu does sound playing but we don't know our path in
+		// the scene, which makes this hard.
+		// PlayButtonPressedSound();
+		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+
+		loadDialog.Popup();
 	}
 
 	private void quit() {
@@ -52,5 +71,4 @@ public partial class GameMenu : Popup {
 	private void map() {
 		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
 	}
-
 }

@@ -40,6 +40,10 @@ namespace QueryCiv3.Biq {
 		public bool EnablesCommunicationTrading { get => Util.GetFlag(Flags[2], 0); }
 		public bool NotRequiredForEraAdvancement { get => Util.GetFlag(Flags[2], 1); }
 		public bool DoublesWorkerRate { get => Util.GetFlag(Flags[2], 2); }
+		public bool CannotBeTraded { get => Util.GetFlag(Flags[2], 3); }
+		public bool PermitsSacrifice { get => Util.GetFlag(Flags[2], 4); }
+		public bool BonusTechToFirstCivThatResearches { get => Util.GetFlag(Flags[2], 5); }
+		public bool RevealsWorldMap { get => Util.GetFlag(Flags[2], 6); }
 
 		public int Flavors;
 		private fixed byte UnknownBuffer[4];

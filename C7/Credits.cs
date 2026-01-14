@@ -18,8 +18,8 @@ public partial class Credits : Node2D {
 	}
 
 	private void ShowCredits() {
-		ImageTexture creditsTexture = Util.LoadTextureFromPCX("Art/Credits/credits_background.pcx");
-		ImageTexture goBackTexture = Util.LoadTextureFromPCX("Art/exitBox-backgroundStates.pcx", 0, 0, 72, 48);
+		ImageTexture creditsTexture = TextureLoader.Load("credits.background");
+		ImageTexture goBackTexture = TextureLoader.Load("ui.exit.normal");
 
 		TextureRect creditsBackground = new TextureRect();
 		creditsBackground.Texture = creditsTexture;
@@ -60,6 +60,6 @@ public partial class Credits : Node2D {
 	}
 	public void ReturnToMenu() {
 		log.Information("Returning to main menu");
-		GetTree().ChangeSceneToFile("res://MainMenu.tscn");
+		GetTree().ChangeSceneToFile("res://UIElements/MainMenu/main_menu.tscn");
 	}
 }

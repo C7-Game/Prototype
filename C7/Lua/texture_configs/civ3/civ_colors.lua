@@ -1,0 +1,38 @@
+local PALETTES = "Art/Units/Palettes/"
+
+local civ_colors = {
+    color_0 = { path = PALETTES .. "ntp00.pcx" },
+    color_1 = { path = PALETTES .. "ntp01.pcx" },
+    color_2 = { path = PALETTES .. "ntp02.pcx" },
+    color_3 = { path = PALETTES .. "ntp03.pcx" },
+    color_4 = { path = PALETTES .. "ntp04.pcx" },
+    color_5 = { path = PALETTES .. "ntp05.pcx" },
+    color_6 = { path = PALETTES .. "ntp06.pcx" },
+    color_7 = { path = PALETTES .. "ntp07.pcx" },
+    color_8 = { path = PALETTES .. "ntp08.pcx" },
+    color_9 = { path = PALETTES .. "ntp09.pcx" },
+    color_10 = { path = PALETTES .. "ntp10.pcx" },
+    color_11 = { path = PALETTES .. "ntp11.pcx" },
+    color_12 = { path = PALETTES .. "ntp12.pcx" },
+    color_13 = { path = PALETTES .. "ntp13.pcx" },
+    color_14 = { path = PALETTES .. "ntp14.pcx" },
+    color_15 = { path = PALETTES .. "ntp15.pcx" },
+    color_16 = { path = PALETTES .. "ntp16.pcx" },
+    color_17 = { path = PALETTES .. "ntp17.pcx" },
+    color_18 = { path = PALETTES .. "ntp18.pcx" },
+    color_19 = { path = PALETTES .. "ntp19.pcx" },
+    color_20 = { path = PALETTES .. "ntp20.pcx" },
+    color_21 = { path = PALETTES .. "ntp21.pcx" },
+    color_22 = { path = PALETTES .. "ntp22.pcx" },
+    color_23 = { path = PALETTES .. "ntp23.pcx" },
+    color_24 = { path = PALETTES .. "ntp24.pcx" },
+    color_25 = { path = PALETTES .. "ntp25.pcx" },
+    color_26 = { path = PALETTES .. "ntp26.pcx" },
+    color_27 = { path = PALETTES .. "ntp27.pcx" },
+    color_28 = { path = PALETTES .. "ntp28.pcx" },
+    color_29 = { path = PALETTES .. "ntp29.pcx" },
+    color_30 = { path = PALETTES .. "ntp30.pcx" },
+    color_31 = { path = PALETTES .. "ntp31.pcx" },
+}
+
+return civ_colors

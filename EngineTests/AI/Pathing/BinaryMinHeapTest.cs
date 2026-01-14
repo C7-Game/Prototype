@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using C7Engine.Pathing;
 using Xunit;
 
-namespace EngineTests {
+namespace EngineTests.AI.Pathing {
 	public class BinaryMinHeapTest {
-		private void checkBunchInsert<T>(List<T> list) where T:IComparable<T> {
+		private void checkBunchInsert<T>(List<T> list) where T : IComparable<T> {
 			BinaryMinHeap<T> heap = new BinaryMinHeap<T>();
 			foreach (T v in list) {
 				heap.insert(v);
@@ -31,7 +31,7 @@ namespace EngineTests {
 			}
 
 			Random random = new Random(0x1337);
-			for (int i = lst.Count - 1; i > 1 ; --i) {
+			for (int i = lst.Count - 1; i > 1; --i) {
 				var pos = random.Next(i - 1);
 				(lst[i], lst[pos]) = (lst[pos], lst[i]);
 			}

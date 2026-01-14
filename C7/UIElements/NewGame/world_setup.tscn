@@ -1,0 +1,758 @@
+[gd_scene load_steps=16 format=3 uid="uid://b3qpc8q2w7rru"]
+
+[ext_resource type="Script" uid="uid://bvgtd1omfo4du" path="res://UIElements/NewGame/WorldSetup.cs" id="1_tyjud"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2"]
+[ext_resource type="Script" uid="uid://dcrdcjop64t6t" path="res://UIElements/Civ3TextureButton.cs" id="3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rlsqa"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_v0f8b"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_joj1k"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_13ceg"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_2b8n4"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_3"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_4"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_5"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_8ublj"]
+device = -1
+keycode = 4194309
+
+[sub_resource type="Shortcut" id="Shortcut_33b04"]
+events = [SubResource("InputEventKey_8ublj")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_klcu1"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_7oyjg"]
+events = [SubResource("InputEventKey_klcu1")]
+
+[node name="Control" type="CenterContainer" node_paths=PackedStringArray("background", "pangaeaLabel", "continentsLabel", "archipelagoLabel", "pangaea60", "pangaea70", "pangaea80", "continents60", "continents70", "continents80", "archipelago60", "archipelago70", "archipelago80", "pangaea60Large", "pangaea70Large", "pangaea80Large", "continents60Large", "continents70Large", "continents80Large", "archipelago60Large", "archipelago70Large", "archipelago80Large", "arid", "normal", "wet", "cool", "temperate", "warm", "billion3", "billion4", "billion5", "aridLarge", "normalLarge", "wetLarge", "coolLarge", "temperateLarge", "warmLarge", "billion3Large", "billion4Large", "billion5Large", "tinySize", "smallSize", "standardSize", "largeSize", "hugeSize", "randomSize", "confirm", "cancel", "seedInput")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tyjud")
+background = NodePath("Background")
+pangaeaLabel = NodePath("Background/PangaeaLabel")
+continentsLabel = NodePath("Background/ContinentsLabel")
+archipelagoLabel = NodePath("Background/ArchipelagoLabel")
+pangaea60 = NodePath("Background/Pangaea60")
+pangaea70 = NodePath("Background/Pangaea70")
+pangaea80 = NodePath("Background/Pangaea80")
+continents60 = NodePath("Background/Continents60")
+continents70 = NodePath("Background/Continents70")
+continents80 = NodePath("Background/Continents80")
+archipelago60 = NodePath("Background/Archipelago60")
+archipelago70 = NodePath("Background/Archipelago70")
+archipelago80 = NodePath("Background/Archipelago80")
+pangaea60Large = NodePath("Background/Pangaea60Large")
+pangaea70Large = NodePath("Background/Pangaea70Large")
+pangaea80Large = NodePath("Background/Pangaea80Large")
+continents60Large = NodePath("Background/Continents60Large")
+continents70Large = NodePath("Background/Continents70Large")
+continents80Large = NodePath("Background/Continents80Large")
+archipelago60Large = NodePath("Background/Archipelago60Large")
+archipelago70Large = NodePath("Background/Archipelago70Large")
+archipelago80Large = NodePath("Background/Archipelago80Large")
+arid = NodePath("Background/Arid")
+normal = NodePath("Background/Normal")
+wet = NodePath("Background/Wet")
+cool = NodePath("Background/Cool")
+temperate = NodePath("Background/Temperate")
+warm = NodePath("Background/Warm")
+billion3 = NodePath("Background/Billion3")
+billion4 = NodePath("Background/Billion4")
+billion5 = NodePath("Background/Billion5")
+aridLarge = NodePath("Background/AridLarge")
+normalLarge = NodePath("Background/NormalLarge")
+wetLarge = NodePath("Background/WetLarge")
+coolLarge = NodePath("Background/CoolLarge")
+temperateLarge = NodePath("Background/TemperateLarge")
+warmLarge = NodePath("Background/WarmLarge")
+billion3Large = NodePath("Background/Billion3Large")
+billion4Large = NodePath("Background/Billion4Large")
+billion5Large = NodePath("Background/Billion5Large")
+tinySize = NodePath("Background/TinySize")
+smallSize = NodePath("Background/SmallSize")
+standardSize = NodePath("Background/StandardSize")
+largeSize = NodePath("Background/LargeSize")
+hugeSize = NodePath("Background/HugeSize")
+randomSize = NodePath("Background/RandomSize")
+confirm = NodePath("Background/Confirm")
+cancel = NodePath("Background/Cancel")
+seedInput = NodePath("Background/SeedInput")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("2")
+
+[node name="Label" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 118.0
+offset_top = 96.0
+offset_right = 270.0
+offset_bottom = 119.0
+theme_override_font_sizes/font_size = 16
+text = "WORLD SIZE"
+horizontal_alignment = 1
+
+[node name="TinySize" type="CheckButton" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 167.0
+offset_top = 115.0
+offset_right = 242.0
+offset_bottom = 141.0
+theme_override_colors/font_hover_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rlsqa")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rlsqa")
+button_group = SubResource("ButtonGroup_v0f8b")
+text = "Tiny"
+alignment = 2
+
+[node name="SmallSize" type="CheckButton" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 160.0
+offset_top = 137.0
+offset_right = 242.0
+offset_bottom = 163.0
+theme_override_colors/font_hover_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rlsqa")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rlsqa")
+button_group = SubResource("ButtonGroup_v0f8b")
+text = "Small"
+alignment = 2
+
+[node name="StandardSize" type="CheckButton" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 136.0
+offset_top = 159.0
+offset_right = 241.0
+offset_bottom = 185.0
+theme_override_colors/font_hover_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rlsqa")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rlsqa")
+button_pressed = true
+button_group = SubResource("ButtonGroup_v0f8b")
+text = "Standard"
+alignment = 2
+
+[node name="LargeSize" type="CheckButton" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 162.0
+offset_top = 183.0
+offset_right = 241.0
+offset_bottom = 209.0
+theme_override_colors/font_hover_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rlsqa")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rlsqa")
+button_group = SubResource("ButtonGroup_v0f8b")
+text = "Large"
+alignment = 2
+
+[node name="HugeSize" type="CheckButton" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 163.0
+offset_top = 208.0
+offset_right = 240.0
+offset_bottom = 234.0
+theme_override_colors/font_hover_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rlsqa")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rlsqa")
+button_group = SubResource("ButtonGroup_v0f8b")
+text = "Huge"
+alignment = 2
+
+[node name="RandomSize" type="CheckButton" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 140.0
+offset_top = 231.0
+offset_right = 240.0
+offset_bottom = 257.0
+theme_override_colors/font_hover_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.0305083, 0.489873, 0.588479, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_rlsqa")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rlsqa")
+button_group = SubResource("ButtonGroup_v0f8b")
+text = "Random"
+alignment = 2
+
+[node name="Label2" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 114.0
+offset_top = 15.0
+offset_right = 417.0
+offset_bottom = 54.0
+theme_override_font_sizes/font_size = 28
+text = "CHOOSE YOUR WORLD"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="SeedInput" type="LineEdit" parent="Background"]
+layout_mode = 0
+offset_left = 708.0
+offset_top = 20.0
+offset_right = 824.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/focus = SubResource("StyleBoxLine_joj1k")
+theme_override_styles/normal = SubResource("StyleBoxFlat_13ceg")
+text = "-1"
+virtual_keyboard_type = 2
+
+[node name="Label3" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 608.0
+offset_top = 19.0
+offset_right = 697.0
+offset_bottom = 48.0
+theme_override_font_sizes/font_size = 16
+text = "Enter seed: "
+vertical_alignment = 1
+
+[node name="PangaeaLabel" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 344.0
+offset_right = 382.0
+offset_bottom = 364.0
+text = "Pangaea (70% water)"
+horizontal_alignment = 1
+
+[node name="ContinentsLabel" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 395.0
+offset_top = 344.0
+offset_right = 628.0
+offset_bottom = 364.0
+text = "Continents"
+horizontal_alignment = 1
+
+[node name="ArchipelagoLabel" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 638.0
+offset_top = 344.0
+offset_right = 871.0
+offset_bottom = 364.0
+text = "Archipelago"
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 650.0
+offset_right = 158.0
+offset_bottom = 670.0
+text = "Arid"
+horizontal_alignment = 1
+
+[node name="Label5" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 168.0
+offset_top = 650.0
+offset_right = 236.0
+offset_bottom = 670.0
+text = "Normal"
+horizontal_alignment = 1
+
+[node name="Label6" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 247.0
+offset_top = 650.0
+offset_right = 315.0
+offset_bottom = 670.0
+text = "Wet"
+horizontal_alignment = 1
+
+[node name="Label7" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 560.0
+offset_top = 650.0
+offset_right = 628.0
+offset_bottom = 670.0
+text = "Cool"
+horizontal_alignment = 1
+
+[node name="Label8" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 475.0
+offset_top = 650.0
+offset_right = 547.0
+offset_bottom = 670.0
+text = "Temperate"
+horizontal_alignment = 1
+
+[node name="Label9" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 395.0
+offset_top = 650.0
+offset_right = 467.0
+offset_bottom = 670.0
+text = "Warm"
+horizontal_alignment = 1
+
+[node name="Label10" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 697.0
+offset_top = 650.0
+offset_right = 769.0
+offset_bottom = 670.0
+text = "3 Billion"
+horizontal_alignment = 1
+
+[node name="Label11" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 779.0
+offset_top = 650.0
+offset_right = 851.0
+offset_bottom = 670.0
+text = "4 Billion"
+horizontal_alignment = 1
+
+[node name="Label12" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 859.0
+offset_top = 650.0
+offset_right = 931.0
+offset_bottom = 670.0
+text = "5 Billion"
+horizontal_alignment = 1
+
+[node name="Pangaea60" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 312.0
+offset_top = 290.0
+offset_right = 387.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Pangaea70" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 231.0
+offset_top = 290.0
+offset_right = 306.0
+offset_bottom = 340.0
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Pangaea80" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 290.0
+offset_right = 225.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Continents60" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 555.0
+offset_top = 290.0
+offset_right = 630.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Continents70" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 474.0
+offset_top = 290.0
+offset_right = 549.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Continents80" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 393.0
+offset_top = 290.0
+offset_right = 468.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Archipelago60" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 798.0
+offset_top = 290.0
+offset_right = 873.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Archipelago70" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 717.0
+offset_top = 290.0
+offset_right = 792.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Archipelago80" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 636.0
+offset_top = 290.0
+offset_right = 711.0
+offset_bottom = 340.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_2b8n4")
+script = ExtResource("3")
+
+[node name="Pangaea80Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Pangaea70Large" type="TextureRect" parent="Background"]
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Pangaea60Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Continents80Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Continents70Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Continents60Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Archipelago80Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Archipelago70Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Archipelago60Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 84.0
+offset_right = 661.0
+offset_bottom = 284.0
+script = ExtResource("2")
+
+[node name="Label13" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 262.0
+offset_right = 660.0
+offset_bottom = 282.0
+text = "LAND MASS AND WATER COVERAGE"
+horizontal_alignment = 1
+
+[node name="Arid" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 596.0
+offset_right = 159.0
+offset_bottom = 646.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_3")
+script = ExtResource("3")
+
+[node name="Normal" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 165.0
+offset_top = 596.0
+offset_right = 240.0
+offset_bottom = 646.0
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_3")
+script = ExtResource("3")
+
+[node name="Wet" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 247.0
+offset_top = 596.0
+offset_right = 322.0
+offset_bottom = 646.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_3")
+script = ExtResource("3")
+
+[node name="Warm" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 391.0
+offset_top = 596.0
+offset_right = 466.0
+offset_bottom = 646.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_4")
+script = ExtResource("3")
+
+[node name="Temperate" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 472.0
+offset_top = 596.0
+offset_right = 547.0
+offset_bottom = 646.0
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_4")
+script = ExtResource("3")
+
+[node name="Cool" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 553.0
+offset_top = 596.0
+offset_right = 628.0
+offset_bottom = 646.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_4")
+script = ExtResource("3")
+
+[node name="Billion3" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 697.0
+offset_top = 596.0
+offset_right = 772.0
+offset_bottom = 646.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_5")
+script = ExtResource("3")
+
+[node name="Billion4" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 778.0
+offset_top = 596.0
+offset_right = 853.0
+offset_bottom = 646.0
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_5")
+script = ExtResource("3")
+
+[node name="Billion5" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 859.0
+offset_top = 596.0
+offset_right = 934.0
+offset_bottom = 646.0
+toggle_mode = true
+button_group = SubResource("ButtonGroup_5")
+script = ExtResource("3")
+
+[node name="AridLarge" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 55.0
+offset_top = 389.0
+offset_right = 355.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="NormalLarge" type="TextureRect" parent="Background"]
+layout_mode = 0
+offset_left = 55.0
+offset_top = 389.0
+offset_right = 355.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="WetLarge" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 55.0
+offset_top = 389.0
+offset_right = 355.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="WarmLarge" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 389.0
+offset_right = 661.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="TemperateLarge" type="TextureRect" parent="Background"]
+layout_mode = 0
+offset_left = 361.0
+offset_top = 389.0
+offset_right = 661.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="CoolLarge" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 361.0
+offset_top = 389.0
+offset_right = 661.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="Billion3Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 667.0
+offset_top = 389.0
+offset_right = 967.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="Billion4Large" type="TextureRect" parent="Background"]
+layout_mode = 0
+offset_left = 667.0
+offset_top = 389.0
+offset_right = 967.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="Billion5Large" type="TextureRect" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 667.0
+offset_top = 389.0
+offset_right = 967.0
+offset_bottom = 589.0
+script = ExtResource("2")
+
+[node name="Label14" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 569.0
+offset_right = 354.0
+offset_bottom = 589.0
+text = "CLIMATE"
+horizontal_alignment = 1
+
+[node name="Label15" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 569.0
+offset_right = 658.0
+offset_bottom = 589.0
+text = "TEMPERATURE"
+horizontal_alignment = 1
+
+[node name="Label16" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 667.0
+offset_top = 569.0
+offset_right = 965.0
+offset_bottom = 589.0
+text = "AGE"
+horizontal_alignment = 1
+
+[node name="Confirm" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 960.0
+offset_top = 728.0
+offset_right = 979.0
+offset_bottom = 747.0
+shortcut = SubResource("Shortcut_33b04")
+script = ExtResource("3")
+
+[node name="Cancel" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 988.0
+offset_top = 729.0
+offset_right = 1007.0
+offset_bottom = 748.0
+shortcut = SubResource("Shortcut_7oyjg")
+script = ExtResource("3")

@@ -1,33 +1,59 @@
 [color=black][center]
-[b]C7 0.2 "Carthage"[/b]
-[url]c7-game.github.io[/url]
+[b]OpenCiv3 0.3 "Dutch" Preview 1[/b]
+© OpenCiv3 contributors
+[url]www.openciv3.org[/url]
 
 [b]An open source project
 by the 4X gaming community
 made with Godot Engine[/b]
 
+[b]Core Team[/b]
+
+WildWeazel
+Quintillus
+JimOfLeisure
+maxpetul
+pcen
+Tom Werner
+Yegor Budylin
 
 [b]Developers[/b]
 
 Armageddon1
+benskywalker
 Caro-Kann
+craven
+David1Socha
 Flintlock / maxpetul
 JimOfLeisure
 Kright
+KulkoBSW
 Lanzelot
+lt-brlara
 pcen
 Quintillus
+rchoffardet
 steviek
 Tom Werner
+TomKode
 WildWeazel
 Yegor Budylin
 
 [b]Artists[/b]
 
+aaglo
+embryodead
+imperator1961
 Kyriakos
- [i]Persian City Set[/i]
+Micaelus
+Orthanc
 Plotinus
- [i]Carthaginian Settler[/i]
+register
+Sandris
+ShiroKobbure
+utahjazz7
+Virote_Considon
+Vuldacon
 
 [b]Co-conspirators[/b]
 
@@ -36,12 +62,22 @@ Civinator
 Ozymandias
 Vuldacon
 
+[b]In Memoriam[/b]
+
+Balthasar
+[i]a wise old man[/i]
+
+Ozymandias
+[i]a gentleman and a scholar[/i]
+
 [b]Special Thanks[/b]
+
+SuedeCivIII for promotional media
 Thunderfall and leif erikson for the development forum at CivFanatics
 Sid Meier for creating [i]Civilization[/i]
 Soren Johnson and Firaxis for [i]Civilization III[/i]
 
-C7 is not affiliated with civfanatics.com,
+OpenCiv3 is not affiliated with civfanatics.com,
 Firaxis Games, Infogrames Interactive,
 Atari Interactive, or Take-Two Interactive Software.
 All trademarks are property of their respective owners.

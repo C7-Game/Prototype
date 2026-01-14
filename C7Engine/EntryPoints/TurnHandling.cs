@@ -1,8 +1,13 @@
 using System.Diagnostics;
 using C7Engine.AI;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Linq;
 using Serilog;
 
 namespace C7Engine {
+	using System;
+	using System.Threading.Tasks;
 	using C7GameData;
 
 	public class TurnHandling {
@@ -14,14 +19,10 @@ namespace C7Engine {
 
 			foreach (MapUnit mapUnit in gameData.mapUnits)
 				mapUnit.OnBeginTurn();
-
-			foreach (Player player in gameData.players) {
-				player.hasPlayedThisTurn = false;
-			}
 		}
 
 		// Implements the game loop. This method is called when the game is started and when the player signals that they're done moving.
-		internal static void AdvanceTurn() {
+		internal static async Task AdvanceTurn() {
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.Start();
 			GameData gameData = EngineStorage.gameData;
@@ -29,7 +30,7 @@ namespace C7Engine {
 				bool firstTurn = GetTurnNumber() == 0;
 
 				// Movement phase
-				if (PlayPlayerTurns(gameData, firstTurn)) {
+				if (await PlayPlayerTurns(gameData, firstTurn)) {
 					stopwatch.Stop();
 					log.Information("Turn time took " + stopwatch.ElapsedMilliseconds + " milliseconds");
 					return;
@@ -40,11 +41,35 @@ namespace C7Engine {
 				UnitInteractions.ClearWaitQueue();
 
 				SpawnBarbarians(gameData);
-				HandleCityResults(gameData);
-				gameData.UpdateTileOwners();
 
 				gameData.turn++;
+				foreach (Player player in gameData.players) {
+					player.MaybeSpawnBonusUnits(gameData);
+					player.RecalculateCitizenMoods(gameData, goIntoDisorderIfUnhappy: true);
+					player.DoCorruptionCalculations(gameData);
+
+					// Do the financial updates before updating the cities, so
+					// that a newly produced unit won't put a player over the
+					// unit support cap and cause them to lose gold unexpectedly.
+					player.DoPerTurnFinanceUpdates(gameData);
+					player.DoPerTurnScienceUpdates(gameData);
+
+					// Note that we do growth after calculating citizen moods,
+					// to ensure that the player has a chance to deal with the
+					// unhappiness of a new citizen during their turn.
+					log.Information($"\n*** City growth/production for turn {gameData.turn}, player {player} ***");
+					player.HandleCityUpdates(gameData);
+				}
+
+				// Now that the turn is ending, do all the bookkeeping for the
+				// start of the next turn. We don't put the "hasPlayedThisTurn"
+				// logic in OnBeginTurn because OnBeginTurn is called when a
+				// save game is loaded, and that would erase the saved information
+				// about which players have played.
 				OnBeginTurn();
+				foreach (Player player in gameData.players) {
+					player.hasPlayedThisTurn = false;
+				}
 			}
 		}
 
@@ -54,113 +79,69 @@ namespace C7Engine {
 		/// <param name="gameData"></param>
 		/// <param name="firstTurn"></param>
 		/// <returns>true when it is time for the human to take control again</returns>
-		private static bool PlayPlayerTurns(GameData gameData, bool firstTurn) {
+		private static async Task<bool> PlayPlayerTurns(GameData gameData, bool firstTurn) {
 			foreach (Player player in gameData.players) {
-				if ((!player.hasPlayedThisTurn) &&
-					!(firstTurn && player.SitsOutFirstTurn())) {
-					if (player.isBarbarians) {
-						//Call the barbarian AI
-						//TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans,
-						//strategy, etc.) For now, we only have a random AI, so that will be in a future commit
-						new BarbarianAI().PlayTurn(player, gameData);
-						player.hasPlayedThisTurn = true;
-					} else if (!player.isHuman) {
-						PlayerAI.PlayTurn(player, GameData.rng);
-						player.hasPlayedThisTurn = true;
-					} else if (player.id != EngineStorage.uiControllerID) {
-						player.hasPlayedThisTurn = true;
-					}
-					//Human player check.  Let the human see what's going on even if they are in observer mode.
-					if (player.id == EngineStorage.uiControllerID) {
-						new MsgStartTurn().send();
-						return true;
-					}
+				if (player.hasPlayedThisTurn || player.defeated) {
+					continue;
+				}
+
+				if (firstTurn && player.SitsOutFirstTurn()) {
+					continue;
+				}
+
+				if (player.isBarbarians) {
+					//Call the barbarian AI
+					//TODO: The AIs should be stored somewhere on the game state as some of them will store state (plans,
+					//strategy, etc.) For now, we only have a random AI, so that will be in a future commit
+					await new BarbarianAI().PlayTurn(player, gameData);
+					player.hasPlayedThisTurn = true;
+				} else if (!player.isHuman) {
+					await PlayerAI.PlayTurn(player, GameData.rng, gameData.techs);
+					player.hasPlayedThisTurn = true;
+				} else if (player.id != EngineStorage.uiControllerID) {
+					player.hasPlayedThisTurn = true;
+				}
+				//Human player check.  Let the human see what's going on even if they are in observer mode.
+				if (player.id == EngineStorage.uiControllerID) {
+					new MsgStartTurn().send();
+					return true;
 				}
 			}
 			return false;
 		}
+
 		private static void SpawnBarbarians(GameData gameData) {
-			//Generate new barbarian units.
 			Player barbPlayer = gameData.players.Find(player => player.isBarbarians);
-			foreach (Tile tile in gameData.map.barbarianCamps) {
-				//7% chance of a new barbarian.  Probably should scale based on barbarian activity.
-				int result = GameData.rng.Next(100);
-				log.Verbose("Random barb result = " + result);
-				if (result < 4) {
-					MapUnit newUnit = new MapUnit(gameData.ids.CreateID("barbarian"));
-					newUnit.location = tile;
-					newUnit.owner = gameData.players[0];
-					newUnit.unitType = gameData.barbarianInfo.basicBarbarian;
-					newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-					newUnit.experienceLevel = gameData.defaultExperienceLevel;
-					newUnit.hitPointsRemaining = 3;
-					newUnit.isFortified = true; //todo: hack for unit selection
 
-					tile.unitsOnTile.Add(newUnit);
-					gameData.mapUnits.Add(newUnit);
-					barbPlayer.units.Add(newUnit);
-					log.Debug("New barbarian added at " + tile);
-				} else if (tile.NeighborsWater() && result < 6) {
-					MapUnit newUnit = new MapUnit(gameData.ids.CreateID(gameData.barbarianInfo.barbarianSeaUnit.name));
-					newUnit.location = tile;
-					newUnit.owner = gameData.players[0]; //todo: make this reliably point to the barbs
-					newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnit;
-					newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-					newUnit.experienceLevel = gameData.defaultExperienceLevel;
-					newUnit.hitPointsRemaining = 3;
-					newUnit.isFortified = true; //todo: hack for unit selection
+			// A random 5% of camps will spawn a unit each turn. Shuffle the
+			// camps to make this random.
+			int barbariansToSpawn = (int)Math.Ceiling(GameData.rng.Next(gameData.map.barbarianCamps.Count) / 20.0);
+			List<int> tileIndicies = Enumerable.Range(0, gameData.map.barbarianCamps.Count).ToList();
+			GameData.rng.Shuffle<int>(CollectionsMarshal.AsSpan(tileIndicies));
 
-					tile.unitsOnTile.Add(newUnit);
-					gameData.mapUnits.Add(newUnit);
-					barbPlayer.units.Add(newUnit);
+			for (int i = 0; i < barbariansToSpawn; ++i) {
+				Tile tile = gameData.map.barbarianCamps[tileIndicies[i]];
+				MapUnit newUnit = new(gameData.ids.CreateID("barbarian"));
+				newUnit.location = tile;
+				newUnit.owner = barbPlayer;
+				// TODO: make this a conscript.
+				newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
+				newUnit.experienceLevel = gameData.defaultExperienceLevel;
+				newUnit.hitPointsRemaining = 3;
+				tile.unitsOnTile.Add(newUnit);
+				gameData.mapUnits.Add(newUnit);
+				barbPlayer.units.Add(newUnit);
+
+				// Give costal camps a chance to spawn a boat.
+				if (tile.NeighborsWater() && GameData.rng.Next(100) < 20) {
+					newUnit.unitType = gameData.barbarianInfo.barbarianSeaUnitProto;
 					log.Debug("New barbarian galley added at " + tile);
-				}
-			}
-		}
-		private static void HandleCityResults(GameData gameData) {
-
-			log.Information("\n*** City production for turn " + gameData.turn + " ***");
-
-			foreach (City city in gameData.cities) {
-				int initialSize = city.size;
-				city.ComputeCityGrowth();
-				int newSize = city.size;
-				if (newSize > initialSize) {
-					CityResident newResident = new CityResident();
-					newResident.nationality = city.owner.civilization;
-					CityTileAssignmentAI.AssignNewCitizenToTile(city, newResident);
-				} else if (newSize < initialSize) {
-					int diff = initialSize - newSize;
-					if (newSize <= 0) {
-						log.Error($"Attempting to remove the last resident from {city}");
-					} else {
-						city.RemoveCitizens(diff);
-					}
+					continue;
 				}
 
-				IProducible producedItem = city.ComputeTurnProduction();
-				if (producedItem != null) {
-					log.Information($"Produced {producedItem} in {city}");
-					if (producedItem is UnitPrototype prototype) {
-						MapUnit newUnit = prototype.GetInstance(gameData);
-						newUnit.owner = city.owner;
-						newUnit.location = city.location;
-						newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
-						newUnit.experienceLevel = gameData.defaultExperienceLevel;
-						newUnit.facingDirection = TileDirection.SOUTHWEST;
-
-						city.location.unitsOnTile.Add(newUnit);
-						gameData.mapUnits.Add(newUnit);
-						city.owner.AddUnit(newUnit);
-
-						if (newUnit.unitType.populationCost > 0) {
-							city.RemoveCitizens(newUnit.unitType.populationCost);
-						}
-					}
-					city.SetItemBeingProduced(CityProductionAI.GetNextItemToBeProduced(city, producedItem));
-				}
-
-				city.owner.gold += city.CurrentCommerceYield();
+				// Otherwise its a 3:1 ratio of advanced to basic barbarians.
+				newUnit.unitType = GameData.rng.Next(100) < 25 ? gameData.barbarianInfo.advancedBarbarian : gameData.barbarianInfo.basicBarbarian;
+				log.Debug("New barbarian added at " + tile);
 			}
 		}
 

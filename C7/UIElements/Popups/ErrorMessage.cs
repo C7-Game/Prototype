@@ -30,6 +30,6 @@ public partial class ErrorMessage : Popup {
 	}
 
 	private void quit() {
-		GetTree().ChangeSceneToFile("res://MainMenu.tscn");
+		GetTree().ChangeSceneToFile("res://UIElements/MainMenu/main_menu.tscn");
 	}
 }

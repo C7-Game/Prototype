@@ -1,7 +1,10 @@
 using Godot;
 using System.Collections.Generic;
+using C7Engine;
 using C7GameData;
 using Serilog;
+using System.Linq;
+using System.Globalization;
 
 /*
  UnitButtons contains the buttons at the bottom of the game UI when viewing the
@@ -14,7 +17,11 @@ public partial class UnitButtons : VBoxContainer {
 
 	private ILogger log = LogManager.ForContext<UnitButtons>();
 
-	private Dictionary<string, UnitControlButton> buttonMap = new Dictionary<string, UnitControlButton>();
+	// A record holding a button and the base tooltip (without any indication
+	// of how many turns an action might take).
+	public record ButtonAndTooltip(TextureButton button, string baseTooltip);
+
+	private Dictionary<string, ButtonAndTooltip> buttonMap = new();
 
 	[Export]
 	HBoxContainer primaryControls;
@@ -25,60 +32,82 @@ public partial class UnitButtons : VBoxContainer {
 	[Export]
 	HBoxContainer advancedControls;
 
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready() {
-		// You can hide buttons like this.  This will come in handy later!
-		// Remember to re-calc the margin after hiding/unhiding buttons, as that may affect the width.
-		// this.GetNode<FortifyButton>("PrimaryUnitControls/FortifyButton").Hide();
+	private static readonly string[] terraformOrder = [
+		C7Action.UnitBuildRoad,
+		C7Action.UnitBuildRailroad,
+		C7Action.UnitBuildMine,
+		C7Action.UnitIrrigate,
+		C7Action.UnitClearForest,
+		C7Action.UnitClearWetlands,
+		C7Action.UnitBuildFortress,
+		C7Action.UnitBuildBarricade,
+		C7Action.UnitPlantForest,
+		C7Action.UnitClearDamage,
+	];
 
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitHold, 0, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitWait, 1, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitFortify, 2, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitDisband, 3, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitGoto, 4, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitExplore, 5, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitSentry, 6, 0, onButtonPressed));
-		AddNewButton(primaryControls, new UnitControlButton(C7Action.UnitSentryEnemyOnly, 2, 5, onButtonPressed));
+	private void SetUpControlButtons() {
+		AddNewButton(primaryControls, C7Action.UnitHold);
+		AddNewButton(primaryControls, C7Action.UnitWait);
+		AddNewButton(primaryControls, C7Action.UnitFortify);
+		AddNewButton(primaryControls, C7Action.UnitDisband);
+		AddNewButton(primaryControls, C7Action.UnitGoto);
+		AddNewButton(primaryControls, C7Action.UnitExplore);
+		// AddNewButton(primaryControls, C7Action.UnitSentry);
+		// AddNewButton(primaryControls, C7Action.UnitSentryEnemyOnly);
 
 		//   ******* SPECIALIZED CONTROLS *************
-		AddNewButton(specializedControls, new UnitControlButton("load", 7, 0, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("unload", 0, 1, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("pillage", 2, 1, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("bombard", 3, 1, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("autobombard", 3, 5, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("paradrop", 4, 1, onButtonPressed));
+		// AddNewButton(specializedControls, "load");
+		// AddNewButton(specializedControls, "unload");
+		// AddNewButton(specializedControls, "pillage");
+		// AddNewButton(specializedControls, "bombard");
+		// AddNewButton(specializedControls, "autobombard");
+		// AddNewButton(specializedControls, "paradrop");
 		//superfortify?
-		AddNewButton(specializedControls, new UnitControlButton("hurryBuilding", 6, 1, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("upgrade", 7, 1, onButtonPressed));
+		// AddNewButton(specializedControls, "hurryBuilding");
+		// AddNewButton(specializedControls, "upgrade");
+		// AddNewButton(specializedControls, "sacrifice");
+		// AddNewButton(specializedControls, "scienceAge");
+		AddNewButton(specializedControls, C7Action.UnitBuildCity);
 
-		//TODO: The first two buttons in row index 2, and validate science age/colony are correct
-		AddNewButton(specializedControls, new UnitControlButton("sacrifice", 3, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("scienceAge", 3, 2, onButtonPressed));  //validate
-		AddNewButton(specializedControls, new UnitControlButton("buildColony", 4, 2, onButtonPressed)); //validate
-		AddNewButton(specializedControls, new UnitControlButton(C7Action.UnitBuildCity, 5, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton(C7Action.UnitBuildRoad, 6, 2, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("buildRailroad", 7, 2, onButtonPressed));
+		SetUpTerraformButtons();
 
-		AddNewButton(specializedControls, new UnitControlButton("fortress", 0, 3, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("barricade", 4, 4, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton(C7Action.UnitBuildMine, 1, 3, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton(C7Action.UnitIrrigate, 2, 3, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("chopForest", 3, 3, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("chopJungle", 4, 3, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("plantForest", 5, 3, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("clearDamage", 6, 3, onButtonPressed));
-		AddNewButton(specializedControls, new UnitControlButton("automate", 7, 3, onButtonPressed));
+		AddNewButton(specializedControls, C7Action.UnitAutomate);
 
 		// Row index 4 and later not yet added
 	}
 
-	private void AddNewButton(HBoxContainer row, UnitControlButton button) {
-		row.AddChild(button);
-		buttonMap[button.action] = button;
+	private void SetUpTerraformButtons() {
+		var terraformOrderMap = terraformOrder
+			.Select((action, index) => new { action, index })
+			.ToDictionary(x => x.action, x => x.index);
+
+		var sortedTerraforms = EngineStorage.gameData.Terraforms
+			.OrderBy(tf => terraformOrderMap.TryGetValue(tf.UIAction, out var idx) ? idx : int.MaxValue);
+
+		foreach (Terraform tf in sortedTerraforms) {
+			AddNewButton(specializedControls, tf.UIAction);
+		}
 	}
 
-	private void onButtonPressed(string action) {
-		EmitSignal(SignalName.ActionRequested, action);
+	private void AddNewButton(HBoxContainer row, string action) {
+		TextureButton button = new();
+		TextureLoader.SetButtonTextures(button, "ui.unit_control." + action);
+		button.Pressed += () => { EmitSignal(SignalName.ActionRequested, action); };
+
+		// Add a tooltip to the button to explain what it does, and ensure that
+		// the tooltip is readable.
+		string? tooltipText = C7Action.ToTooltip(action);
+		if (tooltipText != null) {
+			button.TooltipText = tooltipText;
+
+			var customTheme = new Theme();
+			customTheme.SetStylebox("panel", "TooltipPanel", TemporaryPopup.PopupStyleBox());
+			customTheme.SetColor("font_color", "TooltipLabel", Colors.White);
+			button.Theme = customTheme;
+		}
+
+		row.AddChild(button);
+		buttonMap[action] = new ButtonAndTooltip(button, button.TooltipText);
 	}
 
 	private void OnNoMoreAutoselectableUnits() {
@@ -86,20 +115,44 @@ public partial class UnitButtons : VBoxContainer {
 	}
 
 	private void OnNewUnitSelected(ParameterWrapper<MapUnit> wrappedMapUnit) {
-		MapUnit unit = wrappedMapUnit.Value;
-		foreach (UnitControlButton button in buttonMap.Values) {
-			button.Visible = false;
+		UpdateButtons(wrappedMapUnit.Value);
+	}
+
+	private void OnUnitMoved(ParameterWrapper<MapUnit> wrappedMapUnit) {
+		UpdateButtons(wrappedMapUnit.Value);
+	}
+
+	private void UpdateButtons(MapUnit unit) {
+		if (!unit.CanBeActive()) return;
+		// Reset the visibility and tooltip whenever the unit changes.
+		foreach (ButtonAndTooltip btt in buttonMap.Values) {
+			btt.button.Visible = false;
+			btt.button.TooltipText = btt.baseTooltip;
 		}
+
+		var unitActions = unit.GetAvailableActions().Select(C7Action.ToActionString);
 
 		// Mark all the buttons corresponding to the unit's available actions
 		// as visible. We do this rather than using the unit prototype's actions
 		// so that we don't display buttons that do nothing - we don't want to
 		// show the "road" button if we can't build a road, etc.
-		foreach (string action in unit.availableActions) {
-			if (buttonMap.ContainsKey(action)) {
-				buttonMap[action].Visible = true;
+		foreach (string actionKey in unitActions) {
+			if (buttonMap.TryGetValue(actionKey, out ButtonAndTooltip value)) {
+				value.button.Visible = true;
 			} else {
-				log.Warning("Could not find button " + action);
+				log.Warning("Could not find button " + actionKey);
+			}
+		}
+
+		// Do the same thing for each available terraform, but update the button
+		// tooltip to include how many turns it will take.
+		foreach (Terraform terraform in unit.GetAvailableTerraforms()) {
+			string actionKey = terraform.UIAction;
+			if (buttonMap.TryGetValue(actionKey, out ButtonAndTooltip value)) {
+				value.button.Visible = true;
+				value.button.TooltipText = $"{value.baseTooltip} ({unit.TurnsToCompleteTerraform(terraform)} turns)";
+			} else {
+				log.Warning("Could not find button " + actionKey);
 			}
 		}
 

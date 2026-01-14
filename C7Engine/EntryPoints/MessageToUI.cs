@@ -1,46 +1,71 @@
 namespace C7Engine {
-	using System.Threading;
 	using C7GameData;
+	using System;
 
-	public class MessageToUI {
+	public interface IMessageToUI {
+		public void send();
+	}
+
+	public class MessageToUI : IMessageToUI {
 		public void send() {
 			EngineStorage.messagesToUI.Enqueue(this);
 		}
 	}
 
-	public class MsgStartUnitAnimation : MessageToUI {
+	public class AnimationMessage : IMessageToUI {
+		internal Guid animationId = Guid.NewGuid();
+
+		public void send() {
+			EngineStorage.animationMessages.Enqueue(this);
+		}
+
+		public void markCompleted() {
+			if (EngineStorage.pendingAnimations.TryGetValue(animationId, out var tcs)) {
+				EngineStorage.pendingAnimations.Remove(animationId);
+				tcs.TrySetResult(true);
+			}
+		}
+	}
+
+	public class MsgStartUnitAnimation : AnimationMessage {
 		public ID unitID;
 		public MapUnit.AnimatedAction action;
-		public AutoResetEvent completionEvent;
 		public AnimationEnding ending;
 
-		public MsgStartUnitAnimation(MapUnit unit, MapUnit.AnimatedAction action, AutoResetEvent completionEvent, AnimationEnding ending) {
+		public MsgStartUnitAnimation(MapUnit unit, MapUnit.AnimatedAction action, AnimationEnding ending) {
 			this.unitID = unit.id;
 			this.action = action;
-			this.completionEvent = completionEvent;
 			this.ending = ending;
 		}
 	}
 
-	public class MsgStartEffectAnimation : MessageToUI {
+	public class MsgStartEffectAnimation : AnimationMessage {
 		public int tileIndex;
 		public AnimatedEffect effect;
-		public AutoResetEvent completionEvent;
 		public AnimationEnding ending;
 
-		public MsgStartEffectAnimation(Tile tile, AnimatedEffect effect, AutoResetEvent completionEvent, AnimationEnding ending) {
-			this.tileIndex = EngineStorage.gameData.map.tileCoordsToIndex(tile.xCoordinate, tile.yCoordinate);
+		public MsgStartEffectAnimation(Tile tile, AnimatedEffect effect, AnimationEnding ending) {
+			this.tileIndex = EngineStorage.gameData.map.tileCoordsToIndex(tile.XCoordinate, tile.YCoordinate);
 			this.effect = effect;
-			this.completionEvent = completionEvent;
 			this.ending = ending;
 		}
 	}
 
 	public class MsgStartTurn : MessageToUI { }
 
-	public class MsgUpdateUiAfterMove : MessageToUI { }
+	public class MsgShowScienceAdvisor : MessageToUI { }
 
-	public class MsgUpdateUiAfterTechSelection : MessageToUI { }
+	public class MsgUpdateUiAfterDomesticChange : MessageToUI { }
+
+	public class MsgWarDeclaration : MessageToUI {
+		public Player aggressor;
+		public Player opponent;
+
+		public MsgWarDeclaration(Player aggressor, Player opponent) {
+			this.aggressor = aggressor;
+			this.opponent = opponent;
+		}
+	}
 
 	public class MsgCityDestroyed : MessageToUI {
 		public City city;
@@ -50,4 +75,77 @@ namespace C7Engine {
 		}
 	}
 
+	public class MsgCivilizationDestroyed : MessageToUI {
+		public Civilization civilization;
+
+		public MsgCivilizationDestroyed(Civilization civ) {
+			this.civilization = civ;
+		}
+	}
+
+	public class MsgCityCreated : MessageToUI {
+		public City city;
+
+		public MsgCityCreated(City city) {
+			this.city = city;
+		}
+	}
+
+	public class MsgDisplayHurryProductionPopup : MessageToUI {
+		public City city;
+		public City.HurryProductionDetails details;
+
+		public MsgDisplayHurryProductionPopup(City c, City.HurryProductionDetails d) {
+			city = c;
+			details = d;
+		}
+	}
+
+	public class MsgShowCityScreen : MessageToUI {
+		public City city;
+
+		public MsgShowCityScreen(City city) {
+			this.city = city;
+		}
+	}
+
+	public class MsgShowMilitaryAdvisorPopup : MessageToUI {
+		public string message;
+		public bool happy;
+		public MsgShowMilitaryAdvisorPopup(string message, bool happy) {
+			this.message = message;
+			this.happy = happy;
+		}
+	}
+
+	public class MsgShowTemporaryPopup : MessageToUI {
+		public string message;
+		public Tile location;
+
+		public MsgShowTemporaryPopup(string message, Tile location) {
+			this.message = message;
+			this.location = location;
+		}
+	}
+
+	public class MsgShowTradeOffer : MessageToUI {
+		public Player aiPlayer;
+		public Player humanPlayer;
+		public TradeOffer aiWant;
+		public TradeOffer aiGive;
+
+		public MsgShowTradeOffer(Player aiPlayer, Player humanPlayer, TradeOffer aiWant, TradeOffer aiGive) {
+			this.aiPlayer = aiPlayer;
+			this.humanPlayer = humanPlayer;
+			this.aiWant = aiWant;
+			this.aiGive = aiGive;
+		}
+	}
+
+	public class MsgUnitMoved : MessageToUI {
+		public MapUnit Unit;
+		public MsgUnitMoved(MapUnit unit) {
+			this.Unit = unit;
+		}
+	}
 }

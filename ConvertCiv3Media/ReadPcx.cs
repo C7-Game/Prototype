@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 
-namespace ConvertCiv3Media
-{
+namespace ConvertCiv3Media {
 	public class Pcx {
 
 		public byte[,] Palette = new byte[256, 3];
@@ -11,13 +10,12 @@ namespace ConvertCiv3Media
 		public int Height = 0;
 
 		// constructors
-		public Pcx(){}
+		public Pcx() { }
 		public Pcx(string path) {
 			this.Load(path);
 		}
 
-		public byte ColorIndexAt(int x, int y)
-		{
+		public byte ColorIndexAt(int x, int y) {
 			int pixel = y * Width + x;
 			return ColorIndices[pixel];
 		}
@@ -50,7 +48,7 @@ namespace ConvertCiv3Media
 			bool JunkByte = BytesPerLine > Width;
 
 			// Loop to decode run-length-encoded image data which begins at file offset 0x80
-			for (int ImgIdx = 0, PcxIdx = 0x80, RunLen = 0, LineIdx = 0; ImgIdx < Width * Height; ) {
+			for (int ImgIdx = 0, PcxIdx = 0x80, RunLen = 0, LineIdx = 0; ImgIdx < Width * Height;) {
 				// if two most significant bits are 11
 				if ((PcxBytes[PcxIdx] & 0xc0) == 0xc0) {
 					// then it & 0x3f is the run length of the following byte

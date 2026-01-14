@@ -20,13 +20,12 @@ public partial class CivilizationDestroyed : Popup {
 		//The top 110 px are for the advisor.
 		AddTexture(530, 260);
 
-		ImageTexture AdvisorHappy = Util.LoadTextureFromPCX("Art/SmallHeads/popupMILITARY.pcx", 1, 40, 149, 110, false);
-		TextureRect AdvisorHead = new() {
-			Texture = AdvisorHappy
+		TextureRect advisorHead = new() {
+			Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Military, AdvisorHead.Mood.Happy, eraIndex: 0),
 		};
 		//Appears at 400, 110 in game, but leftmost 25px are transparent with default graphics
-		AdvisorHead.SetPosition(new Vector2(375, 0));
-		AddChild(AdvisorHead);
+		advisorHead.SetPosition(new Vector2(375, 0));
+		AddChild(advisorHead);
 
 		AddBackground(530, 150, 110);
 		AddHeader("Military Advisor", 120);

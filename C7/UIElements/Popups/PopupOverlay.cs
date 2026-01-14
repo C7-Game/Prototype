@@ -1,15 +1,17 @@
 using Godot;
+using C7GameData;
 using Serilog;
 
 [GlobalClass]
+[Tool]
 public partial class PopupOverlay : HBoxContainer {
 
 	private ILogger log = LogManager.ForContext<PopupOverlay>();
 
-	[Signal] public delegate void UnitDisbandedEventHandler();
 	[Signal] public delegate void QuitEventHandler();
 	[Signal] public delegate void RetireEventHandler();
 	[Signal] public delegate void BuildCityEventHandler(string name);
+	[Signal] public delegate void DiplomacySelectionEventHandler(ParameterWrapper<ID> opponentPlayer);
 	[Signal] public delegate void HidePopupEventHandler();
 
 	Control currentChild = null;
@@ -79,7 +81,7 @@ public partial class PopupOverlay : HBoxContainer {
 		if (soundFile == "") {
 			log.Error("Invalid popup category");
 		}
-		AudioStreamWav wav = Util.LoadWAVFromDisk(Util.Civ3MediaPath(soundFile));
+		AudioStreamWav wav = Util.LoadCiv3WAVFromDisk(soundFile);
 
 		// 1. prevent mouse interaction with non-UI elements (ie. the map)
 		MouseFilter = MouseFilterEnum.Stop;
@@ -91,7 +93,9 @@ public partial class PopupOverlay : HBoxContainer {
 		setMouseFilter(control, MouseFilterEnum.Ignore);
 
 		Show();
-		PlaySound(wav);
+		if (wav != null) {
+			PlaySound(wav);
+		}
 	}
 
 	/**

@@ -1,0 +1,369 @@
+[gd_scene load_steps=7 format=3 uid="uid://da7hbbufyfllg"]
+
+[ext_resource type="Script" uid="uid://ch2d6f1o1sxh2" path="res://UIElements/Advisors/DomesticAdvisor.cs" id="1"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2"]
+[ext_resource type="Script" uid="uid://dcrdcjop64t6t" path="res://UIElements/Civ3TextureButton.cs" id="3"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0b8py"]
+font_size = 13
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_61gj0"]
+line_spacing = 0.0
+font_size = 11
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5hkgh"]
+
+[node name="DomesticAdvisor" type="CenterContainer" node_paths=PackedStringArray("background", "close", "changeGovernment", "governmentLabel", "scienceStatus", "treasury", "incomeDetails", "expenseDetails", "incomeSummary", "expenseSummary", "sumSummary", "growth", "cityListContainer", "eatenFood", "fullFood", "wastedShield", "goodShield", "wastedGold", "goodGold", "happyFace", "contentFace", "beaker", "treasuryIcon")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+background = NodePath("Background")
+close = NodePath("Background/Close")
+changeGovernment = NodePath("Background/ChangeGovernment")
+governmentLabel = NodePath("Background/ChangeGovernment/GovernmentLabel")
+scienceStatus = NodePath("Background/ScienceStatus")
+treasury = NodePath("Background/Treasury")
+incomeDetails = NodePath("Background/IncomeDetails")
+expenseDetails = NodePath("Background/ExpenseDetails")
+incomeSummary = NodePath("Background/IncomeSummary")
+expenseSummary = NodePath("Background/ExpenseSummary")
+sumSummary = NodePath("Background/SumSummary")
+growth = NodePath("Background/Growth")
+cityListContainer = NodePath("Background/ScrollContainer/VBoxContainer")
+eatenFood = NodePath("Background/EatenFood")
+fullFood = NodePath("Background/FullFood")
+wastedShield = NodePath("Background/WastedShield")
+goodShield = NodePath("Background/GoodShield")
+wastedGold = NodePath("Background/WastedGold")
+goodGold = NodePath("Background/GoodGold")
+happyFace = NodePath("Background/HappyFace")
+contentFace = NodePath("Background/ContentFace")
+beaker = NodePath("Background/Beaker")
+treasuryIcon = NodePath("Background/TreasuryIcon")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("2")
+
+[node name="Close" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 952.0
+offset_top = 720.0
+offset_right = 1024.0
+offset_bottom = 768.0
+script = ExtResource("3")
+
+[node name="ChangeGovernment" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 650.0
+offset_top = 186.0
+offset_right = 795.0
+offset_bottom = 210.0
+script = ExtResource("3")
+
+[node name="GovernmentLabel" type="Label" parent="Background/ChangeGovernment"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 2.0
+offset_right = 139.0
+offset_bottom = 22.0
+text = "Despotism"
+
+[node name="Label" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 559.0
+offset_top = 189.0
+offset_right = 642.0
+offset_bottom = 209.0
+text = "Government"
+label_settings = SubResource("LabelSettings_0b8py")
+
+[node name="ScienceStatus" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 565.0
+offset_top = 165.0
+offset_right = 711.0
+offset_bottom = 185.0
+text = "Placeholder (25 turns)"
+
+[node name="Treasury" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 83.0
+offset_top = 193.0
+offset_right = 237.0
+offset_bottom = 213.0
+text = "Treasury: 12345 gold"
+
+[node name="IncomeDetails" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 84.0
+offset_top = 98.0
+offset_right = 222.0
+offset_bottom = 165.0
+text = "From cities: + 1234
+From taxmen: +0
+From other civs: +0
+From interest: +0"
+label_settings = SubResource("LabelSettings_61gj0")
+horizontal_alignment = 2
+
+[node name="ExpenseDetails" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 379.0
+offset_top = 87.0
+offset_right = 537.0
+offset_bottom = 183.0
+text = "-123: Science
+-18: Entertainment
+-100: Corruption
+-19: Maintenance
+-5: Unit costs
+-8: To other civs"
+label_settings = SubResource("LabelSettings_61gj0")
+
+[node name="IncomeSummary" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 254.0
+offset_top = 102.0
+offset_right = 294.0
+offset_bottom = 122.0
+text = "Income: 1234"
+
+[node name="ExpenseSummary" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 254.0
+offset_top = 152.0
+offset_right = 294.0
+offset_bottom = 172.0
+text = "Expenses: 4567"
+
+[node name="SumSummary" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 254.0
+offset_top = 193.0
+offset_right = 294.0
+offset_bottom = 213.0
+text = "Net loss: -18"
+
+[node name="Growth" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 390.0
+offset_top = 195.0
+offset_right = 459.0
+offset_bottom = 215.0
+text = "Shrinking!"
+
+[node name="Label2" type="Label" parent="Background"]
+layout_mode = 2
+offset_left = 122.0
+offset_top = 253.0
+offset_right = 158.0
+offset_bottom = 273.0
+text = "Cities"
+
+[node name="Label3" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 707.0
+offset_top = 253.0
+offset_right = 779.0
+offset_bottom = 273.0
+text = "Population"
+
+[node name="Label4" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 899.0
+offset_top = 252.0
+offset_right = 967.0
+offset_bottom = 272.0
+text = "Producing"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Background"]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 298.0
+offset_right = 986.0
+offset_bottom = 676.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/ScrollContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Background/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(30, 50)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(127, 0)
+layout_mode = 2
+text = "Placeholder that gets "
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Label2" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "10.20"
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "10.20"
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "10.20"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+
+[node name="Label5" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "20"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Label6" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "20"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Label7" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "20"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Label8" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "20"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="HSeparator3" type="HSeparator" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(25, 0)
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_5hkgh")
+
+[node name="PanelContainer2" type="PanelContainer" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_5hkgh")
+
+[node name="Label9" type="Label" parent="Background/ScrollContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+text = "Statue of Ze
+(200 turns)"
+vertical_alignment = 1
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="EatenFood" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 241.0
+offset_top = 247.0
+offset_right = 270.0
+offset_bottom = 276.0
+script = ExtResource("3")
+
+[node name="FullFood" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 251.0
+offset_top = 256.0
+offset_right = 280.0
+offset_bottom = 285.0
+script = ExtResource("3")
+
+[node name="WastedShield" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 294.0
+offset_top = 245.0
+offset_right = 323.0
+offset_bottom = 274.0
+script = ExtResource("3")
+
+[node name="GoodShield" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 298.0
+offset_top = 253.0
+offset_right = 327.0
+offset_bottom = 282.0
+script = ExtResource("3")
+
+[node name="WastedGold" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 333.0
+offset_top = 246.0
+offset_right = 362.0
+offset_bottom = 275.0
+script = ExtResource("3")
+
+[node name="GoodGold" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 342.0
+offset_top = 251.0
+offset_right = 371.0
+offset_bottom = 280.0
+script = ExtResource("3")
+
+[node name="ContentFace" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 458.0
+offset_top = 251.0
+offset_right = 487.0
+offset_bottom = 280.0
+script = ExtResource("3")
+
+[node name="HappyFace" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 443.0
+offset_top = 251.0
+offset_right = 472.0
+offset_bottom = 280.0
+script = ExtResource("3")
+
+[node name="Beaker" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 493.0
+offset_top = 246.0
+offset_right = 522.0
+offset_bottom = 275.0
+script = ExtResource("3")
+
+[node name="TreasuryIcon" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 537.0
+offset_top = 248.0
+offset_right = 566.0
+offset_bottom = 277.0
+script = ExtResource("3")

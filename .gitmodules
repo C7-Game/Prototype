@@ -1,0 +1,3 @@
+[submodule "C7/Assets"]
+	path = C7/Assets
+	url = git@github.com:C7-Game/Assets.git

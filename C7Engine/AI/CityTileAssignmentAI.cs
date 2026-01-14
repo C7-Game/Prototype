@@ -1,5 +1,6 @@
 using System;
 using C7GameData;
+using System.Linq;
 using Serilog;
 
 namespace C7Engine.AI {
@@ -14,17 +15,17 @@ namespace C7Engine.AI {
 
 		private static ILogger log = Log.ForContext<CityTileAssignmentAI>();
 
-		public static void AssignNewCitizenToTile(City city, CityResident newResident) {
+		// Assigns a citizen, which is alredy part of a city, to a tile, if possible.
+		public static void AssignNewCitizenToTile(GameData gameData, CityResident newResident, bool manageMoods = false) {
+			City city = newResident.city;
 			int foodYield = city.CurrentFoodYield();
 
-			int desiredFoodRate = city.size * FOOD_PER_CITIZEN + DesiredFoodSurplusPerTurn;
+			int desiredFoodRate = city.residents.Count * FOOD_PER_CITIZEN + DesiredFoodSurplusPerTurn;
 			int targetTileFoodAmount = desiredFoodRate - foodYield;
-
-			Tile cityCenter = city.location;
 
 			double maxScore = 0;
 			Tile preferredTile = Tile.NONE;
-			foreach (Tile t in cityCenter.neighbors.Values) {
+			foreach (Tile t in city.GetWorkableTiles()) {
 				if (t.personWorkingTile == null) {
 					double score = CalculateTileYieldScore(t, targetTileFoodAmount, city.owner);
 					log.Debug($"Tile {t} scored {score}");
@@ -36,17 +37,33 @@ namespace C7Engine.AI {
 			}
 
 			string yield = city.location.YieldString(city.owner);
-			log.Information($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {yield}");
+			log.Debug($"Assigning new citizen of {city.name} to tile {preferredTile} with yield {yield}");
 
-			newResident.tileWorked = preferredTile;
-			preferredTile.personWorkingTile = newResident;
+			if (preferredTile == Tile.NONE) {
+				newResident.citizenType = city.owner.GetKnownSpecialists(gameData)[0];
+			} else {
+				newResident.tileWorked = preferredTile;
+				preferredTile.personWorkingTile = newResident;
+			}
 
-			city.residents.Add(newResident);
+			// Check to see if this citizen working a tile would cause the city
+			// to be unhappy. If so, make them an entertainer.
+			City.Mood cityMood = city.RecalculateCitizenMoods(gameData);
+
+			if (cityMood == City.Mood.Unhappy && manageMoods) {
+				newResident.citizenType = city.owner.GetKnownSpecialists(gameData).MaxBy(x => x.Luxuries);
+				if (newResident.tileWorked != Tile.NONE) {
+					newResident.tileWorked = Tile.NONE;
+					preferredTile.personWorkingTile = null;
+				}
+			}
 		}
 
 		public static double CalculateTileYieldScore(Tile t, int targetFoodAmount, Player player) {
-			int score = t.foodYield(player) * foodPriorityRate + t.productionYield(player) * productionPriorityRate + t.commerceYield(player) * commercePriorityRate;
-			int penalty = (targetFoodAmount - t.foodYield(player));
+			int score = t.foodYield(player).yield * foodPriorityRate
+				+ t.productionYield(player).yield * productionPriorityRate
+				+ t.commerceYield(player).yield * commercePriorityRate;
+			int penalty = (targetFoodAmount - t.foodYield(player).yield);
 			if (penalty <= 0) {
 				return score;
 			}

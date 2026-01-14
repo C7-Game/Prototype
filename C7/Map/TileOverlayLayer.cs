@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using C7GameData;
 using Godot;
 
@@ -7,7 +8,6 @@ namespace C7.Map {
 	public partial class TileOverlayLayer : LooseLayer {
 		private readonly ImageTexture roadTexture;
 		private readonly ImageTexture railroadTexture;
-		private readonly ImageTexture mineTexture;
 		private readonly ImageTexture grassIrrigationTexture;
 		private readonly ImageTexture desertIrrigationTexture;
 		private readonly ImageTexture plainsIrrigationTexture;
@@ -15,93 +15,88 @@ namespace C7.Map {
 		private readonly Vector2 tileSize;
 
 		public TileOverlayLayer() {
-			roadTexture = Util.LoadTextureFromPCX("Art/Terrain/roads.pcx");
-			railroadTexture = Util.LoadTextureFromPCX("Art/Terrain/railroads.pcx");
+			roadTexture = TextureLoader.Load("terrain_improvements.road");
+			railroadTexture = TextureLoader.Load("terrain_improvements.railroad");
 			tileSize = roadTexture.GetSize() / 16;
 			// grid 16x16 tiles
 			// assume that roads and railroads textures have the same size
 
-			// TerrainBuildings.pcx contains multiple pieces of art in a grid, with each
-			// item being 128x64 pixesl.
-			//
-			// The basic version is:
-			//  Fortress (ancient)     | Colony (an)   | Barb camp
-			//  Fortress (medieval)    | Colony (me)   | Mine
-			//  Fortress (industrial)  | Colony (in)   | Empty
-			//  Fortress (modern)      | Colony (mo)   | Empty
-			mineTexture = Util.LoadTextureFromPCX("Art/Terrain/TerrainBuildings.pcx", 128 * 2, 64, 128, 64);
-
 			// Each irrigation.pcx has a 4x4 grid of irrigation tiles, with
 			// each tile being 128x64 pixels.
-			grassIrrigationTexture = Util.LoadTextureFromPCX("Art/Terrain/irrigation.pcx");
-			desertIrrigationTexture = Util.LoadTextureFromPCX("Art/Terrain/irrigation DESETT.pcx");
-			plainsIrrigationTexture = Util.LoadTextureFromPCX("Art/Terrain/irrigation PLAINS.pcx");
-			tundraIrrigationTexture = Util.LoadTextureFromPCX("Art/Terrain/irrigation TUNDRA.pcx");
+			grassIrrigationTexture = TextureLoader.Load("terrain_improvements.irrigation.grass");
+			desertIrrigationTexture = TextureLoader.Load("terrain_improvements.irrigation.desert");
+			plainsIrrigationTexture = TextureLoader.Load("terrain_improvements.irrigation.plains");
+			tundraIrrigationTexture = TextureLoader.Load("terrain_improvements.irrigation.tundra");
 		}
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
-			if (!HasAnyOverlays(tile)) return;
-
 			Rect2 screenTarget = new Rect2(tileCenter - tileSize / 2, tileSize);
 
-			// Irrigation shows up under roads, so draw that first.
-			if (tile.overlays.irrigation) {
-				// Figure out which index into the irrigation texture to use for
-				// this tile.
-				int irrigationIndex = 0;
-				foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
-					if (dirToTile.Value.overlays.irrigation) {
-						irrigationIndex |= getIrrigationFlag(dirToTile.Key);
-					}
+			foreach (TerrainImprovement ti in tile.overlays.GetImprovements().OrderBy(ti => ti.zIndex)) {
+				switch (ti.key) {
+					case "irrigation":
+						drawIrrigaton(looseView, tile, screenTarget);
+						break;
+					case "road":
+						drawRoad(looseView, tile, screenTarget);
+						break;
+					case "railroad":
+						drawRailRoad(looseView, tile, screenTarget);
+						break;
+					default:
+						looseView.DrawTexture(TextureLoader.Load($"terrain_improvements.{ti.key}"), screenTarget.Position);
+						break;
 				}
+			}
+		}
 
-				// Deserts, plains, and tundra (??) have specific textures for
-				// irrigation. Everything else uses the grassland texture.
-				ImageTexture texture;
-				if (tile.baseTerrainType.Key == "plains") {
-					texture = plainsIrrigationTexture;
-				} else if (tile.baseTerrainType.Key == "desert") {
-					texture = desertIrrigationTexture;
-				} else if (tile.baseTerrainType.Key == "tundra") {
-					texture = tundraIrrigationTexture;
-				} else {
-					texture = grassIrrigationTexture;
+		private void drawIrrigaton(LooseView looseView, Tile tile, Rect2 screenTarget) {
+			// Figure out which index into the irrigation texture to use for
+			// this tile.
+			int irrigationIndex = 0;
+			foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
+				if (hasIrrigation(dirToTile.Value)) {
+					irrigationIndex |= getIrrigationFlag(dirToTile.Key);
 				}
-
-				// Draw the subtexture of the irrigation texture for this tile.
-				looseView.DrawTextureRectRegion(texture, screenTarget, getIrrigationRect(irrigationIndex));
 			}
 
-			if (hasRoad(tile) && !hasRailRoad(tile)) {
-				int roadIndex = 0;
-				foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
-					if (hasRoad(dirToTile.Value)) {
-						roadIndex |= getRoadFlag(dirToTile.Key);
-					}
+			// Deserts, plains, and tundra (??) have specific textures for
+			// irrigation. Everything else uses the grassland texture.
+			ImageTexture texture = tile.baseTerrainType.Key switch {
+				"plains" => plainsIrrigationTexture,
+				"desert" => desertIrrigationTexture,
+				"tundra" => tundraIrrigationTexture,
+				_ => grassIrrigationTexture
+			};
+
+			// Draw the subtexture of the irrigation texture for this tile.
+			looseView.DrawTextureRectRegion(texture, screenTarget, getIrrigationRect(irrigationIndex));
+		}
+
+		private void drawRoad(LooseView looseView, Tile tile, Rect2 screenTarget) {
+			int roadIndex = 0;
+			foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
+				if (hasRoad(dirToTile.Value) || dirToTile.Value.HasCity || hasRailRoad((dirToTile.Value))) {
+					roadIndex |= getRoadFlag(dirToTile.Key);
 				}
+			}
+			looseView.DrawTextureRectRegion(roadTexture, screenTarget, getRoadRect(roadIndex));
+		}
+
+		private void drawRailRoad(LooseView looseView, Tile tile, Rect2 screenTarget) {
+			int roadIndex = 0;
+			int railroadIndex = 0;
+			foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
+				if (hasRailRoad(dirToTile.Value) || dirToTile.Value.HasCity) {
+					railroadIndex |= getRoadFlag(dirToTile.Key);
+				} else if (hasRoad(dirToTile.Value)) {
+					roadIndex |= getRoadFlag(dirToTile.Key);
+				}
+			}
+			if (roadIndex != 0) {
 				looseView.DrawTextureRectRegion(roadTexture, screenTarget, getRoadRect(roadIndex));
 			}
-
-			if (hasRailRoad(tile)) {
-				int roadIndex = 0;
-				int railroadIndex = 0;
-				foreach (KeyValuePair<TileDirection, Tile> dirToTile in tile.neighbors) {
-					if (hasRailRoad(dirToTile.Value)) {
-						railroadIndex |= getRoadFlag(dirToTile.Key);
-					} else if (hasRoad(dirToTile.Value)) {
-						roadIndex |= getRoadFlag(dirToTile.Key);
-					}
-				}
-				if (roadIndex != 0) {
-					looseView.DrawTextureRectRegion(roadTexture, screenTarget, getRoadRect(roadIndex));
-				}
-				looseView.DrawTextureRectRegion(railroadTexture, screenTarget, getRoadRect(railroadIndex));
-			}
-
-			// Mines go over roads, so draw those last.
-			if (tile.overlays.mine) {
-				looseView.DrawTexture(mineTexture, screenTarget.Position);
-			}
+			looseView.DrawTextureRectRegion(railroadTexture, screenTarget, getRoadRect(railroadIndex));
 		}
 
 		// Returns the rectangle within the road texture for a given index,
@@ -160,19 +155,16 @@ namespace C7.Map {
 			};
 		}
 
-		private static bool HasAnyOverlays(Tile tile) {
-			return tile.overlays.road ||
-				tile.overlays.railroad ||
-				tile.overlays.mine ||
-				tile.overlays.irrigation;
-		}
-
 		private static bool hasRoad(Tile tile) {
-			return tile.overlays.road;
+			return tile.overlays.ImprovementAtLayer(TerrainImprovement.Layer.Roads)?.key == "road";
 		}
 
 		private static bool hasRailRoad(Tile tile) {
-			return tile.overlays.railroad;
+			return tile.overlays.ImprovementAtLayer(TerrainImprovement.Layer.Roads)?.key == "railroad";
+		}
+
+		private static bool hasIrrigation(Tile tile) {
+			return tile.overlays.ImprovementAtLayer(TerrainImprovement.Layer.ResourceDevelopment)?.key == "irrigation";
 		}
 	}
 }

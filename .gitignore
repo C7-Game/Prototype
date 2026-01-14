@@ -15,7 +15,7 @@ C7/Exports
 Exports/
 
 # Test runtime files
-C7GameDataTests/data/
+EngineTests/data/
 
 # Mono-specific ignores
 .mono/
@@ -23,7 +23,6 @@ data_*/
 
 # Below here are ignores imported from Puppeteer's project
 sav/
-*.png
 *.pcx
 *.flc
 *.mp4
@@ -47,6 +46,11 @@ project.lock.json
 C7.ini
 log.txt
 *.csproj.old
+*.csproj.old.*
+C7/.idea/.*
+
+# The file we use to allow generating new maps
+C7/Text/c7-autosave-turn-0.json
 
 # Build results
 [Dd]ebug/

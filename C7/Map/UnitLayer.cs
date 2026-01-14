@@ -1,46 +1,19 @@
 using System;
 using System.Collections.Generic;
 using C7GameData;
-using C7Engine;
-using ConvertCiv3Media;
 using Godot;
 
 public partial class UnitLayer : LooseLayer {
-	private ImageTexture unitIcons;
-	private int unitIconsWidth;
 	private ImageTexture unitMovementIndicators;
 
 	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
 	// any particular order so we must use the ZIndex property to ensure they're properly layered.
-	public const int effectAnimZIndex = 150;
-	public const int unitAnimZIndex = 100;
-	public const int cursorZIndex = 50;
+	public const int effectAnimZIndex = 1;
+	public const int unitAnimZIndex = 1;
+	public const int cursorZIndex = -1;
 
 	public UnitLayer() {
-		var iconPCX = new Pcx(Util.Civ3MediaPath("Art/Units/units_32.pcx"));
-		unitIcons = PCXToGodot.getImageTextureFromPCX(iconPCX);
-		unitIconsWidth = (unitIcons.GetWidth() - 1) / 33;
-
-		var moveIndPCX = new Pcx(Util.Civ3MediaPath("Art/interface/MovementLED.pcx"));
-		unitMovementIndicators = PCXToGodot.getImageTextureFromPCX(moveIndPCX);
-	}
-
-	// Creates a plane mesh facing the positive Z-axis with the given shader attached. The quad is 1.0 units long on both sides,
-	// intended to be scaled to the appropriate size when used.
-	public static (ShaderMaterial, MeshInstance2D) createShadedQuad(Shader shader) {
-		PlaneMesh mesh = new PlaneMesh();
-		mesh.SubdivideDepth = 1;
-		mesh.Orientation = PlaneMesh.OrientationEnum.Z;
-		mesh.Size = new Vector2(1, 1);
-
-		ShaderMaterial shaderMat = new ShaderMaterial();
-		shaderMat.Shader = shader;
-
-		MeshInstance2D meshInst = new MeshInstance2D();
-		meshInst.Material = shaderMat;
-		meshInst.Mesh = mesh;
-
-		return (shaderMat, meshInst);
+		unitMovementIndicators = TextureLoader.Load("ui.unit_control.movement_indicators");
 	}
 
 	public Color getHPColor(float fractionRemaining) {
@@ -107,7 +80,7 @@ public partial class UnitLayer : LooseLayer {
 		}
 
 		public AnimationInstance(LooseView looseView) {
-			AnimationManager manager = looseView.mapView.game.civ3AnimData;
+			AnimationManager manager = looseView.mapView.game.animationController.civ3AnimData;
 
 			this.sprite = new AnimatedSprite2D();
 			this.sprite.ZIndex = unitAnimZIndex;
@@ -141,21 +114,50 @@ public partial class UnitLayer : LooseLayer {
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
 		AnimationInstance inst = getBlankAnimationInstance(looseView);
-		looseView.mapView.game.civ3AnimData.forUnit(unit.unitType, appearance.action).loadSpriteAnimation();
+		C7Animation unitAnimation = looseView.mapView.game.animationController.civ3AnimData.forUnit(unit.unitType, appearance.action);
+		unitAnimation.loadSpriteAnimation();
+
 		string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
 
-		// Need to move the sprites upward a bit so that their feet are at the center of the tile. I don't know if spriteHeight/4 is the right
-		var animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
-		Vector2 position = tileCenter + animOffset - new Vector2(0, inst.FrameSize(animName).Y / 4);
-		inst.SetPosition(position);
+		Vector2 framePosition = GetFramePosition(appearance, unitAnimation, inst, animName, tileCenter);
 
-		Color civColor = Util.LoadColor(unit.owner.colorIndex);
+		inst.SetPosition(framePosition);
+
+		Color civColor = TextureLoader.LoadColor(unit.owner.colorIndex);
 		int nextFrame = inst.GetNextFrameByProgress(animName, appearance.progress);
 		inst.material.SetShaderParameter("tintColor", new Vector3(civColor.R, civColor.G, civColor.B));
 
 		inst.SetAnimation(animName);
 		inst.SetFrame(nextFrame);
 		inst.Show();
+	}
+
+	private Vector2 GetFramePosition(MapUnit.Appearance appearance, C7Animation unitAnimation, AnimationInstance inst, string animName, Vector2 tileCenter) {
+		// 1. Place unit in the center of the tile.
+		//	  This places the *center* of the sprite frame at the center point of the tile.
+		//
+		// 2. Apply animation offset.
+		//    This applies the offset of the animation when a unit moves from one tile to another, it "follows" the movement
+		//    it's pretty much a noop for the default or other animations that stay in the same tile.
+		//
+		// 3. Apply the offsets from the flic file to place them correctly in a 240x240 rect
+		//    (which starts at the center of the tile extending to the right and bottom).
+		//    The offsets we read from the flic file represent the offsets from the top left corner of the frame,
+		//    so this is why here we need to add half the width and height since the transforms
+		//    in our frames are applied at the center of the image
+		//
+		// 4. Offset the frame by half the width and height of the original size of the animation (which is usually 240x240 in pixels)
+		//    to place it correctly on the tile.
+		//
+		// 5. Finally add (or subtract if negative in .ini) any custom offset from the ini file
+
+		Vector2 animOffset = MapView.cellSize * new Vector2(appearance.offsetX, appearance.offsetY);
+		Vector2I flicOffset = unitAnimation.GetFlicAnimationOffset();
+		Vector2 flicOffsetWithAlignedFrame = new ((inst.FrameSize(animName).X / 2) + flicOffset.X,
+												  (inst.FrameSize(animName).Y / 2) + flicOffset.Y);
+		Vector2I flicOriginalSize = unitAnimation.GetFlicAnimationOriginalSize();
+
+		return tileCenter + animOffset + flicOffsetWithAlignedFrame - (flicOriginalSize / 2);
 	}
 
 	public void drawEffectAnimFrame(LooseView looseView, C7Animation anim, float progress, Vector2 tileCenter) {
@@ -174,21 +176,13 @@ public partial class UnitLayer : LooseLayer {
 		// Initialize cursor if necessary
 		if (cursorSprite == null) {
 			cursorSprite = new AnimatedSprite2D();
-			SpriteFrames frames = new SpriteFrames();
-			cursorSprite.SpriteFrames = frames;
-			AnimationManager.loadCursorAnimation("Art/Animations/Cursor/Cursor.flc", ref frames);
-			cursorSprite.Animation = "cursor"; // hardcoded in loadCursorAnimation
+			cursorSprite.SpriteFrames = TextureLoader.LoadAnimation("animations.cursor", "cursor");
+			cursorSprite.Animation = "cursor";
 			looseView.AddChild(cursorSprite);
+			cursorSprite.Play("cursor");
 		}
 
-		const double period = 2.5; // TODO: Just eyeballing this for now. Read the actual period from the INI or something.
-		double repCount = (double)Time.GetTicksMsec() / 1000.0 / period;
-		float progress = (float)(repCount - Math.Floor(repCount));
 		cursorSprite.Position = position;
-		int frameCount = cursorSprite.SpriteFrames.GetFrameCount("cursor");
-		int nextFrame = (int)((float)frameCount * progress);
-		nextFrame = nextFrame >= frameCount ? frameCount - 1 : (nextFrame < 0 ? 0 : nextFrame);
-		cursorSprite.Frame = nextFrame;
 		cursorSprite.Show();
 	}
 
@@ -202,7 +196,7 @@ public partial class UnitLayer : LooseLayer {
 		// Hide cursor if it's been initialized
 		cursorSprite?.Hide();
 
-		looseView.mapView.game.updateAnimations(gameData);
+		looseView.mapView.game.animationController.updateAnimations();
 	}
 
 	// Returns which unit should be drawn from among a list of units. The list is assumed to be non-empty.
@@ -218,7 +212,7 @@ public partial class UnitLayer : LooseLayer {
 				selected = u;
 			if (u.HasPriorityAsDefender(bestDefender, currentlySelectedUnit))
 				bestDefender = u;
-			if (looseView.mapView.game.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
+			if (looseView.mapView.game.animationController.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
 				doingInterestingAnimation = u;
 		}
 
@@ -227,10 +221,14 @@ public partial class UnitLayer : LooseLayer {
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
+		if (!UnitsVisible(gameData, looseView.mapView.game.controller, tile)) {
+			return;
+		}
+
 		// First draw animated effects. These will always appear over top of units regardless of draw order due to z-index.
-		C7Animation tileEffect = looseView.mapView.game.animTracker.getTileEffect(tile);
+		C7Animation tileEffect = looseView.mapView.game.animationController.animTracker.getTileEffect(tile);
 		if (tileEffect != null) {
-			(_, float progress) = looseView.mapView.game.animTracker.getCurrentActionAndProgress(tile);
+			(_, float progress, _) = looseView.mapView.game.animationController.animTracker.getCurrentActionAndProgress(tile);
 			drawEffectAnimFrame(looseView, tileEffect, progress, tileCenter);
 		}
 
@@ -241,7 +239,7 @@ public partial class UnitLayer : LooseLayer {
 		var white = Color.Color8(255, 255, 255);
 
 		MapUnit unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
-		MapUnit.Appearance appearance = looseView.mapView.game.animTracker.getUnitAppearance(unit);
+		MapUnit.Appearance appearance = looseView.mapView.game.animationController.animTracker.getUnitAppearance(unit);
 		Vector2 animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
 
 		// If the unit we're about to draw is currently selected, draw the cursor first underneath it
@@ -251,39 +249,91 @@ public partial class UnitLayer : LooseLayer {
 
 		drawUnitAnimFrame(looseView, unit, appearance, tileCenter);
 
-		Vector2 indicatorLoc = tileCenter - new Vector2(26, 40) + animOffset;
+		// TODO: Figure out how we can draw the unit's HP bar above the unit and the cursor
 
-		int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
-		Vector2 moveIndUpperLeft = new Vector2(1 + 7 * moveIndIndex, 1);
-		Rect2 moveIndRect = new Rect2(moveIndUpperLeft, new Vector2(6, 6));
-		var screenRect = new Rect2(indicatorLoc, new Vector2(6, 6));
-		looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+		// Option A: Support all kind of zoom levels. The downside is at large zoom distances, the HP indicators dominate the screen
+		// float cameraZoom = Math.Min(looseView.mapView.cameraZoom, 1.0f);
 
-		int hpIndHeight = 6 * (unit.maxHitPoints <= 5 ? unit.maxHitPoints : 5), hpIndWidth = 6;
-		Rect2 hpIndBackgroundRect = new Rect2(indicatorLoc + new Vector2(-1, 8), new Vector2(hpIndWidth, hpIndHeight));
-		if ((unit.unitType.attack > 0) || (unit.unitType.defense > 0)) {
+		// Option B: 2 Zoom levels regular, and double size.
+		// At larger distances it stays relatively small, but at this point I don't think we need to see the HP
+		float cameraZoom = Math.Clamp(looseView.mapView.cameraZoom, 0.5f, 1.0f);
+
+		float offsetXFromCenter = 26;
+		Vector2 hpStartingLocation = tileCenter - new Vector2(offsetXFromCenter, 0) + animOffset;
+
+		int maxHp = unit.maxHitPoints;
+		float hpIndHeight = GetHpFractionHeight(maxHp) / cameraZoom;
+		float hpIndWidth = 2 / cameraZoom;
+		float hpBarTotal = (hpIndHeight * maxHp + (maxHp - 1)/cameraZoom);
+		Vector2 movementLedCropping = new Vector2(6, 6);
+		Vector2 movementLedSize = movementLedCropping / cameraZoom;
+		float fortifiedLineExpand = 0.5f / cameraZoom;
+		float lineWidth = 1 / cameraZoom;
+
+		int offsetYFromCenter = 8;
+		Rect2 hpIndBackgroundRect = new Rect2(hpStartingLocation - new Vector2(0, offsetXFromCenter), Vector2.One);
+		if (unit.unitType.attack > 0 || unit.unitType.defense > 0) {
+			hpIndBackgroundRect = new Rect2((hpStartingLocation - new Vector2(0, hpBarTotal) - new Vector2(0, offsetYFromCenter)), new Vector2(hpIndWidth, hpBarTotal));
 			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
 			looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
-			float hpHeight = hpFraction * (hpIndHeight - 2);
-			if (hpHeight < 1)
-				hpHeight = 1;
-			var hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(1, hpIndHeight - 1 - hpHeight), // position
-										   new Vector2(hpIndWidth - 2, hpHeight)); // size
-			looseView.DrawRect(hpContentsRect, getHPColor(hpFraction));
-			if (unit.isFortified)
-				looseView.DrawRect(hpIndBackgroundRect, white, false);
+			Color hpColor = getHPColor(hpFraction);
+			for (int i = 0; i < unit.hitPointsRemaining; i++) {
+				Rect2 hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(0, hpBarTotal) - new Vector2(0, hpIndHeight + (hpIndHeight+lineWidth)*i), new Vector2(hpIndWidth, hpIndHeight));
+				looseView.DrawRect(hpContentsRect, hpColor);
+			}
+			if (unit.isFortified) {
+				Rect2 fortifiedRect = hpIndBackgroundRect.Grow(fortifiedLineExpand);
+				looseView.DrawRect(fortifiedRect, white, false, width: lineWidth);
+			}
 		}
+
+		// TODO: Maybe add this is as a player configuration for a "harder" mode,
+		// where players can't see how many enemy units there are even in tiles that don't have a city.
+		// RightClickMenu functionality would need to be made configurable if this gets implemented in the future.
+		if (unit.location.HasCity && unit.owner != looseView.mapView.game.controller)
+			return;
+
+		// Draw movement indicator for our units
+		if (looseView.mapView.game.controller == unit.owner) {
+			int moveIndIndex = (!unit.movementPoints.canMove) ? 4 : ((unit.movementPoints.remaining >= unit.unitType.movement) ? 0 : 2);
+			Vector2 moveIndUpperLeft = new Vector2((1 + 7 * moveIndIndex), 1);
+			Rect2 moveIndRect = new Rect2(moveIndUpperLeft, movementLedCropping);
+			Rect2 screenRect = new Rect2(hpIndBackgroundRect.Position - (new Vector2(2, 6) / cameraZoom), movementLedSize);
+			looseView.DrawTextureRectRegion(unitMovementIndicators, screenRect, moveIndRect);
+		}
+
+		float lineMarginFromBar = 3 / cameraZoom;
 
 		// Draw lines to show that there are more units on this tile
 		if (tile.unitsOnTile.Count > 1) {
 			int lineCount = tile.unitsOnTile.Count;
-			if (lineCount > 5)
-				lineCount = 5;
+			// TODO: Make configurable to taste, with cap of 8?
+			if (lineCount > 8)
+				lineCount = 8;
 			for (int n = 0; n < lineCount; n++) {
-				var lineStart = indicatorLoc + new Vector2(-2, hpIndHeight + 12 + 4 * n);
-				looseView.DrawLine(lineStart, lineStart + new Vector2(8, 0), white);
-				looseView.DrawLine(lineStart + new Vector2(0, 1), lineStart + new Vector2(8, 1), Color.Color8(75, 75, 75));
+				Vector2 lineStart = hpStartingLocation - new Vector2(lineWidth, offsetYFromCenter - lineMarginFromBar - lineMarginFromBar*n);
+				looseView.DrawLine(lineStart, lineStart + new Vector2(4, 0) / cameraZoom, white, width: lineWidth);
+				looseView.DrawLine(lineStart + new Vector2(0, 1) / cameraZoom, lineStart + new Vector2(4, 1) / cameraZoom, Color.Color8(75, 75, 75));
 			}
 		}
+	}
+
+	// Draw smaller pixels for the hp fractions as the max hp grows
+	private int GetHpFractionHeight(int h) {
+		if (h <= 6)
+			return 4;
+		if (h <= 12)
+			return 2;
+		return 1;
+	}
+
+	private bool UnitsVisible(GameData gameData, Player player, Tile t) {
+		if (gameData.observerMode) {
+			return true;
+		}
+
+		// Only draw units on active tiles - otherwise if the tile is only known
+		// but not actively seen, we can't see units.
+		return player.tileKnowledge.isActiveTile(t);
 	}
 }

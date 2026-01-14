@@ -11,7 +11,8 @@ using System.Collections.Generic;
 public partial class Advisors : CenterContainer {
 	private ILogger log = LogManager.ForContext<Advisors>();
 
-	private DomesticAdvisor domesticAdvisor;
+	[Export] public DomesticAdvisor domesticAdvisor;
+	private MilitaryAdvisor militaryAdvisor;
 	private ScienceAdvisor scienceAdvisor;
 
 	// A list of all the non-null advisors, so we can hide them whenever we
@@ -33,24 +34,26 @@ public partial class Advisors : CenterContainer {
 		this.Show();
 	}
 
-	private void _on_Advisor_hide() {
-		this.Hide();
-	}
-
 	private void OnShowSpecificAdvisor(string advisorType) {
 		// Hide any existing advisors so we can draw the requested one.
 		foreach (TextureRect tr in advisors) {
 			tr.Hide();
 		}
+		domesticAdvisor.Hide();
 
 		if (advisorType.Equals("F1")) {
-			if (domesticAdvisor == null) {
-				domesticAdvisor = new DomesticAdvisor();
-				advisors.Add(domesticAdvisor);
-				AddChild(domesticAdvisor);
-			} else {
-				domesticAdvisor.Show();
+			domesticAdvisor.ShowAdvisor();
+			this.Show();
+		}
+		if (advisorType.Equals("F3")) {
+			if (militaryAdvisor != null) {
+				RemoveChild(militaryAdvisor);
+				militaryAdvisor = null;
 			}
+
+			militaryAdvisor = new MilitaryAdvisor();
+			advisors.Add(militaryAdvisor);
+			AddChild(militaryAdvisor);
 			this.Show();
 		}
 		if (advisorType.Equals("F6")) {
@@ -65,25 +68,6 @@ public partial class Advisors : CenterContainer {
 			advisors.Add(scienceAdvisor);
 			AddChild(scienceAdvisor);
 			this.Show();
-		}
-	}
-
-	public override void _UnhandledInput(InputEvent @event) {
-		if (this.Visible) {
-			if (@event is InputEventKey eventKey) {
-				//As I've added more shortcuts, I've realized checking all of them here could be irksome.
-				//For now, I'm thinking it would make more sense to process or allow through the ones that should go through,
-				//as most of the global ones should *not* go through here.
-				if (eventKey.Pressed) {
-					if (eventKey.Keycode == Godot.Key.Escape) {
-						this.Hide();
-						GetViewport().SetInputAsHandled();
-					} else {
-						log.Debug("Advisor received a key press; stopping propagation.");
-						GetViewport().SetInputAsHandled();
-					}
-				}
-			}
 		}
 	}
 }

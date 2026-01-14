@@ -5,9 +5,7 @@ namespace C7Engine.AI.StrategicAI {
 	public class ExplorationPriority : StrategicPriority {
 		private readonly int TEMP_GAME_LENGTH = 540;
 
-		public ExplorationPriority() {
-			key = "Exploration";
-		}
+		public ExplorationPriority() { }
 
 		public override void CalculateWeightAndMetadata(Player player) {
 			//Eventually this should consider the expected number of unknown tiles and the ability to explore them

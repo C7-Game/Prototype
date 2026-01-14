@@ -12,7 +12,9 @@ namespace C7.Map {
 
 		public void UpdateAfterCityDestruction(City city) {
 			citySceneLookup.Remove(city, out CityScene cityScene);
-			cityScene.Hide();
+			if (cityScene != null) {
+				cityScene.Hide();
+			}
 		}
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
@@ -21,12 +23,16 @@ namespace C7.Map {
 			}
 
 			City city = tile.cityAtTile;
+			Vector2I tileCenter2I = new((int)tileCenter.X, (int)tileCenter.Y);
+
 			if (!citySceneLookup.ContainsKey(city)) {
-				CityScene cityScene = new CityScene(city, tile, new Vector2I((int)tileCenter.X, (int)tileCenter.Y));
+				CityScene cityScene = new CityScene(city);
+				cityScene.SetTileCenter(tileCenter2I);
 				looseView.AddChild(cityScene);
 				citySceneLookup[city] = cityScene;
 			} else {
 				CityScene scene = citySceneLookup[city];
+				scene.SetTileCenter(tileCenter2I);
 				scene._Draw();
 			}
 		}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using QueryCiv3;
 using C7GameData;

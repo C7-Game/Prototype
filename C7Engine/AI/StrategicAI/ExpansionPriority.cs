@@ -14,9 +14,7 @@ namespace C7GameData.AIData {
 
 		private ILogger log = Log.ForContext<ExpansionPriority>();
 
-		public ExpansionPriority() {
-			key = "Expansion";
-		}
+		public ExpansionPriority() { }
 
 		public override void CalculateWeightAndMetadata(Player player) {
 			if (player.cities.Count < 2) {
@@ -30,11 +28,11 @@ namespace C7GameData.AIData {
 			}
 		}
 
-		public override float GetProductionItemFlatAdjuster(IProducible producible) {
+		public override float GetProductionItemFlatAdjuster(Player player, IProducible producible) {
 			if (producible is UnitPrototype prototype) {
-				if (prototype.actions.Contains(C7Action.UnitBuildCity)) {
+				if (prototype.actions.Contains(UnitAction.BuildCity)) {
 					//Offset the shield cost and pop cost maluses, and add a flat 30 value to be equivalent to an early-game unit
-					int adjustment = prototype.shieldCost + 10 * prototype.populationCost + SETTLER_FLAT_APPEAL;
+					int adjustment = player.ShieldCost(prototype) + 10 * prototype.populationCost + SETTLER_FLAT_APPEAL;
 					log.Debug($"ExpansionPriority adjusting {producible} by {adjustment}");
 					return adjustment;
 				}
@@ -49,7 +47,7 @@ namespace C7GameData.AIData {
 		/// <returns></returns>
 		public override float GetProductionItemPreferenceWeight(IProducible producible) {
 			if (producible is UnitPrototype prototype) {
-				if (prototype.actions.Contains(C7Action.UnitBuildCity)) {
+				if (prototype.actions.Contains(UnitAction.BuildCity)) {
 					return SETTLER_WEIGHTED_APPEAL;
 				}
 			}

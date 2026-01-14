@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using C7GameData;
 using C7Engine;
+using System;
 
 public partial class RightClickMenu : VBoxContainer {
 	protected Game game;
@@ -99,6 +100,13 @@ public partial class RightClickMenu : VBoxContainer {
 			this.AcceptEvent();
 		}
 	}
+
+	public void ShowCannotMovePopup() {
+		TemporaryPopup popup = new("This unit has already moved.", 1);
+		popup.SetPosition(position + new Vector2(0, -64));
+		GetParent().AddChild(popup);
+		popup.ShowPopup();
+	}
 }
 
 public partial class RightClickTileMenu : RightClickMenu {
@@ -127,9 +135,14 @@ public partial class RightClickTileMenu : RightClickMenu {
 	public void ResetItems(Tile tile, Dictionary<ID, bool> uiUpdatedUnitStates = null) {
 		RemoveAll();
 
+		bool observerMode = false;
+		EngineStorage.ReadGameData((GameData gameData) => {
+			observerMode = gameData.observerMode;
+		});
+
 		int fortifiedCount = 0;
-		List<MapUnit> playerUnits = tile.unitsOnTile.FindAll(unit => unit.owner.id == game.controller.id);
-		List<MapUnit> nonPlayerUnits = tile.unitsOnTile.FindAll(unit => unit.owner.id != game.controller.id);
+		List<MapUnit> playerUnits = tile.unitsOnTile.FindAll(unit => unit.owner.id == game.controller.id || observerMode);
+		List<MapUnit> nonPlayerUnits = tile.unitsOnTile.FindAll(unit => unit.owner.id != game.controller.id && !observerMode);
 
 		foreach (MapUnit unit in playerUnits) {
 			bool isFortified = isUnitFortified(unit, uiUpdatedUnitStates);
@@ -140,10 +153,10 @@ public partial class RightClickTileMenu : RightClickMenu {
 		int unfortifiedCount = playerUnits.Count - fortifiedCount;
 
 		if (fortifiedCount > 1) {
-			AddItem($"Wake All ({fortifiedCount} units)", () => ForAll(tile.xCoordinate, tile.yCoordinate, false));
+			AddItem($"Wake All ({fortifiedCount} units)", () => ForAll(tile.XCoordinate, tile.YCoordinate, false));
 		}
 		if (unfortifiedCount > 1) {
-			AddItem($"Fortify All ({unfortifiedCount} units)", () => ForAll(tile.xCoordinate, tile.yCoordinate, true));
+			AddItem($"Fortify All ({unfortifiedCount} units)", () => ForAll(tile.XCoordinate, tile.YCoordinate, true));
 		}
 		if (tile.cityAtTile?.owner == game.controller) {
 			AddItem("Change Production (Shift+right click)", () => {
@@ -151,45 +164,69 @@ public partial class RightClickTileMenu : RightClickMenu {
 				this.CloseAndDelete();
 				new RightClickChooseProductionMenu(game, tile.cityAtTile).Open(this.position);
 			});
+			AddItem("Hurry Production", () => {
+				this.CloseAndDelete();
+				EngineStorage.ReadGameData((GameData gameData) => {
+					City.HurryProductionDetails details = tile.cityAtTile.GetHurryProductionDetails();
+					new MsgDisplayHurryProductionPopup(tile.cityAtTile, details).send();
+				});
+			});
+			AddItem("Zoom to city", () => {
+				this.CloseAndDelete();
+				EngineStorage.ReadGameData((GameData gameData) => {
+					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
+				});
+			});
 		}
 
 		// If we're looking at an enemy tile, then the behavior depends on whether the units
 		// are in a city. We can see the full list of units outside of a city, but in a city
 		// we can only see the top defender.
 		if (nonPlayerUnits.Count > 0) {
+			Action contactCiv = () => {
+				this.CloseAndDelete();
+				game.controller.EnsureRelationshipExists(nonPlayerUnits[0].owner);
+				game.OnDiplomacySelected(new ParameterWrapper<ID>(nonPlayerUnits[0].owner.id));
+			};
+
 			if (tile.cityAtTile == null) {
 				foreach (MapUnit unit in nonPlayerUnits) {
 					AddItem($"{unit.owner.civilization.noun} {unit.Describe()}", null);
 				}
-				AddItem($"Contact {nonPlayerUnits[0].owner.civilization.name}", null);
 			} else {
 				// TODO: This isn't necessarily the top unit, get that code to an accessible
 				// location and then use it here.
 				MapUnit unit = nonPlayerUnits[0];
 				AddItem($"{unit.owner.civilization.noun} {unit.Describe()}", null);
-				AddItem($"Contact {unit.owner.civilization.name}", null);
 			}
+
+			if (!nonPlayerUnits[0].owner.isBarbarians)
+				AddItem($"Contact {nonPlayerUnits[0].owner.civilization.name}", contactCiv);
 		}
 	}
 
 	public void SelectUnit(ID id) {
-		using (var gameDataAccess = new UIGameDataAccess()) {
-			MapUnit toSelect = gameDataAccess.gameData.mapUnits.Find(u => u.id == id);
+		EngineStorage.ReadGameData((GameData gameData) => {
+			MapUnit toSelect = gameData.mapUnits.Find(u => u.id == id);
 			if (toSelect != null && toSelect.owner == game.controller) {
-				game.setSelectedUnit(toSelect);
+				bool canMove = game.unitSelector.SetSelectedUnit(toSelect);
+				if (!canMove) {
+					ShowCannotMovePopup();
+				}
+
 				new MsgSetFortification(toSelect.id, false).send();
 				ResetItems(toSelect.location, new Dictionary<ID, bool>() { { toSelect.id, false } });
 			}
-		}
+		});
 		if (!Input.IsKeyPressed(Godot.Key.Shift)) {
 			CloseAndDelete();
 		}
 	}
 
 	public void ForAll(int tileX, int tileY, bool isFortify) {
-		using (var gameDataAccess = new UIGameDataAccess()) {
+		EngineStorage.ReadGameData((GameData gameData) => {
 			bool hasSelectedUnit = false;
-			Tile tile = gameDataAccess.gameData.map.tileAt(tileX, tileY);
+			Tile tile = gameData.map.tileAt(tileX, tileY);
 			Dictionary<ID, bool> modified = new Dictionary<ID, bool>();
 			foreach (MapUnit unit in tile.unitsOnTile) {
 				if (unit.isFortified != isFortify) {
@@ -197,12 +234,16 @@ public partial class RightClickTileMenu : RightClickMenu {
 					new MsgSetFortification(unit.id, isFortify).send();
 
 					if (!hasSelectedUnit && !isFortify) {
-						game.setSelectedUnit(unit);
+						bool canMove = game.unitSelector.SetSelectedUnit(unit);
+						if (!canMove) {
+							ShowCannotMovePopup();
+						}
 					}
 				}
 			}
+
 			ResetItems(tile, modified);
-		}
+		});
 		if (!Input.IsKeyPressed(Godot.Key.Shift)) {
 			CloseAndDelete();
 		}
@@ -224,6 +265,19 @@ public partial class RightClickCityMenu : RightClickMenu {
 				this.CloseAndDelete();
 				new RightClickChooseProductionMenu(game, tile.cityAtTile).Open(this.position);
 			});
+			AddItem("Hurry Production", () => {
+				this.CloseAndDelete();
+				EngineStorage.ReadGameData((GameData gameData) => {
+					City.HurryProductionDetails details = tile.cityAtTile.GetHurryProductionDetails();
+					new MsgDisplayHurryProductionPopup(tile.cityAtTile, details).send();
+				});
+			});
+			AddItem("Zoom to city", () => {
+				this.CloseAndDelete();
+				EngineStorage.ReadGameData((GameData gameData) => {
+					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
+				});
+			});
 		}
 	}
 }
@@ -231,22 +285,24 @@ public partial class RightClickCityMenu : RightClickMenu {
 public partial class RightClickChooseProductionMenu : RightClickMenu {
 	private ID cityID;
 
-	private ImageTexture GetProducibleIcon(IProducible producible) {
+	public static ImageTexture GetProducibleIcon(IProducible producible) {
 		if (producible is UnitPrototype proto) {
-			const int iconWidth = 32, iconHeight = 32, iconsPerRow = 14;
-			int x = 1 + 33 * (proto.iconIndex % iconsPerRow),
-				y = 1 + 33 * (proto.iconIndex / iconsPerRow);
-			return Util.LoadTextureFromPCX("Art/Units/units_32.pcx", x, y, iconWidth, iconHeight);
-		} else
+			return TextureLoader.Load("unit_icons", proto, useCache: true);
+		} else if (producible is Building b) {
+			return TextureLoader.Load("building_icons.small", b, useCache: true);
+		} else {
 			return null;
+		}
 	}
 
 	public RightClickChooseProductionMenu(Game game, City city) : base(game) {
 		cityID = city.id;
-		foreach (IProducible option in city.ListProductionOptions()) {
-			int buildTime = city.TurnsToProduce(option);
-			AddItem($"{option.name} ({buildTime} turns)", () => ChooseProduction(option.name), GetProducibleIcon(option));
-		}
+		EngineStorage.ReadGameData((GameData gameData) => {
+			foreach (IProducible option in city.ListProductionOptions(gameData)) {
+				int buildTime = city.TurnsToProduce(option);
+				AddItem($"{option.name} ({buildTime} turns)", () => ChooseProduction(option.name), GetProducibleIcon(option));
+			}
+		});
 	}
 
 	public void ChooseProduction(string producibleName) {

@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3 uid="uid://dkcu255o1qrt1"]
+
+[ext_resource type="PackedScene" uid="uid://bnvwn0hhrsn82" path="res://UIElements/black_sidebars.tscn" id="1_a64pg"]
+[ext_resource type="Script" uid="uid://by7gjap06whbu" path="res://UIElements/PalaceScreen/PalaceScreen.cs" id="2_kp65c"]
+[ext_resource type="Script" uid="uid://dcrdcjop64t6t" path="res://UIElements/Civ3TextureButton.cs" id="4_yi45k"]
+
+[node name="PalaceScene" instance=ExtResource("1_a64pg")]
+
+[node name="PalaceScreen" type="TextureRect" parent="HBoxContainer" index="1" node_paths=PackedStringArray("switchButtonContainer")]
+layout_mode = 2
+script = ExtResource("2_kp65c")
+switchButtonContainer = NodePath("SwitchButtonContainer")
+textureConfigKey = "palace.background"
+
+[node name="Close" type="TextureButton" parent="HBoxContainer/PalaceScreen" index="0"]
+layout_mode = 0
+offset_left = 979.0
+offset_top = 11.0
+offset_right = 1011.0
+offset_bottom = 59.0
+script = ExtResource("4_yi45k")
+textureConfigKey = "city_screen.buttons.close"
+
+[node name="SwitchButtonContainer" type="HBoxContainer" parent="HBoxContainer/PalaceScreen" index="1"]
+layout_mode = 0
+offset_left = 490.0
+offset_top = 645.0
+offset_right = 968.0
+offset_bottom = 699.0
+theme_override_constants/separation = 35
+
+[connection signal="pressed" from="HBoxContainer/PalaceScreen/Close" to="." method="hide"]

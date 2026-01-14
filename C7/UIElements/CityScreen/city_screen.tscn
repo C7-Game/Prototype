@@ -1,0 +1,289 @@
+[gd_scene load_steps=12 format=3 uid="uid://bo4yg85jcbgdx"]
+
+[ext_resource type="Script" uid="uid://cc43pgbg3jt26" path="res://UIElements/CityScreen/CityScreen.cs" id="1_e5kig"]
+[ext_resource type="PackedScene" uid="uid://bnvwn0hhrsn82" path="res://UIElements/black_sidebars.tscn" id="1_hl43g"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_0mao8"]
+[ext_resource type="Script" uid="uid://dcrdcjop64t6t" path="res://UIElements/Civ3TextureButton.cs" id="3_3cdyr"]
+[ext_resource type="Script" uid="uid://xd5truvfnnws" path="res://UIElements/CityScreen/ProductionMenu.cs" id="4_xfbtv"]
+[ext_resource type="FontFile" uid="uid://c1qd602n7xu3h" path="res://Fonts/NotoSans-Regular.ttf" id="5_hld1k"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_ce4da"]
+device = -1
+keycode = 4194319
+
+[sub_resource type="Shortcut" id="Shortcut_ub3nk"]
+events = [SubResource("InputEventKey_ce4da")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_5maft"]
+device = -1
+keycode = 4194321
+
+[sub_resource type="Shortcut" id="Shortcut_o26ee"]
+events = [SubResource("InputEventKey_5maft")]
+
+[sub_resource type="LabelSettings" id="LabelSettings_wgpk8"]
+font = ExtResource("5_hld1k")
+font_size = 28
+font_color = Color(0, 0, 0, 1)
+
+[node name="CityScreen" node_paths=PackedStringArray("background", "existingBuildings", "culturePerTurn", "totalCulture", "cityName", "productionButton", "close", "previousCity", "nextCity", "productionMenu", "strategicResources", "luxuriesContainer", "productionLabel", "completeInLabel", "growthInLabel", "foodLabel", "granaryLabel", "shieldsInBoxContainer", "foodInBoxContainer", "foodInGranaryContainer", "shieldRowContainer", "foodRowContainer") instance=ExtResource("1_hl43g")]
+script = ExtResource("1_e5kig")
+background = NodePath("HBoxContainer/Background")
+existingBuildings = NodePath("HBoxContainer/Background/ScrollContainerBuildings/ExistingBuildings")
+culturePerTurn = NodePath("HBoxContainer/Background/CulturePerTurn")
+totalCulture = NodePath("HBoxContainer/Background/TotalCulture")
+cityName = NodePath("HBoxContainer/Background/CityName")
+productionButton = NodePath("HBoxContainer/Background/ProductionButton")
+close = NodePath("HBoxContainer/Background/Close")
+previousCity = NodePath("HBoxContainer/Background/PreviousCity")
+nextCity = NodePath("HBoxContainer/Background/NextCity")
+productionMenu = NodePath("HBoxContainer/Background/ProductionMenu")
+strategicResources = NodePath("HBoxContainer/Background/ScrollContainerStrategicResources/StrategicResourceContainer")
+luxuriesContainer = NodePath("HBoxContainer/Background/ScrollContainerLuxuries/LuxuriesContainer")
+productionLabel = NodePath("HBoxContainer/Background/ProductionLabel")
+completeInLabel = NodePath("HBoxContainer/Background/CompleteInLabel")
+growthInLabel = NodePath("HBoxContainer/Background/GrowthInLabel")
+foodLabel = NodePath("HBoxContainer/Background/FoodLabel")
+granaryLabel = NodePath("HBoxContainer/Background/CenterContainer2/VBoxContainer/Label")
+shieldsInBoxContainer = NodePath("HBoxContainer/Background/CenterContainer/ShieldsInBoxContainer")
+foodInBoxContainer = NodePath("HBoxContainer/Background/CenterContainer2/VBoxContainer/HBoxContainer/FoodInBoxContainer")
+foodInGranaryContainer = NodePath("HBoxContainer/Background/CenterContainer2/VBoxContainer/HBoxContainer2/FoodInGranaryContainer")
+shieldRowContainer = NodePath("HBoxContainer/Background/ShieldRowContainer")
+foodRowContainer = NodePath("HBoxContainer/Background/FoodRowContainer")
+
+[node name="Background" type="TextureRect" parent="HBoxContainer" index="1"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+script = ExtResource("2_0mao8")
+
+[node name="Improvements" type="Label" parent="HBoxContainer/Background" index="0"]
+layout_mode = 2
+offset_left = 7.0
+offset_top = 514.0
+offset_right = 116.0
+offset_bottom = 534.0
+text = "IMPROVEMENTS"
+
+[node name="ScrollContainerBuildings" type="ScrollContainer" parent="HBoxContainer/Background" index="1"]
+layout_mode = 2
+offset_left = 7.0
+offset_top = 537.0
+offset_right = 153.0
+offset_bottom = 759.0
+
+[node name="ExistingBuildings" type="VBoxContainer" parent="HBoxContainer/Background/ScrollContainerBuildings" index="0"]
+layout_mode = 2
+
+[node name="Luxuries" type="Label" parent="HBoxContainer/Background" index="2"]
+layout_mode = 0
+offset_left = 162.0
+offset_top = 514.0
+offset_right = 227.0
+offset_bottom = 534.0
+text = "LUXURIES
+"
+
+[node name="ScrollContainerLuxuries" type="ScrollContainer" parent="HBoxContainer/Background" index="3"]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 537.0
+offset_right = 281.0
+offset_bottom = 704.0
+
+[node name="LuxuriesContainer" type="VBoxContainer" parent="HBoxContainer/Background/ScrollContainerLuxuries" index="0"]
+layout_mode = 2
+
+[node name="Culture" type="Label" parent="HBoxContainer/Background" index="4"]
+layout_mode = 0
+offset_left = 714.0
+offset_top = 4.0
+offset_right = 775.0
+offset_bottom = 24.0
+text = "CULTURE"
+
+[node name="CulturePerTurn" type="Label" parent="HBoxContainer/Background" index="5"]
+layout_mode = 0
+offset_left = 790.0
+offset_top = 4.0
+offset_right = 830.0
+offset_bottom = 24.0
+text = "-1/turn"
+
+[node name="TotalCulture" type="Label" parent="HBoxContainer/Background" index="6"]
+layout_mode = 0
+offset_left = 714.0
+offset_top = 60.0
+offset_right = 815.0
+offset_bottom = 80.0
+text = "Total: 123/1234"
+
+[node name="ProductionButton" type="TextureButton" parent="HBoxContainer/Background" index="7"]
+layout_mode = 0
+offset_left = 906.0
+offset_top = 515.0
+offset_right = 1020.0
+offset_bottom = 610.0
+script = ExtResource("3_3cdyr")
+
+[node name="Close" type="TextureButton" parent="HBoxContainer/Background" index="8"]
+layout_mode = 0
+offset_left = 950.0
+offset_top = 20.0
+offset_right = 990.0
+offset_bottom = 60.0
+script = ExtResource("3_3cdyr")
+
+[node name="ProductionMenu" type="TextureRect" parent="HBoxContainer/Background" index="9"]
+visible = false
+layout_mode = 0
+offset_left = 814.0
+offset_top = 135.0
+offset_right = 1017.0
+offset_bottom = 495.0
+script = ExtResource("4_xfbtv")
+
+[node name="PreviousCity" type="TextureButton" parent="HBoxContainer/Background" index="10"]
+layout_mode = 0
+offset_left = 359.0
+offset_top = 31.0
+offset_right = 399.0
+offset_bottom = 79.0
+shortcut = SubResource("Shortcut_ub3nk")
+script = ExtResource("3_3cdyr")
+
+[node name="NextCity" type="TextureButton" parent="HBoxContainer/Background" index="11"]
+layout_mode = 0
+offset_left = 625.0
+offset_top = 31.0
+offset_right = 665.0
+offset_bottom = 79.0
+shortcut = SubResource("Shortcut_o26ee")
+script = ExtResource("3_3cdyr")
+
+[node name="CityName" type="Label" parent="HBoxContainer/Background" index="12"]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 18.0
+offset_right = 630.0
+offset_bottom = 60.0
+text = "Placeholder City"
+label_settings = SubResource("LabelSettings_wgpk8")
+horizontal_alignment = 1
+
+[node name="StrategicResourceLabel" type="Label" parent="HBoxContainer/Background" index="13"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = 45.0
+offset_bottom = 24.0
+text = "STRATEGIC RESOURCES"
+
+[node name="ScrollContainerStrategicResources" type="ScrollContainer" parent="HBoxContainer/Background" index="14"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 24.0
+offset_right = 294.0
+offset_bottom = 89.0
+
+[node name="StrategicResourceContainer" type="HBoxContainer" parent="HBoxContainer/Background/ScrollContainerStrategicResources" index="0"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ProductionLabel" type="Label" parent="HBoxContainer/Background" index="15"]
+layout_mode = 0
+offset_left = 284.0
+offset_top = 509.0
+offset_right = 505.0
+offset_bottom = 529.0
+theme_override_font_sizes/font_size = 12
+text = "PRODUCTION: 10 per turn"
+
+[node name="CompleteInLabel" type="Label" parent="HBoxContainer/Background" index="16"]
+layout_mode = 0
+offset_left = 904.0
+offset_top = 608.0
+offset_right = 1021.0
+offset_bottom = 626.0
+theme_override_font_sizes/font_size = 10
+text = "Complete in 100 turns"
+horizontal_alignment = 1
+
+[node name="GrowthInLabel" type="Label" parent="HBoxContainer/Background" index="17"]
+layout_mode = 0
+offset_left = 776.0
+offset_top = 563.0
+offset_right = 893.0
+offset_bottom = 581.0
+theme_override_font_sizes/font_size = 10
+text = "Growth in 8 turns"
+horizontal_alignment = 1
+
+[node name="FoodLabel" type="Label" parent="HBoxContainer/Background" index="18"]
+layout_mode = 0
+offset_left = 285.0
+offset_top = 557.0
+offset_right = 506.0
+offset_bottom = 577.0
+theme_override_font_sizes/font_size = 12
+text = "FOOD: 3 per turn"
+
+[node name="CenterContainer" type="CenterContainer" parent="HBoxContainer/Background" index="19"]
+layout_mode = 0
+offset_left = 904.0
+offset_top = 626.0
+offset_right = 1020.0
+offset_bottom = 764.0
+
+[node name="ShieldsInBoxContainer" type="GridContainer" parent="HBoxContainer/Background/CenterContainer" index="0"]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 6
+
+[node name="CenterContainer2" type="CenterContainer" parent="HBoxContainer/Background" index="20"]
+layout_mode = 0
+offset_left = 774.0
+offset_top = 584.0
+offset_right = 896.0
+offset_bottom = 761.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Background/CenterContainer2" index="0"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/Background/CenterContainer2/VBoxContainer" index="0"]
+layout_mode = 2
+
+[node name="FoodInBoxContainer" type="GridContainer" parent="HBoxContainer/Background/CenterContainer2/VBoxContainer/HBoxContainer" index="0"]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/Background/CenterContainer2/VBoxContainer" index="1"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "GRANARY"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer/Background/CenterContainer2/VBoxContainer" index="2"]
+layout_mode = 2
+
+[node name="FoodInGranaryContainer" type="GridContainer" parent="HBoxContainer/Background/CenterContainer2/VBoxContainer/HBoxContainer2" index="0"]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 2
+
+[node name="ShieldRowContainer" type="Control" parent="HBoxContainer/Background" index="21"]
+anchors_preset = 0
+offset_left = 288.0
+offset_top = 522.0
+offset_right = 835.0
+offset_bottom = 549.0
+
+[node name="FoodRowContainer" type="Control" parent="HBoxContainer/Background" index="22"]
+anchors_preset = 0
+offset_left = 287.0
+offset_top = 571.0
+offset_right = 767.0
+offset_bottom = 598.0

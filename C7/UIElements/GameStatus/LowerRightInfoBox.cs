@@ -1,44 +1,76 @@
 using Godot;
-using ConvertCiv3Media;
 using C7GameData;
 using Serilog;
+using C7Engine;
 
-public partial class LowerRightInfoBox : TextureRect {
+[GlobalClass]
+[Tool]
+public partial class LowerRightInfoBox : Civ3TextureRect {
 	private ILogger log = LogManager.ForContext<LowerRightInfoBox>();
 
-	TextureButton nextTurnButton = new TextureButton();
-	ImageTexture nextTurnOnTexture;
-	ImageTexture nextTurnOffTexture;
-	ImageTexture nextTurnBlinkTexture;
+	private const int fontSize = 12;
+	private const float offsetUnitThumbnailX = 14;
+	private const float offsetUnitThumbnailY = 16;
 
-	Label lblUnitSelected = new Label();
-	Label attackDefenseMovement = new Label();
-	Label terrainType = new Label();
-	Label yearAndGold = new Label();
-	Label scienceProgress = new();
+	private TextureRect boxRightRectangle = new();
+	private TextureButton boxRightRectangleButton = new();
 
-	Timer blinkingTimer = new Timer();
-	bool timerStarted = false;  //This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
+	private TextureButton nextTurnButton = new();
+	private ImageTexture nextTurnOnTexture;
+	private ImageTexture nextTurnOffTexture;
+	private ImageTexture nextTurnBlinkTexture;
+
+	private Label unitRank = new();
+	private Label unitType = new();
+	private Label attackDefenseMovement = new();
+	private Label terrainType = new();
+
+	private Label civAndGovt = new();
+	private Label yearAndGold = new();
+	private Label scienceProgress = new();
+
+	private Label suggestion = new();
+
+	private Sprite2D unitPlaceholder = new();
+	private Sprite2D unitTintPlaceholder = new();
+
+	private Timer blinkingTimer = new Timer();
+	private bool timerStarted = false;  //This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
+
+	[Signal] public delegate void BlinkyEndTurnButtonPressedEventHandler();
+	[Signal] public delegate void CenterCameraOnActiveUnitEventHandler();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
+		unitRank.AddThemeFontSizeOverride("font_size", fontSize);
+		unitType.AddThemeFontSizeOverride("font_size", fontSize);
+		attackDefenseMovement.AddThemeFontSizeOverride("font_size", fontSize);
+		terrainType.AddThemeFontSizeOverride("font_size", fontSize);
+		civAndGovt.AddThemeFontSizeOverride("font_size", fontSize);
+		yearAndGold.AddThemeFontSizeOverride("font_size", fontSize);
+		scienceProgress.AddThemeFontSizeOverride("font_size", fontSize);
+		suggestion.AddThemeFontSizeOverride("font_size", fontSize);
+
 		this.CreateUI();
 	}
 
 	private void CreateUI() {
-		Pcx boxRightColor = new Pcx(Util.Civ3MediaPath("Art/interface/box right color.pcx"));
-		Pcx boxRightAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/box right alpha.pcx"));
-		ImageTexture boxRight = PCXToGodot.getImageFromPCXWithAlphaBlend(boxRightColor, boxRightAlpha);
-		TextureRect boxRightRectangle = new TextureRect();
+		ImageTexture boxRight = TextureLoader.Load("lower_right_infobox.box");
+		boxRightRectangle = new TextureRect();
 		boxRightRectangle.Texture = boxRight;
 		boxRightRectangle.SetPosition(new Vector2(0, 0));
 		AddChild(boxRightRectangle);
 
-		Pcx nextTurnColor = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states color.pcx"));
-		Pcx nextTurnAlpha = new Pcx(Util.Civ3MediaPath("Art/interface/nextturn states alpha.pcx"));
-		nextTurnOffTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 0, 0, 47, 28);
-		nextTurnOnTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 47, 0, 47, 28);
-		nextTurnBlinkTexture = PCXToGodot.getImageFromPCXWithAlphaBlend(nextTurnColor, nextTurnAlpha, 94, 0, 47, 28);
+		// An "invisible" button covering the inside area of the box so we can register the click
+		// and center the camera on the unit or end the turn
+		boxRightRectangleButton.SetSize(new Vector2(228, 108));
+		boxRightRectangleButton.SetPosition(new Vector2(40, 17));
+		AddChild(boxRightRectangleButton);
+		boxRightRectangleButton.Pressed += HandleBoxClick;
+
+		nextTurnOffTexture = TextureLoader.Load("lower_right_infobox.next_turn.off");
+		nextTurnOnTexture = TextureLoader.Load("lower_right_infobox.next_turn.on");
+		nextTurnBlinkTexture = TextureLoader.Load("lower_right_infobox.next_turn.blink");
 
 		nextTurnButton.TextureNormal = nextTurnOffTexture;
 		nextTurnButton.TextureHover = nextTurnOnTexture;
@@ -47,40 +79,55 @@ public partial class LowerRightInfoBox : TextureRect {
 		nextTurnButton.Pressed += turnEnded;
 
 
-		//Labels and whatnot in this text box
-		lblUnitSelected.Text = "Settler";
-		lblUnitSelected.HorizontalAlignment = HorizontalAlignment.Right;
-		lblUnitSelected.SetPosition(new Vector2(0, 20));
-		lblUnitSelected.AnchorRight = 1.0f;
-		lblUnitSelected.OffsetRight = -30;
-		boxRightRectangle.AddChild(lblUnitSelected);
+		// Unit info
+		unitType.Text = "Settler";
+		unitType.HorizontalAlignment = HorizontalAlignment.Right;
+		unitType.SetPosition(new Vector2(0, 18));
+		unitType.AnchorRight = 1.0f;
+		unitType.OffsetRight = -35;
+		boxRightRectangle.AddChild(unitType);
+
+		unitRank.Text = "Regular";
+		unitRank.HorizontalAlignment = HorizontalAlignment.Right;
+		unitRank.SetPosition(new Vector2(0, 32));
+		unitRank.AnchorRight = 1.0f;
+		unitRank.OffsetRight = -35;
+		unitRank.Visible = false;
+		boxRightRectangle.AddChild(unitRank);
 
 		attackDefenseMovement.Text = "0.0. 1/1";
 		attackDefenseMovement.HorizontalAlignment = HorizontalAlignment.Right;
-		attackDefenseMovement.SetPosition(new Vector2(0, 35));
+		attackDefenseMovement.SetPosition(new Vector2(0, 32));
 		attackDefenseMovement.AnchorRight = 1.0f;
-		attackDefenseMovement.OffsetRight = -30;
+		attackDefenseMovement.OffsetRight = -35;
 		boxRightRectangle.AddChild(attackDefenseMovement);
 
 		terrainType.Text = "Grassland";
 		terrainType.HorizontalAlignment = HorizontalAlignment.Right;
-		terrainType.SetPosition(new Vector2(0, 50));
+		terrainType.SetPosition(new Vector2(0, 46));
 		terrainType.AnchorRight = 1.0f;
-		terrainType.OffsetRight = -30;
+		terrainType.OffsetRight = -35;
 		boxRightRectangle.AddChild(terrainType);
 
-		Label civAndGovt = new Label();
-		civAndGovt.SetPosition(new Vector2(0, 75));
+		// Player info
+		civAndGovt.SetPosition(new Vector2(0, 80));
 		boxRightRectangle.AddChild(civAndGovt);
-		SetTextAndCenterLabel(civAndGovt, "Carthage - Despotism (5.5.0)");
+		civAndGovt.SetTextAndCenterLabel("Carthage - Despotism (5.5.0)");
 
-		yearAndGold.SetPosition(new Vector2(0, 90));
+		yearAndGold.SetPosition(new Vector2(0, 94));
 		boxRightRectangle.AddChild(yearAndGold);
-		SetTextAndCenterLabel(yearAndGold, "Turn 0  10 Gold (+0 per turn)");
+		yearAndGold.SetTextAndCenterLabel("Turn 0  10 Gold (+0 per turn)");
 
-		scienceProgress.SetPosition(new Vector2(0, 105));
+		scienceProgress.SetPosition(new Vector2(0, 108));
 		boxRightRectangle.AddChild(scienceProgress);
-		SetTextAndCenterLabel(scienceProgress, "");
+		scienceProgress.SetTextAndCenterLabel("");
+
+		// End of turn suggestions
+		suggestion.HorizontalAlignment = HorizontalAlignment.Right;
+		suggestion.SetPosition(new Vector2(0, 25));
+		suggestion.AnchorRight = 1.0f;
+		suggestion.OffsetRight = -45;
+		boxRightRectangle.AddChild(suggestion);
 
 		//Setup up, but do not start, the timer.
 		blinkingTimer.OneShot = false;
@@ -89,10 +136,11 @@ public partial class LowerRightInfoBox : TextureRect {
 		AddChild(blinkingTimer);
 	}
 
-	public void SetEndOfTurnStatus() {
-		lblUnitSelected.Text = "ENTER or SPACEBAR for next turn";
-		attackDefenseMovement.Visible = false;
-		terrainType.Visible = false;
+	private void SetEndOfTurnStatus() {
+		UpdateUnitGraphic(MapUnit.NONE);
+		HideUnitInfo();
+		suggestion.Text = "ENTER or SPACEBAR for next turn";
+		suggestion.Visible = true;
 
 		toggleEndTurnButton();
 
@@ -107,68 +155,163 @@ public partial class LowerRightInfoBox : TextureRect {
 	private void toggleEndTurnButton() {
 		if (nextTurnButton.TextureNormal == nextTurnOnTexture) {
 			nextTurnButton.TextureNormal = nextTurnBlinkTexture;
-			lblUnitSelected.Visible = true;
+			suggestion.Visible = true;
 		} else {
 			nextTurnButton.TextureNormal = nextTurnOnTexture;
-			lblUnitSelected.Visible = false;
+			suggestion.Visible = false;
 		}
 	}
 
-	public void StopToggling() {
+	private void StopToggling() {
 		nextTurnButton.TextureNormal = nextTurnOffTexture;
-		lblUnitSelected.Text = "Please wait...";
-		lblUnitSelected.Visible = true;
 		blinkingTimer.Stop();
 		timerStarted = false;
+		suggestion.Visible = false;
+	}
+
+	private void PleaseWait() {
+		HideUnitInfo();
+		suggestion.Text = "Please wait...";
+		suggestion.Visible = true;
 	}
 
 	private void turnEnded() {
 		log.Debug("Emitting the blinky button pressed signal");
-		GetParent().EmitSignal(GameStatus.SignalName.BlinkyEndTurnButtonPressed);
+		EmitSignal(SignalName.BlinkyEndTurnButtonPressed);
 	}
 
-	public void UpdateUnitInfo(MapUnit NewUnit, TerrainType terrain) {
+	private void UpdateUnitInfo(MapUnit unit, TerrainType terrain) {
+		if (!unit.CanBeActive()) return;
+
+		bool showRank = false;
+
 		terrainType.Text = terrain.DisplayName;
-		terrainType.Visible = true;
-		lblUnitSelected.Text = NewUnit.unitType.name;
-		lblUnitSelected.Visible = true;
-		string movementPointsRemaining = NewUnit.movementPoints.canMove ? "" + $"{(NewUnit.movementPoints.getMixedNumber())}" : "0";
+		if (unit.location.HasCity && unit.owner == unit.location.cityAtTile.owner) {
+			terrainType.Text = unit.location.cityAtTile.name;
+		}
+		if (unit.HasRank()) {
+			showRank = true;
+			unitRank.Text = unit.experienceLevel.displayName;
+			attackDefenseMovement.SetPosition(new Vector2(0, 46));
+			terrainType.SetPosition(new Vector2(0, 60));
+		} else {
+			attackDefenseMovement.SetPosition(new Vector2(0, 32));
+			terrainType.SetPosition(new Vector2(0, 46));
+		}
+		unitType.Text = unit.unitType.name;
+		string movementPointsRemaining = unit.movementPoints.canMove ? "" + $"{(unit.movementPoints.getMixedNumber())}" : "0";
 		string bombardText = "";
-		if (NewUnit.unitType.bombard > 0) {
-			bombardText = $"({NewUnit.unitType.bombard})";
+		if (unit.unitType.bombard > 0) {
+			bombardText = $"({unit.unitType.bombard})";
 		}
-		attackDefenseMovement.Text = $"{NewUnit.unitType.attack}{bombardText}.{NewUnit.unitType.defense} {movementPointsRemaining}/{NewUnit.unitType.movement}";
+		attackDefenseMovement.Text = $"{unit.unitType.attack}{bombardText}.{unit.unitType.defense} {movementPointsRemaining}/{unit.unitType.movement}";
+
+		suggestion.Visible = false;
+
+		ShowUnitInfo(showRank);
+	}
+
+	private void HideUnitInfo() {
+		terrainType.Visible = false;
+		unitType.Visible = false;
+		unitRank.Visible = false;
+		attackDefenseMovement.Visible = false;
+		unitPlaceholder.Visible = false;
+		unitTintPlaceholder.Visible = false;
+	}
+	private void ShowUnitInfo(bool showRank) {
+		terrainType.Visible = true;
+		unitType.Visible = true;
+		unitRank.Visible = showRank;
 		attackDefenseMovement.Visible = true;
+		unitPlaceholder.Visible = true;
+		unitTintPlaceholder.Visible = true;
 	}
 
-	///This is going to evolve a lot over time.  Probably this info box will need to keep some local state.
-	///But for now it'll show the changing turn number, providing some interactivity
-	public void SetTurnAndGold(int turnNumber, int gold, int goldPerTurn) {
-		if (goldPerTurn >= 0) {
-			yearAndGold.Text = $"Turn {turnNumber}  {gold} Gold (+{goldPerTurn} per turn)";
-		} else {
-			yearAndGold.Text = $"Turn {turnNumber}  {gold} Gold (-{goldPerTurn} per turn)";
+	public override void _Process(double delta) {
+		if (Engine.IsEditorHint())
+			return;
+
+		// Update our information each time we're drawn, just like the tile and
+		// city scenes.
+		EngineStorage.ReadGameData((GameData gD) => {
+			Player player = gD.GetFirstHumanPlayer();
+
+			// Gold per turn and turn indicator.
+			{
+				int turnNumber = TurnHandling.GetTurnNumber();
+				int gold = player.gold;
+				int goldPerTurn = player.CalculateGoldPerTurn();
+
+				if (goldPerTurn >= 0) {
+					yearAndGold.Text = $"Turn {turnNumber}  {gold} Gold (+{goldPerTurn} per turn)";
+				} else {
+					yearAndGold.Text = $"Turn {turnNumber}  {gold} Gold ({goldPerTurn} per turn)";
+				}
+			}
+
+			// Tech progress.
+			scienceProgress.SetTextAndCenterLabel(player.SummarizeScience(gD));
+
+			// Civ and government.
+			civAndGovt.SetTextAndCenterLabel($"{player.civilization.name} - {player.government.name} (5.5.0)");
+		});
+
+		base._Process(delta);
+	}
+
+	private void OnNewUnitSelected(ParameterWrapper<MapUnit> wrappedMapUnit) {
+		MapUnit unit = wrappedMapUnit.Value;
+		log.Information("Selected unit: " + unit + " at " + unit.location);
+		StopToggling();
+		UpdateUnitGraphic(unit);
+		UpdateUnitInfo(unit, unit.location.overlayTerrainType);
+	}
+
+	private void UpdateUnitGraphic(MapUnit unit) {
+		if (this.GetChildren().Contains(unitPlaceholder))
+			this.RemoveChild(unitPlaceholder);
+		if (this.GetChildren().Contains(unitTintPlaceholder))
+			this.RemoveChild(unitTintPlaceholder);
+
+		if (unit == MapUnit.NONE || unit == null) {
+			return;
 		}
+
+		string key = AnimationManager.GetUnitDefaultThumbnailKey(unit.unitType);
+		ImageTexture baseFrame = AnimationManager.AnimationThumbnails[key];
+		ImageTexture tintFrame = AnimationManager.AnimationTintThumbnails[key];
+
+		ShaderMaterial material = TextureLoader.GetShaderMaterialForUnit(unit.owner.colorIndex);
+
+		// Add the base sprite.
+		unitPlaceholder = new Sprite2D();
+		unitPlaceholder.Texture = baseFrame;
+		unitPlaceholder.Position = new Vector2(
+			boxRightRectangle.Texture.GetWidth() / 2f - offsetUnitThumbnailX,
+			boxRightRectangle.Texture.GetHeight() / 2f - offsetUnitThumbnailY);
+		this.AddChild(unitPlaceholder);
+
+		// Add the tint sprite, hooking up the shader.
+		unitTintPlaceholder = new Sprite2D();
+		unitTintPlaceholder.Texture = tintFrame;
+		unitTintPlaceholder.Material = material;
+		unitTintPlaceholder.Position = unitPlaceholder.Position;
+		this.AddChild(unitTintPlaceholder);
 	}
 
-	public void UpdateTechProgress(string techName, int turnsRemaining) {
-		if (turnsRemaining > 0) {
-			SetTextAndCenterLabel(scienceProgress, $"{techName} (-- turns)");
-		} else {
-			SetTextAndCenterLabel(scienceProgress, $"{techName} ({turnsRemaining} turns)");
+	private void HandleBoxClick() {
+		// When the turn can be ended, the click on the box is like clicking on the blinky button
+		if (timerStarted) {
+			turnEnded();
+			return;
 		}
+		// Otherwise we can center the camera to the unit currently active
+		EmitSignal(SignalName.CenterCameraOnActiveUnit);
 	}
 
-	private void SetTextAndCenterLabel(Label label, string text) {
-		//For the centered labels, we anchor them center, with equal weight on each side.
-		//Then, when they are visible, we add a left margin that's negative and equal to half
-		//their width.
-		//Seems like there probably is an easier way, but I haven't found it yet.
-		label.Text = text;
-		label.HorizontalAlignment = HorizontalAlignment.Center;
-		label.AnchorLeft = 0.5f;
-		label.AnchorRight = 0.5f;
-		label.OffsetLeft = -1 * (label.Size.X / 2.0f);
-
+	private void OnUnitMoved(ParameterWrapper<MapUnit> wrappedMapUnit) {
+		MapUnit unit = wrappedMapUnit.Value;
+		UpdateUnitInfo(unit, unit.location.overlayTerrainType);
 	}
 }

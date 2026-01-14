@@ -3,11 +3,10 @@ using System;
 using System.Linq;
 using C7.Map;
 using Godot;
-using ConvertCiv3Media;
 using C7GameData;
 using C7Engine;
 using Serilog;
-using Serilog.Events;
+using System.Diagnostics;
 
 // Loose layers are for drawing things on the map on a per-tile basis. (Historical aside: There used to be another kind of layer called a TileLayer
 // that was intended to draw regularly tiled objects like terrain sprites but using LooseLayers for everything was found to be a prefereable
@@ -35,9 +34,6 @@ public partial class TerrainLayer : LooseLayer {
 
 	public static readonly Vector2 terrainSpriteSize = new Vector2(128, 64);
 
-	// A triple sheet is a sprite sheet containing sprites for three different terrain types including transitions between.
-	private List<ImageTexture> tripleSheets;
-
 	// TileToDraw stores the arguments passed to drawObject so the draws can be sorted by texture before being submitted. This significantly
 	// reduces the number of draw calls Godot must generate (1483 to 312 when fully zoomed out on our test map) and modestly improves framerate
 	// (by about 14% on my system).
@@ -63,25 +59,6 @@ public partial class TerrainLayer : LooseLayer {
 
 	private List<TileToDraw> tilesToDraw = new List<TileToDraw>();
 
-	public TerrainLayer() {
-		tripleSheets = loadTerrainTripleSheets();
-	}
-
-	public List<ImageTexture> loadTerrainTripleSheets() {
-		List<string> fileNames = new List<string> {
-			"Art/Terrain/xtgc.pcx",
-			"Art/Terrain/xpgc.pcx",
-			"Art/Terrain/xdgc.pcx",
-			"Art/Terrain/xdpc.pcx",
-			"Art/Terrain/xdgp.pcx",
-			"Art/Terrain/xggc.pcx",
-			"Art/Terrain/wCSO.pcx",
-			"Art/Terrain/wSSS.pcx",
-			"Art/Terrain/wOOO.pcx",
-		};
-		return fileNames.ConvertAll(name => Util.LoadTextureFromPCX(name));
-	}
-
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		tilesToDraw.Add(new TileToDraw(tile, tileCenter));
 		tilesToDraw.Add(new TileToDraw(tile.neighbors[TileDirection.SOUTH], tileCenter + new Vector2(0, 64)));
@@ -90,18 +67,25 @@ public partial class TerrainLayer : LooseLayer {
 	}
 
 	public override void onEndDraw(LooseView looseView, GameData gameData) {
+
 		tilesToDraw.Sort();
+
 		foreach (TileToDraw tTD in tilesToDraw) {
-			if (tTD.tile != Tile.NONE) {
-				int xSheet = tTD.tile.ExtraInfo.BaseTerrainImageID % 9, ySheet = tTD.tile.ExtraInfo.BaseTerrainImageID / 9;
-				Rect2 texRect = new Rect2(new Vector2(xSheet, ySheet) * terrainSpriteSize, terrainSpriteSize);
-				Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.Y);
-				// Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
-				// Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
-				Rect2 screenRect = new Rect2(tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset, terrainSpriteSize * 1.001f);
-				looseView.DrawTextureRectRegion(tripleSheets[tTD.tile.ExtraInfo.BaseTerrainFileID], screenRect, texRect);
-			}
+			if (tTD.tile == Tile.NONE) { continue; }
+
+			ImageTexture texture = TextureLoader.Load("terrain.base", tTD.tile, useCache: true);
+
+			Vector2 terrainOffset = new Vector2(0, -1 * MapView.cellSize.Y);
+			Vector2 position = tTD.tileCenter - (float)0.5 * terrainSpriteSize + terrainOffset;
+
+			// Multiply size by 100.1% so avoid "seams" in the map.  See issue #106.
+			// Jim's option of a whole-map texture is less hacky, but this is quicker and seems to be working well.
+			Rect2 screenRect = new Rect2(position, terrainSpriteSize * 1.001f);
+
+			looseView.DrawTextureRect(texture, screenRect, tile: false);
+
 		}
+
 		tilesToDraw.Clear();
 	}
 }
@@ -122,16 +106,15 @@ public partial class HillsLayer : LooseLayer {
 	private ImageTexture jungleVolcanoTexture;
 
 	public HillsLayer() {
-		mountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains.pcx");
-		snowMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/Mountains-snow.pcx");
-		forestMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain forests.pcx");
-		jungleMountainTexture = Util.LoadTextureFromPCX("Art/Terrain/mountain jungles.pcx");
-		hillsTexture = Util.LoadTextureFromPCX("Art/Terrain/xhills.pcx");
-		forestHillsTexture = Util.LoadTextureFromPCX("Art/Terrain/hill forests.pcx");
-		jungleHillsTexture = Util.LoadTextureFromPCX("Art/Terrain/hill jungle.pcx");
-		volcanosTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos.pcx");
-		forestVolcanoTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos forests.pcx");
-		jungleVolcanoTexture = Util.LoadTextureFromPCX("Art/Terrain/Volcanos jungles.pcx");
+		mountainTexture = TextureLoader.Load("terrain.mountain.base");
+		snowMountainTexture = TextureLoader.Load("terrain.mountain.snow");
+		forestMountainTexture = TextureLoader.Load("terrain.mountain.forest");
+		jungleMountainTexture = TextureLoader.Load("terrain.mountain.jungle");
+		hillsTexture = TextureLoader.Load("terrain.hill.base");
+		forestHillsTexture = TextureLoader.Load("terrain.hill.forest");
+		jungleHillsTexture = TextureLoader.Load("terrain.hill.jungle");
+		volcanosTexture = TextureLoader.Load("terrain.volcano.base");
+		forestVolcanoTexture = TextureLoader.Load("terrain.volcano.forest");
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
@@ -227,7 +210,7 @@ public partial class HillsLayer : LooseLayer {
 		}
 
 		//If we get here, it's a tie between forest and jungle.  Deterministically choose one so it doesn't change on every render
-		if (center.xCoordinate % 2 == 0) {
+		if (center.XCoordinate % 2 == 0) {
 			return forest;
 		}
 		return jungle;
@@ -267,17 +250,17 @@ public partial class ForestLayer : LooseLayer {
 	private ImageTexture pineTundraTexture;
 
 	public ForestLayer() {
-		largeJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 0, 512, 176);
-		smallJungleTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 176, 768, 176);
-		largeForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 352, 512, 176);
-		largePlainsForestTexture = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx", 0, 352, 512, 176);
-		largeTundraForestTexture = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx", 0, 352, 512, 176);
-		smallForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 528, 640, 176);
-		smallPlainsForestTexture = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx", 0, 528, 640, 176);
-		smallTundraForestTexture = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx", 0, 528, 640, 176);
-		pineForestTexture = Util.LoadTextureFromPCX("Art/Terrain/grassland forests.pcx", 0, 704, 768, 176);
-		pinePlainsTexture = Util.LoadTextureFromPCX("Art/Terrain/plains forests.pcx", 0, 704, 768, 176);
-		pineTundraTexture = Util.LoadTextureFromPCX("Art/Terrain/tundra forests.pcx", 0, 704, 768, 176);
+		largeJungleTexture = TextureLoader.Load("terrain.jungle.large");
+		smallJungleTexture = TextureLoader.Load("terrain.jungle.small");
+		largeForestTexture = TextureLoader.Load("terrain.forest.large");
+		largePlainsForestTexture = TextureLoader.Load("terrain.forest.plains.large");
+		largeTundraForestTexture = TextureLoader.Load("terrain.forest.tundra.large");
+		smallForestTexture = TextureLoader.Load("terrain.forest.small");
+		smallPlainsForestTexture = TextureLoader.Load("terrain.forest.plains.small");
+		smallTundraForestTexture = TextureLoader.Load("terrain.forest.tundra.small");
+		pineForestTexture = TextureLoader.Load("terrain.pine.forest");
+		pinePlainsTexture = TextureLoader.Load("terrain.pine.plains");
+		pineTundraTexture = TextureLoader.Load("terrain.pine.tundra");
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
@@ -285,14 +268,14 @@ public partial class ForestLayer : LooseLayer {
 			//Randomly, but predictably, choose a large jungle graphic
 			//More research is needed on when to use large vs small jungles.  Probably, small is used when neighboring fewer jungles.
 			//For the first pass, we're just always using large jungles.
-			int randomJungleRow = tile.yCoordinate % 2;
+			int randomJungleRow = tile.YCoordinate % 2;
 			int randomJungleColumn;
 			ImageTexture jungleTexture;
-			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-				randomJungleColumn = tile.xCoordinate % 6;
+			if (tile.GetEdgeNeighbors().Any(t => t.IsWater())) {
+				randomJungleColumn = tile.XCoordinate % 6;
 				jungleTexture = smallJungleTexture;
 			} else {
-				randomJungleColumn = tile.xCoordinate % 4;
+				randomJungleColumn = tile.XCoordinate % 4;
 				jungleTexture = largeJungleTexture;
 			}
 			Rect2 jungleRectangle = new Rect2(randomJungleColumn * forestJungleSize.X, randomJungleRow * forestJungleSize.Y, forestJungleSize);
@@ -304,8 +287,8 @@ public partial class ForestLayer : LooseLayer {
 			int forestColumn = 0;
 			ImageTexture forestTexture;
 			if (tile.isPineForest) {
-				forestRow = tile.yCoordinate % 2;
-				forestColumn = tile.xCoordinate % 6;
+				forestRow = tile.YCoordinate % 2;
+				forestColumn = tile.XCoordinate % 6;
 				if (tile.baseTerrainType.Key == "grassland") {
 					forestTexture = pineForestTexture;
 				} else if (tile.baseTerrainType.Key == "plains") {
@@ -314,9 +297,9 @@ public partial class ForestLayer : LooseLayer {
 					forestTexture = pineTundraTexture;
 				}
 			} else {
-				forestRow = tile.yCoordinate % 2;
-				if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-					forestColumn = tile.xCoordinate % 5;
+				forestRow = tile.YCoordinate % 2;
+				if (tile.GetEdgeNeighbors().Any(t => t.IsWater())) {
+					forestColumn = tile.XCoordinate % 5;
 					if (tile.baseTerrainType.Key == "grassland") {
 						forestTexture = smallForestTexture;
 					} else if (tile.baseTerrainType.Key == "plains") {
@@ -325,7 +308,7 @@ public partial class ForestLayer : LooseLayer {
 						forestTexture = smallTundraForestTexture;
 					}
 				} else {
-					forestColumn = tile.xCoordinate % 4;
+					forestColumn = tile.XCoordinate % 4;
 					if (tile.baseTerrainType.Key == "grassland") {
 						forestTexture = largeForestTexture;
 					} else if (tile.baseTerrainType.Key == "plains") {
@@ -351,20 +334,20 @@ public partial class MarshLayer : LooseLayer {
 	private ImageTexture smallMarshTexture;
 
 	public MarshLayer() {
-		largeMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0, 0, 512, 176);
-		smallMarshTexture = Util.LoadTextureFromPCX("Art/Terrain/marsh.pcx", 0, 176, 640, 176);
+		largeMarshTexture = TextureLoader.Load("terrain.marsh.large");
+		smallMarshTexture = TextureLoader.Load("terrain.marsh.small");
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		if (tile.overlayTerrainType.Key == "marsh") {
-			int randomJungleRow = tile.yCoordinate % 2;
+			int randomJungleRow = tile.YCoordinate % 2;
 			int randomMarshColumn;
 			ImageTexture marshTexture;
-			if (tile.getEdgeNeighbors().Any(t => t.IsWater())) {
-				randomMarshColumn = tile.xCoordinate % 5;
+			if (tile.GetEdgeNeighbors().Any(t => t.IsWater())) {
+				randomMarshColumn = tile.XCoordinate % 5;
 				marshTexture = smallMarshTexture;
 			} else {
-				randomMarshColumn = tile.xCoordinate % 4;
+				randomMarshColumn = tile.XCoordinate % 4;
 				marshTexture = largeMarshTexture;
 			}
 			Rect2 jungleRectangle = new Rect2(randomMarshColumn * marshSize.X, randomJungleRow * marshSize.Y, marshSize);
@@ -380,7 +363,7 @@ public partial class RiverLayer : LooseLayer {
 	private ImageTexture riverTexture;
 
 	public RiverLayer() {
-		riverTexture = Util.LoadTextureFromPCX("Art/Terrain/mtnRivers.pcx");
+		riverTexture = TextureLoader.Load("terrain.river");
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
@@ -431,27 +414,26 @@ public partial class GridLayer : LooseLayer {
 		Vector2 right = tileCenter + new Vector2(cS.X, 0);
 		looseView.DrawLine(left, top, color, lineWidth);
 		looseView.DrawLine(top, right, color, lineWidth);
+
+		if (gameData.observerMode && gameData.showGridCoordinates) {
+			looseView.DrawString(ThemeDB.FallbackFont,
+								 tileCenter + new Vector2(-16, 0), tile.XCoordinate + "," + tile.YCoordinate,
+								 HorizontalAlignment.Center, -1, 24, Color.Color8(255, 0, 0));
+		}
 	}
 }
 
 public partial class BuildingLayer : LooseLayer {
-	private ImageTexture buildingsTex;
-	private Vector2 buildingSpriteSize;
+	private ImageTexture barbCamp;
 
 	public BuildingLayer() {
-		var buildingsPCX = new Pcx(Util.Civ3MediaPath("Art/Terrain/TerrainBuildings.PCX"));
-		buildingsTex = PCXToGodot.getImageTextureFromPCX(buildingsPCX);
-		//In Conquests, this graphic is 4x4, and the search path will now find the Conquests one first
-		buildingSpriteSize = new Vector2((float)buildingsTex.GetWidth() / 4, (float)buildingsTex.GetHeight() / 4);
+		barbCamp = TextureLoader.Load("terrain.barbarian_camp");
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		if (tile.hasBarbarianCamp) {
-			var texRect = new Rect2(buildingSpriteSize * new Vector2(2, 0), buildingSpriteSize); //(2, 0) is the offset in the TerrainBuildings.PCX file (top row, third in)
-
-			// TODO: Modify this calculation so it doesn't assume buildingSpriteSize is the same as the size of the terrain tiles
-			var screenRect = new Rect2(tileCenter - (float)0.5 * buildingSpriteSize, buildingSpriteSize);
-			looseView.DrawTextureRectRegion(buildingsTex, screenRect, texRect);
+			Rect2 screenRect = new(tileCenter - 0.5f * barbCamp.GetSize(), barbCamp.GetSize());
+			looseView.DrawTextureRect(barbCamp, screenRect, tile: false);
 		}
 	}
 }
@@ -459,12 +441,17 @@ public partial class BuildingLayer : LooseLayer {
 public partial class LooseView : Node2D {
 	public MapView mapView;
 	public List<LooseLayer> layers = new List<LooseLayer>();
+	private static ILogger log = Log.ForContext<LooseView>();
+
+	protected List<VisibleTile> visibleKnownTiles;
+	protected List<VisibleTile> visibleUnKnownTiles;
+	public Dictionary<Tile, Vector2> tileCenters { get; private set; } = new Dictionary<Tile, Vector2>();
 
 	public LooseView(MapView mapView) {
 		this.mapView = mapView;
 	}
 
-	private struct VisibleTile {
+	protected struct VisibleTile {
 		public Tile tile;
 		public Vector2 tileCenter;
 	}
@@ -472,52 +459,88 @@ public partial class LooseView : Node2D {
 	public override void _Draw() {
 		base._Draw();
 
-		using (var gameDataAccess = new UIGameDataAccess()) {
-			GameData gD = gameDataAccess.gameData;
-
+		EngineStorage.ReadGameData((GameData gD) => {
 			// Iterating over visible tiles is unfortunately pretty expensive. Assemble a list of Tile references and centers first so we don't
 			// have to reiterate for each layer. Doing this improves framerate significantly.
 			MapView.VisibleRegion visRegion = mapView.getVisibleRegion();
-			List<VisibleTile> visibleTiles = new List<VisibleTile>();
-			for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++) {
-				if (gD.map.isRowAt(y)) {
-					for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
-						Tile tile = gD.map.tileAt(x, y);
-						if (IsTileKnown(tile, gameDataAccess)) {
-							visibleTiles.Add(new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) });
+			visibleKnownTiles = new List<VisibleTile>();
+			visibleUnKnownTiles = new List<VisibleTile>();
+			GetVisibleTiles(visRegion, gD);
+
+			Stopwatch stopwatch = new Stopwatch();
+			stopwatch.Start();
+			foreach (LooseLayer layer in layers.FindAll(L => L.visible && !(L is FogOfWarLayer) && !(L is GridLayer))) {
+				layer.onBeginDraw(this, gD);
+				foreach (VisibleTile vT in visibleKnownTiles) {
+					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
+				}
+
+				layer.onEndDraw(this, gD);
+			}
+
+			foreach (GridLayer layer in layers.Where(layer => layer.visible && layer is GridLayer).Cast<GridLayer>()) {
+				layer.onBeginDraw(this, gD);
+				foreach (VisibleTile vT in visibleKnownTiles.Concat(visibleUnKnownTiles)) {
+					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
+				}
+
+				layer.onEndDraw(this, gD);
+			}
+
+			if (stopwatch.ElapsedMilliseconds > 100) {
+				log.Information($"-> End draw: {stopwatch.ElapsedMilliseconds} milliseconds");
+			}
+
+			if (!gD.observerMode) {
+				foreach (FogOfWarLayer layer in layers.Where(layer => layer is FogOfWarLayer).Cast<FogOfWarLayer>()) {
+					for (int Y = visRegion.upperLeftY; Y < visRegion.lowerRightY; Y++) {
+						if (gD.map.isRowAt(Y)) {
+							for (int X = visRegion.getRowStartX(Y); X < visRegion.lowerRightX; X += 2) {
+								Tile tile = gD.map.tileAt(X, Y);
+								if (tile != Tile.NONE) {
+									VisibleTile invisibleTile = new VisibleTile {
+										tile = tile,
+										tileCenter = MapView.cellSize * new Vector2(X + 1, Y + 1)
+									};
+									layer.drawObject(this, gD, tile, invisibleTile.tileCenter);
+								}
+							}
 						}
 					}
 				}
 			}
+		});
+	}
 
-			foreach (LooseLayer layer in layers.FindAll(L => L.visible && !(L is FogOfWarLayer))) {
-				layer.onBeginDraw(this, gD);
-				foreach (VisibleTile vT in visibleTiles) {
-					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
-				}
-				layer.onEndDraw(this, gD);
-			}
-
-			if (!gD.observerMode) {
-				foreach (LooseLayer layer in layers.FindAll(layer => layer is FogOfWarLayer)) {
-					for (int y = visRegion.upperLeftY; y < visRegion.lowerRightY; y++)
-						if (gD.map.isRowAt(y))
-							for (int x = visRegion.getRowStartX(y); x < visRegion.lowerRightX; x += 2) {
-								Tile tile = gD.map.tileAt(x, y);
-								if (tile != Tile.NONE) {
-									VisibleTile invisibleTile = new VisibleTile { tile = tile, tileCenter = MapView.cellSize * new Vector2(x + 1, y + 1) };
-									layer.drawObject(this, gD, tile, invisibleTile.tileCenter);
-								}
-							}
+	private void GetVisibleTiles(MapView.VisibleRegion visRegion, GameData gD) {
+		for (int Y = visRegion.upperLeftY; Y < visRegion.lowerRightY; Y++) {
+			if (gD.map.isRowAt(Y)) {
+				for (int X = visRegion.getRowStartX(Y); X < visRegion.lowerRightX; X += 2) {
+					Tile tile = gD.map.tileAt(X, Y);
+					Vector2 tileCenter = MapView.cellSize * new Vector2(X + 1, Y + 1);
+					if (IsTileKnown(tile, gD)) {
+						visibleKnownTiles.Add(new VisibleTile {
+							tile = tile,
+							tileCenter = tileCenter
+						});
+					} else {
+						visibleUnKnownTiles.Add(new VisibleTile {
+							tile = tile,
+							tileCenter = tileCenter
+						});
+					}
+					tileCenters[tile] = tileCenter;
 				}
 			}
 		}
 	}
-	private static bool IsTileKnown(Tile tile, UIGameDataAccess gameDataAccess) {
-		if (gameDataAccess.gameData.observerMode) {
+
+	private static bool IsTileKnown(Tile tile, GameData gameData) {
+		if (gameData.observerMode) {
 			return true;
 		}
-		return tile != Tile.NONE && gameDataAccess.gameData.GetHumanPlayers()[0].tileKnowledge.isTileKnown(tile);
+		TileKnowledge knowledge = gameData.GetFirstHumanPlayer().tileKnowledge;
+		return tile != Tile.NONE && knowledge.isTileKnown(tile);
 	}
 }
 
@@ -530,6 +553,8 @@ public partial class MapView : Node2D {
 	}
 
 	public Game game;
+
+	public MapView() { }
 
 	public int mapWidth { get; private set; }
 	public int mapHeight { get; private set; }
@@ -551,7 +576,7 @@ public partial class MapView : Node2D {
 		set { setCameraZoomFromMiddle(value); }
 	}
 
-	private LooseView looseView;
+	private List<LooseView> looseViews = new();
 
 	// Specifies a rectangular block of tiles that are currently potentially on screen. Accessible through getVisibleRegion(). Tile coordinates
 	// are "virtual", i.e. "unwrapped", so there isn't necessarily a tile at each location. The region is intended to include the upper left
@@ -568,8 +593,20 @@ public partial class MapView : Node2D {
 
 	public GridLayer gridLayer { get; private set; }
 	public CityLayer cityLayer { get; private set; }
+	public TileAssignmentLayer tileAssignmentLayer { get; private set; }
 
-	public ImageTexture civColorWhitePalette = null;
+	const float MIN_SCALE = 0.1f;
+	const float MAX_SCALE = 4.0f;
+
+	private LowerRightInfoBox lowerRightInfoBox;
+	public override void _Ready() {
+		lowerRightInfoBox = GetNode<LowerRightInfoBox>("/root/C7Game/CanvasLayer/Control/GameStatus/LowerRightInfoBox");
+		lowerRightInfoBox.CenterCameraOnActiveUnit += OnCenterCameraOnUnit;
+	}
+
+	public override void _ExitTree() {
+		lowerRightInfoBox.CenterCameraOnActiveUnit -= OnCenterCameraOnUnit;
+	}
 
 	public MapView(Game game, int mapWidth, int mapHeight, bool wrapHorizontally, bool wrapVertically) {
 		this.game = game;
@@ -578,34 +615,69 @@ public partial class MapView : Node2D {
 		this.wrapHorizontally = wrapHorizontally;
 		this.wrapVertically = wrapVertically;
 
-		looseView = new LooseView(this);
-		looseView.layers.Add(new TerrainLayer());
-		looseView.layers.Add(new RiverLayer());
-		looseView.layers.Add(new ForestLayer());
-		looseView.layers.Add(new MarshLayer());
-		looseView.layers.Add(new HillsLayer());
-		looseView.layers.Add(new TntLayer());
-		looseView.layers.Add(new TileOverlayLayer());
-		looseView.layers.Add(new ResourceLayer());
+		// Set up our set of views, and the layers within each view.
+		//
+		// The drawing order within a view matches the order of `layers`, so
+		// here borders will be drawn on top of the terrain.
+		//
+		// However, because cities and units use child nodes, we need separate
+		// LooseView objects to get the ordering correct between textures and
+		// nodes. Without this unit health bars (which are textures) would
+		// be drawn behind cities (which are child nodes).
+		LooseView terrainView = new(this);
+		terrainView.layers.Add(new TerrainLayer());
+		terrainView.layers.Add(new RiverLayer());
+		terrainView.layers.Add(new ForestLayer());
+		terrainView.layers.Add(new MarshLayer());
+		terrainView.layers.Add(new HillsLayer());
+		terrainView.layers.Add(new TntLayer());
+		terrainView.layers.Add(new TileOverlayLayer());
+		terrainView.layers.Add(new ResourceLayer());
 		this.gridLayer = new GridLayer();
-		looseView.layers.Add(this.gridLayer);
-		looseView.layers.Add(new BuildingLayer());
-		looseView.layers.Add(new BorderLayer());
-		looseView.layers.Add(new UnitLayer());
-		looseView.layers.Add(new GotoLayer());
+		terrainView.layers.Add(this.gridLayer);
+		terrainView.layers.Add(new BuildingLayer());
+		terrainView.layers.Add(new BorderLayer());
+
+		LooseView cityView = new(this);
 		this.cityLayer = new();
-		looseView.layers.Add(this.cityLayer);
-		looseView.layers.Add(new FogOfWarLayer());
+		cityView.layers.Add(this.cityLayer);
 
-		(civColorWhitePalette, _) = Util.loadPalettizedPCX("Art/Units/Palettes/ntp00.pcx");
+		LooseView tileAssignmentView = new(this);
+		this.tileAssignmentLayer = new();
+		tileAssignmentView.layers.Add(this.tileAssignmentLayer);
 
-		AddChild(looseView);
+		LooseView fogOfWarView = new(this);
+		fogOfWarView.layers.Add(new FogOfWarLayer());
+
+		LooseView unitView = new(this);
+		unitView.layers.Add(new GotoLayer());
+		LooseView otherView = new(this);
+		otherView.layers.Add(new UnitLayer());
+
+		AddChild(terrainView);
+		looseViews.Add(terrainView);
+
+		AddChild(cityView);
+		looseViews.Add(cityView);
+
+		AddChild(tileAssignmentView);
+		looseViews.Add(tileAssignmentView);
+
+		AddChild(fogOfWarView);
+		looseViews.Add(fogOfWarView);
+
+		AddChild(unitView);
+		looseViews.Add(unitView);
+		AddChild(otherView);
+		looseViews.Add(otherView);
 	}
 
 	public override void _Process(double delta) {
 		// Redraw everything. This is necessary so that animations play. Maybe we could only update the unit layer but long term I think it's
 		// better to redraw everything every frame like a typical modern video game.
-		looseView.QueueRedraw();
+		foreach (LooseView looseView in looseViews) {
+			looseView.QueueRedraw();
+		}
 	}
 
 	// Returns the size in pixels of the area in which the map will be drawn. This is the viewport size or, if that's null, the window size.
@@ -614,24 +686,28 @@ public partial class MapView : Node2D {
 	}
 
 	public VisibleRegion getVisibleRegion() {
-		(int x0, int y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
+		(int X0, int Y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
 		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		return new VisibleRegion {
-			upperLeftX = x0 - 2,
-			upperLeftY = y0 - 2,
-			lowerRightX = x0 + (int)mapViewSize.X,
-			lowerRightY = y0 + (int)mapViewSize.Y
+			upperLeftX = X0 - 2,
+			upperLeftY = Y0 - 2,
+			lowerRightX = X0 + (int)mapViewSize.X,
+			lowerRightY = Y0 + (int)mapViewSize.Y
 		};
 	}
 
 	// "center" is the screen location around which the zoom is centered, e.g., if center is (0, 0) the tile in the top left corner will be the
 	// same after the zoom level is changed, and if center is screenSize/2, the tile in the center of the window won't change.
 	public void setCameraZoom(float newScale, Vector2 center) {
+		newScale = Math.Clamp(newScale, MIN_SCALE, MAX_SCALE);
+
 		Vector2 v2NewZoom = new Vector2(newScale, newScale);
 		Vector2 v2OldZoom = new Vector2(cameraZoom, cameraZoom);
 		if (v2NewZoom != v2OldZoom) {
 			internalCameraZoom = newScale;
-			looseView.Scale = v2NewZoom;
+			foreach (LooseView looseView in looseViews) {
+				looseView.Scale = v2NewZoom;
+			}
 			setCameraLocation((v2NewZoom / v2OldZoom) * (cameraLocation + center) - center);
 		}
 	}
@@ -688,21 +764,23 @@ public partial class MapView : Node2D {
 		}
 
 		internalCameraLocation = location;
-		looseView.Position = -location;
+		foreach (LooseView looseView in looseViews) {
+			looseView.Position = -location;
+		}
 	}
 
-	public Vector2 screenLocationOfTileCoords(int x, int y, bool center = true) {
-		// Add one to x & y to get the tile center b/c in Civ 3 the tile at (x, y) is a diamond centered on (x+1, y+1).
+	public Vector2 screenLocationOfTileCoords(int X, int Y, bool center = true) {
+		// Add one to X & Y to get the tile center b/c in Civ 3 the tile at (X, Y) is a diamond centered on (x+1, y+1).
 		Vector2 centeringOffset = center ? new Vector2(1, 1) : new Vector2(0, 0);
 
-		var mapLoc = (new Vector2(x, y) + centeringOffset) * cellSize;
+		var mapLoc = (new Vector2(X, Y) + centeringOffset) * cellSize;
 		return mapLoc * cameraZoom - cameraLocation;
 	}
 
-	// Returns the location of tile (x, y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the
-	// upper left. Works even if (x, y) is off screen or out of bounds.
+	// Returns the location of tile (X, Y) on the screen, if "center" is true returns the location of the tile center and otherwise returns the
+	// upper left. Works even if (X, Y) is off screen or out of bounds.
 	public Vector2 screenLocationOfTile(Tile tile, bool center = true) {
-		return screenLocationOfTileCoords(tile.xCoordinate, tile.yCoordinate, center);
+		return screenLocationOfTileCoords(tile.XCoordinate, tile.YCoordinate, center);
 	}
 
 	// Returns the virtual tile coordinates on screen at the given location. "Virtual" meaning the coordinates are unwrapped and there isn't
@@ -711,29 +789,36 @@ public partial class MapView : Node2D {
 		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
 		Vector2 intMapLoc = mapLoc.Floor();
 		Vector2 fracMapLoc = mapLoc - intMapLoc;
-		int x = (int)intMapLoc.X, y = (int)intMapLoc.Y;
-		bool evenColumn = x % 2 == 0, evenRow = y % 2 == 0;
+		int X = (int)intMapLoc.X, Y = (int)intMapLoc.Y;
+		bool evenColumn = X % 2 == 0, evenRow = Y % 2 == 0;
 		if (evenColumn ^ evenRow) {
 			if (fracMapLoc.Y > fracMapLoc.X)
-				x -= 1;
+				X -= 1;
 			else
-				y -= 1;
+				Y -= 1;
 		} else {
 			if (fracMapLoc.Y < 1 - fracMapLoc.X) {
-				x -= 1;
-				y -= 1;
+				X -= 1;
+				Y -= 1;
 			}
 		}
-		return (x, y);
+		return (X, Y);
 	}
 
 	public Tile tileOnScreenAt(GameMap map, Vector2 screenLocation) {
-		(int x, int y) = tileCoordsOnScreenAt(screenLocation);
-		return map.tileAt(x, y);
+		(int X, int Y) = tileCoordsOnScreenAt(screenLocation);
+		return map.tileAt(X, Y);
 	}
 
 	public void centerCameraOnTile(Tile t) {
-		var tileCenter = new Vector2(t.xCoordinate + 1, t.yCoordinate + 1) * scaledCellSize;
+		var tileCenter = new Vector2(t.XCoordinate + 1, t.YCoordinate + 1) * scaledCellSize;
 		setCameraLocation(tileCenter - (float)0.5 * getVisibleAreaSize());
+	}
+
+	public void OnCenterCameraOnUnit() {
+		MapUnit currentlySelectedUnit = game.CurrentlySelectedUnit;
+		if (currentlySelectedUnit == MapUnit.NONE || currentlySelectedUnit == null)
+			return;
+		centerCameraOnTile(currentlySelectedUnit.location);
 	}
 }

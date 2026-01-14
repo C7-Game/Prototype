@@ -1,23 +1,24 @@
-# C7
-C7 is an in-development 4X strategy game built with Godot and C#, with a historical focus inspired by games such as _Civilization_, _Galactic Civilizations_, and _Humankind_. We aim to create a new game that looks and plays like classic Civ but incorporates features from the best of the genre and our own dreams.
+# OpenCiv3
 
-[Homepage](https://c7-game.github.io/)
+**OpenCiv3** (formerly known by the codename "C7") is an open-source, mod-oriented remake of _Civilization III_ by the fan community built with Godot and C#, with capabilities inspired by other 4X games and lessons learned in Civ3 modding. We aim to create a new game that looks and plays like Civ3 but incorporates features from the best of the genre and our own dreams.
 
-[GitHub](https://github.com/C7-Game)
+***OpenCiv3 is under active development and currently in an early pre-alpha state.*** It is a rudimentary playable game but lacking many mechanics and late-game content, and errors are likely. Keep up with our development for the latest updates and opportunities to contribute!
 
-[CivFanatics subforum](https://forums.civfanatics.com/forums/civ3-future-development.604/)
+- [OpenCiv3.org](https://www.openciv3.org)
+- [CivFanatics subforum](https://forums.civfanatics.com/forums/civ3-future-development.604/)
+- [Discord](https://discord.gg/uwxUuWhM89)
 
-[Discord](https://discord.gg/uwxUuWhM89)
+> [!NOTE]
+> OpenCiv3 is not affiliated with civfanatics.com,
+> Firaxis Games, BreakAway Games, Hasbro Interactive, Infogrames Interactive,
+> Atari Interactive, or Take-Two Interactive Software.
+> All trademarks are property of their respective owners.
 
 ## Status
 
-The first preview of the third milestone, "Carthage", is available on the [Releases page](https://github.com/C7-Game/Prototype/releases).  As of this release, you can build cities and units of your choosing among a set of early-game units, and engage in combat with AI civs that are also exanding and exploring. Current information on installation and features can always be found on the [project homepage.](https://c7-game.github.io/)
+The latest stable version can be downloaded from the [Releases page](releases). Current information on installation and features can always be found on the [project homepage.](https://www.openciv3.org/)
 
-You can view our progress towards the full "Carthage" milestone from [this project page](https://github.com/C7-Game/Prototype/projects/3).  Key features being planned include improved combat detail, roads, tile visibility/exploration for human players, and save/load.
-
-At this stage, C7 is not yet a fully playable game, but becomes a little bit closer every month.  Take the latest release for a spin, leave some [feedback](https://forums.civfanatics.com/forums/civ3-future-development.604/), and follow the repo for updates.
-
-For now, an installation of _Sid Meier's Civilization III Complete_ (or _Conquests_) is required for art assets, which you can find on Steam or GOG.
+OpenCiv3 is in a pre-alpha state. It is a rudimentary playable game but lacking many mechanics and late-game content, and errors are likely. Keep up with our development for the latest updates and opportunities to contribute!
 
 ## Contributing
 

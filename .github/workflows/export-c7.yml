@@ -7,7 +7,7 @@ on:
         description: Checked for debug build, unchecked for release
         default: true
       folder-suffix:
-        description: Will be added to "C7" for folder name
+        description: Will be added to $EXPORT_NAME for folder name
         required: false
       include-username:
         type: boolean
@@ -28,32 +28,39 @@ on:
 
 
 env:
-  GODOT_VERSION: 4.2.2
-  EXPORT_NAME: C7
+  GODOT_VERSION: 4.4.1
+  EXPORT_NAME: OpenCiv3
+  PROJECT_DIR: C7
 
 jobs:
   Export-C7-Windows:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-4.2.2
+      image: barichello/godot-ci:mono-4.4.1
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         lfs: true
+        submodules: true
     - uses: ./.github/workflows/composite/buildSetup
     - name: Windows Build
       run: |
         mkdir -v -p build/${FOLDER_NAME}
-        cd ${EXPORT_NAME}
+        cd ${PROJECT_DIR}
         dotnet build
         godot -v --headless --export${BUILD_SUFFIX} "Windows Desktop" ../build/${FOLDER_NAME}/${EXPORT_NAME}.exe
     - name: Run tests
       run: |
         dotnet test C7
+    - name: Verify formatting (`run dotnet format C7/C7.sln whitespace` to fix)
+      run: |
+        dotnet format C7/C7.sln whitespace --verify-no-changes
     - name: Copy Static Files
       run: |
-        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp -r ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
+        if cp -r ${PROJECT_DIR}/Text build/${FOLDER_NAME}/Text && \\
+           cp -r ${PROJECT_DIR}/Assets build/${FOLDER_NAME}/Assets && \\
+           cp -r ${PROJECT_DIR}/Lua build/${FOLDER_NAME}/Lua
         then
           echo "successfully copied static files to build"
         else
@@ -68,25 +75,31 @@ jobs:
   Export-C7-Linux:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-4.2.2
+      image: barichello/godot-ci:mono-4.4.1
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         lfs: true
+        submodules: true
     - uses: ./.github/workflows/composite/buildSetup
     - name: Linux Build
       run: |
         mkdir -v -p build/${FOLDER_NAME}
-        cd ${EXPORT_NAME}
+        cd ${PROJECT_DIR}
         dotnet build
         godot -v --headless --export${BUILD_SUFFIX} "Linux/X11" ../build/${FOLDER_NAME}/${EXPORT_NAME}.x86_64
     - name: Run tests
       run: |
         dotnet test C7
+    - name: Verify formatting (`run dotnet format C7/C7.sln whitespace` to fix)
+      run: |
+        dotnet format C7/C7.sln whitespace --verify-no-changes
     - name: Copy Static Files
       run: |
-        if cp -r ${EXPORT_NAME}/Text build/${FOLDER_NAME}/Text && cp -r ${EXPORT_NAME}/Art build/${FOLDER_NAME}/Art
+        if cp -r ${PROJECT_DIR}/Text build/${FOLDER_NAME}/Text && \\
+           cp -r ${PROJECT_DIR}/Assets build/${FOLDER_NAME}/Assets && \\
+           cp -r ${PROJECT_DIR}/Lua build/${FOLDER_NAME}/Lua
         then
           echo "successfully copied static files to build"
         else
@@ -104,26 +117,30 @@ jobs:
   Export-C7-Mac:
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-4.2.2
+      image: barichello/godot-ci:mono-4.4.1
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         lfs: true
+        submodules: true
     - uses: ./.github/workflows/composite/buildSetup
     - name: Mac Build
       run: |
         mkdir -v -p build/${FOLDER_NAME}
-        cd ${EXPORT_NAME}
+        cd ${PROJECT_DIR}
         dotnet build
         godot -v --headless --export${BUILD_SUFFIX} "macOS" ../build/${FOLDER_NAME}.zip
     - name: Run tests
       run: |
         dotnet test C7
+    - name: Verify formatting (`run dotnet format C7/C7.sln whitespace` to fix)
+      run: |
+        dotnet format C7/C7.sln whitespace --verify-no-changes
     - name: Copy Static Files
       run: |
-        cd ${EXPORT_NAME}
-        if zip -r ../build/${FOLDER_NAME}.zip Art Text
+        cd ${PROJECT_DIR}
+        if zip -r ../build/${FOLDER_NAME}.zip Assets Text Lua
         then
           echo "successfully copied static files to build"
         else

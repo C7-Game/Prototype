@@ -27,7 +27,7 @@ namespace C7.Map {
 #pragma warning restore CS0414
 
 		public TntLayer() {
-			tntTexture = Util.LoadTextureFromPCX("Art/Terrain/tnt.pcx");
+			tntTexture = TextureLoader.Load("terrain.tnt");
 		}
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 			if (tile.overlayTerrainType.Key == "grassland" && tile.isBonusShield) {

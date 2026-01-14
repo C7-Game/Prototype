@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bvncm1bgcii5e"]
 
-[ext_resource type="Script" path="res://UIElements/Civ3FileDialog.cs" id="1_mb1lm"]
+[ext_resource type="Script" uid="uid://bw35dy5mh6hx" path="res://UIElements/Civ3FileDialog.cs" id="1_mb1lm"]
 
 [node name="LoadDialog" type="FileDialog"]
 initial_position = 1

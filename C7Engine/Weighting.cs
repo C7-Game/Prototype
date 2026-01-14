@@ -1,4 +1,4 @@
-﻿namespace C7Engine {
+namespace C7Engine {
 	/// <summary>
 	/// For weighted actions, this class is used to help determine how the AI makes its decision.
 	/// The idea is that for some things, the AI should always choose what it considers the best option.  But for other

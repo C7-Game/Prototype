@@ -1,15 +1,39 @@
+using C7GameData;
+
 namespace C7Engine.Pathing {
 	/**
 	 * Returns a pathing algorithm to use.
-	 * Eventually, this will depend on some map considerations.
-	 * For now, just return the first one.
 	 */
 	public class PathingAlgorithmChooser {
-		private static PathingAlgorithm landAlgorithm = new DijkstrasAlgorithm(new WalkerOnLand());
-		private static PathingAlgorithm waterAlgorithm = new DijkstrasAlgorithm(new WalkerOnWater());
+		public static PathingAlgorithm GetAlgorithm(MapUnit unit) {
+			return new AStarAlgorithm(
+				new UnitWalker(unit),
+				(Tile from, Tile to) => {
+					// HACK: for land-based movement we have to deal with railroads,
+					// which have zero movement cost. If our heuristic is too strong it
+					// will result in units taking a direct path between points A and B,
+					// even if a more indirect path could be taken entirely by railroad.
+					// To avoid this problem we scale our heuristic function down by a
+					// constant (arbitraily chosen to work well in practice) so that a 
+					// typical tile movement cost (around 1/3 to 3, depending on roads
+					// and terrain) dwarfs the heuristic. The heuristic is still enough
+					// to point the search in the proper direction, and since it is 
+					// still an underestimate in most cases, it works properly.
+					if (unit.IsLandUnit()) {
+						return from.distanceTo(to) / 100.0;
+					}
 
-		public static PathingAlgorithm GetAlgorithm(bool isLandUnit) {
-			return isLandUnit ? landAlgorithm : waterAlgorithm;
+					return from.distanceTo(to);
+				},
+				(Tile neighbor, Tile destination) => {
+					// Only allow a potentially attacking move for the last step,
+					// to allow pathing to attack. We don't want to try and path
+					// through opponents on the way to our destination though,
+					// as we can get stuck.
+					bool allowCombat = neighbor == destination;
+					return unit.CanEnterTile(neighbor, allowCombat);
+				}
+			);
 		}
 	}
 }

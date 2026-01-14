@@ -22,8 +22,8 @@ namespace QueryCiv3.Biq {
 		public int DefenseBonus;
 		public int NavalDefenseBonus;
 		public int MaintenanceCost;
-		public int HappyFacesAllCities;
-		public int HappyFaces;
+		public int ContentFacesAllCities;
+		public int ContentFaces;
 		public int UnhappyFacesAllCities;
 		public int UnhappyFaces;
 		public int NumberOfRequiredBuildings;

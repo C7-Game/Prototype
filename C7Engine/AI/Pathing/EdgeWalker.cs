@@ -6,36 +6,55 @@ namespace C7Engine.Pathing {
 		public abstract IEnumerable<Edge<TNode>> getEdges(TNode node);
 	}
 
-	public class WalkerOnLand : EdgeWalker<Tile> {
-		public override IEnumerable<Edge<Tile>> getEdges(Tile node) {
-			List<Edge<Tile>> result = new List<Edge<Tile>>();
-			foreach (KeyValuePair<TileDirection, Tile> pair in node.neighbors) {
-				TileDirection direction = pair.Key;
-				Tile neighbor = pair.Value;
-				if (neighbor.IsLand()) {
-					float movementCost = TilePath.getMovementCost(node, direction, neighbor);
-					result.Add(new Edge<Tile>(node, neighbor, movementCost));
-				}
-			}
-			return result;
+	public class UnitWalker : EdgeWalker<Tile> {
+		private MapUnit unit;
+
+		public UnitWalker(MapUnit unit) {
+			this.unit = unit;
 		}
-	}
 
-	public class WalkerOnWater : EdgeWalker<Tile> {
 		public override IEnumerable<Edge<Tile>> getEdges(Tile node) {
 			List<Edge<Tile>> result = new List<Edge<Tile>>();
 			foreach (KeyValuePair<TileDirection, Tile> pair in node.neighbors) {
 				TileDirection direction = pair.Key;
 				Tile neighbor = pair.Value;
+				bool neighborHasCityWithSameOwner = neighbor.cityAtTile != null && neighbor.cityAtTile.owner == unit.owner;
 
-				// Allow navigating to water tiles or tiles with a city, to support
-				// costal and canal cities.
+				bool isPassable = false;
+
+				if (unit.owner.isHuman && !unit.owner.HasExploredTile(neighbor)) {
+					isPassable = true;
+				} else {
+					if (unit.IsLandUnit())
+						isPassable = neighbor.IsLand();
+					else if (unit.IsWaterUnit())
+						isPassable = neighbor.IsWater() || neighborHasCityWithSameOwner;
+				}
+
+				if (!isPassable) {
+					continue;
+				}
+
+				float tileMovementCost = TilePath.GetMovementCost(unit.owner, node, direction, neighbor);
+				float unitMovementPoints = unit.unitType.movement;
+
+				// If this tile would consume all of the movement points of this
+				// unit, it has a cost of 1 turn. Otherwise we use the fraction
+				// of a turn it would use as the cost.
 				//
-				// If the unit can't enter the city (for example an enemy city), we
-				// will path right next to it and then refuse to actually enter it.
-				if (neighbor.IsWater() || neighbor.HasCity) {
-					float movementCost = TilePath.getMovementCost(node, direction, neighbor);
-					result.Add(new Edge<Tile>(node, neighbor, movementCost));
+				// Examples:
+				//  - Warrior (1mp) moving onto Grassland (cost 1) => 1 turn
+				//  - Warrior (1mp) moving onto Hills (cost 2) => 1 turn
+				//  - Warrior (1mp) moving onto Jungle (cost 3) => 1 turn
+				//
+				//  - Cavalry (3mp) moving onto Grassland (cost 1) => 1/3
+				//  - Cavalry (3mp) moving onto Hills (cost 2) => 2/3
+				//  - Cavalry (3mp) moving onto Jungle (cost 3) => 3/3
+				//
+				if (tileMovementCost >= unitMovementPoints) {
+					result.Add(new Edge<Tile>(node, neighbor, 1));
+				} else {
+					result.Add(new Edge<Tile>(node, neighbor, tileMovementCost / unitMovementPoints));
 				}
 			}
 			return result;

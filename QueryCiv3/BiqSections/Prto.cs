@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace QueryCiv3.Biq {
@@ -17,6 +17,43 @@ namespace QueryCiv3.Biq {
 	public unsafe struct PRTORACE {
 		private fixed byte Race[4];
 		public bool this[int index] { get => Util.GetFlag(Race[index / 8], index % 8); }
+
+		private const int MAX_CIV = 32;
+
+		// Find an index of civilization to which a unit belongs an a unique unit.
+		// Returns -1 if a unit is not unique.
+		public int GetUniqueCivIndex() {
+			int civIndex = -1;
+
+			// Skip barbarians (index 0)
+			for (int i = 1; i < MAX_CIV; i++) {
+				if (this[i]) {
+					if (civIndex != -1) {
+						return -1; // More than one civilization found
+					}
+
+					civIndex = i;
+				}
+			}
+
+			return civIndex;
+		}
+
+		public IEnumerable<int> GetAvailableCivIndexes() {
+			for (int i = 0; i < MAX_CIV; i++) {
+				if (this[i]) {
+					yield return i;
+				}
+			}
+		}
+
+		public IEnumerable<int> GetUnavailableCivIndexes() {
+			for (int i = 0; i < MAX_CIV; i++) {
+				if (!this[i]) {
+					yield return i;
+				}
+			}
+		}
 	}
 
 	[StructLayout(LayoutKind.Sequential, Pack = 1)]

@@ -4,7 +4,7 @@ using C7GameData;
 
 namespace C7Engine.Pathing {
 	public abstract class PathingAlgorithm {
-		public abstract TilePath PathFrom(Tile start, Tile destination);
+		public abstract TilePath PathFrom(Tile start, Tile destination, MapUnit unit);
 
 		// Should not be public
 		public TilePath ConstructPath(Tile destination, Dictionary<Tile, Tile> predecessors) {

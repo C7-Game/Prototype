@@ -1,0 +1,157 @@
+[gd_scene load_steps=9 format=3 uid="uid://4e71j27bd536"]
+
+[ext_resource type="Script" uid="uid://conqgejgvnn6d" path="res://UIElements/NewGame/PlayerSetup.cs" id="1"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2"]
+[ext_resource type="Script" uid="uid://dcrdcjop64t6t" path="res://UIElements/Civ3TextureButton.cs" id="3"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_8ublj"]
+device = -1
+keycode = 4194309
+
+[sub_resource type="Shortcut" id="Shortcut_33b04"]
+events = [SubResource("InputEventKey_8ublj")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_klcu1"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_7oyjg"]
+events = [SubResource("InputEventKey_klcu1")]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ld2d8"]
+
+[node name="Control" type="CenterContainer" node_paths=PackedStringArray("background", "playerListContainer", "civLabel", "opponentListContainer", "difficultyContainer", "confirm", "cancel", "loadingLabel")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+background = NodePath("Background")
+playerListContainer = NodePath("Background/CenterContainer/PlayerListContainer")
+civLabel = NodePath("Background/CivLabel")
+opponentListContainer = NodePath("Background/OpponentListContainer")
+difficultyContainer = NodePath("Background/DifficultyContainer")
+confirm = NodePath("Background/Confirm")
+cancel = NodePath("Background/Cancel")
+loadingLabel = NodePath("Background/LoadingLabel")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("2")
+textureConfigKey = "player_setup.background"
+
+[node name="Label" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 114.0
+offset_top = 25.0
+offset_right = 326.0
+offset_bottom = 57.0
+theme_override_font_sizes/font_size = 24
+text = "PLAYER SETUP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 147.0
+offset_top = 77.0
+offset_right = 294.0
+offset_bottom = 99.0
+theme_override_font_sizes/font_size = 15
+text = "YOUR CIVILIZATION"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label3" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 734.0
+offset_top = 78.0
+offset_right = 881.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 15
+text = "YOUR RIVALS"
+vertical_alignment = 1
+
+[node name="Label4" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 110.0
+offset_top = 642.0
+offset_right = 257.0
+offset_bottom = 664.0
+theme_override_font_sizes/font_size = 15
+text = "DIFFICULTY"
+vertical_alignment = 1
+
+[node name="OpponentListContainer" type="GridContainer" parent="Background"]
+layout_mode = 0
+offset_left = 636.0
+offset_top = 123.0
+offset_right = 948.0
+offset_bottom = 458.0
+
+[node name="CenterContainer" type="CenterContainer" parent="Background"]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 122.0
+offset_right = 386.0
+offset_bottom = 460.0
+
+[node name="PlayerListContainer" type="GridContainer" parent="Background/CenterContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 3
+
+[node name="DifficultyContainer" type="GridContainer" parent="Background"]
+layout_mode = 0
+offset_left = 91.0
+offset_top = 690.0
+offset_right = 934.0
+offset_bottom = 750.0
+columns = 8
+
+[node name="CivLabel" type="Label" parent="Background"]
+layout_mode = 0
+offset_left = 421.0
+offset_top = 289.0
+offset_right = 608.0
+offset_bottom = 368.0
+text = "Hannibal of the Carthaginians
+(Industrious, Seafaring)"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Confirm" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 960.0
+offset_top = 728.0
+offset_right = 979.0
+offset_bottom = 747.0
+shortcut = SubResource("Shortcut_33b04")
+script = ExtResource("3")
+textureConfigKey = "ui.confirm"
+
+[node name="Cancel" type="TextureButton" parent="Background"]
+layout_mode = 0
+offset_left = 988.0
+offset_top = 729.0
+offset_right = 1007.0
+offset_bottom = 748.0
+shortcut = SubResource("Shortcut_7oyjg")
+script = ExtResource("3")
+textureConfigKey = "ui.cancel"
+
+[node name="LoadingLabel" type="Label" parent="Background"]
+visible = false
+layout_mode = 0
+offset_left = 310.0
+offset_top = 325.0
+offset_right = 717.0
+offset_bottom = 434.0
+theme_override_font_sizes/font_size = 38
+theme_override_styles/normal = SubResource("StyleBoxFlat_ld2d8")
+text = "Loading..."
+horizontal_alignment = 1
+vertical_alignment = 1

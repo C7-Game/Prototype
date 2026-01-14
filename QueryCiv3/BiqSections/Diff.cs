@@ -16,7 +16,7 @@ namespace QueryCiv3.Biq {
 		public int ExtraStartUnit1;
 		public int ExtraStartUnit2;
 		public int AdditionalFreeSupport;
-		public int BonusForEachCity;
+		public int UnitSupportBonusForEachSettlement;
 		public int AttackBonusAgainstBarbarians;
 		public int CostFactor;
 		public int PercentageOfOptimalCities;

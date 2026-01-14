@@ -1,5 +1,4 @@
 using C7GameData;
-using ConvertCiv3Media;
 using Godot;
 
 namespace C7.Map {
@@ -9,37 +8,57 @@ namespace C7.Map {
 		private readonly Vector2 tileSize;
 
 		public FogOfWarLayer() {
-			Pcx fogOfWarPcx = new Pcx(Util.Civ3MediaPath("Art/Terrain/FogOfWar.pcx"));
-			fogOfWarTexture = PCXToGodot.getPureAlphaFromPCX(fogOfWarPcx);
+			fogOfWarTexture = TextureLoader.Load("terrain.fog_of_war");
 			tileSize = fogOfWarTexture.GetSize() / 9;
 		}
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
-			Rect2 screenTarget = new Rect2(tileCenter - tileSize / 2, tileSize);
-			TileKnowledge tileKnowledge = gameData.GetHumanPlayers()[0].tileKnowledge;
-			//N.B. FogOfWar.pcx handles both totally unknown and fogged tiles, indexed in the same file.
-			//Hence the trinary math rather than the more commonplace binary.
-			if (!tileKnowledge.isTileKnown(tile)) {
-				int sum = 0;
-				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTH]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]))
-					sum += 1 * 2;
-				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.WEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHWEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]))
-					sum += 3 * 2;
-				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.EAST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.NORTHEAST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST]))
-					sum += 9 * 2;
-				if (tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTH]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHWEST]) || tileKnowledge.isTileKnown(tile.neighbors[TileDirection.SOUTHEAST]))
-					sum += 27 * 2;
-				if (sum != 0) {
-					looseView.DrawTextureRectRegion(fogOfWarTexture, screenTarget, getRect(sum));
-				}
-			}
-			//do nothing if the tile is known (equiv to the lower-right)
-		}
 
-		private Rect2 getRect(int sum) {
-			int row = sum / 9;
-			int col = sum % 9;
-			return new Rect2(col * tileSize.X, row * tileSize.Y, tileSize);
+			// Fog of war is computed from the squares' intersections.
+			// Thus, for each iteration, we have to consider that we are at the north intersection of the iterated tile
+
+			Tile north = tile.neighbors[TileDirection.NORTH];
+			Tile south = tile;
+			Tile east = tile.neighbors[TileDirection.NORTHEAST];
+			Tile west = tile.neighbors[TileDirection.NORTHWEST];
+
+			TileKnowledge tileKnowledge = gameData.GetFirstHumanPlayer().tileKnowledge;
+			int column = 0;
+			int row = 0;
+
+			if (tileKnowledge.isActiveTile(north)) {
+				column += 2;
+			} else if (tileKnowledge.isTileKnown(north)) {
+				column += 1;
+			}
+
+			if (tileKnowledge.isActiveTile(west)) {
+				column += 6;
+			} else if (tileKnowledge.isTileKnown(west)) {
+				column += 3;
+			}
+
+			if (tileKnowledge.isActiveTile(east)) {
+				row += 2;
+			} else if (tileKnowledge.isTileKnown(east)) {
+				row += 1;
+			}
+
+			if (tileKnowledge.isActiveTile(south)) {
+				row += 6;
+			} else if (tileKnowledge.isTileKnown(south)) {
+				row += 3;
+			}
+
+			// save a few draw calls when the tile is completely visible
+			if (column == 8 && row == 8) {
+				return;
+			}
+
+			var fogOrigin = new Vector2(tileCenter.X - tileSize.X/2, tileCenter.Y - tileSize.Y);
+			var fogRect = new Rect2(fogOrigin, tileSize);
+			var spriteRect = new Rect2(column * tileSize.X, row * tileSize.Y, tileSize * 0.999f);
+			looseView.DrawTextureRectRegion(fogOfWarTexture, fogRect, spriteRect);
 		}
 	}
 }

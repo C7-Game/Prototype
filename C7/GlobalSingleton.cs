@@ -1,5 +1,6 @@
 using Godot;
-using QueryCiv3;
+using C7Engine;
+using C7GameData.Save;
 
 /****
 	Need to pass values from one scene to another, particularly when loading
@@ -11,11 +12,31 @@ public partial class GlobalSingleton : Node {
 	// which then should blank it again to prevent reloading same if going back to main menu
 	// and back to game
 	public string LoadGamePath;
-	// For now this needs to get passed to QueryCiv3 when importing.
-	public string DefaultBicPath { get => Civ3Location.GetCiv3Path() + @"/Conquests/conquests.biq"; }
-	// This is the 'static map' used in lieu of terrain generation
-	public string DefaultGamePath { get => @"./Text/c7-static-map-save.json"; }
-	public void ResetLoadGamePath() {
-		LoadGamePath = DefaultGamePath;
+
+	// Generated game data used when starting a new game
+	public SaveGame SaveGame;
+
+	public bool ModernGraphicsActive { get; private set; }
+
+	public GlobalSingleton() {
+		if (C7Settings.UseStandaloneMode()) {
+			ToggleModernGraphics();
+		}
+	}
+
+	// The characteristics of the world to generate. This exists in the singleton
+	// to allow the world setup screen to pass the information to the player
+	// setup screen, which is what actually kicks off the world generation.
+	public WorldCharacteristics WorldCharacteristics;
+
+	public void ResetLoadGameFields() {
+		LoadGamePath = GamePaths.DefaultGamePath;
+		SaveGame = null;
+	}
+
+	public void ToggleModernGraphics() {
+		string newConfig = ModernGraphicsActive ? GamePaths.ClassicGraphicsConfig : GamePaths.ModernGraphicsConfig;
+		TextureLoader.SetConfig(GamePaths.TextureConfigsDir, newConfig);
+		ModernGraphicsActive = !ModernGraphicsActive;
 	}
 }

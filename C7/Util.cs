@@ -1,57 +1,20 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using C7Engine;
-using Godot;
 using ConvertCiv3Media;
-using C7GameData;
+using Godot;
 using QueryCiv3;
 
 public partial class Util {
-	static public string Civ3Root = Civ3Location.GetCiv3Path();
-
-	static private string SteamCommonDir() {
-		string home = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
-		if (home == null) { return null; }
-		return System.IO.Path.Combine(home, "Library/Application Support/Steam/steamapps/common");
-	}
-
-	static private bool FolderIsCiv3(System.IO.DirectoryInfo di) {
-		return di.EnumerateFiles().Any(f => f.Name == "civ3id.mb");
-	}
+	static public string Civ3Root = GetCiv3Path();
 
 	static public string GetCiv3Path() {
-		// Use CIV3_HOME env var if present
-		string path = System.Environment.GetEnvironmentVariable("CIV3_HOME");
-		if (path != null) { return path; }
-
-		// Use settings value if present
-		path = C7Settings.GetSettingValue("locations", "civ3InstallDir");
+		string path = C7Settings.GetSettingValue("locations", "civ3InstallDir");
 		if (path != null) return path;
 
-		if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-			// Look up in Windows registry if present
-			path = Civ3PathFromRegistry();
-			if (path != null) { return path; }
-		} else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-			// Check for a civ3 folder in steamapps/common
-			System.IO.DirectoryInfo root = new System.IO.DirectoryInfo(Util.SteamCommonDir());
-			foreach (System.IO.DirectoryInfo di in root.GetDirectories()) {
-				if (Util.FolderIsCiv3(di)) {
-					return di.FullName;
-				}
-			}
-		}
-
-		return "/civ3/path/not/found";
-	}
-
-	static public string Civ3PathFromRegistry() {
-		// Assuming 64-bit platform, get vanilla Civ3 install folder from registry
-		// Return null if value not present or if key not found
-		object path = Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Infogrames Interactive\Civilization III", "install_path", null);
-		return path == null ? null : (string)path;
+		return Civ3Location.GetCiv3Path();
 	}
 
 	// Checks if a file exists ignoring case on the latter parts of its path. If the file is found, returns its full path re-capitalized as
@@ -107,7 +70,7 @@ public partial class Util {
 
 			foreach (string step in ignoredCaseExtension.Replace('\\', '/').Split('/')) {
 				string goal = System.IO.Path.Combine(tr, step);
-				List<string> matches = System.IO.Directory.EnumerateFileSystemEntries(tr, "**")
+				List<string> matches = System.IO.Directory.EnumerateFileSystemEntries(tr, "*")
 					.Where(p => p.Equals(goal, StringComparison.CurrentCultureIgnoreCase))
 					.ToList();
 
@@ -165,13 +128,20 @@ public partial class Util {
 			}
 		}
 
-		//Next, before trying the base Civ paths, see if we have it packaged with C7
-		string c7Path = FileExistsIgnoringCase(getProjectDirectoryPath(), mediaPath);
-		if (c7Path != null) {
-			return c7Path;
+		// Next, before trying the base Civ paths, see if we have it packaged
+		// with C7 and are in standalone mode.
+		string c7BasePath = System.IO.Path.Combine(getProjectDirectoryPath(), "Assets");
+		string c7Path = FileExistsIgnoringCase(c7BasePath, mediaPath);
+
+		if (C7Settings.UseStandaloneMode()) {
+			if (c7Path != null) {
+				return c7Path;
+			} else {
+				throw new ApplicationException("Media path not found: " + mediaPath);
+			}
 		}
 
-		//Finally, check the base Civ paths
+		//Next, check the base Civ paths
 		string[] basePaths = new string[] {
 			"Conquests",
 			"civ3PTW",
@@ -181,6 +151,13 @@ public partial class Util {
 			string actualCasePath = CheckForCiv3Media(mediaPath, basePaths[i]);
 			if (actualCasePath != null)
 				return actualCasePath;
+		}
+
+		// Finally, use a c7 path even if we aren't in standalone mode, but only
+		// if we can't find the path in civ3 graphics. This allows us to toggle
+		// to c7 art when we aren't in standalone mode.
+		if (c7Path != null) {
+			return c7Path;
 		}
 
 		throw new ApplicationException("Media path not found: " + mediaPath);
@@ -193,86 +170,27 @@ public partial class Util {
 		return FileExistsIgnoringCase(Civ3Root, fullPath);
 	}
 
-	//Send this function a path (e.g. Art/title.pcx) and it will load it up and convert it to a texture for you.
-	static public ImageTexture LoadTextureFromPCX(string relPath) {
-		if (textureCache.ContainsKey(relPath)) {
-			return textureCache[relPath];
-		}
-		Pcx NewPCX = LoadPCX(relPath);
-		ImageTexture texture = PCXToGodot.getImageTextureFromPCX(NewPCX);
-		textureCache[relPath] = texture;
-		return texture;
-	}
-
 	static public (ImageTexture, ImageTexture) LoadTextureFromFlicData(byte[] image, byte[,] pallete, int width, int height) {
 		var (baseImage, tintImage) = PCXToGodot.ByteArrayWithTintToImage(image, pallete, width, height, shadows: true);
 		return (ImageTexture.CreateFromImage(baseImage), ImageTexture.CreateFromImage(tintImage));
 	}
 
+	private static Dictionary<string, Flic> flicCache = new();
+
 	static public Flic LoadFlic(string path) {
-		return new ConvertCiv3Media.Flic(Util.Civ3MediaPath(path));
+		if (flicCache.ContainsKey(path)) {
+			return flicCache[path];
+		}
+		Flic result = new ConvertCiv3Media.Flic(Util.Civ3MediaPath(path));
+		flicCache[path] = result;
+		return result;
 	}
 
 	static private string getProjectDirectoryPath() {
 		// see issue https://github.com/godotengine/godot/issues/24222#issuecomment-709092664
-		// - use local resource folder in debug mode
-		// - use executable folder in release mode
-		return OS.IsDebugBuild() ? "res://" : OS.GetExecutablePath().GetBaseDir();
-	}
-
-	// Send this function a path (e.g. Title_Screen.jpg) and it will
-	// load it up and convert it in both debug and release modes.
-	// Note: We probably will need variants of this for other file types, too.
-	static public ImageTexture LoadTextureFromC7JPG(string relPath) {
-		Image img = Image.LoadFromFile(Util.getProjectDirectoryPath().PathJoin(relPath));
-		return ImageTexture.CreateFromImage(img);
-	}
-
-	private static Dictionary<string, ImageTexture> textureCache = new Dictionary<string, ImageTexture>();
-	//Send this function a path (e.g. Art/exitBox-backgroundStates.pcx), and the coordinates of the extracted image you need from that PCX
-	//file, and it'll load it up and return you what you need.
-	static public ImageTexture LoadTextureFromPCX(string relPath, int leftStart, int topStart, int width, int height, bool shadows = true) {
-		string key = relPath + "-" + leftStart + "-" + topStart + "-" + width + "-" + height;
-		if (textureCache.ContainsKey(key)) {
-			return textureCache[key];
-		}
-		Pcx NewPCX = LoadPCX(relPath);
-		ImageTexture texture = PCXToGodot.getImageTextureFromPCX(NewPCX, leftStart, topStart, width, height, shadows);
-		textureCache[key] = texture;
-		return texture;
-	}
-
-	private static Dictionary<string, Pcx> PcxCache = new Dictionary<string, Pcx>();
-
-	/**
-	 * Utility method for loading PCX files that will cache them, so we don't have to load them from disk so often.
-	 **/
-	static public Pcx LoadPCX(string relPath) {
-		if (PcxCache.ContainsKey(relPath)) {
-			return PcxCache[relPath];
-		}
-		Pcx thePcx = new Pcx(Civ3MediaPath(relPath));
-		PcxCache[relPath] = thePcx;
-		return thePcx;
-	}
-
-	private static Dictionary<int, Color> ColorCache = new();
-	private const string CivPalettePath = "Art/Units/Palettes/";
-
-	// Transforms color index loaded from a save file into Godot Color
-	public static Color LoadColor(int colorIndex) {
-		if (ColorCache.TryGetValue(colorIndex, out Color value)) {
-			return value;
-		}
-
-		string fileName = $"ntp{colorIndex:D2}.pcx";
-		string filePath = System.IO.Path.Combine(CivPalettePath, fileName);
-
-		Pcx pcx = LoadPCX(filePath);
-		Color color = PCXToGodot.GetColorFromPCX(pcx);
-
-		ColorCache[colorIndex] = color;
-		return color;
+		// - use local resource folder while running from the editor binary
+		// - use executable folder in the exported builds
+		return OS.HasFeature("editor") ? "res://" : OS.GetExecutablePath().GetBaseDir();
 	}
 
 	// Replaces image colors based on a given dictionary
@@ -307,21 +225,14 @@ public partial class Util {
 		return ImageTexture.CreateFromImage(img);
 	}
 
-	// Creates textures from a PCX file without de-palettizing it. Returns two ImageTextures, the first is 16x16 with RGB8 format containing the
-	// color palette and the second is the size of the image itself and contains the indices in R8 format.
-	public static (ImageTexture palette, ImageTexture indices) loadPalettizedPCX(string filePath) {
-		var pcx = LoadPCX(filePath);
-
-		var imgIndices = Image.CreateFromData(pcx.Width, pcx.Height, false, Image.Format.R8, pcx.ColorIndices);
-		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
-
-		return (createPaletteTexture(pcx.Palette), texIndices);
-	}
-
 	// A FlicSheet is a sprite sheet created from a Flic file, with each frame of the animation as its own sprite
 	public struct FlicSheet {
 		public ImageTexture palette, indices;
+		public int spriteOriginalWidth, spriteOriginalHeight;
 		public int spriteWidth, spriteHeight;
+		public int offsetLeft, offsetTop;
+		public int framesPerAnimation, numberOfAnimations;
+		public int animationSpeed, animationTime;
 	}
 
 	// Loads a Flic and also converts it into a sprite sheet
@@ -350,7 +261,33 @@ public partial class Util {
 		var imgIndices = Image.CreateFromData(countColumns * flic.Width, countRows * flic.Height, false, Image.Format.R8, allIndices);
 		ImageTexture texIndices = ImageTexture.CreateFromImage(imgIndices);
 
-		return (new FlicSheet { palette = texPalette, indices = texIndices, spriteWidth = flic.Width, spriteHeight = flic.Height }, flic);
+		return (new FlicSheet {
+			palette = texPalette,
+			indices = texIndices,
+			spriteOriginalWidth = flic.OriginalWidth,
+			spriteOriginalHeight = flic.OriginalHeight,
+			spriteWidth = flic.Width,
+			spriteHeight = flic.Height,
+			offsetLeft = flic.OffsetLeft,
+			offsetTop = flic.OffsetTop,
+			framesPerAnimation = flic.FramesPerAnimation,
+			numberOfAnimations = flic.NumAnimations,
+			animationSpeed = flic.AnimationSpeed,
+			animationTime = flic.AnimationTime
+		}, flic);
+	}
+
+	// Like LoadWAVFromDisk, but the path is a relative path, not the result of
+	// calling Civ3MediaPath.
+	//
+	// The result may be null if modern graphics are active, as we do not yet
+	// have sound replacements.
+	public static AudioStreamWav? LoadCiv3WAVFromDisk(string path) {
+		try {
+			return LoadWAVFromDisk(Civ3MediaPath(path));
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	static public AudioStreamWav LoadWAVFromDisk(string path) {
@@ -432,5 +369,29 @@ public partial class Util {
 		}
 
 		return wav;
+	}
+
+	// This method is intended for use within overrides of Godot object _ValidateProperty method.
+	// Its purpose is to prevent values of properties listed in validProperties from being saved as
+	// part of the scene.  It's useful when using [Tool] scripts to execute code in editor. It
+	// allows to load Civ3 textures as part of such scripts, but prevents these textures from being
+	// saved into the scene.
+	//
+	// See Godot docs on _ValidateProperty:
+	// https://docs.godotengine.org/en/4.2/classes/class_object.html#class-object-private-method-validate-property
+	public static void ApplyNoSaveFlag(Godot.Collections.Dictionary property, HashSet<StringName> validProperties) {
+		StringName propertyName = property["name"].AsStringName();
+
+		if (validProperties.Contains(propertyName)) {
+			property["usage"] = (int)PropertyUsageFlags.NoInstanceState;
+		}
+	}
+
+	// Allow clearing the caches, so that scenarios with different files that
+	// have the same name can be loaded independently.
+	public static void ClearCaches() {
+		flicCache.Clear();
+		TextureLoader.ClearCache();
+		AnimationManager.ClearCache();
 	}
 }

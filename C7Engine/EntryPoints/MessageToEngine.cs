@@ -9,7 +9,6 @@ namespace C7Engine {
 
 		public void send() {
 			EngineStorage.pendingMessages.Enqueue(this);
-			EngineStorage.actionAddedToQueue.Set();
 		}
 	}
 
@@ -53,38 +52,28 @@ namespace C7Engine {
 			this.dir = dir;
 		}
 
-		public override void process() {
+		public override async void process() {
 			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
-			unit?.move(dir);
+			if (unit == null) return;
 
-			// The unit moved to a new tile - if it still has movement points,
-			// update the UI to reflect this new position and movement points.
-			if (unit?.movementPoints.canMove == true) {
-				new MsgUpdateUiAfterMove().send();
-			}
+			await unit.move(dir, true);
 		}
 	}
 
 	public class MsgSetUnitPath : MessageToEngine {
 		private ID unitID;
-		private int destX;
-		private int destY;
+		private TilePath path;
 
-		public MsgSetUnitPath(ID unitID, Tile tile) {
+		public MsgSetUnitPath(ID unitID, TilePath path) {
 			this.unitID = unitID;
-			this.destX = tile.xCoordinate;
-			this.destY = tile.yCoordinate;
+			this.path = path;
 		}
 
-		public override void process() {
+		public override async void process() {
 			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
-			unit?.setUnitPath(EngineStorage.gameData.map.tileAt(destX, destY));
+			if (unit == null) return;
 
-			// The unit moved to a new tile - if it still has movement points,
-			// update the UI to reflect this new position and movement points.
-			if (unit?.movementPoints.canMove == true) {
-				new MsgUpdateUiAfterMove().send();
-			}
+			await unit.setUnitPath(path);
 		}
 	}
 
@@ -104,6 +93,56 @@ namespace C7Engine {
 		}
 	}
 
+	// Switches the player government to anarchy and determines when the player
+	// can exit anarchy.
+	public class StartGovernmentTransitionMsg : MessageToEngine {
+		private Player player;
+
+		public StartGovernmentTransitionMsg(Player p) {
+			player = p;
+		}
+
+		public override void process() {
+			GameData gD = EngineStorage.gameData;
+			Government transitionGovt = gD.governments.Find(x => x.transitionType);
+			player.government = transitionGovt;
+			player.inAnarchyUntilTurn = gD.turn + player.GetTurnsOfAnarchyForTransition(gD);
+
+			// Update the domestic advisor once we know how long the anarchy is.
+			new MsgUpdateUiAfterDomesticChange().send();
+		}
+	}
+
+	public class SelectGovernmentMsg : MessageToEngine {
+		private Player player;
+		private Government government;
+
+		public SelectGovernmentMsg(Player player, Government government) {
+			this.player = player;
+			this.government = government;
+		}
+
+		public override void process() {
+			player.government = government;
+		}
+	}
+
+	// A Class that allows the UI to have the game engine run some
+	// terraform action.
+	public class MsgStartWorkerJob : MessageToEngine {
+		private ID UnitID;
+		private Terraform Action;
+		public MsgStartWorkerJob(ID unitID, Terraform action) {
+			this.UnitID = unitID;
+			this.Action = action;
+		}
+
+		public override void process() {
+			MapUnit unit = EngineStorage.gameData.GetUnit(UnitID);
+			unit?.PerformTerraformAction(Action);
+		}
+	}
+
 	public class MsgChooseProduction : MessageToEngine {
 		private ID cityID;
 		private string producibleName;
@@ -116,7 +155,7 @@ namespace C7Engine {
 		public override void process() {
 			City city = EngineStorage.gameData.cities.Find(c => c.id == cityID);
 			if (city != null) {
-				foreach (IProducible producible in city.ListProductionOptions()) {
+				foreach (IProducible producible in city.ListProductionOptions(EngineStorage.gameData)) {
 					if (producible.name == producibleName) {
 						city.SetItemBeingProduced(producible);
 						break;
@@ -127,49 +166,154 @@ namespace C7Engine {
 	}
 
 	public class MsgChooseResearch : MessageToEngine {
-		private ID techId;
-		public MsgChooseResearch(ID techId) {
-			this.techId = techId;
+		private Tech tech;
+		private AdvisorState advisorState;
+		private SelectionMode selectionMode;
+
+		public enum AdvisorState : byte {
+			DontShow,
+			Show,
+		}
+		public enum SelectionMode : byte {
+			Single,
+			Multi,
+		}
+
+		public MsgChooseResearch(Tech tech, AdvisorState advisorState, SelectionMode selectionMode = SelectionMode.Single) {
+			this.tech = tech;
+			this.advisorState = advisorState;
+			this.selectionMode = selectionMode;
 		}
 
 		public override void process() {
-			Player player = EngineStorage.gameData.GetHumanPlayers()[0];
-			if (player.currentlyResearchedTech == techId) {
+			Player player = EngineStorage.gameData.GetFirstHumanPlayer();
+
+			bool isTechEraBeyondPlayerEra = EraUtils.GetEraIndex(tech.EraCivilopediaName) > EraUtils.GetEraIndex(player.eraCivilopediaName);
+			if (player.knownTechs.Contains(tech.id) || isTechEraBeyondPlayerEra)
+				return;
+			if (player.currentlyResearchedTech == tech.id && player.ResearchQueue.Count == 1) {
 				return;
 			}
-			Tech requestedTech = EngineStorage.gameData.techs.Find(t => t.id == techId);
 
-			// Ensure this is an eligible tech to research.
-			//
-			// TODO: do a topological sort to allow a queue of techs to study.
-			foreach (Tech prereq in requestedTech.Prerequisites) {
-				if (!player.knownTechs.Contains(prereq.id)) {
-					return;
+			// Start the tech queueing process
+			// and start researching the first tech in the queue
+			// or append a new queue to the current one if it's a multiselection process
+			if (selectionMode == SelectionMode.Single) {
+				player.CalculateFreshTechQueueAndAssignNewCurrent(tech);
+			} else {
+				player.CalculateTechQueueAndAppendToCurrentQueue(tech);
+
+			}
+
+			// update the UI
+			if (advisorState == AdvisorState.Show) {
+
+				new MsgShowScienceAdvisor().send();
+			}
+		}
+	}
+
+	public class MsgChangeSliders : MessageToEngine {
+		private bool moreScience;
+		private bool lessScience;
+		private bool moreLuxury;
+		private bool lessLuxury;
+
+		public MsgChangeSliders(bool moreScience, bool lessScience, bool moreLuxury, bool lessLuxury) {
+			this.moreScience = moreScience;
+			this.lessScience = lessScience;
+			this.moreLuxury = moreLuxury;
+			this.lessLuxury = lessLuxury;
+		}
+
+		public override void process() {
+			Player player = EngineStorage.gameData.GetFirstHumanPlayer();
+
+			if (moreScience && player.scienceRate == 10 || lessScience && player.scienceRate == 0) {
+				return;
+			}
+			if (moreLuxury && player.luxuryRate == 10 || lessLuxury && player.luxuryRate == 0) {
+				return;
+			}
+
+			// Increase our science rate, taking away from tax rate if we can,
+			// otherwise decrease the luxury rate.
+			if (moreScience) {
+				player.scienceRate++;
+				if (player.taxRate > 0) {
+					player.taxRate--;
+				} else {
+					player.luxuryRate--;
 				}
 			}
 
-			// Start researching this tech and update the UI.
-			player.currentlyResearchedTech = requestedTech.id;
-			new MsgUpdateUiAfterTechSelection().send();
+			// Ditto for luxury.
+			if (moreLuxury) {
+				player.luxuryRate++;
+				if (player.taxRate > 0) {
+					player.taxRate--;
+				} else {
+					player.scienceRate--;
+				}
+			}
+
+			// Decreasing is easier, we decrease the requested slider and bump
+			// up the tax rate.
+			if (lessScience) {
+				player.scienceRate--;
+				player.taxRate++;
+			}
+
+			if (lessLuxury) {
+				player.luxuryRate--;
+				player.taxRate++;
+			}
+
+			// Update citizen moods in all cities, as changing the sliders can
+			// change moods.
+			foreach (City city in player.cities) {
+				city.RecalculateCitizenMoods(EngineStorage.gameData);
+			}
+
+			// Update the ui to reflect our changes.
+			new MsgUpdateUiAfterDomesticChange().send();
 		}
 	}
 
 	public class MsgEndTurn : MessageToEngine {
-
 		private ILogger log = Log.ForContext<MsgEndTurn>();
 
-		public override void process() {
+		public override async void process() {
 			Player controller = EngineStorage.gameData.GetPlayer(EngineStorage.uiControllerID);
 
-			foreach (MapUnit unit in controller.units) {
-				log.Debug($"{unit}, path length: {unit.path?.PathLength() ?? 0}");
-				if (unit.path?.PathLength() > 0) {
-					unit.moveAlongPath();
-				}
-			}
+			// Reorder the unit list so that non-busy units will be selected
+			// first.
+			controller.units.Sort((x, y) => x.IsBusy().CompareTo(y.IsBusy()));
 
 			controller.hasPlayedThisTurn = true;
-			TurnHandling.AdvanceTurn();
+			await TurnHandling.AdvanceTurn();
+		}
+	}
+
+	public class MsgPerformUnitAction : MessageToEngine {
+		private MapUnit unit;
+		public MsgPerformUnitAction(MapUnit unit) {
+			this.unit = unit;
+		}
+
+		public override async void process() {
+			await unit.PerformBusyAction();
+		}
+	}
+
+	public class MsgDoHurryProduction : MessageToEngine {
+		private City city;
+		public MsgDoHurryProduction(City c) {
+			city = c;
+		}
+
+		public override void process() {
+			city.HurryProduction();
 		}
 	}
 
@@ -183,5 +327,36 @@ namespace C7Engine {
 		public override void process() {
 			EngineStorage.animationsEnabled = enabled;
 		}
+	}
+
+	public class MsgToggleAnimationsEnabled : MessageToEngine {
+
+		public MsgToggleAnimationsEnabled() {
+		}
+
+		public override void process() {
+			EngineStorage.animationsEnabled = !EngineStorage.animationsEnabled;
+		}
+	}
+
+	public class MsgBuildCity : MessageToEngine {
+		private MapUnit unit;
+		private string name;
+
+		public MsgBuildCity(MapUnit unit, string name) {
+			this.unit = unit;
+			this.name = name;
+		}
+
+		public override async void process() {
+			City? city = await unit.buildCity(name);
+			if (city != null) {
+				new MsgCityCreated(city).send();
+			}
+		}
+	}
+
+	public class MsgDiplomacyCompleted : MessageToEngine {
+		public override void process() { }
 	}
 }

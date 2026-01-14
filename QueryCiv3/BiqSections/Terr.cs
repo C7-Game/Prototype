@@ -25,7 +25,10 @@ namespace QueryCiv3.Biq {
 		public int Shields;
 		public int Commerce;
 		// Which worker job (TFRM) can be performed on this terrain type
-		public int WorkerJobAllowed;
+		private int WorkerJobAllowed;
+		public readonly bool CanPlantForest { get => WorkerJobAllowed == 5; }
+		public readonly bool CanChopForest { get => WorkerJobAllowed == 6; }
+		public readonly bool CanClearWetlands { get => WorkerJobAllowed == 7; }
 		// Which Terrain this Terrain becomes if affected by pollution.  -1 = not affected.  14 = Base Terrain Type (probably 12 in Vanilla/PTW)
 		public int PollutionEffect;
 		public byte AllowCities;
@@ -36,7 +39,7 @@ namespace QueryCiv3.Biq {
 		public byte AllowForts;
 		public byte AllowOutposts;
 		public byte AllowRadarTowers;
-		private fixed byte Unknown[4];
+		private int Unknown;
 		public byte LandmarkEnabled;
 		public int LandmarkFood;
 		public int LandmarkShields;
@@ -51,7 +54,7 @@ namespace QueryCiv3.Biq {
 		public string LandmarkName { get => Util.GetString(ref this, 157, 32); }
 		public string LandmarkCivilopediaEntry { get => Util.GetString(ref this, 189, 32); }
 
-		private fixed byte Unknown2[4];
+		private int Unknown2;
 		public int TerrainFlags;
 		public int DiseaseStrength;
 	}

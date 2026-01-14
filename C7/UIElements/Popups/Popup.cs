@@ -35,30 +35,19 @@ public partial class Popup : TextureRect {
 
 	const int HTILE_SIZE = 61;
 	const int VTILE_SIZE = 44;
-	private readonly static int BUTTON_LABEL_OFFSET = 0;    //Necessary in Godot 3, appears unnecessary in 4
 
-	private static ImageTexture InactiveButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 1, 1, 20, 20, false);
-	private static ImageTexture HoverButton = Util.LoadTextureFromPCX("Art/buttonsFINAL.pcx", 22, 1, 20, 20, false);
 	private static Dictionary<(int, int), ImageTexture> backgroundCache = new Dictionary<(int, int), ImageTexture>();
 
 	protected void AddButton(string label, int verticalPosition, Action action) {
 		const int HORIZONTAL_POSITION = 30;
-		TextureButton newButton = new TextureButton();
-		newButton.TextureNormal = InactiveButton;
-		newButton.TextureHover = HoverButton;
-		newButton.SetPosition(new Vector2(HORIZONTAL_POSITION, verticalPosition));
-		AddChild(newButton);
-		newButton.Pressed += action;
 
-		Theme theme = new Theme();
-		theme.SetFontSize("font_size", "Button", 14);
-		Button newButtonLabel = new Button();
-		newButtonLabel.Theme = theme;
-		newButtonLabel.Text = label;
-
-		newButtonLabel.SetPosition(new Vector2(HORIZONTAL_POSITION + 25, verticalPosition + BUTTON_LABEL_OFFSET));
-		AddChild(newButtonLabel);
-		newButtonLabel.Pressed += action;
+		Civ3MenuButton button = new() {
+			Text = label,
+			FontSize = 14,
+		};
+		button.SetPosition(new Vector2(HORIZONTAL_POSITION, verticalPosition));
+		AddChild(button);
+		button.Pressed += action;
 	}
 
 	protected void AddHeader(string text, int vOffset) {
@@ -122,20 +111,18 @@ public partial class Popup : TextureRect {
 
 		Image image = Image.Create(width, height, false, Image.Format.Rgba8);
 
-		Pcx popupborders = Util.LoadPCX("Art/popupborders.pcx");
-
 		//The pop-up part is the tricky part
 		Stopwatch imageTimer = new Stopwatch();
 		imageTimer.Start();
-		Image topLeftPopup = PCXToGodot.getImageFromPCX(popupborders, 251, 1, 61, 44);
-		Image topCenterPopup = PCXToGodot.getImageFromPCX(popupborders, 313, 1, 61, 44);
-		Image topRightPopup = PCXToGodot.getImageFromPCX(popupborders, 375, 1, 61, 44);
-		Image middleLeftPopup = PCXToGodot.getImageFromPCX(popupborders, 251, 46, 61, 44);
-		Image middleCenterPopup = PCXToGodot.getImageFromPCX(popupborders, 313, 46, 61, 44);
-		Image middleRightPopup = PCXToGodot.getImageFromPCX(popupborders, 375, 46, 61, 44);
-		Image bottomLeftPopup = PCXToGodot.getImageFromPCX(popupborders, 251, 91, 61, 44);
-		Image bottomCenterPopup = PCXToGodot.getImageFromPCX(popupborders, 313, 91, 61, 44);
-		Image bottomRightPopup = PCXToGodot.getImageFromPCX(popupborders, 375, 91, 61, 44);
+		Image topLeftPopup = TextureLoader.Load("popup_background.top_left").GetImage();
+		Image topCenterPopup = TextureLoader.Load("popup_background.top_center").GetImage();
+		Image topRightPopup = TextureLoader.Load("popup_background.top_right").GetImage();
+		Image middleLeftPopup = TextureLoader.Load("popup_background.middle_left").GetImage();
+		Image middleCenterPopup = TextureLoader.Load("popup_background.middle_center").GetImage();
+		Image middleRightPopup = TextureLoader.Load("popup_background.middle_right").GetImage();
+		Image bottomLeftPopup = TextureLoader.Load("popup_background.bottom_left").GetImage();
+		Image bottomCenterPopup = TextureLoader.Load("popup_background.bottom_center").GetImage();
+		Image bottomRightPopup = TextureLoader.Load("popup_background.bottom_right").GetImage();
 		imageTimer.Stop();
 		TimeSpan stopwatchElapsed = imageTimer.Elapsed;
 		log.Debug("Image creation time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
@@ -163,4 +150,29 @@ public partial class Popup : TextureRect {
 		return rect;
 	}
 
+	protected void AddConfirmButton(Vector2 position, Action action) {
+		ImageTexture circleTexture= TextureLoader.Load("ui.confirm.normal");
+		ImageTexture circleHover = TextureLoader.Load("ui.confirm.hover");
+		ImageTexture circlePressed = TextureLoader.Load("ui.confirm.pressed");
+		TextureButton confirmButton = new TextureButton();
+		confirmButton.TextureNormal = circleTexture;
+		confirmButton.TextureHover = circleHover;
+		confirmButton.TexturePressed = circlePressed;
+		confirmButton.SetPosition(position);
+		confirmButton.Pressed += action;
+		AddChild(confirmButton);
+	}
+
+	protected void AddCancelButton(Vector2 position) {
+		ImageTexture xTexture = TextureLoader.Load("ui.cancel.normal");
+		ImageTexture xHover = TextureLoader.Load("ui.cancel.hover");
+		ImageTexture xPressed = TextureLoader.Load("ui.cancel.pressed");
+		TextureButton cancelButton = new TextureButton();
+		cancelButton.TextureNormal = xTexture;
+		cancelButton.TextureHover = xHover;
+		cancelButton.TexturePressed = xPressed;
+		cancelButton.SetPosition(position);
+		cancelButton.Pressed += GetParent<PopupOverlay>().OnHidePopup;
+		AddChild(cancelButton);
+	}
 }

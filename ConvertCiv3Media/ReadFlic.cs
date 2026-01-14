@@ -2,11 +2,14 @@ using System;
 using System.IO;
 using Serilog;
 
-namespace ConvertCiv3Media
-{
+namespace ConvertCiv3Media {
 	// Under construction
 	// Not intended to be a generalized/universal Flic reader
-	// Implementing from description at https://www.drdobbs.com/windows/the-flic-file-format/184408954
+	// [BROKEN LINK] Implementing from description at https://www.drdobbs.com/windows/the-flic-file-format/184408954
+	//
+	// The link above is broken at the time of writing this 28/10/2025
+	// The link below probably is the same article as above, on another site
+	// https://jacobfilipp.com/DrDobbs/articles/DDJ/1993/9303/9303a/9303a.htm#00af_0005
 	public class Flic {
 		private static ILogger log = Log.ForContext<Flic>();
 		// Images is an array of animations,images, each of which is a byte array of palette indexes
@@ -14,15 +17,21 @@ namespace ConvertCiv3Media
 		// All animations/images have same palette, height, and width
 		// Palette is 256 colors in red, green, blue order
 		public byte[,] Palette = new byte[256,3];
+		public int OriginalWidth = 0;
+		public int OriginalHeight = 0;
 		public int Width = 0;
 		public int Height = 0;
+		public int OffsetLeft = 0;
+		public int OffsetTop = 0;
 		public int NumAnimations = 0;
 		public int FramesPerAnimation = 0;
+		public int AnimationTime = 0;
+		public int AnimationSpeed = 0;
 
 		private string path;
 
 		// constructors
-		public Flic(){}
+		public Flic() { }
 		public Flic(string path) {
 			this.path = path;
 			this.Load(path);
@@ -41,6 +50,19 @@ namespace ConvertCiv3Media
 			int NumFrames = BitConverter.ToUInt16(FlicBytes, 6);
 			this.Width = BitConverter.ToUInt16(FlicBytes, 8);
 			this.Height = BitConverter.ToUInt16(FlicBytes, 10);
+
+			this.AnimationSpeed = BitConverter.ToInt32(FlicBytes, 16);
+
+			this.OffsetLeft = BitConverter.ToUInt16(FlicBytes, 100);
+			this.OffsetTop = BitConverter.ToUInt16(FlicBytes, 102);
+
+			// Disclaimer! I don't know if the width & height order is correct here
+			// but since the game always assumes a 240x240 size, maybe it doesn't matter
+			this.OriginalWidth = BitConverter.ToUInt16(FlicBytes, 104);
+			this.OriginalHeight = BitConverter.ToUInt16(FlicBytes, 106);
+
+			this.AnimationTime = BitConverter.ToUInt16(FlicBytes, 108);
+
 			int ImageLength = this.Width * this.Height;
 
 			// Civ3-specific values
@@ -58,7 +80,7 @@ namespace ConvertCiv3Media
 			this.Images = new byte[NumAnimations, this.FramesPerAnimation][];
 			for (int i = 0; i < this.NumAnimations; i++) {
 				for (int j = 0; j < this.FramesPerAnimation; j++) {
-					this.Images[i,j] = new byte[this.Width * this.Height];
+					this.Images[i, j] = new byte[this.Width * this.Height];
 				}
 			}
 
@@ -96,9 +118,9 @@ namespace ConvertCiv3Media
 									throw new ApplicationException("Unable to deal with color palette with non-zero CopyCount = " + CopyCount);
 								}
 								for (int p = 0; p < 256; p++) {
-									this.Palette[p,0] = FlicBytes[10 + SubOffset + p * 3];
-									this.Palette[p,1] = FlicBytes[10 + SubOffset + p * 3 + 1];
-									this.Palette[p,2] = FlicBytes[10 + SubOffset + p * 3 + 2];
+									this.Palette[p, 0] = FlicBytes[10 + SubOffset + p * 3];
+									this.Palette[p, 1] = FlicBytes[10 + SubOffset + p * 3 + 1];
+									this.Palette[p, 2] = FlicBytes[10 + SubOffset + p * 3 + 2];
 								}
 								break;
 							case 15:
@@ -117,7 +139,7 @@ namespace ConvertCiv3Media
 										// If TypeSise is negative, repeat the next byte abs(TypeSize) times
 										bool CopyMany = TypeSize < 0;
 										for (int foo = 0; foo < Math.Abs(TypeSize); foo++) {
-											this.Images[anim,f][y * this.Width + x] = FlicBytes[head];
+											this.Images[anim, f][y * this.Width + x] = FlicBytes[head];
 											x++;
 											if (CopyMany) {
 												head++;
@@ -137,7 +159,7 @@ namespace ConvertCiv3Media
 								}
 								// diff chunk
 								// Copy last frame image
-								Array.Copy(this.Images[anim,f-1], this.Images[anim,f], this.Images[anim,f].Length);
+								Array.Copy(this.Images[anim, f - 1], this.Images[anim, f], this.Images[anim, f].Length);
 								int NumLines = BitConverter.ToUInt16(FlicBytes, SubOffset + 6);
 								for (int Line = 0, y = 0, head = SubOffset + 8; Line < NumLines; Line++) {
 									int WordsPerLine = BitConverter.ToInt16(FlicBytes, head);
@@ -146,14 +168,14 @@ namespace ConvertCiv3Media
 									if ((WordsPerLine & 0xc00) == 0xc00) {
 										y += Math.Abs(WordsPerLine);
 										WordsPerLine = BitConverter.ToInt16(FlicBytes, head);
-										head+=2;
+										head += 2;
 									}
 									// If two high bits are 10, this is a special word to set the last pixel for odd-length lines
 									// This may not have been tested; none of my Flics change the last pixel
 									if ((WordsPerLine & 0x800) == 0x800) {
-										this.Images[anim,f][this.Width * (y + 1) - 1] = (byte)(WordsPerLine & 0xff);
+										this.Images[anim, f][this.Width * (y + 1) - 1] = (byte)(WordsPerLine & 0xff);
 										WordsPerLine = BitConverter.ToInt16(FlicBytes, head);
-										head+=2;
+										head += 2;
 									}
 									// We're out of special words; if this word has either high bit set, throw exception
 									if ((WordsPerLine & 0xc00) != 0) {
@@ -172,13 +194,13 @@ namespace ConvertCiv3Media
 										// If NumWords is positive, copy NumWords following words to image
 										// If NumWords is negative, repeat the next word abs(NumWords) times
 										for (int ii = 0; ii < Math.Abs(NumWords); ii++) {
-											this.Images[anim,f][this.Width * y + x] = FlicBytes[head];
-											this.Images[anim,f][this.Width * y + x + 1] = FlicBytes[head + 1];
+											this.Images[anim, f][this.Width * y + x] = FlicBytes[head];
+											this.Images[anim, f][this.Width * y + x + 1] = FlicBytes[head + 1];
 											if (Positive) { head += 2; }
 											x += 2;
 										}
 										// If NumWords was negative, we're still pointing at the repeated word, so advance head
-										if (! Positive) { head += 2; }
+										if (!Positive) { head += 2; }
 									}
 									y++;
 								}
@@ -198,8 +220,7 @@ namespace ConvertCiv3Media
 			}
 		}
 
-		public override string ToString()
-		{
+		public override string ToString() {
 			return "FLIC " + this.path;
 		}
 	}
