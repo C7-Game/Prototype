@@ -21,24 +21,21 @@ public partial class LogManager : Node {
 		// Includes all logs of an 'Information' level regardless of namespace, and all logs of
 		// the C7Engine.AI namespace regardless of log level.
 		string filter = "(@l = 'Fatal' OR @l = 'Error' OR @l = 'Warning' OR @l = 'Information')";
-		// suggested:  
+		// suggested:
 		// filter += " OR SourceContext like 'C7Engine.AI.%'"; // (insert the namespace you need to debug)
 
 		Log.Logger = new LoggerConfiguration()
-			// .WriteTo.GodotSink(formatter: consoleTemplate)	//Writing to console can slow the game down considerably (see #278).  Thus it is disabled by default.
 			.WriteTo.File("log.txt", buffered: true, flushToDiskInterval: TimeSpan.FromMilliseconds(2500), fileSizeLimitBytes: 52428800, //50 MB
 						  outputTemplate: "[{Level:u3}] {Timestamp:HH:mm:ss} {SourceContext}: {Message:lj} {NewLine}{Exception}")
 			.Filter.ByIncludingOnly(filter)
 			.MinimumLevel.Debug()
 			.CreateLogger();
 
-		GD.Print("Hello logger!");
 		Log.ForContext<LogManager>().Debug("Hello!");
 	}
 
 	public override void _Notification(int what) {
 		if (what == ((long)DisplayServer.WindowEvent.CloseRequest)) {
-			GD.Print("Goodbye logger!");
 			Log.ForContext<LogManager>().Debug("Goodbye!");
 			Log.CloseAndFlush();
 			GetTree().Quit();
