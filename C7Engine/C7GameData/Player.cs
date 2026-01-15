@@ -8,6 +8,35 @@ using Serilog;
 using static C7GameData.EraUtils;
 
 namespace C7GameData {
+
+	public struct PlayerCommerceBreakdown {
+		public int corrupted;       // Amount of commerce lost directly to corruption
+		public int taxes;           // Amount of treasury income from REGULAR citizens working tiles
+		public int taxmenTaxes;     // Amount of treasury income from tax collector specialists
+		public int beakers;         // Amount of commerce going to science
+		public int happiness;       // Amount of commerce going to entertainment
+		public int fromOtherCivs;   // Income from other Civ GPT deals
+		public int toOtherCivs;     // Expenses paid to other Civ GPT deals
+		public int interest;        // Interest income from Wall Street-flag small wonder
+		public int maintenance;     // Expenses due to aggregate building maintenance
+		public int unitSupport;     // Expenses due to unit support costs
+
+		public int Inflows() {
+			return corrupted + taxes + taxmenTaxes + beakers + happiness + fromOtherCivs + interest;
+		}
+
+		public int Outflows() {
+			return corrupted + beakers + happiness + toOtherCivs + maintenance + unitSupport;
+		}
+
+		public int Netflows() {
+			return Inflows() - Outflows();
+		}
+
+		public int CityInflows() {
+			return corrupted + taxes + beakers + happiness;
+		}
+	}
 	public class Player {
 		private static ILogger log = Log.ForContext<Player>();
 
@@ -324,6 +353,61 @@ namespace C7GameData {
 			return "";
 		}
 
+		public PlayerCommerceBreakdown AggregateFlows() {
+			var result = new PlayerCommerceBreakdown
+			{
+				corrupted = 0,
+				taxes = 0,
+				taxmenTaxes = 0,
+				beakers = 0,
+				happiness = 0,
+				fromOtherCivs = 0,
+				toOtherCivs = 0,
+				interest = 0,
+				maintenance = 0,
+				unitSupport = 0
+			};
+
+			// If player has no cities, apply no expenses or income.
+			// This is how this behaves in regular Civ 3 as well (if you're not defeated, e.g. you still have a King unit or settler)
+			if (cities.Count == 0) return result;
+
+			// Assume player has no buildings that generate interest income until we check
+			int interestBuildings = 0;
+
+			foreach (City city in cities) {
+				CommerceBreakdown cityCommerce = city.CurrentCommerceYield();
+				result.corrupted += cityCommerce.corrupted;
+				result.taxes += cityCommerce.taxes;
+				result.beakers += cityCommerce.beakers;
+				result.happiness += cityCommerce.happiness;
+				result.maintenance += city.MaintenanceCosts();
+
+				interestBuildings += city.constructed_buildings.Count(cb => cb.building.treasuryEarnsInterest);
+
+				foreach (CityResident cr in city.residents) {
+					// Split city income into "regular citizen" and "tax collector" buckets
+					result.taxes -= cr.citizenType.Taxes;
+					result.taxmenTaxes += cr.citizenType.Taxes;
+				}
+			}
+
+			foreach (var pr in playerRelationships.Values) {
+				foreach (var mtd in pr.multiTurnDeals) {
+					if (mtd.dealSubType == DealSubType.GoldPerTurn) {
+						if (mtd.dealDetails == DealDetails.Inbound) result.fromOtherCivs += mtd.goldPerTurn;
+						else if (mtd.dealDetails == DealDetails.Outbound) result.toOtherCivs += mtd.goldPerTurn;
+					}
+				}
+			}
+
+			result.unitSupport = TotalUnitsAllowedUnitsAndSupportCost().Item3;
+
+			if (interestBuildings > 0) result.interest = interestBuildings * Math.Min((int)(gold * rules.TreasuryInterestRate), rules.MaxInterest);
+
+			return result;
+		}
+
 		public int MaintenanceCosts() {
 			int result = 0;
 			foreach (City c in cities) {
@@ -332,18 +416,9 @@ namespace C7GameData {
 			return result;
 		}
 
+		// TODO: Add interest and GPT deals
 		public int CalculateGoldPerTurn() {
-			int result = 0;
-			foreach (City city in cities) {
-				result += city.CurrentCommerceYield().taxes;
-				result -= city.MaintenanceCosts();
-			}
-
-			// Subtract unit support costs, if any.
-			var (_, _, unitSupportCost) = TotalUnitsAllowedUnitsAndSupportCost();
-			result -= unitSupportCost;
-
-			return result;
+			return AggregateFlows().Netflows();
 		}
 
 		public bool WouldAcceptDealFrom(GameData gameData, Player other, TradeOffer theirOffer, TradeOffer ourOffer) {
