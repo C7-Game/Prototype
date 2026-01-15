@@ -527,6 +527,7 @@ namespace C7GameData {
 				commerce.corrupt = uncorruptedCommerce;
 			}
 
+			// TODO: Science/Luxury commerce doesn't seem to be tabulating correctly, can be negative in some cases with specialists, might be ImportCiv3 issue?
 			CommerceBreakdown result = new();
 			result.corrupted = commerce.corrupt;
 			result.beakers = (int)Math.Floor(commerce.useful * owner.scienceRate / 10.0);
