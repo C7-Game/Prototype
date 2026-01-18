@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,6 +33,7 @@ namespace C7GameData.Save {
 		public HashSet<string> requiredResources = [];
 
 		public HashSet<ID> terraformActions = [];
+		public HashSet<string> unavailableTo = [];
 
 		public SaveUnitPrototype() { }
 
@@ -60,6 +62,7 @@ namespace C7GameData.Save {
 
 			requiredResources = proto.requiredResources.Select(r => r.Key).ToHashSet();
 			terraformActions = proto.terraformActions.Select(r => r.Id).ToHashSet();
+			unavailableTo = proto.unavailableTo.Select(r => r.name).ToHashSet();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Serilog;
 using QueryCiv3;
@@ -1044,6 +1045,16 @@ namespace C7GameData {
 			return availableTo.Length == 0 || prto.ShieldCost < 1 || prto.Army;
 		}
 
+		private HashSet<string> ImportUnitAvailability(PRTO prto) {
+			HashSet<string> unavailableToCivs = [];
+			int[] availableTo = prto.AvailableTo.GetAvailableCivIndexes().ToArray();
+			for (int i = 0; i < biq.Race.Length; ++i) {
+				if (!availableTo.Contains(i))
+					unavailableToCivs.Add(biq.Race[i].Name);
+			}
+			return unavailableToCivs;
+		}
+
 		private void ImportUnitPrototypes() {
 			PRTO[] Prto = biq.Prto ?? defaultBiq.Prto;
 			foreach (PRTO prto in Prto) {
@@ -1082,6 +1093,8 @@ namespace C7GameData {
 				if (prto.RequiredResource2 != -1) {
 					prototype.requiredResources.Add(save.Resources[prto.RequiredResource2].Key);
 				}
+
+				prototype.unavailableTo = ImportUnitAvailability(prto);
 
 				//Temporary check until #330 is finished
 				if (!save.UnitPrototypes.Where(p => p.name == prototype.name).Any()) {

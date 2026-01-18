@@ -69197,6 +69197,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69231,6 +69234,9 @@
         "Terraform-7",
         "Terraform-13",
         "Terraform-3"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69255,6 +69261,33 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "China",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Iroquois",
+        "England",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Netherlands",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -69279,6 +69312,10 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Spain"
       ]
     },
     {
@@ -69306,6 +69343,9 @@
       ],
       "requiredResources": [
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69334,6 +69374,9 @@
       "requiredResources": [
         "Oil",
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69358,6 +69401,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "Sumeria"
       ]
     },
     {
@@ -69383,6 +69429,11 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Babylon",
+        "Maya"
       ]
     },
     {
@@ -69408,6 +69459,13 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Greece",
+        "Zululand",
+        "Carthage",
+        "Sumeria"
       ]
     },
     {
@@ -69436,6 +69494,12 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Persia",
+        "Celts"
       ]
     },
     {
@@ -69464,6 +69528,11 @@
       ],
       "requiredResources": [
         "Horses"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Egypt",
+        "Hittites"
       ]
     },
     {
@@ -69492,6 +69561,9 @@
       ],
       "requiredResources": [
         "Horses"
+      ],
+      "unavailableTo": [
+        "Iroquois"
       ]
     },
     {
@@ -69520,6 +69592,12 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Greece",
+        "Carthage",
+        "Netherlands"
       ]
     },
     {
@@ -69545,6 +69623,10 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Scandinavia"
       ]
     },
     {
@@ -69573,6 +69655,10 @@
       ],
       "requiredResources": [
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "France"
       ]
     },
     {
@@ -69602,6 +69688,14 @@
       "requiredResources": [
         "Horses",
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "China",
+        "Japan",
+        "India",
+        "Mongols",
+        "Arabia"
       ]
     },
     {
@@ -69627,6 +69721,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69655,6 +69752,9 @@
       "requiredResources": [
         "Horses",
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69683,6 +69783,9 @@
       ],
       "requiredResources": [
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69712,6 +69815,10 @@
       "requiredResources": [
         "Oil",
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Germany"
       ]
     },
     {
@@ -69740,6 +69847,9 @@
       "requiredResources": [
         "Oil",
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69768,6 +69878,9 @@
       "requiredResources": [
         "Oil",
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69794,6 +69907,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69824,6 +69940,9 @@
       "requiredResources": [
         "Iron",
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69850,6 +69969,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69878,6 +70000,9 @@
       ],
       "requiredResources": [
         "Aluminum"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69905,6 +70030,9 @@
       ],
       "requiredResources": [
         "Aluminum"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69934,6 +70062,9 @@
       "requiredResources": [
         "Aluminum",
         "Uranium"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69962,6 +70093,9 @@
       "requiredResources": [
         "Aluminum",
         "Uranium"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -69987,6 +70121,10 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Byzantines"
       ]
     },
     {
@@ -70012,6 +70150,10 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Portugal"
       ]
     },
     {
@@ -70041,6 +70183,10 @@
       "requiredResources": [
         "Iron",
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "England"
       ]
     },
     {
@@ -70066,6 +70212,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70096,6 +70245,9 @@
       "requiredResources": [
         "Iron",
         "Coal"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70123,6 +70275,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70150,6 +70305,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70177,6 +70335,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70205,6 +70366,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70233,6 +70397,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70262,6 +70429,9 @@
       "requiredResources": [
         "Aluminum",
         "Uranium"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70289,6 +70459,9 @@
       ],
       "requiredResources": [
         "Uranium"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70315,6 +70488,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70340,6 +70516,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70366,6 +70545,9 @@
       "requiredResources": [
         "Oil",
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70392,6 +70574,10 @@
       "requiredResources": [
         "Oil",
         "Aluminum"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "America"
       ]
     },
     {
@@ -70418,6 +70604,9 @@
       "requiredResources": [
         "Oil",
         "Aluminum"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70444,6 +70633,9 @@
       "requiredResources": [
         "Oil",
         "Aluminum"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70467,6 +70659,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70490,6 +70685,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -70518,6 +70716,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70547,6 +70778,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70576,6 +70840,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70605,6 +70902,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70637,6 +70967,39 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70669,6 +71032,39 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70701,6 +71097,39 @@
       ],
       "requiredResources": [
         "Horses"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70734,6 +71163,39 @@
       "requiredResources": [
         "Horses",
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70766,6 +71228,39 @@
       ],
       "requiredResources": [
         "Horses"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70798,6 +71293,39 @@
       ],
       "requiredResources": [
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70830,6 +71358,39 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70859,6 +71420,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70891,6 +71485,39 @@
       "requiredResources": [
         "Horses",
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70924,6 +71551,39 @@
       "requiredResources": [
         "Oil",
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70957,6 +71617,39 @@
       "requiredResources": [
         "Iron",
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -70987,6 +71680,39 @@
       "requiredResources": [
         "Oil",
         "Aluminum"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71015,6 +71741,9 @@
       "requiredResources": [
         "Iron",
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -71047,6 +71776,39 @@
       ],
       "requiredResources": [
         "Horses"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71078,6 +71840,39 @@
       ],
       "requiredResources": [
         "Horses"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71107,6 +71902,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71139,6 +71967,39 @@
       "requiredResources": [
         "Horses",
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71171,6 +72032,39 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71204,6 +72098,39 @@
       "requiredResources": [
         "Horses",
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71233,6 +72160,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71265,6 +72225,39 @@
       ],
       "requiredResources": [
         "Saltpeter"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71293,6 +72286,10 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Persia"
       ]
     },
     {
@@ -71318,6 +72315,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -71338,6 +72338,40 @@
         "hold",
         "wait",
         "fortify"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71360,6 +72394,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71382,6 +72450,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71404,6 +72506,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71426,6 +72562,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71448,6 +72618,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71470,6 +72674,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71492,6 +72730,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71514,6 +72786,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71536,6 +72842,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71558,6 +72898,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71580,6 +72954,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71602,6 +73010,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71624,6 +73066,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71646,6 +73122,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71668,6 +73178,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71690,6 +73234,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71712,6 +73290,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71734,6 +73346,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71756,6 +73402,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71778,6 +73458,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71800,6 +73514,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71822,6 +73570,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71844,6 +73626,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71866,6 +73682,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71894,6 +73744,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71926,6 +73809,39 @@
       ],
       "requiredResources": [
         "Horses"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71948,6 +73864,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71970,6 +73920,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -71992,6 +73976,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72021,6 +74039,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72053,6 +74104,39 @@
       ],
       "requiredResources": [
         "Iron"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72075,6 +74159,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72101,6 +74219,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -72123,6 +74244,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72145,6 +74300,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72167,6 +74356,40 @@
         "fortify",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72195,6 +74418,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Maya"
       ]
     },
     {
@@ -72224,6 +74480,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca"
       ]
     },
     {
@@ -72254,6 +74543,39 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72283,6 +74605,9 @@
       ],
       "requiredResources": [
         "Oil"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -72309,6 +74634,40 @@
       ],
       "terraformActions": [
         "Terraform-3"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72332,6 +74691,40 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom",
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
       ]
     },
     {
@@ -72357,6 +74750,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -72386,6 +74782,9 @@
       "requiredResources": [
         "Oil",
         "Rubber"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -72410,6 +74809,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -72435,6 +74837,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     },
     {
@@ -72459,6 +74864,9 @@
         "disband",
         "goto",
         "explore"
+      ],
+      "unavailableTo": [
+        "A Barbarian Chiefdom"
       ]
     }
   ],
@@ -76069,8 +78477,8 @@
     "startUnitType2": "Worker",
     "scoutUnitType": "Scout",
 	"maxRankOfWorkableTiles": 2,
-	"maxRankOfBarbarianCampTiles": 2,
-  "defaultDealDuration": 20,
+	"maxRankOfBarbarianCampTiles": 2, 
+    "defaultDealDuration": 20,
     "treasuryInterestRate": 0.05,
     "maxInterest": 50
   },

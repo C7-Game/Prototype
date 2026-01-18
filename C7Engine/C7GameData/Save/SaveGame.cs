@@ -297,6 +297,8 @@ namespace C7GameData.Save {
 					civ.uniqueUnit = proto;
 				}
 
+				proto.unavailableTo = saveProto.unavailableTo.Select(c => civDict[c]).ToHashSet();
+
 				proto.requiredResources = saveProto.requiredResources.Select(a => resDict[a]).ToHashSet();
 			}
 

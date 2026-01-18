@@ -52,6 +52,7 @@ namespace C7GameData {
 		public HashSet<Resource> requiredResources { get; set; } = [];
 
 		public HashSet<Terraform> terraformActions = [];
+		public HashSet<Civilization> unavailableTo { get; set; } = [];
 		public bool isWorker => terraformActions.Count > 0;
 
 		public UnitPrototype() { }

@@ -83,6 +83,10 @@ namespace C7GameData {
 				return false;
 			}
 
+			if (unit.unavailableTo.Contains(this)) {
+				return false;
+			}
+
 			// Check if unit is replaced by a unique unit
 			if (uniqueUnit != null && uniqueUnit.unique.replace == unit) {
 				return false;
