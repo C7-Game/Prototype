@@ -74,6 +74,7 @@ namespace C7Engine {
 			return tcs.Task.ContinueWith(t => (T)t.Result);
 		}
 
+		[Obsolete("Use direct access via EngineStorage.gameData instead.")]
 		public static void ReadGameData(Action<GameData> accessor) {
 			accessor(gameData);
 		}
