@@ -108,6 +108,10 @@ namespace C7GameData {
 			return categories.Contains("Sea");
 		}
 
+		public bool CanAttack() {
+			return attack > 0 || bombard > 0;
+		}
+
 		// TODO: Consider golden ages when determining whether a unit is obsolete.
 		// If a golden age has not yet been triggered and a unit can trigger one,
 		// it shouldn't be marked as obsolete, even if its upgrade is available.

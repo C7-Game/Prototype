@@ -541,7 +541,7 @@ namespace C7GameData {
 				foreach (MapUnit other in tile.unitsOnTile) {
 					if (other.owner != owner) {
 						if (!other.owner.IsAtPeaceWith(owner))
-							return allowCombat && unitType.attack > 0;
+							return allowCombat && unitType.CanAttack();
 						return false;
 					}
 				}
