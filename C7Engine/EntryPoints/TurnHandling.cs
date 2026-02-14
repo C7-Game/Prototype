@@ -124,6 +124,7 @@ namespace C7Engine {
 				MapUnit newUnit = new(gameData.ids.CreateID("barbarian"));
 				newUnit.location = tile;
 				newUnit.owner = barbPlayer;
+				newUnit.nationality = barbPlayer.civilization;
 				// TODO: make this a conscript.
 				newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 				newUnit.experienceLevel = gameData.defaultExperienceLevel;

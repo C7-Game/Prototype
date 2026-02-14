@@ -360,6 +360,7 @@ namespace C7GameData {
 				Civilization civ = new Civilization{
 					name = race.Name,
 					noun = race.Noun,
+					adjective = race.Adjective,
 					leader = race.LeaderName,
 					leaderGender = race.LeaderGender == 0 ? Gender.Male : Gender.Female,
 					colorIndex = race.DefaultColor,
@@ -795,6 +796,7 @@ namespace C7GameData {
 				SaveUnit saveUnit = new SaveUnit{
 					id = ids.CreateID(prototype.Name),
 					name = String.IsNullOrEmpty(unit.Name) ? prototype.Name : unit.Name,
+					nationality = save.Civilizations[unit.Nationality].name,
 					owner = player.id,
 					prototype = prototype.Name,
 					currentLocation = new TileLocation(unit.X, unit.Y),
@@ -822,6 +824,10 @@ namespace C7GameData {
 				SaveUnit saveUnit = new SaveUnit{
 					id = ids.CreateID(prototype.Name),
 					name = String.IsNullOrEmpty(unitName) ? prototype.Name : unitName,
+                    /* TODO: scenarios seem to not support slave units by default,
+                       meaning there is no Nationality field in the Biq UNIT data structure,
+                       we might want to do something different in the future (somehow) */
+                    nationality = player.civilization,
 					owner = player.id,
 					prototype = prototype.Name,
 					currentLocation = new TileLocation(x, y),

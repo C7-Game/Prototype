@@ -14,6 +14,7 @@ namespace C7GameData {
 	public class MapUnit {
 		public ID id { get; internal set; }
 		public string name { get; internal set; }
+		public Civilization nationality { get; set; }
 		public UnitPrototype unitType { get; set; }
 		public Player owner { get; set; }
 		public Tile previousLocation { get; internal set; }
@@ -51,7 +52,6 @@ namespace C7GameData {
 		public float WorkerProgressTowardsJob { get; set; }
 		public Terraform WorkerJob { get; set; }
 
-
 		public UnitAI currentAI;
 
 		public MapUnit(ID id) {
@@ -83,19 +83,31 @@ namespace C7GameData {
 			return !this.IsBusy() && this.movementPoints.canMove;
 		}
 
+		public bool IsSlave() {
+			return !string.Equals(this.nationality.name, this.owner.civilization.name, StringComparison.CurrentCultureIgnoreCase);
+		}
+
 		public override string ToString() {
 			if (this != MapUnit.NONE) {
-				return this.owner + " " + unitType.name + " at (" + location.XCoordinate + ", " + location.YCoordinate + ") with " + movementPoints.getMixedNumber() + " MP and " + hitPointsRemaining + " HP, id = " + id;
+				return $"{this.owner} {this.GetDisplayName()} at [{this.location.XCoordinate}, {this.location.YCoordinate}] " +
+					   $"with {this.movementPoints.getMixedNumber()} MP and {this.hitPointsRemaining} HP, id = {id}";
 			} else {
 				return "This is the NONE unit";
 			}
 		}
 
+		public string GetDisplayName() {
+			return this.IsSlave() ? $"{this.name} ({this.nationality.name})" : this.name;
+		}
+
 		public string Describe() {
 			UnitPrototype type = this.unitType;
-			string hPDesc = ((type.attack > 0) || (type.defense > 0)) ? $" ({hitPointsRemaining}/{maxHitPoints})" : "";
+			string exp = this.HasRank() ? $"{this.experienceLevel.displayName}" : "";
+			string hPDesc = ((type.attack > 0) || (type.defense > 0)) ? $" ({this.hitPointsRemaining}/{this.maxHitPoints})" : "";
+			string displayName = this.IsSlave() ? $" ({this.nationality.adjective}) {this.name}" : $" {this.name}";
 			string attackDesc = (type.bombard > 0) ? $"{type.attack}({type.bombard})" : type.attack.ToString();
-			return $"{experienceLevel.displayName}{hPDesc} {this.name} ({attackDesc}.{type.defense}.{movementPoints.getMixedNumber()}/{type.movement})";
+			string stats = $" ({attackDesc}.{type.defense}.{this.movementPoints.getMixedNumber()}/{type.movement})";
+			return $"{exp}{hPDesc}{displayName}{stats}".Trim();
 		}
 
 		// TODO: The contents of this enum are copy-pasted from UnitAction in Civ3UnitSprite.cs. We should unify these so we don't have two different
@@ -158,7 +170,7 @@ namespace C7GameData {
 		private static int GetWorkerJobCost(Tile tile, Terraform workerJob) {
 			// For the movement cost multiplier, see note 7
 			// (https://apolyton.net/forum/civilization-series/civilization-iii/59815-civilization-iii-bic-file-format-2nd-thread?p=1362768#post1362768)
-			// For example, clearing a forest has a cost of 4, but with a nomral
+			// For example, clearing a forest has a cost of 4, but with a normal
 			// worker that would take 2 turns. In order for the job to take the
 			// expected 4 turns we need to multiply by the movement cost of the
 			// terrain. This also makes roading hills/mountains more expensive.
@@ -754,7 +766,7 @@ namespace C7GameData {
 		}
 
 		public float workerSpeed() {
-			float progressPerTurn = JOB_PROGRESS_WORKER;
+			float progressPerTurn = this.IsSlave() ? JOB_PROGRESS_SLAVE : JOB_PROGRESS_WORKER;
 			if (owner.civilization.traits.Contains(Civilization.Trait.Industrious)) {
 				progressPerTurn *= 1.5f;
 			}

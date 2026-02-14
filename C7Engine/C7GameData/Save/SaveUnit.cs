@@ -6,6 +6,7 @@ namespace C7GameData.Save {
 	public class SaveUnit : IHasID {
 		public ID id { get; set; }
 		public string name;
+		public string nationality;
 		public string prototype;
 		public ID owner;
 		public TileLocation previousLocation = new TileLocation();
@@ -28,6 +29,7 @@ namespace C7GameData.Save {
 		public SaveUnit(MapUnit unit, GameMap map) {
 			id = unit.id;
 			name = unit.name;
+			nationality = unit.nationality.name;
 			prototype = unit.unitType.name;
 			owner = unit.owner.id;
 			if (unit.previousLocation is not null) {
@@ -68,6 +70,13 @@ namespace C7GameData.Save {
 			unit.location.unitsOnTile.Add(unit);
 			unit.movementPoints.reset(movePointsRemaining);
 			unit.name = string.IsNullOrEmpty(name) ? unit.unitType.name : name;
+
+			Player originalNationality = players.Find(player => player.civilization.name == nationality);
+			if (originalNationality != null) {
+				unit.nationality = originalNationality.civilization;
+			} else {
+				unit.nationality = unit.owner.civilization;
+			}
 
 			return unit;
 		}

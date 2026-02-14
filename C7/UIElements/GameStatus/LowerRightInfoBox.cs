@@ -198,7 +198,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 			attackDefenseMovement.SetPosition(new Vector2(0, 32));
 			terrainType.SetPosition(new Vector2(0, 46));
 		}
-		unitType.Text = unit.name;
+		unitType.Text = unit.GetDisplayName();
 		string movementPointsRemaining = unit.movementPoints.canMove ? "" + $"{(unit.movementPoints.getMixedNumber())}" : "0";
 		string bombardText = "";
 		if (unit.unitType.bombard > 0) {

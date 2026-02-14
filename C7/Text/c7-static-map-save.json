@@ -68872,6 +68872,7 @@
     {
       "id": "Settler-1",
       "name": "Settler",
+      "nationality": "Netherlands",
       "prototype": "Settler",
       "owner": "player-2",
       "previousLocation": {
@@ -68892,6 +68893,7 @@
     {
       "id": "Worker-1",
       "name": "Worker",
+      "nationality": "Netherlands",
       "prototype": "Worker",
       "owner": "player-2",
       "previousLocation": {
@@ -68912,6 +68914,7 @@
     {
       "id": "Settler-2",
       "name": "Settler",
+      "nationality": "America",
       "prototype": "Settler",
       "owner": "player-3",
       "previousLocation": {
@@ -68932,6 +68935,7 @@
     {
       "id": "Worker-2",
       "name": "Worker",
+      "nationality": "America",
       "prototype": "Worker",
       "owner": "player-3",
       "previousLocation": {
@@ -68952,6 +68956,7 @@
     {
       "id": "Scout-1",
       "name": "Scout",
+      "nationality": "America",
       "prototype": "Scout",
       "owner": "player-3",
       "previousLocation": {
@@ -68972,6 +68977,7 @@
     {
       "id": "Settler-3",
       "name": "Settler",
+      "nationality": "Aztecs",
       "prototype": "Settler",
       "owner": "player-4",
       "previousLocation": {
@@ -68992,6 +68998,7 @@
     {
       "id": "Worker-3",
       "name": "Worker",
+      "nationality": "Aztecs",
       "prototype": "Worker",
       "owner": "player-4",
       "previousLocation": {
@@ -69012,6 +69019,7 @@
     {
       "id": "Settler-4",
       "name": "Settler",
+      "nationality": "Inca",
       "prototype": "Settler",
       "owner": "player-5",
       "previousLocation": {
@@ -69032,6 +69040,7 @@
     {
       "id": "Worker-4",
       "name": "Worker",
+      "nationality": "Inca",
       "prototype": "Worker",
       "owner": "player-5",
       "previousLocation": {
@@ -69052,6 +69061,7 @@
     {
       "id": "Scout-2",
       "name": "Scout",
+      "nationality": "Inca",
       "prototype": "Scout",
       "owner": "player-5",
       "previousLocation": {
@@ -69072,6 +69082,7 @@
     {
       "id": "Settler-5",
       "name": "Settler",
+      "nationality": "Persia",
       "prototype": "Settler",
       "owner": "player-6",
       "previousLocation": {
@@ -69092,6 +69103,7 @@
     {
       "id": "Worker-5",
       "name": "Worker",
+      "nationality": "Persia",
       "prototype": "Worker",
       "owner": "player-6",
       "previousLocation": {
@@ -69112,6 +69124,7 @@
     {
       "id": "Settler-6",
       "name": "Settler",
+      "nationality": "Maya",
       "prototype": "Settler",
       "owner": "player-7",
       "previousLocation": {
@@ -69132,6 +69145,7 @@
     {
       "id": "Worker-6",
       "name": "Worker",
+      "nationality": "Maya",
       "prototype": "Worker",
       "owner": "player-7",
       "previousLocation": {
@@ -69152,6 +69166,7 @@
     {
       "id": "Settler-7",
       "name": "Settler",
+      "nationality": "Iroquois",
       "prototype": "Settler",
       "owner": "player-8",
       "previousLocation": {
@@ -69172,6 +69187,7 @@
     {
       "id": "Worker-7",
       "name": "Worker",
+      "nationality": "Iroquois",
       "prototype": "Worker",
       "owner": "player-8",
       "previousLocation": {
@@ -74507,6 +74523,7 @@
     {
       "name": "A Barbarian Chiefdom",
       "noun": "Barbarians",
+      "adjective": "Barbarian",
       "colorIndex": 0,
       "leaderGender": "male",
       "cityNames": [
@@ -74603,6 +74620,7 @@
     {
       "name": "Rome",
       "noun": "Romans",
+      "adjective": "Roman",
       "leader": "Caesar",
       "colorIndex": 1,
       "leaderGender": "male",
@@ -74677,6 +74695,7 @@
     {
       "name": "Egypt",
       "noun": "Egyptians",
+      "adjective": "Egyptian",
       "leader": "Cleopatra",
       "colorIndex": 3,
       "leaderGender": "female",
@@ -74736,6 +74755,7 @@
     {
       "name": "Greece",
       "noun": "Greeks",
+      "adjective": "Greek",
       "leader": "Alexander",
       "colorIndex": 10,
       "leaderGender": "male",
@@ -74795,6 +74815,7 @@
     {
       "name": "Babylon",
       "noun": "Babylonians",
+      "adjective": "Babylonian",
       "leader": "Hammurabi",
       "colorIndex": 1,
       "leaderGender": "male",
@@ -74852,6 +74873,7 @@
     {
       "name": "Germany",
       "noun": "Germans",
+      "adjective": "German",
       "leader": "Bismarck",
       "colorIndex": 6,
       "leaderGender": "male",
@@ -74898,6 +74920,7 @@
     {
       "name": "Russia",
       "noun": "Russians",
+      "adjective": "Russian",
       "leader": "Catherine",
       "colorIndex": 9,
       "leaderGender": "female",
@@ -74967,6 +74990,7 @@
     {
       "name": "China",
       "noun": "Chinese",
+      "adjective": "Chinese",
       "leader": "Mao",
       "colorIndex": 5,
       "leaderGender": "male",
@@ -75015,6 +75039,7 @@
     {
       "name": "America",
       "noun": "Americans",
+      "adjective": "American",
       "leader": "Lincoln",
       "colorIndex": 5,
       "leaderGender": "male",
@@ -75085,6 +75110,7 @@
     {
       "name": "Japan",
       "noun": "Japanese",
+      "adjective": "Japanese",
       "leader": "Tokugawa",
       "colorIndex": 4,
       "leaderGender": "male",
@@ -75141,6 +75167,7 @@
     {
       "name": "France",
       "noun": "French",
+      "adjective": "French",
       "leader": "Joan d\u0027Arc",
       "colorIndex": 7,
       "leaderGender": "female",
@@ -75192,6 +75219,7 @@
     {
       "name": "India",
       "noun": "Indians",
+      "adjective": "Indian",
       "leader": "Gandhi",
       "colorIndex": 8,
       "leaderGender": "male",
@@ -75239,6 +75267,7 @@
     {
       "name": "Persia",
       "noun": "Persians",
+      "adjective": "Persian",
       "leader": "Xerxes",
       "colorIndex": 10,
       "leaderGender": "male",
@@ -75298,6 +75327,7 @@
     {
       "name": "Aztecs",
       "noun": "Aztecs",
+      "adjective": "Aztec",
       "leader": "Montezuma",
       "colorIndex": 4,
       "leaderGender": "male",
@@ -75364,6 +75394,7 @@
     {
       "name": "Zululand",
       "noun": "Zulu",
+      "adjective": "Zulu",
       "leader": "Shaka",
       "colorIndex": 3,
       "leaderGender": "male",
@@ -75410,6 +75441,7 @@
     {
       "name": "Iroquois",
       "noun": "Iroquois",
+      "adjective": "Iroquois",
       "leader": "Hiawatha",
       "colorIndex": 8,
       "leaderGender": "male",
@@ -75469,6 +75501,7 @@
     {
       "name": "England",
       "noun": "English",
+      "adjective": "English",
       "leader": "Elizabeth",
       "colorIndex": 2,
       "leaderGender": "female",
@@ -75528,6 +75561,7 @@
     {
       "name": "Mongols",
       "noun": "Mongols",
+      "adjective": "Mongol",
       "leader": "Temujin",
       "colorIndex": 3,
       "leaderGender": "male",
@@ -75588,6 +75622,7 @@
     {
       "name": "Spain",
       "noun": "Spanish",
+      "adjective": "Spanish",
       "leader": "Isabella",
       "colorIndex": 5,
       "leaderGender": "female",
@@ -75649,6 +75684,7 @@
     {
       "name": "Scandinavia",
       "noun": "Vikings",
+      "adjective": "Viking",
       "leader": "Ragnar Lodbrok",
       "colorIndex": 8,
       "leaderGender": "male",
@@ -75712,6 +75748,7 @@
     {
       "name": "Ottomans",
       "noun": "Ottomans",
+      "adjective": "Ottoman",
       "leader": "Osman",
       "colorIndex": 2,
       "leaderGender": "male",
@@ -75771,6 +75808,7 @@
     {
       "name": "Celts",
       "noun": "Celts",
+      "adjective": "Celtic",
       "leader": "Brennus",
       "colorIndex": 4,
       "leaderGender": "male",
@@ -75831,6 +75869,7 @@
     {
       "name": "Arabia",
       "noun": "Arabs",
+      "adjective": "Arabic",
       "leader": "Abu Bakr",
       "colorIndex": 7,
       "leaderGender": "male",
@@ -75889,6 +75928,7 @@
     {
       "name": "Carthage",
       "noun": "Carthaginians",
+      "adjective": "Carthaginian",
       "leader": "Hannibal",
       "colorIndex": 9,
       "leaderGender": "male",
@@ -75949,6 +75989,7 @@
     {
       "name": "Korea",
       "noun": "Koreans",
+      "adjective": "Korean",
       "leader": "Wang Kon",
       "colorIndex": 6,
       "leaderGender": "male",
@@ -76009,6 +76050,7 @@
     {
       "name": "Sumeria",
       "noun": "Sumerians",
+      "adjective": "Sumerian",
       "leader": "Gilgamesh",
       "colorIndex": 5,
       "leaderGender": "male",
@@ -76064,6 +76106,7 @@
     {
       "name": "Hittites",
       "noun": "Hittites",
+      "adjective": "Hittite",
       "leader": "Mursilis",
       "colorIndex": 14,
       "leaderGender": "male",
@@ -76119,6 +76162,7 @@
     {
       "name": "Netherlands",
       "noun": "Dutch",
+      "adjective": "Dutch",
       "leader": "William",
       "colorIndex": 2,
       "leaderGender": "male",
@@ -76174,6 +76218,7 @@
     {
       "name": "Portugal",
       "noun": "Portuguese",
+      "adjective": "Portuguese",
       "leader": "Henry",
       "colorIndex": 8,
       "leaderGender": "male",
@@ -76240,6 +76285,7 @@
     {
       "name": "Byzantines",
       "noun": "Byzantines",
+      "adjective": "Byzantine",
       "leader": "Theodora",
       "colorIndex": 11,
       "leaderGender": "female",
@@ -76295,6 +76341,7 @@
     {
       "name": "Inca",
       "noun": "Inca",
+      "adjective": "Incan",
       "leader": "Pachacuti",
       "colorIndex": 7,
       "leaderGender": "male",
@@ -76350,6 +76397,7 @@
     {
       "name": "Maya",
       "noun": "Maya",
+      "adjective": "Mayan",
       "leader": "Smoke-Jaguar",
       "colorIndex": 6,
       "leaderGender": "male",

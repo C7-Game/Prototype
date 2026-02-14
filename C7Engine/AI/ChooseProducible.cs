@@ -80,6 +80,7 @@ namespace C7Engine {
 			// would give it.
 			MapUnit temp = unit.GetInstance(EngineStorage.gameData);
 			temp.owner = player;
+			temp.nationality = player.civilization;
 			temp.location = city.location;
 
 			////////////////////////////////////////////////////////////////////

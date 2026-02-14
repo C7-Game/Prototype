@@ -816,7 +816,7 @@ public partial class Game : Node {
 			}
 			popupOverlay.ShowPopup(
 				new ConfirmationPopup(
-					$"Disband {CurrentlySelectedUnit.unitType.name}? Pardon me but these are OUR people. Do \nyou really want to disband them?",
+					$"Disband {CurrentlySelectedUnit.name}? Pardon me but these are OUR people. Do \nyou really want to disband them?",
 					"Yes, we need to!",
 					"No. Maybe you are right, advisor.",
 					() => {

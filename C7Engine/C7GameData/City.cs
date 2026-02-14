@@ -688,6 +688,7 @@ namespace C7GameData {
 		public void AddUnit(UnitPrototype prototype, GameData gameData) {
 			MapUnit newUnit = prototype.GetInstance(gameData);
 			newUnit.owner = owner;
+			newUnit.nationality = owner.civilization;
 			newUnit.location = location;
 			newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 			newUnit.experienceLevel = gameData.defaultExperienceLevel;

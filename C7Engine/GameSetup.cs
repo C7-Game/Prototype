@@ -101,6 +101,7 @@ public class GameSetup {
 		SaveUnit unit = new() {
 			id = ids.CreateID(unitType),
 			name = unitType,
+			nationality = player.civilization,
 			prototype = unitType,
 			owner = player.id,
 			previousLocation = new TileLocation(-1, -1),

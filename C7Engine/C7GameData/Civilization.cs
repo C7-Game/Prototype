@@ -32,6 +32,8 @@ namespace C7GameData {
 
 		// `noun` is "Americans" for "America", or "Spanish" for "Spain", etc.
 		public string noun;
+		// `adjective` is "American" for "America", or "Celtic" for "Celts", etc.
+		public string adjective;
 		public string leader;
 		public int colorIndex;
 		public Gender leaderGender;
