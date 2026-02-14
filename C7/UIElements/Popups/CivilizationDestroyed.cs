@@ -1,8 +1,5 @@
 using Godot;
-using System;
-using System.Diagnostics;
 using C7GameData;
-using Serilog;
 
 public partial class CivilizationDestroyed : Popup {
 	string civNoun = "";
@@ -40,6 +37,6 @@ public partial class CivilizationDestroyed : Popup {
 	}
 
 	private void ContinueAction() {
-		GetParent().EmitSignal("HidePopup");
+		GetParent<PopupOverlay>().Hide();
 	}
 }

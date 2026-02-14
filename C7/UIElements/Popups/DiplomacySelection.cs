@@ -26,10 +26,13 @@ public partial class DiplomacySelection : Popup {
 		int vOffset = 65;
 		foreach (KeyValuePair<ID, PlayerRelationship> kvp in player.playerRelationships) {
 			string status = kvp.Value.AtWar() ? "War" : "Peace";
+
+			var diplomacy = GetNode<Diplomacy>("../%DiplomacyOverlay");
+			var popupOverlay = GetParent<PopupOverlay>();
+
 			AddButton($"{allPlayers.Find(x => x.id == kvp.Key).civilization.noun} (at {status})", vOffset, () => {
-				Node parent = GetParent();
-				parent.EmitSignal(PopupOverlay.SignalName.HidePopup);
-				parent.EmitSignal(PopupOverlay.SignalName.DiplomacySelection, new ParameterWrapper<ID>(kvp.Key));
+				popupOverlay.Hide();
+				diplomacy.ShowTalkScreenForPlayer(player.id, kvp.Key);
 			});
 			vOffset += 25;
 		}

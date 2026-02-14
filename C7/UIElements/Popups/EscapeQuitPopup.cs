@@ -39,6 +39,6 @@ public partial class EscapeQuitPopup : Popup {
 	}
 
 	private void cancel() {
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 	}
 }

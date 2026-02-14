@@ -172,7 +172,7 @@ public partial class Popup : TextureRect {
 		cancelButton.TextureHover = xHover;
 		cancelButton.TexturePressed = xPressed;
 		cancelButton.SetPosition(position);
-		cancelButton.Pressed += GetParent<PopupOverlay>().OnHidePopup;
+		cancelButton.Pressed += GetParent<PopupOverlay>().Hide;
 		AddChild(cancelButton);
 	}
 }

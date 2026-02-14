@@ -170,9 +170,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 			});
 			AddItem("Zoom to city", () => {
 				this.CloseAndDelete();
-				EngineStorage.ReadGameData((GameData gameData) => {
-					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
-				});
+				game.ShowCityScreenForCity(tile.cityAtTile);
 			});
 		}
 
@@ -180,10 +178,13 @@ public partial class RightClickTileMenu : RightClickMenu {
 		// are in a city. We can see the full list of units outside of a city, but in a city
 		// we can only see the top defender.
 		if (nonPlayerUnits.Count > 0) {
+			MapUnit topUnit = nonPlayerUnits[0];
+			Player opponent = topUnit.owner;
+
 			Action contactCiv = () => {
 				this.CloseAndDelete();
-				game.controller.EnsureRelationshipExists(nonPlayerUnits[0].owner);
-				game.OnDiplomacySelected(new ParameterWrapper<ID>(nonPlayerUnits[0].owner.id));
+				game.controller.EnsureRelationshipExists(opponent);
+				GetNode<Diplomacy>("../%DiplomacyOverlay").ShowTalkScreenForPlayer(game.controller.id, opponent.id);
 			};
 
 			if (tile.cityAtTile == null) {
@@ -193,12 +194,11 @@ public partial class RightClickTileMenu : RightClickMenu {
 			} else {
 				// TODO: This isn't necessarily the top unit, get that code to an accessible
 				// location and then use it here.
-				MapUnit unit = nonPlayerUnits[0];
-				AddItem($"{unit.owner.civilization.noun} {unit.Describe()}", null);
+				AddItem($"{opponent.civilization.noun} {topUnit.Describe()}", null);
 			}
 
-			if (!nonPlayerUnits[0].owner.isBarbarians)
-				AddItem($"Contact {nonPlayerUnits[0].owner.civilization.name}", contactCiv);
+			if (!opponent.isBarbarians)
+				AddItem($"Contact {opponent.civilization.name}", contactCiv);
 		}
 	}
 
@@ -271,9 +271,7 @@ public partial class RightClickCityMenu : RightClickMenu {
 			});
 			AddItem("Zoom to city", () => {
 				this.CloseAndDelete();
-				EngineStorage.ReadGameData((GameData gameData) => {
-					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
-				});
+				game.ShowCityScreenForCity(tile.cityAtTile);
 			});
 		}
 	}

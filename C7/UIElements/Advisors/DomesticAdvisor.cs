@@ -2,7 +2,6 @@ using C7Engine;
 using C7GameData;
 using Godot;
 using System.Collections.Generic;
-using System;
 
 [GlobalClass]
 [Tool]
@@ -30,7 +29,7 @@ public partial class DomesticAdvisor : Control {
 	[Export] TextureButton contentFace;
 	[Export] TextureButton beaker;
 	[Export] TextureButton treasuryIcon;
-	PopupOverlay popupOverlay;
+	[Export] PopupOverlay popupOverlay;
 
 	TextureRect scienceSliderIcon = new();
 	Label scienceSliderLabel = new();
@@ -140,61 +139,68 @@ public partial class DomesticAdvisor : Control {
 	}
 
 	public void ShowAdvisor() {
+		GameData gameData = EngineStorage.gameData;
+
+		Player player = gameData.GetFirstHumanPlayer();
+
+		// Ensure the citizen moods are correct before displaying
+		// them.
+		foreach (City c in player.cities) {
+			c.RecalculateCitizenMoods(gameData);
+		}
+
 		Show();
 
-		EngineStorage.ReadGameData((GameData gameData) => {
-			Player player = gameData.GetFirstHumanPlayer();
-			PlayerCommerceBreakdown totalIncome = player.AggregateFlows();
+		PlayerCommerceBreakdown totalIncome = player.AggregateFlows();
 
-			int scienceRate = player.scienceRate;
-			int luxuryRate = player.luxuryRate;
+		int scienceRate = player.scienceRate;
+		int luxuryRate = player.luxuryRate;
 
-			scienceSliderIcon.SetPosition(new Vector2(CalculateSliderXPos(scienceRate), scienceSliderY));
-			luxurySliderIcon.SetPosition(new Vector2(CalculateSliderXPos(luxuryRate), luxurySliderY));
-			scienceSliderLabel.Text = $"{scienceRate * 10}%";
-			luxurySliderLabel.Text = $"{luxuryRate * 10}%";
+		scienceSliderIcon.SetPosition(new Vector2(CalculateSliderXPos(scienceRate), scienceSliderY));
+		luxurySliderIcon.SetPosition(new Vector2(CalculateSliderXPos(luxuryRate), luxurySliderY));
+		scienceSliderLabel.Text = $"{scienceRate * 10}%";
+		luxurySliderLabel.Text = $"{luxuryRate * 10}%";
 
-			governmentLabel.Text = $"{player.government.name}";
-			scienceStatus.Text = player.SummarizeScience(gameData);
-			treasury.Text = $"Treasury: {player.gold}";
+		governmentLabel.Text = $"{player.government.name}";
+		scienceStatus.Text = player.SummarizeScience(gameData);
+		treasury.Text = $"Treasury: {player.gold}";
 
-			incomeDetails.Text = $"From cities: +{totalIncome.CityInflows()}\nFrom taxmen: +{totalIncome.taxmenTaxes}\nFrom other civs: +{totalIncome.fromOtherCivs}\nFrom interest: +{totalIncome.interest}";
-			expenseDetails.Text = $"-{totalIncome.beakers}: Science\n-{totalIncome.happiness}: Entertainment\n-{totalIncome.corrupted}: Corruption\n-{totalIncome.maintenance}: Maintenance\n-{totalIncome.unitSupport}: Unit costs\n-{totalIncome.toOtherCivs}: To other civs";
-			incomeSummary.Text = $"Income: {totalIncome.Inflows()}";
-			expenseSummary.Text = $"Expenses: {totalIncome.Outflows()}";
+		incomeDetails.Text = $"From cities: +{totalIncome.CityInflows()}\nFrom taxmen: +{totalIncome.taxmenTaxes}\nFrom other civs: +{totalIncome.fromOtherCivs}\nFrom interest: +{totalIncome.interest}";
+		expenseDetails.Text = $"-{totalIncome.beakers}: Science\n-{totalIncome.happiness}: Entertainment\n-{totalIncome.corrupted}: Corruption\n-{totalIncome.maintenance}: Maintenance\n-{totalIncome.unitSupport}: Unit costs\n-{totalIncome.toOtherCivs}: To other civs";
+		incomeSummary.Text = $"Income: {totalIncome.Inflows()}";
+		expenseSummary.Text = $"Expenses: {totalIncome.Outflows()}";
 
-			int goldPerTurn = player.CalculateGoldPerTurn();
-			if (goldPerTurn > 0) {
-				sumSummary.Text = $"Net gain: +{goldPerTurn}";
-				growth.Text = "Growing!";
-			} else if (goldPerTurn < 0) {
-				sumSummary.Text = $"Net loss: {goldPerTurn}";
-				growth.Text = "Shrinking!";
-			} else {
-				sumSummary.Text = $"Neutral: {goldPerTurn}";
-				growth.Text = "Balanced";
-			}
+		int goldPerTurn = player.CalculateGoldPerTurn();
+		if (goldPerTurn > 0) {
+			sumSummary.Text = $"Net gain: +{goldPerTurn}";
+			growth.Text = "Growing!";
+		} else if (goldPerTurn < 0) {
+			sumSummary.Text = $"Net loss: {goldPerTurn}";
+			growth.Text = "Shrinking!";
+		} else {
+			sumSummary.Text = $"Neutral: {goldPerTurn}";
+			growth.Text = "Balanced";
+		}
 
-			//TODO: Randomize or set logically
-			advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Domestic, AdvisorHead.Mood.Happy, player.EraIndex());
+		//TODO: Randomize or set logically
+		advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Domestic, AdvisorHead.Mood.Happy, player.EraIndex());
 
-			// Disable the change government button unless we have a government to
-			// switch to.
-			changeGovernment.Disabled = player.GetAvailableGovernments(gameData).Count == 1;
+		// Disable the change government button unless we have a government to
+		// switch to.
+		changeGovernment.Disabled = player.GetAvailableGovernments(gameData).Count == 1;
 
-			if (player.government.transitionType && player.inAnarchyUntilTurn > gameData.turn) {
-				DialogBoxAdvise.Text = $"{player.inAnarchyUntilTurn - gameData.turn} turns of anarchy left";
-			}
+		if (player.government.transitionType && player.inAnarchyUntilTurn > gameData.turn) {
+			DialogBoxAdvise.Text = $"{player.inAnarchyUntilTurn - gameData.turn} turns of anarchy left";
+		}
 
-			foreach (var node in cityListContainer.GetChildren()) {
-				cityListContainer.RemoveChild(node);
-				node.QueueFree();
-			}
+		foreach (var node in cityListContainer.GetChildren()) {
+			cityListContainer.RemoveChild(node);
+			node.QueueFree();
+		}
 
-			foreach (City city in player.cities) {
-				cityListContainer.AddChild(MakeCityRow(city));
-			}
-		});
+		foreach (City city in player.cities) {
+			cityListContainer.AddChild(MakeCityRow(city));
+		}
 	}
 
 	private int CalculateSliderXPos(int sliderRate) {
@@ -202,10 +208,6 @@ public partial class DomesticAdvisor : Control {
 		int maxX = 725;
 
 		return minX + (int)((maxX - minX) * (sliderRate / 10.0));
-	}
-
-	public void SetPopupOverlay(PopupOverlay po) {
-		popupOverlay = po;
 	}
 
 	private void ChangeGovernments() {

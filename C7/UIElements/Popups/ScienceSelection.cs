@@ -40,16 +40,16 @@ public partial class ScienceSelection : Popup {
 
 		AddButton("OK. Sounds good.", 235, () => {
 			new MsgChooseResearch(options[optionButton.Selected], AdvisorState.DontShow).send();
-			GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+			GetParent<PopupOverlay>().Hide();
 		});
 		AddButton("What's the big picture?", 265, () => {
 			new MsgShowScienceAdvisor().send();
-			GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+			GetParent<PopupOverlay>().Hide();
 		});
 
 		AddConfirmButton(new Vector2(width - 40, height - 40), () => {
 			new MsgChooseResearch(options[optionButton.Selected], AdvisorState.DontShow).send();
-			GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+			GetParent<PopupOverlay>().Hide();
 		});
 	}
 

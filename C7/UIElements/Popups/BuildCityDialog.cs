@@ -73,7 +73,7 @@ public partial class BuildCityDialog : Popup {
 		GetViewport().SetInputAsHandled();
 		log.Debug("The user hit enter with a city name of " + name);
 		GetParent().EmitSignal(PopupOverlay.SignalName.BuildCity, name);
-		GetParent().EmitSignal(PopupOverlay.SignalName.HidePopup);
+		GetParent<PopupOverlay>().Hide();
 	}
 
 }

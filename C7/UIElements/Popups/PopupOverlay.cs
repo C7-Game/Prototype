@@ -1,5 +1,4 @@
 using Godot;
-using C7GameData;
 using Serilog;
 
 [GlobalClass]
@@ -11,8 +10,6 @@ public partial class PopupOverlay : HBoxContainer {
 	[Signal] public delegate void QuitEventHandler();
 	[Signal] public delegate void RetireEventHandler();
 	[Signal] public delegate void BuildCityEventHandler(string name);
-	[Signal] public delegate void DiplomacySelectionEventHandler(ParameterWrapper<ID> opponentPlayer);
-	[Signal] public delegate void HidePopupEventHandler();
 
 	Control currentChild = null;
 
@@ -25,12 +22,15 @@ public partial class PopupOverlay : HBoxContainer {
 		Info    //Sounds similar to the above, but lower-pitched in the second half
 	}
 
-	public void OnHidePopup() {
+	public override void _Ready() {
+		Hidden += OnHidePopup;
+	}
+
+	private void OnHidePopup() {
 		// 1. enable mouse interaction with non-UI nodes
 		MouseFilter = MouseFilterEnum.Pass;
 		RemoveChild(currentChild);
 		currentChild = null;
-		Hide();
 
 		// 2. enable mouse interactions with other UI elements
 		setMouseFilter(control, MouseFilterEnum.Pass);
