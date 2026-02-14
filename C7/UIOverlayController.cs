@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using C7Engine;
 using Godot;
@@ -18,7 +20,15 @@ public partial class UIOverlayController : Node {
 	[Export]
 	private MessageConsumer messageConsumer;
 
+	private Dictionary<Key, Action> keyActions;
+
 	public override void _Ready() {
+		keyActions = new() {
+			{ Key.F1, () => advisor.ShowAdvisor(Advisors.Type.Domestic) },
+			{ Key.F3, () => advisor.ShowAdvisor(Advisors.Type.Military) },
+			{ Key.F6, () => advisor.ShowAdvisor(Advisors.Type.Scientific) },
+			{ Key.F9, () => palaceScene.Show() },
+		};
 		messageConsumer.messageConsumed += HandleEngineMessage;
 	}
 
@@ -33,17 +43,10 @@ public partial class UIOverlayController : Node {
 
 	public override void _UnhandledInput(InputEvent @event) {
 		if (@event is InputEventKey eventKeyDown && eventKeyDown.Pressed) {
-			if (eventKeyDown.Keycode == Godot.Key.F1) {
-				advisor.ShowAdvisor(Advisors.Type.Domestic);
-			}
-			if (eventKeyDown.Keycode == Godot.Key.F3) {
-				advisor.ShowAdvisor(Advisors.Type.Military);
-			}
-			if (eventKeyDown.Keycode == Godot.Key.F6) {
-				advisor.ShowAdvisor(Advisors.Type.Scientific);
-			}
-			if (eventKeyDown.Keycode == Godot.Key.F9) {
-				palaceScene.Show();
+			if (keyActions.TryGetValue(eventKeyDown.Keycode, out var action)) {
+				HideOverlays();
+				action.Invoke();
+				GetViewport().SetInputAsHandled();
 			}
 			if (eventKeyDown.Keycode == Godot.Key.Escape && IsOverlayVisible()) {
 				HideOverlays();
