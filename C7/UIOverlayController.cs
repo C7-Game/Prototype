@@ -2,6 +2,8 @@ using System.Linq;
 using C7Engine;
 using Godot;
 
+// This node handles engine messages and user input related to the overlay UIs
+// and controls the visibility of the overlay UI components
 public partial class UIOverlayController : Node {
 	[Export]
 	private PopupOverlay popupOverlay;
