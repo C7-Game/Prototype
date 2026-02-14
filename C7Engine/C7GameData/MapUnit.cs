@@ -83,7 +83,7 @@ namespace C7GameData {
 			return !this.IsBusy() && this.movementPoints.canMove;
 		}
 
-		public bool IsSlave() {
+		public bool IsCaptive() {
 			return !string.Equals(this.nationality.name, this.owner.civilization.name, StringComparison.CurrentCultureIgnoreCase);
 		}
 
@@ -97,14 +97,14 @@ namespace C7GameData {
 		}
 
 		public string GetDisplayName() {
-			return this.IsSlave() ? $"{this.name} ({this.nationality.name})" : this.name;
+			return this.IsCaptive() ? $"{this.name} ({this.nationality.name})" : this.name;
 		}
 
 		public string Describe() {
 			UnitPrototype type = this.unitType;
 			string exp = this.HasRank() ? $"{this.experienceLevel.displayName}" : "";
 			string hPDesc = ((type.attack > 0) || (type.defense > 0)) ? $" ({this.hitPointsRemaining}/{this.maxHitPoints})" : "";
-			string displayName = this.IsSlave() ? $" ({this.nationality.adjective}) {this.name}" : $" {this.name}";
+			string displayName = this.IsCaptive() ? $" ({this.nationality.adjective}) {this.name}" : $" {this.name}";
 			string attackDesc = (type.bombard > 0) ? $"{type.attack}({type.bombard})" : type.attack.ToString();
 			string stats = $" ({attackDesc}.{type.defense}.{this.movementPoints.getMixedNumber()}/{type.movement})";
 			return $"{exp}{hPDesc}{displayName}{stats}".Trim();
@@ -766,7 +766,7 @@ namespace C7GameData {
 		}
 
 		public float workerSpeed() {
-			float progressPerTurn = this.IsSlave() ? JOB_PROGRESS_SLAVE : JOB_PROGRESS_WORKER;
+			float progressPerTurn = this.IsCaptive() ? JOB_PROGRESS_SLAVE : JOB_PROGRESS_WORKER;
 			if (owner.civilization.traits.Contains(Civilization.Trait.Industrious)) {
 				progressPerTurn *= 1.5f;
 			}
