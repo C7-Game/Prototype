@@ -397,6 +397,5 @@ public partial class Util {
 		TextureLoader.ClearCache();
 		AnimationManager.ClearCache();
 		PlayerTextureUtil.ClearCache();
-		RulesEngine.ClearCache();
 	}
 }

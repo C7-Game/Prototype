@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using C7Engine;
+using C7Engine.Lua;
 using Serilog;
 
 namespace C7GameData.Save {
@@ -76,7 +77,8 @@ namespace C7GameData.Save {
 				Difficulties = data.difficulties,
 				GameDifficulty = data.gameDifficulty,
 				Rules = data.rules,
-				TerrainImprovements = data.terrainImprovements.ConvertAll(ti => ti.ToSaveTerrainImprovement())
+				TerrainImprovements = data.terrainImprovements.ConvertAll(ti => ti.ToSaveTerrainImprovement()),
+				GameModeConfig = data.gameModeConfig,
 			};
 			save.StrengthBonuses.Add(data.fortificationBonus);
 			save.StrengthBonuses.Add(data.riverCrossingBonus);
@@ -98,13 +100,11 @@ namespace C7GameData.Save {
 			}
 		}
 
-		public GameData ToGameData(string luaRulesDir) {
+		public GameData ToGameData(BehaviorEngine behaviors) {
 			GameData data = InitializeGameData();
 
-			// TODO: In the future the path to the Lua script should be loaded from a save
-			// to allow a modded game to rely on a specific Lua ruleset.
-			string rulesScript = "civ3.lua";
-			data.luaRulesEngine.Initialize(luaRulesDir, rulesScript);
+			data.luaBehaviorEngine = behaviors;
+			data.gameModeConfig = GameModeConfig;
 
 			ConvertTerrainImprovements(data);
 			ConvertTerraforms(data);
@@ -211,7 +211,7 @@ namespace C7GameData.Save {
 					upgradesFrom = Create(save.upgradesFrom);
 				}
 
-				var improvement = new TerrainImprovement(save, gameData.luaRulesEngine, ResolveTerrainType, upgradesFrom);
+				var improvement = new TerrainImprovement(save, gameData.luaBehaviorEngine, ResolveTerrainType, upgradesFrom);
 				created[key] = improvement;
 				return improvement;
 			}
@@ -239,7 +239,7 @@ namespace C7GameData.Save {
 		}
 
 		private void ConvertInflow(GameData data) {
-			data.Inflows = Inflows.ConvertAll(saveInflow => new Inflow(saveInflow, data.luaRulesEngine));
+			data.Inflows = Inflows.ConvertAll(saveInflow => new Inflow(saveInflow, data.luaBehaviorEngine));
 		}
 
 		private void ConvertBuildings(GameData data) {
@@ -416,9 +416,18 @@ namespace C7GameData.Save {
 
 		public List<Difficulty> Difficulties = new();
 		public Difficulty GameDifficulty = new();
+
+		public GameMode.Config GameModeConfig = new("civ3");
+
 		public void Save(string path) {
 			byte[] json = JsonSerializer.SerializeToUtf8Bytes(this, JsonOptions);
 			File.WriteAllBytes(path, json);
+		}
+
+		// Makes a deep copy of a SaveGame instance via JSON serialization
+		public SaveGame Clone() {
+			byte[] json = JsonSerializer.SerializeToUtf8Bytes(this, JsonOptions);
+			return JsonSerializer.Deserialize<SaveGame>(json, JsonOptions);
 		}
 
 		public static SaveGame Load(string path, Func<string, string> getPediaIconsPath) {

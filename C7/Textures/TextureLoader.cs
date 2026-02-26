@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using MoonSharp.Interpreter;
 using Script = MoonSharp.Interpreter.Script;
-using MoonSharp.Interpreter.Loaders;
 using C7.Map;
 using C7Engine.Lua;
 
@@ -81,8 +80,7 @@ public static class TextureLoader {
 	private static Dictionary<(string configKey, string animationName), SpriteFrames> animationCache = [];
 
 	static TextureLoader() {
-		// Note: classes in the C7GameData namespace are already registered in
-		// the C7Engine.Lua.RulesEngine static constructor.
+		// Note: classes in the C7GameData namespace are already registered as part of GameModeLoader logic
 		UserData.RegisterType<CityGraphicsDetails>();
 		UserData.RegisterType<PopHead.TextureKey>();
 		UserData.RegisterType<BorderLayer.TextureDetails>();
@@ -92,33 +90,25 @@ public static class TextureLoader {
 		// in the class as well.
 		UserData.RegisterType<AdvisorHead>();
 
-		// We need to register Civilization here, despite it being in
-		// the C7GameData namespace, since it can be passed to
-		// Moonsharp before LuaRulesEngine initialization, in the game
-		// setup screen
-		UserData.RegisterType<C7GameData.Civilization>();
-
 		// We need to register the "Type" type to be able to inspect
 		// the types of C# objects in the Lua code
 		UserData.RegisterType<Type>();
 
-		SetConfig(GamePaths.TextureConfigsDir, GamePaths.ClassicGraphicsConfig);
+		// Initialize the TextureLoader when running in the editor
+		// In game it is done by GlobalSingleton, but it's not accessible in the editor
+		if (Engine.IsEditorHint()) {
+			GameMode gameMode = GameMode.Load(GamePaths.GameModesDir, GamePaths.basic);
+
+			var (script, textureConfig) = gameMode.textures;
+			TextureLoader.SetConfig(script, textureConfig);
+		}
 	}
 
-	public static void SetConfig(string configDir, string configScript) {
+	public static void SetConfig(Script lua, Table textureConfig) {
 		ClearCache();
 
-		lua = new Script();
-		lua.Options.ScriptLoader = new FileSystemScriptLoader {
-			ModulePaths = [
-				Path.Combine(configDir, "?.lua"),
-				Path.Combine(configDir, "*", "?.lua")
-			]
-		};
-
-		string fullScriptPath = Path.Combine(configDir, configScript);
-		DynValue res = lua.SafeDoFile(fullScriptPath);
-		textureConfig = res.Table;
+		TextureLoader.lua = lua;
+		TextureLoader.textureConfig = textureConfig;
 	}
 
 	/// Returns a texture based on the config key.

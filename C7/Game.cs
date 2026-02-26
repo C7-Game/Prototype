@@ -110,11 +110,7 @@ public partial class Game : Node {
 	}
 
 	private async Task LoadGame() {
-		// Ensure we clear out our image caches, as scenarios and games will
-		// use the same filenames but have different content for them.
-		Util.ClearCaches();
-
-		CreateGameParams options = new(GamePaths.LuaRulesDir, GamePaths.DefaultBicPath)
+		CreateGameParams options = new(GamePaths.DefaultBicPath)
 			{
 			GetPediaIconsPath = (scenarioSearchPath) => {
 				// When the game loading logic tries to load the PediaIcons file, set the
@@ -133,11 +129,14 @@ public partial class Game : Node {
 				Util.setModPath(scenarioSearchPath);
 				log.Debug("RelativeModPath ", scenarioSearchPath);
 				return Util.Civ3MediaPath("Text/PediaIcons.txt");
-			}
+			},
+			GameModeLoader = (config) => {
+				Global.ActivateGameMode(config);
+				return Global.GameMode.behaviors;
+			},
 		};
-
 		if (Global.SaveGame != null) {
-			controller = await CreateGame.createGame(Global.SaveGame, options);
+			controller = await CreateGame.createGame(Global.SaveGame, options.GameModeLoader);
 		} else if (Global.LoadGamePath != null) {
 			controller = await CreateGame.createGame(Global.LoadGamePath, options);
 		} else {
@@ -597,9 +596,6 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.O && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 			ToggleObserverMode();
 		}
-		if (eventKeyDown.Keycode == Godot.Key.T && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
-			ToggleC7Graphics();
-		}
 		if (eventKeyDown.Keycode == Godot.Key.F1) {
 			EmitSignal(SignalName.ShowSpecificAdvisor, "F1");
 		}
@@ -685,11 +681,6 @@ public partial class Game : Node {
 		EngineStorage.ReadGameData((GameData gameData) => {
 			gameData.showGridCoordinates = !gameData.showGridCoordinates;
 		});
-	}
-
-	private void ToggleC7Graphics() {
-		Global.ToggleModernGraphics();
-		InitializeMapView();
 	}
 
 	private void HandleMagnifyGesture(InputEventMagnifyGesture magnifyGesture) {

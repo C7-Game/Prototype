@@ -186,7 +186,7 @@ namespace C7GameData {
 		}
 
 		private void LoadLuaFunctions(GameData gameData) {
-			RulesEngine luaEngine = gameData.luaRulesEngine;
+			BehaviorEngine luaEngine = gameData.luaBehaviorEngine;
 
 			foreach (var path in dataSource.productionPrerequisites) {
 				var rule = luaEngine.ImportFunc<Func<City, bool>>(path);

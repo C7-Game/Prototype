@@ -10,7 +10,7 @@ public class PlayerRelationshipTest : IClassFixture<SaveGameFixture> {
 	C7GameData.GameData gameData;
 
 	public PlayerRelationshipTest(SaveGameFixture fixture) {
-		gameData = fixture.saveGame.ToGameData(PathUtils.luaRulesDir);
+		gameData = fixture.saveGame.ToGameData(fixture.behaviors);
 
 		EngineStorage.InitializeGameDataForTests(gameData);
 	}

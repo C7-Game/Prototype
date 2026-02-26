@@ -48,7 +48,7 @@ namespace C7GameData {
 
 		public TerrainImprovement(
 			SaveTerrainImprovement save,
-			RulesEngine rulesEngine,
+			BehaviorEngine rulesEngine,
 			Func<string, TerrainType> resolveTerrainType,
 			TerrainImprovement upgradesFrom = null
 		) {

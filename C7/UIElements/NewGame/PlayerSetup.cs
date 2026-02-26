@@ -192,10 +192,6 @@ public partial class PlayerSetup : Control {
 		civLabel.Text = $"{civilization.leader} of the {civilization.noun}\n({traits})";
 	}
 
-	private SaveGame GetSave() {
-		return GameModeLoader.Load(GamePaths.GameModesDir, GamePaths.GameMode);
-	}
-
 	private List<SelectedOpponent> CollectSelectedOpponents() {
 		List<SelectedOpponent> opponents = [];
 

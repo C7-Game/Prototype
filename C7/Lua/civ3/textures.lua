@@ -154,9 +154,9 @@ textures.ui = {
   },
 }
 
-textures.terrain = require "civ3.terrain"
+textures.terrain = require "textures.terrain"
 
-textures.resources = require "civ3.resources"
+textures.resources = require "textures.resources"
 
 textures.credits = {
   background = CREDITS .. "credits_background.pcx",
@@ -336,8 +336,8 @@ textures.palace = {
   background = PALACE .. "bkgr.pcx",
 }
 
-textures.world_setup = require "civ3.world_setup"
-textures.player_setup = require "civ3.player_setup"
+textures.world_setup = require "textures.world_setup"
+textures.player_setup = require "textures.player_setup"
 
 textures.diplomacy = {
   deal = "Art/Diplomacy/counter.pcx",
@@ -448,17 +448,17 @@ textures.animations = {
   },
 }
 
-textures.popheads = require "civ3.popheads"
-textures.cities = require "civ3.cities"
-textures.advisor_heads = require "civ3.advisor_heads"
-textures.ui.unit_control = require "civ3.unit_control"
-textures.terrain_improvements = require "civ3.terrain_improvements"
-textures.civ_colors = require "civ3.civ_colors"
-textures.unit_icons = require "civ3.unit_icons"
-textures.building_icons = require "civ3.building_icons"
-textures.tech_icons = require "civ3.tech_icons"
-textures.tech_boxes = require "civ3.tech_boxes"
-textures.leader_heads = require "civ3.leader_heads"
-textures.borders = require "civ3.borders"
+textures.popheads = require "textures.popheads"
+textures.cities = require "textures.cities"
+textures.advisor_heads = require "textures.advisor_heads"
+textures.ui.unit_control = require "textures.unit_control"
+textures.terrain_improvements = require "textures.terrain_improvements"
+textures.civ_colors = require "textures.civ_colors"
+textures.unit_icons = require "textures.unit_icons"
+textures.building_icons = require "textures.building_icons"
+textures.tech_icons = require "textures.tech_icons"
+textures.tech_boxes = require "textures.tech_boxes"
+textures.leader_heads = require "textures.leader_heads"
+textures.borders = require "textures.borders"
 
 return textures

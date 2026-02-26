@@ -1,19 +1,19 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using C7Engine.Lua;
 using C7GameData;
 using C7GameData.Save;
 
 namespace C7Engine;
 
 public class CreateGameParams {
-	public string LuaRulesDir;
 	public string DefaultBicPath;
+	public Func<GameMode.Config, BehaviorEngine> GameModeLoader;
 
 	public Func<string, string> GetPediaIconsPath = s => s;
 
-	public CreateGameParams(string LuaRulesDir, string DefaultBicPath) {
-		this.LuaRulesDir = LuaRulesDir;
+	public CreateGameParams(string DefaultBicPath) {
 		this.DefaultBicPath = DefaultBicPath;
 	}
 }
@@ -27,11 +27,14 @@ public class CreateGame {
 		**/
 	public static async Task<Player> createGame(string loadFilePath, CreateGameParams options) {
 		SaveGame save = SaveManager.LoadSave(loadFilePath, options.DefaultBicPath, options.GetPediaIconsPath);
-		return await createGame(save, options);
+
+		return await createGame(save, options.GameModeLoader);
 	}
 
-	public static async Task<Player> createGame(SaveGame save, CreateGameParams options) {
-		GameData gameData = save.ToGameData(options.LuaRulesDir);
+	public static async Task<Player> createGame(SaveGame save, Func<GameMode.Config, BehaviorEngine> gameModeLoader) {
+		BehaviorEngine behaviors = gameModeLoader(save.GameModeConfig);
+
+		GameData gameData = save.ToGameData(behaviors);
 
 		EngineStorage.gameData = gameData;
 		EngineStorage.gameData.onGameCreation();

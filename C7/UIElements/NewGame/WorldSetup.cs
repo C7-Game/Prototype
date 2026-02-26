@@ -1,10 +1,9 @@
 using Godot;
 using System;
 using C7Engine;
-using C7Engine.Lua;
+using Serilog;
 using C7GameData;
 using C7GameData.Save;
-using Serilog;
 
 [Tool]
 public partial class WorldSetup : Control {
@@ -72,10 +71,9 @@ public partial class WorldSetup : Control {
 	WorldCharacteristics.Climate clim = WorldCharacteristics.Climate.Normal;
 
 	private WorldSize _worldSize = WorldSize.Generic();
+	private SaveGame _saveGame;
 
 	private int GameSeed => int.Parse(seedInput.Text);
-
-	private SaveGame _saveGame;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
@@ -268,7 +266,8 @@ public partial class WorldSetup : Control {
 		billion4Large.Visible = true;
 		billion4.ButtonPressed = true;
 
-		_saveGame = GameModeLoader.Load(GamePaths.GameModesDir, GamePaths.GameMode);
+		GlobalSingleton Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
+		_saveGame = Global.GameMode.GetSave();
 
 		InitMapSizes();
 	}
@@ -292,7 +291,7 @@ public partial class WorldSetup : Control {
 		};
 
 		try {
-			// Dynamically create a new button for each world size in the game 
+			// Dynamically create a new button for each world size in the game
 			foreach (var ws in _saveGame.WorldSizes) {
 				var worldSizeButton = new Civ3MenuButton
 				{
@@ -311,7 +310,7 @@ public partial class WorldSetup : Control {
 					_worldSize = ws;
 			}
 
-			// Move random as last in the list and drop default map option and 
+			// Move random as last in the list and drop default map option and
 			worldSizeButtonsContainer.AddChild(randomSizeButton);
 		} catch (Exception ex) {
 			log.Warning(ex, "Failed to load map sizes from game mode.");

@@ -69,13 +69,13 @@ public partial class MainMenu : Node {
 		ButtonContainer.Exit.Pressed += _on_Exit_pressed;
 
 		ButtonContainer.ToggleGraphics.Pressed += () => {
-			Global.ToggleModernGraphics();
-			SetToggleGraphicsText();
+			Global.ToggleStandaloneMode();
+			GetTree().ChangeSceneToFile("res://UIElements/MainMenu/main_menu.tscn");
 		};
 		SetToggleGraphicsText();
 
 		// We can't toggle to using civ3 graphics in standalone mode.
-		if (C7Settings.UseStandaloneMode()) {
+		if (C7Settings.UseStandaloneMode() && !ClassicGraphicsAvailable()) {
 			ButtonContainer.ToggleGraphics.Visible = false;
 		}
 
@@ -100,7 +100,7 @@ public partial class MainMenu : Node {
 	}
 
 	private void SetToggleGraphicsText() {
-		if (Global.ModernGraphicsActive) {
+		if (C7Settings.UseStandaloneMode()) {
 			ButtonContainer.ToggleGraphics.Text = "Import Civilization III Graphics";
 		} else {
 			ButtonContainer.ToggleGraphics.Text = "Use OpenCiv3 Graphics";
@@ -169,11 +169,7 @@ public partial class MainMenu : Node {
 	}
 
 	private void UseStandaloneModePressed() {
-		if (!Global.ModernGraphicsActive) {
-			Global.ToggleModernGraphics();
-		}
-		C7Settings.SetValue("locations", "useStandaloneMode", "true");
-		C7Settings.SaveSettings();
+		Global.ActivateGameMode(GamePaths.standalone);
 		DisplayTitleScreen();
 	}
 }

@@ -44,7 +44,7 @@ public class Inflow : IProducible {
 		return true;
 	}
 
-	public Inflow(SaveInflow saveInflow, RulesEngine luaRulesEngine) {
+	public Inflow(SaveInflow saveInflow, BehaviorEngine luaRulesEngine) {
 		this.name = saveInflow.name;
 		this.iconRowIndex = saveInflow.iconRowIndex;
 		this.localYield = saveInflow.localYield.ConvertAll(y => new LocalYield(y.yieldType, luaRulesEngine, y.yieldCalculation));
@@ -71,7 +71,7 @@ public struct LocalYield {
 	public readonly Func<ScriptContext, int> yieldCalculation;
 
 	public LocalYield() { }
-	public LocalYield(InflowYield type, RulesEngine rulesEngine, string yieldCalculation = null) {
+	public LocalYield(InflowYield type, BehaviorEngine rulesEngine, string yieldCalculation = null) {
 		this.yieldType = type;
 		if (yieldCalculation != null) {
 			this.yieldCalculation = rulesEngine.ImportFunc<Func<ScriptContext, int>>(yieldCalculation);

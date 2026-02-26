@@ -41,26 +41,33 @@ public class PathUtils {
 		}
 	}
 
-	public static string luaRulesDir => getBasePath("../C7/Lua/rules");
-	public static string gameModesDir => getBasePath("../C7/Lua/game_modes/");
+	public static string gameModesDir => getBasePath("../C7/Lua/");
 }
 
 public class SaveGameFixture : IDisposable {
 	internal SaveGame saveGame;
 	internal SaveGame standaloneSaveGame;
+	internal BehaviorEngine behaviors;
 
 	const int TestSeed = 123456;
 
 	public SaveGameFixture() {
-		GameModeConfig basic = new("base-ruleset.json");
-		GameModeConfig standalone = new("base-ruleset.json", ["standalone.lua"]);
+		GameMode.Config basic = new("civ3");
+		GameMode.Config standalone = new("civ3", ["standalone"]);
 
 		saveGame = LoadSave(basic);
 		standaloneSaveGame = LoadSave(standalone);
+
+		// Standalone and basic modes should use the same set of behaviors
+		behaviors = LoadGameMode(basic).behaviors;
 	}
 
-	private static SaveGame LoadSave(GameModeConfig gameModeConfig) {
-		SaveGame save = GameModeLoader.Load(PathUtils.gameModesDir, gameModeConfig);
+	private static GameMode LoadGameMode(GameMode.Config gameModeConfig) {
+		return GameMode.Load(PathUtils.gameModesDir, gameModeConfig);
+	}
+
+	private static SaveGame LoadSave(GameMode.Config gameModeConfig) {
+		SaveGame save = LoadGameMode(gameModeConfig).GetSave();
 
 		WorldSize worldSize = new() {
 			width = 100,
@@ -176,28 +183,26 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 						continue;
 					default:
 						throw new Exception($"{msg}");
-						continue;
 				}
 			}
 		}
 	}
 
 	private Player CreateHeadlessGame(string path, string biqPath, Func<string, string> getPediaIconsPath) {
-		CreateGameParams options = new(PathUtils.luaRulesDir, biqPath) {
-			GetPediaIconsPath = getPediaIconsPath
+		CreateGameParams options = new(biqPath) {
+			GetPediaIconsPath = getPediaIconsPath,
+			GameModeLoader = (_) => { return fixture.behaviors; },
 		};
 
 		return CreateGame.createGame(path, options).Result;
 	}
 
 	private Player CreateHeadlessGame(SaveGame game) {
-		CreateGameParams options = new(PathUtils.luaRulesDir, "");
-
-		return CreateGame.createGame(game, options).Result;
+		return CreateGame.createGame(game, (_) => { return fixture.behaviors; }).Result;
 	}
 
 	private C7GameData.GameData ToGameData(SaveGame game) {
-		return game.ToGameData(PathUtils.luaRulesDir);
+		return game.ToGameData(fixture.behaviors);
 	}
 
 	private void CheckAiInvariants() {

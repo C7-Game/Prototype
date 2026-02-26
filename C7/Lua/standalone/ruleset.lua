@@ -36,7 +36,7 @@ local unit_replacement_art_map = {
 --[[
 This function defines the standalone addon to the base ruleset.
 
-This function takes the initial save data from `base-ruleset.json` and
+This function takes the initial save data from `civ3/ruleset.json` and
 removes the units for which we don't have graphics replacements.
 
 On the C# side, this function is called as part of addon loading logic

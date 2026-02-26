@@ -62,7 +62,8 @@ namespace C7GameData {
 
 		public string scenarioSearchPath;   //legacy from Civ3, we'll probably have a more modern format someday but this keeps legacy compatibility
 
-		internal RulesEngine luaRulesEngine = new();
+		internal BehaviorEngine luaBehaviorEngine;
+		internal GameMode.Config gameModeConfig;
 
 		// The cached trade network for all players. This is invalidated whenever
 		// a road is built or a city is created/destroyed.
@@ -190,7 +191,7 @@ namespace C7GameData {
 				// This clears out tile ownership due to Law VII or Law VIII.
 				// Regular tile ownership update will re-assign ownership where needed.
 				foreach (var fringeTile in tile.GetEdgeNeighbors().Where(x => !borderTileIds.Contains(x.Id))) {
-					if (fringeTile.HasCity) // skip encountered cities, just in case 
+					if (fringeTile.HasCity) // skip encountered cities, just in case
 						continue;
 
 					fringeTile.owningCity = null;
@@ -237,7 +238,7 @@ namespace C7GameData {
 		public async Task DisbandUnit(MapUnit unit) {
 			log.Information($"Player {unit.owner} disbands unit: {unit}");
 
-			var disbandFunction = this.luaRulesEngine.ImportFunc<Action<MapUnit>>("gameplay.units.disband", true);
+			var disbandFunction = this.luaBehaviorEngine.ImportFunc<Action<MapUnit>>("gameplay.units.disband");
 			disbandFunction.Invoke(unit);
 
 			await unit.animateAsync(MapUnit.AnimatedAction.DEATH, AnimationEnding.Pause);

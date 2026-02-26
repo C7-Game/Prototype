@@ -53,14 +53,14 @@ public class Terraform {
 		if (saveTerraform.Improvement != null)
 			Improvement = gameData.terrainImprovements.Find(ti => ti.key == saveTerraform.Improvement);
 
-		SetRules(gameData.luaRulesEngine);
+		SetRules(gameData.luaBehaviorEngine);
 	}
 
 	public string ToString() {
 		return Name;
 	}
 
-	private void SetRules(RulesEngine engine) {
+	private void SetRules(BehaviorEngine engine) {
 		foreach (string functionPath in dataSource.Effects) {
 			Effect += engine.ImportFunc<Action<ScriptContext>>(functionPath);
 		}
