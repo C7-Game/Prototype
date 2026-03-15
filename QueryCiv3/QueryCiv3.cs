@@ -91,6 +91,17 @@ namespace QueryCiv3 {
 			for (int i = 0; i < length; i++) Out.Add(FileData[i + offset]);
 			return Out.ToArray();
 		}
+		public byte[] GetRegion(int index) {
+			if (index >= Sections.Length) return new byte[] { };
+
+			int ending;
+			if (index == Sections.Length-1) {
+				ending = Length - Sections[index].Offset;
+			} else {
+				ending = Sections[index + 1].Offset - Sections[index].Offset;
+			}
+			return GetBytes(Sections[index].Offset, ending);
+		}
 		// NOTE: Tried to parameterize encoding with default of Civ3StringEncoding, but default must be compile-time constant
 		public string GetString(int offset, int length) {
 			byte[] StringBytes = GetBytes(offset, length);

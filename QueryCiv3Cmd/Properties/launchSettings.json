@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "QueryCiv3Cmd": {
+      "commandName": "Project",
+      "commandLineArgs": "dump --file \"C:\\Program Files (x86)\\Atari\\Civilization III Complete\\Conquests\\Saves\\PBE-060-Mongols-000.SAV\" --out \"dump.log\" --sections TILE --blacklist true"
+    }
+  }
+}

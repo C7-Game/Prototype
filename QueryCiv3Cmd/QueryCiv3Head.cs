@@ -1,51 +1,261 @@
-
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.PortableExecutable;
-using System.Security.Cryptography;
+using System.CommandLine;
+using System.CommandLine.Parsing;
 using QueryCiv3;
 
-internal class Program {
-	private static void Main(string[] args) {
+internal class QueryCiv3Head {
+	private static int Main(string[] args) {
 
-		string outputFilename = "C:\\Program Files (x86)\\Atari\\Civilization III Complete\\Conquests\\Saves\\output.SAV";
-		string filename = "C:\\Program Files (x86)\\Atari\\Civilization III Complete\\Conquests\\Saves\\output.SAV";
-		string referenceFilename = "C:\\Program Files (x86)\\Atari\\Civilization III Complete\\Conquests\\Saves\\PBE-060-Mongols-000.SAV";
+		//Some examples...
+		//summary --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV"
+		//patchByte --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --out "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\output2.SAV" --section "GAME" --index 1 --offset 0x144 --value 31
+		//compare --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --ref "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Iroquois-000.SAV" --out "diff.log" --showDifference true
+		//patch --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --ref "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Indians-000.SAV" --out "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\output.SAV" --sections GAME CIV3
+		//dump --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --out "dump.log" --sections TILE --blacklist true
 
-		string[] headers = {
-			//"CIV3", //differs by noise
-			//"GAME", //differs by noise
-			//"CNSL",
-			//"LEAD", //differs by noise
-			//"RPLS",
-			//"RPLT",
+		Option<Civ3File> fileOption = new ("--file")
+		{
+			Description = "The base file, to read or to modify",
+			CustomParser = Civ3FileParser
 		};
-		//BLDG seems to change even when nothing else does, which is wack
 
-		string patchSectionName = "GAME";
-		int patchIndex = 1;
-		int patchOffset = 0x144;
-		byte patchValue = 31;
+		Option<Civ3File> referenceFileOption = new("--ref")
+		{
+			Description = "The reference file, to compare to or to copy from",
+			CustomParser = Civ3FileParser
+		};
 
-		bool showDifference = true;
-		bool patchingFromReferenceFile = false;
-		bool patchingFromConsole = true;
+		Option<FileInfo?> outputFileOption = new("--out")
+		{
+			Description = "The output file"
+		};
 
-		byte[] fileBytes = Util.ReadFile(filename);
-		Civ3File file = new Civ3File(fileBytes);
+		Option<List<string>> sectionNamesOption = new("--sections")
+		{
+			Description = "The sections of the file that should be considered",
+			AllowMultipleArgumentsPerToken = true,
+		};
+		/*
+		 * Some notes on sections:
+		 * CIV3 differs by noise/time. Playing the exact turn twice will change this section.
+		 * GAME differs by noise/time. Playing the exact turn twice will change this section.
+		 * LEAD differs by noise/time. Playing the exact turn twice will change this section.
+		 * BLDG changes mid-game. It's likely taking on some junk data.
+		 */
 
-		byte[] referenceFileBytes = Util.ReadFile(referenceFilename);
-		Civ3File referenceFile = new Civ3File(referenceFileBytes);
+		Option<bool> sectionBlacklistOption = new("--blacklist")
+		{
+			Description = "Whether to use the section list as a blacklist or a whitelist",
+			DefaultValueFactory = _ => false
+		};
+
+		Option<string> sectionNameOption = new("--section")
+		{
+			Description = "The name of the section to change"
+		};
+
+		Option<int> indexOption = new("--index")
+		{
+			Description = "The index of the section to change (1st = 0, 2nd = 0, etc)"
+		};
+
+		Option<int> patchOffsetOption = new("--offset")
+		{
+			Description = "The offset of the byte to change (use 0x to specify hex)",
+			CustomParser = result => {
+				string? value = result.Tokens.SingleOrDefault()?.Value;
+				if (value is null)
+				{
+					result.AddError("No value provided");
+					return 0;
+				}
+				if (value.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+					  && int.TryParse(value.AsSpan(2), System.Globalization.NumberStyles.HexNumber, null, out int hex))
+					return hex;
+				if (int.TryParse(value, out int dec))
+					return dec;
+				result.AddError($"Could not parse '{value}' as an integer");
+				return 0;
+			}
+		};
+
+		Option<byte> patchValueOption = new("--value")
+		{
+			Description = "The new value of the byte"
+		};
+
+		//To set the next player to player #31 (0 is barbs):
+		//--section "GAME" --index 1 --offset 0x144 --value 31
+
+		Option<bool> showDifferenceOption = new("--showDifference")
+		{
+			Description = "Whether to show the byte-by-byte difference, or just which sections differ",
+			DefaultValueFactory = _ => false
+		};
+
+		//TODO
+		//Option<bool> useJson = new("--json")
+		//{
+		//	Description = "Whether or not to format the output as a .json file"
+		//};
+
+		RootCommand rootCommand = new("Civ3 file query app");
+
+		// SUMMARY COMMAND
+		Command summaryCommand = new("summary", "Shows how many of each section type is in the file")
+		{
+			fileOption,
+			outputFileOption
+		};
+		rootCommand.Subcommands.Add(summaryCommand);
+
+		summaryCommand.SetAction(parseResult => OutputSummary(parseResult.GetValue(fileOption), parseResult.GetValue(outputFileOption)?.FullName));
+
+		// PATCH BYTE COMMAND
+		Command patchByteCommand = new("patchByte", "Patch a specific byte in the file")
+		{
+			fileOption,
+			outputFileOption,
+			sectionNameOption,
+			indexOption,
+			patchOffsetOption,
+			patchValueOption
+		};
+		rootCommand.Subcommands.Add(patchByteCommand);
+
+		patchByteCommand.SetAction(parseResult => {
+			Civ3File? file = parseResult.GetValue(fileOption);
+			byte[] fileData = file.GetBytes(0, file.Length);
+			string? patchSectionName = parseResult.GetValue(sectionNameOption);
+			int patchSectionCount = parseResult.GetValue(indexOption);
+			int patchSectionIndex = GetSectionIndexOfType(file, patchSectionName, patchSectionCount);
+			if (patchSectionIndex != -1) {
+				Civ3Section? patchSection = file.Sections[patchSectionIndex];
+				ApplyPatch(fileData, [parseResult.GetValue(patchValueOption)], patchSection.Offset + parseResult.GetValue(patchOffsetOption));
+				File.WriteAllBytes(parseResult.GetValue(outputFileOption).FullName, fileData);
+			} else {
+				Console.WriteLine("Could not apply patch: no section found at {0} {1}", patchSectionName, patchSectionCount);
+			}
+		});
+
+		//DUMP COMMAND
+		Command dumpCommand = new("dump", "Produce a hex dump of all sections matching criteria")
+		{
+			fileOption,
+			sectionNamesOption,
+			sectionBlacklistOption,
+			outputFileOption
+		};
+		rootCommand.Subcommands.Add(dumpCommand);
+
+		dumpCommand.SetAction(parseResult => {
+			Civ3File file = parseResult.GetValue(fileOption)!;
+			List<string> sectionNames = parseResult.GetValue(sectionNamesOption)!;
+			if (sectionNames.Count == 0 || parseResult.GetValue(sectionBlacklistOption)) {
+
+				using StreamWriter streamWriter = GetFileOrConsoleWriter(parseResult.GetValue(outputFileOption)?.FullName);
+				DumpAllSectionsExclusive(streamWriter, file, sectionNames);
+			} else {
+				foreach (string header in sectionNames) {
+					DumpAllSectionsOfHeader(parseResult.GetValue(outputFileOption)?.FullName, file, header);
+				}
+			}
+		});
+
+		//COMPARE COMMAND
+		Command compareCommand = new("compare", "Compare two files and print the differences")
+		{
+			fileOption,
+			referenceFileOption,
+			outputFileOption,
+			sectionNamesOption,
+			sectionBlacklistOption,
+			showDifferenceOption,
+		};
+		rootCommand.Subcommands.Add(compareCommand);
+
+		compareCommand.SetAction(parseResult => {
+
+			string? fileOutputName = parseResult.GetValue(outputFileOption)?.FullName;
+			using StreamWriter streamWriter = GetFileOrConsoleWriter(fileOutputName);
+
+			Civ3File file = parseResult.GetValue(fileOption);
+			Civ3File referenceFile = parseResult.GetValue(referenceFileOption);
+			bool showDifference = parseResult.GetValue(showDifferenceOption);
+
+			ForEachMismatchedSection(file,
+				referenceFile,
+				parseResult.GetValue(sectionNamesOption),
+				parseResult.GetValue(sectionBlacklistOption), (bi, ri) => {
+					streamWriter.WriteLine("{0} differs", file.Sections[bi].Name);
+
+					if (showDifference) {
+						byte[] content = file.GetRegion(bi);
+						byte[] referenceContent = referenceFile.GetRegion(ri);
+
+						for (int j = 0; j < content.Length || j < referenceContent.Length; j++) {
+							byte? firstByte = j >= content.Length ? null : content[j];
+							byte? secondByte = j >= referenceContent.Length ? null : referenceContent[j];
+							if (firstByte != secondByte) {
+								streamWriter.WriteLine("0x{0}: {1}|{2}", j.ToString("X4"), firstByte?.ToString("X2"), secondByte?.ToString("X2"));
+							}
+						}
+					}
+				});
+		});
+
+		//PATCH COMMAND
+		Command patchCommand = new("patch", "Patch from file")
+		{
+			fileOption,
+			referenceFileOption,
+			outputFileOption,
+			sectionNamesOption,
+			sectionBlacklistOption
+		};
+		rootCommand.Subcommands.Add(patchCommand);
+
+		patchCommand.SetAction(parseResult => {
+			Civ3File file = parseResult.GetValue(fileOption);
+			Civ3File referenceFile = parseResult.GetValue(referenceFileOption);
+			byte[] fileData = file.GetBytes(0, file.Length);
+			ForEachMismatchedSection(file,
+				referenceFile,
+				parseResult.GetValue(sectionNamesOption),
+				parseResult.GetValue(sectionBlacklistOption), (bi, ri) => {
+					ApplyPatch(fileData, referenceFile.GetRegion(ri), file.Sections[bi].Offset);
+				});
+			File.WriteAllBytes(parseResult.GetValue(outputFileOption).FullName, fileData);
+		});
+
+		return rootCommand.Parse(args).Invoke();
+
+	}
+
+	static Civ3File? Civ3FileParser(ArgumentResult result) {
+		string? path = result.Tokens.SingleOrDefault()?.Value;
+		if (path is null || !File.Exists(path)) {
+			result.AddError($"File not found: {path}");
+			return null!;
+		}
+		Civ3File file = new Civ3File(Util.ReadFile(path));
+		if (!file.IsGameFile) {
+			result.AddError($"File is not a valid savegame: {path}");
+			return null;
+		}
+		return file;
+	}
+
+	private static StreamWriter GetFileOrConsoleWriter(string? fileOutputName) {
+		if (fileOutputName != null) {
+			return new StreamWriter(fileOutputName);
+		} else {
+			return new StreamWriter(Console.OpenStandardOutput());
+		}
+	}
+
+	private static void ForEachMismatchedSection(Civ3File file, Civ3File referenceFile, List<string> headers, bool sectionBlacklist, Action<int, int> onMismatch) {
 
 		if (file.IsGameFile && referenceFile.IsGameFile) {
-
-			OutputSummary(file);
-			foreach (string header in headers) {
-				DumpAllSections(filename, file, header);
-				DumpAllSections(referenceFilename, referenceFile, header);
-			}
 
 			int matchingTo = 0;
 			int referenceOffset = 0;
@@ -81,163 +291,81 @@ internal class Program {
 					continue;
 				}
 
-				byte[] content = GetSectionFromIndex(file, i);
-				byte[] referenceContent = GetSectionFromIndex(referenceFile, i + referenceOffset);
-
-				if (!content.SequenceEqual(referenceContent) && headers.Contains(section.Name)) {
-
-					Console.WriteLine("{0} ({1}) differs", section.Name, referenceSection.Name);
-
-					if (showDifference) {
-						for (int j = 0; j < content.Length || j < referenceContent.Length; j++) {
-							bool validInReference = j + referenceOffset < referenceContent.Length && j + referenceOffset >= 0;
-							Console.WriteLine("{0} / {1}", j >= content.Length ? " " : content[j], validInReference ? referenceContent[j + referenceOffset] : " ");
-						}
-					}
-
-					if (patchingFromReferenceFile) {
-						ApplyPatch(fileBytes, referenceContent, referenceSection.Offset);
-					}
-
-				} else {
-
-					//Console.WriteLine("{0} matches", section.Name);
-
-				}
-				//get both sections
-				//compare the difference
-			}
-
-			//TODO output Blast encrypted files
-			if (patchingFromReferenceFile || patchingFromConsole) {
-
-				Civ3Section? patchSection = GetSectionOfType(file, patchSectionName, patchIndex);
-				if (patchSection != null) {
-					ApplyPatch(fileBytes, [patchValue], patchSection.Offset + patchOffset);
-				} else {
-					Console.WriteLine("Could not apply patch: no section found at {0} {1}", patchSectionName, patchIndex);
+				if (headers.Count != 0 && (!headers.Contains(section.Name) ^ sectionBlacklist)) {
+					continue;
 				}
 
-				File.WriteAllBytes(outputFilename, fileBytes);
+				byte[] content = file.GetRegion(i);
+				byte[] referenceContent = referenceFile.GetRegion(i + referenceOffset);
 
+				if (!content.SequenceEqual(referenceContent)) {
+					onMismatch(i, i + referenceOffset);
+				}
 			}
-
-
-		} else {
-			Console.WriteLine("Not a game file");
-			Environment.Exit(1);
 		}
-
 	}
 
-	private static void DumpAllSections(string filename, Civ3File file, string header) {
-		bool matchFound = true;
-		int index = 0;
-		while (matchFound) {
-			byte[] bytesFound = GetRegionOfType(file, header, index);
-			if (bytesFound.Length == 0) {
-				matchFound = false;
+	private static string ByteArrayAsString(byte[] array) {
+		return BitConverter.ToString(array);
+	}
+
+	private static void DumpAllSectionsExclusive(StreamWriter streamWriter, Civ3File file, List<string> sectionNames) {
+		for (int i = 0; i < file.Sections.Length; i++) {
+			Civ3Section section = file.Sections[i];
+			if (sectionNames.Contains(section.Name)) {
+				continue;
+			}
+			byte[] bytesFound = file.GetRegion(i);
+			streamWriter.WriteLine($"{i} ({section.Name}): {ByteArrayAsString(bytesFound)}");
+		}
+	}
+
+	private static void DumpAllSectionsOfHeader(string? filename, Civ3File file, string header) {
+		int sectionCount = 0;
+		while (true) {
+			int index = GetSectionIndexOfType(file, header, sectionCount);
+			if (index == -1) {
+				break;
 			} else {
-				File.WriteAllBytes(filename + " " + header + index + ".bin", bytesFound);
-				index++;
+				byte[] bytesFound = file.GetRegion(index);
+				if (filename != null) {
+					File.WriteAllBytes(filename + " " + header + " " + sectionCount + ".bin", bytesFound);
+				} else {
+					Console.WriteLine($"{header} {sectionCount}: {ByteArrayAsString(bytesFound)}");
+				}
+				sectionCount++;
 			}
 		}
 	}
 
 	private static void ApplyPatch(byte[] fileBytes, byte[] patch, int offset) {
-		for (int i = 0; i < patch.Length; i++) {
-			fileBytes[i + offset] = patch[i];
-		}
+		Array.Copy(patch, 0, fileBytes, offset, patch.Length);
 	}
 
-	//a bit of copy pasting never hurt nobody.
-	private static Civ3Section? GetSectionOfType(Civ3File file, string header, int ignore = 0) {
+	
+	private static int GetSectionIndexOfType(Civ3File file, string header, int ignore = 0) {
 
-		foreach (Civ3Section section in file.Sections) {
+		for (int i = 0; i < file.Sections.Length; i++) {
+			Civ3Section section = file.Sections[i];
 
 			if (section.Name == header) {
 				if (ignore > 0) {
 					ignore--;
 					continue;
 				}
-				return section;
+				return i;
 			}
 		}
 
-		return null;
+		return -1;
 
 	}
 
-	private static byte[] GetRegionOfType(Civ3File file, string header, int ignore = 0) {
-		Civ3Section? selection = null;
-		Civ3Section? selectionEnd = null;
+	private static void OutputSummary(Civ3File file, string? outputFilename) {
 
-		foreach (Civ3Section section in file.Sections) {
+		using StreamWriter streamWriter = GetFileOrConsoleWriter(outputFilename);
+		foreach (var group in file.Sections.GroupBy(s => s.Name))
+			streamWriter.Write("{0} {1}; ", group.Key, group.Count());
 
-			if (selection != null) {
-				selectionEnd = section;
-				break;
-			}
-
-			if (section.Name == header) {
-				if (ignore > 0) {
-					ignore--;
-					continue;
-				}
-				selection = section;
-			}
-		}
-
-		if (selection == null) {
-			return Array.Empty<byte>();
-		} else {
-			return GetSection(file, selection, selectionEnd);
-		}
-	}
-
-	private static byte[] GetSectionFromIndex(Civ3File file, int i) {
-		Civ3Section section = file.Sections[i];
-		Civ3Section? terminator = i != file.Sections.Length - 1 ? file.Sections[i + 1] : null;
-
-		return GetSection(file, section, terminator);
-	}
-
-	private static byte[] GetSection(Civ3File file, Civ3Section start, Civ3Section? terminator) {
-		if (terminator == null) {
-			return file.GetBytes(start.Offset, file.Length - start.Offset);
-		} else {
-			return file.GetBytes(start.Offset, terminator.Offset - start.Offset);
-		}
-	}
-
-	private static void OutputSummary(Civ3File file) {
-		Dictionary<string, int> firstSections = new Dictionary<string, int>();
-
-		//TODO get sections
-		foreach (Civ3Section section in file.Sections) {
-
-			var contained = false;
-
-			foreach (KeyValuePair<string, int> section2 in firstSections) {
-				if (section2.Key == section.Name) {
-					contained = true;
-					firstSections.Remove(section2.Key);
-					firstSections.Add(section2.Key, section2.Value + 1);
-					break;
-				}
-			}
-
-			if (contained) {
-				continue;
-			}
-
-			firstSections.Add(section.Name, 1);
-
-		}
-
-		foreach (KeyValuePair<string, int> section in firstSections) {
-			Console.Write("{0} {1}; ", section.Key, section.Value);
-		}
-		Console.WriteLine();
 	}
 }
