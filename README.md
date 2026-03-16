@@ -35,4 +35,4 @@ To set up a working development environment, see [Developing and Setting Up IDEs
 - ConvertCiv3Media - A library dedicated to reading images and animations from Civ3, used by C7 at the time being.
 - EngineTests - Tests for logic in the engine.
 - QueryCiv3 - A data reader for Civ3 BIQ and SAV files that fetches data based on offsets from labeled section headers, used by C7
-- QueryCiv3Head - A command line application to debug and modify Civ3 files
+- QueryCiv3Head - A command line interface to use QueryCiv3, used to debug, modify and research Civ3 files

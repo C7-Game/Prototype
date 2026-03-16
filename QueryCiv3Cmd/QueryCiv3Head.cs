@@ -8,6 +8,8 @@ internal class QueryCiv3Head {
 		//Some examples...
 		//summary --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV"
 		//patchByte --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --out "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\output2.SAV" --section "GAME" --index 1 --offset 0x144 --value 31
+		//other useful bytes...
+		//0x1544 - turn custom music on/off in scenarios (only works on new ones; was 0x1564 for an ongoing one)
 		//compare --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --ref "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Iroquois-000.SAV" --out "diff.log" --showDifference true
 		//patch --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --ref "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Indians-000.SAV" --out "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\output.SAV" --sections GAME CIV3
 		//dump --file "C:\Program Files (x86)\Atari\Civilization III Complete\Conquests\Saves\PBE-060-Mongols-000.SAV" --out "dump.log" --sections TILE --blacklist true
@@ -55,7 +57,7 @@ internal class QueryCiv3Head {
 
 		Option<int> indexOption = new("--index")
 		{
-			Description = "The index of the section to change (1st = 0, 2nd = 0, etc)"
+			Description = "The index of the section to change (1st = 0, 2nd = 1, etc)"
 		};
 
 		Option<int> patchOffsetOption = new("--offset")
