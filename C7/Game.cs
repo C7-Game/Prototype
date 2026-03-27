@@ -62,7 +62,7 @@ public partial class Game : Node {
 	private Vector2 OldPosition;
 
 	Stopwatch loadTimer = new Stopwatch();
-	GlobalSingleton Global;
+	public GlobalSingleton Global { get; private set; }
 
 	[Export]
 	private PopupOverlay popupOverlay;

@@ -215,7 +215,9 @@ public partial class PCXToGodot : GodotObject {
 
 		if (colorOptions.shadows) {
 			for (int i = 240; i < 256; i++) {
-				ColorData[i] = ((MAX_COLOR - i) * 16) << ALPHA_BITSHIFT;
+				if (!colorOptions.transparentColorIndexes.Contains(i)) {
+					ColorData[i] = ((MAX_COLOR - i) * 16) << ALPHA_BITSHIFT;
+				}
 			}
 		}
 
