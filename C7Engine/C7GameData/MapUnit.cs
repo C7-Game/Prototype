@@ -750,6 +750,10 @@ namespace C7GameData {
 			return location.neighbors.Values.All(tile => !tile.HasCity);
 		}
 
+		public bool canBombard() {
+			return unitType.actions.Contains(UnitAction.Bombard);
+		}
+
 		public async Task<City?> buildCity(string cityName) {
 			if (!canBuildCity()) {
 				log.Warning($"can't build city at {location}");

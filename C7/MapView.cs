@@ -710,6 +710,7 @@ public partial class MapView : Node2D {
 
 		LooseView unitView = new(this);
 		unitView.layers.Add(new GotoLayer());
+		unitView.layers.Add(new BombardLayer());
 		LooseView otherView = new(this);
 		otherView.layers.Add(new UnitLayer());
 

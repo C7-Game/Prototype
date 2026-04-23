@@ -51,6 +51,16 @@ public partial class Game : Node {
 	};
 	public GotoInfo gotoInfo = null;
 
+	public class BombardInfo {
+		public MapUnit bombardingUnit;
+		public Tile mouseTile;
+
+		public BombardInfo(MapUnit bombardingUnit) {
+			this.bombardingUnit = bombardingUnit;
+		}
+	};
+	public BombardInfo bombardInfo = null;
+
 	public class TileInfo {
 		public Tile targetTile;
 		public HashSet<Tile> coveredTiles = [];
@@ -636,6 +646,8 @@ public partial class Game : Node {
 			OldPosition = eventMouseMotion.Position;
 		} else if (gotoInfo != null) {
 			gotoInfo = GetGotoInfo(eventMouseMotion.Position);
+		} else if (bombardInfo != null) {
+			bombardInfo.mouseTile = PositionToTile(eventMouseMotion.Position);
 		}
 	}
 
@@ -909,6 +921,15 @@ public partial class Game : Node {
 			});
 		}
 
+		if (currentAction == C7Action.UnitBombard) {
+			if (CurrentlySelectedUnit != MapUnit.NONE && (CurrentlySelectedUnit?.canBombard() ?? false)) {
+				EngineStorage.ReadGameData((GameData gameData) => {
+					MapUnit currentUnit = gameData.GetUnit(CurrentlySelectedUnit.id);
+					setBombard(currentUnit);
+				});
+			}
+		}
+
 		Terraform terraform = C7Action.ToTerraform(currentAction);
 
 		if (CurrentlySelectedUnit == MapUnit.NONE || CurrentlySelectedUnit == null
@@ -937,6 +958,10 @@ public partial class Game : Node {
 		} else {
 			gotoInfo = null;
 		}
+	}
+
+	private void setBombard(MapUnit bombardingUnit) {
+		bombardInfo = bombardingUnit == null ? null : new BombardInfo(bombardingUnit);
 	}
 
 	private void HandleGotoClick(GotoInfo info) {
