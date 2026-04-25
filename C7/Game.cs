@@ -535,6 +535,10 @@ public partial class Game : Node {
 		if (gotoInfo != null) {
 			HandleGotoClick(gotoInfo);
 			setGotoMode(false);
+		} else if (bombardInfo != null) {
+			Tile tile = PositionToTile(eventMouseButton.Position);
+			HandleBombardClick(bombardInfo, tile);
+			setBombard(null);
 		} else {
 			// Select unit on tile at mouse location
 			HandleUnitSelection(eventMouseButton);
@@ -591,6 +595,8 @@ public partial class Game : Node {
 		else if (!shiftDown && tile.cityAtTile?.owner == controller)
 			// There are no units, but this is the player's city.
 			new RightClickCityMenu(this, tile).Open(eventMouseButton.Position);
+		else if (bombardInfo != null)
+			setBombard(null);
 		else
 			ShowTileInfo(tile);
 
@@ -805,6 +811,11 @@ public partial class Game : Node {
 			return;
 		}
 
+		if (currentAction == C7Action.Escape && bombardInfo != null) {
+			setBombard(null);
+			return;
+		}
+
 		// never poll for actions if UI elements are visible
 		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible || palaceScene.Visible) {
 			return;
@@ -962,6 +973,8 @@ public partial class Game : Node {
 
 	private void setBombard(MapUnit bombardingUnit) {
 		bombardInfo = bombardingUnit == null ? null : new BombardInfo(bombardingUnit);
+		if (bombardingUnit == null)
+			Input.SetCustomMouseCursor(null);
 	}
 
 	private void HandleGotoClick(GotoInfo info) {
@@ -1041,6 +1054,16 @@ public partial class Game : Node {
 		});
 
 		return result;
+	}
+
+	private void HandleBombardClick(BombardInfo info, Tile tile) {
+		if (info == null || tile == null) {
+			return;
+		}
+
+		EngineStorage.ReadGameData((GameData gameData) => {
+			new MsgBombard(CurrentlySelectedUnit.id, tile).send();
+		});
 	}
 
 	/**

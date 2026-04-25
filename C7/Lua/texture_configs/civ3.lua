@@ -163,11 +163,7 @@ textures.ui = {
       bombard = {
           path = CURSORS,
           crop_region = { 199, 1, 32, 32 },
-      },
-      bombard_tile = {
-          path = CURSORS,
-          crop_region = { 260, 220, 128, 64 },
-      },
+      }
   }
 }
 
