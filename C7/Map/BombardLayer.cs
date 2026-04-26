@@ -43,17 +43,21 @@ public partial class BombardLayer : LooseLayer {
 		// Choose one of two cursors depending on mouse tile hover
 		if (bombardInfo.mouseTile != null) {
 			var bombardable = bombardTiles.Contains(bombardInfo.mouseTile);
-			if (bombardable)
+			if (bombardable) {
 				DrawBombardCursor();
-			else
+				drawTargetBombardTile(looseView, TileCenter(bombardInfo.mouseTile));
+			} else
 				DrawBombardDenyCursor();
 		}
 
 		// Draw bombard grid
 		foreach (var bt in bombardTiles) {
-			var center = MapView.cellSize * new Vector2(bt.XCoordinate + 1, bt.YCoordinate + 1);
-			drawBombardTile(looseView, center);
+			drawBombardTile(looseView, TileCenter(bt));
 		}
+	}
+
+	private static Vector2 TileCenter(Tile bt) {
+		return MapView.cellSize * new Vector2(bt.XCoordinate + 1, bt.YCoordinate + 1);
 	}
 
 	private void drawBombardTile(LooseView looseView, Vector2 tileCenter) {
@@ -62,6 +66,20 @@ public partial class BombardLayer : LooseLayer {
 		var top = tileCenter + new Vector2(0, -cS.Y);
 		var right = tileCenter + new Vector2(cS.X, 0);
 		var bottom = tileCenter + new Vector2(0, cS.Y);
+		DrawSquare(looseView, left, top, right, bottom);
+	}
+
+	private void drawTargetBombardTile(LooseView looseView, Vector2 tileCenter) {
+		var cS = MapView.cellSize;
+		var inset = 10;
+		var left = tileCenter + new Vector2(-cS.X + inset, 0);
+		var top = tileCenter + new Vector2(0, -cS.Y + (inset/2f));
+		var right = tileCenter + new Vector2(cS.X - inset, 0);
+		var bottom = tileCenter + new Vector2(0, cS.Y - (inset/2f));
+		DrawSquare(looseView, left, top, right, bottom);
+	}
+
+	private void DrawSquare(LooseView looseView, Vector2 left, Vector2 top, Vector2 right, Vector2 bottom) {
 		looseView.DrawLine(left, top, bombardRed, bombardGridLineWidth);
 		looseView.DrawLine(top, right, bombardRed, bombardGridLineWidth);
 		looseView.DrawLine(left, bottom, bombardRed, bombardGridLineWidth);
