@@ -38,6 +38,7 @@ namespace C7GameData {
 		public int defense { get; set; }
 		public int bombard { get; set; }
 		public int bombardRange { get; set; }
+		public int rateOfFire { get; set; }
 		public int movement { get; set; }
 		public int iconIndex { get; set; }
 		public UnitPrototype upgradeTo;
@@ -58,9 +59,9 @@ namespace C7GameData {
 		public UnitPrototype() { }
 
 		public UnitPrototype(SaveUnitPrototype proto, IEnumerable<Terraform> terraforms) {
-			(name, artName, shieldCost, populationCost, attack, defense, bombard, bombardRange, movement, iconIndex, unproducible) =
+			(name, artName, shieldCost, populationCost, attack, defense, bombard, bombardRange, rateOfFire, movement, iconIndex, unproducible) =
 			(proto.name, proto.artName, proto.shieldCost, proto.populationCost,
-			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.movement, proto.iconIndex, proto.unproducible);
+			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire, proto.movement, proto.iconIndex, proto.unproducible);
 
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;

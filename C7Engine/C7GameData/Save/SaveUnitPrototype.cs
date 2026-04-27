@@ -17,6 +17,7 @@ namespace C7GameData.Save {
 		public int defense { get; set; }
 		public int bombard { get; set; }
 		public int bombardRange { get; set; }
+		public int rateOfFire { get; set; }
 		public int movement { get; set; }
 		public int iconIndex { get; set; }
 
@@ -38,9 +39,10 @@ namespace C7GameData.Save {
 
 		public SaveUnitPrototype(UnitPrototype proto) {
 			(name, artName, shieldCost, populationCost, unproducible,
-			attack, defense, bombard, bombardRange, movement, iconIndex) =
+			attack, defense, bombard, bombardRange, rateOfFire, movement, iconIndex) =
 			(proto.name, proto.artName, proto.shieldCost, proto.populationCost, proto.unproducible,
-			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.movement, proto.iconIndex);
+			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire,
+			 proto.movement, proto.iconIndex);
 
 			if (proto.requiredTech != null)
 				requiredTech = proto.requiredTech.id;

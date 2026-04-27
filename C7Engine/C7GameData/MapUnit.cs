@@ -409,6 +409,8 @@ namespace C7GameData {
 			var unitOriginalOrientation = facingDirection;
 			facingDirection = location.directionTo(tile);
 
+			// TODO: Apply unitType.rateOfFire
+
 			// TODO: Figure out the bombard defense that walls grant.
 			double bombardStrength  = StrengthVersus(target, CombatRole.Bombard, facingDirection);
 			double defenderStrength = target.StrengthVersus(this, CombatRole.BombardDefense, facingDirection);
