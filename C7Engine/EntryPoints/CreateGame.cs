@@ -41,9 +41,13 @@ public class CreateGame {
 			false => throw new Exception($"The provided save does not contain a human player"),
 		};
 
+		EngineStorage.animationsEnabled = false;
+
 		EngineStorage.uiControllerID = humanPlayer.id;
 		TurnHandling.OnBeginTurn(); // Call for the first turn
 		await TurnHandling.AdvanceTurn();
+
+		EngineStorage.animationsEnabled = true;
 
 		return humanPlayer;
 	}
