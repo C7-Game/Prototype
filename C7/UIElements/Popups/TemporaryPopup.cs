@@ -6,6 +6,7 @@ public partial class TemporaryPopup : Label {
 	private int durationInMillis;
 
 	public TemporaryPopup(string text, float durationInSec) {
+		ZIndex = 3;
 		Text = text;
 		this.durationInMillis = (int)(durationInSec * 1000);
 

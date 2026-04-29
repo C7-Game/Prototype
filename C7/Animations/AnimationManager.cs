@@ -40,6 +40,10 @@ public partial class AnimationManager {
 		return AnimationKey(BaseAnimationKey(unit, action), direction);
 	}
 
+	public static string AnimationKey(AnimatedEffect effect, MapUnit.AnimatedAction action) {
+		return $"{effect.ToString()}_{action.ToString()}";
+	}
+
 	public static readonly Dictionary<string, ImageTexture> AnimationThumbnails = new();
 	public static readonly Dictionary<string, ImageTexture> AnimationTintThumbnails = new();
 
@@ -112,6 +116,10 @@ public partial class AnimationManager {
 		return getINIData(string.Format("Art/Units/{0}/{0}.INI", unitTypeName));
 	}
 
+	public string GetFlicFilePath(string rootPath, IniData iniData, MapUnit.AnimatedAction action) {
+		return rootPath + "/" + getFlicFileName(iniData, action);
+	}
+
 	public string getUnitFlicFilepath(UnitPrototype unit, MapUnit.AnimatedAction action) {
 		string directory = string.Format("Art/Units/{0}", unit.artName);
 		IniData ini = getUnitINIData(unit.artName);
@@ -169,6 +177,23 @@ public partial class AnimationManager {
 		}
 	}
 
+	public static void loadFlicEffectAnimation(string path, string name, ref SpriteFrames frames, ref SpriteFrames tint) {
+		Flic flic = Util.LoadFlic(path);
+
+		for (int row = 0; row < flic.Images.GetLength(0); row++) {
+			string animationName = name;
+			frames.AddAnimation(animationName);
+			tint.AddAnimation(animationName);
+
+			for (int col = 0; col < flic.Images.GetLength(1); col++) {
+				byte[] frame = flic.Images[row,col];
+				(ImageTexture bl, ImageTexture tl) = Util.LoadTextureFromFlicData(frame, flic.Palette, flic.Width, flic.Height);
+				frames.AddFrame(animationName, bl, 0.5f); // TODO: frame duration is controlled by .ini
+				tint.AddFrame(animationName, tl, 0.5f);   // TODO: frame duration is controlled by .ini
+			}
+		}
+	}
+
 	public bool LoadAnimation(UnitPrototype unit, MapUnit.AnimatedAction action) {
 		string name = BaseAnimationKey(unit.artName, action);
 		string testName = AnimationKey(name, TileDirection.NORTH);
@@ -180,11 +205,20 @@ public partial class AnimationManager {
 		return true;
 	}
 
+	public bool LoadAnimation(AnimatedEffect effect, MapUnit.AnimatedAction action, string flicFilePath) {
+		string name = AnimationKey(effect, action);
+		if (spriteFrames.HasAnimation(name) && tintFrames.HasAnimation(name)) {
+			return false;
+		}
+		loadFlicEffectAnimation(flicFilePath, name, ref this.spriteFrames, ref this.tintFrames);
+		return true;
+	}
+
 	private Dictionary<string, Util.FlicSheet> flicSheets = new Dictionary<string, Util.FlicSheet>();
 
 	public Util.FlicSheet getFlicSheet(string rootPath, IniData iniData, MapUnit.AnimatedAction action) {
 		Util.FlicSheet tr;
-		string pathKey = rootPath + "/" + getFlicFileName(iniData, action);
+		string pathKey = GetFlicFilePath(rootPath, iniData, action);
 		if (!flicSheets.TryGetValue(pathKey, out tr)) {
 			(tr, _) = Util.loadFlicSheet(pathKey);
 			flicSheets.Add(pathKey, tr);
@@ -229,6 +263,7 @@ public partial class C7Animation {
 	public string folderPath { get; private set; } // For example "Art/Units/Warrior" or "Art/Animations/Trajectory"
 	public string iniFileName { get; private set; }
 	private UnitPrototype unit;
+	public AnimatedEffect effect;
 	public MapUnit.AnimatedAction action { get; private set; }
 
 	public C7Animation(AnimationManager civ3AnimData, UnitPrototype unit, MapUnit.AnimatedAction action) {
@@ -264,6 +299,7 @@ public partial class C7Animation {
 		this.folderPath = "Art/Animations/" + effectCategories[effect];
 		this.iniFileName = effectINIFileNames[effect];
 		this.action = MapUnit.AnimatedAction.DEATH;
+		this.effect = effect;
 	}
 
 	public IniData getINIData() {
@@ -276,6 +312,11 @@ public partial class C7Animation {
 
 	public void loadSpriteAnimation() {
 		this.animationManager.LoadAnimation(this.unit, this.action);
+	}
+
+	public void loadEffectAnimation() {
+		var path = animationManager.GetFlicFilePath(folderPath, getINIData(), action);
+		this.animationManager.LoadAnimation(this.effect, this.action, path);
 	}
 
 	public void playSound() {

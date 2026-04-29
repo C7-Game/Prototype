@@ -9,7 +9,7 @@ public partial class UnitLayer : LooseLayer {
 
 	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
 	// any particular order so we must use the ZIndex property to ensure they're properly layered.
-	public const int effectAnimZIndex = 1;
+	public const int effectAnimZIndex = 2;
 	public const int unitAnimZIndex = 1;
 	public const int cursorZIndex = -1;
 
@@ -162,13 +162,19 @@ public partial class UnitLayer : LooseLayer {
 	}
 
 	public void drawEffectAnimFrame(LooseView looseView, C7Animation anim, float progress, Vector2 tileCenter) {
-		// var flicSheet = anim.getFlicSheet();
-		// var inst = getBlankAnimationInstance(looseView);
-		// setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
-		// inst.shaderMat.SetShaderParameter("civColor", new Vector3(1, 1, 1));
-		// inst.meshInst.Position = tileCenter;
-		// inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
-		// inst.meshInst.ZIndex = effectAnimZIndex;
+		AnimationInstance inst = getBlankAnimationInstance(looseView);
+		inst.sprite.ZIndex = effectAnimZIndex;
+		inst.spriteTint.ZIndex = effectAnimZIndex;
+		inst.SetPosition(tileCenter);
+
+		anim.loadEffectAnimation();
+
+		string animName = AnimationManager.AnimationKey(anim.effect, anim.action);
+		int nextFrame = inst.GetNextFrameByProgress(animName, progress);
+
+		inst.SetAnimation(animName);
+		inst.SetFrame(nextFrame);
+		inst.Show();
 	}
 
 	private AnimatedSprite2D cursorSprite = null;

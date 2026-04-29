@@ -409,27 +409,39 @@ namespace C7GameData {
 			var unitOriginalOrientation = facingDirection;
 			facingDirection = location.directionTo(tile);
 
-			// TODO: Apply unitType.rateOfFire
+			var hitCount = 0;
 
-			// TODO: Figure out the bombard defense that walls grant.
-			double bombardStrength  = StrengthVersus(target, CombatRole.Bombard, facingDirection);
-			double defenderStrength = target.StrengthVersus(this, CombatRole.BombardDefense, facingDirection);
-			double attackerOdds = bombardStrength / (bombardStrength + defenderStrength);
-			if (Double.IsNaN(attackerOdds))
-				return;
+			foreach (var fire in Enumerable.Range(0, unitType.rateOfFire)) {
+				// TODO: Figure out the bombard defense that walls grant.
+				double bombardStrength  = StrengthVersus(target, CombatRole.Bombard, facingDirection);
+				double defenderStrength = target.StrengthVersus(this, CombatRole.BombardDefense, facingDirection);
+				double attackerOdds = bombardStrength / (bombardStrength + defenderStrength);
+				if (Double.IsNaN(attackerOdds))
+					return;
 
-			await animateAsync(MapUnit.AnimatedAction.ATTACK1);
-			movementPoints.onUnitMove(1);
-			if (GameData.rng.NextDouble() < attackerOdds) {
-				target.hitPointsRemaining -= 1;
-				tile.Animate(AnimatedEffect.Hit3);
-			} else
-				tile.Animate(AnimatedEffect.Miss);
+				// TODO: Lethal/non-lethal bombardment
 
-			if (target.hitPointsRemaining <= 0) {
-				RollToPromote(target);
-				await target.animateAsync(MapUnit.AnimatedAction.DEATH);
-				target.RemoveFromPlay();
+				await animateAsync(MapUnit.AnimatedAction.ATTACK1);
+				movementPoints.onUnitMove(1);
+				if (GameData.rng.NextDouble() < attackerOdds) {
+					hitCount += 1;
+					target.hitPointsRemaining -= 1;
+					await tile.AnimateAsync(AnimatedEffect.Hit3);
+				} else
+					await tile.AnimateAsync(AnimatedEffect.Miss);
+
+				if (target.hitPointsRemaining <= 0) {
+					RollToPromote(target);
+					await target.animateAsync(MapUnit.AnimatedAction.DEATH);
+					target.RemoveFromPlay();
+				}
+			}
+
+			if (owner.isHuman) {
+				if (hitCount > 0)
+					new MsgShowTemporaryPopup($"Artillery bombardment successful! Enemy units injured.", tile).send();
+				else
+					new MsgShowTemporaryPopup($"Artillery bombardment failed.", tile).send();
 			}
 
 			facingDirection = unitOriginalOrientation;
