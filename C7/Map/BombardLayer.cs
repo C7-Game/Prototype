@@ -37,7 +37,7 @@ public partial class BombardLayer : LooseLayer {
 
 		var unit = bombardInfo.bombardingUnit;
 		var range = unit.unitType.bombardRange;
-		var reachableTiles = tile.GetTilesWithinRankDistance(range);
+		var reachableTiles = tile.GetTilesWithinBombardRange(range);
 		var bombardTiles = reachableTiles.Except([tile]).ToHashSet();
 
 		// Choose one of two cursors depending on mouse tile hover

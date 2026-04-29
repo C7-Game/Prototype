@@ -702,6 +702,17 @@ namespace C7GameData {
 			return result;
 		}
 
+		// Same as GetTilesWithinRankDistance, but includes "corner tiles",
+		// i.e., returns perfect tile squares. 
+		public List<Tile> GetTilesWithinBombardRange(int range) {
+			List<Tile> result = new();
+			for (int i = 0; i < (range * 2 + 1) * (range * 2 + 1); ++i) {
+				Tile t = GetTileAtNeighborIndex(i);
+				result.Add(t);
+			}
+			return result;
+		}
+
 		public MapUnit FindTopDefender(MapUnit opponent) {
 			if (unitsOnTile.Count > 0) {
 				IEnumerable<MapUnit> potentialDefenders = unitsOnTile.Where(u => u.CanDefendAgainst(opponent));
