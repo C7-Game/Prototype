@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using C7GameData;
 using Godot;
@@ -12,6 +13,8 @@ public partial class BombardLayer : LooseLayer {
 
 	private Color bombardRed = Color.Color8(200, 0, 0, 225);
 	private float bombardGridLineWidth = (float)1.0;
+
+	private Dictionary<string, List<Tile>> tileSquareCache = new();
 
 	public BombardLayer() {
 		bombardCursorTexture = TextureLoader.Load("ui.cursor.bombard");
@@ -37,7 +40,7 @@ public partial class BombardLayer : LooseLayer {
 
 		var unit = bombardInfo.bombardingUnit;
 		var range = unit.unitType.bombardRange;
-		var reachableTiles = tile.GetTilesWithinBombardRange(range);
+		var reachableTiles = GetTileSquare(tile, range);
 		var bombardTiles = reachableTiles.Except([tile]).ToHashSet();
 
 		// Choose one of two cursors depending on mouse tile hover
@@ -54,6 +57,14 @@ public partial class BombardLayer : LooseLayer {
 		foreach (var bt in bombardTiles) {
 			drawBombardTile(looseView, TileCenter(bt));
 		}
+	}
+
+	private List<Tile> GetTileSquare(Tile tile, int range) {
+		var key = $"{tile.Id}_{range}";
+		if (tileSquareCache.TryGetValue(key, out var square))
+			return square;
+		tileSquareCache[key] = tile.GetTilesWithinTileSquare(range);
+		return tileSquareCache[key];
 	}
 
 	private static Vector2 TileCenter(Tile bt) {

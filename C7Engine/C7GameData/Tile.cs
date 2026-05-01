@@ -703,10 +703,10 @@ namespace C7GameData {
 		}
 
 		// Same as GetTilesWithinRankDistance, but includes "corner tiles",
-		// i.e., returns perfect tile squares. 
-		public List<Tile> GetTilesWithinBombardRange(int range) {
+		// i.e., returns perfect tile squares.
+		public List<Tile> GetTilesWithinTileSquare(int rank) {
 			List<Tile> result = new();
-			for (int i = 0; i < (range * 2 + 1) * (range * 2 + 1); ++i) {
+			for (int i = 0; i < (rank * 2 + 1) * (rank * 2 + 1); ++i) {
 				Tile t = GetTileAtNeighborIndex(i);
 				result.Add(t);
 			}
