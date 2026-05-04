@@ -426,14 +426,17 @@ namespace C7GameData {
 			if (unitType.bombard == 0)
 				return false;
 
+			if (tile.HasImprovements)
+				return true;
+
 			MapUnit target = tile.FindTopDefender(this);
+			if (target?.owner == owner)
+				return false;
+
 			if (target != MapUnit.NONE)
 				return true;
 
 			if (tile.HasCity && tile.cityAtTile.owner != owner)
-				return true;
-
-			if (tile.HasImprovements)
 				return true;
 
 			return false;
@@ -445,7 +448,7 @@ namespace C7GameData {
 
 			MapUnit target = tile.FindTopDefender(this);
 
-			var hasTargetUnit = target != MapUnit.NONE;
+			var hasTargetUnit = target != MapUnit.NONE && target.owner != owner;
 			var hasForeignCity = tile.HasCity && tile.cityAtTile.owner != owner;
 			var hasCityWalls = hasForeignCity && tile.cityAtTile.GetBuildings().Any(b => b.building.providesWalls);
 			var hasTileImprovements = tile.HasImprovements;
