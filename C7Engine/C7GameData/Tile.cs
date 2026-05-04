@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace C7GameData {
 	using System;
 	using System.Collections.Generic;
@@ -786,6 +788,8 @@ namespace C7GameData {
 		public void ClearTerrainOverlay() {
 			overlayTerrainType = baseTerrainType;
 		}
+
+		public bool HasImprovements => overlays.HasBeenImproved();
 	}
 
 	public enum TileDirection {
@@ -849,6 +853,11 @@ namespace C7GameData {
 				// be true in some unit tests.
 				EngineStorage.gameData?.InvalidateCachedTradeNetwork();
 			}
+		}
+
+		public void Remove(TerrainImprovement improvement) {
+			if (!terrainImprovementByLayer.Remove(improvement.layer))
+				Log.Warning("Failed to remove terrain improvement.");
 		}
 
 		public TerrainImprovement ImprovementAtLayer(TerrainImprovement.Layer layer) {

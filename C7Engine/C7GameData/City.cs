@@ -629,6 +629,16 @@ namespace C7GameData {
 			residents.RemoveAt(residents.Count - 1);
 		}
 
+		public void RemoveRandomCitizen() {
+			if (residents.Count == 1)
+				return; // TODO: Handle extreme case
+
+			var idx = GameData.rng.Next(residents.Count);
+
+			residents[idx].tileWorked.personWorkingTile = null;
+			residents.RemoveAt(idx);
+		}
+
 		public void AddCitizen(CityResident cr) {
 			residents.Add(cr);
 		}
@@ -697,6 +707,9 @@ namespace C7GameData {
 				year = 1, // TODO: Implement in-game year tracking
 				totalCulture = 0
 			});
+		}
+		public void RemoveBuilding(CityBuilding building) {
+			constructed_buildings.Remove(building);
 		}
 
 		public void AddUnit(UnitPrototype prototype, GameData gameData) {

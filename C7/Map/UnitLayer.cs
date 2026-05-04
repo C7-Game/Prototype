@@ -210,21 +210,26 @@ public partial class UnitLayer : LooseLayer {
 	public MapUnit selectUnitToDisplay(LooseView looseView, List<MapUnit> units) {
 		// From the list, pick out which units are (1) the strongest defender vs the currently selected unit, (2) the currently selected unit
 		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
-		MapUnit bestDefender = units[0],
-			selected = null,
-			doingInterestingAnimation = null;
+		MapUnit bestDefender = units[0], selected = null, doingInterestingAnimation = null;
 		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
+
 		foreach (var u in units) {
-			if (u == currentlySelectedUnit)
+			if (u == currentlySelectedUnit) {
 				selected = u;
+				break;
+			}
+
+			if (looseView.mapView.game.animationController.animTracker.getUnitAppearance(u).DeservesPlayerAttention()) {
+				doingInterestingAnimation = u;
+				break;
+			}
+
 			if (u.HasPriorityAsDefender(bestDefender, currentlySelectedUnit))
 				bestDefender = u;
-			if (looseView.mapView.game.animationController.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
-				doingInterestingAnimation = u;
 		}
 
 		// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
-		return selected != null ? selected : (doingInterestingAnimation != null ? doingInterestingAnimation : bestDefender);
+		return selected ?? doingInterestingAnimation ?? bestDefender;
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {

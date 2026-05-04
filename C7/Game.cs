@@ -58,6 +58,22 @@ public partial class Game : Node {
 		public BombardInfo(MapUnit bombardingUnit) {
 			this.bombardingUnit = bombardingUnit;
 		}
+
+		public bool requiresWarDeclaration(Tile tile, out Player player) {
+			player = null;
+
+			var bombarder = bombardingUnit.owner;
+			var foreignUnits = tile.unitsOnTile.Where(x => x.owner != bombarder).ToList();
+			if (!foreignUnits.Any())
+				return false;
+
+			var targetPlayers = foreignUnits.Select(x => x.owner).Distinct();
+			var friendly= targetPlayers.Where(p => bombarder.IsAtPeaceWith(p)).ToList();
+			player = friendly.FirstOrDefault();
+			return friendly.Any();
+
+			// TODO: handle complex scenarios arising from multiple civs co-located on tile
+		}
 	};
 	public BombardInfo bombardInfo = null;
 
@@ -537,8 +553,10 @@ public partial class Game : Node {
 			setGotoMode(false);
 		} else if (bombardInfo != null) {
 			Tile tile = PositionToTile(eventMouseButton.Position);
-			HandleBombardClick(bombardInfo, tile);
-			setBombard(null);
+			if (bombardInfo.bombardingUnit.canBombardTile(tile)) {
+				HandleBombardClick(bombardInfo, tile);
+				setBombard(null);
+			}
 		} else {
 			// Select unit on tile at mouse location
 			HandleUnitSelection(eventMouseButton);
@@ -983,24 +1001,27 @@ public partial class Game : Node {
 		}
 
 		EngineStorage.ReadGameData((GameData gameData) => {
-			int currentTurn = gameData.turn;
-
 			// If this move would require declaring war, display a popup that checks
 			// if the player really wants to declare war. If they do, declare the
 			// war for them, clear out the player, and call this method again.
 			if (info.requiresWarDeclarationOnPlayer != null) {
 				GotoInfo stashed = info;
-				popupOverlay.ShowPopup(new WarConfirmation(stashed.requiresWarDeclarationOnPlayer,
-					() => {
-						controller.DeclareWarOn(info.requiresWarDeclarationOnPlayer, currentTurn);
-						stashed.requiresWarDeclarationOnPlayer = null;
-						HandleGotoClick(stashed);
-					}), PopupOverlay.PopupCategory.Advisor);
-				return;
+				MaybeDeclareWar(stashed.requiresWarDeclarationOnPlayer, gameData.turn, () => {
+					stashed.requiresWarDeclarationOnPlayer = null;
+					HandleGotoClick(stashed);
+				});
+			} else {
+				new MsgSetUnitPath(CurrentlySelectedUnit.id, info.path).send();
 			}
-
-			new MsgSetUnitPath(CurrentlySelectedUnit.id, info.path).send();
 		});
+	}
+
+	private void MaybeDeclareWar(Player player, int currentTurn, Action callback) {
+		popupOverlay.ShowPopup(new WarConfirmation(player,
+			() => {
+				controller.DeclareWarOn(player, currentTurn);
+				callback();
+			}), PopupOverlay.PopupCategory.Advisor);
 	}
 
 	private GotoInfo GetGotoInfo(Vector2 mousePos) {
@@ -1062,7 +1083,13 @@ public partial class Game : Node {
 		}
 
 		EngineStorage.ReadGameData((GameData gameData) => {
-			new MsgBombard(CurrentlySelectedUnit.id, tile).send();
+			if (info.requiresWarDeclaration(tile, out var player)) {
+				MaybeDeclareWar(player, gameData.turn, () => {
+					new MsgBombard(CurrentlySelectedUnit.id, tile).send();
+				});
+			} else {
+				new MsgBombard(CurrentlySelectedUnit.id, tile).send();
+			}
 		});
 	}
 

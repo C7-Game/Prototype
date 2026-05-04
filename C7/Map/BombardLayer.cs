@@ -41,7 +41,8 @@ public partial class BombardLayer : LooseLayer {
 		var unit = bombardInfo.bombardingUnit;
 		var range = unit.unitType.bombardRange;
 		var reachableTiles = GetTileSquare(tile, range);
-		var bombardTiles = reachableTiles.Except([tile]).ToHashSet();
+		var targetTiles = reachableTiles.Except([tile]).Where(t => unit.canBombardTile(t));
+		var bombardTiles = targetTiles.ToHashSet();
 
 		// Choose one of two cursors depending on mouse tile hover
 		if (bombardInfo.mouseTile != null) {
@@ -54,7 +55,7 @@ public partial class BombardLayer : LooseLayer {
 		}
 
 		// Draw bombard grid
-		foreach (var bt in bombardTiles) {
+		foreach (var bt in reachableTiles) {
 			drawBombardTile(looseView, TileCenter(bt));
 		}
 	}
