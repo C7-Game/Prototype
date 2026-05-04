@@ -1,9 +1,6 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using C7Engine;
 using C7GameData;
 using Godot;
@@ -200,9 +197,8 @@ public partial class TechBox : TextureButton {
 
 		// Units
 		foreach (UnitPrototype unit in Units[tech.id]) {
-			// TODO : load the correct textures
-			// ImageTexture texture = ...
-			// textures.Add(texture);
+			ImageTexture texture = TextureLoader.LoadByPath(unit.art.pediaArt.small);
+			textures.Add(texture);
 		}
 
 		// Buildings
@@ -250,23 +246,10 @@ public partial class TechBox : TextureButton {
 		List<UnitPrototype> units = new();
 		// List of units that require this tech to be built, taking into account that some are unique
 		List<UnitPrototype> unitsRequiringTech = gameData.unitPrototypes.Where(u => u.requiredTech == tech).ToList();
-		HashSet<string> replacements = new();
-
-		// Filter out all the units that are getting replaced
-		// e.x. Numidian Mercenary replaces Spearman
-		foreach (UnitPrototype u in unitsRequiringTech) {
-			if (u.unique != null && EngineStorage.gameData.GetFirstHumanPlayer().civilization == u.unique.civilization) {
-				if (u.unique.replace != null)
-					replacements.Add(u.unique.replace.name);
-			}
-		}
 
 		// Then add the correct units to the list
 		foreach (UnitPrototype u in unitsRequiringTech) {
-			if (u.unique == null && !replacements.Contains(u.name)) {
-				units.Add(u);
-			}
-			if (u.unique != null && EngineStorage.gameData.GetFirstHumanPlayer().civilization == u.unique.civilization) {
+			if (u.producibleBy.Contains(EngineStorage.gameData.GetFirstHumanPlayer().civilization)) {
 				units.Add(u);
 			}
 		}

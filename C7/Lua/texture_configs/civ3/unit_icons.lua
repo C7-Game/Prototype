@@ -7,14 +7,32 @@ local unit_icons = {
     path = "Art/Units/units_32.pcx",
   },
 }
+  
+-- Context - ItemContext (UnitPrototype proto, Player player)
+function unit_icons:map_object_to_sprite(context)
+  local proto = context.proto
+  local player = context.player
 
-function unit_icons:map_object_to_sprite(unit_prototype)
-  if (unit_prototype:GetType().Name ~= "UnitPrototype") then
+  if (proto:GetType().Name ~= "UnitPrototype") then
     error "Expected a UnitPrototype object"
   end
+  if (player:GetType().Name ~= "Player") then
+    error "Expected a Player object"
+  end
+  
+  local index = proto.art.thumbnailArt.defaultIndex
+  
+  local variations = proto.art.thumbnailArt.variations
+  local key = player.eraCivilopediaName
+  
+  if (variations and variations[key]) then
+    index = variations[key]
+  end
+    
+  -- TODO: add SCI leader logic
 
-  local x = 1 + (ICON_WIDTH + 1) * (unit_prototype.iconIndex % ICONS_PER_ROW)
-  local y = 1 + (ICON_HEIGHT + 1) * math.floor(unit_prototype.iconIndex / ICONS_PER_ROW)
+  local x = 1 + (ICON_WIDTH + 1) * (index % ICONS_PER_ROW)
+  local y = 1 + (ICON_HEIGHT + 1) * math.floor(index / ICONS_PER_ROW)
 
   return {
     path = self.extra_data.path,

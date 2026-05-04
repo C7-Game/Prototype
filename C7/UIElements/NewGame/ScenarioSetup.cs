@@ -36,12 +36,13 @@ public partial class ScenarioSetup : Control {
 
 		// Set up buttons for the civs the player can play as.
 		civilizations = save.Civilizations;
-		playerListContainer.Columns = (int)Math.Ceiling(save.Civilizations.Count / 12.0);
-		string initiallySelectedCiv = save.Civilizations[1].name;
-		foreach (Civilization civ in save.Civilizations) {
-			if (civ.isBarbarian) {
-				continue;
-			}
+		playerListContainer.Columns = (int)Math.Ceiling(civilizations.Count / 12.0);
+
+		List<SavePlayer> pickablePlayers = save.Players.Where(p => p.canBePicked).ToList();
+		string initiallySelectedCiv = pickablePlayers.First(p => p.canBePicked).civilization;
+
+		foreach (SavePlayer player in pickablePlayers) {
+			Civilization civ = civilizations.Find(c => c.name == player.civilization);
 
 			Civ3MenuButton button = new() {
 				Text = civ.name,

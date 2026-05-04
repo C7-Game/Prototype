@@ -712,14 +712,10 @@ namespace C7GameData {
 			constructed_buildings.Remove(building);
 		}
 
-		public void AddUnit(UnitPrototype prototype, GameData gameData) {
-			MapUnit newUnit = prototype.GetInstance(gameData);
-			newUnit.owner = owner;
-			newUnit.nationality = owner.civilization;
-			newUnit.location = location;
+		public void AddUnit(UnitPrototype proto, GameData gameData) {
+			MapUnit newUnit = proto.GetInstance(gameData.GenerateID(proto.name), proto, owner, location: location);
 			newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 			newUnit.experienceLevel = gameData.defaultExperienceLevel;
-			newUnit.facingDirection = TileDirection.SOUTHWEST;
 
 			location.unitsOnTile.Add(newUnit);
 			gameData.mapUnits.Add(newUnit);

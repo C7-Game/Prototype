@@ -115,10 +115,10 @@ public partial class UnitLayer : LooseLayer {
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
 		AnimationInstance inst = getBlankAnimationInstance(looseView);
-		C7Animation unitAnimation = looseView.mapView.game.animationController.civ3AnimData.forUnit(unit.unitType, appearance.action);
+		C7Animation unitAnimation = looseView.mapView.game.animationController.civ3AnimData.forUnit(unit, appearance.action);
 		unitAnimation.loadSpriteAnimation();
 
-		string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
+		string animName = AnimationManager.AnimationKey(unit, appearance.action, appearance.direction);
 
 		Vector2 framePosition = GetFramePosition(appearance, unitAnimation, inst, animName, tileCenter);
 

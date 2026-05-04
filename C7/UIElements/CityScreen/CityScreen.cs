@@ -596,10 +596,11 @@ public partial class CityScreen : Control {
 
 		int marginTop = 35;
 
-		if (city.itemBeingProduced is UnitPrototype up) {
-			AnimationManager animationManager = mapView.game.animationController.civ3AnimData.forUnit(up, MapUnit.AnimatedAction.DEFAULT).animationManager;
+		if (city.itemBeingProduced is UnitPrototype proto) {
+			var unit = proto.GetInstance(gameData.GenerateID(proto.name), proto, city.owner);
+			AnimationManager animationManager = mapView.game.animationController.civ3AnimData.forUnit(unit, MapUnit.AnimatedAction.DEFAULT).animationManager;
 			ShaderMaterial material = PlayerTextureUtil.GetShaderMaterialForUnit(city.owner.GetPlayerColor());
-			(ImageTexture baseImage, ImageTexture imageTint) = animationManager.GetAnimationFrameAndTintTextures(up);
+			(ImageTexture baseImage, ImageTexture imageTint) = animationManager.GetAnimationFrameAndTintTextures(unit);
 
 			// Add the base sprite.
 			Sprite2D baseImageSprite = new();

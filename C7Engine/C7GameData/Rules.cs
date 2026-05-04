@@ -22,5 +22,6 @@ namespace C7GameData {
 		public int MaxInterest = 50;
 		public int ShieldCostPerGold;
 		public float ShieldRateForDisbanding; // per cent
+		public bool AllowLesserUnitProduction; // for example, allow building a Spearman/Pikeman when we can build a Musketman (simultaneously)
 	}
 }

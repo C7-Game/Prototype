@@ -28,15 +28,15 @@ public partial class AnimationManager {
 		return String.Format("{0}_{1}", unitName, action.ToString());
 	}
 
-	public static string BaseAnimationKey(UnitPrototype unit, MapUnit.AnimatedAction action) {
-		return BaseAnimationKey(unit.artName, action);
+	public static string BaseAnimationKey(MapUnit unit, MapUnit.AnimatedAction action) {
+		return BaseAnimationKey(unit.GetArtName(), action);
 	}
 
 	public static string AnimationKey(string baseKey, TileDirection direction) {
 		return String.Format("{0}_{1}", baseKey, direction.ToString());
 	}
 
-	public static string AnimationKey(UnitPrototype unit, MapUnit.AnimatedAction action, TileDirection direction) {
+	public static string AnimationKey(MapUnit unit, MapUnit.AnimatedAction action, TileDirection direction) {
 		return AnimationKey(BaseAnimationKey(unit, action), direction);
 	}
 
@@ -73,11 +73,11 @@ public partial class AnimationManager {
 		return tr;
 	}
 
-	public static string GetUnitDefaultThumbnailKey(UnitPrototype unit) {
-		return $"{unit.artName}_{thumbnailDirection}_{thumbnailAction}_{thumbnailFrame}";
+	public static string GetUnitDefaultThumbnailKey(MapUnit unit) {
+		return $"{unit.GetArtName()}_{thumbnailDirection}_{thumbnailAction}_{thumbnailFrame}";
 	}
 
-	public (ImageTexture baseFrame, ImageTexture tintFrame) GetAnimationFrameAndTintTextures(UnitPrototype unit) {
+	public (ImageTexture baseFrame, ImageTexture tintFrame) GetAnimationFrameAndTintTextures(MapUnit unit) {
 
 		string key = GetUnitDefaultThumbnailKey(unit);
 
@@ -120,9 +120,9 @@ public partial class AnimationManager {
 		return rootPath + "/" + getFlicFileName(iniData, action);
 	}
 
-	public string getUnitFlicFilepath(UnitPrototype unit, MapUnit.AnimatedAction action) {
-		string directory = string.Format("Art/Units/{0}", unit.artName);
-		IniData ini = getUnitINIData(unit.artName);
+	public string getUnitFlicFilepath(MapUnit unit, MapUnit.AnimatedAction action) {
+		string directory = string.Format("Art/Units/{0}", unit.GetArtName());
+		IniData ini = getUnitINIData(unit.GetArtName());
 		string filename = getFlicFileName(ini, action);
 		return directory.PathJoin(filename);
 	}
@@ -194,8 +194,8 @@ public partial class AnimationManager {
 		}
 	}
 
-	public bool LoadAnimation(UnitPrototype unit, MapUnit.AnimatedAction action) {
-		string name = BaseAnimationKey(unit.artName, action);
+	public bool LoadAnimation(MapUnit unit, MapUnit.AnimatedAction action) {
+		string name = BaseAnimationKey(unit.GetArtName(), action);
 		string testName = AnimationKey(name, TileDirection.NORTH);
 		if (spriteFrames.HasAnimation(testName) && tintFrames.HasAnimation(testName)) {
 			return false;
@@ -244,7 +244,7 @@ public partial class AnimationManager {
 		}
 	}
 
-	public C7Animation forUnit(UnitPrototype unit, MapUnit.AnimatedAction action) {
+	public C7Animation forUnit(MapUnit unit, MapUnit.AnimatedAction action) {
 		return new C7Animation(this, unit, action);
 	}
 
@@ -262,14 +262,14 @@ public partial class C7Animation {
 	public AnimationManager animationManager { get; private set; }
 	public string folderPath { get; private set; } // For example "Art/Units/Warrior" or "Art/Animations/Trajectory"
 	public string iniFileName { get; private set; }
-	private UnitPrototype unit;
+	private MapUnit unit;
 	public AnimatedEffect effect;
 	public MapUnit.AnimatedAction action { get; private set; }
 
-	public C7Animation(AnimationManager civ3AnimData, UnitPrototype unit, MapUnit.AnimatedAction action) {
+	public C7Animation(AnimationManager civ3AnimData, MapUnit unit, MapUnit.AnimatedAction action) {
 		this.animationManager = civ3AnimData;
-		this.folderPath = "Art/Units/" + unit.artName;
-		this.iniFileName = unit.artName + ".ini";
+		this.folderPath = "Art/Units/" + unit.GetArtName();
+		this.iniFileName = unit.GetArtName() + ".ini";
 		this.action = action;
 		this.unit = unit;
 	}

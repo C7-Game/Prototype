@@ -21,7 +21,7 @@ namespace C7Engine {
 		public static readonly int MAX_WATER_EXPLORERS = 4;
 
 		public static async Task PlayTurn(Player player, GameData gameData) {
-			if (player.isHuman || player.isBarbarians) {
+			if (player.isHuman || player.isBarbarians || !player.isIncludedInGame) {
 				return;
 			}
 			List<Tech> techs = gameData.techs;

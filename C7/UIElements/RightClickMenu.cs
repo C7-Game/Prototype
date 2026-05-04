@@ -287,9 +287,9 @@ public partial class RightClickCityMenu : RightClickMenu {
 public partial class RightClickChooseProductionMenu : RightClickMenu {
 	private ID cityID;
 
-	public static ImageTexture GetProducibleIcon(IProducible producible) {
+	public static ImageTexture GetProducibleIcon(IProducible producible, Player player) {
 		if (producible is UnitPrototype proto) {
-			return TextureLoader.Load("unit_icons", proto, useCache: true);
+			return TextureLoader.Load("unit_icons", new ItemContext(proto, player), useCache: true);
 		} else if (producible is Building b) {
 			return TextureLoader.Load("building_icons.small", b, useCache: true);
 		} else if (producible is Inflow inflow) {
@@ -304,7 +304,7 @@ public partial class RightClickChooseProductionMenu : RightClickMenu {
 		EngineStorage.ReadGameData((GameData gameData) => {
 			foreach (IProducible option in city.ListProductionOptions(gameData)) {
 				int buildTime = city.TurnsToProduce(option);
-				AddItem($"{option.name} ({buildTime} turns)", () => ChooseProduction(option.name), GetProducibleIcon(option));
+				AddItem($"{option.name} ({buildTime} turns)", () => ChooseProduction(option.name), GetProducibleIcon(option, city.owner));
 			}
 		});
 	}

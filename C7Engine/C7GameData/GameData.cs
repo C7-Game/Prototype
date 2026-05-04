@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Serilog;
 using C7Engine.Lua;
 using C7Engine.Pathing;
 using System.Threading.Tasks;
 using C7Engine;
 
+[assembly: InternalsVisibleTo("EngineTests")]
 namespace C7GameData {
 	public class GameData {
 		private static ILogger log = Log.ForContext<GameData>();
@@ -31,6 +33,7 @@ namespace C7GameData {
 		public List<City> cities = new List<City>();
 
 		internal List<Civilization> civilizations = new List<Civilization>();
+		internal HashSet<CultureGroup> cultureGroups = new HashSet<CultureGroup>();
 
 		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();
 		public List<Tech> techs = new();
@@ -43,6 +46,7 @@ namespace C7GameData {
 		public string defaultExperienceLevelKey;
 		public ExperienceLevel defaultExperienceLevel;
 		public Rules rules;
+		public TimeOptions timeOptions;
 
 		public BarbarianInfo barbarianInfo = new BarbarianInfo();
 
@@ -266,13 +270,10 @@ namespace C7GameData {
 			log.Information($"Player {owner} removed unit: {unit}");
 		}
 
-		internal void SpawnUnit(Player player, UnitPrototype unitType, Tile tile) {
+		internal void SpawnUnit(Player player, UnitPrototype proto, Tile tile) {
 			// TODO: consolidate unit spawning routines (here) 
 
-			MapUnit newUnit = unitType.GetInstance(this);
-			newUnit.location = tile;
-			newUnit.owner = player;
-			newUnit.nationality = player.civilization;
+			MapUnit newUnit = proto.GetInstance(this.GenerateID(proto.name), proto, player, location: tile);
 			// TODO: make this a conscript.
 			newUnit.experienceLevelKey = defaultExperienceLevelKey;
 			newUnit.experienceLevel = defaultExperienceLevel;
@@ -283,7 +284,7 @@ namespace C7GameData {
 			player.units.Add(newUnit);
 
 			log.Debug("New unit of type {type} added at {tile} for player {player}",
-				unitType.name, tile, player);
+				proto.name, tile, player);
 		}
 
 		public int TechCostFor(Tech tech, Player player) {
@@ -377,6 +378,12 @@ namespace C7GameData {
 
 			// should never happen, if it does some part of the algorithm has gone wrong
 			throw new Exception($"Failed to resolve ownership of {t} between {a.name} and {b.name}, something went wrong");
+		}
+	}
+
+	public static class GameDataUtils {
+		public static ID GenerateID(this GameData gameData, string identifier) {
+			return gameData.ids.CreateID(identifier);
 		}
 	}
 }

@@ -107,7 +107,7 @@ public partial class UnitSelector : Node {
 			unit.wake();
 			NoMoreAutoselectableUnitsEmitted = false;
 			ParameterWrapper<MapUnit> wrappedUnit = new(CurrentlySelectedUnit);
-			PreLoadUnitAnimationThumbnail(wrappedUnit.Value.unitType);
+			PreLoadUnitAnimationThumbnail(wrappedUnit.Value);
 			EmitSignal(SignalName.NewAutoselectedUnit, wrappedUnit);
 			return true;
 		}
@@ -120,7 +120,7 @@ public partial class UnitSelector : Node {
 		return false;
 	}
 
-	private void PreLoadUnitAnimationThumbnail(UnitPrototype unit) {
+	private void PreLoadUnitAnimationThumbnail(MapUnit unit) {
 		game.animationController.civ3AnimData.GetAnimationFrameAndTintTextures(unit);
 	}
 }

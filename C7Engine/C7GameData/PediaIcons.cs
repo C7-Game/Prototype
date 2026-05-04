@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Serilog;
 
 namespace C7GameData {
@@ -28,6 +29,11 @@ namespace C7GameData {
 		// building icon art file.
 		public readonly Dictionary<string, int> buildingToRowNumberMapping = new();
 
+		private readonly Dictionary<string, string> civilopediaLargeIcons = new();
+		private readonly Dictionary<string, string> civilopediaSmallIcons = new();
+
+		private readonly Dictionary<string, int> unitSmallIconsIndex = new();
+
 		private readonly string pediaIconsPath;
 
 		public PediaIcons(string path) {
@@ -38,16 +44,10 @@ namespace C7GameData {
 			for (int i = 0; i < lines.Length - 1; ++i) {
 				if (lines[i].StartsWith(animNamePrefix)) {
 					string civilopediaName = lines[i].Substring(animNamePrefix.Length);
-					if (civilopediaName.Contains("_ERAS_")) {
-						// HACK: The civilopedia name for leaders differs by era, but the current
-						// approach for resolving the artwork is era independent. Given a line like
-						// #ANIMNAME_PRTO_Leader_ERAS_Ancient_Times we want to end up with
-						// PRTO_Leader to match the biq file.
-						civilopediaName = civilopediaName.Substring(0, civilopediaName.IndexOf("_ERAS_"));
-					}
 
 					string artName = lines[i + 1];
-					unitArtMapping[civilopediaName] = artName;
+					unitArtMapping.TryAdd(civilopediaName, artName);
+
 					continue;
 				}
 
@@ -69,6 +69,15 @@ namespace C7GameData {
 					// support that yet.
 					buildingToRowNumberMapping[lines[i].Substring(6)] = Int32.Parse(lines[i + 2]);
 				}
+
+				if (lines[i].StartsWith("#UNITICON_PRTO") && i + 1 < lines.Length) {
+					unitSmallIconsIndex[lines[i].Substring(10)] = Int32.Parse(lines[i + 1]);
+				}
+
+				if (lines[i].StartsWith("#ICON_PRTO") && i + 2 < lines.Length) {
+					civilopediaLargeIcons[lines[i].Substring(6)] = lines[i + 1];
+					civilopediaSmallIcons[lines[i].Substring(6)] = lines[i + 2];
+				}
 			}
 		}
 
@@ -76,13 +85,39 @@ namespace C7GameData {
 			return techSmallIconMapping[civilopediaEntry];
 		}
 
-		public string GetUnitArtName(string civilopediaEntry) {
-			string artName = unitArtMapping[civilopediaEntry];
-			if (artName == null) {
-				log.Error($"Could not find #ANIMNAME_{civilopediaEntry} in PediaIcons file '{pediaIconsPath}");
-				return "Warrior";
+		public MainArt GetUnitMainArt(string civilopediaEntry) {
+			if (!unitArtMapping.TryGetValue(civilopediaEntry, out string artName)) {
+				log.Warning($"Could not find #ANIMNAME_{civilopediaEntry} in PediaIcons file '{pediaIconsPath}");
+				artName = unitArtMapping.First(e => e.Key.StartsWith(civilopediaEntry)).Value;
+				artName = artName.Replace($"{civilopediaEntry}_", "");
 			}
-			return artName;
+
+			var variations = unitArtMapping
+				.Where(e => e.Key != civilopediaEntry && e.Key.StartsWith(civilopediaEntry))
+				.ToDictionary(e => e.Key.Replace($"{civilopediaEntry}_", ""), e => e.Value);
+
+			return new MainArt() {
+				defaultName = artName,
+				variations = variations.Count > 0 ? variations : null,
+			};
+		}
+
+		public ThumbNailArt GetUnitThumbnailArt(string civilopediaEntry, int index) {
+			var variations = unitSmallIconsIndex
+				.Where(e => e.Key != civilopediaEntry && e.Key.StartsWith(civilopediaEntry))
+				.ToDictionary(e => e.Key.Replace($"{civilopediaEntry}_", ""), e => e.Value);
+
+			return new ThumbNailArt() {
+				defaultIndex = index,
+				variations = variations.Count > 0 ? variations : null,
+			};
+		}
+
+		public PediaArt GetUnitCivilopediaArt(string civilopediaEntry) {
+			return new PediaArt() {
+				large = civilopediaLargeIcons[civilopediaEntry],
+				small = civilopediaSmallIcons[civilopediaEntry],
+			};
 		}
 
 		public string GetLeaderArtName(string civilopediaEntry) {

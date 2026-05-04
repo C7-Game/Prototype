@@ -3,13 +3,8 @@ using System.Linq;
 
 namespace C7GameData.Save {
 	public class SaveUnitPrototype {
-		public class Unique {
-			public string replace;
-			public string civilization;
-		};
-
 		public string name { get; set; }
-		public string artName { get; set; }
+		public Art art { get; set; }
 		public int shieldCost { get; set; }
 		public int populationCost { get; set; }
 		public ID requiredTech { get; set; }
@@ -19,10 +14,10 @@ namespace C7GameData.Save {
 		public int bombardRange { get; set; }
 		public int rateOfFire { get; set; }
 		public int movement { get; set; }
-		public int iconIndex { get; set; }
+
+		public HashSet<string> producibleBy = [];
 
 		public string upgradeTo;
-		public Unique unique;
 		public bool unproducible;
 
 		public HashSet<string> categories = new HashSet<string>();
@@ -38,11 +33,10 @@ namespace C7GameData.Save {
 		public SaveUnitPrototype() { }
 
 		public SaveUnitPrototype(UnitPrototype proto) {
-			(name, artName, shieldCost, populationCost, unproducible,
-			attack, defense, bombard, bombardRange, rateOfFire, movement, iconIndex) =
-			(proto.name, proto.artName, proto.shieldCost, proto.populationCost, proto.unproducible,
-			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire,
-			 proto.movement, proto.iconIndex);
+			(name, art, shieldCost, populationCost, unproducible,
+			attack, defense, bombard, bombardRange, rateOfFire, movement) =
+			(proto.name, proto.art, proto.shieldCost, proto.populationCost, proto.unproducible,
+			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire, proto.movement);
 
 			if (proto.requiredTech != null)
 				requiredTech = proto.requiredTech.id;
@@ -50,19 +44,13 @@ namespace C7GameData.Save {
 			if (proto.upgradeTo != null)
 				upgradeTo = proto.upgradeTo.name;
 
-			if (proto.unique != null) {
-				unique = new() {
-					civilization = proto.unique.civilization.name,
-					replace = proto.unique.replace?.name
-				};
-			}
-
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;
 			attributes = new HashSet<string>(proto.attributes);
 
 			requiredResources = proto.requiredResources.Select(r => r.Key).ToHashSet();
 			terraformActions = proto.terraformActions.Select(r => r.Id).ToHashSet();
+			producibleBy = proto.producibleBy.Select(r => r.name).ToHashSet();
 		}
 	}
 }

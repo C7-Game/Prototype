@@ -100,6 +100,23 @@ namespace C7GameData {
 			return this.IsCaptive() ? $"{this.name} ({this.nationality.name})" : this.name;
 		}
 
+		// TODO: best move this to lua at some point
+		public string GetArtName() {
+			if (this.unitType.art.mainArt.variations != null) {
+				if (this.unitType.isWorker && this.IsCaptive()) {
+					if (this.unitType.art.mainArt.variations.FirstOrDefault(s => s.Key.EndsWith("SLAVE")).Value != null)
+						return this.unitType.art.mainArt.variations.First(s => s.Key.EndsWith("SLAVE")).Value;
+				}
+
+				if (this.unitType.art.mainArt.variations.TryGetValue($"{this.owner.eraCivilopediaName}", out var value))
+					return value;
+
+				//TODO: add military + science leader variation
+			}
+
+			return this.unitType.art.mainArt.defaultName;
+		}
+
 		public string Describe() {
 			UnitPrototype type = this.unitType;
 			string exp = this.HasRank() ? $"{this.experienceLevel.displayName}" : "";

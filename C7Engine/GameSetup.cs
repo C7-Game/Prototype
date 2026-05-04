@@ -44,6 +44,9 @@ public class GameSetup {
 		AddPlayer(save, save.Civilizations.Find(c => c.isBarbarian), isHuman: false);
 		save.BarbarianInfo.barbarianActivity = worldCharacteristics.barbarianActivity;
 
+		// TODO: There is an option called "Culturally Linked Start Loc."
+		// which (if on) puts players with the same culture group near each other
+
 		// Add the human player.
 		AddPlayer(save, this.playerCivilization, isHuman: true);
 
@@ -88,6 +91,7 @@ public class GameSetup {
 		save.Players.Add(player);
 
 		if (civ.isBarbarian) {
+			player.canBePicked = false;
 			return;
 		}
 

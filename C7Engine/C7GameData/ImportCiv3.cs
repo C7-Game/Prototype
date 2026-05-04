@@ -59,12 +59,13 @@ namespace C7GameData {
 		private void ImportSharedBiqData() {
 			save.TerrainImprovements = SaveTerrainImprovement.Civ3Improvements().ToList();
 
+			ImportTimeScale();
 			ImportRaces();
+			ImportCultureGroups();
 			ImportTechs();
 			ImportCiv3Resources();
 			ImportTerraforms();
 			ImportUnitPrototypes();
-			ImportUniqueUnitReplacements();
 			ImportUnitUpgrades();
 			ImportBuildings();
 			ImportCiv3TerrainTypes();
@@ -126,6 +127,9 @@ namespace C7GameData {
 					baseTerrain = save.TerrainTypes[civ3Tile.BaseTerrain].Key,
 					overlayTerrain = save.TerrainTypes[civ3Tile.OverlayTerrain].Key,
 				};
+				if (civ3Tile.BarbarianCamp >= 0) {
+					tile.features.Add("barbarianCamp");
+				}
 				if (civ3Tile.BonusShield) {
 					tile.features.Add("bonusShield");
 				}
@@ -183,6 +187,10 @@ namespace C7GameData {
 				}
 				i++;
 			}
+
+			// make barbarians unpickable
+			save.Players.Where(p => p.isBarbarian).ToList().ForEach(p => p.canBePicked = false);
+
 			return save;
 		}
 
@@ -226,6 +234,9 @@ namespace C7GameData {
 					baseTerrain = save.TerrainTypes[civ3Tile.BaseTerrain].Key,
 					overlayTerrain = save.TerrainTypes[civ3Tile.OverlayTerrain].Key,
 				};
+				if (civ3Tile.BarbarianCamp) {
+					tile.features.Add("barbarianCamp");
+				}
 				if (civ3Tile.BonusGrassland) {
 					tile.features.Add("bonusShield");
 				}
@@ -315,6 +326,18 @@ namespace C7GameData {
 				}
 			}
 
+			// Remove any unplayable Players, except Barbarians,
+			// ex. Mongols in `4 Middle Ages.biq` scenario.
+			// We only need to do this in the .biq files, not the .sav,
+			// because .sav files already contain just the playable Players + Barbarians.
+			// It's easier to do it like this, otherwise we need to manipulate the biq arrays,
+			// to check for playable players, offset array indexes by the difference, etc,
+			// as we are parsing the file, which is 10 times the hassle compared to this approach
+			save.Players = save.Players.Where(p => p.isBarbarian || p.isIncludedInGame).ToList();
+
+			// make barbarians unpickable
+			save.Players.Where(p => p.isBarbarian).ToList().ForEach(p => p.canBePicked = false);
+
 			return save;
 		}
 
@@ -322,6 +345,34 @@ namespace C7GameData {
 			int Y = tileIndex / (mapWidth / 2);
 			int X = tileIndex % (mapWidth / 2) * 2 + (Y % 2);
 			return (X, Y);
+		}
+
+		private void ImportTimeScale() {
+			save.TimeOptions = new TimeOptions() {
+				baseUnit = (TimeUnit)biq.Game[0].BaseTimeUnit,
+				startYear = biq.Game[0].StartYear,
+				startMonth = biq.Game[0].StartMonth,
+				startWeek = biq.Game[0].StartWeek,
+				turnLimit = biq.Game[0].TurnTimeLimit,
+				negativeLabel = "BC",
+				positiveLabel = "AD",
+			};
+
+			save.TimeOptions.timeScale = new int[2, 8];
+
+			for (int i = 0; i < 7; ++i) {
+				var turns = biq.Game[0].TimescaleNumberOfTurns[i];
+				var units = biq.Game[0].TurnNumberOfTimeUnits[i];
+				save.TimeOptions.timeScale[0, i] = turns;
+				save.TimeOptions.timeScale[1, i] = units;
+			}
+
+			// Add some extra padding at the end to allow continuing playing 1 turn at a time.
+			// CivIII allows dates from -10000 to 10000, so 50000 is enough to cover for that,
+			// and for our custom scenarios from now on, this value is easily editable in the json
+			save.TimeOptions.timeScale[0, 7] = 50000;
+			save.TimeOptions.timeScale[1, 7] = 1;
+
 		}
 
 		private void ImportCiv3Resources() {
@@ -355,6 +406,23 @@ namespace C7GameData {
 			}
 		}
 
+		private void ImportCultureGroups() {
+			BiqData theBiq = biq.Race is null ? defaultBiq : biq;
+			HashSet<CultureGroup> cultureGroups = new HashSet<CultureGroup>();
+			HashSet<int> cultureGroupsIndexes = new HashSet<int>();
+			int i = 0;
+			foreach (RACE race in theBiq.Race) {
+				if (cultureGroupsIndexes.Add(race.CultureGroup)) {
+					var cg = new CultureGroup() {
+						index = race.CultureGroup,
+						name = GetCultureGroupIdentifier(race.CultureGroup),
+					};
+					cultureGroups.Add(cg);
+				}
+			}
+			save.CultureGroups = cultureGroups.OrderBy(c => c.index).ToHashSet();
+		}
+
 		private void ImportRaces() {
 			BiqData theBiq = biq.Race is null ? defaultBiq : biq;
 			int i = 0;
@@ -373,6 +441,7 @@ namespace C7GameData {
 					civ.cityNames.Add(city.Name);
 				}
 				civ.traits = LoadCivTraits(race).ToHashSet();
+				civ.cultureGroupKey = GetCultureGroupIdentifier(race.CultureGroup);
 
 				// Look up the image for non-barbarian civs.
 				string artName = pediaIcons.GetLeaderArtName(race.CivilopediaEntry);
@@ -383,6 +452,17 @@ namespace C7GameData {
 				save.Civilizations.Add(civ);
 				i++;
 			}
+		}
+
+		private static string GetCultureGroupIdentifier(int cultureGroupIndex) {
+			if (cultureGroupIndex == -1) return "None"; // Barbarians
+			if (cultureGroupIndex == 0) return "American";
+			if (cultureGroupIndex == 1) return "European";
+			if (cultureGroupIndex == 2) return "Mediterranean";
+			if (cultureGroupIndex == 3) return "Mid East";
+			if (cultureGroupIndex == 4) return "Asian";
+			log.Error($"The culture group index {cultureGroupIndex} is invalid. Defaulting to `American`.");
+			return "American";
 		}
 
 		private static IEnumerable<Civilization.Trait> LoadCivTraits(RACE race) {
@@ -407,10 +487,16 @@ namespace C7GameData {
 
 			// Make a player for each civ. The barbarians are always civ 0.
 			for (int i = 0; i < save.Civilizations.Count; ++i) {
-				save.Players.Add(MakeSavePlayerFromCiv(save.Civilizations[i],
-									   isBarbarian: i == 0,
+				Civilization civ = save.Civilizations[i];
+
+				// GameCiv[0] does not contain the barbarians,
+				// but we want to include them in the gameplay
+				bool isIncluded = theBiq.GameCiv[0].Contains(i) || civ.isBarbarian;
+
+				save.Players.Add(MakeSavePlayerFromCiv(civ,
 									   isHuman: false,
-									   era: ""));
+									   era: "",
+									   isIncluded));
 
 				// Set a government for players not associated with LEAD.
 				// Usually, this applies only to barbarians, but in some scenarios
@@ -424,6 +510,8 @@ namespace C7GameData {
 			int leadIndex = 0;
 			foreach (LEAD lead in theBiq.Lead) {
 				SavePlayer player = save.Players[lead.Civ];
+
+				player.canBePicked = lead.HumanPlayer == 1;
 
 				// Put the player in the correct starting era.
 				player.eraCivilopediaName = theBiq.Eras[lead.InitialEra].CivilopediaEntry;
@@ -469,9 +557,11 @@ namespace C7GameData {
 				}
 				Civilization civ = save.Civilizations[leader.RaceID];
 				SavePlayer player = MakeSavePlayerFromCiv(civ,
-										  isBarbarian: i == 0,
 										  isHuman: i == 1,
-										  era: theBiq.Eras[leader.Era].CivilopediaEntry);
+										  era: theBiq.Eras[leader.Era].CivilopediaEntry,
+                                          // by default if the player is in the .sav file, well, it's included in the game
+                                          // in contrast to a .biq file where it can have a player/civ that is not included in the final gameplay
+                                          true);
 
 				// Record what the player is currently researching.
 				if (leader.Researching > -1) {
@@ -499,6 +589,7 @@ namespace C7GameData {
 				player.taxRate = leader.TaxRate;
 				player.governmentId = save.Governments[leader.Government].id;
 				player.inAnarchyUntilTurn = save.TurnNumber + leader.AnarchyTurnsLeft;
+				player.primaryColorIndex = leader.Color;
 
 				save.Players.Add(player);
 				i++;
@@ -777,17 +868,17 @@ namespace C7GameData {
 			}
 		}
 
-		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isBarbarian, bool isHuman, string era) {
+		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isHuman, string era, bool isIncludedInGame = true) {
 			return new SavePlayer {
 				id = ids.CreateID("player"),
 				primaryColorIndex = civ.primaryColorIndex,
 				secondaryColorIndex = civ.secondaryColorIndex,
 				human = isHuman,
 				civilization = civ.name,
-
+				isIncludedInGame = isIncludedInGame,
 				// Never let barbarians play before a real player.
-				hasPlayedCurrentTurn = isBarbarian,
-
+				hasPlayedCurrentTurn = civ.isBarbarian,
+				isBarbarian = civ.isBarbarian,
 				eraCivilopediaName = era,
 			};
 		}
@@ -853,7 +944,11 @@ namespace C7GameData {
 
 				// The owner index is into the list of civs, and we have a 1:1
 				// mapping of players and civs.
-				SavePlayer player = save.Players[unit.Owner];
+				// The exception to this are barbarian units (unit.OwnerType == 1), 
+				// where the owner points to the tribe (city name in other civs), rather than the player/civ
+				// TODO: implement tribes for barbarians
+				int owner = unit.OwnerType == 1 ? 0 : unit.Owner;
+				SavePlayer player = save.Players[owner];
 				ExperienceLevel experience = save.ExperienceLevels[unit.ExperienceLevel];
 				save.Units.Add(createUnitAtLocation(player, unit.Name, unit.UnitType, experience.key, experience.baseHitPoints, unit.X, unit.Y));
 			}
@@ -1050,21 +1145,22 @@ namespace C7GameData {
 			if (prto.BuildFortress) yield return TerraformKey.BuildFortress;
 		}
 
-		private SaveUnitPrototype.Unique ImportUniqueUnitData(PRTO prto) {
-			int civIndex = prto.AvailableTo.GetUniqueCivIndex();
-
-			if (civIndex == -1) {
-				return null;
-			}
-
-			return new() { civilization = save.Civilizations[civIndex].name };
-		}
-
 		private static bool IsUnproducible(PRTO prto) {
 			int[] availableTo = prto.AvailableTo.GetAvailableCivIndexes().ToArray();
 
 			// TODO: Implement proper logic for Army production
 			return availableTo.Length == 0 || prto.ShieldCost < 1 || prto.Army;
+		}
+
+		private HashSet<string> ImportUnitAvailability(PRTO prto) {
+			HashSet<string> availableToCivs = [];
+			int[] availableTo = prto.AvailableTo.GetAvailableCivIndexes().ToArray();
+			for (int i = 0; i < biq.Race.Length; ++i) {
+				if (availableTo.Contains(i))
+					availableToCivs.Add(biq.Race[i].Name);
+			}
+
+			return availableToCivs;
 		}
 
 		private void ImportUnitPrototypes() {
@@ -1080,7 +1176,13 @@ namespace C7GameData {
 				}
 
 				prototype.name = prto.Name;
-				prototype.artName = pediaIcons.GetUnitArtName(prto.CivilopediaEntry);
+
+				Art unitArt = new Art();
+				unitArt.mainArt = pediaIcons.GetUnitMainArt(prto.CivilopediaEntry);
+				unitArt.thumbnailArt = pediaIcons.GetUnitThumbnailArt(prto.CivilopediaEntry, prto.IconIndex);
+				unitArt.pediaArt = pediaIcons.GetUnitCivilopediaArt(prto.CivilopediaEntry);
+				prototype.art = unitArt;
+
 				prototype.attack = prto.Attack;
 				prototype.defense = prto.Defense;
 				prototype.movement = prto.Movement;
@@ -1089,11 +1191,10 @@ namespace C7GameData {
 				prototype.bombard = prto.BombardStrength;
 				prototype.bombardRange = prto.BombardRange;
 				prototype.rateOfFire = prto.RateOfFire;
-				prototype.iconIndex = prto.IconIndex;
+
 				prototype.actions.UnionWith(GetUnitActions(prto));
 				prototype.terraformActions.UnionWith(GetUnitTerraforms(prto).Select(tfKey => terraformIdByCiv3Key[tfKey]));
 
-				prototype.unique = ImportUniqueUnitData(prto);
 				prototype.unproducible = IsUnproducible(prto);
 
 				if (prto.Required != -1) {
@@ -1108,6 +1209,8 @@ namespace C7GameData {
 					prototype.requiredResources.Add(save.Resources[prto.RequiredResource2].Key);
 				}
 
+				prototype.producibleBy = ImportUnitAvailability(prto);
+
 				//Temporary check until #330 is finished
 				if (!save.UnitPrototypes.Where(p => p.name == prototype.name).Any()) {
 					save.UnitPrototypes.Add(prototype);
@@ -1115,79 +1218,16 @@ namespace C7GameData {
 			}
 		}
 
-		// This method assigns standard units that are replaced by unique units.
-		//
-		// A unique unit replaces a standard unit if both share the same tech requirement
-		// and the standard unit is unproducible by the civilization to which the unique unit belongs.
-		//
-		// For example, this method updates the Mounted Warrior prototype to indicate that it replaces the Horseman.
-		private void ImportUniqueUnitReplacements() {
-			var unitPrototypeDict = save.UnitPrototypes.ToDictionary(b => b.name);
-
-			// Group unique units by civilization.
-			// In the base ruleset a civilization only has one unique unit,
-			// but this may vary in scenarios.
-			var uniqueUnitPrototypesByCiv = save.UnitPrototypes
-					.Where(u => u.unique != null)
-					.ToLookup(u => u.unique.civilization);
-
-			PRTO[] Prto = biq.Prto ?? defaultBiq.Prto;
-
-			foreach (PRTO standardUnitPrto in Prto) {
-				string standardUnitName = standardUnitPrto.Name;
-				SaveUnitPrototype standardUnit = unitPrototypeDict[standardUnitName];
-
-				// Skip units that are either unique or unproducible (cannot be built normally)
-				if (standardUnit.unique != null) {
-					continue;
-				}
-
-				if (standardUnit.unproducible) {
-					continue;
-				}
-
-				// For each civilization that cannot build the standard unit
-				foreach (int civIndex in standardUnitPrto.AvailableTo.GetUnavailableCivIndexes()) {
-					if (civIndex >= save.Civilizations.Count) {
-						break;
-					}
-
-					var uniqueUnits = uniqueUnitPrototypesByCiv[save.Civilizations[civIndex].name];
-
-					foreach (SaveUnitPrototype uniqueUnit in uniqueUnits) {
-						// If the unique unit has the same tech requirement as the standard unit,
-						// mark the unique unit as a replacement for the standard unit
-						if (uniqueUnit.requiredTech == standardUnit.requiredTech) {
-							uniqueUnit.unique.replace = standardUnitName;
-						}
-					}
-				}
-			}
-		}
-
-		// This method loads unit upgrades from CIV3 data. In CIV3, unique units are part of the upgrade chain.
-		//
-		// For example, the upgrade path for Horseman looks like this:
-		// Horseman->Mounted Warrior->Three-Man Chariot->Knight->Keshik->Ansar Warrior->Rider->Samurai->War Elephant->Cavalry.
-		// see also: https://forums.civfanatics.com/threads/how-to-upgrade-regular-units-to-uus.108396/
-		//
-		// When loading this data, the method ignores the unique units in the upgrade chain.
-		// Instead, each unit of the chain will be assigned an upgrade that represents the closest non-unique unit
-		// that also requires a tech advancement over the base unit.
-		//
-		// For example, this method will mark that Horseman upgrades to Knight and that Keshik upgrades to Cavalry.
 		private void ImportUnitUpgrades() {
 			Dictionary<SaveUnitPrototype, SaveUnitPrototype> upgradeDict = BuildUpgradeDict();
 
 			foreach (SaveUnitPrototype proto in save.UnitPrototypes) {
-				proto.upgradeTo = GetUnitUpgrade(proto, upgradeDict);
+				proto.upgradeTo = upgradeDict[proto]?.name;
 			}
 		}
 
 		// This method builds a Dictionary of unit upgrades based on the CIV3 data.
 		// The dictionary represents the raw upgrade relationships as defined in the game files.
-		// The dictionary serves as an intermediate data structure for the ImportUnitUpgrades process,
-		// before filtering out unique units.
 		private Dictionary<SaveUnitPrototype, SaveUnitPrototype> BuildUpgradeDict() {
 			PRTO[] Prto = biq.Prto ?? defaultBiq.Prto;
 			var unitPrototypeDict = save.UnitPrototypes.ToDictionary(b => b.name);
@@ -1205,29 +1245,6 @@ namespace C7GameData {
 			}
 
 			return upgradeDict;
-		}
-
-		// This method returns the name of the first valid unit upgrade in the upgrade chain.
-		// A valid upgrade must require a different technology than the base unit and must not be a unique unit.
-		// If no valid upgrade is found, it returns null.
-		private static string GetUnitUpgrade(SaveUnitPrototype proto, Dictionary<SaveUnitPrototype, SaveUnitPrototype> upgradeDict) {
-			SaveUnitPrototype currentProto = proto;
-
-			while (true) {
-				// Check if there's an upgrade available
-				var upgrade = upgradeDict[currentProto];
-				if (upgrade == null) {
-					return null;
-				}
-
-				// If this upgrade represents a technology advancement over the base unit and is not a unique unit, return it
-				if (upgrade.requiredTech != proto.requiredTech && upgrade.unique == null) {
-					return upgrade.name;
-				}
-
-				// Otherwise, continue checking the upgrade chain
-				currentProto = upgrade;
-			}
 		}
 
 		private void ImportBuildings() {
@@ -1735,6 +1752,7 @@ namespace C7GameData {
 			save.Rules.DefaultDealDuration = 20;
 			save.Rules.ShieldCostPerGold = rule.ShieldsCostPerGold;
 			save.Rules.ShieldRateForDisbanding = 0.25f;
+			save.Rules.AllowLesserUnitProduction = false;
 		}
 
 		private static void SetWorldWrap(SavData civ3Save, SaveGame save) {

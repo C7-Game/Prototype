@@ -49,7 +49,7 @@ public partial class AnimationTracker {
 	}
 
 	public void startAnimation(MapUnit unit, MapUnit.AnimatedAction action, Action completionEvent, AnimationEnding ending) {
-		startAnimation(unit.id, civ3AnimData.forUnit(unit.unitType, action), completionEvent, ending);
+		startAnimation(unit.id, civ3AnimData.forUnit(unit, action), completionEvent, ending);
 	}
 
 	public void startAnimation(Tile tile, AnimatedEffect effect, Action completionEvent, AnimationEnding ending) {

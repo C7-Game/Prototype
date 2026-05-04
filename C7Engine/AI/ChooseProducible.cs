@@ -78,10 +78,7 @@ namespace C7Engine {
 
 			// Create a fake version of this unit so we can check what AI we
 			// would give it.
-			MapUnit temp = unit.GetInstance(EngineStorage.gameData);
-			temp.owner = player;
-			temp.nationality = player.civilization;
-			temp.location = city.location;
+			MapUnit temp = unit.GetInstance(EngineStorage.gameData.GenerateID(unit.name), unit, player, location: city.location);
 
 			////////////////////////////////////////////////////////////////////
 			///

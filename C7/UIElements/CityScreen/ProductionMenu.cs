@@ -54,7 +54,7 @@ public partial class ProductionMenu : Civ3TextureRect {
 			}
 			child.SetText(0, text);
 			child.SetText(1, $"{buildTime} turns");
-			child.SetIcon(0, RightClickChooseProductionMenu.GetProducibleIcon(option));
+			child.SetIcon(0, RightClickChooseProductionMenu.GetProducibleIcon(option, city.owner));
 			child.SetCustomMinimumHeight(40);
 			child.SetAutowrapMode(0, TextServer.AutowrapMode.WordSmart);
 			tree.SetColumnTitleAlignment(1, HorizontalAlignment.Right);

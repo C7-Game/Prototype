@@ -1,51 +1,15 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using C7GameData;
 using C7GameData.Save;
+using EngineTests.Utils;
 using QueryCiv3;
 using Xunit;
 
 namespace EngineTests.GameData;
 
-public class MultiTurnDealTest {
-	private static readonly string C7GameDataTestsFolderName = "EngineTests";
+public class MultiTurnDealTest : RemoteSaveLoader {
 	private const string SAVES_FOLDER = "saves/multi-turn-deals";
-	private static string getDataPath(string file) => Path.Combine(testDirectory, "data", file);
-	private static string defaultBicPath => Path.Combine(Civ3Location.GetCiv3Path(), "Conquests", "conquests.biq");
-	private static string defaultPediaIconsPath => Path.Combine(Civ3Location.GetCiv3Path(), "Conquests", "Text", "PediaIcons.txt");
-
-	private static string testDirectory {
-		get {
-			string[] parts = AppDomain.CurrentDomain.BaseDirectory.Split(Path.DirectorySeparatorChar);
-			int pos = parts.Reverse().ToList().FindIndex(s => s == C7GameDataTestsFolderName);
-			string up = string.Concat("..", Path.DirectorySeparatorChar);
-			string relativePath = string.Concat(Enumerable.Repeat(up, pos - 1));
-			return Path.GetFullPath(relativePath);
-		}
-	}
-
-	private static async Task<(SaveGame game, Exception ex, string savePath)> LoadGameAndData(string saveName, string savesFolder, string uri, string biqPath = "default", string pediaPath = "default") {
-		string savesPath = getDataPath(savesFolder);
-		Directory.CreateDirectory(savesPath);
-
-		string savePath = Path.Combine(savesPath, saveName);
-		using HttpClient client = new();
-		byte[] fileData = await client.GetByteArrayAsync($"{uri}");
-		await File.WriteAllBytesAsync(savePath, fileData);
-
-		FileInfo saveFile = new DirectoryInfo(savesPath).GetFiles().First(f => f.Name == saveName);
-
-		SaveGame game = null;
-		Exception ex = Record.Exception(() => {
-			game = ImportCiv3.ImportSav(saveFile.FullName, biqPath == "default" ? defaultBicPath : biqPath, (relativeModePath) =>
-				{ return pediaPath == "default" ? defaultPediaIconsPath : pediaPath; });
-		});
-		return (game, ex, savePath);
-	}
-
 	[Fact]
 	public async void TestMultiTurnDeal_Save_A() {
 		// When running the tests via github actions, civ3 isn't installed so we

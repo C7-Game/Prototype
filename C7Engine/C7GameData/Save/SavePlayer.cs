@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace C7GameData.Save {
 
@@ -10,6 +11,8 @@ namespace C7GameData.Save {
 		public bool human = false;
 		public bool hasPlayedCurrentTurn = false;
 		public bool defeated = false;
+		public bool isIncludedInGame = true;
+		public bool canBePicked = true;
 
 		public string civilization;
 
@@ -60,10 +63,17 @@ namespace C7GameData.Save {
 		// The current government of the player.
 		public ID governmentId;
 
+		// Used when importing from .biq, to make it easier to distinguish barbarians from other players.
+		// It's not meant to be saved in the json.
+		[JsonIgnore]
+		public bool isBarbarian { get; init; }
+
 		public Player ToPlayer(GameMap map, List<Civilization> civilizations, List<Government> governments, List<Tech> techs, Rules rules) {
 			Player player = new Player{
 				id = id,
 				isHuman = human,
+				isIncludedInGame = isIncludedInGame,
+				canBePicked = canBePicked,
 				hasPlayedThisTurn = hasPlayedCurrentTurn,
 				defeated = defeated,
 				primaryColorIndex = primaryColorIndex,
@@ -104,6 +114,10 @@ namespace C7GameData.Save {
 				player.AddTechItemToResearchQueue(tech);
 			}
 
+			if (player.civilization.isBarbarian) {
+				player.canBePicked = false;
+			}
+
 			return player;
 		}
 
@@ -111,6 +125,8 @@ namespace C7GameData.Save {
 
 		public SavePlayer(Player player) {
 			id = player.id;
+			isIncludedInGame = player.isIncludedInGame;
+			canBePicked = player.canBePicked;
 			primaryColorIndex = player.primaryColorIndex;
 			secondaryColorIndex = player.secondaryColorIndex;
 			human = player.isHuman;
