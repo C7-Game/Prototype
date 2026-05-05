@@ -846,18 +846,25 @@ namespace C7GameData {
 
 			terrainImprovementByLayer[improvement.layer] = improvement;
 
-			// If a road is being added to a tile that previously had
-			// no road, invalidate the cached trade network
-			if (improvement.layer == TerrainImprovement.Layer.Roads && replacedImprovement == null) {
-				// Hack: don't do this if gamedata is null, which can
-				// be true in some unit tests.
-				EngineStorage.gameData?.InvalidateCachedTradeNetwork();
-			}
+			ApplyTerrainImprovementChange(replacedImprovement, improvement);
 		}
 
 		public void Remove(TerrainImprovement improvement) {
 			if (!terrainImprovementByLayer.Remove(improvement.layer))
 				Log.Warning("Failed to remove terrain improvement.");
+
+			ApplyTerrainImprovementChange(improvement, null);
+		}
+
+		private static void ApplyTerrainImprovementChange(TerrainImprovement oldImprovement, TerrainImprovement newImprovement) {
+			var roadCreated = oldImprovement == null && newImprovement?.layer == TerrainImprovement.Layer.Roads;
+			var roadRemoved = oldImprovement?.layer == TerrainImprovement.Layer.Roads && newImprovement == null;
+
+			// If there's a change in road coverage, invalidate the cached trade network
+			if (roadCreated || roadRemoved) {
+				// Hack: don't do this if gamedata is null, which can be true in some unit tests.
+				EngineStorage.gameData?.InvalidateCachedTradeNetwork();
+			}
 		}
 
 		public TerrainImprovement ImprovementAtLayer(TerrainImprovement.Layer layer) {
