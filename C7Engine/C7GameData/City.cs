@@ -355,7 +355,7 @@ namespace C7GameData {
 
 			// Handle the city starving.
 			if (foodStored < 0) {
-				RemoveCitizen();
+				RemoveLastCitizen();
 				foodStored = 0;
 				return;
 			}
@@ -624,9 +624,9 @@ namespace C7GameData {
 			return residents.Count * 2;
 		}
 
-		private void RemoveCitizen() {
-			residents[residents.Count - 1].tileWorked.personWorkingTile = null;
-			residents.RemoveAt(residents.Count - 1);
+
+		private void RemoveLastCitizen() {
+			RemoveCitizenAt(residents.Count - 1);
 		}
 
 		public void RemoveRandomCitizen() {
@@ -634,9 +634,12 @@ namespace C7GameData {
 				return; // TODO: Handle extreme case
 
 			var idx = GameData.rng.Next(residents.Count);
+			RemoveCitizenAt(idx);
+		}
 
-			residents[idx].tileWorked.personWorkingTile = null;
-			residents.RemoveAt(idx);
+		private void RemoveCitizenAt(int index) {
+			residents[index].tileWorked.personWorkingTile = null;
+			residents.RemoveAt(index);
 		}
 
 		public void AddCitizen(CityResident cr) {
@@ -646,7 +649,7 @@ namespace C7GameData {
 		public void RemoveCitizens(int number) {
 			for (int i = 0; i < number; i++) {
 				if (residents.Count > 0) {
-					RemoveCitizen();
+					RemoveLastCitizen();
 				} else {
 					Log.Warning("Trying to remove last citizen from " + name);
 					break;
@@ -656,7 +659,7 @@ namespace C7GameData {
 
 		public void RemoveAllCitizens() {
 			while (residents.Count > 0) {
-				RemoveCitizen();
+				RemoveLastCitizen();
 			}
 		}
 
