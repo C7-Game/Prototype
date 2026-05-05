@@ -472,6 +472,8 @@ namespace C7GameData {
 		}
 
 		private async Task bombardUnits(Tile tile, MapUnit target) {
+			// TODO: Make configurable
+
 			var hitCount = 0;
 
 			foreach (var fire in Enumerable.Range(0, unitType.rateOfFire)) {
@@ -514,6 +516,7 @@ namespace C7GameData {
 			// CF Civilopedia: City walls have a land bombardment defense of 8
 			// CF Civilopedia: Coastal defences have a land bombardment defense of 8
 			// Anecdotal: "City walls are hit first."
+			// TODO: Make configurable
 
 			const int wallDefence = 8;
 
@@ -556,6 +559,7 @@ namespace C7GameData {
 			// Anecdotal: If there are no units left to hit, then citizens or buildings are hit, apparently with same probability.
 			// Anecdotal: "buildings (if I remember correctly) have a defense value of 16"
 			// Anecdotal: It seems population is killed off more quickly than buildings.
+			// TODO: Make configurable
 
 			const int buildingDefence = 16;
 			const int populationDefence = 12;
@@ -602,6 +606,8 @@ namespace C7GameData {
 		private async Task bombardTileImprovements(Tile tile) {
 			// Anecdotal: "arty seems to wipe out improvement on 75% or more of the shots"
 			// ==> Artillery.bombard : 12 --> TileImprovement.Defense : 3
+			// TODO: Make configurable
+
 			const int tileImprovementDefence = 3;
 
 			var hitCount = 0;
