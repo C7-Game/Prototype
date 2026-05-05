@@ -430,7 +430,7 @@ namespace C7GameData {
 				return true;
 
 			MapUnit target = tile.FindTopDefender(this);
-			if (target?.owner == owner)
+			if (target.owner == owner)
 				return false;
 
 			if (target != MapUnit.NONE)
