@@ -16,15 +16,15 @@
 
 ## Status
 
-The latest stable version can be downloaded from the [Releases page](https://github.com/C7-Game/Prototype/releases). Current information on installation and features can always be found on the [project homepage.](https://www.openciv3.org/)
+The latest stable version can be downloaded from the [Releases page](https://github.com/C7-Game/OpenCiv3/releases). Current information on installation and features can always be found on the [project homepage.](https://www.openciv3.org/)
 
 OpenCiv3 is in a pre-alpha state. It is a rudimentary playable game but lacking many mechanics and late-game content, and errors are likely. Keep up with our development for the latest updates and opportunities to contribute!
 
 ## Contributing
 
-Find the project interesting and want to contribute?  See [Contributing](https://github.com/C7-Game/Prototype/wiki/Contributing) on our Wiki for more information! At the moment, additional developer support is the most-needed asset, but all sorts of help (art, writing, project management, playtesting) could be useful.
+Find the project interesting and want to contribute?  See [Contributing](https://github.com/C7-Game/OpenCiv3/wiki/Contributing) on our Wiki for more information! At the moment, additional developer support is the most-needed asset, but all sorts of help (art, writing, project management, playtesting) could be useful.
 
-To set up a working development environment, see [Developing and Setting Up IDEs](https://github.com/C7-Game/Prototype/wiki/Developing-and-Setting-Up-IDEs).
+To set up a working development environment, see [Developing and Setting Up IDEs](https://github.com/C7-Game/OpenCiv3/wiki/Developing-and-Setting-Up-IDEs).
 
 ## What are those subfolders?
 

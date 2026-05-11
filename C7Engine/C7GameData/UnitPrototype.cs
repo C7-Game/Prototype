@@ -65,6 +65,17 @@ namespace C7GameData {
 		public HashSet<Civilization> producibleBy { get; set; } = [];
 		public UnitPrototype upgradeTo;
 		public bool unproducible;
+		public HashSet<SaveUnitPrototype.Flag> flags = [];
+		public bool rotateBeforeAttack {
+			get => flags.Contains(SaveUnitPrototype.Flag.RotateBeforeAttack);
+			set {
+				if (value) {
+					flags.Add(SaveUnitPrototype.Flag.RotateBeforeAttack);
+				} else {
+					flags.Remove(SaveUnitPrototype.Flag.RotateBeforeAttack);
+				}
+			}
+		}
 
 		public HashSet<string> categories = new HashSet<string>();
 
@@ -88,6 +99,7 @@ namespace C7GameData {
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;
 			attributes = new HashSet<string>(proto.attributes);
+			flags = new HashSet<SaveUnitPrototype.Flag>(proto.flags);
 
 			terraformActions = proto.terraformActions.Select(id => terraforms.First(t => t.Id == id)).ToHashSet();
 		}

@@ -18,13 +18,7 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		// This tests a Conquests game with Conquests rules from a .SAV file
 
 		#region setup
-		// When running the tests via github actions, civ3 isn't installed so we
-		// can't load the default bic.
-		//
-		// See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-		// for a full list of env vars.
-		string is_on_github = System.Environment.GetEnvironmentVariable("CI");
-		if (is_on_github != null) {
+		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
 			return;
 		}
 
@@ -263,13 +257,7 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 	public async void UnitAvailability_JSON() {
 		// This tests a Conquests game with Conquests rules from a .json file
 		#region setup
-		// When running the tests via github actions, civ3 isn't installed so we
-		// can't load the default bic.
-		//
-		// See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-		// for a full list of env vars.
-		string is_on_github = System.Environment.GetEnvironmentVariable("CI");
-		if (is_on_github != null) {
+		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
 			return;
 		}
 
@@ -451,13 +439,9 @@ public class UnitPrototypeScenarioTest : RemoteSaveLoader {
 		// This tests a Conquests scenario with custom rules 
 
 		#region setup
-		// When running the tests via github actions, civ3 isn't installed so we
-		// can't load the default bic.
-		//
-		// See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-		// for a full list of env vars.
-		string is_on_github = System.Environment.GetEnvironmentVariable("CI");
-		if (is_on_github != null) {
+		// Civ3 isn't installed in CI, so we can't load the default BIC. Local
+		// contributors without Civ3 assets configured should skip this too.
+		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
 			return;
 		}
 		string scenarioBiqPath = Path.Combine(Civ3Location.GetCiv3Path(), "Conquests", "Conquests", "4 Middle Ages.biq");

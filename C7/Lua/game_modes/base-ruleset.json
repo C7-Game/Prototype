@@ -2556,6 +2556,9 @@
       "bombardRange": 2,
       "rateOfFire": 3,
       "movement": 2,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2848,6 +2851,9 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2917,6 +2923,9 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 4,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2986,6 +2995,9 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 5,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3059,6 +3071,9 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 4,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3493,6 +3508,9 @@
       "bombardRange": 2,
       "rateOfFire": 2,
       "movement": 5,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4885,6 +4903,9 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 5,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "England"
       ],
@@ -4970,6 +4991,9 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 5,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -6584,6 +6608,9 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 4,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "producibleBy": [
         "Portugal"
       ],
@@ -7147,6 +7174,9 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "flags": [
+        "rotateBeforeAttack"
+      ],
       "upgradeTo": "Galley",
       "producibleBy": [
         "Rome",

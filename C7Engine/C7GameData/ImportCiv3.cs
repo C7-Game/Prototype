@@ -1191,6 +1191,9 @@ namespace C7GameData {
 				prototype.bombard = prto.BombardStrength;
 				prototype.bombardRange = prto.BombardRange;
 				prototype.rateOfFire = prto.RateOfFire;
+				if (prto.TurnToAttack) {
+					prototype.flags.Add(SaveUnitPrototype.Flag.RotateBeforeAttack);
+				}
 
 				prototype.actions.UnionWith(GetUnitActions(prto));
 				prototype.terraformActions.UnionWith(GetUnitTerraforms(prto).Select(tfKey => terraformIdByCiv3Key[tfKey]));

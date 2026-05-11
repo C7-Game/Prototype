@@ -313,15 +313,26 @@ namespace C7GameData {
 			return ((unitType.movement > 1) && (opponent.unitType.movement <= 1)) ? experienceLevel.retreatChance : 0.0;
 		}
 
+		internal TileDirection GetAttackAnimationDirection(TileDirection attackDirection) {
+			return unitType.rotateBeforeAttack ? attackDirection.rotatedCounterClockwise90Degrees() : attackDirection;
+		}
+
+		internal TileDirection GetDefenseAnimationDirection(TileDirection attackDirection) {
+			return GetAttackAnimationDirection(attackDirection.reversed());
+		}
+
 		public async Task<CombatResult> fight(MapUnit defender) {
 			var attacker = this;
 
-			// Rotate defender to face its attacker. We'll restore the original facing direction at the end of the battle.
+			// Set combat animation facing. We'll restore the defender's original facing direction at the end of the battle.
+			TileDirection attackerAttackDirection = attacker.location.directionTo(defender.location);
+			TileDirection defenderDefenseDirection = attackerAttackDirection.reversed();
 			var defenderOriginalDirection = defender.facingDirection;
-			defender.facingDirection = attacker.facingDirection.reversed();
+			attacker.facingDirection = attacker.GetAttackAnimationDirection(attackerAttackDirection);
+			defender.facingDirection = defender.GetAttackAnimationDirection(defenderDefenseDirection);
 
-			IEnumerable<StrengthBonus> attackBonuses  = attacker.ListStrengthBonusesVersus(defender, CombatRole.Attack , attacker.facingDirection),
-								   defenseBonuses = defender.ListStrengthBonusesVersus(attacker, CombatRole.Defense, attacker.facingDirection);
+			IEnumerable<StrengthBonus> attackBonuses  = attacker.ListStrengthBonusesVersus(defender, CombatRole.Attack , attackerAttackDirection),
+								   defenseBonuses = defender.ListStrengthBonusesVersus(attacker, CombatRole.Defense, attackerAttackDirection);
 
 			double attackerStrength = attacker.unitType.attack  * StrengthBonus.ListToMultiplier(attackBonuses),
 			   defenderStrength = defender.unitType.defense * StrengthBonus.ListToMultiplier(defenseBonuses);
@@ -344,7 +355,7 @@ namespace C7GameData {
 			MapUnit defensiveBombarder = MapUnit.NONE;
 			double defensiveBombarderStrength = 0.0;
 			foreach (MapUnit candidate in defender.location.unitsOnTile.Where(u => u != defender && !u.owner.IsAtPeaceWith(attacker.owner) && u.defensiveBombardsRemaining > 0)) {
-				double strength = candidate.StrengthVersus(attacker, CombatRole.DefensiveBombard, attacker.facingDirection.reversed());
+				double strength = candidate.StrengthVersus(attacker, CombatRole.DefensiveBombard, defenderDefenseDirection);
 				if (strength > defensiveBombarderStrength) {
 					defensiveBombarder = candidate;
 					defensiveBombarderStrength = strength;
@@ -354,12 +365,13 @@ namespace C7GameData {
 			// https://github.com/C7-Game/Prototype/pull/250#discussion_r893051111
 			if (defensiveBombarder != MapUnit.NONE && attacker.hitPointsRemaining > 1) {
 				var dBOriginalDirection = defensiveBombarder.facingDirection;
-				defensiveBombarder.facingDirection = defender.facingDirection;
+				TileDirection defensiveBombardDirection = defenderDefenseDirection;
+				defensiveBombarder.facingDirection = defensiveBombarder.GetAttackAnimationDirection(defensiveBombardDirection);
 
 				await defensiveBombarder.animateAsync(MapUnit.AnimatedAction.ATTACK1);
 
 				// dADB = defense Against Defensive Bombard
-				double dADB = attacker.StrengthVersus(defensiveBombarder, CombatRole.DefensiveBombardDefense, defensiveBombarder.facingDirection);
+				double dADB = attacker.StrengthVersus(defensiveBombarder, CombatRole.DefensiveBombardDefense, defensiveBombardDirection);
 				if (GameData.rng.NextDouble() < defensiveBombarderStrength / (defensiveBombarderStrength + dADB))
 					attacker.hitPointsRemaining -= 1;
 
@@ -379,9 +391,9 @@ namespace C7GameData {
 						GameData.rng.NextDouble() < defender.RetreatChance(attacker, false)) {
 						// TODO: Defender retreat behavior requires some more work. There's an issue for it here:
 						// https://github.com/C7-Game/Prototype/issues/274
-						Tile retreatDestination = defender.location.neighbors[attacker.facingDirection];
+						Tile retreatDestination = defender.location.neighbors[attackerAttackDirection];
 						if ((retreatDestination != Tile.NONE) && defender.CanEnterTile(retreatDestination, TileProbe.MoveNonAggroProbe())) {
-							await defender.move(attacker.facingDirection, true);
+							await defender.move(attackerAttackDirection, true);
 							result = CombatResult.DefenderRetreated;
 							break;
 						}
@@ -843,6 +855,7 @@ namespace C7GameData {
 					}
 				}
 
+				facingDirection = dir;
 				float movementCost = TilePath.GetMovementCost(this.owner, location, dir, newLoc);
 				if (!location.unitsOnTile.Remove(this))
 					throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
