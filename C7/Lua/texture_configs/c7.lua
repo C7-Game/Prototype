@@ -103,6 +103,7 @@ local c7_texture_list = {
   "Art/Units/units_32.png",
   "Art/city screen/buildings-small.png",
   "Art/city screen/buildings-large.png",
+  "Art/Cursor.png"
 }
 
 -- Build lookup table from c7_texture_list without extensions
