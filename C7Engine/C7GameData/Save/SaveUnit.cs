@@ -19,6 +19,7 @@ namespace C7GameData.Save {
 		public string experience;
 		public float WorkerProgressTowardsJob;
 		public ID WorkerJob;
+		public ID loadedOnUnitId;
 
 		// True for multiple types of automation, including worker automation
 		// and automated exploring.
@@ -58,6 +59,7 @@ namespace C7GameData.Save {
 				experienceLevel = experienceLevels.Find(el => el.key == experience),
 				owner = players.Find(player => player.id == owner),
 				location = map.tileAt(currentLocation.X, currentLocation.Y),
+				loadedOnUnitId = loadedOnUnitId,
 				previousLocation = currentLocation.X == - 1 ? Tile.NONE : map.tileAt(previousLocation.X, previousLocation.Y),
 				hitPointsRemaining = hitPointsRemaining,
 				movementPoints = new MovementPoints(),

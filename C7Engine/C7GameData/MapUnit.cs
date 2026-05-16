@@ -51,6 +51,8 @@ namespace C7GameData {
 
 		public float WorkerProgressTowardsJob { get; set; }
 		public Terraform WorkerJob { get; set; }
+		
+		public ID loadedOnUnitId { get; set; }
 
 		public UnitAI currentAI;
 
@@ -85,6 +87,15 @@ namespace C7GameData {
 
 		public bool IsCaptive() {
 			return !string.Equals(this.nationality.name, this.owner.civilization.name, StringComparison.CurrentCultureIgnoreCase);
+		}
+		
+		public bool CanTransport() {
+			return this.unitType.capacity > 0;
+		}
+		
+		public bool IsLoadedIn(MapUnit transport)
+		{
+			return transport.id == this.loadedOnUnitId;
 		}
 
 		public override string ToString() {

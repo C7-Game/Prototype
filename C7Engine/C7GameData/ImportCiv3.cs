@@ -883,7 +883,11 @@ namespace C7GameData {
 			};
 		}
 
-		private void ImportSavUnits() {
+		private void ImportSavUnits()
+		{
+			var shadowIdMap = new Dictionary<int, ID>();
+			var loadMap = new Dictionary<ID, int>();
+			
 			foreach (QueryCiv3.Sav.UNIT unit in savData.Unit) {
 				if (unit.OwnerID < 0 || unit.OwnerID >= save.Players.Count) {
 					continue;
@@ -910,7 +914,17 @@ namespace C7GameData {
 					saveUnit.action = "fortified";
 				}
 
+				shadowIdMap[unit.ID] = saveUnit.id;
+				if (unit.LoadedOnUnitId > 0)
+					loadMap[saveUnit.id] = unit.LoadedOnUnitId;
+				
 				save.Units.Add(saveUnit);
+			}
+
+			foreach (var saveUnit in save.Units)
+			{
+				if (loadMap.TryGetValue(saveUnit.id, out var loadedOnUnitId))
+					saveUnit.loadedOnUnitId = shadowIdMap[loadedOnUnitId];
 			}
 		}
 
@@ -1186,6 +1200,7 @@ namespace C7GameData {
 				prototype.attack = prto.Attack;
 				prototype.defense = prto.Defense;
 				prototype.movement = prto.Movement;
+				prototype.capacity = prto.Capacity;
 				prototype.shieldCost = prto.ShieldCost;
 				prototype.populationCost = prto.PopulationCost;
 				prototype.bombard = prto.BombardStrength;

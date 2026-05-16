@@ -420,6 +420,13 @@ textures.lower_left_infobox = {
     },
 }
 
+textures.transport_infobox = {
+    box = {
+      path = INTERFACE .. "box trans color.pcx",
+      alpha = INTERFACE .. "box trans alpha.pcx",
+    },
+}
+
 textures.tileinfo = {
       box = {
         path = TILEINFO

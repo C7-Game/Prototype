@@ -62,6 +62,7 @@ namespace C7GameData {
 		public int bombardRange { get; set; }
 		public int rateOfFire { get; set; }
 		public int movement { get; set; }
+		public int capacity { get; set; }
 		public HashSet<Civilization> producibleBy { get; set; } = [];
 		public UnitPrototype upgradeTo;
 		public bool unproducible;
@@ -91,10 +92,16 @@ namespace C7GameData {
 
 		public UnitPrototype() { }
 
-		public UnitPrototype(SaveUnitPrototype proto, IEnumerable<Terraform> terraforms) {
-			(name, art, shieldCost, populationCost, attack, defense, bombard, bombardRange, rateOfFire, movement, unproducible) =
-			(proto.name, proto.art, proto.shieldCost, proto.populationCost,
-			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire, proto.movement, proto.unproducible);
+		public UnitPrototype(SaveUnitPrototype proto, IEnumerable<Terraform> terraforms)
+		{
+			(name, art, shieldCost, populationCost)
+				= (proto.name, proto.art, proto.shieldCost, proto.populationCost);
+
+			(attack, defense, bombard, bombardRange, rateOfFire)
+				= (proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire);
+				
+			(movement, capacity, unproducible) =
+				(proto.movement, proto.capacity, proto.unproducible);
 
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;

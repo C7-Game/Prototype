@@ -1,4 +1,3 @@
-using C7.Textures;
 using Godot;
 using C7GameData;
 using Serilog;
@@ -8,6 +7,8 @@ using C7Engine;
 [Tool]
 public partial class LowerRightInfoBox : Civ3TextureRect {
 	private ILogger log = LogManager.ForContext<LowerRightInfoBox>();
+
+	public Game game { get; set; }
 
 	private const int fontSize = 12;
 	private const float offsetUnitThumbnailX = 14;
@@ -276,26 +277,17 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 			return;
 		}
 
-		string key = AnimationManager.GetUnitDefaultThumbnailKey(unit);
-		ImageTexture baseFrame = AnimationManager.AnimationThumbnails[key];
-		ImageTexture tintFrame = AnimationManager.AnimationTintThumbnails[key];
-
-		ShaderMaterial material = PlayerTextureUtil.GetShaderMaterialForUnit(unit.owner.GetPlayerColor());
-
-		// Add the base sprite.
-		unitPlaceholder = new Sprite2D();
-		unitPlaceholder.Texture = baseFrame;
-		unitPlaceholder.Position = new Vector2(
+		(unitPlaceholder, unitTintPlaceholder) = StatusUtils.GetUnitSprites(game, unit);
+		
+		var unitSpritePosition = new Vector2(
 			boxRightRectangle.Texture.GetWidth() / 2f - offsetUnitThumbnailX,
 			boxRightRectangle.Texture.GetHeight() / 2f - offsetUnitThumbnailY);
-		this.AddChild(unitPlaceholder);
-
-		// Add the tint sprite, hooking up the shader.
-		unitTintPlaceholder = new Sprite2D();
-		unitTintPlaceholder.Texture = tintFrame;
-		unitTintPlaceholder.Material = material;
-		unitTintPlaceholder.Position = unitPlaceholder.Position;
-		this.AddChild(unitTintPlaceholder);
+		
+		unitPlaceholder.Position = unitSpritePosition; 
+		AddChild(unitPlaceholder);
+		
+		unitTintPlaceholder.Position = unitSpritePosition;
+		AddChild(unitTintPlaceholder);
 	}
 
 	private void HandleBoxClick() {
