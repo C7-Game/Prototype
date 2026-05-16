@@ -92,14 +92,13 @@ namespace C7GameData {
 
 		public UnitPrototype() { }
 
-		public UnitPrototype(SaveUnitPrototype proto, IEnumerable<Terraform> terraforms)
-		{
+		public UnitPrototype(SaveUnitPrototype proto, IEnumerable<Terraform> terraforms) {
 			(name, art, shieldCost, populationCost)
 				= (proto.name, proto.art, proto.shieldCost, proto.populationCost);
 
 			(attack, defense, bombard, bombardRange, rateOfFire)
 				= (proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire);
-				
+
 			(movement, capacity, unproducible) =
 				(proto.movement, proto.capacity, proto.unproducible);
 

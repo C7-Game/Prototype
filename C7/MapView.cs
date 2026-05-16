@@ -661,7 +661,7 @@ public partial class MapView : Node2D {
 		lowerRightInfoBox.CenterCameraOnActiveUnit += OnCenterCameraOnUnit;
 
 		var canvasControl = GetNode<Control>("/root/C7Game/CanvasLayer/Control");
-		
+
 		miniMap = new MiniMap(this);
 		canvasControl.AddChild(miniMap);
 

@@ -278,14 +278,14 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		}
 
 		(unitPlaceholder, unitTintPlaceholder) = StatusUtils.GetUnitSprites(game, unit);
-		
+
 		var unitSpritePosition = new Vector2(
 			boxRightRectangle.Texture.GetWidth() / 2f - offsetUnitThumbnailX,
 			boxRightRectangle.Texture.GetHeight() / 2f - offsetUnitThumbnailY);
-		
-		unitPlaceholder.Position = unitSpritePosition; 
+
+		unitPlaceholder.Position = unitSpritePosition;
 		AddChild(unitPlaceholder);
-		
+
 		unitTintPlaceholder.Position = unitSpritePosition;
 		AddChild(unitTintPlaceholder);
 	}

@@ -51,7 +51,7 @@ namespace C7GameData {
 
 		public float WorkerProgressTowardsJob { get; set; }
 		public Terraform WorkerJob { get; set; }
-		
+
 		public ID loadedOnUnitId { get; set; }
 
 		public UnitAI currentAI;
@@ -88,13 +88,16 @@ namespace C7GameData {
 		public bool IsCaptive() {
 			return !string.Equals(this.nationality.name, this.owner.civilization.name, StringComparison.CurrentCultureIgnoreCase);
 		}
-		
+
 		public bool CanTransport() {
 			return this.unitType.capacity > 0;
 		}
-		
-		public bool IsLoadedIn(MapUnit transport)
-		{
+
+		public bool IsLoaded() {
+			return this.loadedOnUnitId != null;
+		}
+
+		public bool IsLoadedIn(MapUnit transport) {
 			return transport.id == this.loadedOnUnitId;
 		}
 
@@ -868,8 +871,25 @@ namespace C7GameData {
 
 				facingDirection = dir;
 				float movementCost = TilePath.GetMovementCost(this.owner, location, dir, newLoc);
+
+				// Leave old tile 
 				if (!location.unitsOnTile.Remove(this))
 					throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
+
+				if (CanTransport()) {
+					// Move transported units
+					var transported = location.unitsOnTile
+						.Where(u => u.IsLoadedIn(this)).ToList();
+
+					foreach (var tu in transported) {
+						if (!location.unitsOnTile.Remove(tu))
+							throw new System.Exception("Failed to remove unit from tile during transport move");
+						newLoc.unitsOnTile.Add(tu);
+						tu.location = newLoc;
+					}
+				}
+
+				// Enter new tile
 				// Make sure the unit is on the new location before claiming we have entered the tile
 				newLoc.unitsOnTile.Add(this);
 				location = newLoc;
