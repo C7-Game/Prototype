@@ -1144,6 +1144,8 @@ namespace C7GameData {
 			if (prto.GoTo) yield return UnitAction.Goto;
 			if (prto.Explore) yield return UnitAction.Explore;
 			if (prto.Automate) yield return UnitAction.Automate;
+			if (prto.Load) yield return UnitAction.Load;
+			if (prto.Unload) yield return UnitAction.Unload;
 		}
 
 		private static IEnumerable<TerraformKey> GetUnitTerraforms(PRTO prto) {

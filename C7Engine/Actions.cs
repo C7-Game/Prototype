@@ -45,11 +45,15 @@ public static class C7Action {
 	public const string UnitSentry = "unit_sentry";
 	public const string UnitSentryEnemyOnly = "unit_sentry_enemy_only";
 	public const string UnitWait = "unit_wait";
+	public const string UnitLoad = "unit_load";
+	public const string UnitUnload = "unit_unload";
 
 	private static readonly Dictionary<string, UnitAction> toUnitAction = new() {
 		[UnitBuildCity] = UnitAction.BuildCity,
 		[UnitBombard] = UnitAction.Bombard,
 		[UnitHold] = UnitAction.Hold,
+		[UnitLoad] = UnitAction.Load,
+		[UnitUnload] = UnitAction.Unload,
 		[UnitWait] = UnitAction.Wait,
 		[UnitFortify] = UnitAction.Fortify,
 		[UnitDisband] = UnitAction.Disband,
@@ -83,6 +87,8 @@ public static class C7Action {
 		[UnitSentry] = "Sentry",
 		[UnitSentryEnemyOnly] = "Sentry Enemy Only",
 		[UnitWait] = "Wait",
+		[UnitLoad] = "Load",
+		[UnitUnload] = "Unload"
 	};
 
 	public static UnitAction? ToUnitAction(string action) {

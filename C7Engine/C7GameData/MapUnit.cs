@@ -957,23 +957,8 @@ namespace C7GameData {
 					}
 				}
 
-				// Board transport, as needed
-				if (CanBoardTransportOnTile(newLoc)) {
-					var t = SelectTransportToBoard(newLoc);
-					if (t == null)
-						throw new System.Exception("Failed to find a transport to move to");
-					t.board(this);
-					isFortified = true;
-				}
-
-				// Unboard transport, as needed
-				if (CanUnboardTransportToTile(newLoc)) {
-					var t = FindTransportToUnboard(this.location, this.loadedOnUnitId);
-					if (t == null)
-						throw new System.Exception("Failed to find the transport to unboard from");
-					t.unboard(this);
-					wake();
-				}
+				TryBoardingTransportOnTile(newLoc);
+				TryUnboardingTransportToTile(newLoc);
 
 				// Enter new tile
 				// Make sure the unit is on the new location before claiming we have entered the tile
@@ -991,6 +976,39 @@ namespace C7GameData {
 			return true;
 		}
 
+		public void TryBoardingTransportOnTile(Tile newLoc) {
+			if (!CanBoardTransportOnTile(newLoc))
+				return;
+
+			var t = SelectTransportToBoard(newLoc);
+			BoardTransport(t);
+		}
+
+		public void BoardTransport(MapUnit t) {
+			if (t == null)
+				throw new System.Exception("Failed to find a transport to move to");
+			t.board(this);
+			isFortified = true;
+			if (this.owner.isHuman)
+				new MsgUnitMoved(this).send();
+		}
+
+		public void TryUnboardingTransportToTile(Tile newLoc) {
+			if (!CanUnboardTransportToTile(newLoc))
+				return;
+
+			var t = FindTransportToUnboard(this.location, this.loadedOnUnitId);
+			UnboardTransport(t);
+		}
+
+		public void UnboardTransport(MapUnit t) {
+			if (t == null)
+				throw new System.Exception("Failed to find the transport to unboard from");
+			t.unboard(this);
+			wake();
+			if (this.owner.isHuman)
+				new MsgUnitMoved(this).send();
+		}
 
 		/// <summary>
 		/// Boards unit into this transport
@@ -1235,6 +1253,13 @@ namespace C7GameData {
 			}
 			if (canAutomate()) {
 				result.Add(UnitAction.Automate);
+			}
+
+			if (CanBoardTransportOnTile(this.location) && this.loadedOnUnitId == null) {
+				result.Add(UnitAction.Load);
+			}
+			if (CanUnboardTransportToTile(this.location) && this.location.HasCity) {
+				result.Add(UnitAction.Unload);
 			}
 
 			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.

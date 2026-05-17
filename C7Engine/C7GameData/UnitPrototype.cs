@@ -15,7 +15,9 @@ namespace C7GameData {
 		Disband,
 		Goto,
 		Explore,
-		Automate
+		Automate,
+		Load,
+		Unload
 	}
 
 	public struct ItemContext(UnitPrototype proto, Player player) {

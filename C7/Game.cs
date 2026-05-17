@@ -959,6 +959,17 @@ public partial class Game : Node {
 			}
 		}
 
+
+		if (currentAction == C7Action.UnitLoad) {
+			// TODO: Which transport?
+			if (CurrentlySelectedUnit != MapUnit.NONE && CurrentlySelectedUnit != null)
+				new MsgLoadToTransport(CurrentlySelectedUnit.id).send();
+		}
+		if (currentAction == C7Action.UnitUnload) {
+			if (CurrentlySelectedUnit != MapUnit.NONE && CurrentlySelectedUnit != null)
+				new MsgUnloadFromTransport(CurrentlySelectedUnit.id).send();
+		}
+
 		Terraform terraform = C7Action.ToTerraform(currentAction);
 
 		if (CurrentlySelectedUnit == MapUnit.NONE || CurrentlySelectedUnit == null
