@@ -963,6 +963,7 @@ namespace C7GameData {
 					if (t == null)
 						throw new System.Exception("Failed to find a transport to move to");
 					t.board(this);
+					isFortified = true;
 				}
 
 				// Unboard transport, as needed
@@ -971,6 +972,7 @@ namespace C7GameData {
 					if (t == null)
 						throw new System.Exception("Failed to find the transport to unboard from");
 					t.unboard(this);
+					wake();
 				}
 
 				// Enter new tile
