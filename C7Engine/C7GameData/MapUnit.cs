@@ -754,8 +754,15 @@ namespace C7GameData {
 				}
 				return false;
 			}
+
 			// TODO: to be modified to allow boarding on ships,
 			// that have the capacity and can take units of this kind
+			if (CanBoardTransportOnTile(tile))
+				return true;
+
+			if (CanUnboardTransportToTile(tile))
+				return true;
+
 			if (this.IsLandUnit() && !tile.IsLand())
 				return false;
 
@@ -809,6 +816,67 @@ namespace C7GameData {
 
 			return true;
 		}
+
+		private bool CanBoardTransportOnTile(Tile tile) {
+			var availableTransports = tile.unitsOnTile.Where(u => u.CanTransport());
+			foreach (var transport in availableTransports) {
+				if (transport.CanLoad(this))
+					return true;
+			}
+
+			return false;
+		}
+
+		private MapUnit SelectTransportToBoard(Tile tile) {
+			// TODO: Let human player choose via UI which transport to load unit in
+
+			var availableTransports = tile.unitsOnTile
+				.Where(u => u.CanTransport())
+				.Where(u => !u.IsFull());
+
+			// Sort candidates by free capacity, but prefer transports that already have units
+			availableTransports = availableTransports
+				.OrderBy(t => !t.IsEmpty())
+				.ThenByDescending(t => t.FreeCapacity());
+
+			foreach (var transport in availableTransports) {
+				if (transport.CanLoad(this))
+					return transport;
+			}
+
+			return null;
+		}
+
+		private MapUnit FindTransportToUnboard(Tile tile, ID transport) {
+			return tile.unitsOnTile.FirstOrDefault(t => t.id == transport);
+		}
+
+		private bool CanLoad(MapUnit mapUnit) {
+			if (owner != mapUnit.owner)
+				return false;
+
+			var hasRoom = !IsFull();
+
+			// TODO: type restrictions: only subs can carry nukes, etc.
+			var suitableUnit = mapUnit.IsLandUnit();  // only land units in transports for now
+			return hasRoom && suitableUnit;
+		}
+
+		private bool CanUnboardTransportToTile(Tile tile) {
+			var isLoaded = this.loadedOnUnitId != null;
+			var isValidLanding = tile.IsLand() && this.IsLandUnit(); // TODO: other cases
+																	 // TODO: transport chaining?
+
+			return isLoaded && isValidLanding;
+		}
+
+		private int FreeCapacity() {
+			var loaded = this.location.unitsOnTile.Where(u => u.IsLoadedIn(this)).ToList();
+			return this.unitType.capacity - loaded.Count;
+		}
+
+		private bool IsEmpty() => unitType.capacity > 0 && FreeCapacity() == unitType.capacity;
+		private bool IsFull() => unitType.capacity > 0 && FreeCapacity() == 0;
 
 		private static bool HasHostileUnits(Tile tile, Player player) {
 			foreach (MapUnit other in tile.unitsOnTile) {
@@ -872,12 +940,12 @@ namespace C7GameData {
 				facingDirection = dir;
 				float movementCost = TilePath.GetMovementCost(this.owner, location, dir, newLoc);
 
-				// Leave old tile 
+				// Leave old tile
 				if (!location.unitsOnTile.Remove(this))
 					throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
 
+				// Move transported units, too
 				if (CanTransport()) {
-					// Move transported units
 					var transported = location.unitsOnTile
 						.Where(u => u.IsLoadedIn(this)).ToList();
 
@@ -887,6 +955,22 @@ namespace C7GameData {
 						newLoc.unitsOnTile.Add(tu);
 						tu.location = newLoc;
 					}
+				}
+
+				// Board transport, as needed
+				if (CanBoardTransportOnTile(newLoc)) {
+					var t = SelectTransportToBoard(newLoc);
+					if (t == null)
+						throw new System.Exception("Failed to find a transport to move to");
+					t.board(this);
+				}
+
+				// Unboard transport, as needed
+				if (CanUnboardTransportToTile(newLoc)) {
+					var t = FindTransportToUnboard(this.location, this.loadedOnUnitId);
+					if (t == null)
+						throw new System.Exception("Failed to find the transport to unboard from");
+					t.unboard(this);
 				}
 
 				// Enter new tile
@@ -903,6 +987,25 @@ namespace C7GameData {
 				movementPoints.onUnitMove(movementCost);
 			}
 			return true;
+		}
+
+
+		/// <summary>
+		/// Boards unit into this transport
+		/// </summary>
+		/// <param name="mapUnit">The unit to load on a transport</param>
+		private void board(MapUnit mapUnit) {
+			mapUnit.loadedOnUnitId = this.id;
+			// TODO: consume moves?
+		}
+
+		/// <summary>
+		/// Unloads a unit from this transport
+		/// </summary>
+		/// <param name="mapUnit">The unit to unload from a transport</param>
+		private void unboard(MapUnit mapUnit) {
+			mapUnit.loadedOnUnitId = null;
+			// TODO: consume moves?
 		}
 
 		private float SumWorkerProgress(Tile tile, Terraform workerJob) {
