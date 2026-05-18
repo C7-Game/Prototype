@@ -920,6 +920,10 @@ namespace C7GameData {
 				save.Units.Add(saveUnit);
 			}
 
+			// Civ3 saves have their own ID scheme.
+			// Here we translate one "loaded on" reference to another using information
+			// gathered above. Note that we can't be sure to be able to resolve identifiers
+			// until we have scanned all units. Hence a second pass for these mappings.
 			foreach (var saveUnit in save.Units) {
 				if (loadMap.TryGetValue(saveUnit.id, out var loadedOnUnitId))
 					saveUnit.loadedOnUnitId = shadowIdMap[loadedOnUnitId];

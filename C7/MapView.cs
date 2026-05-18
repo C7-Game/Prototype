@@ -667,7 +667,6 @@ public partial class MapView : Node2D {
 
 		transportInfoBox = new TransportInfoBox(game);
 		canvasControl.AddChild(transportInfoBox);
-		// TODO: transportInfoBox.Hide();
 	}
 
 	public override void _ExitTree() {

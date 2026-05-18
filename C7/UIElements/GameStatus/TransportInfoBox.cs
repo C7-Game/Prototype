@@ -14,17 +14,12 @@ public partial class TransportInfoBox : Civ3TextureRect {
 
 	private readonly Game _game;
 
-	private Vector2 transportUnitsAnchor = new Vector2(70f, 45f);
+	private Vector2 transportUnitsAnchor = new(70f, 45f);
 
 	private TextureRect boxTransportRect = new();
-	private TextureButton boxTransportRectButton = new();
-
-	private Label unitRank = new();
-	private Label unitType = new();
-
+	
 	private Dictionary<ID, Tuple<Sprite2D, Sprite2D>> unitSpritesCache = new();
-
-	private float extraXOffset = 7;
+	
 	private Vector2I frameOffset = new (-20, -175);
 
 	public TransportInfoBox(Game game) {
@@ -38,13 +33,6 @@ public partial class TransportInfoBox : Civ3TextureRect {
 		boxTransportRect.Texture = boxTransport;
 		boxTransportRect.SetPosition(new Vector2(0, 0));
 		AddChild(boxTransportRect);
-
-		// // An "invisible" button covering the inside area of the box so we can register the click
-		// // and center the camera on the unit or end the turn
-		// boxTransportRectButton.SetSize(new Vector2(228, 108));
-		// boxTransportRectButton.SetPosition(new Vector2(40, 17));
-		// AddChild(boxTransportRectButton);
-		// boxTransportRectButton.Pressed += HandleBoxClick;
 	}
 
 	public override void _Process(double delta) {
@@ -116,13 +104,12 @@ public partial class TransportInfoBox : Civ3TextureRect {
 			unitTintSprite.Position = unitSpritePosition;
 			AddChild(unitTintSprite);
 
-			// unitSprite.Pressed += HandleBoxClick; // TODO: this won't work
+			// unitSprite.Pressed += HandleBoxClick; // TODO: this won't work, need click targets
 		}
 	}
-
-
-
+	
 	private void HandleBoxClick() {
+		// TODO: Select unit based on click inside TransportInfoBox
 		// EmitSignal(SignalName.CenterCameraOnActiveUnit);
 	}
 }
