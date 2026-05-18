@@ -985,8 +985,11 @@ namespace C7GameData {
 		}
 
 		public void BoardTransport(MapUnit t) {
-			if (t == null)
-				throw new System.Exception("Failed to find a transport to move to");
+			if (t == null) {
+				// TODO: throw new System.Exception("Failed to find a transport to move to");
+				Log.Warning("Failed to find a transport to board");
+				return;
+			}
 			t.board(this);
 			isFortified = true;
 			if (this.owner.isHuman)
@@ -1002,8 +1005,11 @@ namespace C7GameData {
 		}
 
 		public void UnboardTransport(MapUnit t) {
-			if (t == null)
-				throw new System.Exception("Failed to find the transport to unboard from");
+			if (t == null) {
+				// TODO: throw new System.Exception("Failed to find the transport to unboard from");
+				Log.Warning("Failed to find a transport to unboard");
+				return;
+			}
 			t.unboard(this);
 			wake();
 			if (this.owner.isHuman)
