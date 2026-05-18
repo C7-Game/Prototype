@@ -977,7 +977,8 @@ namespace C7GameData {
 		}
 
 		public void TryBoardingTransportOnTile(Tile newLoc) {
-			if (!CanBoardTransportOnTile(newLoc))
+			var enteringCity = newLoc.HasCity && newLoc != location;
+			if (enteringCity || !CanBoardTransportOnTile(newLoc))
 				return;
 
 			var t = SelectTransportToBoard(newLoc);

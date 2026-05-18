@@ -17,9 +17,9 @@ public partial class TransportInfoBox : Civ3TextureRect {
 	private Vector2 transportUnitsAnchor = new(70f, 45f);
 
 	private TextureRect boxTransportRect = new();
-	
+
 	private Dictionary<ID, Tuple<Sprite2D, Sprite2D>> unitSpritesCache = new();
-	
+
 	private Vector2I frameOffset = new (-20, -175);
 
 	public TransportInfoBox(Game game) {
@@ -107,7 +107,7 @@ public partial class TransportInfoBox : Civ3TextureRect {
 			// unitSprite.Pressed += HandleBoxClick; // TODO: this won't work, need click targets
 		}
 	}
-	
+
 	private void HandleBoxClick() {
 		// TODO: Select unit based on click inside TransportInfoBox
 		// EmitSignal(SignalName.CenterCameraOnActiveUnit);
