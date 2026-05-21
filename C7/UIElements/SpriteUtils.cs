@@ -2,7 +2,7 @@ using C7.Textures;
 using C7GameData;
 using Godot;
 
-public static class StatusUtils {
+public static class SpriteUtils {
 	public static (Sprite2D unitSprite, Sprite2D unitTintSprite) GetUnitSprites(Game game, MapUnit unit) {
 		var am = game.animationController.civ3AnimData;
 

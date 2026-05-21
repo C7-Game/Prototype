@@ -37,6 +37,7 @@ namespace C7GameData.Save {
 				previousLocation = new TileLocation(unit.previousLocation);
 			}
 			currentLocation = new TileLocation(unit.location);
+			loadedOnUnitId = unit.loadedOnUnitId;
 			if (unit.path?.PathLength() > 0) {
 				path = unit.path.path.ToList().ConvertAll(tile => new TileLocation(tile));
 			}

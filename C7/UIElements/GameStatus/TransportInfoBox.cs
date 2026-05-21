@@ -14,16 +14,22 @@ public partial class TransportInfoBox : Civ3TextureRect {
 
 	private readonly Game _game;
 
+	private Vector2I frameOffset = new (-27, -180);
 	private Vector2 transportUnitsAnchor = new(70f, 45f);
+	private Vector2 miniatureScale = new(0.7f, 0.7f);
+	private Vector2 unitButtonSize = new(50, 50);
+	// Note: the draw area for the box is a bit more than 200x100
 
 	private TextureRect boxTransportRect = new();
 
-	private Dictionary<ID, Tuple<Sprite2D, Sprite2D>> unitSpritesCache = new();
+	private Dictionary<ID, bool> unitTracker = new();
 
-	private Vector2I frameOffset = new (-20, -175);
+
 
 	public TransportInfoBox(Game game) {
 		_game = game;
+
+		MouseFilter = MouseFilterEnum.Stop;
 	}
 
 	public override void _Ready() {
@@ -49,6 +55,9 @@ public partial class TransportInfoBox : Civ3TextureRect {
 				return;
 			}
 
+			if (!unitTracker.TryGetValue(unit.id, out _))
+				ClearUnitSprites();
+
 			Visible = true;
 			var loadedUnits = gD.mapUnits.Where(u => u.IsLoadedIn(unit));
 			var transportUnits = new List<MapUnit>([unit]).Concat(loadedUnits).ToList();
@@ -67,8 +76,8 @@ public partial class TransportInfoBox : Civ3TextureRect {
 	}
 
 	private void ClearUnitSprites() {
-		unitSpritesCache.Clear();
-		foreach (var c in GetChildren().Where(c => c is Sprite2D))
+		unitTracker.Clear();
+		foreach (var c in GetChildren().Where(c => c is TextureButton))
 			c.QueueFree();
 	}
 
@@ -82,33 +91,69 @@ public partial class TransportInfoBox : Civ3TextureRect {
 			return;
 
 		foreach (var (unit, idx) in units.Select((x, i) => (x, i))) {
-			if (unitSpritesCache.TryGetValue(unit.id, out var sprites)) {
+			if (unitTracker.TryGetValue(unit.id, out _)) {
 				continue;
 			}
 
-			(var unitSprite, var unitTintSprite) = StatusUtils.GetUnitSprites(_game, unit);
-			unitSpritesCache[unit.id] = new Tuple<Sprite2D, Sprite2D>(unitSprite, unitTintSprite);
+			// Get sprites
+			var (unitSprite, unitTintSprite) = SpriteUtils.GetUnitSprites(_game, unit);
+			unitTracker[unit.id] = true;
 
-			var unitSpritePosition = transportUnitsAnchor;
-			var unitSpriteDrawWidth = boxTransportRect.Texture.GetWidth() - transportUnitsAnchor.X;
+			// Resize sprites
+			unitSprite.SetScale(miniatureScale);
+			unitTintSprite.SetScale(miniatureScale);
 
-			unitSpritePosition.X += idx * unitSprite.Texture.GetWidth();
+			// Create button
+			TextureButton unitButton = new();
+			unitButton.SetSize(unitButtonSize);
+			unitButton.Pressed += () => HandleBoxClick(unit);
+			AddChild(unitButton);
 
-			while (unitSpritePosition.X > unitSpriteDrawWidth) {
-				unitSpritePosition.X -= unitSpriteDrawWidth;
-				unitSpritePosition.Y += unitSprite.Texture.GetHeight();
+			// Position button
+			var pos = CalculateUnitButtonPosition(idx);
+			unitButton.SetPosition(pos);
+
+			// Add sprites
+			unitButton.AddChild(unitSprite);
+			unitButton.AddChild(unitTintSprite);
+
+			// Draw a box around the transport unit
+			if (idx == 0) {
+				var line = new Line2D();
+
+				line.Width = 3f;
+				line.DefaultColor = TextureLoader.LoadColor(unit.owner.GetPlayerColor());
+				line.Position = unitButtonSize / -2f;
+
+				// draw lines at normal scale, let parent scale things down 
+				line.AddPoint(new Vector2(0, 0));
+				line.AddPoint(new Vector2(unitButtonSize.X, 0));
+				line.AddPoint(new Vector2(unitButtonSize.X, unitButtonSize.Y));
+				line.AddPoint(new Vector2(0, unitButtonSize.Y));
+				line.AddPoint(new Vector2(0, 0));
+
+				// parent to button
+				unitButton.AddChild(line);
 			}
-
-			unitSprite.Position = unitSpritePosition;
-			AddChild(unitSprite);
-			unitTintSprite.Position = unitSpritePosition;
-			AddChild(unitTintSprite);
-
-			// unitSprite.Pressed += HandleBoxClick; // TODO: this won't work, need click targets
 		}
 	}
 
-	private void HandleBoxClick() {
+	private Vector2 CalculateUnitButtonPosition(int idx) {
+		// TODO: common baseline
+
+		var drawAreaWidth = boxTransportRect.Texture.GetWidth() - transportUnitsAnchor.X;
+		var columns = (int) Math.Floor(drawAreaWidth / unitButtonSize.X);
+
+		var unitSpritePosition = transportUnitsAnchor;
+
+		unitSpritePosition.X += (idx % columns) * unitButtonSize.X;
+		unitSpritePosition.Y += ((int)Math.Floor(idx / (1f * columns))) * unitButtonSize.Y;
+
+		return unitSpritePosition;
+	}
+
+	private void HandleBoxClick(MapUnit unit) {
+		Log.Information("Unit Box click: {MapUnit}", unit);
 		// TODO: Select unit based on click inside TransportInfoBox
 		// EmitSignal(SignalName.CenterCameraOnActiveUnit);
 	}
