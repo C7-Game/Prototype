@@ -24,8 +24,6 @@ public partial class TransportInfoBox : Civ3TextureRect {
 
 	private Dictionary<ID, bool> unitTracker = new();
 
-
-
 	public TransportInfoBox(Game game) {
 		_game = game;
 
@@ -77,7 +75,7 @@ public partial class TransportInfoBox : Civ3TextureRect {
 
 	private void ClearUnitSprites() {
 		unitTracker.Clear();
-		foreach (var c in GetChildren().Where(c => c is TextureButton))
+		foreach (var c in GetChildren().Where(c => c is Button))
 			c.QueueFree();
 	}
 
@@ -99,14 +97,14 @@ public partial class TransportInfoBox : Civ3TextureRect {
 			var (unitSprite, unitTintSprite) = SpriteUtils.GetUnitSprites(_game, unit);
 			unitTracker[unit.id] = true;
 
-			// Resize sprites
+			// Resize sprites (tint is a child of the main sprite and is scaled with parent)
 			unitSprite.SetScale(miniatureScale);
-			unitTintSprite.SetScale(miniatureScale);
 
 			// Create button
-			TextureButton unitButton = new();
+			Button unitButton = new();
 			unitButton.SetSize(unitButtonSize);
-			unitButton.Pressed += () => HandleBoxClick(unit);
+			unitButton.ActionMode = BaseButton.ActionModeEnum.Press;
+			unitButton.Pressed += () => HandleUnitClick(unit);
 			AddChild(unitButton);
 
 			// Position button
@@ -115,7 +113,10 @@ public partial class TransportInfoBox : Civ3TextureRect {
 
 			// Add sprites
 			unitButton.AddChild(unitSprite);
-			unitButton.AddChild(unitTintSprite);
+			unitSprite.AddChild(unitTintSprite);
+
+			// Draw sprites centered on the button
+			unitSprite.Position += unitButtonSize / 2;
 
 			// Draw a box around the transport unit
 			if (idx == 0) {
@@ -123,7 +124,6 @@ public partial class TransportInfoBox : Civ3TextureRect {
 
 				line.Width = 3f;
 				line.DefaultColor = TextureLoader.LoadColor(unit.owner.GetPlayerColor());
-				line.Position = unitButtonSize / -2f;
 
 				// draw lines at normal scale, let parent scale things down 
 				line.AddPoint(new Vector2(0, 0));
@@ -139,22 +139,22 @@ public partial class TransportInfoBox : Civ3TextureRect {
 	}
 
 	private Vector2 CalculateUnitButtonPosition(int idx) {
-		// TODO: common baseline
-
 		var drawAreaWidth = boxTransportRect.Texture.GetWidth() - transportUnitsAnchor.X;
 		var columns = (int) Math.Floor(drawAreaWidth / unitButtonSize.X);
 
 		var unitSpritePosition = transportUnitsAnchor;
 
+		// offset based on index
 		unitSpritePosition.X += (idx % columns) * unitButtonSize.X;
 		unitSpritePosition.Y += ((int)Math.Floor(idx / (1f * columns))) * unitButtonSize.Y;
+
+		// from centered to draw corner
+		unitSpritePosition -= unitButtonSize / 2;
 
 		return unitSpritePosition;
 	}
 
-	private void HandleBoxClick(MapUnit unit) {
-		Log.Information("Unit Box click: {MapUnit}", unit);
-		// TODO: Select unit based on click inside TransportInfoBox
-		// EmitSignal(SignalName.CenterCameraOnActiveUnit);
+	private void HandleUnitClick(MapUnit unit) {
+		_game.SelectUnit(unit);
 	}
 }

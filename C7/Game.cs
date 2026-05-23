@@ -559,7 +559,7 @@ public partial class Game : Node {
 			}
 		} else {
 			// Select unit on tile at mouse location
-			HandleUnitSelection(eventMouseButton);
+			HandleUnitSelectionTileClick(eventMouseButton);
 		}
 	}
 
@@ -572,22 +572,34 @@ public partial class Game : Node {
 		}
 	}
 
-	private void HandleUnitSelection(InputEventMouseButton eventMouseButton) {
+	private void HandleUnitSelectionTileClick(InputEventMouseButton eventMouseButton) {
+
 		Tile tile = PositionToTile(eventMouseButton.Position);
 		if (tile == null) {
 			return;
 		}
 
 		// TODO: This should really be the top unit.
-		MapUnit to_select = tile.unitsOnTile.FirstOrDefault();
-		if (to_select == null || to_select.owner != controller) {
+		MapUnit unit = tile.unitsOnTile.FirstOrDefault();
+		if (unit == null || unit.owner != controller) {
 			return;
 		}
 
-		bool canMove = unitSelector.SetSelectedUnit(to_select);
+		SelectUnit(unit, eventMouseButton.Position);
+	}
+
+	private void SelectUnit(MapUnit unit, Vector2 screenPosition) {
+		bool canMove = unitSelector.SetSelectedUnit(unit);
 		if (!canMove) {
-			TemporaryPopup.Show(this, "This unit has already moved.", eventMouseButton.Position);
+			TemporaryPopup.Show(this, "This unit has already moved.", screenPosition);
+		} else {
+			unit.ResetFacingDirection();
 		}
+	}
+
+	public void SelectUnit(MapUnit unit) {
+		var screenPos = mapView.screenLocationOfTile(unit.location);
+		SelectUnit(unit, screenPos);
 	}
 
 	private void HandleRightMouseButton(InputEventMouseButton eventMouseButton) {

@@ -224,13 +224,17 @@ namespace C7GameData {
 		}
 
 		public void fortify() {
-			facingDirection = TileDirection.SOUTHEAST;
+			ResetFacingDirection();
 			isFortified = true;
 			animate(MapUnit.AnimatedAction.FORTIFY);
 		}
 
 		public void wake() {
 			isFortified = false;
+		}
+
+		public void ResetFacingDirection() {
+			facingDirection = TileDirection.SOUTHEAST;
 		}
 
 		public IEnumerable<StrengthBonus> ListStrengthBonusesVersus(MapUnit opponent, CombatRole role, TileDirection? attackDirection) {
