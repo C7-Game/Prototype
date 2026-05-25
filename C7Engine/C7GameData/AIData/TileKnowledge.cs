@@ -60,7 +60,8 @@ namespace C7GameData {
 			}
 		}
 
-		private List<Tile> GetTilesVisibleToUnit(Tile unitLocation) {
+		public List<Tile> GetTilesVisibleToUnit(Tile unitLocation) {
+			// TODO: Make visibility configurable in game rules
 			// Space for current tile, 8 inner ring tiles, 12 outer ring tiles
 			List<Tile> result = new(21);
 			result.Add(unitLocation);

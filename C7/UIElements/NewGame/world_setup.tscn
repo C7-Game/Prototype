@@ -36,7 +36,7 @@ keycode = 4194305
 [sub_resource type="Shortcut" id="Shortcut_7oyjg"]
 events = [SubResource("InputEventKey_klcu1")]
 
-[node name="Control" type="CenterContainer" node_paths=PackedStringArray("background", "pangaeaLabel", "continentsLabel", "archipelagoLabel", "pangaea60", "pangaea70", "pangaea80", "continents60", "continents70", "continents80", "archipelago60", "archipelago70", "archipelago80", "pangaea60Large", "pangaea70Large", "pangaea80Large", "continents60Large", "continents70Large", "continents80Large", "archipelago60Large", "archipelago70Large", "archipelago80Large", "arid", "normal", "wet", "cool", "temperate", "warm", "billion3", "billion4", "billion5", "aridLarge", "normalLarge", "wetLarge", "coolLarge", "temperateLarge", "warmLarge", "billion3Large", "billion4Large", "billion5Large", "confirm", "cancel", "seedInput", "worldSizeButtonsContainer")]
+[node name="Control" type="CenterContainer" node_paths=PackedStringArray("background", "pangaeaLabel", "continentsLabel", "archipelagoLabel", "pangaea60", "pangaea70", "pangaea80", "continents60", "continents70", "continents80", "archipelago60", "archipelago70", "archipelago80", "pangaea60Large", "pangaea70Large", "pangaea80Large", "continents60Large", "continents70Large", "continents80Large", "archipelago60Large", "archipelago70Large", "archipelago80Large", "arid", "normal", "wet", "cool", "temperate", "warm", "billion3", "billion4", "billion5", "aridLarge", "normalLarge", "wetLarge", "coolLarge", "temperateLarge", "warmLarge", "billion3Large", "billion4Large", "billion5Large", "confirm", "cancel", "seedInput", "worldSizeButtonsContainer", "barbActivityButtonsContainer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -87,6 +87,7 @@ confirm = NodePath("Background/Confirm")
 cancel = NodePath("Background/Cancel")
 seedInput = NodePath("Background/SeedInput")
 worldSizeButtonsContainer = NodePath("Background/WorldSizeButtonsScroller/WorldSizeButtonsContainer")
+barbActivityButtonsContainer = NodePath("Background/BarbActivityScroller/BarbActivityButtonsContainer")
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 2
@@ -100,6 +101,15 @@ offset_right = 270.0
 offset_bottom = 119.0
 theme_override_font_sizes/font_size = 16
 text = "WORLD SIZE"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="Background/Label"]
+offset_left = 623.0
+offset_top = -1.0
+offset_right = 789.0
+offset_bottom = 22.0
+theme_override_font_sizes/font_size = 16
+text = "BARBARIANS"
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="Background"]
@@ -647,4 +657,14 @@ offset_right = 272.0
 offset_bottom = 256.0
 
 [node name="WorldSizeButtonsContainer" type="VBoxContainer" parent="Background/WorldSizeButtonsScroller"]
+layout_mode = 2
+
+[node name="BarbActivityScroller" type="ScrollContainer" parent="Background"]
+layout_mode = 0
+offset_left = 743.0
+offset_top = 113.0
+offset_right = 901.0
+offset_bottom = 257.0
+
+[node name="BarbActivityButtonsContainer" type="VBoxContainer" parent="Background/BarbActivityScroller"]
 layout_mode = 2

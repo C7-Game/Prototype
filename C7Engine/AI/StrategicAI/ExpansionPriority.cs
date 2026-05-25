@@ -20,7 +20,7 @@ namespace C7GameData.AIData {
 			if (player.cities.Count < 2) {
 				this.calculatedWeight = 1000;
 			} else {
-				int score = UtilityCalculations.CalculateAvailableLandScore(player);
+				float score = UtilityCalculations.CalculateAvailableLandScore(player);
 				score = ApplyEarlyGameMultiplier(score);
 				score = ApplyNationTraitMultiplier(score, player);
 
@@ -58,18 +58,17 @@ namespace C7GameData.AIData {
 			return "ExpansionPriority";
 		}
 
-		private int ApplyEarlyGameMultiplier(int score) {
+		private float ApplyEarlyGameMultiplier(float score) {
 			//If it's early game, multiply this score.
 			//TODO: We haven't implemented the part for "how many turns does the game have?" yet.  So this is hard-coded.
-			int gameTurn = EngineStorage.gameData.turn;
-			int percentOfGameFinished = (gameTurn * 100) / TEMP_GAME_LENGTH;
-			if (percentOfGameFinished < EARLY_GAME_CUTOFF) {
-				score = score * (EARLY_GAME_CUTOFF - percentOfGameFinished) / 5;
-			}
-			return score;
+			var gameTurn = EngineStorage.gameData.turn;
+			var percentOfGameFinished = (gameTurn * 100) / TEMP_GAME_LENGTH;
+			var isEarlyGame = percentOfGameFinished < EARLY_GAME_CUTOFF;
+			var multiplier = isEarlyGame ? (EARLY_GAME_CUTOFF - percentOfGameFinished) / 5.0f : 1.0f;
+			return score * multiplier;
 		}
 
-		private int ApplyNationTraitMultiplier(int score, Player player) {
+		private float ApplyNationTraitMultiplier(float score, Player player) {
 			// TODO: The "Expansionist" trait should give a higher priority to this strategic priority.
 			return score;
 		}

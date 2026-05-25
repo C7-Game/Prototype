@@ -98,5 +98,8 @@ namespace C7.Map {
 			cityGraphics.MouseFilter = Control.MouseFilterEnum.Ignore;
 			cityGraphics.Texture = cityTexture;
 		}
+
+		public void HideLabel() => cityLabelScene?.Hide();
+		public void ShowLabel() => cityLabelScene?.Show();
 	}
 }

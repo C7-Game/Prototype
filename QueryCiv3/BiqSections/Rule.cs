@@ -79,6 +79,8 @@ namespace QueryCiv3.Biq {
 		public int MaximumResearchTime;
 		public int MinimumResearchTime;
 		public int FlagUnitType;
+
+		// Only in conquests
 		public int UpgradeCost;
 	}
 }

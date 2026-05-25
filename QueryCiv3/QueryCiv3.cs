@@ -2,6 +2,20 @@ using System;
 using System.Collections.Generic;
 
 namespace QueryCiv3 {
+	public enum FileVersion {
+		Vanilla,
+		PlayTheWorld,
+		Conquests,
+	}
+
+	public class Civ3Version {
+		public FileVersion FileVersion;
+		public string FileTypeName;
+		public short MagicNumber; // not sure what it is, or even if it is in anything except .sav files
+		public int MajorVersion;
+		public int MinorVersion;
+	}
+
 	public class Civ3Section {
 		public string Name;
 		public int Offset;
@@ -11,12 +25,13 @@ namespace QueryCiv3 {
 		public Civ3Section[] Sections { get; protected set; }
 		public bool IsGameFile { get; protected set; }
 		public bool IsBicFile { get; protected set; }
+		public Civ3Version Civ3Version { get; protected set; }
 		public int Length => FileData.Length;
 		public Civ3File(byte[] fileBytes) {
 			this.FileData = fileBytes;
 			Sections = PopulateSections(FileData);
-			byte[] Civ3Bytes = new byte[]{0x43, 0x49, 0x56, 0x33};
-			byte[] BicBytes = new byte[]{0x42, 0x49, 0x43};
+			byte[] Civ3Bytes = new byte[]{0x43, 0x49, 0x56, 0x33}; // CIV3
+			byte[] BicBytes = new byte[]{0x42, 0x49, 0x43}; // BIC
 			IsGameFile = true;
 			IsBicFile = true;
 			for (int i = 0; i < 4; i++) {
@@ -27,6 +42,42 @@ namespace QueryCiv3 {
 					IsBicFile = false;
 				}
 			}
+
+			this.Civ3Version = PopulateCiv3Version();
+		}
+
+		private Civ3Version PopulateCiv3Version() {
+			string header = "";
+			short mag = -1;
+			int maj = -1;
+			int min = -1;
+
+			if (IsGameFile) {
+				header = GetString(0, 4);
+				mag = ReadInt16(4);
+				maj = ReadInt32(6);
+				min = ReadInt32(10);
+			} else if (IsBicFile) {
+				header = GetString(0, 4);
+				mag = -1;
+				maj = ReadInt32(24);
+				min = ReadInt32(28);
+			}
+
+			return new Civ3Version() {
+				FileTypeName = header,
+				FileVersion = GetGameVersion(header, maj),
+				MagicNumber = mag,
+				MajorVersion = maj,
+				MinorVersion = min,
+			};
+		}
+
+		private FileVersion GetGameVersion(string input, int majorVersion) {
+			if ((input == "BICX" && majorVersion == 12) || (input == "BICQ" && majorVersion == 12)) return FileVersion.Conquests;
+			if (input == "BICX") return FileVersion.PlayTheWorld;
+			if (input == "BIC") return FileVersion.Vanilla;
+			return FileVersion.Conquests;
 		}
 		public Boolean SectionExists(string sectionName) {
 			bool result = false;

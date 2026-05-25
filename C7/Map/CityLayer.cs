@@ -11,6 +11,10 @@ namespace C7.Map {
 		}
 
 		public void UpdateAfterCityDestruction(City city) {
+			EraseCity(city);
+		}
+
+		private void EraseCity(City city) {
 			citySceneLookup.Remove(city, out CityScene cityScene);
 			if (cityScene != null) {
 				cityScene.Hide();
@@ -19,6 +23,11 @@ namespace C7.Map {
 
 		public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 			if (tile.cityAtTile is null) {
+				return;
+			}
+
+			if (looseView.IsTileCoveredByTileInfo(tile)) {
+				EraseCity(tile.cityAtTile);
 				return;
 			}
 
@@ -34,6 +43,11 @@ namespace C7.Map {
 				CityScene scene = citySceneLookup[city];
 				scene.SetTileCenter(tileCenter2I);
 				scene._Draw();
+
+				if (looseView.HasCityLabelToHideFromTileInfo(tile))
+					scene.HideLabel();
+				else
+					scene.ShowLabel();
 			}
 		}
 	}

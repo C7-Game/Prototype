@@ -22,33 +22,28 @@ namespace C7.Map {
 			Tile east = tile.neighbors[TileDirection.NORTHEAST];
 			Tile west = tile.neighbors[TileDirection.NORTHWEST];
 
-			TileKnowledge tileKnowledge = gameData.GetFirstHumanPlayer().tileKnowledge;
+			var tk = gameData.GetFirstHumanPlayer().tileKnowledge;
+			var ti = looseView.mapView.game.tileInfo;
+
+			(bool, bool, bool) Status(Tile tile) {
+				return (tk.isTileKnown(tile), tk.isActiveTile(tile), ti?.targetTile == tile);
+			}
+
 			int column = 0;
 			int row = 0;
+			bool known, active, target;
 
-			if (tileKnowledge.isActiveTile(north)) {
-				column += 2;
-			} else if (tileKnowledge.isTileKnown(north)) {
-				column += 1;
-			}
+			(known, active, target) = Status(north);
+			column += known ? (active || target) ? 2 : 1 : 0;
 
-			if (tileKnowledge.isActiveTile(west)) {
-				column += 6;
-			} else if (tileKnowledge.isTileKnown(west)) {
-				column += 3;
-			}
+			(known, active, target) = Status(west);
+			column += known ? (active || target) ? 6 : 3 : 0;
 
-			if (tileKnowledge.isActiveTile(east)) {
-				row += 2;
-			} else if (tileKnowledge.isTileKnown(east)) {
-				row += 1;
-			}
+			(known, active, target) = Status(east);
+			row += known ? (active || target) ? 2 : 1 : 0;
 
-			if (tileKnowledge.isActiveTile(south)) {
-				row += 6;
-			} else if (tileKnowledge.isTileKnown(south)) {
-				row += 3;
-			}
+			(known, active, target) = Status(south);
+			row += known ? (active || target) ? 6 : 3 : 0;
 
 			// save a few draw calls when the tile is completely visible
 			if (column == 8 && row == 8) {

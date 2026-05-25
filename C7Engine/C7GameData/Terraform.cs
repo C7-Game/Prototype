@@ -89,6 +89,8 @@ public class Terraform {
 		Effect?.Invoke(new(player, tile, this));
 
 		if (Improvement != null) {
+			if (!tile.overlays.CanAdd(Improvement))
+				throw new InvalidOperationException($"Cannot add {Improvement.key} to the tile {tile}");
 			tile.overlays.Add(Improvement);
 		}
 	}

@@ -107,7 +107,6 @@ public partial class Util {
 	/// Assumes Conquests/Complete
 	/// </summary>
 	/// <param name="mediaPath">The media path, e.g. Art/Units/units_32.pcx</param>
-	/// <param name="modPath">The mod path for a scenario, e.g. RFRE</param>
 	/// <returns>The path to the media on the file system, or an exception if it cannot be found</returns>
 	/// <exception cref="ApplicationException"></exception>
 	public static string Civ3MediaPath(string mediaPath) {

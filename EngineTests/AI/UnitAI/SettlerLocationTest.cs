@@ -1,9 +1,11 @@
+using System;
 using C7Engine;
 using C7GameData;
 using C7GameData.AIData;
 using C7GameData.Save;
 using EngineTests.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace EngineTests.AI.UnitAI {
@@ -83,20 +85,23 @@ namespace EngineTests.AI.UnitAI {
 
 			// a single plains tile surrounded by desert
 			// not a good settlement spot, but our settler is already on this tile
-			InitilizeStartTile(MakePlainsTile(), new TileLocation(50, 50));
+			InitilizeStartTile(MakePlainsTile(), new TileLocation(25, 25));
 			Tile close = startTile;
 			map.AddRange(SurroundTile(close, MakeDesertTileWithDefaultYield));
 
 			// a hill tile surrounded by flood plains
 			// high settlement score from yield but very far away
-			InitilizeStartTile(MakeHillTile(), new TileLocation(200, 50));
+			InitilizeStartTile(MakeHillTile(), new TileLocation(200, 25));
 			Tile far = startTile;
 			map.AddRange(SurroundTile(far, MakeFloodPlainTileWithDefaultYield));
+
+			InitPartialGameMap(250, 50, map);
 
 			Player player = MakeTestPlayer(map);
 			Tile chosenTile = SettlerLocationAI.FindSettlerLocation(close, player);
 			Assert.Equal(close, chosenTile);
 		}
+
 		[Fact]
 		private void NotAlreadyBeingSettled() {
 			// just one hill tile

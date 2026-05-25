@@ -7,13 +7,13 @@ using C7GameData.Save;
 
 namespace C7Engine;
 
-public class CreateGameParams {
+public class GameParams {
 	public string DefaultBicPath;
 	public Func<GameMode.Config, BehaviorEngine> GameModeLoader;
 
 	public Func<string, string> GetPediaIconsPath = s => s;
 
-	public CreateGameParams(string DefaultBicPath) {
+	public GameParams(string DefaultBicPath) {
 		this.DefaultBicPath = DefaultBicPath;
 	}
 }
@@ -25,7 +25,7 @@ public class CreateGame {
 		* quickly.  By keeping all the client-callable APIs in the EntryPoints folder,
 		* hopefully it won't be too much of a goose hunt to refactor it later if we decide to do so.
 		**/
-	public static async Task<Player> createGame(string loadFilePath, CreateGameParams options) {
+	public static async Task<Player> createGame(string loadFilePath, GameParams options) {
 		SaveGame save = SaveManager.LoadSave(loadFilePath, options.DefaultBicPath, options.GetPediaIconsPath);
 
 		return await createGame(save, options.GameModeLoader);
@@ -45,8 +45,6 @@ public class CreateGame {
 		};
 
 		EngineStorage.uiControllerID = humanPlayer.id;
-		TurnHandling.OnBeginTurn(); // Call for the first turn
-		await TurnHandling.AdvanceTurn();
 
 		return humanPlayer;
 	}

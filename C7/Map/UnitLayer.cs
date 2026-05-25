@@ -9,7 +9,7 @@ public partial class UnitLayer : LooseLayer {
 
 	// The unit animations, effect animations, and cursor are all drawn as children attached to the looseView but aren't created and attached in
 	// any particular order so we must use the ZIndex property to ensure they're properly layered.
-	public const int effectAnimZIndex = 1;
+	public const int effectAnimZIndex = 2;
 	public const int unitAnimZIndex = 1;
 	public const int cursorZIndex = -1;
 
@@ -115,10 +115,10 @@ public partial class UnitLayer : LooseLayer {
 
 	public void drawUnitAnimFrame(LooseView looseView, MapUnit unit, MapUnit.Appearance appearance, Vector2 tileCenter) {
 		AnimationInstance inst = getBlankAnimationInstance(looseView);
-		C7Animation unitAnimation = looseView.mapView.game.animationController.civ3AnimData.forUnit(unit.unitType, appearance.action);
+		C7Animation unitAnimation = looseView.mapView.game.animationController.civ3AnimData.forUnit(unit, appearance.action);
 		unitAnimation.loadSpriteAnimation();
 
-		string animName = AnimationManager.AnimationKey(unit.unitType, appearance.action, appearance.direction);
+		string animName = AnimationManager.AnimationKey(unit, appearance.action, appearance.direction);
 
 		Vector2 framePosition = GetFramePosition(appearance, unitAnimation, inst, animName, tileCenter);
 
@@ -162,13 +162,19 @@ public partial class UnitLayer : LooseLayer {
 	}
 
 	public void drawEffectAnimFrame(LooseView looseView, C7Animation anim, float progress, Vector2 tileCenter) {
-		// var flicSheet = anim.getFlicSheet();
-		// var inst = getBlankAnimationInstance(looseView);
-		// setFlicShaderParams(inst.shaderMat, flicSheet, 0, progress);
-		// inst.shaderMat.SetShaderParameter("civColor", new Vector3(1, 1, 1));
-		// inst.meshInst.Position = tileCenter;
-		// inst.meshInst.Scale = new Vector2(flicSheet.spriteWidth, -1 * flicSheet.spriteHeight);
-		// inst.meshInst.ZIndex = effectAnimZIndex;
+		AnimationInstance inst = getBlankAnimationInstance(looseView);
+		inst.sprite.ZIndex = effectAnimZIndex;
+		inst.spriteTint.ZIndex = effectAnimZIndex;
+		inst.SetPosition(tileCenter);
+
+		anim.loadEffectAnimation();
+
+		string animName = AnimationManager.AnimationKey(anim.effect, anim.action);
+		int nextFrame = inst.GetNextFrameByProgress(animName, progress);
+
+		inst.SetAnimation(animName);
+		inst.SetFrame(nextFrame);
+		inst.Show();
 	}
 
 	private AnimatedSprite2D cursorSprite = null;
@@ -204,25 +210,34 @@ public partial class UnitLayer : LooseLayer {
 	public MapUnit selectUnitToDisplay(LooseView looseView, List<MapUnit> units) {
 		// From the list, pick out which units are (1) the strongest defender vs the currently selected unit, (2) the currently selected unit
 		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
-		MapUnit bestDefender = units[0],
-			selected = null,
-			doingInterestingAnimation = null;
+		MapUnit bestDefender = units[0], selected = null, doingInterestingAnimation = null;
 		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
+
 		foreach (var u in units) {
-			if (u == currentlySelectedUnit)
+			if (u == currentlySelectedUnit) {
 				selected = u;
+				break;
+			}
+
+			if (looseView.mapView.game.animationController.animTracker.getUnitAppearance(u).DeservesPlayerAttention()) {
+				doingInterestingAnimation = u;
+				break;
+			}
+
 			if (u.HasPriorityAsDefender(bestDefender, currentlySelectedUnit))
 				bestDefender = u;
-			if (looseView.mapView.game.animationController.animTracker.getUnitAppearance(u).DeservesPlayerAttention())
-				doingInterestingAnimation = u;
 		}
 
 		// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
-		return selected != null ? selected : (doingInterestingAnimation != null ? doingInterestingAnimation : bestDefender);
+		return selected ?? doingInterestingAnimation ?? bestDefender;
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		if (!UnitsVisible(gameData, looseView.mapView.game.controller, tile)) {
+			return;
+		}
+
+		if (looseView.IsTileCoveredByTileInfo(tile)) {
 			return;
 		}
 

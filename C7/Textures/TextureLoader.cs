@@ -456,4 +456,8 @@ public static class TextureLoader {
 		animationCache.Clear();
 		colorCache.Clear();
 	}
+
+	public static Vector2 Center(this ImageTexture tex) {
+		return new Vector2(tex.GetWidth(), tex.GetHeight()) / 2;
+	}
 }

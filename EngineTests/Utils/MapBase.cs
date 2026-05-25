@@ -45,8 +45,15 @@ public class MapBase {
 		Player player = MakePlayer(true);
 		player.civilization = new Civilization();
 		player.government = new Government();
+		player.rules = MakeTestRules();
 		foreach (Tile tile in knownTiles) { player.tileKnowledge.knownTiles.Add(tile); }
 		return player;
+	}
+
+	protected static Rules MakeTestRules() {
+		return new Rules() {
+			MaxRankOfWorkableTiles = 2
+		};
 	}
 
 	private TileDirection[] directions = {
@@ -206,5 +213,22 @@ public class MapBase {
 			baseTerrainType = new() { Key = "ocean" },
 			overlayTerrainType = new() { Key = "ocean", movementCost = 1 }
 		};
+	}
+
+	/// <summary>
+	/// Given game map dimensions in tiles and an incomplete set of tiles, fill the
+	/// game map with NONE tiles, and then overlay the known tiles.
+	/// </summary>
+	/// <param name="tilesWidth"></param>
+	/// <param name="tilesHeight"></param>
+	/// <param name="tiles"></param>
+	protected void InitPartialGameMap(int tilesWidth, int tilesHeight, List<Tile> tiles) {
+		gameMap.numTilesWide = tilesWidth;
+		gameMap.numTilesTall = tilesHeight;
+		gameMap.tiles = Enumerable.Range(0, tilesWidth * tilesHeight).Select(x => Tile.NONE).ToList();
+		foreach (var tile in tiles) {
+			var idx = gameMap.tileCoordsToIndex(tile.XCoordinate, tile.YCoordinate);
+			gameMap.tiles[idx] = tile;
+		}
 	}
 }

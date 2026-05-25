@@ -17,16 +17,20 @@ namespace QueryCiv3.Sav {
 		public bool CulturalVictory { get => Util.GetFlag(Flags[4], 4); }
 		public bool CivSpecificAbilities { get => Util.GetFlag(Flags[4], 5); }
 		public bool CulturallyLinkedStart { get => Util.GetFlag(Flags[4], 6); }
-		public bool RestartPlayers { get => Util.GetFlag(Flags[4], 7); }
+		public bool RespawnAiPlayers { get => Util.GetFlag(Flags[4], 7); }
 
 		public bool PreserveRandomSeed { get => Util.GetFlag(Flags[5], 0); }
 		public bool AcceleratedProduction { get => Util.GetFlag(Flags[5], 1); }
-		public bool Elimination { get => Util.GetFlag(Flags[5], 2); }
+		public bool CityElimination { get => Util.GetFlag(Flags[5], 2); }
 		public bool Regicide { get => Util.GetFlag(Flags[5], 3); }
 		public bool MassRegicide { get => Util.GetFlag(Flags[5], 4); }
 		public bool VictoryLocations { get => Util.GetFlag(Flags[5], 5); }
 		public bool CaptureTheFlag { get => Util.GetFlag(Flags[5], 6); }
 		public bool AllowCulturalConversions { get => Util.GetFlag(Flags[5], 7); }
+
+		public bool WonderVictory { get => Util.GetFlag(Flags[6], 0); }
+		public bool ReverseCaptureTheFlag { get => Util.GetFlag(Flags[6], 1); }
+		public bool AllowScientificLeaders { get => Util.GetFlag(Flags[6], 2); }
 
 
 		public int DifficultyID;

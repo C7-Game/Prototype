@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using IniParser.Model;
 using IniParser.Exceptions;
 
@@ -5,6 +8,20 @@ namespace C7Engine {
 	public class C7Settings {
 		private const string SETTINGS_FILE_NAME = "C7.ini";
 		public static IniData settings;
+
+		public static class LastGame {
+			public const string SectionName = nameof(LastGame);
+			public const string WorldSize = nameof(WorldSize);
+			public const string BarbarianActivity = nameof(BarbarianActivity);
+			public const string Landform = nameof(Landform);
+			public const string OceanCoverage = nameof(OceanCoverage);
+			public const string Climate = nameof(Climate);
+			public const string Temperature = nameof(Temperature);
+			public const string Age = nameof(Age);
+			public const string Civilization = nameof(Civilization);
+			public const string Difficulty = nameof(Difficulty);
+			public const string Opponents = nameof(Opponents);
+		}
 
 		public static void LoadSettings() {
 			try {
@@ -45,6 +62,11 @@ namespace C7Engine {
 				return defaultValue;
 			}
 			return settings[section][key];
+		}
+
+		public static T GetTypedSettingOrDefault<T>(string section, string key, T defaultValue) where T : struct, Enum {
+			string value = GetSettingValue(section, key);
+			return Enum.TryParse(value, true, out T result) ? result : defaultValue;
 		}
 
 		public static bool UseStandaloneMode() {

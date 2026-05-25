@@ -46,7 +46,7 @@ namespace C7GameData.AIData {
 				}
 			}
 
-			bool outOfLandToExpandTo = UtilityCalculations.CalculateAvailableLandScore(player) == 0;
+			bool outOfLandToExpandTo = UtilityCalculations.CalculateAvailableLandScore(player) < 1;
 
 			// Don't go to war if there's still land we should be expanding to.
 			if (!outOfLandToExpandTo) {

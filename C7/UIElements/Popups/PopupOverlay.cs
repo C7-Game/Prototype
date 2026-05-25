@@ -13,6 +13,7 @@ public partial class PopupOverlay : HBoxContainer {
 	[Signal] public delegate void BuildCityEventHandler(string name);
 	[Signal] public delegate void DiplomacySelectionEventHandler(ParameterWrapper<ID> opponentPlayer);
 	[Signal] public delegate void HidePopupEventHandler();
+	[Signal] public delegate void ClickEventHandler();
 
 	Control currentChild = null;
 
@@ -22,21 +23,17 @@ public partial class PopupOverlay : HBoxContainer {
 	public enum PopupCategory {
 		Advisor,
 		Console,
-		Info    //Sounds similar to the above, but lower-pitched in the second half
+		Info,    //Sounds similar to the above, but lower-pitched in the second half
+		TileInfo
 	}
 
 	public void OnHidePopup() {
-		// 1. enable mouse interaction with non-UI nodes
-		MouseFilter = MouseFilterEnum.Pass;
-		RemoveChild(currentChild);
-		currentChild = null;
+		Reconnect();
+		if (currentChild != null) {
+			RemoveChild(currentChild);
+			currentChild = null;
+		}
 		Hide();
-
-		// 2. enable mouse interactions with other UI elements
-		setMouseFilter(control, MouseFilterEnum.Pass);
-
-		// 3. enable clicking other UI elements
-		control.ProcessMode = ProcessModeEnum.Inherit;
 	}
 
 	public bool ShowingPopup => currentChild is not null;
@@ -45,15 +42,6 @@ public partial class PopupOverlay : HBoxContainer {
 		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("PopupSound");
 		player.Stream = wav;
 		player.Play();
-	}
-
-	private void setMouseFilter(Node n, MouseFilterEnum filter) {
-		foreach (Node child in n?.GetChildren()) {
-			setMouseFilter(child, filter);
-		}
-		if (n is Control control) {
-			control.MouseFilter = filter;
-		}
 	}
 
 	public void ShowPopup(Popup child, PopupCategory category) {
@@ -72,29 +60,69 @@ public partial class PopupOverlay : HBoxContainer {
 		AddChild(child);
 		currentChild = child;
 
-		string soundFile = category switch {
+		var soundFile = category switch {
 			PopupCategory.Advisor => "Sounds/PopupAdvisor.wav",
 			PopupCategory.Console => "Sounds/PopupConsole.wav",
 			PopupCategory.Info => "Sounds/PopupInfo.wav",
-			_ => "",
+			_ => null
 		};
-		if (soundFile == "") {
-			log.Error("Invalid popup category");
-		}
-		AudioStreamWav wav = Util.LoadCiv3WAVFromDisk(soundFile);
 
-		// 1. prevent mouse interaction with non-UI elements (ie. the map)
-		MouseFilter = MouseFilterEnum.Stop;
+		var wav = soundFile == null ? null : Util.LoadCiv3WAVFromDisk(soundFile);
 
-		// 2. prevent clicking other UI elements
-		control.ProcessMode = ProcessModeEnum.Disabled;
-
-		// 3. ignore all mouse input on other UI elements (ie. button color changes on hover)
-		setMouseFilter(control, MouseFilterEnum.Ignore);
+		Isolate();
 
 		Show();
+
 		if (wav != null) {
 			PlaySound(wav);
+		}
+	}
+
+	/// <summary>
+	/// Creates a modal context by preventing UI events outside the popup context.
+	/// Inverse of `Reconnect(..)`.
+	/// </summary>
+	private void Isolate() {
+		// 1. Overlay catches mouse events, prevents event propagation
+		MouseFilter = MouseFilterEnum.Stop;
+
+		// 2. Stop the world: switch off UI elements
+		control.ProcessMode = ProcessModeEnum.Disabled;
+
+		// 3. Ignore all mouse input on UI elements
+		SetMouseFilter(control, MouseFilterEnum.Ignore);
+	}
+
+	/// <summary>
+	/// Unwind a modal context by allowing UI events outside the popup context.
+	/// Inverse of `Isolate(..)`.
+	/// </summary>
+	private void Reconnect() {
+		// 1. Let events propagate past the overlay
+		control.MouseFilter = MouseFilterEnum.Pass;
+
+		// 2. Let UI elements catch mouse inputs again
+		SetMouseFilter(control, MouseFilterEnum.Pass);
+
+		// 3. Restart the world: let UI elements run normal
+		control.ProcessMode = ProcessModeEnum.Inherit;
+	}
+
+	/// Recursively set MouseFilter on node children and their children, etc.
+	private static void SetMouseFilter(Node n, MouseFilterEnum filter) {
+		foreach (var child in n?.GetChildren() ?? []) {
+			SetMouseFilter(child, filter);
+		}
+		if (n is Control control) {
+			control.MouseFilter = filter;
+		}
+	}
+
+	public override void _GuiInput(InputEvent @event) {
+		// Raise an event when popup overlay catches a click that the popup itself misses.
+		// This usually means a click outside the popup modal.
+		if (Visible && @event is InputEventMouseButton ev && ev.Pressed) {
+			EmitSignal(SignalName.Click);
 		}
 	}
 
@@ -112,5 +140,20 @@ public partial class PopupOverlay : HBoxContainer {
 			// as most of the global ones should *not* go through here.
 			GetViewport().SetInputAsHandled();
 		}
+
+		if (@event is InputEventMouseButton ev) {
+			// Catch right clicks over UI elements to stop awkward TileInfo renders 
+			if (ev.ButtonIndex == MouseButton.Right) {
+				if (IsOverUI()) {
+					AcceptEvent();
+					GetViewport().SetInputAsHandled();
+				}
+			}
+		}
+	}
+
+	private bool IsOverUI() {
+		Control ctrl = GetViewport().GuiGetHoveredControl();
+		return ctrl is TextureButton or TextureRect;
 	}
 }

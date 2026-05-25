@@ -38,6 +38,8 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 	private Timer blinkingTimer = new Timer();
 	private bool timerStarted = false;  //This "isStopped" returns false if it's never been started.  So we need this to know if we've ever started it.
 
+	private float extraXOffset = 7;
+
 	[Signal] public delegate void BlinkyEndTurnButtonPressedEventHandler();
 	[Signal] public delegate void CenterCameraOnActiveUnitEventHandler();
 
@@ -53,6 +55,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		suggestion.AddThemeFontSizeOverride("font_size", fontSize);
 
 		this.CreateUI();
+		PleaseWait();
 	}
 
 	private void CreateUI() {
@@ -77,7 +80,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		nextTurnButton.TextureHover = nextTurnOnTexture;
 		nextTurnButton.SetPosition(new Vector2(0, 0));
 		AddChild(nextTurnButton);
-		nextTurnButton.Pressed += turnEnded;
+		nextTurnButton.Pressed += TurnEnded;
 
 
 		// Unit info
@@ -111,17 +114,14 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		boxRightRectangle.AddChild(terrainType);
 
 		// Player info
-		civAndGovt.SetPosition(new Vector2(0, 80));
 		boxRightRectangle.AddChild(civAndGovt);
-		civAndGovt.SetTextAndCenterLabel("Carthage - Despotism (5.5.0)");
+		civAndGovt.SetTextAndCenterLabel("Netherlands - Despotism (5.5.0)").AddXOffset(extraXOffset).AddYOffset(80);
 
-		yearAndGold.SetPosition(new Vector2(0, 94));
 		boxRightRectangle.AddChild(yearAndGold);
-		yearAndGold.SetTextAndCenterLabel("Turn 0  10 Gold (+0 per turn)");
+		yearAndGold.SetTextAndCenterLabel("Turn 0  10 Gold (+0 per turn)").AddXOffset(extraXOffset).AddYOffset(94);
 
-		scienceProgress.SetPosition(new Vector2(0, 108));
 		boxRightRectangle.AddChild(scienceProgress);
-		scienceProgress.SetTextAndCenterLabel("");
+		scienceProgress.SetTextAndCenterLabel("").AddXOffset(extraXOffset).AddYOffset(108);
 
 		// End of turn suggestions
 		suggestion.HorizontalAlignment = HorizontalAlignment.Right;
@@ -176,7 +176,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		suggestion.Visible = true;
 	}
 
-	private void turnEnded() {
+	private void TurnEnded() {
 		log.Debug("Emitting the blinky button pressed signal");
 		EmitSignal(SignalName.BlinkyEndTurnButtonPressed);
 	}
@@ -244,18 +244,16 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 				int gold = player.gold;
 				int goldPerTurn = player.CalculateGoldPerTurn();
 
-				if (goldPerTurn >= 0) {
-					yearAndGold.Text = $"Turn {turnNumber}  {gold} Gold (+{goldPerTurn} per turn)";
-				} else {
-					yearAndGold.Text = $"Turn {turnNumber}  {gold} Gold ({goldPerTurn} per turn)";
-				}
+				var turnText = gD.timeOptions.GetDisplayTime(turnNumber);
+				var gptText = $"{(goldPerTurn >= 0 ? "+" : "")}{goldPerTurn}";
+				yearAndGold.SetTextAndCenterLabel($"{turnText}  {gold} Gold ({gptText} per turn)").AddXOffset(extraXOffset);
 			}
 
 			// Tech progress.
-			scienceProgress.SetTextAndCenterLabel(player.SummarizeScience(gD));
+			scienceProgress.SetTextAndCenterLabel(player.SummarizeScience(gD)).AddXOffset(extraXOffset);
 
 			// Civ and government.
-			civAndGovt.SetTextAndCenterLabel($"{player.civilization.name} - {player.government.name} (5.5.0)");
+			civAndGovt.SetTextAndCenterLabel($"{player.civilization.name} - {player.government.name} (5.5.0)").AddXOffset(extraXOffset);
 		});
 
 		base._Process(delta);
@@ -279,7 +277,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 			return;
 		}
 
-		string key = AnimationManager.GetUnitDefaultThumbnailKey(unit.unitType);
+		string key = AnimationManager.GetUnitDefaultThumbnailKey(unit);
 		ImageTexture baseFrame = AnimationManager.AnimationThumbnails[key];
 		ImageTexture tintFrame = AnimationManager.AnimationTintThumbnails[key];
 
@@ -304,7 +302,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 	private void HandleBoxClick() {
 		// When the turn can be ended, the click on the box is like clicking on the blinky button
 		if (timerStarted) {
-			turnEnded();
+			TurnEnded();
 			return;
 		}
 		// Otherwise we can center the camera to the unit currently active

@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace C7GameData {
 	using System;
 	using System.Collections.Generic;
@@ -232,6 +234,10 @@ namespace C7GameData {
 
 		public bool IsWater() {
 			return baseTerrainType.isWater();
+		}
+
+		public bool IsCoast() {
+			return baseTerrainType.isCoast();
 		}
 
 		public bool IsAllowCities() {
@@ -698,6 +704,17 @@ namespace C7GameData {
 			return result;
 		}
 
+		// Same as GetTilesWithinRankDistance, but includes "corner tiles",
+		// i.e., returns perfect tile squares.
+		public List<Tile> GetTilesWithinTileSquare(int rank) {
+			List<Tile> result = new();
+			for (int i = 0; i < (rank * 2 + 1) * (rank * 2 + 1); ++i) {
+				Tile t = GetTileAtNeighborIndex(i);
+				result.Add(t);
+			}
+			return result;
+		}
+
 		public MapUnit FindTopDefender(MapUnit opponent) {
 			if (unitsOnTile.Count > 0) {
 				IEnumerable<MapUnit> potentialDefenders = unitsOnTile.Where(u => u.CanDefendAgainst(opponent));
@@ -771,6 +788,8 @@ namespace C7GameData {
 		public void ClearTerrainOverlay() {
 			overlayTerrainType = baseTerrainType;
 		}
+
+		public bool HasImprovements => overlays.HasBeenImproved();
 	}
 
 	public enum TileDirection {
@@ -799,6 +818,20 @@ namespace C7GameData {
 			}
 		}
 
+		public static TileDirection rotatedCounterClockwise90Degrees(this TileDirection dir) {
+			switch (dir) {
+				case TileDirection.NORTH: return TileDirection.WEST;
+				case TileDirection.NORTHEAST: return TileDirection.NORTHWEST;
+				case TileDirection.EAST: return TileDirection.NORTH;
+				case TileDirection.SOUTHEAST: return TileDirection.NORTHEAST;
+				case TileDirection.SOUTH: return TileDirection.EAST;
+				case TileDirection.SOUTHWEST: return TileDirection.SOUTHEAST;
+				case TileDirection.WEST: return TileDirection.SOUTH;
+				case TileDirection.NORTHWEST: return TileDirection.SOUTHWEST;
+				default: throw new ArgumentOutOfRangeException("Invalid TileDirection");
+			}
+		}
+
 		public static (int, int) toCoordDiff(this TileDirection dir) {
 			switch (dir) {
 				case TileDirection.NORTH: return (0, -2);
@@ -823,18 +856,27 @@ namespace C7GameData {
 		}
 
 		public void Add(TerrainImprovement improvement) {
-			if (!CanAdd(improvement))
-				throw new InvalidOperationException($"Cannot add {improvement.key} to the tile");
-
 			terrainImprovementByLayer.TryGetValue(improvement.layer, out TerrainImprovement replacedImprovement);
 
 			terrainImprovementByLayer[improvement.layer] = improvement;
 
-			// If a road is being added to a tile that previously had
-			// no road, invalidate the cached trade network
-			if (improvement.layer == TerrainImprovement.Layer.Roads && replacedImprovement == null) {
-				// Hack: don't do this if gamedata is null, which can
-				// be true in some unit tests.
+			ApplyTerrainImprovementChange(replacedImprovement, improvement);
+		}
+
+		public void Remove(TerrainImprovement improvement) {
+			if (!terrainImprovementByLayer.Remove(improvement.layer))
+				Log.Warning("Failed to remove terrain improvement.");
+
+			ApplyTerrainImprovementChange(improvement, null);
+		}
+
+		private static void ApplyTerrainImprovementChange(TerrainImprovement oldImprovement, TerrainImprovement newImprovement) {
+			var roadCreated = oldImprovement == null && newImprovement?.layer == TerrainImprovement.Layer.Roads;
+			var roadRemoved = oldImprovement?.layer == TerrainImprovement.Layer.Roads && newImprovement == null;
+
+			// If there's a change in road coverage, invalidate the cached trade network
+			if (roadCreated || roadRemoved) {
+				// Hack: don't do this if gamedata is null, which can be true in some unit tests.
 				EngineStorage.gameData?.InvalidateCachedTradeNetwork();
 			}
 		}

@@ -17,5 +17,7 @@ namespace C7GameData {
 
 		public int defaultHitpoints = 2;
 		public int maxHitpoints = 2;
+
+		public BarbarianActivity barbarianActivity = BarbarianActivity.Roaming;
 	}
 }

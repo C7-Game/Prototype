@@ -155,8 +155,7 @@ public partial class Civ3MenuButton : BaseButton {
 		Color currentTextColor = fontColor;
 
 		// ButtonPressed is true if ToggleMode is on and button is selected
-		// DrawMode.Pressed is true if mouse is down on the button
-		bool isEffectivelyPressed = (ToggleMode && ButtonPressed) || GetDrawMode() == DrawMode.Pressed;
+		bool isEffectivelyPressed = (ToggleMode && ButtonPressed);
 
 		if (isEffectivelyPressed) {
 			currentTexture = pressedTexture;

@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 
 namespace QueryCiv3.Biq {
@@ -25,11 +24,16 @@ namespace QueryCiv3.Biq {
 		public int Length;
 		public int DefaultGameRules; // 0: don't use, 1: use
 		public int DefaultVictoryConditions; // 0: don't use, 1: use
-		public int NumberOfPlayableCivs; // 0: all playable
+											 // By playable here, it means these civs' data are included in the game data,
+											 // not necessarily that the human player can pick them,
+											 // or that they are even a part of the game
+		public int NumberOfPlayableCivs; // 0: all (31) playable
 
 		/*
             Dynamic length gap
-            In BIQ files, for each playable civ, there is a 1 int long ID for that civ
+            In BIQ files, if the NumberOfPlayableCivs is > 0,
+            for each playable civ, there is a 1 int long ID for that civ.
+            If the NumberOfPlayableCivs is 0 this section has been observed to have 0 length. 
             Data is instead stored in 2d array GameCiv
         */
 
@@ -39,18 +43,22 @@ namespace QueryCiv3.Biq {
 		public bool DiplomaticVictory { get => Util.GetFlag(Flags[0], 2); }
 		public bool ConquestVictory { get => Util.GetFlag(Flags[0], 3); }
 		public bool CulturalVictory { get => Util.GetFlag(Flags[0], 4); }
-		public bool CivSpecificAbilities { get => Util.GetFlag(Flags[0], 5); }
+		public bool CivSpecificAbilities { get => Util.GetFlag(Flags[0], 5); } // PTW, or at least not present in Conquests biq >= 12.8
 		public bool CulturallyLinkedStart { get => Util.GetFlag(Flags[0], 6); }
-		public bool RestartPlayers { get => Util.GetFlag(Flags[0], 7); }
+		public bool RespawnAiPlayers { get => Util.GetFlag(Flags[0], 7); }
 
 		public bool PreserveRandomSeed { get => Util.GetFlag(Flags[1], 0); }
 		public bool AcceleratedProduction { get => Util.GetFlag(Flags[1], 1); }
-		public bool Elimination { get => Util.GetFlag(Flags[1], 2); }
+		public bool CityElimination { get => Util.GetFlag(Flags[1], 2); }
 		public bool Regicide { get => Util.GetFlag(Flags[1], 3); }
 		public bool MassRegicide { get => Util.GetFlag(Flags[1], 4); }
-		public bool VictoryLocations { get => Util.GetFlag(Flags[1], 5); }
-		public bool CaptureTheFlag { get => Util.GetFlag(Flags[1], 6); }
+		public bool VictoryLocations { get => Util.GetFlag(Flags[1], 5); } // 'Victory Point Scoring' flag in Editor
+		public bool CaptureTheFlag { get => Util.GetFlag(Flags[1], 6); } // 'Capture the Unit' flag in Editor
 		public bool AllowCulturalConversions { get => Util.GetFlag(Flags[1], 7); }
+
+		public bool WonderVictory { get => Util.GetFlag(Flags[2], 0); }
+		public bool ReverseCaptureTheFlag { get => Util.GetFlag(Flags[2], 1); }
+		public bool AllowScientificLeaders { get => Util.GetFlag(Flags[2], 2); }
 
 		public int PlaceCaptureUnits;
 		public int AutoPlaceKings;
@@ -71,9 +79,13 @@ namespace QueryCiv3.Biq {
 
 		/*
             Dynamic length gap
-            In BIQ files, for each playable civ, there is a single int for alliance status
+            In BIQ files, if the NumberOfPlayableCivs is > 0,
+            for each playable civ, there is a single int for alliance status.
+            If the NumberOfPlayableCivs is 0 this section has been observed to have 0 length. 
             Data is instead stored in 2d array GameAlliance
         */
+
+		// (4 bytes - long		map visible, BIX >= 11.19 ONLY, not BIQ (major=12))
 
 		public int VictoryPointLimit;
 		public int CityEliminationCount;
@@ -102,7 +114,7 @@ namespace QueryCiv3.Biq {
 		public int PlagueStrength;
 		public int PlagueGracePeriod;
 		public int PlagueMaxOccurance;
-		private fixed byte UnknownBuffer2[264];
+		private fixed byte UnknownBuffer2[264]; // one 4-byte int + 260 bytes of string?
 		public int RespawnFlagUnits;
 		public byte CaptureAnyFlag;
 		public int GoldForCapture;

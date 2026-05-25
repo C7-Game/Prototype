@@ -54,8 +54,8 @@ public partial class MainMenu : Node {
 
 		// TODO: enable buttons are features are implemented
 		ButtonContainer.NewGame.Pressed += GoToWorldSetup;
-		ButtonContainer.QuickStart.Pressed += StartGame;
-		ButtonContainer.Tutorial.Pressed += StartGame;
+		ButtonContainer.QuickStart.Pressed += QuickStartGame;
+		ButtonContainer.Tutorial.Pressed += QuickStartGame;
 		ButtonContainer.Tutorial.Visible = false;
 		ButtonContainer.LoadGame.Pressed += LoadGame;
 		ButtonContainer.LoadScenario.Pressed += LoadScenario;
@@ -112,9 +112,10 @@ public partial class MainMenu : Node {
 		GetTree().ChangeSceneToFile("res://UIElements/NewGame/world_setup.tscn");
 	}
 
-	public void StartGame() {
+	public void QuickStartGame() {
 		log.Information("start game button pressed");
 		PlayButtonPressedSound();
+		QuickStartSetup.Init(Global);
 		GetTree().ChangeSceneToFile("res://C7Game.tscn");
 	}
 

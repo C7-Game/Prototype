@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using QueryCiv3.Biq;
 
 namespace QueryCiv3 {
@@ -240,7 +239,7 @@ namespace QueryCiv3 {
 								for (int i = 0; i < count; i++) {
 									Buffer.MemoryCopy(dataPtr, gamePtr, GAME_LEN_1, GAME_LEN_1);
 									gamePtr += GAME_LEN_1;
-									playableCivs = Game[i].NumberOfPlayableCivs == 0 ? 31 : Game[i].NumberOfPlayableCivs;
+									playableCivs = Game[i].NumberOfPlayableCivs;
 									GameCiv[i] = new int[playableCivs];
 									rowLength = playableCivs * sizeof(int);
 									fixed (void* ptr2 = GameCiv[i]) Buffer.MemoryCopy(dataPtr + GAME_LEN_1, ptr2, rowLength, rowLength);

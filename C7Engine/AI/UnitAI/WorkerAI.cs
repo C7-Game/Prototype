@@ -1,4 +1,3 @@
-using System;
 using C7Engine.Pathing;
 using C7GameData;
 using System.Collections.Generic;

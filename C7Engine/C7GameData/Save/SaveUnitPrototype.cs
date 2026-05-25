@@ -3,25 +3,30 @@ using System.Linq;
 
 namespace C7GameData.Save {
 	public class SaveUnitPrototype {
-		public class Unique {
-			public string replace;
-			public string civilization;
-		};
+		public enum Flag {
+			RotateBeforeAttack,
+		}
 
 		public string name { get; set; }
-		public string artName { get; set; }
+		public Art art { get; set; }
 		public int shieldCost { get; set; }
 		public int populationCost { get; set; }
 		public ID requiredTech { get; set; }
 		public int attack { get; set; }
 		public int defense { get; set; }
 		public int bombard { get; set; }
+		public int bombardRange { get; set; }
+		public int rateOfFire { get; set; }
 		public int movement { get; set; }
-		public int iconIndex { get; set; }
+
+		public HashSet<string> producibleBy = [];
 
 		public string upgradeTo;
-		public Unique unique;
 		public bool unproducible;
+
+		// Assorted boolean flags for the unit prototype. They're stored in
+		// this set rather than as booleans to avoid bloating the json file.
+		public HashSet<Flag> flags = [];
 
 		public HashSet<string> categories = new HashSet<string>();
 
@@ -36,10 +41,10 @@ namespace C7GameData.Save {
 		public SaveUnitPrototype() { }
 
 		public SaveUnitPrototype(UnitPrototype proto) {
-			(name, artName, shieldCost, populationCost, unproducible,
-			attack, defense, bombard, movement, iconIndex) =
-			(proto.name, proto.artName, proto.shieldCost, proto.populationCost, proto.unproducible,
-			 proto.attack, proto.defense, proto.bombard, proto.movement, proto.iconIndex);
+			(name, art, shieldCost, populationCost, unproducible,
+			attack, defense, bombard, bombardRange, rateOfFire, movement) =
+			(proto.name, proto.art, proto.shieldCost, proto.populationCost, proto.unproducible,
+			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire, proto.movement);
 
 			if (proto.requiredTech != null)
 				requiredTech = proto.requiredTech.id;
@@ -47,19 +52,14 @@ namespace C7GameData.Save {
 			if (proto.upgradeTo != null)
 				upgradeTo = proto.upgradeTo.name;
 
-			if (proto.unique != null) {
-				unique = new() {
-					civilization = proto.unique.civilization.name,
-					replace = proto.unique.replace?.name
-				};
-			}
-
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;
 			attributes = new HashSet<string>(proto.attributes);
+			flags = new HashSet<Flag>(proto.flags);
 
 			requiredResources = proto.requiredResources.Select(r => r.Key).ToHashSet();
 			terraformActions = proto.terraformActions.Select(r => r.Id).ToHashSet();
+			producibleBy = proto.producibleBy.Select(r => r.name).ToHashSet();
 		}
 	}
 }

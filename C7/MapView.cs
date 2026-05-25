@@ -47,13 +47,9 @@ public partial class TerrainLayer : LooseLayer {
 		}
 
 		public int CompareTo(TileToDraw other) {
-			// "other" might be null, in which case we should return a positive value. CompareTo(null) will do this.
-			try {
-				return this.tile.ExtraInfo.BaseTerrainFileID.CompareTo(other?.tile.ExtraInfo.BaseTerrainFileID);
-			} catch (Exception) {
-				//It also could be Tile.NONE.  In which case, also return a positive value.
-				return 1;
-			}
+			var a= this?.tile?.ExtraInfo?.BaseTerrainFileID ?? int.MaxValue;
+			var b= other?.tile?.ExtraInfo?.BaseTerrainFileID ?? int.MaxValue;
+			return a.CompareTo(b);
 		}
 	}
 
@@ -519,7 +515,7 @@ public partial class LooseView : Node2D {
 				layer.onEndDraw(this, gD);
 			}
 
-			foreach (GridLayer layer in layers.Where(layer => layer.visible && layer is GridLayer).Cast<GridLayer>()) {
+			foreach (var layer in layers.Where(layer => layer.visible && layer is GridLayer)) {
 				layer.onBeginDraw(this, gD);
 				foreach (VisibleTile vT in visibleKnownTiles.Concat(visibleUnKnownTiles)) {
 					layer.drawObject(this, gD, vT.tile, vT.tileCenter);
@@ -583,6 +579,22 @@ public partial class LooseView : Node2D {
 		TileKnowledge knowledge = gameData.GetFirstHumanPlayer().tileKnowledge;
 		return tile != Tile.NONE && knowledge.isTileKnown(tile);
 	}
+
+	public bool IsTileCoveredByTileInfo(Tile tile) {
+		var target = mapView.game.tileInfo;
+		if (target == null) return false;
+
+		return target.IsCovered(tile);
+	}
+
+	public bool HasCityLabelToHideFromTileInfo(Tile tile) {
+		if (!tile.HasCity) return false;
+
+		var target = mapView.game.tileInfo;
+		if (target == null) return false;
+
+		return target.HasCityLabelToCover(tile);
+	}
 }
 
 public partial class MapView : Node2D {
@@ -640,9 +652,15 @@ public partial class MapView : Node2D {
 	const float MAX_SCALE = 4.0f;
 
 	private LowerRightInfoBox lowerRightInfoBox;
+	private MiniMap miniMap;
+
 	public override void _Ready() {
 		lowerRightInfoBox = GetNode<LowerRightInfoBox>("/root/C7Game/CanvasLayer/Control/GameStatus/LowerRightInfoBox");
 		lowerRightInfoBox.CenterCameraOnActiveUnit += OnCenterCameraOnUnit;
+
+		miniMap = new MiniMap(this);
+		var canvasControl = GetNode<Control>("/root/C7Game/CanvasLayer/Control");
+		canvasControl.AddChild(miniMap);
 	}
 
 	public override void _ExitTree() {
@@ -692,6 +710,7 @@ public partial class MapView : Node2D {
 
 		LooseView unitView = new(this);
 		unitView.layers.Add(new GotoLayer());
+		unitView.layers.Add(new BombardLayer());
 		LooseView otherView = new(this);
 		otherView.layers.Add(new UnitLayer());
 
@@ -727,7 +746,7 @@ public partial class MapView : Node2D {
 	}
 
 	public VisibleRegion getVisibleRegion() {
-		(int X0, int Y0) = tileCoordsOnScreenAt(new Vector2(0, 0));
+		(int X0, int Y0) = tileCoordsInMainCamera(new Vector2(0, 0));
 		Vector2 mapViewSize = new Vector2(2, 4) + getVisibleAreaSize() / scaledCellSize;
 		return new VisibleRegion {
 			upperLeftX = X0 - 2,
@@ -826,10 +845,14 @@ public partial class MapView : Node2D {
 
 	// Returns the virtual tile coordinates on screen at the given location. "Virtual" meaning the coordinates are unwrapped and there isn't
 	// necessarily a tile there at all.
-	public (int, int) tileCoordsOnScreenAt(Vector2 screenLocation) {
+	public (int, int) tileCoordsInMainCamera(Vector2 screenLocation) {
 		Vector2 mapLoc = (screenLocation + cameraLocation) / scaledCellSize;
-		Vector2 intMapLoc = mapLoc.Floor();
-		Vector2 fracMapLoc = mapLoc - intMapLoc;
+		return tileCoordsForMapLocation(mapLoc);
+	}
+
+	public (int, int) tileCoordsForMapLocation(Vector2 mapLocation) {
+		Vector2 intMapLoc = mapLocation.Floor();
+		Vector2 fracMapLoc = mapLocation - intMapLoc;
 		int X = (int)intMapLoc.X, Y = (int)intMapLoc.Y;
 		bool evenColumn = X % 2 == 0, evenRow = Y % 2 == 0;
 		if (evenColumn ^ evenRow) {
@@ -847,7 +870,7 @@ public partial class MapView : Node2D {
 	}
 
 	public Tile tileOnScreenAt(GameMap map, Vector2 screenLocation) {
-		(int X, int Y) = tileCoordsOnScreenAt(screenLocation);
+		(int X, int Y) = tileCoordsInMainCamera(screenLocation);
 		return map.tileAt(X, Y);
 	}
 

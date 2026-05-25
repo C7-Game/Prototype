@@ -355,7 +355,7 @@ namespace C7GameData {
 
 			// Handle the city starving.
 			if (foodStored < 0) {
-				RemoveCitizen();
+				RemoveLastCitizen();
 				foodStored = 0;
 				return;
 			}
@@ -624,9 +624,22 @@ namespace C7GameData {
 			return residents.Count * 2;
 		}
 
-		private void RemoveCitizen() {
-			residents[residents.Count - 1].tileWorked.personWorkingTile = null;
-			residents.RemoveAt(residents.Count - 1);
+
+		private void RemoveLastCitizen() {
+			RemoveCitizenAt(residents.Count - 1);
+		}
+
+		public void RemoveRandomCitizen() {
+			if (residents.Count == 1)
+				return; // TODO: Handle extreme case
+
+			var idx = GameData.rng.Next(residents.Count);
+			RemoveCitizenAt(idx);
+		}
+
+		private void RemoveCitizenAt(int index) {
+			residents[index].tileWorked.personWorkingTile = null;
+			residents.RemoveAt(index);
 		}
 
 		public void AddCitizen(CityResident cr) {
@@ -636,7 +649,7 @@ namespace C7GameData {
 		public void RemoveCitizens(int number) {
 			for (int i = 0; i < number; i++) {
 				if (residents.Count > 0) {
-					RemoveCitizen();
+					RemoveLastCitizen();
 				} else {
 					Log.Warning("Trying to remove last citizen from " + name);
 					break;
@@ -646,7 +659,7 @@ namespace C7GameData {
 
 		public void RemoveAllCitizens() {
 			while (residents.Count > 0) {
-				RemoveCitizen();
+				RemoveLastCitizen();
 			}
 		}
 
@@ -698,15 +711,14 @@ namespace C7GameData {
 				totalCulture = 0
 			});
 		}
+		public void RemoveBuilding(CityBuilding building) {
+			constructed_buildings.Remove(building);
+		}
 
-		public void AddUnit(UnitPrototype prototype, GameData gameData) {
-			MapUnit newUnit = prototype.GetInstance(gameData);
-			newUnit.owner = owner;
-			newUnit.nationality = owner.civilization;
-			newUnit.location = location;
+		public void AddUnit(UnitPrototype proto, GameData gameData) {
+			MapUnit newUnit = proto.GetInstance(gameData.GenerateID(proto.name), proto, owner, location: location);
 			newUnit.experienceLevelKey = gameData.defaultExperienceLevelKey;
 			newUnit.experienceLevel = gameData.defaultExperienceLevel;
-			newUnit.facingDirection = TileDirection.SOUTHWEST;
 
 			location.unitsOnTile.Add(newUnit);
 			gameData.mapUnits.Add(newUnit);

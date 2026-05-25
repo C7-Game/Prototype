@@ -220,6 +220,8 @@ public partial class PlayerSetup : Control {
 			opponents = CollectSelectedOpponents()
 		};
 
+		PersistGameSettings(gameSetup);
+
 		// World generation can take a bit of time if multiple attempts are
 		// needed, so we don't want to tie up the UI thread.
 		Thread thread = new(() => {
@@ -229,6 +231,28 @@ public partial class PlayerSetup : Control {
 			CallDeferred(nameof(StartGame));
 		});
 		thread.Start();
+	}
+
+	private void PersistGameSettings(GameSetup gameSetup) {
+		try {
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.WorldSize, gameSetup.worldCharacteristics.worldSize.name);
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.BarbarianActivity, gameSetup.worldCharacteristics.barbarianActivity.ToString());
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.Landform, gameSetup.worldCharacteristics.landform.ToString());
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.OceanCoverage, gameSetup.worldCharacteristics.oceanCoverage.ToString());
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.Climate, gameSetup.worldCharacteristics.climate.ToString());
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.Temperature, gameSetup.worldCharacteristics.temperature.ToString());
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.Age, gameSetup.worldCharacteristics.age.ToString());
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.Civilization, gameSetup.playerCivilization.name);
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.Difficulty, gameSetup.difficulty.Name);
+
+			List<SelectedOpponent> ops = gameSetup.opponents;
+			string opponentsValue = string.Join("|", ops.Select(o => o.isRandom ? "Random" : o.Name));
+			C7Settings.SetValue(C7Settings.LastGame.SectionName, C7Settings.LastGame.Opponents, opponentsValue);
+
+			C7Settings.SaveSettings();
+		} catch (Exception e) {
+			log.Error(e, "Failed to persist game settings to C7.ini");
+		}
 	}
 
 	private void StartGame() {

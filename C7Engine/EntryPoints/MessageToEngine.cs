@@ -78,6 +78,27 @@ namespace C7Engine {
 		}
 	}
 
+	public class MsgBombard : MessageToEngine {
+		private ID unitID;
+		private readonly int tileX;
+		private readonly int tileY;
+
+
+		public MsgBombard(ID unitID, Tile tile) {
+			this.unitID = unitID;
+			this.tileX = tile.XCoordinate;
+			this.tileY = tile.YCoordinate;
+		}
+
+		public override async void process() {
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
+			Tile tile = EngineStorage.gameData.map.tileAt(tileX, tileY);
+			if (unit == null || tile == null) return;
+
+			await unit.bombard(tile);
+		}
+	}
+
 	// A generic class that allows the UI to have the game engine run some
 	// action, assumed to be on a unit.
 	//
