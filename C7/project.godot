@@ -26,6 +26,7 @@ LogManager="*res://LogManager.cs"
 
 window/size/window_width_override=1152
 window/size/window_height_override=768
+window/dpi/allow_hidpi=false
 window/per_pixel_transparency/allowed=true
 
 [dotnet]
