@@ -946,7 +946,7 @@ namespace C7GameData {
 
 				// The owner index is into the list of civs, and we have a 1:1
 				// mapping of players and civs.
-				// The exception to this are barbarian units (unit.OwnerType == 1), 
+				// The exception to this are barbarian units (unit.OwnerType == 1),
 				// where the owner points to the tribe (city name in other civs), rather than the player/civ
 				// TODO: implement tribes for barbarians
 				int owner = unit.OwnerType == 1 ? 0 : unit.Owner;
@@ -1224,32 +1224,72 @@ namespace C7GameData {
 		}
 
 		private void ImportUnitUpgrades() {
-			Dictionary<SaveUnitPrototype, SaveUnitPrototype> upgradeDict = BuildUpgradeDict();
+			List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> upgradePairs = ResolveUpgradePairs();
+
+			// a collection where each unit maps to all of its upgrade targets
+			// the targets are in a list sorted (descending) by number of civ able to produce the unit
+			Dictionary<SaveUnitPrototype, List<SaveUnitPrototype>> upgradeSet =
+				upgradePairs
+				.GroupBy(x => x.Item1)
+				.ToDictionary(x => x.Key, y => y
+						.Select(uu => uu.Item2)
+						.Where(u => u != null)
+						.OrderByDescending(u => u.producibleBy.Count)
+						.ThenBy(u => u.name)
+						.ToList());
 
 			foreach (SaveUnitPrototype proto in save.UnitPrototypes) {
-				proto.upgradeTo = upgradeDict[proto]?.name;
+				// Push upgrade targets to a stack
+				List<SaveUnitPrototype> upgradeTargets = upgradeSet[proto];
+				var upgradeStack =  new Stack<SaveUnitPrototype>();
+				upgradeTargets.ForEach(upgradeStack.Push);
+
+				proto.upgradeTo = null; // default case
+
+				// While targets in stack, find a non-unique unit for the upgrade target
+				while (upgradeStack.Count > 0) {
+					var candidate = upgradeStack.Pop();
+					if (candidate.IsUniqueUnit()) {
+						if (upgradeSet.TryGetValue(candidate, out List<SaveUnitPrototype> uniqueUpgradeTo)) {
+							uniqueUpgradeTo.ForEach(upgradeStack.Push);
+						}
+					} else { // found a reasonable upgrade target
+						proto.upgradeTo = candidate.name;
+						break;
+					}
+				}
 			}
+
+			// HACK: Scheme above results in "Swiss Mercenary" -> "Rifleman", but we want -> "Musketman"
+			var swiss = save.UnitPrototypes.FirstOrDefault(u => u.name == "Swiss Mercenary");
+			if (swiss != null)
+				swiss.upgradeTo = "Musketman";
+
+			// HACK: Scheme above results in "Berserk" -> "Longbowman", but we want -> "Guerilla"
+			var berserk = save.UnitPrototypes.FirstOrDefault(u => u.name == "Berserk");
+			if (berserk != null)
+				berserk.upgradeTo = "Guerilla";
 		}
 
 		// This method builds a Dictionary of unit upgrades based on the CIV3 data.
 		// The dictionary represents the raw upgrade relationships as defined in the game files.
-		private Dictionary<SaveUnitPrototype, SaveUnitPrototype> BuildUpgradeDict() {
+		private List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> ResolveUpgradePairs() {
 			PRTO[] Prto = biq.Prto ?? defaultBiq.Prto;
 			var unitPrototypeDict = save.UnitPrototypes.ToDictionary(b => b.name);
 
-			Dictionary<SaveUnitPrototype, SaveUnitPrototype> upgradeDict = [];
+			List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> upgradePairs = [];
 
 			foreach (PRTO prto in Prto) {
 				SaveUnitPrototype upgradeFrom = unitPrototypeDict[prto.Name];
 				if (prto.UpgradeTo != -1) {
 					SaveUnitPrototype upgradeTo = unitPrototypeDict[Prto[prto.UpgradeTo].Name];
-					upgradeDict[upgradeFrom] = upgradeTo;
+					upgradePairs.Add(new Tuple<SaveUnitPrototype, SaveUnitPrototype>(upgradeFrom, upgradeTo));
 				} else {
-					upgradeDict[upgradeFrom] = null;
+					upgradePairs.Add(new Tuple<SaveUnitPrototype, SaveUnitPrototype>(upgradeFrom, null));
 				}
 			}
 
-			return upgradeDict;
+			return upgradePairs;
 		}
 
 		private void ImportBuildings() {

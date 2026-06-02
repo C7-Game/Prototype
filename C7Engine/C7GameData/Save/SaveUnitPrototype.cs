@@ -61,5 +61,7 @@ namespace C7GameData.Save {
 			terraformActions = proto.terraformActions.Select(r => r.Id).ToHashSet();
 			producibleBy = proto.producibleBy.Select(r => r.name).ToHashSet();
 		}
+
+		public bool IsUniqueUnit() => producibleBy.Count == 1;
 	}
 }
