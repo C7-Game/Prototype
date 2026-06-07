@@ -8,9 +8,10 @@ using Xunit;
 namespace EngineTests.GameData;
 
 public class AmbReaderTest {
-	[Fact]
+
+	[SkippableFact]
 	public void WorkerRunAmbTest() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) { return; }
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		string path = Path.Combine(Civ3Location.GetCiv3Path(), "Art", "Units", "Worker", "WorkerRun.amb");
 

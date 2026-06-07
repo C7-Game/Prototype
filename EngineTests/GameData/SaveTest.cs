@@ -458,9 +458,9 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 	}
 
 
-	[Fact]
+	[SkippableFact]
 	public async void LoadSampleSaves() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) { return; }
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		string savesPath = PathUtils.getDataPath("saves");
 		Directory.CreateDirectory(savesPath);
@@ -496,9 +496,9 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 		Assert.True(i > 0);
 	}
 
-	[Fact]
+	[SkippableFact]
 	public void LoadAllConquestScenarios() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) { return; }
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		string[] singleplayerScenarios = {
 			"1 Mesopotamia.biq",

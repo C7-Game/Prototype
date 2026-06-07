@@ -13,14 +13,14 @@ namespace EngineTests.GameData;
 
 public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 	private const string SAVES_FOLDER = "saves/unit-availability";
-	[Fact]
+
+	[SkippableFact]
 	public async void UnitAvailability_SAV() {
 		// This tests a Conquests game with Conquests rules from a .SAV file
 
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
+
 		#region setup
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
 
 		string saveName = "Conquests 16 Players.SAV";
 		string uri = "https://www.dropbox.com/scl/fi/gmxbx1mtrammzfc6vly1g/Conquests-16-Players.SAV?rlkey=2z1es5aetqva4ymv59qduq1at&st=d0udmb3w&dl=1";
@@ -253,13 +253,13 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		#endregion
 	}
 
-	[Fact]
+	[SkippableFact]
 	public async void UnitAvailability_JSON() {
 		// This tests a Conquests game with Conquests rules from a .json file
+
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
+
 		#region setup
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
 
 		string saveName = "Conquests 16 Players.json";
 		string uri = "https://www.dropbox.com/scl/fi/g1qxuvc6xptg1l6hx9s21/Conquests-16-Players.json?rlkey=bkq158od7469pibhtw44g04if&st=k2fg3ev5&dl=1";
@@ -434,16 +434,17 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 
 public class UnitPrototypeScenarioTest : RemoteSaveLoader {
 	private const string SAVES_FOLDER = "saves/unit-availability";
-	[Fact]
-	public async void UnitAvailability_SAV() {
-		// This tests a Conquests scenario with custom rules 
 
-		#region setup
+	[SkippableFact]
+	public async void UnitAvailability_SAV() {
+		// This tests a Conquests scenario with custom rules
+
 		// Civ3 isn't installed in CI, so we can't load the default BIC. Local
 		// contributors without Civ3 assets configured should skip this too.
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
+
+		#region setup
+
 		string scenarioBiqPath = Path.Combine(Civ3Location.GetCiv3Path(), "Conquests", "Conquests", "4 Middle Ages.biq");
 		string scenarioPediaPath = Path.Combine(Civ3Location.GetCiv3Path(), "Conquests", "Conquests", "Middle Ages", "Text", "PediaIcons.txt");
 
