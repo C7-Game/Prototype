@@ -4360,6 +4360,7 @@
       ],
       "upgradeTo": "Longbowman",
       "unproducible": false,
+      "variantOf": "Archer",
       "categories": [
         "Land"
       ],
@@ -4400,6 +4401,7 @@
       ],
       "upgradeTo": "Musketman",
       "unproducible": false,
+      "variantOf": "Pikeman",
       "categories": [
         "Land"
       ],
@@ -4440,6 +4442,7 @@
       ],
       "upgradeTo": "Musketman",
       "unproducible": false,
+      "variantOf": "Spearman",
       "categories": [
         "Land"
       ],
@@ -4480,6 +4483,7 @@
       ],
       "upgradeTo": "Medieval Infantry",
       "unproducible": false,
+      "variantOf": "Swordsman",
       "categories": [
         "Land"
       ],
@@ -4521,8 +4525,9 @@
       "producibleBy": [
         "Persia"
       ],
-      "upgradeTo": "Medieval Infantry",
+      "upgradeTo": "Guerilla",
       "unproducible": false,
+      "variantOf": "Medieval Infantry",
       "categories": [
         "Land"
       ],
@@ -4566,6 +4571,7 @@
       ],
       "upgradeTo": "Knight",
       "unproducible": false,
+      "variantOf": "Chariot",
       "categories": [
         "Land"
       ],
@@ -4609,6 +4615,7 @@
       ],
       "upgradeTo": "Cavalry",
       "unproducible": false,
+      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -4653,6 +4660,7 @@
       ],
       "upgradeTo": "Knight",
       "unproducible": false,
+      "variantOf": "Horseman",
       "categories": [
         "Land"
       ],
@@ -4696,6 +4704,7 @@
       ],
       "upgradeTo": "Rifleman",
       "unproducible": false,
+      "variantOf": "Musketman",
       "categories": [
         "Land"
       ],
@@ -4739,6 +4748,7 @@
       ],
       "upgradeTo": "Cavalry",
       "unproducible": false,
+      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -4782,6 +4792,7 @@
       ],
       "upgradeTo": "Cavalry",
       "unproducible": false,
+      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -4821,6 +4832,7 @@
         "Russia"
       ],
       "unproducible": false,
+      "variantOf": "Cavalry",
       "categories": [
         "Land"
       ],
@@ -4865,6 +4877,7 @@
       ],
       "upgradeTo": "Modern Armor",
       "unproducible": false,
+      "variantOf": "Tank",
       "categories": [
         "Land"
       ],
@@ -4955,6 +4968,7 @@
         "America"
       ],
       "unproducible": false,
+      "variantOf": "Jet Fighter",
       "categories": [
         "Air"
       ],
@@ -5073,6 +5087,7 @@
       ],
       "upgradeTo": "Cavalry",
       "unproducible": false,
+      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -5114,8 +5129,8 @@
       "producibleBy": [
         "Spain"
       ],
-      "upgradeTo": "Explorer",
       "unproducible": false,
+      "variantOf": "Explorer",
       "categories": [
         "Land"
       ],
@@ -5159,6 +5174,7 @@
       ],
       "upgradeTo": "Guerilla",
       "unproducible": false,
+      "variantOf": "Longbowman",
       "categories": [
         "Land"
       ],
@@ -5198,6 +5214,7 @@
         "Ottomans"
       ],
       "unproducible": false,
+      "variantOf": "Cavalry",
       "categories": [
         "Land"
       ],
@@ -5242,6 +5259,7 @@
       ],
       "upgradeTo": "Medieval Infantry",
       "unproducible": false,
+      "variantOf": "Swordsman",
       "categories": [
         "Land"
       ],
@@ -5285,6 +5303,7 @@
       ],
       "upgradeTo": "Cavalry",
       "unproducible": false,
+      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -5327,8 +5346,9 @@
       "producibleBy": [
         "Carthage"
       ],
-      "upgradeTo": "Pikeman",
+      "upgradeTo": "Musketman",
       "unproducible": false,
+      "variantOf": "Pikeman",
       "categories": [
         "Land"
       ],
@@ -6402,6 +6422,7 @@
       ],
       "upgradeTo": "Pikeman",
       "unproducible": false,
+      "variantOf": "Spearman",
       "categories": [
         "Land"
       ],
@@ -6442,6 +6463,7 @@
       ],
       "upgradeTo": "Knight",
       "unproducible": false,
+      "variantOf": "Chariot",
       "categories": [
         "Land"
       ],
@@ -6587,6 +6609,7 @@
       ],
       "upgradeTo": "Galleon",
       "unproducible": false,
+      "variantOf": "Caravel",
       "flags": [
         "rotateBeforeAttack"
       ],
@@ -6628,8 +6651,9 @@
       "producibleBy": [
         "Netherlands"
       ],
-      "upgradeTo": "Musketman",
+      "upgradeTo": "Rifleman",
       "unproducible": false,
+      "variantOf": "Pikeman",
       "categories": [
         "Land"
       ],
@@ -6879,6 +6903,7 @@
       ],
       "upgradeTo": "Explorer",
       "unproducible": false,
+      "variantOf": "Scout",
       "categories": [
         "Land"
       ],
@@ -6919,6 +6944,7 @@
       ],
       "upgradeTo": "Longbowman",
       "unproducible": false,
+      "variantOf": "Archer",
       "categories": [
         "Land"
       ],
@@ -6959,6 +6985,7 @@
       ],
       "upgradeTo": "Caravel",
       "unproducible": false,
+      "variantOf": "Galley",
       "categories": [
         "Sea"
       ],

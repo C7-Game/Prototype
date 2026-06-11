@@ -295,6 +295,11 @@ namespace C7GameData.Save {
 					proto.upgradeTo = unitPrototypeDict[saveProto.upgradeTo];
 				}
 
+				if (saveProto.variantOf != null) {
+					proto.variantOf = unitPrototypeDict[saveProto.variantOf];
+					proto.variantOf.variants.Add(proto);
+				}
+
 				if (saveProto.requiredTech != null) {
 					proto.requiredTech = techDict[saveProto.requiredTech];
 				}

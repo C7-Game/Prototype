@@ -24,6 +24,8 @@ namespace C7GameData.Save {
 		public string upgradeTo;
 		public bool unproducible;
 
+		public string variantOf; // TODO: multiple, e.g., Enkidu Warrior replaces Warrior AND Spearman
+
 		// Assorted boolean flags for the unit prototype. They're stored in
 		// this set rather than as booleans to avoid bloating the json file.
 		public HashSet<Flag> flags = [];
@@ -52,6 +54,9 @@ namespace C7GameData.Save {
 			if (proto.upgradeTo != null)
 				upgradeTo = proto.upgradeTo.name;
 
+			if (proto.variantOf != null)
+				variantOf = proto.variantOf.name;
+
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;
 			attributes = new HashSet<string>(proto.attributes);
@@ -63,5 +68,8 @@ namespace C7GameData.Save {
 		}
 
 		public bool IsUniqueUnit() => producibleBy.Count == 1;
+
+		// TODO: missiles and transports, leader/army/princess?
+		public bool IsNonCombatUnit() => attack == 0 & bombard == 0;
 	}
 }

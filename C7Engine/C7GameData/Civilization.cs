@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace C7GameData {
@@ -48,7 +49,7 @@ namespace C7GameData {
 		public CultureGroup cultureGroup { get; private set; }
 
 		// This is null during gameplay to discourage usage, and instead use the cultureGroup
-		// It's only used for saving/loading 
+		// It's only used for saving/loading
 		public string cultureGroupKey;
 
 		public void SetCultureGroup(int index, string cultureGroupName) {
@@ -97,29 +98,27 @@ namespace C7GameData {
 
 		// This method is primarily here to satisfy the weird upgrade chains from the .biq and .sav files
 		public List<UnitPrototype> GetUpgradeChain(UnitPrototype unit) {
-			List<UnitPrototype> result = [];
+
+			// TODO: Needs something extra for the Abbasids scenario: Ansar Warrior variants get overlooked
+
+			HashSet<UnitPrototype> result = [];
 			var current = unit;
 
-			while (true) {
-				var upgrade = current.upgradeTo;
-				if (upgrade == null) break;
+			var queue =  new Queue<UnitPrototype>();
+			queue.Enqueue(current.upgradeTo);
+			while (queue.Count > 0) {
+				var upgrade = queue.Dequeue();
+				if (upgrade == null) continue;
 
-				var upgradeIsAvailable = upgrade.producibleBy.Contains(this) && !result.Contains(upgrade);
-
-				if (upgradeIsAvailable) {
+				if (upgrade.producibleBy.Contains(this))
 					result.Add(upgrade);
-				}
-				current = upgrade;
 
-			}
-
-			for (int i = result.Count - 1; i >= 0; i--) {
-				if (!result[i].producibleBy.Contains(this)) {
-					result.Remove(result[i]);
+				foreach (var variant in upgrade.variants) {
+					queue.Enqueue(variant);
 				}
 			}
 
-			return result;
+			return result.ToList();
 		}
 
 		public bool IsUnitAvailable(UnitPrototype unit) {

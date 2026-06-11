@@ -65,6 +65,8 @@ namespace C7GameData {
 		public HashSet<Civilization> producibleBy { get; set; } = [];
 		public UnitPrototype upgradeTo;
 		public bool unproducible;
+		public UnitPrototype variantOf;
+		public List<UnitPrototype> variants = [];
 		public HashSet<SaveUnitPrototype.Flag> flags = [];
 		public bool rotateBeforeAttack {
 			get => flags.Contains(SaveUnitPrototype.Flag.RotateBeforeAttack);
