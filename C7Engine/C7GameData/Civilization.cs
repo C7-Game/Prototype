@@ -96,29 +96,8 @@ namespace C7GameData {
 
 		public SettlerTileAdjustments Adjustments = new();
 
-		// This method is primarily here to satisfy the weird upgrade chains from the .biq and .sav files
 		public List<UnitPrototype> GetUpgradeChain(UnitPrototype unit) {
-
-			// TODO: Needs something extra for the Abbasids scenario: Ansar Warrior variants get overlooked
-
-			HashSet<UnitPrototype> result = [];
-			var current = unit;
-
-			var queue =  new Queue<UnitPrototype>();
-			queue.Enqueue(current.upgradeTo);
-			while (queue.Count > 0) {
-				var upgrade = queue.Dequeue();
-				if (upgrade == null) continue;
-
-				if (upgrade.producibleBy.Contains(this))
-					result.Add(upgrade);
-
-				foreach (var variant in upgrade.variants) {
-					queue.Enqueue(variant);
-				}
-			}
-
-			return result.ToList();
+			return unit.upgradesTo.Where(x => x.producibleBy.Contains(this)).ToList();
 		}
 
 		public bool IsUnitAvailable(UnitPrototype unit) {

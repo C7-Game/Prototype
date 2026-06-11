@@ -21,10 +21,8 @@ namespace C7GameData.Save {
 
 		public HashSet<string> producibleBy = [];
 
-		public string upgradeTo;
+		public List<string> upgradesTo;
 		public bool unproducible;
-
-		public string variantOf; // TODO: multiple, e.g., Enkidu Warrior replaces Warrior AND Spearman
 
 		// Assorted boolean flags for the unit prototype. They're stored in
 		// this set rather than as booleans to avoid bloating the json file.
@@ -51,11 +49,8 @@ namespace C7GameData.Save {
 			if (proto.requiredTech != null)
 				requiredTech = proto.requiredTech.id;
 
-			if (proto.upgradeTo != null)
-				upgradeTo = proto.upgradeTo.name;
-
-			if (proto.variantOf != null)
-				variantOf = proto.variantOf.name;
+			if (proto.upgradesTo != null)
+				upgradesTo = proto.upgradesTo?.Select(x => x.name).OrderBy(x => x).ToList() ?? [];
 
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;
@@ -66,10 +61,5 @@ namespace C7GameData.Save {
 			terraformActions = proto.terraformActions.Select(r => r.Id).ToHashSet();
 			producibleBy = proto.producibleBy.Select(r => r.name).ToHashSet();
 		}
-
-		public bool IsUniqueUnit() => producibleBy.Count == 1;
-
-		// TODO: missiles and transports, leader/army/princess?
-		public bool IsNonCombatUnit() => attack == 0 & bombard == 0;
 	}
 }

@@ -960,7 +960,9 @@
         "Hittites",
         "Portugal"
       ],
-      "upgradeTo": "Explorer",
+      "upgradesTo": [
+        "Explorer"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1242,7 +1244,12 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Swordsman",
+      "upgradesTo": [
+        "Gallic Swordsman",
+        "Immortals",
+        "Legionary",
+        "Swordsman"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1310,7 +1317,10 @@
         "Byzantines",
         "Inca"
       ],
-      "upgradeTo": "Longbowman",
+      "upgradesTo": [
+        "Berserk",
+        "Longbowman"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1376,7 +1386,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Pikeman",
+      "upgradesTo": [
+        "Musketman",
+        "Pikeman"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1443,7 +1456,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Medieval Infantry",
+      "upgradesTo": [
+        "Medieval Infantry"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1514,7 +1529,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Horseman",
+      "upgradesTo": [
+        "Horseman",
+        "Mounted Warrior"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1587,7 +1605,15 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Knight",
+      "upgradesTo": [
+        "Ansar Warrior",
+        "Keshik",
+        "Knight",
+        "Rider",
+        "Samurai",
+        "Three-Man Chariot",
+        "War Elephant"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1657,7 +1683,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Musketman",
+      "upgradesTo": [
+        "Musketeer",
+        "Musketman"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1729,7 +1758,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Guerilla",
+      "upgradesTo": [
+        "Guerilla"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1798,7 +1829,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Rifleman",
+      "upgradesTo": [
+        "Rifleman",
+        "Swiss Mercenary"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1866,7 +1900,11 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Cavalry",
+      "upgradesTo": [
+        "Cavalry",
+        "Cossack",
+        "Sipahi"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -1940,7 +1978,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Infantry",
+      "upgradesTo": [
+        "Infantry"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -2081,7 +2121,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Mech Infantry",
+      "upgradesTo": [
+        "Mech Infantry"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -2153,7 +2195,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Modern Armor",
+      "upgradesTo": [
+        "Modern Armor"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -2373,7 +2417,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Trebuchet",
+      "upgradesTo": [
+        "Trebuchet"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -2444,7 +2490,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Artillery",
+      "upgradesTo": [
+        "Artillery",
+        "Hwach'a"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -2519,7 +2568,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Radar Artillery",
+      "upgradesTo": [
+        "Radar Artillery"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -2884,7 +2935,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Caravel",
+      "upgradesTo": [
+        "Caravel",
+        "Carrack"
+      ],
       "unproducible": false,
       "flags": [
         "rotateBeforeAttack"
@@ -2956,7 +3010,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Galleon",
+      "upgradesTo": [
+        "Galleon"
+      ],
       "unproducible": false,
       "flags": [
         "rotateBeforeAttack"
@@ -3105,7 +3161,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Transport",
+      "upgradesTo": [
+        "Transport"
+      ],
       "unproducible": false,
       "flags": [
         "rotateBeforeAttack"
@@ -3178,7 +3236,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Destroyer",
+      "upgradesTo": [
+        "Destroyer"
+      ],
       "unproducible": false,
       "categories": [
         "Sea"
@@ -3764,7 +3824,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Jet Fighter",
+      "upgradesTo": [
+        "F-15",
+        "Jet Fighter"
+      ],
       "unproducible": false,
       "categories": [
         "Air"
@@ -4318,7 +4381,9 @@
       "producibleBy": [
         "Aztecs"
       ],
-      "upgradeTo": "Swordsman",
+      "upgradesTo": [
+        "Swordsman"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -4358,9 +4423,10 @@
       "producibleBy": [
         "Babylon"
       ],
-      "upgradeTo": "Longbowman",
+      "upgradesTo": [
+        "Longbowman"
+      ],
       "unproducible": false,
-      "variantOf": "Archer",
       "categories": [
         "Land"
       ],
@@ -4399,9 +4465,10 @@
       "producibleBy": [
         "Greece"
       ],
-      "upgradeTo": "Musketman",
+      "upgradesTo": [
+        "Musketman"
+      ],
       "unproducible": false,
-      "variantOf": "Pikeman",
       "categories": [
         "Land"
       ],
@@ -4440,9 +4507,10 @@
       "producibleBy": [
         "Zululand"
       ],
-      "upgradeTo": "Musketman",
+      "upgradesTo": [
+        "Musketman"
+      ],
       "unproducible": false,
-      "variantOf": "Spearman",
       "categories": [
         "Land"
       ],
@@ -4481,9 +4549,10 @@
       "producibleBy": [
         "Rome"
       ],
-      "upgradeTo": "Medieval Infantry",
+      "upgradesTo": [
+        "Medieval Infantry"
+      ],
       "unproducible": false,
-      "variantOf": "Swordsman",
       "categories": [
         "Land"
       ],
@@ -4525,9 +4594,10 @@
       "producibleBy": [
         "Persia"
       ],
-      "upgradeTo": "Guerilla",
+      "upgradesTo": [
+        "Guerilla"
+      ],
       "unproducible": false,
-      "variantOf": "Medieval Infantry",
       "categories": [
         "Land"
       ],
@@ -4569,9 +4639,10 @@
       "producibleBy": [
         "Egypt"
       ],
-      "upgradeTo": "Knight",
+      "upgradesTo": [
+        "Knight"
+      ],
       "unproducible": false,
-      "variantOf": "Chariot",
       "categories": [
         "Land"
       ],
@@ -4613,9 +4684,10 @@
       "producibleBy": [
         "China"
       ],
-      "upgradeTo": "Cavalry",
+      "upgradesTo": [
+        "Cavalry"
+      ],
       "unproducible": false,
-      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -4658,9 +4730,10 @@
       "producibleBy": [
         "Iroquois"
       ],
-      "upgradeTo": "Knight",
+      "upgradesTo": [
+        "Knight"
+      ],
       "unproducible": false,
-      "variantOf": "Horseman",
       "categories": [
         "Land"
       ],
@@ -4702,9 +4775,10 @@
       "producibleBy": [
         "France"
       ],
-      "upgradeTo": "Rifleman",
+      "upgradesTo": [
+        "Rifleman"
+      ],
       "unproducible": false,
-      "variantOf": "Musketman",
       "categories": [
         "Land"
       ],
@@ -4746,9 +4820,10 @@
       "producibleBy": [
         "Japan"
       ],
-      "upgradeTo": "Cavalry",
+      "upgradesTo": [
+        "Cavalry"
+      ],
       "unproducible": false,
-      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -4790,9 +4865,10 @@
       "producibleBy": [
         "India"
       ],
-      "upgradeTo": "Cavalry",
+      "upgradesTo": [
+        "Cavalry"
+      ],
       "unproducible": false,
-      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -4832,7 +4908,6 @@
         "Russia"
       ],
       "unproducible": false,
-      "variantOf": "Cavalry",
       "categories": [
         "Land"
       ],
@@ -4875,9 +4950,10 @@
       "producibleBy": [
         "Germany"
       ],
-      "upgradeTo": "Modern Armor",
+      "upgradesTo": [
+        "Modern Armor"
+      ],
       "unproducible": false,
-      "variantOf": "Tank",
       "categories": [
         "Land"
       ],
@@ -4968,7 +5044,6 @@
         "America"
       ],
       "unproducible": false,
-      "variantOf": "Jet Fighter",
       "categories": [
         "Air"
       ],
@@ -5085,9 +5160,10 @@
       "producibleBy": [
         "Mongols"
       ],
-      "upgradeTo": "Cavalry",
+      "upgradesTo": [
+        "Cavalry"
+      ],
       "unproducible": false,
-      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -5130,7 +5206,6 @@
         "Spain"
       ],
       "unproducible": false,
-      "variantOf": "Explorer",
       "categories": [
         "Land"
       ],
@@ -5172,9 +5247,10 @@
       "producibleBy": [
         "Scandinavia"
       ],
-      "upgradeTo": "Guerilla",
+      "upgradesTo": [
+        "Guerilla"
+      ],
       "unproducible": false,
-      "variantOf": "Longbowman",
       "categories": [
         "Land"
       ],
@@ -5214,7 +5290,6 @@
         "Ottomans"
       ],
       "unproducible": false,
-      "variantOf": "Cavalry",
       "categories": [
         "Land"
       ],
@@ -5257,9 +5332,10 @@
       "producibleBy": [
         "Celts"
       ],
-      "upgradeTo": "Medieval Infantry",
+      "upgradesTo": [
+        "Medieval Infantry"
+      ],
       "unproducible": false,
-      "variantOf": "Swordsman",
       "categories": [
         "Land"
       ],
@@ -5301,9 +5377,10 @@
       "producibleBy": [
         "Arabia"
       ],
-      "upgradeTo": "Cavalry",
+      "upgradesTo": [
+        "Cavalry"
+      ],
       "unproducible": false,
-      "variantOf": "Knight",
       "categories": [
         "Land"
       ],
@@ -5346,9 +5423,10 @@
       "producibleBy": [
         "Carthage"
       ],
-      "upgradeTo": "Musketman",
+      "upgradesTo": [
+        "Musketman"
+      ],
       "unproducible": false,
-      "variantOf": "Pikeman",
       "categories": [
         "Land"
       ],
@@ -5387,7 +5465,9 @@
       "producibleBy": [
         "Korea"
       ],
-      "upgradeTo": "Artillery",
+      "upgradesTo": [
+        "Artillery"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -5460,7 +5540,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Guerilla",
+      "upgradesTo": [
+        "Guerilla"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -5533,7 +5615,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "TOW Infantry",
+      "upgradesTo": [
+        "TOW Infantry"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -6420,9 +6504,10 @@
       "producibleBy": [
         "Sumeria"
       ],
-      "upgradeTo": "Pikeman",
+      "upgradesTo": [
+        "Pikeman"
+      ],
       "unproducible": false,
-      "variantOf": "Spearman",
       "categories": [
         "Land"
       ],
@@ -6461,9 +6546,10 @@
       "producibleBy": [
         "Hittites"
       ],
-      "upgradeTo": "Knight",
+      "upgradesTo": [
+        "Knight"
+      ],
       "unproducible": false,
-      "variantOf": "Chariot",
       "categories": [
         "Land"
       ],
@@ -6607,9 +6693,10 @@
       "producibleBy": [
         "Portugal"
       ],
-      "upgradeTo": "Galleon",
+      "upgradesTo": [
+        "Galleon"
+      ],
       "unproducible": false,
-      "variantOf": "Caravel",
       "flags": [
         "rotateBeforeAttack"
       ],
@@ -6651,9 +6738,10 @@
       "producibleBy": [
         "Netherlands"
       ],
-      "upgradeTo": "Rifleman",
+      "upgradesTo": [
+        "Rifleman"
+      ],
       "unproducible": false,
-      "variantOf": "Pikeman",
       "categories": [
         "Land"
       ],
@@ -6759,7 +6847,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Cannon",
+      "upgradesTo": [
+        "Cannon"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -6901,9 +6991,10 @@
       "producibleBy": [
         "Inca"
       ],
-      "upgradeTo": "Explorer",
+      "upgradesTo": [
+        "Explorer"
+      ],
       "unproducible": false,
-      "variantOf": "Scout",
       "categories": [
         "Land"
       ],
@@ -6942,9 +7033,10 @@
       "producibleBy": [
         "Maya"
       ],
-      "upgradeTo": "Longbowman",
+      "upgradesTo": [
+        "Longbowman"
+      ],
       "unproducible": false,
-      "variantOf": "Archer",
       "categories": [
         "Land"
       ],
@@ -6983,9 +7075,10 @@
       "producibleBy": [
         "Byzantines"
       ],
-      "upgradeTo": "Caravel",
+      "upgradesTo": [
+        "Caravel"
+      ],
       "unproducible": false,
-      "variantOf": "Galley",
       "categories": [
         "Sea"
       ],
@@ -7055,7 +7148,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "AEGIS Cruiser",
+      "upgradesTo": [
+        "AEGIS Cruiser"
+      ],
       "unproducible": false,
       "categories": [
         "Sea"
@@ -7202,7 +7297,10 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Galley",
+      "upgradesTo": [
+        "Dromon",
+        "Galley"
+      ],
       "unproducible": false,
       "flags": [
         "rotateBeforeAttack"
@@ -7275,7 +7373,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Modern Paratrooper",
+      "upgradesTo": [
+        "Modern Paratrooper"
+      ],
       "unproducible": false,
       "categories": [
         "Land"
@@ -7418,7 +7518,9 @@
         "Inca",
         "Maya"
       ],
-      "upgradeTo": "Mobile SAM",
+      "upgradesTo": [
+        "Mobile SAM"
+      ],
       "unproducible": false,
       "categories": [
         "Land"

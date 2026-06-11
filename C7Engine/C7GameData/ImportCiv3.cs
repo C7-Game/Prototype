@@ -1225,36 +1225,89 @@ namespace C7GameData {
 		}
 
 		private class UnitNode {
-			private SaveUnitPrototype proto { get; set; }
+			private readonly int _civCount;
+			private SaveUnitPrototype proto { get; }
 			public string name => proto.name;
-			public bool isUniqueUnit => proto.IsUniqueUnit();
 			public bool producibleBy(string civ) => proto.producibleBy.Contains(civ);
-			public string uniqueCiv => proto.producibleBy.Single();
 
 			public HashSet<UnitNode> prev { get; set; } = [];
 			public UnitNode next { get; set; } = null;
 
-			public UnitNode(SaveUnitPrototype proto) {
+			public UnitNode(SaveUnitPrototype proto, int civCount) {
+				_civCount = civCount;
 				this.proto = proto;
 			}
 
+			private bool IsCommon() => proto.producibleBy.Count > (_civCount / 2);
+
 			public override string ToString() {
 				var tail = next == null ? " -| " : $" -> {next}";
-				var uu = this.proto.IsUniqueUnit();
-				return uu ? $"({name}){tail}" : $"{name}{tail}";
+				return IsCommon() ? $"{name}{tail}" : $"({name}){tail}";
 			}
 		}
 
 		private void ImportUnitUpgrades() {
 			List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> upgradePairs = ResolveUpgradePairs();
+			var civs = save.Civilizations.ToList();
 
-			// Build upgrade chains as linked lists
+			// Build upgrade chains as linked lists, indexed by name
+			Dictionary<string, UnitNode> idx = BuildUnitUpgradeChains(upgradePairs, civs);
+
+			// Resolve upgrade mappings for each unit, per civilization
+			// By evaluating the unit upgrade chains in the context of every civilization,
+			// we capture the full picture of how any particular unit can upgrade by any civ.
+			// This full "closure" is the record we store in the save file and base ruleset.
+
+			var upgradeBook = new Dictionary<string, HashSet<string>>();
+
+			foreach (KeyValuePair<string, UnitNode> kv in idx) {
+				var name = kv.Key;
+
+				if (!upgradeBook.ContainsKey(name))
+					upgradeBook[name] = new HashSet<string>();
+
+				foreach (Civilization civ in civs) {
+					var node = kv.Value;
+
+					if (!node.producibleBy(civ.name))
+						continue;
+
+					var upgrade = node.next;
+					while (upgrade != null && !upgrade.producibleBy(civ.name)) {
+						upgrade = upgrade.next;
+					}
+
+					if (upgrade != null)
+						upgradeBook[name].Add(upgrade.name);
+				}
+			}
+
+			// Apply
+			foreach (SaveUnitPrototype proto in save.UnitPrototypes) {
+				if (upgradeBook.TryGetValue(proto.name, out HashSet<string> target)) {
+					proto.upgradesTo = target.OrderBy(x => x).ToList();
+				} else {
+					throw new DataException($"Missing upgrade for {proto.name}");
+				}
+			}
+		}
+
+		/// This function takes pairs of units in the save game format (complex upgrade chain relations)
+		/// and creates a name->Node mapping for further processing. The big idea here
+		/// is to reuse the same object, effectively gathering all references relating to
+		/// a particular unit in one object. And then building a nice index to these nodes.
+		///
+		/// See https://forums.civfanatics.com/threads/how-to-upgrade-regular-units-to-uus.108396/
+		private static Dictionary<string, UnitNode> BuildUnitUpgradeChains(
+			List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> upgradePairs,
+			List<Civilization> civilizations) {
 			var idx = new Dictionary<string, UnitNode>();
+			var civCount = civilizations.Count;
 
 			foreach (Tuple<SaveUnitPrototype, SaveUnitPrototype> pair in upgradePairs) {
-				var a = idx.TryGetValue(pair.Item1.name, out var nodeA) ? nodeA : new UnitNode(pair.Item1);
+				var a = idx.TryGetValue(pair.Item1.name, out var nodeA) ? nodeA : new UnitNode(pair.Item1, civCount);
 				var b = pair.Item2 == null ? null :
-					idx.TryGetValue(pair.Item2.name, out var nodeB) ? nodeB : new UnitNode(pair.Item2);
+					idx.TryGetValue(pair.Item2.name, out var nodeB) ? nodeB : new UnitNode(pair.Item2, civCount);
 				a.next = b;
 				idx[a.name] = a;
 				if (b != null) {
@@ -1263,113 +1316,11 @@ namespace C7GameData {
 				}
 			}
 
-			// Resolve upgrade mappings and the replacement mapping for unique units
-			var upgradeBook = new Dictionary<string, string>();
-
-			// Regular units
-			foreach (KeyValuePair<string, UnitNode> kv in idx) {
-				var name = kv.Key;
-				var node = kv.Value;
-
-				if (node.isUniqueUnit)
-					continue;
-
-				var upgrade = node.next;
-				while (upgrade != null && upgrade.isUniqueUnit) {
-					upgrade = upgrade.next;
-				}
-				upgradeBook[name] = upgrade?.name;
-			}
-
-			// Unique units
-			var uniqueUnits = idx.Values.Where(x => x.isUniqueUnit).ToList();
-
-			foreach (var unitNode in uniqueUnits) {
-				var name = unitNode.name;
-				var civ = unitNode.uniqueCiv;
-
-				var upgrade = unitNode.next;
-				while (upgrade != null && !upgrade.producibleBy(civ)) {
-					upgrade = upgrade.next;
-				}
-
-				upgradeBook[name] = upgrade?.name;
-			}
-
-			// Variants
-			var variantBook = CreateVariantBook(uniqueUnits);
-
-			// Apply
-			foreach (SaveUnitPrototype proto in save.UnitPrototypes) {
-				if (upgradeBook.TryGetValue(proto.name, out string target)) {
-					proto.upgradeTo = target;
-				} else {
-					throw new DataException($"Missing upgrade for {proto.name}");
-				}
-
-				if (variantBook.TryGetValue(proto.name, out string variant)) {
-					proto.variantOf = variant;
-				} else {
-					if (proto.IsUniqueUnit())
-						throw new DataException($"Missing variant for {proto.name}");
-				}
-			}
+			return idx;
 		}
 
-
-		private static Dictionary<string, string> CreateVariantBook(List<UnitNode> uniqueUnits) {
-			// WIP - doesn't quite work;
-			// need to rethink approach because Enkidu Warrior replace BOTH warrior and spearman
-
-			var variantBook = new Dictionary<string, string>();
-
-			foreach (var unitNode in uniqueUnits) {
-				var name = unitNode.name;
-				var civ = unitNode.uniqueCiv;
-
-				var backwardsStack = new Stack<UnitNode>();
-
-				var next = unitNode.next;
-				if (next != null && !next.isUniqueUnit && !next.producibleBy(civ)) {
-					variantBook[name] = next.name;
-					continue;
-				}
-
-				foreach (var upgradePrev in unitNode.next?.prev ?? []) {
-					if (upgradePrev != unitNode)
-						backwardsStack.Push(upgradePrev);
-				}
-				foreach (var prev in unitNode.prev ?? []) {
-					backwardsStack.Push(prev);
-				}
-
-				while (backwardsStack.Count > 0) {
-					var current = backwardsStack.Pop();
-
-					if (!current.isUniqueUnit && !current.producibleBy(civ)) {
-						variantBook[name] = current.name;
-						break;
-					}
-
-					foreach (var prev in current.prev ?? []) {
-						backwardsStack.Push(prev);
-					}
-				}
-
-				if (!variantBook.ContainsKey(name)) { // special cases
-													  // Hwach'aa
-													  // Jaguar Warrior
-													  // Man-o-war
-													  // (Enkidu W)
-					variantBook[name] = null; // TODO: heuristic?
-				}
-			}
-
-			return variantBook;
-		}
-
-		// This method builds a Dictionary of unit upgrades based on the CIV3 data.
-		// The dictionary represents the raw upgrade relationships as defined in the game files.
+		/// This method builds a Dictionary of unit upgrades based on Civ3 data.
+		/// The dictionary represents the raw upgrade relationships as they are defined in a save game file.
 		private List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> ResolveUpgradePairs() {
 			PRTO[] Prto = biq.Prto ?? defaultBiq.Prto;
 			var unitPrototypeDict = save.UnitPrototypes.ToDictionary(b => b.name);

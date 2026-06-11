@@ -291,13 +291,8 @@ namespace C7GameData.Save {
 			foreach (SaveUnitPrototype saveProto in UnitPrototypes) {
 				UnitPrototype proto = unitPrototypeDict[saveProto.name];
 
-				if (saveProto.upgradeTo != null) {
-					proto.upgradeTo = unitPrototypeDict[saveProto.upgradeTo];
-				}
-
-				if (saveProto.variantOf != null) {
-					proto.variantOf = unitPrototypeDict[saveProto.variantOf];
-					proto.variantOf.variants.Add(proto);
+				if ((saveProto.upgradesTo ?? []).Any()) {
+					proto.upgradesTo = saveProto.upgradesTo.Select(x => unitPrototypeDict[x]).ToList();
 				}
 
 				if (saveProto.requiredTech != null) {

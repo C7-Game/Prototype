@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices.JavaScript;
+using Serilog;
 
 namespace C7GameData {
 	using System;
@@ -63,10 +65,8 @@ namespace C7GameData {
 		public int rateOfFire { get; set; }
 		public int movement { get; set; }
 		public HashSet<Civilization> producibleBy { get; set; } = [];
-		public UnitPrototype upgradeTo;
+		public List<UnitPrototype> upgradesTo = [];
 		public bool unproducible;
-		public UnitPrototype variantOf;
-		public List<UnitPrototype> variants = [];
 		public HashSet<SaveUnitPrototype.Flag> flags = [];
 		public bool rotateBeforeAttack {
 			get => flags.Contains(SaveUnitPrototype.Flag.RotateBeforeAttack);
@@ -153,14 +153,10 @@ namespace C7GameData {
 		}
 
 		private UnitPrototype GetUnitUpgrade(Civilization civ) {
-			while (true) {
-				if (upgradeTo == null) return null;
-				if (!upgradeTo.producibleBy.Contains(civ)) {
-					upgradeTo.GetUnitUpgrade(civ);
-				}
-
-				return upgradeTo;
-			}
+			var match = upgradesTo.Where(x => x.producibleBy.Contains(civ)).ToList();
+			if (match.Count > 1)
+				Log.Warning($"Unexpected upgrade chain: more than one valid target for upgrading {name} with {civ.name}.");
+			return match.FirstOrDefault();
 		}
 
 		public bool CanProduce(City city, HashSet<Resource> accessibleResources) {
@@ -189,9 +185,17 @@ namespace C7GameData {
 		// This is how we get that, since we can built a Hwacha,
 		// which upgrades to Artillery, that the Trebuchet is obsolete.
 		private List<UnitPrototype> GetUnitsThatUpgradeToThisUpgrade() {
-			List<UnitPrototype> allUnits = EngineStorage.gameData.unitPrototypes.Where(
-				p => p.upgradeTo != null && p.upgradeTo == this.upgradeTo?.upgradeTo
-					).ToList();
+			var unitProtos = EngineStorage.gameData.unitPrototypes;
+
+			HashSet<UnitPrototype> upgradeUpgrades = (upgradesTo ?? [])
+				.SelectMany(x => x.upgradesTo ?? [])
+				.ToHashSet();
+
+			List<UnitPrototype> allUnits = unitProtos.Where(p
+				=> (p.upgradesTo ?? []).Intersect(upgradeUpgrades).Any())
+				.Except([this])
+				.ToList();
+
 			return allUnits;
 		}
 
@@ -204,16 +208,29 @@ namespace C7GameData {
 
 			var potentialUnits = this.GetUnitsThatUpgradeToThisUpgrade();
 
-			var units = unitUpgradeChain.Concat(potentialUnits.Where(uu => !unitUpgradeChain.Contains(uu)));
+			var units = unitUpgradeChain.Union(potentialUnits);
 
-			// picking the last item, as when trying to get the upgrade for a Warrior,
-			// and Medieval Infantry is available, we don't want to return the Swordsman
-			var unitUpgrade = units.LastOrDefault(uu =>
+			var producibleUnits = units.Where(uu =>
 				uu.MeetsProductionRequirements(city, accessibleResources)
 				&& uu.producibleBy.Contains(city.owner.civilization)
 			);
 
+			// picking the last item, as when trying to get the upgrade for a Warrior,
+			// and Medieval Infantry is available, we don't want to return the Swordsman
+			var unitUpgrade = SortInUpgradeOrder(producibleUnits).LastOrDefault();
+
 			return unitUpgrade;
+		}
+
+
+		private List<UnitPrototype> SortInUpgradeOrder(IEnumerable<UnitPrototype> units) {
+			var sorted = units.ToList();
+			sorted.Sort((a, b) => {
+				if (a.upgradesTo.Contains(b)) return -1;
+				if (b.upgradesTo.Contains(a)) return 1;
+				return 0;
+			});
+			return sorted;
 		}
 
 		private bool MeetsProductionRequirements(City city, HashSet<Resource> accessibleResources) {
