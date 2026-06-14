@@ -1305,19 +1305,10 @@ namespace C7GameData {
 			var idx = new Dictionary<string, UnitNode>();
 			var civCount = civilizations.Count;
 
-			var unusual = new HashSet<Tuple<SaveUnitPrototype, SaveUnitPrototype>>();
-
 			foreach (Tuple<SaveUnitPrototype, SaveUnitPrototype> pair in upgradePairs) {
 				var a = idx.TryGetValue(pair.Item1.name, out var nodeA) ? nodeA : new UnitNode(pair.Item1, civCount);
 				var b = pair.Item2 == null ? null :
 					idx.TryGetValue(pair.Item2.name, out var nodeB) ? nodeB : new UnitNode(pair.Item2, civCount);
-
-				// Detect cases where the upgrade relation leads to "wrong results".
-				// We handle these cases separately later.
-				if (UnusualUpgradeRelation(a, b)) {
-					unusual.Add(pair);
-					continue;
-				}
 
 				a.next = b;
 				idx[a.name] = a;
@@ -1327,49 +1318,7 @@ namespace C7GameData {
 				}
 			}
 
-			foreach (var pair in unusual) {
-				var a = idx[pair.Item1.name];
-				var b = idx[pair.Item2.name];
-				AddReverseUpgrade(a, b);
-			}
-
 			return idx;
-		}
-
-		/// <summary>
-		/// Manipulate the unit upgrade linked lists to apply an upgrade relation in reverse.
-		/// </summary>
-		private static void AddReverseUpgrade(UnitNode a, UnitNode b) {
-			// From:	X -> a -> b -> Y
-			// To:		X -> b -> a -> Y
-
-			b.next?.prev.Remove(b);
-			a.next = b.next;
-			b.next?.prev.Add(a);
-
-			b.next = a;
-			foreach (UnitNode aPrev in a.prev) {
-				aPrev.next = b;
-				b.prev.Add(aPrev);
-			}
-			a.prev.Clear();
-			a.prev.Add(b);
-		}
-
-		/// <summary>
-		/// Detect cases where Civ3 save/scenario declares an unexpected unit upgrade relation,
-		/// with "Musketman -> Swiss Mercenary" being the main motivation. In the game, the Swiss
-		/// Mercenary should upgrade to the Musketman, but the unit prototype data gives the
-		/// relation backwards.
-		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <returns></returns>
-		private static bool UnusualUpgradeRelation(UnitNode a, UnitNode b) {
-			// TODO: Look into a more robust approach based on resource needs and required tech.
-
-			// Shield value heuristic: higher cost -> lower cost indicates reverse relation
-			return a.shieldCost > (b?.shieldCost ?? int.MaxValue);
 		}
 
 		/// This method builds a Dictionary of unit upgrades based on Civ3 data.

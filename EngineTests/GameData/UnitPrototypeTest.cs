@@ -58,6 +58,7 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		var rubber = gd.Resources.FirstOrDefault(r => r.Key == "Rubber");
 		var oil = gd.Resources.FirstOrDefault(r => r.Key == "Oil");
 		var aluminum = gd.Resources.FirstOrDefault(r => r.Key == "Aluminum");
+		var gunpowder = gd.techs.FirstOrDefault(t => t.Name == "Gunpowder");
 
 		// setup techs
 		var wheel = gd.techs.FirstOrDefault(t => t.Name == "The Wheel");
@@ -93,6 +94,7 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		var fighter = protos.FirstOrDefault(p => p.name == "Fighter");
 		var jet = protos.FirstOrDefault(p => p.name == "Jet Fighter");
 		var f15 = protos.FirstOrDefault(p => p.name == "F-15");
+		var musketman = protos.FirstOrDefault(p => p.name == "Musketman");
 
 		#endregion
 
@@ -145,6 +147,17 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		Assert.True(swiss.CanProduce(amsterdam, new HashSet<Resource>() { iron }));
 		// if the city has iron then we can't produce Spearman anymore, as we can produce their upgrade, the Swiss Mercenary
 		Assert.False(spearman.CanProduce(amsterdam, new HashSet<Resource>() { iron }));
+
+		nether.knownTechs.Add(gunpowder.id);
+		Assert.True(swiss.CanProduce(amsterdam, new HashSet<Resource>() { iron }));
+		Assert.False(swiss.CanProduce(amsterdam, new HashSet<Resource>() { saltpeter }));
+		Assert.True(swiss.CanProduce(amsterdam, new HashSet<Resource>() { iron, saltpeter }));
+		Assert.True(musketman.CanProduce(amsterdam, new HashSet<Resource>() { saltpeter }));
+		Assert.False(musketman.CanProduce(amsterdam, new HashSet<Resource>() { iron, saltpeter }));
+		Assert.False(rifleman.CanProduce(amsterdam, new HashSet<Resource>() { iron, saltpeter }));
+
+		Assert.Null(swiss.GetProducibleUpgrade(amsterdam, new HashSet<Resource>() { iron, saltpeter }));
+		Assert.False(swiss.GetProducibleUpgrade(amsterdam, new HashSet<Resource>() { iron, saltpeter }) == musketman);
 
 		nether.knownTechs.Add(nationalism.id);
 		Assert.True(rifleman.CanProduce(amsterdam, noResources));
