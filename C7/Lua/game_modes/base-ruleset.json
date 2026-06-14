@@ -1387,8 +1387,8 @@
         "Maya"
       ],
       "upgradesTo": [
-        "Pikeman",
-        "Swiss Mercenary"
+        "Musketman",
+        "Pikeman"
       ],
       "unproducible": false,
       "categories": [
@@ -1830,7 +1830,8 @@
         "Maya"
       ],
       "upgradesTo": [
-        "Rifleman"
+        "Rifleman",
+        "Swiss Mercenary"
       ],
       "unproducible": false,
       "categories": [
@@ -6738,7 +6739,7 @@
         "Netherlands"
       ],
       "upgradesTo": [
-        "Musketman"
+        "Rifleman"
       ],
       "unproducible": false,
       "categories": [
