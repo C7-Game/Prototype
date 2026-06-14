@@ -152,6 +152,7 @@ namespace C7GameData {
 			return instance;
 		}
 
+		/// Immediate upgrade target, given a civilization.
 		private UnitPrototype GetUnitUpgrade(Civilization civ) {
 			var match = upgradesTo.Where(x => x.producibleBy.Contains(civ)).ToList();
 			if (match.Count > 1)
@@ -159,80 +160,34 @@ namespace C7GameData {
 			return match.FirstOrDefault();
 		}
 
+		/// The upgrade chain: a unit upgrade series as an ordered collection of unit prototypes,
+		/// for a particular civilization, starting from this unit.
+		///
+		/// Note: must be unique and stable: in-game every unit has at most one direct upgrade target.
+		private List<UnitPrototype> GetUpgradeChain(Civilization civ) {
+			var chain = new List<UnitPrototype>();
+			var current = this.GetUnitUpgrade(civ);
+			while (current != null) {
+				chain.Add(current);
+				current = current.GetUnitUpgrade(civ);
+			}
+			return chain;
+		}
+
+		/// Whether a given city can produce this unit, given available resources.
 		public bool CanProduce(City city, HashSet<Resource> accessibleResources) {
-			var unitUpgradeChain = city.owner.civilization.GetUpgradeChain(this);
-			return city.owner.civilization.IsUnitAvailable(this)
+			var civ = city.owner.civilization;
+			return this.IsAvailableTo(civ)
 				   && this.MeetsProductionRequirements(city, accessibleResources)
 				   && !this.IsUnitObsolete(city, accessibleResources);
 		}
 
-		// TODO: Consider golden ages when determining whether a unit is obsolete.
-		// If a golden age has not yet been triggered and a unit can trigger one,
-		// it shouldn't be marked as obsolete, even if its upgrade is available.
-		private bool IsUnitObsolete(City city, HashSet<Resource> accessibleResources) {
-			if (EngineStorage.gameData.rules.AllowLesserUnitProduction) return false;
-
-			if (this.GetProducibleUpgrade(city, accessibleResources) == null) return false;
-
-			return true;
+		/// Whether a Civ could build this unit, if it had a suitable city and necessary resources.
+		private bool IsAvailableTo(Civilization civ) {
+			return !this.unproducible && this.producibleBy.Contains(civ);
 		}
 
-		// For example, if we want to check if the Trebuchet is obsolete for the Koreans,
-		// what we can do, because we don't want to hardcode anywhere that
-		// the Hwacha is the "replacement" to the Cannon (which is Trebuchet's upgrade)
-		// we can check if the upgrade (Artillery) of the upgrade (Cannon) of our unit (Trebuchet)
-		// has other units that upgrade to it and are available to the Koreans.
-		// This is how we get that, since we can built a Hwacha,
-		// which upgrades to Artillery, that the Trebuchet is obsolete.
-		private List<UnitPrototype> GetUnitsThatUpgradeToThisUpgrade() {
-			var unitProtos = EngineStorage.gameData.unitPrototypes;
-
-			HashSet<UnitPrototype> upgradeUpgrades = (upgradesTo ?? [])
-				.SelectMany(x => x.upgradesTo ?? [])
-				.ToHashSet();
-
-			List<UnitPrototype> allUnits = unitProtos.Where(p
-				=> (p.upgradesTo ?? []).Intersect(upgradeUpgrades).Any())
-				.Except([this])
-				.ToList();
-
-			return allUnits;
-		}
-
-		// This should be the method we use to get the "true" upgrade of a given unit
-		public UnitPrototype GetProducibleUpgrade(City city, HashSet<Resource> accessibleResources) {
-			UnitPrototype upgrade = this.GetUnitUpgrade(city.owner.civilization);
-			if (upgrade == null) return null;
-
-			var unitUpgradeChain = city.owner.civilization.GetUpgradeChain(this);
-
-			var potentialUnits = this.GetUnitsThatUpgradeToThisUpgrade();
-
-			var units = unitUpgradeChain.Union(potentialUnits);
-
-			var producibleUnits = units.Where(uu =>
-				uu.MeetsProductionRequirements(city, accessibleResources)
-				&& uu.producibleBy.Contains(city.owner.civilization)
-			);
-
-			// picking the last item, as when trying to get the upgrade for a Warrior,
-			// and Medieval Infantry is available, we don't want to return the Swordsman
-			var unitUpgrade = SortInUpgradeOrder(producibleUnits).LastOrDefault();
-
-			return unitUpgrade;
-		}
-
-
-		private List<UnitPrototype> SortInUpgradeOrder(IEnumerable<UnitPrototype> units) {
-			var sorted = units.ToList();
-			sorted.Sort((a, b) => {
-				if (a.upgradesTo.Contains(b)) return -1;
-				if (b.upgradesTo.Contains(a)) return 1;
-				return 0;
-			});
-			return sorted;
-		}
-
+		/// Whether this unit can be built in this city (by the owner), given this particular set of resources.
 		private bool MeetsProductionRequirements(City city, HashSet<Resource> accessibleResources) {
 			if (!city.owner.HasRequiredTechnology(this)) {
 				return false;
@@ -247,6 +202,81 @@ namespace C7GameData {
 			}
 
 			return true;
+		}
+
+		/// A unit is obsolete if a unit in its upgrade chain can be produced (in this city
+		/// with the given resources).
+		///
+		/// "AllowLesserUnitProduction" removes unit obsolescence.
+		private bool IsUnitObsolete(City city, HashSet<Resource> accessibleResources) {
+			// TODO: Consider golden ages when determining whether a unit is obsolete.
+			// If a golden age has not yet been triggered and a unit can trigger one,
+			// it shouldn't be marked as obsolete, even if its upgrade is available.
+
+			if (EngineStorage.gameData.rules.AllowLesserUnitProduction) return false;
+
+			if (this.GetProducibleUpgrade(city, accessibleResources) == null) return false;
+
+			return true;
+		}
+
+		/// The "true" upgrade for any given in-game unit. The unique unit prototype available to
+		/// this unit for this civ, in this city, with the given resources.
+		public UnitPrototype GetProducibleUpgrade(City city, HashSet<Resource> accessibleResources) {
+			var civ = city.owner.civilization;
+
+			var unitUpgradeChain = this.GetUpgradeChain(civ);
+			if (!unitUpgradeChain.Any())
+				return null;
+
+			// We expand the upgrade chain with "siblings", units that join the chain from nearby "branches"
+			var potentialUnits = this.GetUnitsThatUpgradeTo(this.upgradesTo);
+			var units = unitUpgradeChain.Union(potentialUnits);
+
+			// Filter down to units we can produce
+			var producibleUnits = units.Where(uu =>
+				uu.MeetsProductionRequirements(city, accessibleResources)
+				&& uu.producibleBy.Contains(civ)
+			).ToList();
+
+			// Select the best unit we can upgrade to. Say we are upgrading a Warrior: if Medieval Infantry
+			// is available, we don't want to upgrade to a mere Swordsman.
+			var unitUpgrade = SortInUpgradeOrder(producibleUnits).LastOrDefault();
+
+			return unitUpgrade;
+		}
+
+		// For example, if we want to check if the Trebuchet is obsolete for the Koreans,
+		// what we can do, because we don't want to hardcode anywhere that
+		// the Hwacha is the "replacement" to the Cannon (which is Trebuchet's upgrade)
+		// we can check if the upgrade (Artillery) of the upgrade (Cannon) of our unit (Trebuchet)
+		// has other units that upgrade to it and are available to the Koreans.
+		// This is how we get that, since we can build a Hwacha,
+		// which upgrades to Artillery, that the Trebuchet is obsolete.
+		private List<UnitPrototype> GetUnitsThatUpgradeTo(ICollection<UnitPrototype> units) {
+			var unitProtos = EngineStorage.gameData.unitPrototypes;
+
+			HashSet<UnitPrototype> upgradeUpgrades = (units ?? [])
+				.SelectMany(x => x.upgradesTo ?? [])
+				.ToHashSet();
+
+			List<UnitPrototype> allUnits = unitProtos.Where(p
+					=> (p.upgradesTo ?? []).Intersect(upgradeUpgrades).Any())
+				.Except([this])
+				.ToList();
+
+			return allUnits;
+		}
+
+		/// Sort by the upgrade relation: if a upgrades to b, a is "smaller than" b
+		private List<UnitPrototype> SortInUpgradeOrder(IEnumerable<UnitPrototype> units) {
+			var sorted = units.ToList();
+			sorted.Sort((a, b) => {
+				if (a.upgradesTo.Contains(b)) return -1;
+				if (b.upgradesTo.Contains(a)) return 1;
+				return 0;
+			});
+			return sorted;
 		}
 	}
 }

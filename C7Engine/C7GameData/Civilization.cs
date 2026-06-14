@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace C7GameData {
@@ -95,22 +94,5 @@ namespace C7GameData {
 		}
 
 		public SettlerTileAdjustments Adjustments = new();
-
-		public List<UnitPrototype> GetUpgradeChain(UnitPrototype unit) {
-			return unit.upgradesTo.Where(x => x.producibleBy.Contains(this)).ToList();
-		}
-
-		public bool IsUnitAvailable(UnitPrototype unit) {
-			if (unit.unproducible) {
-				return false;
-			}
-
-			if (!unit.producibleBy.Contains(this)) {
-				return false;
-			}
-
-			return true;
-		}
 	}
-
 }

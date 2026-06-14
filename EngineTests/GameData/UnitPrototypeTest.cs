@@ -37,6 +37,8 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		List<UnitPrototype> protos = gd.unitPrototypes;
 
 		// setup civilizations and players
+		var netherlands = gd.civilizations.FirstOrDefault(c => c.name == "Netherlands");
+		var nether = new Player() { civilization = netherlands };
 		var americans = gd.civilizations.FirstOrDefault(c => c.name == "America");
 		var amer = new Player() { civilization = americans };
 		var ottomans = gd.civilizations.FirstOrDefault(c => c.name == "Ottomans");
@@ -59,17 +61,22 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 
 		// setup techs
 		var wheel = gd.techs.FirstOrDefault(t => t.Name == "The Wheel");
+		var bronze = gd.techs.FirstOrDefault(t => t.Name == "Bronze Working");
 		var horsebackRiding = gd.techs.FirstOrDefault(t => t.Name == "Horseback Riding");
 		var mathematics = gd.techs.FirstOrDefault(t => t.Name == "Mathematics");
+		var feudalism = gd.techs.FirstOrDefault(t => t.Name == "Feudalism");
 		var engineering = gd.techs.FirstOrDefault(t => t.Name == "Engineering");
 		var chivalry = gd.techs.FirstOrDefault(t => t.Name == "Chivalry");
 		var metallurgy = gd.techs.FirstOrDefault(t => t.Name == "Metallurgy");
 		var milTradition = gd.techs.FirstOrDefault(t => t.Name == "Military Tradition");
+		var nationalism = gd.techs.FirstOrDefault(t => t.Name == "Nationalism");
 		var flight = gd.techs.FirstOrDefault(t => t.Name == "Flight");
 		var replaceableParts = gd.techs.FirstOrDefault(t => t.Name == "Replaceable Parts");
 		var rocketry = gd.techs.FirstOrDefault(t => t.Name == "Rocketry");
 
 		// setup some unit prototypes
+		var spearman = protos.FirstOrDefault(p => p.name == "Spearman");
+		var swiss = protos.FirstOrDefault(p => p.name == "Swiss Mercenary");
 		var horseman = protos.FirstOrDefault(p => p.name == "Horseman");
 		var chariot = protos.FirstOrDefault(p => p.name == "Chariot");
 		var threeManChariot = protos.FirstOrDefault(p => p.name == "Three-Man Chariot");
@@ -80,6 +87,7 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		var catapult = protos.FirstOrDefault(p => p.name == "Catapult");
 		var trebuchet = protos.FirstOrDefault(p => p.name == "Trebuchet");
 		var cannon = protos.FirstOrDefault(p => p.name == "Cannon");
+		var rifleman = protos.FirstOrDefault(p => p.name == "Rifleman");
 		var hwacha = protos.FirstOrDefault(p => p.name == "Hwach'a");
 		var artillery = protos.FirstOrDefault(p => p.name == "Artillery");
 		var fighter = protos.FirstOrDefault(p => p.name == "Fighter");
@@ -120,6 +128,34 @@ public class UnitPrototypeConquestsTest : RemoteSaveLoader {
 		Assert.False(cavalry.CanProduce(ankara, new HashSet<Resource>() { horses, iron, saltpeter }));
 
 		Assert.True(sipahi.GetProducibleUpgrade(ankara, new HashSet<Resource>() { horses, iron, saltpeter }) == null);
+		#endregion
+
+		#region Netherlands
+		Tile amsterdamTile = new Tile(ID.None("tile"));
+		City amsterdam = new City(amsterdamTile, nether, "Amsterdam", gd.ids.CreateID("Amsterdam"));
+
+		Assert.True(spearman.producibleBy.Contains(netherlands));
+
+		nether.knownTechs.Add(bronze.id);
+
+		Assert.True(spearman.CanProduce(amsterdam, noResources));
+
+		nether.knownTechs.Add(feudalism.id);
+		Assert.True(spearman.CanProduce(amsterdam, noResources));
+		Assert.True(swiss.CanProduce(amsterdam, new HashSet<Resource>() { iron }));
+		// if the city has iron then we can't produce Spearman anymore, as we can produce their upgrade, the Swiss Mercenary
+		Assert.False(spearman.CanProduce(amsterdam, new HashSet<Resource>() { iron }));
+
+		nether.knownTechs.Add(nationalism.id);
+		Assert.True(rifleman.CanProduce(amsterdam, noResources));
+
+		Assert.True(spearman.GetProducibleUpgrade(amsterdam, new HashSet<Resource>() { iron, saltpeter }) == rifleman);
+		Assert.False(spearman.GetProducibleUpgrade(amsterdam, new HashSet<Resource>() { iron, saltpeter }) == swiss);
+
+		Assert.False(spearman.CanProduce(amsterdam, new HashSet<Resource>() { iron, saltpeter }));
+		Assert.False(swiss.CanProduce(amsterdam, new HashSet<Resource>() { iron, saltpeter }));
+		Assert.True(swiss.GetProducibleUpgrade(amsterdam, new HashSet<Resource>() { iron, saltpeter }) == rifleman);
+		Assert.True(rifleman.CanProduce(amsterdam, new HashSet<Resource>() { iron, saltpeter }));
 		#endregion
 
 		#region Hittites
