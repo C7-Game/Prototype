@@ -4,7 +4,6 @@ using C7Engine;
 using C7GameData;
 using Serilog;
 using System.Linq;
-using System.Globalization;
 
 /*
  UnitButtons contains the buttons at the bottom of the game UI when viewing the
@@ -91,6 +90,7 @@ public partial class UnitButtons : VBoxContainer {
 
 	private void AddNewButton(HBoxContainer row, string action) {
 		TextureButton button = new();
+		button.Hide();
 		TextureLoader.SetButtonTextures(button, "ui.unit_control." + action);
 		button.Pressed += () => { EmitSignal(SignalName.ActionRequested, action); };
 

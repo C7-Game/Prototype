@@ -1,39 +1,49 @@
 using System.Diagnostics;
-using System.Net.NetworkInformation;
+using System.Linq;
+using System.Threading.Tasks;
+using C7GameData;
 using Serilog;
 
 namespace C7Engine {
-	using System.Threading.Tasks;
-	using C7GameData;
 
 	public class TurnHandling {
 		private static ILogger log = Log.ForContext<TurnHandling>();
 
-		internal static void OnBeginTurn() {
+		public static void OnBeginTurn() {
 			GameData gameData = EngineStorage.gameData;
 			log.Information("\n*** Beginning turn " + gameData.turn + " ***");
+		}
 
-			foreach (MapUnit mapUnit in gameData.mapUnits)
-				mapUnit.OnBeginTurn();
+		public static void InitTurnData(Player player = null, bool skipTurn = false) {
+			GameData gameData = EngineStorage.gameData;
+			if (player == null) {
+				foreach (MapUnit mapUnit in gameData.mapUnits)
+					mapUnit.OnBeginTurn(skipTurn);
+			} else {
+				foreach (MapUnit mapUnit in gameData.mapUnits.Where(u => u.owner == player))
+					mapUnit.OnBeginTurn(skipTurn);
+			}
 		}
 
 		// Implements the game loop. This method is called when the game is started and when the player signals that they're done moving.
-		internal static async Task AdvanceTurn() {
+		public static async Task AdvanceTurn() {
 			Stopwatch stopwatch = new Stopwatch();
 			stopwatch.Start();
 			GameData gameData = EngineStorage.gameData;
-			while (true) { // Loop ends with a function return once we reach the UI controller during the movement phase
+
+			// Loop ends with a function return once we reach the UI controller during the movement phase
+			while (true) {
 				bool firstTurn = GetTurnNumber() == 0;
 
 				// Movement phase
 				if (await PlayPlayerTurns(gameData, firstTurn)) {
 					stopwatch.Stop();
-					log.Information("Turn time took " + stopwatch.ElapsedMilliseconds + " milliseconds");
+					log.Debug("Turn time took " + stopwatch.ElapsedMilliseconds + " milliseconds");
 					return;
 				}
 
-				//Clear all wait queue, so if a player ended the turn without handling all waited units, they are selected
-				//at the same place in the order.  Confirmed this is what Civ3 does.
+				// Clear all wait queue, so if a player ended the turn without handling all waited units, they are selected
+				// at the same place in the order. Confirmed this is what Civ3 does.
 				UnitInteractions.ClearWaitQueue();
 
 				BarbarianInteractions.SpawnBarbarians(gameData);
@@ -63,6 +73,7 @@ namespace C7Engine {
 				// save game is loaded, and that would erase the saved information
 				// about which players have played.
 				OnBeginTurn();
+				InitTurnData();
 				foreach (Player player in gameData.players) {
 					player.hasPlayedThisTurn = false;
 				}
@@ -76,7 +87,9 @@ namespace C7Engine {
 		/// <param name="firstTurn"></param>
 		/// <returns>true when it is time for the human to take control again</returns>
 		private static async Task<bool> PlayPlayerTurns(GameData gameData, bool firstTurn) {
-			foreach (Player player in gameData.players) {
+			// Order players: Human -> AI -> Barbarian AI
+			var orderedPlayers = gameData.players.OrderByDescending(p => !p.isBarbarians).ThenByDescending(p => p.isHuman).ToList();
+			foreach (Player player in orderedPlayers) {
 				if (player.hasPlayedThisTurn || player.defeated) {
 					continue;
 				}
@@ -94,7 +107,7 @@ namespace C7Engine {
 				} else if (player.id != EngineStorage.uiControllerID) {
 					player.hasPlayedThisTurn = true;
 				}
-				//Human player check.  Let the human see what's going on even if they are in observer mode.
+				//Human player check. Let the human see what's going on even if they are in observer mode.
 				if (player.id == EngineStorage.uiControllerID) {
 					new MsgStartTurn().send();
 					return true;

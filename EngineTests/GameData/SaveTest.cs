@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using C7Engine;
 using C7Engine.Lua;
 using C7GameData;
@@ -184,18 +185,24 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 		}
 	}
 
-	private Player CreateHeadlessGame(string path, string biqPath, Func<string, string> getPediaIconsPath) {
-		CreateGameParams options = new(PathUtils.luaRulesDir, biqPath) {
+	private async Task<Player> CreateHeadlessGame(string path, string biqPath, Func<string, string> getPediaIconsPath) {
+		GameParams options = new(PathUtils.luaRulesDir, biqPath) {
 			GetPediaIconsPath = getPediaIconsPath
 		};
-
-		return CreateGame.createGame(path, options).Result;
+		var player = CreateGame.createGame(path, options).Result;
+		TurnHandling.OnBeginTurn();
+		TurnHandling.InitTurnData();
+		await TurnHandling.AdvanceTurn();
+		return player;
 	}
 
-	private Player CreateHeadlessGame(SaveGame game) {
-		CreateGameParams options = new(PathUtils.luaRulesDir, "");
-
-		return CreateGame.createGame(game, options).Result;
+	private async Task<Player> CreateHeadlessGame(SaveGame game) {
+		GameParams options = new(PathUtils.luaRulesDir, "");
+		var player = CreateGame.createGame(game, options).Result;
+		TurnHandling.OnBeginTurn();
+		TurnHandling.InitTurnData();
+		await TurnHandling.AdvanceTurn();
+		return player;
 	}
 
 	private C7GameData.GameData ToGameData(SaveGame game) {
@@ -236,7 +243,7 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 	[Theory]
 	[InlineData(SaveType.basic, "basic")]
 	[InlineData(SaveType.standalone, "standalone")]
-	public void SimpleGame(SaveType saveType, string outputFilePostfix) {
+	public async Task SimpleGame(SaveType saveType, string outputFilePostfix) {
 		Log.Logger = new LoggerConfiguration()
 			.WriteTo.Console(outputTemplate: "[{Level:u3}] {Timestamp:HH:mm:ss} {SourceContext}: {Message:lj} {NewLine}{Exception}")
 			.MinimumLevel.Information()
@@ -246,7 +253,7 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 
 		new MsgSetAnimationsEnabled(false).send();
 
-		Player human = CreateHeadlessGame(developerSave);
+		Player human = await CreateHeadlessGame(developerSave);
 
 		// Make all the players AI players while we run the game in headless mode.
 		human.isHuman = false;
@@ -293,8 +300,8 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 	}
 
 	[Fact]
-	public void WorldWrapDetails() {
-		Player human = CreateHeadlessGame(fixture.saveGame);
+	public async Task WorldWrapDetails() {
+		Player human = await CreateHeadlessGame(fixture.saveGame);
 		WaitForStartTurnMessage();
 
 		C7GameData.GameData gd = null;
@@ -316,8 +323,8 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 
 
 	[Fact]
-	public void TurnTimeCalculations() {
-		Player human = CreateHeadlessGame(fixture.saveGame);
+	public async Task TurnTimeCalculations() {
+		Player human = await CreateHeadlessGame(fixture.saveGame);
 		WaitForStartTurnMessage();
 
 		C7GameData.GameData gd = null;
@@ -451,9 +458,9 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 	}
 
 
-	[Fact]
+	[SkippableFact]
 	public async void LoadSampleSaves() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) { return; }
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		string savesPath = PathUtils.getDataPath("saves");
 		Directory.CreateDirectory(savesPath);
@@ -489,9 +496,9 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 		Assert.True(i > 0);
 	}
 
-	[Fact]
+	[SkippableFact]
 	public void LoadAllConquestScenarios() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) { return; }
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		string[] singleplayerScenarios = {
 			"1 Mesopotamia.biq",
@@ -523,7 +530,7 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 		CheckScenariosInCiv3Subfolder("Conquests/Scenarios", multiplayerScenarios, runOneTurn: false, "multiplayer");
 	}
 
-	private void CheckScenariosInCiv3Subfolder(string subfolder, string[] scenarioNamesToTest, bool runOneTurn, string basename) {
+	private async Task CheckScenariosInCiv3Subfolder(string subfolder, string[] scenarioNamesToTest, bool runOneTurn, string basename) {
 		string conquests = Path.Join(Civ3Location.GetCiv3Path(), subfolder);
 		DirectoryInfo directoryInfo = new DirectoryInfo(conquests);
 		IEnumerable<FileInfo> saveFiles = directoryInfo.EnumerateFiles().Where(fi => scenarioNamesToTest.Contains(fi.Name));
@@ -608,7 +615,7 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 
 			// Finally, ensure we can run the first turn of the scenario.
 			if (runOneTurn) {
-				Player human = CreateHeadlessGame(saveFileInfo.FullName, PathUtils.defaultBicPath, getPediaIconsPath);
+				Player human = await CreateHeadlessGame(saveFileInfo.FullName, PathUtils.defaultBicPath, getPediaIconsPath);
 
 				// Make all the players AI players while we run the game in headless mode.
 				human.isHuman = false;

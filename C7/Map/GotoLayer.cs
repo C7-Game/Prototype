@@ -78,7 +78,7 @@ public partial class GotoLayer : LooseLayer {
 			return;
 		}
 
-		Game.GotoInfo gotoInfo = looseView.mapView.game.gotoInfo;
+		GotoInfo gotoInfo = looseView.mapView.game.gotoInfo;
 		Tile unitOriginTile = unit.location;
 
 		if (gotoInfo.destinationTile == tile) {

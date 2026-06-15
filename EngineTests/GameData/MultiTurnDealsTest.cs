@@ -10,11 +10,10 @@ namespace EngineTests.GameData;
 
 public class MultiTurnDealTest : RemoteSaveLoader {
 	private const string SAVES_FOLDER = "saves/multi-turn-deals";
-	[Fact]
+
+	[SkippableFact]
 	public async void TestMultiTurnDeal_Save_A() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		// Save game deal details
 		// Round: 47
@@ -89,11 +88,9 @@ public class MultiTurnDealTest : RemoteSaveLoader {
 		});
 	}
 
-	[Fact]
+	[SkippableFact]
 	public async void TestMultiTurnDeal_Save_B() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		// Save game deal details
 		// Round: 99
@@ -193,11 +190,9 @@ public class MultiTurnDealTest : RemoteSaveLoader {
 		});
 	}
 
-	[Fact]
+	[SkippableFact]
 	public async void TestMultiTurnDeal_Save_C() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		// Save game deal details
 		// Round: 99
@@ -343,11 +338,9 @@ public class MultiTurnDealTest : RemoteSaveLoader {
 		});
 	}
 
-	[Fact]
+	[SkippableFact]
 	public async void TestMultiTurnDeal_Save_D() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		// Save game deal details
 		// Round: 98
@@ -448,11 +441,9 @@ public class MultiTurnDealTest : RemoteSaveLoader {
 
 	}
 
-	[Fact]
+	[SkippableFact]
 	public async void TestMultiTurnDeal_Save_E() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		// Save game deal details
 		// Round: 0
@@ -602,11 +593,9 @@ public class MultiTurnDealTest : RemoteSaveLoader {
 		});
 	}
 
-	[Fact]
+	[SkippableFact]
 	public async void TestMultiTurnDeal_Save_F() {
-		if (Civ3TestData.ShouldSkipCiv3DependentTests()) {
-			return;
-		}
+		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		// Save game deal details
 		// Round: 1

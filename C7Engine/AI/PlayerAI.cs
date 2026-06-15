@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using C7Engine.Pathing;
 using C7GameData;
-using C7GameData.Save;
 using C7GameData.AIData;
 using C7Engine.AI;
 using C7Engine.AI.StrategicAI;
@@ -94,13 +93,15 @@ namespace C7Engine {
 		}
 
 		private static async Task DoUnitActions(Player player) {
-			// Reorder the list so that settlers are last, giving our escorts a
+			// Reorder the list so that settlers are second to last, giving our escorts a
 			// chance to configure themselves without wasting a turn.
-			player.units.Sort((x, y) => (x.unitType.name == "Settler").CompareTo(y.unitType.name == "Settler"));
+			// Finally reorder so that the workers are last, so in case a settler builds a new city,
+			// they move to terraform a tile instead of wasting a turn (especially in the very first round in a new game).
+			player.units.OrderBy(x => x.unitType.isSettler).ThenBy(x => x.unitType.isWorker);
 
 			// Any time we have an unescorted settler, wake up any other units
 			// on the same tile to force us to re-evaluate whether they should
-			// be an escort. Otherwise can have perfectly fine escorts sitting
+			// be an escort. Otherwise, can have perfectly fine escorts sitting
 			// there fortified.
 			foreach (MapUnit u in player.units) {
 				if (u.currentAI is SettlerAI settlerAi && settlerAi.data.escort == null) {
@@ -110,7 +111,7 @@ namespace C7Engine {
 				}
 			}
 
-			//Do things with units.  Copy into an array first to avoid collection-was-modified exception
+			// Do things with units. Copy into an array first to avoid collection-was-modified exception
 			foreach (MapUnit unit in player.units.ToArray()) {
 				// Don't waste time recalculating behaviors for fortified units.
 				// This means we'll have to unfortify all our units after

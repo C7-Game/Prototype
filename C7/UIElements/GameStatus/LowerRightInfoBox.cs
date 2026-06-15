@@ -56,6 +56,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		suggestion.AddThemeFontSizeOverride("font_size", fontSize);
 
 		this.CreateUI();
+		PleaseWait();
 	}
 
 	private void CreateUI() {
@@ -80,7 +81,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		nextTurnButton.TextureHover = nextTurnOnTexture;
 		nextTurnButton.SetPosition(new Vector2(0, 0));
 		AddChild(nextTurnButton);
-		nextTurnButton.Pressed += turnEnded;
+		nextTurnButton.Pressed += TurnEnded;
 
 
 		// Unit info
@@ -176,7 +177,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 		suggestion.Visible = true;
 	}
 
-	private void turnEnded() {
+	private void TurnEnded() {
 		log.Debug("Emitting the blinky button pressed signal");
 		EmitSignal(SignalName.BlinkyEndTurnButtonPressed);
 	}
@@ -293,7 +294,7 @@ public partial class LowerRightInfoBox : Civ3TextureRect {
 	private void HandleBoxClick() {
 		// When the turn can be ended, the click on the box is like clicking on the blinky button
 		if (timerStarted) {
-			turnEnded();
+			TurnEnded();
 			return;
 		}
 		// Otherwise we can center the camera to the unit currently active

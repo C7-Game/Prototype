@@ -137,7 +137,7 @@ namespace C7GameData {
 			string hPDesc = ((type.attack > 0) || (type.defense > 0)) ? $" ({this.hitPointsRemaining}/{this.maxHitPoints})" : "";
 			string displayName = this.IsCaptive() ? $" ({this.nationality.adjective}) {this.name}" : $" {this.name}";
 			string attackDesc = (type.bombard > 0) ? $"{type.attack}({type.bombard})" : type.attack.ToString();
-			string stats = $" ({attackDesc}.{type.defense}.{this.movementPoints.getMixedNumber()}/{type.movement})";
+			string stats = $" ({attackDesc}.{type.defense}.{(EngineStorage.uiControllerID == this.owner.id ? $"{this.movementPoints.getMixedNumber()}/" : "")}{type.movement})";
 			return $"{exp}{hPDesc}{displayName}{stats}".Trim();
 		}
 
@@ -679,16 +679,22 @@ namespace C7GameData {
 			// TODO: Consider friendly/neutral/enemy territory once that's implemented, barracks, the Red Cross
 		}
 
-		public void OnBeginTurn() {
+		public void OnBeginTurn(bool skipTurn = false) {
 			int maxMP = unitType.movement;
-			if (movementPoints.remaining >= maxMP) {
+			if (movementPoints.remaining >= maxMP && !skipTurn) {
 				int maxHP = maxHitPoints;
 				if (hitPointsRemaining < maxHP)
 					hitPointsRemaining += HealRateAt(location);
 				if (hitPointsRemaining > maxHP)
 					hitPointsRemaining = maxHP;
 			}
-			movementPoints.reset(maxMP);
+
+			if (skipTurn) {
+				movementPoints.skipTurn();
+			} else {
+				movementPoints.reset(maxMP);
+			}
+
 			defensiveBombardsRemaining = 1;
 		}
 

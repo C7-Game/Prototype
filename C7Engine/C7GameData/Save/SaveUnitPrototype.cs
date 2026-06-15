@@ -22,7 +22,7 @@ namespace C7GameData.Save {
 
 		public HashSet<string> producibleBy = [];
 
-		public string upgradeTo;
+		public List<string> upgradesTo;
 		public bool unproducible;
 
 		// Assorted boolean flags for the unit prototype. They're stored in
@@ -51,8 +51,8 @@ namespace C7GameData.Save {
 			if (proto.requiredTech != null)
 				requiredTech = proto.requiredTech.id;
 
-			if (proto.upgradeTo != null)
-				upgradeTo = proto.upgradeTo.name;
+			if (proto.upgradesTo != null)
+				upgradesTo = proto.upgradesTo?.Select(x => x.name).OrderBy(x => x).ToList() ?? [];
 
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;

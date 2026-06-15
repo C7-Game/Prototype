@@ -126,14 +126,14 @@ public partial class ScenarioSetup : Control {
 		thread.Start();
 	}
 
-	private void UpdateSaveAndStartGame(SaveGame save, GlobalSingleton Global) {
+	private void UpdateSaveAndStartGame(SaveGame save, GlobalSingleton global) {
 		foreach (SavePlayer sp in save.Players) {
 			sp.human = sp.civilization == this.civilization.name;
 		}
 		save.GameDifficulty = difficulty;
 
 		log.Information("saving updated scenario");
-		Global.SaveGame = save;
+		global.SaveGame = save;
 
 		log.Information("opening map");
 		CallDeferred("StartGame");

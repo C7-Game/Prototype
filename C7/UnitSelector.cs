@@ -2,6 +2,7 @@ using C7Engine;
 using C7GameData;
 using Godot;
 using Serilog;
+using static Game;
 
 /* This class controls the unit selection during the player turn.  It
    handles automatic unit selection in the _Process method, and
@@ -33,7 +34,7 @@ public partial class UnitSelector : Node {
 	}
 
 	public override void _Process(double delta) {
-		if (game.CurrentState != Game.GameState.PlayerTurn) return;
+		if (game.CurrentState != GameState.PlayerTurn) return;
 		if (EngineStorage.HasPendingAnimations()) return;
 
 		// If no unit is selected, move to the next one

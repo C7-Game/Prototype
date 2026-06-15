@@ -13,6 +13,7 @@ namespace C7GameData.Save {
 		public bool defeated = false;
 		public bool isIncludedInGame = true;
 		public bool canBePicked = true;
+		public bool skipFirstTurn = false;
 
 		public string civilization;
 
@@ -75,6 +76,7 @@ namespace C7GameData.Save {
 				isIncludedInGame = isIncludedInGame,
 				canBePicked = canBePicked,
 				hasPlayedThisTurn = hasPlayedCurrentTurn,
+				skipFirstTurn = skipFirstTurn,
 				defeated = defeated,
 				primaryColorIndex = primaryColorIndex,
 				secondaryColorIndex = secondaryColorIndex,

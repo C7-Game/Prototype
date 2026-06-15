@@ -6,13 +6,13 @@ using C7GameData.Save;
 
 namespace C7Engine;
 
-public class CreateGameParams {
+public class GameParams {
 	public string LuaRulesDir;
 	public string DefaultBicPath;
 
 	public Func<string, string> GetPediaIconsPath = s => s;
 
-	public CreateGameParams(string LuaRulesDir, string DefaultBicPath) {
+	public GameParams(string LuaRulesDir, string DefaultBicPath) {
 		this.LuaRulesDir = LuaRulesDir;
 		this.DefaultBicPath = DefaultBicPath;
 	}
@@ -25,12 +25,12 @@ public class CreateGame {
 		* quickly.  By keeping all the client-callable APIs in the EntryPoints folder,
 		* hopefully it won't be too much of a goose hunt to refactor it later if we decide to do so.
 		**/
-	public static async Task<Player> createGame(string loadFilePath, CreateGameParams options) {
+	public static async Task<Player> createGame(string loadFilePath, GameParams options) {
 		SaveGame save = SaveManager.LoadSave(loadFilePath, options.DefaultBicPath, options.GetPediaIconsPath);
 		return await createGame(save, options);
 	}
 
-	public static async Task<Player> createGame(SaveGame save, CreateGameParams options) {
+	public static async Task<Player> createGame(SaveGame save, GameParams options) {
 		GameData gameData = save.ToGameData(options.LuaRulesDir);
 
 		EngineStorage.gameData = gameData;
@@ -42,8 +42,6 @@ public class CreateGame {
 		};
 
 		EngineStorage.uiControllerID = humanPlayer.id;
-		TurnHandling.OnBeginTurn(); // Call for the first turn
-		await TurnHandling.AdvanceTurn();
 
 		return humanPlayer;
 	}

@@ -10,15 +10,15 @@ using Serilog;
 public partial class QuickStartSetup : Node {
 	private static ILogger log = LogManager.ForContext<ScenarioSetup>();
 
-	public static void Init(GlobalSingleton globalState) {
+	public static void Init(GlobalSingleton global) {
 		log.Information("Setting up a QuickStart game");
 
-		globalState.ResetLoadGameFields();
+		global.ResetLoadGameFields();
 
 		var save = GameModeLoader.Load(GamePaths.GameModesDir, GamePaths.GameMode);
 		WorldSize worldSize = GetWorldSize(save.WorldSizes);
 
-		globalState.WorldCharacteristics = new WorldCharacteristics(save) {
+		global.WorldCharacteristics = new WorldCharacteristics(save) {
 			barbarianActivity = GetBarbarianActivity(),
 			landform = GetLandform(),
 			oceanCoverage = GetOceanCoverage(),
@@ -29,7 +29,7 @@ public partial class QuickStartSetup : Node {
 			mapSeed = new Random().Next(),
 		};
 
-		globalState.SaveGame = save;
+		global.SaveGame = save;
 
 		Civilization player = GetPlayerCivilization(save.Civilizations);
 		Difficulty difficulty = GetDifficulty(save.Difficulties);
@@ -39,7 +39,7 @@ public partial class QuickStartSetup : Node {
 		GameSetup gameSetup = new() {
 			playerCivilization = player,
 			difficulty = difficulty,
-			worldCharacteristics = globalState.WorldCharacteristics,
+			worldCharacteristics = global.WorldCharacteristics,
 			opponents = opponents
 		};
 

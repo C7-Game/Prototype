@@ -51,6 +51,7 @@ namespace C7GameData {
 		//We should allow multiple humans, this is a temporary measure.
 		public bool isHuman = false;
 		public bool hasPlayedThisTurn = false;
+		public bool skipFirstTurn = false;
 
 		// Has this player been defeated?
 		public bool defeated = false;
@@ -318,8 +319,7 @@ namespace C7GameData {
 		}
 
 		public bool SitsOutFirstTurn() {
-			// TODO: Scenarios can also specify that certain players sit out the first turn. E.g. WW2 in the Pacific
-			return isBarbarians;
+			return this.isBarbarians || this.skipFirstTurn;
 		}
 
 		public static bool CanMoveFreely(Player player, Tile sourceTile, Tile targetTile) {

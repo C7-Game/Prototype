@@ -9,7 +9,72 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+public class GotoInfo {
+	public Tile destinationTile = null;
+	public int moveCost = -1;
+	public TilePath path = null;
+	public HashSet<System.Numerics.Vector2> pathCoords;
+	public bool attackingMove = false;
+	public Player requiresWarDeclarationOnPlayer = null;
+};
+
+public class TileInfo {
+	public Tile targetTile;
+	public HashSet<Tile> coveredTiles = [];
+	public HashSet<Tile> cityLabelsToHide = [];
+
+	public TileInfo(Tile tile) {
+		targetTile = tile;
+
+		List<TileDirection> coverage = [TileDirection.SOUTHWEST, TileDirection.SOUTH, TileDirection.SOUTHEAST];
+		foreach (var dir in coverage)
+			if (TryNeighbor(tile, dir, out var neighbor))
+				coveredTiles.Add(neighbor);
+
+		List<TileDirection> labelCoverage = [TileDirection.NORTHWEST, TileDirection.NORTH, TileDirection.NORTHEAST];
+		foreach (var dir in labelCoverage)
+			if (TryNeighbor(tile, dir, out var neighbor))
+				cityLabelsToHide.Add(neighbor);
+	}
+
+	private bool TryNeighbor(Tile tile, TileDirection dir, out Tile neighbor) {
+		neighbor = tile.neighbors[dir];
+		return neighbor != Tile.NONE;
+	}
+
+	public bool IsCovered(Tile tile) => tile == targetTile || coveredTiles.Contains(tile);
+
+	public bool HasCityLabelToCover(Tile tile) => cityLabelsToHide.Contains(tile);
+};
+
+public class BombardInfo {
+	public MapUnit bombardingUnit;
+	public Tile mouseTile;
+
+	public BombardInfo(MapUnit bombardingUnit) {
+		this.bombardingUnit = bombardingUnit;
+	}
+
+	public bool requiresWarDeclaration(Tile tile, out Player player) {
+		player = null;
+
+		var bombarder = bombardingUnit.owner;
+		var foreignUnits = tile.unitsOnTile.Where(x => x.owner != bombarder).ToList();
+		if (!foreignUnits.Any())
+			return false;
+
+		var targetPlayers = foreignUnits.Select(x => x.owner).Distinct();
+		var friendly= targetPlayers.Where(p => bombarder.IsAtPeaceWith(p)).ToList();
+		player = friendly.FirstOrDefault();
+		return friendly.Any();
+
+		// TODO: handle complex scenarios arising from multiple civs co-located on tile
+	}
+};
+
 public partial class Game : Node {
+	private ILogger log = LogManager.ForContext<Game>();
+
 	[Signal] public delegate void TurnEndedEventHandler();
 	[Signal] public delegate void ShowSpecificAdvisorEventHandler();
 	[Signal] public delegate void ShowCityScreenEventHandler();
@@ -20,106 +85,10 @@ public partial class Game : Node {
 
 	[Signal] public delegate void UnitMovedEventHandler();
 
-	private ILogger log = LogManager.ForContext<Game>();
-
-	public enum GameState {
-		PreGame,
-		PlayerTurn,
-		ComputerTurn
-	}
-
-	public Player controller; // Player that's controlling the UI.
-
-	private MapView mapView;
-
-	public GameState CurrentState { get; private set; } = GameState.PreGame;
-
-	public MapUnit CurrentlySelectedUnit => unitSelector.CurrentlySelectedUnit;
-	private bool HasCurrentlySelectedUnit() => CurrentlySelectedUnit != MapUnit.NONE;
-
-	// When the game is in "goto" mode, the current destination and the cost of getting
-	// there, in turns.
-	//
-	// Otherwise null.
-	public class GotoInfo {
-		public Tile destinationTile = null;
-		public int moveCost = -1;
-		public TilePath path = null;
-		public HashSet<System.Numerics.Vector2> pathCoords;
-		public bool attackingMove = false;
-		public Player requiresWarDeclarationOnPlayer = null;
-	};
-	public GotoInfo gotoInfo = null;
-
-	public class BombardInfo {
-		public MapUnit bombardingUnit;
-		public Tile mouseTile;
-
-		public BombardInfo(MapUnit bombardingUnit) {
-			this.bombardingUnit = bombardingUnit;
-		}
-
-		public bool requiresWarDeclaration(Tile tile, out Player player) {
-			player = null;
-
-			var bombarder = bombardingUnit.owner;
-			var foreignUnits = tile.unitsOnTile.Where(x => x.owner != bombarder).ToList();
-			if (!foreignUnits.Any())
-				return false;
-
-			var targetPlayers = foreignUnits.Select(x => x.owner).Distinct();
-			var friendly= targetPlayers.Where(p => bombarder.IsAtPeaceWith(p)).ToList();
-			player = friendly.FirstOrDefault();
-			return friendly.Any();
-
-			// TODO: handle complex scenarios arising from multiple civs co-located on tile
-		}
-	};
-	public BombardInfo bombardInfo = null;
-
-	public class TileInfo {
-		public Tile targetTile;
-		public HashSet<Tile> coveredTiles = [];
-		public HashSet<Tile> cityLabelsToHide = [];
-
-		public TileInfo(Tile tile) {
-			targetTile = tile;
-
-			List<TileDirection> coverage = [TileDirection.SOUTHWEST, TileDirection.SOUTH, TileDirection.SOUTHEAST];
-			foreach (var dir in coverage)
-				if (TryNeighbor(tile, dir, out var neighbor))
-					coveredTiles.Add(neighbor);
-
-			List<TileDirection> labelCoverage = [TileDirection.NORTHWEST, TileDirection.NORTH, TileDirection.NORTHEAST];
-			foreach (var dir in labelCoverage)
-				if (TryNeighbor(tile, dir, out var neighbor))
-					cityLabelsToHide.Add(neighbor);
-		}
-
-		private bool TryNeighbor(Tile tile, TileDirection dir, out Tile neighbor) {
-			neighbor = tile.neighbors[dir];
-			return neighbor != Tile.NONE;
-		}
-
-		public bool IsCovered(Tile tile) => tile == targetTile || coveredTiles.Contains(tile);
-
-		public bool HasCityLabelToCover(Tile tile) => cityLabelsToHide.Contains(tile);
-	};
-
-	public TileInfo tileInfo = null;
-
-	// When in observer mode, the number of turns to play before prompting the
-	// user to advance the turn manually. This allows for more rapid debugging
-	// without pressing the spacebar repeatedly.
-	public int turnsLeftToFastForward = 0;
-
 	[Export]
 	Control Toolbar;
 	private bool IsMovingCamera;
 	private Vector2 OldPosition;
-
-	Stopwatch loadTimer = new Stopwatch();
-	GlobalSingleton Global;
 
 	[Export]
 	private PopupOverlay popupOverlay;
@@ -139,6 +108,38 @@ public partial class Game : Node {
 	[Export]
 	public UnitSelector unitSelector;
 
+	Stopwatch loadTimer = new Stopwatch();
+
+	GlobalSingleton Global;
+
+	public Player controller; // Player that's controlling the UI.
+
+	private MapView mapView;
+
+	public enum GameState {
+		PlayerTurn,
+		ComputerTurn
+	}
+	public GameState CurrentState { get; private set; } = GameState.PlayerTurn;
+
+	public MapUnit CurrentlySelectedUnit => unitSelector.CurrentlySelectedUnit;
+	private bool HasCurrentlySelectedUnit() => CurrentlySelectedUnit != MapUnit.NONE;
+
+	// When the game is in "goto" mode, the current destination and the cost of getting
+	// there, in turns.
+	//
+	// Otherwise null.
+	public GotoInfo gotoInfo = null;
+
+	public BombardInfo bombardInfo = null;
+
+	public TileInfo tileInfo = null;
+
+	// When in observer mode, the number of turns to play before prompting the
+	// user to advance the turn manually. This allows for more rapid debugging
+	// without pressing the spacebar repeatedly.
+	public int turnsLeftToFastForward = 0;
+
 	bool errorOnLoad = false;
 
 	public override void _EnterTree() {
@@ -152,7 +153,8 @@ public partial class Game : Node {
 		Global = GetNode<GlobalSingleton>("/root/GlobalSingleton");
 
 		try {
-			await LoadGame();
+			await InitializeGame();
+			await StartGame();
 		} catch (Exception ex) {
 			errorOnLoad = true;
 			string message = ex.Message;
@@ -166,13 +168,39 @@ public partial class Game : Node {
 		}
 	}
 
-	private async Task LoadGame() {
+	private async Task InitializeGame() {
 		// Ensure we clear out our image caches, as scenarios and games will
 		// use the same filenames but have different content for them.
 		Util.ClearCaches();
 
-		CreateGameParams options = new(GamePaths.LuaRulesDir, GamePaths.DefaultBicPath)
-			{
+		GameParams options = CreateGameParams();
+
+		await CreateGameAndAssignPlayerController(options);
+
+		foreach (var gameDataPlayer in EngineStorage.gameData.players) {
+			if (gameDataPlayer.SitsOutFirstTurn() && TurnHandling.GetTurnNumber() == 0)
+				TurnHandling.InitTurnData(gameDataPlayer, true);
+		}
+
+		InitializeMapView();
+	}
+
+	private async Task StartGame() {
+		log.Information("Now in game!");
+
+		TurnHandling.OnBeginTurn();
+
+		loadTimer.Stop();
+		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
+		log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
+
+		EmitSignal(SignalName.GameInitialized);
+
+		Global.ResetLoadGameFields();
+	}
+
+	private GameParams CreateGameParams() {
+		return new(GamePaths.LuaRulesDir, GamePaths.DefaultBicPath) {
 			GetPediaIconsPath = (scenarioSearchPath) => {
 				// When the game loading logic tries to load the PediaIcons file, set the
 				// scenario search path and then use our Civ3MediaPath searching logic to
@@ -192,7 +220,10 @@ public partial class Game : Node {
 				return Util.Civ3MediaPath("Text/PediaIcons.txt");
 			}
 		};
+	}
 
+	private async Task CreateGameAndAssignPlayerController(GameParams options) {
+		// Initializes the game data and returns the "human" player
 		if (Global.SaveGame != null) {
 			controller = await CreateGame.createGame(Global.SaveGame, options);
 		} else if (Global.LoadGamePath != null) {
@@ -200,18 +231,6 @@ public partial class Game : Node {
 		} else {
 			throw new InvalidOperationException("Save data was not set");
 		}
-
-		Global.ResetLoadGameFields();
-
-		InitializeMapView();
-
-		log.Information("Now in game!");
-
-		loadTimer.Stop();
-		TimeSpan stopwatchElapsed = loadTimer.Elapsed;
-		log.Information("Game scene load time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
-
-		EmitSignal(SignalName.GameInitialized);
 	}
 
 	private void InitializeMapView() {
@@ -479,8 +498,8 @@ public partial class Game : Node {
 	}
 
 	public override void _UnhandledInput(InputEvent @event) {
-		// Don't handle mouse actions if UI elements are visible
-		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible || palaceScene.Visible) {
+		// Don't handle mouse actions if UI elements are visible, or it's the AI's turn
+		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible || palaceScene.Visible || CurrentState == GameState.ComputerTurn) {
 			IsMovingCamera = false;
 			return;
 		}
@@ -498,6 +517,7 @@ public partial class Game : Node {
 	}
 
 	private void HandleMouseButtonInput(InputEventMouseButton eventMouseButton) {
+		if (CurrentState == GameState.ComputerTurn) return;
 		if (eventMouseButton.ButtonIndex == MouseButton.Left) {
 			HandleLeftMouseButton(eventMouseButton);
 		} else if (eventMouseButton.ButtonIndex == MouseButton.Right && !eventMouseButton.IsPressed()) {
