@@ -92,13 +92,13 @@ namespace QueryCiv3.Biq {
 		public bool Amphibious { get => Util.GetFlag(Flags1[0], 6); }
 		public bool Submarine { get => Util.GetFlag(Flags1[0], 7); }
 
-		public bool AircraftCarrier { get => Util.GetFlag(Flags1[1], 0); }
+		public bool CanCarryAircraft { get => Util.GetFlag(Flags1[1], 0); }
 		public bool Draft { get => Util.GetFlag(Flags1[1], 1); }
 		public bool Immobile { get => Util.GetFlag(Flags1[1], 2); }
 		public bool SinkInSea { get => Util.GetFlag(Flags1[1], 3); }
 		public bool SinkInOcean { get => Util.GetFlag(Flags1[1], 4); }
 		// unused
-		public bool CarryFootUnitsOnly { get => Util.GetFlag(Flags1[1], 6); }
+		public bool CanCarryFootUnitsOnly { get => Util.GetFlag(Flags1[1], 6); }
 		public bool StartsGoldenAge { get => Util.GetFlag(Flags1[1], 7); }
 
 		public bool NuclearWeapon { get => Util.GetFlag(Flags1[2], 0); }

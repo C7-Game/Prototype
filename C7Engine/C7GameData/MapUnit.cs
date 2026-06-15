@@ -90,7 +90,11 @@ namespace C7GameData {
 		}
 
 		public bool CanTransport() {
-			return this.unitType.capacity > 0;
+			return this.unitType.capacity > 0 && this.unitType.actions.Contains(UnitAction.Unload);
+		}
+
+		public bool IsLoadable() {
+			return this.unitType.actions.Contains(UnitAction.Load);
 		}
 
 		public bool IsLoaded() {
@@ -865,9 +869,12 @@ namespace C7GameData {
 			if (owner != mapUnit.owner)
 				return false;
 
+			if (!mapUnit.IsLoadable())
+				return false;
+
 			var hasRoom = !IsFull();
 
-			// TODO: type restrictions: only subs can carry nukes, etc.
+			// TODO: type restrictions: only subs can carry nukes, carriers take aircraft, etc.
 			var suitableUnit = mapUnit.IsLandUnit();  // only land units in transports for now
 			return hasRoom && suitableUnit;
 		}

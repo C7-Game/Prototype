@@ -794,6 +794,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -838,7 +839,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -872,6 +874,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -916,7 +919,8 @@
         "disband",
         "goto",
         "explore",
-        "automate"
+        "automate",
+        "load"
       ],
       "terraformActions": [
         "Terraform-4",
@@ -951,6 +955,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Russia",
         "America",
@@ -973,7 +978,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -999,6 +1005,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1041,7 +1048,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -1067,6 +1075,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1110,7 +1119,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Rubber"
@@ -1139,6 +1149,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1182,7 +1193,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -1211,6 +1223,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "A Barbarian Chiefdom",
         "Rome",
@@ -1260,7 +1273,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -1286,6 +1300,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1331,7 +1346,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -1357,6 +1373,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1400,7 +1417,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -1426,6 +1444,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Egypt",
         "Greece",
@@ -1469,7 +1488,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -1498,6 +1518,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Greece",
@@ -1543,7 +1564,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses"
@@ -1572,6 +1594,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "A Barbarian Chiefdom",
         "Rome",
@@ -1624,7 +1647,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses"
@@ -1653,6 +1677,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1697,7 +1722,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -1726,6 +1752,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1771,7 +1798,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -1797,6 +1825,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1843,7 +1872,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Saltpeter"
@@ -1872,6 +1902,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1915,7 +1946,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses",
@@ -1945,6 +1977,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1991,7 +2024,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -2017,6 +2051,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2058,7 +2093,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses",
@@ -2088,6 +2124,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2134,7 +2171,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Rubber"
@@ -2163,6 +2201,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2208,7 +2247,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -2238,6 +2278,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2281,7 +2322,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -2311,6 +2353,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2354,7 +2397,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -2384,6 +2428,7 @@
       "bombardRange": 1,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2431,7 +2476,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -2457,6 +2503,7 @@
       "bombardRange": 1,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2505,7 +2552,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron",
@@ -2535,6 +2583,7 @@
       "bombardRange": 2,
       "rateOfFire": 2,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2582,7 +2631,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -2608,6 +2658,7 @@
       "bombardRange": 2,
       "rateOfFire": 3,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2655,7 +2706,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Aluminum"
@@ -2684,78 +2736,7 @@
       "bombardRange": 4,
       "rateOfFire": 3,
       "movement": 1,
-      "producibleBy": [
-        "Rome",
-        "Egypt",
-        "Greece",
-        "Babylon",
-        "Germany",
-        "Russia",
-        "China",
-        "America",
-        "Japan",
-        "France",
-        "India",
-        "Persia",
-        "Aztecs",
-        "Zululand",
-        "Iroquois",
-        "England",
-        "Mongols",
-        "Spain",
-        "Scandinavia",
-        "Ottomans",
-        "Celts",
-        "Arabia",
-        "Carthage",
-        "Korea",
-        "Sumeria",
-        "Hittites",
-        "Netherlands",
-        "Portugal",
-        "Byzantines",
-        "Inca",
-        "Maya"
-      ],
-      "unproducible": false,
-      "categories": [
-        "Land"
-      ],
-      "actions": [
-        "bombard",
-        "hold",
-        "wait",
-        "fortify",
-        "disband",
-        "goto"
-      ],
-      "requiredResources": [
-        "Aluminum"
-      ]
-    },
-    {
-      "name": "Tactical Nuke",
-      "art": {
-        "mainArt": {
-          "defaultName": "Tactical Nuke"
-        },
-        "thumbnailArt": {
-          "defaultIndex": 27
-        },
-        "pediaArt": {
-          "small": "art\\civilopedia\\icons\\units\\27icbmtacticalsmall.pcx",
-          "large": "art\\civilopedia\\icons\\units\\27icbmtacticallarge.pcx"
-        }
-      },
-      "shieldCost": 300,
-      "populationCost": 0,
-      "requiredTech": "tech-69",
-      "attack": 0,
-      "defense": 0,
-      "bombard": 0,
-      "bombardRange": 6,
-      "rateOfFire": 0,
-      "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2800,7 +2781,82 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "load"
+      ],
+      "requiredResources": [
+        "Aluminum"
+      ]
+    },
+    {
+      "name": "Tactical Nuke",
+      "art": {
+        "mainArt": {
+          "defaultName": "Tactical Nuke"
+        },
+        "thumbnailArt": {
+          "defaultIndex": 27
+        },
+        "pediaArt": {
+          "small": "art\\civilopedia\\icons\\units\\27icbmtacticalsmall.pcx",
+          "large": "art\\civilopedia\\icons\\units\\27icbmtacticallarge.pcx"
+        }
+      },
+      "shieldCost": 300,
+      "populationCost": 0,
+      "requiredTech": "tech-69",
+      "attack": 0,
+      "defense": 0,
+      "bombard": 0,
+      "bombardRange": 6,
+      "rateOfFire": 0,
+      "movement": 1,
+      "capacity": 0,
+      "producibleBy": [
+        "Rome",
+        "Egypt",
+        "Greece",
+        "Babylon",
+        "Germany",
+        "Russia",
+        "China",
+        "America",
+        "Japan",
+        "France",
+        "India",
+        "Persia",
+        "Aztecs",
+        "Zululand",
+        "Iroquois",
+        "England",
+        "Mongols",
+        "Spain",
+        "Scandinavia",
+        "Ottomans",
+        "Celts",
+        "Arabia",
+        "Carthage",
+        "Korea",
+        "Sumeria",
+        "Hittites",
+        "Netherlands",
+        "Portugal",
+        "Byzantines",
+        "Inca",
+        "Maya"
+      ],
+      "unproducible": false,
+      "categories": [
+        "Land"
+      ],
+      "actions": [
+        "bombard",
+        "hold",
+        "wait",
+        "fortify",
+        "disband",
+        "goto",
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Aluminum",
@@ -2830,6 +2886,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2903,6 +2960,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 2,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2952,7 +3010,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ]
     },
     {
@@ -2978,6 +3037,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 4,
+      "capacity": 3,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3026,7 +3086,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ]
     },
     {
@@ -3052,6 +3113,7 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 5,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3128,6 +3190,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 4,
+      "capacity": 4,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3177,7 +3240,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ]
     },
     {
@@ -3203,6 +3267,7 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3280,6 +3345,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 6,
+      "capacity": 6,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3323,7 +3389,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ],
       "requiredResources": [
         "Oil"
@@ -3352,6 +3419,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 7,
+      "capacity": 4,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3386,6 +3454,9 @@
         "Maya"
       ],
       "unproducible": false,
+      "flags": [
+        "canCarryAircraft"
+      ],
       "categories": [
         "Sea"
       ],
@@ -3395,7 +3466,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ],
       "requiredResources": [
         "Oil"
@@ -3424,6 +3496,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 4,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3496,6 +3569,7 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 8,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3569,6 +3643,7 @@
       "bombardRange": 2,
       "rateOfFire": 2,
       "movement": 5,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3645,6 +3720,7 @@
       "bombardRange": 2,
       "rateOfFire": 2,
       "movement": 7,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3719,6 +3795,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 5,
+      "capacity": 1,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3753,6 +3830,9 @@
         "Maya"
       ],
       "unproducible": false,
+      "flags": [
+        "canCarryTacticalMissiles"
+      ],
       "categories": [
         "Sea"
       ],
@@ -3762,7 +3842,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ],
       "requiredResources": [
         "Uranium"
@@ -3791,6 +3872,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3836,7 +3918,8 @@
         "hold",
         "wait",
         "fortify",
-        "disband"
+        "disband",
+        "load"
       ],
       "requiredResources": [
         "Oil"
@@ -3865,6 +3948,7 @@
       "bombardRange": 0,
       "rateOfFire": 3,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3906,7 +3990,8 @@
         "hold",
         "wait",
         "fortify",
-        "disband"
+        "disband",
+        "load"
       ],
       "requiredResources": [
         "Oil"
@@ -3935,6 +4020,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 3,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3969,6 +4055,9 @@
         "Maya"
       ],
       "unproducible": false,
+      "flags": [
+        "canCarryFootUnitsOnly"
+      ],
       "categories": [
         "Air"
       ],
@@ -3976,7 +4065,8 @@
         "hold",
         "wait",
         "fortify",
-        "disband"
+        "disband",
+        "unload"
       ],
       "requiredResources": [
         "Oil",
@@ -4006,6 +4096,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4046,7 +4137,8 @@
         "hold",
         "wait",
         "fortify",
-        "disband"
+        "disband",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -4076,6 +4168,7 @@
       "bombardRange": 0,
       "rateOfFire": 2,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4117,7 +4210,8 @@
         "hold",
         "wait",
         "fortify",
-        "disband"
+        "disband",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -4147,6 +4241,7 @@
       "bombardRange": 0,
       "rateOfFire": 3,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4188,7 +4283,8 @@
         "hold",
         "wait",
         "fortify",
-        "disband"
+        "disband",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -4230,6 +4326,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4273,7 +4370,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -4309,6 +4407,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 3,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4352,7 +4451,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -4378,6 +4478,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Aztecs"
       ],
@@ -4394,7 +4495,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -4420,6 +4522,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Babylon"
       ],
@@ -4436,7 +4539,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -4462,6 +4566,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Greece"
       ],
@@ -4478,7 +4583,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -4504,6 +4610,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Zululand"
       ],
@@ -4520,7 +4627,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -4546,6 +4654,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome"
       ],
@@ -4562,7 +4671,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -4591,6 +4701,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Persia"
       ],
@@ -4607,7 +4718,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -4636,6 +4748,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Egypt"
       ],
@@ -4652,7 +4765,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses"
@@ -4681,6 +4795,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "China"
       ],
@@ -4697,7 +4812,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses",
@@ -4727,6 +4843,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Iroquois"
       ],
@@ -4743,7 +4860,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses"
@@ -4772,6 +4890,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "France"
       ],
@@ -4788,7 +4907,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Saltpeter"
@@ -4817,6 +4937,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Japan"
       ],
@@ -4833,7 +4954,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -4862,6 +4984,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "India"
       ],
@@ -4878,7 +5001,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -4904,6 +5028,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Russia"
       ],
@@ -4917,7 +5042,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses",
@@ -4947,6 +5073,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Germany"
       ],
@@ -4963,7 +5090,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -4993,6 +5121,7 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 5,
+      "capacity": 0,
       "producibleBy": [
         "England"
       ],
@@ -5040,6 +5169,7 @@
       "bombardRange": 0,
       "rateOfFire": 2,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "America"
       ],
@@ -5051,7 +5181,8 @@
         "hold",
         "wait",
         "fortify",
-        "disband"
+        "disband",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -5081,6 +5212,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 5,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -5157,6 +5289,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Mongols"
       ],
@@ -5173,7 +5306,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses"
@@ -5202,6 +5336,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Spain"
       ],
@@ -5215,7 +5350,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses"
@@ -5244,6 +5380,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Scandinavia"
       ],
@@ -5260,7 +5397,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5286,6 +5424,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Ottomans"
       ],
@@ -5299,7 +5438,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses",
@@ -5329,6 +5469,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Celts"
       ],
@@ -5345,7 +5486,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -5374,6 +5516,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 3,
+      "capacity": 0,
       "producibleBy": [
         "Arabia"
       ],
@@ -5390,7 +5533,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses",
@@ -5420,6 +5564,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Carthage"
       ],
@@ -5436,7 +5581,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5462,6 +5608,7 @@
       "bombardRange": 1,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Korea"
       ],
@@ -5479,7 +5626,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Saltpeter"
@@ -5508,6 +5656,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -5553,7 +5702,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -5582,6 +5732,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -5628,7 +5779,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5653,6 +5805,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5685,6 +5838,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5694,7 +5848,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5719,6 +5874,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5728,7 +5884,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5753,6 +5910,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5762,7 +5920,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5787,6 +5946,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5796,7 +5956,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5821,6 +5982,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5830,7 +5992,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5855,6 +6018,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5864,7 +6028,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5889,6 +6054,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5898,7 +6064,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5923,6 +6090,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5932,7 +6100,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5957,6 +6126,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5966,7 +6136,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -5991,6 +6162,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6000,7 +6172,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6025,6 +6198,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6034,7 +6208,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6059,6 +6234,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6068,7 +6244,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6093,6 +6270,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6102,7 +6280,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6127,6 +6306,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6136,7 +6316,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6161,6 +6342,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6170,7 +6352,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6195,6 +6378,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6204,7 +6388,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6229,6 +6414,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6238,7 +6424,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6263,6 +6450,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6272,7 +6460,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6297,6 +6486,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6306,7 +6496,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6331,6 +6522,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6340,7 +6532,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6365,6 +6558,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6374,7 +6568,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6399,6 +6594,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6408,7 +6604,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6433,6 +6630,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6442,7 +6640,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6467,6 +6666,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6476,7 +6676,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6501,6 +6702,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Sumeria"
       ],
@@ -6517,7 +6719,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6543,6 +6746,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Hittites"
       ],
@@ -6559,7 +6763,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Horses"
@@ -6587,6 +6792,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6596,7 +6802,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6621,6 +6828,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6630,7 +6838,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6655,6 +6864,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6664,7 +6874,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6690,6 +6901,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 4,
+      "capacity": 3,
       "producibleBy": [
         "Portugal"
       ],
@@ -6709,7 +6921,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ]
     },
     {
@@ -6735,6 +6948,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Netherlands"
       ],
@@ -6751,7 +6965,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Iron"
@@ -6779,6 +6994,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6788,7 +7004,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6814,6 +7031,7 @@
       "bombardRange": 1,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -6861,7 +7079,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6886,6 +7105,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6895,7 +7115,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6920,6 +7141,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6929,7 +7151,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6954,6 +7177,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6963,7 +7187,8 @@
         "wait",
         "fortify",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -6988,6 +7213,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Inca"
       ],
@@ -7004,7 +7230,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -7030,6 +7257,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Maya"
       ],
@@ -7046,7 +7274,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -7072,6 +7301,7 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 3,
+      "capacity": 2,
       "producibleBy": [
         "Byzantines"
       ],
@@ -7089,7 +7319,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "unload"
       ]
     },
     {
@@ -7115,6 +7346,7 @@
       "bombardRange": 1,
       "rateOfFire": 2,
       "movement": 6,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7190,6 +7422,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7200,7 +7433,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "terraformActions": [
         "Terraform-3"
@@ -7228,6 +7462,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7238,7 +7473,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -7264,6 +7500,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7340,6 +7577,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7386,7 +7624,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ],
       "requiredResources": [
         "Oil",
@@ -7416,6 +7655,7 @@
       "bombardRange": 0,
       "rateOfFire": 1,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7459,7 +7699,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -7485,6 +7726,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 1,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7531,7 +7773,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     },
     {
@@ -7557,6 +7800,7 @@
       "bombardRange": 0,
       "rateOfFire": 0,
       "movement": 2,
+      "capacity": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7600,7 +7844,8 @@
         "fortify",
         "disband",
         "goto",
-        "explore"
+        "explore",
+        "load"
       ]
     }
   ],

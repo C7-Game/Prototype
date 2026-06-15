@@ -1151,8 +1151,8 @@ namespace C7GameData {
 			if (prto.GoTo) yield return UnitAction.Goto;
 			if (prto.Explore) yield return UnitAction.Explore;
 			if (prto.Automate) yield return UnitAction.Automate;
-			// if (prto.Load) yield return UnitAction.Load;
-			// if (prto.Unload) yield return UnitAction.Unload;
+			if (prto.Load) yield return UnitAction.Load;
+			if (prto.Unload) yield return UnitAction.Unload;
 		}
 
 		private static IEnumerable<TerraformKey> GetUnitTerraforms(PRTO prto) {
@@ -1213,9 +1213,12 @@ namespace C7GameData {
 				prototype.bombard = prto.BombardStrength;
 				prototype.bombardRange = prto.BombardRange;
 				prototype.rateOfFire = prto.RateOfFire;
-				if (prto.TurnToAttack) {
-					prototype.flags.Add(SaveUnitPrototype.Flag.RotateBeforeAttack);
-				}
+
+				if (prto.TurnToAttack) prototype.flags.Add(SaveUnitPrototype.Flag.RotateBeforeAttack);
+
+				if (prto.CanCarryFootUnitsOnly) prototype.flags.Add(SaveUnitPrototype.Flag.CanCarryFootUnitsOnly);
+				if (prto.CanCarryAircraft) prototype.flags.Add(SaveUnitPrototype.Flag.CanCarryAircraft);
+				if (prto.CanCarryTacticalMissiles) prototype.flags.Add(SaveUnitPrototype.Flag.CanCarryTacticalMissiles);
 
 				prototype.actions.UnionWith(GetUnitActions(prto));
 				prototype.terraformActions.UnionWith(GetUnitTerraforms(prto).Select(tfKey => terraformIdByCiv3Key[tfKey]));

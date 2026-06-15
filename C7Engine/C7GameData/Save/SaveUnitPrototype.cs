@@ -5,6 +5,9 @@ namespace C7GameData.Save {
 	public class SaveUnitPrototype {
 		public enum Flag {
 			RotateBeforeAttack,
+			CanCarryFootUnitsOnly,
+			CanCarryAircraft,
+			CanCarryTacticalMissiles
 		}
 
 		public string name { get; set; }
