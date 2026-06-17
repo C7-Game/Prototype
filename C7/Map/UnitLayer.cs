@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using C7.Textures;
 using C7GameData;
 using Godot;
@@ -210,10 +211,15 @@ public partial class UnitLayer : LooseLayer {
 	public MapUnit selectUnitToDisplay(LooseView looseView, Tile tile, List<MapUnit> units) {
 		// From the list, pick out which units are (1) the strongest defender vs the currently selected unit, (2) the currently selected unit
 		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
-		MapUnit bestDefender = units[0], selected = null, transporter = null, doingInterestingAnimation = null;
+		// If every regular defender is in some transport, the best defender _is_ a transport
+
+		MapUnit bestDefender = units.First(u => u.loadedOnUnitId == null);
+		MapUnit selected = null, transporter = null, doingInterestingAnimation = null;
 		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
 
 		foreach (var u in units) {
+			if (u.loadedOnUnitId != null && u != currentlySelectedUnit) continue;
+
 			if (u == currentlySelectedUnit) {
 				selected = u;
 				break;
