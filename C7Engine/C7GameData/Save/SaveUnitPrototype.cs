@@ -5,6 +5,9 @@ namespace C7GameData.Save {
 	public class SaveUnitPrototype {
 		public enum Flag {
 			RotateBeforeAttack,
+			CanCarryFootUnitsOnly,
+			CanCarryAircraft,
+			CanCarryTacticalMissiles
 		}
 
 		public string name { get; set; }
@@ -18,10 +21,11 @@ namespace C7GameData.Save {
 		public int bombardRange { get; set; }
 		public int rateOfFire { get; set; }
 		public int movement { get; set; }
+		public int capacity { get; set; }
 
 		public HashSet<string> producibleBy = [];
 
-		public string upgradeTo;
+		public List<string> upgradesTo;
 		public bool unproducible;
 
 		// Assorted boolean flags for the unit prototype. They're stored in
@@ -42,15 +46,16 @@ namespace C7GameData.Save {
 
 		public SaveUnitPrototype(UnitPrototype proto) {
 			(name, art, shieldCost, populationCost, unproducible,
-			attack, defense, bombard, bombardRange, rateOfFire, movement) =
+			attack, defense, bombard, bombardRange, rateOfFire, movement, capacity) =
 			(proto.name, proto.art, proto.shieldCost, proto.populationCost, proto.unproducible,
-			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire, proto.movement);
+			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire, proto.movement,
+			 proto.capacity);
 
 			if (proto.requiredTech != null)
 				requiredTech = proto.requiredTech.id;
 
-			if (proto.upgradeTo != null)
-				upgradeTo = proto.upgradeTo.name;
+			if (proto.upgradesTo != null)
+				upgradesTo = proto.upgradesTo?.Select(x => x.name).OrderBy(x => x).ToList() ?? [];
 
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;

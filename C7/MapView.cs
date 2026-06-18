@@ -651,16 +651,22 @@ public partial class MapView : Node2D {
 	const float MIN_SCALE = 0.1f;
 	const float MAX_SCALE = 4.0f;
 
+	private TransportInfoBox transportInfoBox;
 	private LowerRightInfoBox lowerRightInfoBox;
 	private MiniMap miniMap;
 
 	public override void _Ready() {
 		lowerRightInfoBox = GetNode<LowerRightInfoBox>("/root/C7Game/CanvasLayer/Control/GameStatus/LowerRightInfoBox");
+		lowerRightInfoBox.game = game;
 		lowerRightInfoBox.CenterCameraOnActiveUnit += OnCenterCameraOnUnit;
 
-		miniMap = new MiniMap(this);
 		var canvasControl = GetNode<Control>("/root/C7Game/CanvasLayer/Control");
+
+		miniMap = new MiniMap(this);
 		canvasControl.AddChild(miniMap);
+
+		transportInfoBox = new TransportInfoBox(game);
+		canvasControl.AddChild(transportInfoBox);
 	}
 
 	public override void _ExitTree() {

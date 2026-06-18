@@ -3,6 +3,7 @@ using Godot;
 using C7GameData;
 using C7Engine;
 using System;
+using System.Linq;
 
 public partial class RightClickMenu : VBoxContainer {
 	protected Game game;
@@ -64,7 +65,7 @@ public partial class RightClickMenu : VBoxContainer {
 		};
 	}
 
-	public void AddItem(string text, System.Action action, Texture2D icon = null) {
+	public Button AddItem(string text, System.Action action, Texture2D icon = null) {
 		Button button = new Button();
 		button.Text = text;
 		if (icon != null) {
@@ -75,6 +76,7 @@ public partial class RightClickMenu : VBoxContainer {
 			button.Pressed += action;
 		}
 		this.AddChild(button);
+		return button;
 	}
 
 	public void RemoveAll() {
@@ -118,11 +120,23 @@ public partial class RightClickTileMenu : RightClickMenu {
 		return uiStates[unit.id];
 	}
 
+	private bool isUnitLoadedOnTransport(MapUnit unit) => unit.IsLoaded();
+
 	private string getUnitAction(MapUnit unit, bool isFortified) {
 		if (unit.owner == game.controller) {
 			return isFortified ? "Wake" : "Activate";
 		}
 		return "Contact";
+	}
+
+	private static StyleBoxFlat AltItemStyleBox(Color color) {
+		return new StyleBoxFlat() {
+			BgColor = color,
+			ContentMarginLeft = 20f,
+			ContentMarginTop = 2f,
+			ContentMarginRight = 4f,
+			ContentMarginBottom = 2f
+		};
 	}
 
 	// uiUpdatedUnitStates maps unit guid to a boolean that is true if they were fortified
@@ -146,11 +160,20 @@ public partial class RightClickTileMenu : RightClickMenu {
 		List<MapUnit> playerUnits = tile.unitsOnTile.FindAll(unit => unit.owner.id == game.controller.id || observerMode);
 		List<MapUnit> nonPlayerUnits = tile.unitsOnTile.FindAll(unit => unit.owner.id != game.controller.id && !observerMode);
 
+		// Sort by transport group
+		playerUnits = playerUnits
+			.GroupBy(u => u.CanTransport() ? u.id : u.loadedOnUnitId ?? ID.None("Other"))
+			.SelectMany(g => g.OrderBy(u => u.CanTransport() ? int.MinValue : 0))
+			.ToList();
+
 		foreach (MapUnit unit in playerUnits) {
 			bool isFortified = isUnitFortified(unit, uiUpdatedUnitStates);
 			fortifiedCount += isFortified ? 1 : 0;
 			string actionName = getUnitAction(unit, isFortified);
-			AddItem($"{actionName} {unit.Describe()}", () => SelectUnit(unit.id));
+			var menuItem = AddItem($"{actionName} {unit.Describe()}", () => SelectUnit(unit.id));
+
+			if (isUnitLoadedOnTransport(unit))
+				ApplyAltItemOverrides(menuItem);
 		}
 		int unfortifiedCount = playerUnits.Count - fortifiedCount;
 
@@ -205,6 +228,17 @@ public partial class RightClickTileMenu : RightClickMenu {
 			if (!nonPlayerUnits[0].owner.isBarbarians)
 				AddItem($"Contact {nonPlayerUnits[0].owner.civilization.name}", contactCiv);
 		}
+	}
+
+	private static void ApplyAltItemOverrides(Button menuItem) {
+		var grey = Color.Color8(64, 64, 64, 255);
+		menuItem.AddThemeColorOverride("font_color", grey);
+		menuItem.AddThemeColorOverride("font_hover_color", grey);
+		menuItem.AddThemeColorOverride("font_pressed_color", grey);
+		menuItem.AddThemeColorOverride("font_focus_color", grey);
+		menuItem.AddThemeStyleboxOverride("normal", AltItemStyleBox(Color.Color8(255, 247, 222, 255)));
+		menuItem.AddThemeStyleboxOverride("hover", AltItemStyleBox(Color.Color8(255, 189, 107, 255)));
+		menuItem.AddThemeStyleboxOverride("pressed", AltItemStyleBox(Color.Color8(140, 200, 200, 255)));
 	}
 
 	public void SelectUnit(ID id) {

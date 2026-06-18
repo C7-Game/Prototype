@@ -99,6 +99,46 @@ namespace C7Engine {
 		}
 	}
 
+	public class MsgLoadToTransport : MessageToEngine {
+		private ID unitID;
+		private ID transportUnitId;
+
+		public MsgLoadToTransport(ID unitID, ID transportUnitId = null) {
+			this.unitID = unitID;
+			this.transportUnitId = transportUnitId;
+		}
+
+		public override void process() {
+			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
+			MapUnit transportUnit;
+			if (this.transportUnitId != null) {
+				transportUnit = EngineStorage.gameData.GetUnit(transportUnitId);
+				unit.BoardTransport(transportUnit);
+			} else
+				unit.TryBoardingTransportOnTile(unit.location);
+		}
+	}
+
+	public class MsgUnloadTransport : MessageToEngine {
+		private ID transportUnitId;
+
+		public MsgUnloadTransport(ID transportUnitId) {
+			this.transportUnitId = transportUnitId;
+		}
+
+		public override void process() {
+			// TODO: more selective unload, let human player choose
+			MapUnit transportUnit = EngineStorage.gameData.GetUnit(transportUnitId);
+			foreach (MapUnit unit in transportUnit.location.unitsOnTile) {
+				if (unit.loadedOnUnitId == transportUnit.id) {
+					unit.UnboardTransport(transportUnit);
+				}
+			}
+			new
+				MsgTransportUnloaded(transportUnit).send();
+		}
+	}
+
 	// A generic class that allows the UI to have the game engine run some
 	// action, assumed to be on a unit.
 	//

@@ -52,6 +52,8 @@ namespace C7GameData {
 		public float WorkerProgressTowardsJob { get; set; }
 		public Terraform WorkerJob { get; set; }
 
+		public ID loadedOnUnitId { get; set; }
+
 		public UnitAI currentAI;
 
 		public MapUnit(ID id) {
@@ -85,6 +87,22 @@ namespace C7GameData {
 
 		public bool IsCaptive() {
 			return !string.Equals(this.nationality.name, this.owner.civilization.name, StringComparison.CurrentCultureIgnoreCase);
+		}
+
+		public bool CanTransport() {
+			return this.unitType.capacity > 0 && this.unitType.actions.Contains(UnitAction.Unload);
+		}
+
+		public bool IsLoadable() {
+			return this.unitType.actions.Contains(UnitAction.Load);
+		}
+
+		public bool IsLoaded() {
+			return this.loadedOnUnitId != null;
+		}
+
+		public bool IsLoadedIn(MapUnit transport) {
+			return transport.id == this.loadedOnUnitId;
 		}
 
 		public override string ToString() {
@@ -210,13 +228,17 @@ namespace C7GameData {
 		}
 
 		public void fortify() {
-			facingDirection = TileDirection.SOUTHEAST;
+			ResetFacingDirection();
 			isFortified = true;
 			animate(MapUnit.AnimatedAction.FORTIFY);
 		}
 
 		public void wake() {
 			isFortified = false;
+		}
+
+		public void ResetFacingDirection() {
+			facingDirection = TileDirection.SOUTHEAST;
 		}
 
 		public IEnumerable<StrengthBonus> ListStrengthBonusesVersus(MapUnit opponent, CombatRole role, TileDirection? attackDirection) {
@@ -746,8 +768,13 @@ namespace C7GameData {
 				}
 				return false;
 			}
-			// TODO: to be modified to allow boarding on ships,
-			// that have the capacity and can take units of this kind
+
+			if (CanBoardTransportOnTile(tile))
+				return true;
+
+			if (CanUnloadToTile(tile))
+				return true;
+
 			if (this.IsLandUnit() && !tile.IsLand())
 				return false;
 
@@ -801,6 +828,80 @@ namespace C7GameData {
 
 			return true;
 		}
+
+		private bool CanBoardTransportOnTile(Tile tile) {
+			if (!IsLoadable())
+				return false;
+
+			var availableTransports = tile.unitsOnTile.Where(u => u.CanTransport());
+			foreach (var transport in availableTransports) {
+				if (transport.CanLoad(this))
+					return true;
+			}
+
+			return false;
+		}
+
+		private bool CanUnboardTransportToTile(Tile tile) {
+			return IsLoadable() && IsLoaded() && tile.IsLand();
+		}
+
+		private MapUnit SelectTransportToBoard(Tile tile) {
+			// TODO: Let human player choose via UI which transport to load unit in
+
+			var availableTransports = tile.unitsOnTile
+				.Where(u => u.CanTransport())
+				.Where(u => !u.IsFull());
+
+			// Sort candidates by free capacity, but prefer transports that already have units
+			availableTransports = availableTransports
+				.OrderBy(t => !t.IsEmpty())
+				.ThenByDescending(t => t.FreeCapacity());
+
+			foreach (var transport in availableTransports) {
+				if (transport.CanLoad(this))
+					return transport;
+			}
+
+			return null;
+		}
+
+		private MapUnit FindTransportToUnboard(Tile tile, ID transport) {
+			return tile.unitsOnTile.FirstOrDefault(t => t.id == transport);
+		}
+
+		private bool CanLoad(MapUnit mapUnit) {
+			if (owner != mapUnit.owner)
+				return false;
+
+			if (!mapUnit.IsLoadable())
+				return false;
+
+			var hasRoom = !IsFull();
+
+			// TODO: type restrictions: only subs can carry nukes, carriers take aircraft, etc.
+			var suitableUnit = mapUnit.IsLandUnit();  // only land units in transports for now
+			return hasRoom && suitableUnit;
+		}
+
+		// TODO: Transport chaining
+		// TODO: Amphibious assault
+
+		private bool CanUnloadToTile(Tile tile) {
+			if (!CanTransport())
+				return false;
+
+			var isValidLanding = tile.IsLand();
+			return !IsEmpty() && isValidLanding;
+		}
+
+		public int FreeCapacity() {
+			var loaded = this.location.unitsOnTile.Where(u => u.IsLoadedIn(this)).ToList();
+			return this.unitType.capacity - loaded.Count;
+		}
+
+		private bool IsEmpty() => unitType.capacity > 0 && FreeCapacity() == unitType.capacity;
+		private bool IsFull() => unitType.capacity > 0 && FreeCapacity() == 0;
 
 		private static bool HasHostileUnits(Tile tile, Player player) {
 			foreach (MapUnit other in tile.unitsOnTile) {
@@ -863,8 +964,28 @@ namespace C7GameData {
 
 				facingDirection = dir;
 				float movementCost = TilePath.GetMovementCost(this.owner, location, dir, newLoc);
+
+				// Leave old tile
 				if (!location.unitsOnTile.Remove(this))
 					throw new System.Exception("Failed to remove unit from tile it's supposed to be on");
+
+				// Move transported units, too
+				if (CanTransport()) {
+					var transported = location.unitsOnTile
+						.Where(u => u.IsLoadedIn(this)).ToList();
+
+					foreach (var tu in transported) {
+						if (!location.unitsOnTile.Remove(tu))
+							throw new System.Exception("Failed to remove unit from tile during transport move");
+						newLoc.unitsOnTile.Add(tu);
+						tu.location = newLoc;
+					}
+				}
+
+				TryBoardingTransportOnTile(newLoc);
+				TryUnboardingTransportToTile(newLoc);
+
+				// Enter new tile
 				// Make sure the unit is on the new location before claiming we have entered the tile
 				newLoc.unitsOnTile.Add(this);
 				location = newLoc;
@@ -878,6 +999,66 @@ namespace C7GameData {
 				movementPoints.onUnitMove(movementCost);
 			}
 			return true;
+		}
+
+		public void TryBoardingTransportOnTile(Tile newLoc) {
+			var enteringCity = newLoc.HasCity && newLoc != location;
+			if (enteringCity || !CanBoardTransportOnTile(newLoc))
+				return;
+
+			var t = SelectTransportToBoard(newLoc);
+			BoardTransport(t);
+		}
+
+		public void TryUnboardingTransportToTile(Tile newLoc) {
+			if (!CanUnboardTransportToTile(newLoc))
+				return;
+
+			var t = FindTransportToUnboard(this.location, this.loadedOnUnitId);
+			UnboardTransport(t);
+		}
+
+		public void BoardTransport(MapUnit t) {
+			if (t == null) {
+				// TODO: throw new System.Exception("Failed to find a transport to move to");
+				Log.Warning("Failed to find a transport to board");
+				return;
+			}
+			t.board(this);
+			isFortified = true;
+			ResetFacingDirection();
+			if (this.owner.isHuman)
+				new MsgUnitMoved(this).send();
+		}
+
+		public void UnboardTransport(MapUnit t) {
+			if (t == null) {
+				// TODO: throw new System.Exception("Failed to find the transport to unboard from");
+				Log.Warning("Failed to find a transport to unboard");
+				return;
+			}
+			t.unboard(this);
+			wake();
+			if (this.owner.isHuman)
+				new MsgUnitMoved(this).send();
+		}
+
+		/// <summary>
+		/// Boards unit into this transport
+		/// </summary>
+		/// <param name="mapUnit">The unit to load on a transport</param>
+		private void board(MapUnit mapUnit) {
+			mapUnit.loadedOnUnitId = this.id;
+			// TODO: consume moves?
+		}
+
+		/// <summary>
+		/// Unloads a unit from this transport
+		/// </summary>
+		/// <param name="mapUnit">The unit to unload from a transport</param>
+		private void unboard(MapUnit mapUnit) {
+			mapUnit.loadedOnUnitId = null;
+			// TODO: consume moves?
 		}
 
 		private float SumWorkerProgress(Tile tile, Terraform workerJob) {
@@ -1105,6 +1286,13 @@ namespace C7GameData {
 			}
 			if (canAutomate()) {
 				result.Add(UnitAction.Automate);
+			}
+
+			if (CanBoardTransportOnTile(this.location) && this.loadedOnUnitId == null) {
+				result.Add(UnitAction.Load);
+			}
+			if (CanUnloadToTile(this.location) && this.location.HasCity) {
+				result.Add(UnitAction.Unload);
 			}
 
 			// Eventually we will have advanced actions too, whose availability will rely on their base actions' availability.

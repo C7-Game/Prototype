@@ -48,7 +48,7 @@ namespace C7GameData {
 		public CultureGroup cultureGroup { get; private set; }
 
 		// This is null during gameplay to discourage usage, and instead use the cultureGroup
-		// It's only used for saving/loading 
+		// It's only used for saving/loading
 		public string cultureGroupKey;
 
 		public void SetCultureGroup(int index, string cultureGroupName) {
@@ -94,45 +94,5 @@ namespace C7GameData {
 		}
 
 		public SettlerTileAdjustments Adjustments = new();
-
-		// This method is primarily here to satisfy the weird upgrade chains from the .biq and .sav files
-		public List<UnitPrototype> GetUpgradeChain(UnitPrototype unit) {
-			List<UnitPrototype> result = [];
-			var current = unit;
-
-			while (true) {
-				var upgrade = current.upgradeTo;
-				if (upgrade == null) break;
-
-				var upgradeIsAvailable = upgrade.producibleBy.Contains(this) && !result.Contains(upgrade);
-
-				if (upgradeIsAvailable) {
-					result.Add(upgrade);
-				}
-				current = upgrade;
-
-			}
-
-			for (int i = result.Count - 1; i >= 0; i--) {
-				if (!result[i].producibleBy.Contains(this)) {
-					result.Remove(result[i]);
-				}
-			}
-
-			return result;
-		}
-
-		public bool IsUnitAvailable(UnitPrototype unit) {
-			if (unit.unproducible) {
-				return false;
-			}
-
-			if (!unit.producibleBy.Contains(this)) {
-				return false;
-			}
-
-			return true;
-		}
 	}
-
 }

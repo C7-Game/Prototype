@@ -51,15 +51,15 @@ return function(civ3_game_mode)
     -- Only preserve a unit if we have an art replacement for it
     if replacement_art then
       unit_prototype.art.mainArt.defaultName = replacement_art
-      
+
       -- TODO: these are just placeholders until we have some proper art
       unit_prototype.art.pediaArt.large = "art\\civilopedia\\icons\\units\\unit_large.png"
       unit_prototype.art.pediaArt.small = "art\\civilopedia\\icons\\units\\unit_small.png"
 
       -- Remove the unit upgrade if we don't have a sprite for it
-      local upgrade = unit_prototype.upgradeTo
+      local upgrade = unit_prototype.upgradesTo
       if not unit_replacement_art_map[upgrade] then
-        unit_prototype.upgradeTo = nil
+        unit_prototype.upgradesTo = nil
       end
 
       table.insert(updated_unit_prototypes, unit_prototype)

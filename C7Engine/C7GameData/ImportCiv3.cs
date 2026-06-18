@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Serilog;
 using QueryCiv3;
@@ -886,6 +887,9 @@ namespace C7GameData {
 		}
 
 		private void ImportSavUnits() {
+			var shadowIdMap = new Dictionary<int, ID>();
+			var loadMap = new Dictionary<ID, int>();
+
 			foreach (QueryCiv3.Sav.UNIT unit in savData.Unit) {
 				if (unit.OwnerID < 0 || unit.OwnerID >= save.Players.Count) {
 					continue;
@@ -912,7 +916,20 @@ namespace C7GameData {
 					saveUnit.action = "fortified";
 				}
 
+				shadowIdMap[unit.ID] = saveUnit.id;
+				if (unit.LoadedOnUnitId > 0)
+					loadMap[saveUnit.id] = unit.LoadedOnUnitId;
+
 				save.Units.Add(saveUnit);
+			}
+
+			// Civ3 saves have their own ID scheme.
+			// Here we translate one "loaded on" reference to another using information
+			// gathered above. Note that we can't be sure to be able to resolve identifiers
+			// until we have scanned all units. Hence a second pass for these mappings.
+			foreach (var saveUnit in save.Units) {
+				if (loadMap.TryGetValue(saveUnit.id, out var loadedOnUnitId))
+					saveUnit.loadedOnUnitId = shadowIdMap[loadedOnUnitId];
 			}
 		}
 
@@ -946,7 +963,7 @@ namespace C7GameData {
 
 				// The owner index is into the list of civs, and we have a 1:1
 				// mapping of players and civs.
-				// The exception to this are barbarian units (unit.OwnerType == 1), 
+				// The exception to this are barbarian units (unit.OwnerType == 1),
 				// where the owner points to the tribe (city name in other civs), rather than the player/civ
 				// TODO: implement tribes for barbarians
 				int owner = unit.OwnerType == 1 ? 0 : unit.Owner;
@@ -1134,6 +1151,8 @@ namespace C7GameData {
 			if (prto.GoTo) yield return UnitAction.Goto;
 			if (prto.Explore) yield return UnitAction.Explore;
 			if (prto.Automate) yield return UnitAction.Automate;
+			if (prto.Load) yield return UnitAction.Load;
+			if (prto.Unload) yield return UnitAction.Unload;
 		}
 
 		private static IEnumerable<TerraformKey> GetUnitTerraforms(PRTO prto) {
@@ -1188,14 +1207,18 @@ namespace C7GameData {
 				prototype.attack = prto.Attack;
 				prototype.defense = prto.Defense;
 				prototype.movement = prto.Movement;
+				prototype.capacity = prto.Capacity;
 				prototype.shieldCost = prto.ShieldCost;
 				prototype.populationCost = prto.PopulationCost;
 				prototype.bombard = prto.BombardStrength;
 				prototype.bombardRange = prto.BombardRange;
 				prototype.rateOfFire = prto.RateOfFire;
-				if (prto.TurnToAttack) {
-					prototype.flags.Add(SaveUnitPrototype.Flag.RotateBeforeAttack);
-				}
+
+				if (prto.TurnToAttack) prototype.flags.Add(SaveUnitPrototype.Flag.RotateBeforeAttack);
+
+				if (prto.CanCarryFootUnitsOnly) prototype.flags.Add(SaveUnitPrototype.Flag.CanCarryFootUnitsOnly);
+				if (prto.CanCarryAircraft) prototype.flags.Add(SaveUnitPrototype.Flag.CanCarryAircraft);
+				if (prto.CanCarryTacticalMissiles) prototype.flags.Add(SaveUnitPrototype.Flag.CanCarryTacticalMissiles);
 
 				prototype.actions.UnionWith(GetUnitActions(prto));
 				prototype.terraformActions.UnionWith(GetUnitTerraforms(prto).Select(tfKey => terraformIdByCiv3Key[tfKey]));
@@ -1223,33 +1246,124 @@ namespace C7GameData {
 			}
 		}
 
-		private void ImportUnitUpgrades() {
-			Dictionary<SaveUnitPrototype, SaveUnitPrototype> upgradeDict = BuildUpgradeDict();
+		private class UnitNode {
+			private readonly int _civCount;
+			private SaveUnitPrototype proto { get; }
+			public string name => proto.name;
+			public int shieldCost => proto.shieldCost;
+			public bool producibleBy(string civ) => proto.producibleBy.Contains(civ);
 
-			foreach (SaveUnitPrototype proto in save.UnitPrototypes) {
-				proto.upgradeTo = upgradeDict[proto]?.name;
+			public HashSet<UnitNode> prev { get; set; } = [];
+			public UnitNode next { get; set; } = null;
+
+			public UnitNode(SaveUnitPrototype proto, int civCount) {
+				_civCount = civCount;
+				this.proto = proto;
+			}
+
+			private bool IsCommon() => proto.producibleBy.Count > (_civCount / 2);
+
+			public override string ToString() {
+				var tail = next == null ? " -| " : $" -> {next}";
+				return IsCommon() ? $"{name}{tail}" : $"({name}){tail}";
 			}
 		}
 
-		// This method builds a Dictionary of unit upgrades based on the CIV3 data.
-		// The dictionary represents the raw upgrade relationships as defined in the game files.
-		private Dictionary<SaveUnitPrototype, SaveUnitPrototype> BuildUpgradeDict() {
+		private void ImportUnitUpgrades() {
+			List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> upgradePairs = ResolveUpgradePairs();
+			var civs = save.Civilizations.ToList();
+
+			// Build upgrade chains as linked lists, indexed by name
+			Dictionary<string, UnitNode> idx = BuildUnitUpgradeChains(upgradePairs, civs);
+
+			// Resolve upgrade mappings for each unit, per civilization
+			// By evaluating the unit upgrade chains in the context of every civilization,
+			// we capture the full picture of how any particular unit can upgrade by any civ.
+			// This full "closure" is the record we store in the save file and base ruleset.
+
+			var upgradeBook = new Dictionary<string, HashSet<string>>();
+
+			foreach (KeyValuePair<string, UnitNode> kv in idx) {
+				var name = kv.Key;
+
+				if (!upgradeBook.ContainsKey(name))
+					upgradeBook[name] = new HashSet<string>();
+
+				foreach (Civilization civ in civs) {
+					var node = kv.Value;
+
+					if (!node.producibleBy(civ.name))
+						continue;
+
+					var upgrade = node.next;
+					while (upgrade != null && !upgrade.producibleBy(civ.name)) {
+						upgrade = upgrade.next;
+					}
+
+					if (upgrade != null)
+						upgradeBook[name].Add(upgrade.name);
+				}
+			}
+
+			// Apply
+			foreach (SaveUnitPrototype proto in save.UnitPrototypes) {
+				if (upgradeBook.TryGetValue(proto.name, out HashSet<string> target)) {
+					proto.upgradesTo = target.OrderBy(x => x).ToList();
+				} else {
+					throw new DataException($"Missing upgrade for {proto.name}");
+				}
+			}
+		}
+
+		/// This function takes pairs of units in the save game format (complex upgrade chain relations)
+		/// and creates a name->Node mapping for further processing. The big idea here
+		/// is to reuse the same object, effectively gathering all references relating to
+		/// a particular unit in one object. And then building a nice index to these nodes.
+		///
+		/// See https://forums.civfanatics.com/threads/how-to-upgrade-regular-units-to-uus.108396/
+		private static Dictionary<string, UnitNode> BuildUnitUpgradeChains(
+			List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> upgradePairs,
+			List<Civilization> civilizations) {
+			var idx = new Dictionary<string, UnitNode>();
+			var civCount = civilizations.Count;
+
+			foreach (Tuple<SaveUnitPrototype, SaveUnitPrototype> pair in upgradePairs) {
+				var a = idx.TryGetValue(pair.Item1.name, out var nodeA) ? nodeA : new UnitNode(pair.Item1, civCount);
+				var b = pair.Item2 == null ? null :
+					idx.TryGetValue(pair.Item2.name, out var nodeB) ? nodeB : new UnitNode(pair.Item2, civCount);
+
+				a.next = b;
+				idx[a.name] = a;
+				if (b != null) {
+					b.prev.Add(a);
+					idx[b.name] = b;
+				}
+			}
+
+			return idx;
+		}
+
+		/// This method builds a Dictionary of unit upgrades based on Civ3 data.
+		/// The dictionary represents the raw upgrade relationships as they are defined in a save game file.
+		private List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> ResolveUpgradePairs() {
 			PRTO[] Prto = biq.Prto ?? defaultBiq.Prto;
 			var unitPrototypeDict = save.UnitPrototypes.ToDictionary(b => b.name);
 
-			Dictionary<SaveUnitPrototype, SaveUnitPrototype> upgradeDict = [];
+			List<Tuple<SaveUnitPrototype, SaveUnitPrototype>> upgradePairs = [];
 
 			foreach (PRTO prto in Prto) {
 				SaveUnitPrototype upgradeFrom = unitPrototypeDict[prto.Name];
 				if (prto.UpgradeTo != -1) {
 					SaveUnitPrototype upgradeTo = unitPrototypeDict[Prto[prto.UpgradeTo].Name];
-					upgradeDict[upgradeFrom] = upgradeTo;
+					upgradePairs.Add(new Tuple<SaveUnitPrototype, SaveUnitPrototype>(upgradeFrom, upgradeTo));
 				} else {
-					upgradeDict[upgradeFrom] = null;
+					upgradePairs.Add(new Tuple<SaveUnitPrototype, SaveUnitPrototype>(upgradeFrom, null));
 				}
 			}
 
-			return upgradeDict;
+			// Note: duplicate pairs are due to "OtherStrategy", alternate AI strategy for unit
+
+			return upgradePairs;
 		}
 
 		private void ImportBuildings() {

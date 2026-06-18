@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using C7.Textures;
 using C7GameData;
 using Godot;
@@ -207,13 +208,18 @@ public partial class UnitLayer : LooseLayer {
 	}
 
 	// Returns which unit should be drawn from among a list of units. The list is assumed to be non-empty.
-	public MapUnit selectUnitToDisplay(LooseView looseView, List<MapUnit> units) {
+	public MapUnit selectUnitToDisplay(LooseView looseView, Tile tile, List<MapUnit> units) {
 		// From the list, pick out which units are (1) the strongest defender vs the currently selected unit, (2) the currently selected unit
 		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
-		MapUnit bestDefender = units[0], selected = null, doingInterestingAnimation = null;
+		// If every regular defender is in some transport, the best defender _is_ a transport
+
+		MapUnit bestDefender = units.FirstOrDefault(u => u.loadedOnUnitId == null) ?? units[0];
+		MapUnit selected = null, transporter = null, doingInterestingAnimation = null;
 		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
 
 		foreach (var u in units) {
+			if (u.loadedOnUnitId != null && u != currentlySelectedUnit) continue;
+
 			if (u == currentlySelectedUnit) {
 				selected = u;
 				break;
@@ -228,8 +234,16 @@ public partial class UnitLayer : LooseLayer {
 				bestDefender = u;
 		}
 
-		// Prefer showing the selected unit, secondly show one doing a relevant animation, otherwise show the top defender
-		return selected ?? doingInterestingAnimation ?? bestDefender;
+		// On water, show the transport of the best defender (hopefully stable)
+		if (tile.IsWater()) {
+			foreach (var u in units) {
+				if (u.CanTransport() && bestDefender.IsLoadedIn(u))
+					transporter = u;
+			}
+		}
+
+		// Prefer showing the selected unit, then animation, then transport, otherwise show the top defender
+		return selected ?? doingInterestingAnimation ?? transporter ?? bestDefender;
 	}
 
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
@@ -254,7 +268,7 @@ public partial class UnitLayer : LooseLayer {
 
 		var white = Color.Color8(255, 255, 255);
 
-		MapUnit unit = selectUnitToDisplay(looseView, tile.unitsOnTile);
+		MapUnit unit = selectUnitToDisplay(looseView, tile, tile.unitsOnTile);
 		MapUnit.Appearance appearance = looseView.mapView.game.animationController.animTracker.getUnitAppearance(unit);
 		Vector2 animOffset = new Vector2(appearance.offsetX, appearance.offsetY) * MapView.cellSize;
 
