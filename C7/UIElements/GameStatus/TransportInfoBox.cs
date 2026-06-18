@@ -23,6 +23,7 @@ public partial class TransportInfoBox : Civ3TextureRect {
 	private TextureRect boxTransportRect = new();
 
 	private Dictionary<ID, bool> unitTracker = new();
+	private int cachedCapacity = 0;
 
 	public TransportInfoBox(Game game) {
 		_game = game;
@@ -49,12 +50,17 @@ public partial class TransportInfoBox : Civ3TextureRect {
 			var unit = _game.CurrentlySelectedUnit;
 			if (unit == null || unit == MapUnit.NONE || !unit.CanTransport()) {
 				Visible = false;
-				ClearUnitSprites();
+				Reset();
 				return;
 			}
 
 			if (!unitTracker.TryGetValue(unit.id, out _))
-				ClearUnitSprites();
+				Reset();
+			else if (unit.FreeCapacity() != cachedCapacity) {
+				// UI update post load/unload
+				Reset();
+				cachedCapacity = unit.FreeCapacity();
+			}
 
 			Visible = true;
 			var loadedUnits = gD.mapUnits.Where(u => u.IsLoadedIn(unit));
@@ -73,7 +79,7 @@ public partial class TransportInfoBox : Civ3TextureRect {
 		SetPosition(frameOffset + new Vector2(vp.X - boxSize.X, vp.Y - boxSize.Y));
 	}
 
-	private void ClearUnitSprites() {
+	private void Reset() {
 		unitTracker.Clear();
 		foreach (var c in GetChildren().Where(c => c is Button))
 			c.QueueFree();
@@ -125,7 +131,7 @@ public partial class TransportInfoBox : Civ3TextureRect {
 				line.Width = 3f;
 				line.DefaultColor = TextureLoader.LoadColor(unit.owner.GetPlayerColor());
 
-				// draw lines at normal scale, let parent scale things down 
+				// draw lines at normal scale, let parent scale things down
 				line.AddPoint(new Vector2(0, 0));
 				line.AddPoint(new Vector2(unitButtonSize.X, 0));
 				line.AddPoint(new Vector2(unitButtonSize.X, unitButtonSize.Y));

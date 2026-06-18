@@ -769,12 +769,10 @@ namespace C7GameData {
 				return false;
 			}
 
-			// TODO: to be modified to allow boarding on ships,
-			// that have the capacity and can take units of this kind
 			if (CanBoardTransportOnTile(tile))
 				return true;
 
-			if (CanUnboardTransportToTile(tile))
+			if (CanUnloadToTile(tile))
 				return true;
 
 			if (this.IsLandUnit() && !tile.IsLand())
@@ -832,6 +830,9 @@ namespace C7GameData {
 		}
 
 		private bool CanBoardTransportOnTile(Tile tile) {
+			if (!IsLoadable())
+				return false;
+
 			var availableTransports = tile.unitsOnTile.Where(u => u.CanTransport());
 			foreach (var transport in availableTransports) {
 				if (transport.CanLoad(this))
@@ -839,6 +840,10 @@ namespace C7GameData {
 			}
 
 			return false;
+		}
+
+		private bool CanUnboardTransportToTile(Tile tile) {
+			return IsLoadable() && IsLoaded() && tile.IsLand();
 		}
 
 		private MapUnit SelectTransportToBoard(Tile tile) {
@@ -879,15 +884,18 @@ namespace C7GameData {
 			return hasRoom && suitableUnit;
 		}
 
-		private bool CanUnboardTransportToTile(Tile tile) {
-			var isLoaded = this.loadedOnUnitId != null;
-			var isValidLanding = tile.IsLand() && this.IsLandUnit(); // TODO: other cases
-																	 // TODO: transport chaining?
+		// TODO: Transport chaining
+		// TODO: Amphibious assault
 
-			return isLoaded && isValidLanding;
+		private bool CanUnloadToTile(Tile tile) {
+			if (!CanTransport())
+				return false;
+
+			var isValidLanding = tile.IsLand();
+			return !IsEmpty() && isValidLanding;
 		}
 
-		private int FreeCapacity() {
+		public int FreeCapacity() {
 			var loaded = this.location.unitsOnTile.Where(u => u.IsLoadedIn(this)).ToList();
 			return this.unitType.capacity - loaded.Count;
 		}
@@ -1002,6 +1010,14 @@ namespace C7GameData {
 			BoardTransport(t);
 		}
 
+		public void TryUnboardingTransportToTile(Tile newLoc) {
+			if (!CanUnboardTransportToTile(newLoc))
+				return;
+
+			var t = FindTransportToUnboard(this.location, this.loadedOnUnitId);
+			UnboardTransport(t);
+		}
+
 		public void BoardTransport(MapUnit t) {
 			if (t == null) {
 				// TODO: throw new System.Exception("Failed to find a transport to move to");
@@ -1010,16 +1026,9 @@ namespace C7GameData {
 			}
 			t.board(this);
 			isFortified = true;
+			ResetFacingDirection();
 			if (this.owner.isHuman)
 				new MsgUnitMoved(this).send();
-		}
-
-		public void TryUnboardingTransportToTile(Tile newLoc) {
-			if (!CanUnboardTransportToTile(newLoc))
-				return;
-
-			var t = FindTransportToUnboard(this.location, this.loadedOnUnitId);
-			UnboardTransport(t);
 		}
 
 		public void UnboardTransport(MapUnit t) {
@@ -1282,7 +1291,7 @@ namespace C7GameData {
 			if (CanBoardTransportOnTile(this.location) && this.loadedOnUnitId == null) {
 				result.Add(UnitAction.Load);
 			}
-			if (CanUnboardTransportToTile(this.location) && this.location.HasCity) {
+			if (CanUnloadToTile(this.location) && this.location.HasCity) {
 				result.Add(UnitAction.Unload);
 			}
 

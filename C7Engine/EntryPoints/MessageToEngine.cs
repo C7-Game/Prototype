@@ -119,23 +119,23 @@ namespace C7Engine {
 		}
 	}
 
-	public class MsgUnloadFromTransport : MessageToEngine {
-		private ID unitID;
+	public class MsgUnloadTransport : MessageToEngine {
 		private ID transportUnitId;
 
-		public MsgUnloadFromTransport(ID unitID, ID transportUnitId = null) {
-			this.unitID = unitID;
+		public MsgUnloadTransport(ID transportUnitId) {
 			this.transportUnitId = transportUnitId;
 		}
 
 		public override void process() {
-			MapUnit unit = EngineStorage.gameData.GetUnit(unitID);
-			MapUnit transportUnit;
-			if (this.transportUnitId != null) {
-				transportUnit = EngineStorage.gameData.GetUnit(transportUnitId);
-				unit.UnboardTransport(transportUnit);
-			} else
-				unit.TryUnboardingTransportToTile(unit.location);
+			// TODO: more selective unload, let human player choose
+			MapUnit transportUnit = EngineStorage.gameData.GetUnit(transportUnitId);
+			foreach (MapUnit unit in transportUnit.location.unitsOnTile) {
+				if (unit.loadedOnUnitId == transportUnit.id) {
+					unit.UnboardTransport(transportUnit);
+				}
+			}
+			new
+				MsgTransportUnloaded(transportUnit).send();
 		}
 	}
 

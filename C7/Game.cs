@@ -360,6 +360,10 @@ public partial class Game : Node {
 			case MsgUnitMoved mUUAAB:
 				EmitSignal(SignalName.UnitMoved, new ParameterWrapper<MapUnit>(mUUAAB.Unit));
 				break;
+			case MsgTransportUnloaded mTU:
+				// UnitMoved is enough to refresh UI
+				EmitSignal(SignalName.UnitMoved, new ParameterWrapper<MapUnit>(mTU.Unit));
+				break;
 		}
 	}
 
@@ -612,8 +616,6 @@ public partial class Game : Node {
 		bool canMove = unitSelector.SetSelectedUnit(unit);
 		if (!canMove) {
 			TemporaryPopup.Show(this, "This unit has already moved.", screenPosition);
-		} else {
-			unit.ResetFacingDirection();
 		}
 	}
 
@@ -998,8 +1000,9 @@ public partial class Game : Node {
 				new MsgLoadToTransport(CurrentlySelectedUnit.id).send();
 		}
 		if (currentAction == C7Action.UnitUnload) {
-			if (CurrentlySelectedUnit != MapUnit.NONE && CurrentlySelectedUnit != null)
-				new MsgUnloadFromTransport(CurrentlySelectedUnit.id).send();
+			if (CurrentlySelectedUnit != MapUnit.NONE && CurrentlySelectedUnit != null) {
+				new MsgUnloadTransport(CurrentlySelectedUnit.id).send();
+			}
 		}
 
 		Terraform terraform = C7Action.ToTerraform(currentAction);

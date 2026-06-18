@@ -213,7 +213,7 @@ public partial class UnitLayer : LooseLayer {
 		// itself if it's in the list, and (3) any unit that is playing an animation that the player would want to see.
 		// If every regular defender is in some transport, the best defender _is_ a transport
 
-		MapUnit bestDefender = units.First(u => u.loadedOnUnitId == null);
+		MapUnit bestDefender = units.FirstOrDefault(u => u.loadedOnUnitId == null) ?? units[0];
 		MapUnit selected = null, transporter = null, doingInterestingAnimation = null;
 		var currentlySelectedUnit = looseView.mapView.game.CurrentlySelectedUnit;
 
