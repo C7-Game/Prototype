@@ -15,11 +15,8 @@ public class SaveGameFixture : IDisposable {
 	const int TestSeed = 123456;
 
 	public SaveGameFixture() {
-		// TODO: sort out
 		GameMode.Config basic = new("civ3");
 		GameMode.Config standalone = new("civ3", ["standalone"]);
-		// GameModeConfig basic = new("base-ruleset.json");
-		// GameModeConfig standalone = new("base-ruleset.json", ["standalone.lua"]);
 
 		saveGame = LoadSave(basic);
 		standaloneSaveGame = LoadSave(standalone);
@@ -68,7 +65,7 @@ public class SaveGameFixture : IDisposable {
 	}
 
 	/// <summary>
-	/// Given a save game, create test-ready game data. 
+	/// Given a save game, create test-ready game data.
 	/// </summary>
 	public static C7GameData.GameData HydrateSaveGame(SaveGame game) {
 		var fixture = new SaveGameFixture();
