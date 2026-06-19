@@ -401,7 +401,7 @@ namespace C7Engine {
 			// Now max out the science slider and then decrease it (increasing
 			// the tax rate) until we're not losing money.
 			player.scienceRate = MAX_SLIDER_VALUE - player.luxuryRate;
-			while (player.CalculateGoldPerTurn() < 0 && player.scienceRate > 0) {
+			while (player.scienceRate > 0 && !BudgetIsTolerable(player)) {
 				player.scienceRate--;
 				player.taxRate++;
 			}
@@ -440,6 +440,12 @@ namespace C7Engine {
 					CityTileAssignmentAI.AssignNewCitizenToTile(EngineStorage.gameData, newResident, manageMoods: true);
 				}
 			}
+		}
+
+		public static bool BudgetIsTolerable(Player player) {
+			var gpt = player.CalculateGoldPerTurn();
+			var tolerableDeficit = gpt > player.gold * -0.1;
+			return gpt > 0 || tolerableDeficit;
 		}
 	}
 }

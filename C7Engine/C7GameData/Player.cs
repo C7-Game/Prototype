@@ -121,6 +121,8 @@ namespace C7GameData {
 			}
 		}
 
+		private int lastGoldPerTurn = 0;
+
 		/// <summary>
 		/// Sets the current gold amount of the player. If the add parameter is true, the gold gets appended.<br/>
 		/// </summary>
@@ -751,7 +753,7 @@ namespace C7GameData {
 				}
 
 				// If that wasn't sufficient, go after luxuries.
-				if (scienceRate > 0) {
+				if (luxuryRate > 0) {
 					--luxuryRate;
 					++taxRate;
 					continue;
@@ -761,7 +763,8 @@ namespace C7GameData {
 				throw new Exception($"{this} was unable to get the budget under control despite being under the unit support cap and zeroing out the sliders (gold={gold}, gpt={CalculateGoldPerTurn()})");
 			}
 
-			gold += CalculateGoldPerTurn();
+			lastGoldPerTurn = CalculateGoldPerTurn();
+			gold += lastGoldPerTurn;
 		}
 
 		public void HandleCityUpdates(GameData gameData) {

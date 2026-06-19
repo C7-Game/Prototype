@@ -56,6 +56,11 @@ namespace C7Engine {
 			// I am not sure how civ III does this, although I guess we should consider stuff like
 			// no more buildings to build, reached unit cap, very bad economy with no other options,
 			// the WealthNever and WealthOften flags from RACE, etc
+
+			if (HasWeakEconomy(player)) {
+				return 100 - player.gold;
+			}
+
 			return -1000f;
 		}
 
@@ -134,6 +139,10 @@ namespace C7Engine {
 			// still in the expansion phase.
 			if (unitSupportCost > 0 && !atWar && !stats.inExpansionPhase) {
 				score -= unitSupportCost / 2;
+
+				if (HasWeakEconomy(player)) {
+					score -= unitSupportCost * 2;
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -288,6 +297,11 @@ namespace C7Engine {
 				score += 20;
 			}
 
+			// Penalize buildings if economy is weak
+			if (HasWeakEconomy(player)) {
+				score -= 10 * building.maintenanceCost;
+			}
+
 			return score;
 		}
 
@@ -373,6 +387,10 @@ namespace C7Engine {
 				}
 			}
 			return result;
+		}
+
+		public static bool HasWeakEconomy(Player player) {
+			return player.luxuryRate == 0 && player.scienceRate == 0 && player.gold < 100;
 		}
 	}
 }
