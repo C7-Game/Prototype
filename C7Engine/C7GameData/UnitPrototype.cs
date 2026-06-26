@@ -67,6 +67,7 @@ namespace C7GameData {
 		public int rateOfFire { get; set; }
 		public int movement { get; set; }
 		public int capacity { get; set; }
+		public int hpBonus { get; set; }
 		public HashSet<Civilization> producibleBy { get; set; } = [];
 		public List<UnitPrototype> upgradesTo = [];
 		public bool unproducible;
@@ -92,7 +93,8 @@ namespace C7GameData {
 
 		public HashSet<Terraform> terraformActions = [];
 
-		public bool isWorker => terraformActions.Count > 0;
+		// terraformActions.Count > 0 is not enough, as for example the Crusader unit can build a Fortress
+		public bool isWorker => terraformActions.Count > 0 && actions.Contains(UnitAction.Automate);
 		public bool isSettler => actions.Contains(UnitAction.BuildCity);
 
 
@@ -105,8 +107,8 @@ namespace C7GameData {
 			(attack, defense, bombard, bombardRange, rateOfFire)
 				= (proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire);
 
-			(movement, capacity, unproducible) =
-				(proto.movement, proto.capacity, proto.unproducible);
+			(movement, capacity, hpBonus, unproducible) =
+				(proto.movement, proto.capacity, proto.hpBonus, proto.unproducible);
 
 			categories = new HashSet<string>(proto.categories);
 			actions = proto.actions;

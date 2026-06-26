@@ -67,8 +67,7 @@ namespace C7Engine.Pathing {
 					}
 
 					foreach (Tile n in x.neighbors.Values) {
-						if (n.overlays.HasRoad() && !seen.Contains(n)) {
-							seen.Add(n);
+						if (n.IsRoaded() && seen.Add(n)) {
 							toCheck.Enqueue(n);
 						}
 					}

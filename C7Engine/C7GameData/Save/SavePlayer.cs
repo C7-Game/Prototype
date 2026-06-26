@@ -64,17 +64,20 @@ namespace C7GameData.Save {
 		// The current government of the player.
 		public ID governmentId;
 
+		public string alliance;
+
 		// Used when importing from .biq, to make it easier to distinguish barbarians from other players.
 		// It's not meant to be saved in the json.
 		[JsonIgnore]
 		public bool isBarbarian { get; init; }
 
-		public Player ToPlayer(GameMap map, List<Civilization> civilizations, List<Government> governments, List<Tech> techs, Rules rules) {
+		public Player ToPlayer(GameMap map, List<Civilization> civilizations, List<Government> governments, List<Tech> techs, Rules rules, HashSet<Alliance> alliances) {
 			Player player = new Player{
 				id = id,
 				isHuman = human,
 				isIncludedInGame = isIncludedInGame,
 				canBePicked = canBePicked,
+				alliance = alliance is not null ? alliances.First(a => a.name == alliance) : null,
 				hasPlayedThisTurn = hasPlayedCurrentTurn,
 				skipFirstTurn = skipFirstTurn,
 				defeated = defeated,
@@ -129,6 +132,7 @@ namespace C7GameData.Save {
 			id = player.id;
 			isIncludedInGame = player.isIncludedInGame;
 			canBePicked = player.canBePicked;
+			alliance = (player.isBarbarians || player.alliance == null) ? null : player.alliance.name;
 			primaryColorIndex = player.primaryColorIndex;
 			secondaryColorIndex = player.secondaryColorIndex;
 			human = player.isHuman;

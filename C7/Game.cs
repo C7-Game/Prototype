@@ -178,8 +178,11 @@ public partial class Game : Node {
 		await CreateGameAndAssignPlayerController(options);
 
 		foreach (var gameDataPlayer in EngineStorage.gameData.players) {
-			if (gameDataPlayer.SitsOutFirstTurn() && TurnHandling.GetTurnNumber() == 0)
-				TurnHandling.InitTurnData(gameDataPlayer, true);
+			if (TurnHandling.GetTurnNumber() == 0)
+				if (gameDataPlayer.SitsOutFirstTurn())
+					TurnHandling.InitTurnData(gameDataPlayer, true);
+				else if (Global.SaveGame != null)
+					TurnHandling.InitTurnData(gameDataPlayer, false);
 		}
 
 		InitializeMapView();
@@ -347,6 +350,18 @@ public partial class Game : Node {
 												}),
 						PopupOverlay.PopupCategory.Advisor);
 				}
+				break;
+			case MsgDisplayStopWorkerActionPopup mDSWA:
+				popupOverlay.ShowPopup(
+					new ConfirmationPopup(
+						$"This worker has been ordered to {C7Action.ToTooltip(mDSWA.workerJob.UIAction)} and will be done in {mDSWA.turnsLeft} turns." +
+						$"\nDo you want them to stop?",
+						"Yes, there is more important work to do!",
+						"No, carry on.",
+						() => {
+							new MsgDoStopWorkerAction(mDSWA.worker).send();
+						}),
+					PopupOverlay.PopupCategory.Advisor);
 				break;
 			case MsgWarDeclaration mWD:
 				popupOverlay.ShowPopup(
@@ -601,7 +616,6 @@ public partial class Game : Node {
 	}
 
 	private void HandleUnitSelectionTileClick(InputEventMouseButton eventMouseButton) {
-
 		Tile tile = PositionToTile(eventMouseButton.Position);
 		if (tile == null) {
 			return;
@@ -618,8 +632,15 @@ public partial class Game : Node {
 
 	private void SelectUnit(MapUnit unit, Vector2 screenPosition) {
 		bool canMove = unitSelector.SetSelectedUnit(unit);
+
+		if (unit.WorkerJob != null) {
+			return;
+		}
+
+		Tile tile = PositionToTile(screenPosition);
+
 		if (!canMove) {
-			TemporaryPopup.Show(this, "This unit has already moved.", screenPosition);
+			new MsgShowTemporaryPopup("This unit has already moved.", tile).send();
 		}
 	}
 
@@ -642,13 +663,15 @@ public partial class Game : Node {
 	private void HandleRightClickOnTile(Tile tile, InputEventMouseButton eventMouseButton) {
 		bool shiftDown = Input.IsKeyPressed(Godot.Key.Shift);
 
+		var activeTile = controller.tileKnowledge.isActiveTile(tile);
+
 		// Handle the shortcut of shift+right clicking a city to get the change production menu.
-		if (shiftDown && tile.cityAtTile?.owner == controller)
+		if (shiftDown && activeTile && tile.cityAtTile?.owner == controller)
 			new RightClickChooseProductionMenu(this, tile.cityAtTile).Open(eventMouseButton.Position);
-		else if (!shiftDown && tile.unitsOnTile.Count > 0)
+		else if (!shiftDown && activeTile && tile.unitsOnTile.Count > 0)
 			// There are units on this title, so open that menu.
 			new RightClickTileMenu(this, tile).Open(eventMouseButton.Position);
-		else if (!shiftDown && tile.cityAtTile?.owner == controller)
+		else if (!shiftDown && activeTile && tile.cityAtTile?.owner == controller)
 			// There are no units, but this is the player's city.
 			new RightClickCityMenu(this, tile).Open(eventMouseButton.Position);
 		else if (bombardInfo != null)
@@ -1066,6 +1089,7 @@ public partial class Game : Node {
 			}), PopupOverlay.PopupCategory.Advisor);
 	}
 
+	private Tile lastTile = null;
 	private GotoInfo GetGotoInfo(Vector2 mousePos) {
 		GotoInfo result = new();
 
@@ -1074,12 +1098,20 @@ public partial class Game : Node {
 		// Figure out which tile it was.
 		EngineStorage.ReadGameData((GameData gameData) => {
 			Tile tile = mapView.tileOnScreenAt(gameData.map, mousePos);
-			result.destinationTile = tile;
+			if (tile == lastTile) {
+				result = gotoInfo;
+				return;
+			}
+			lastTile = result.destinationTile = tile;
 
 			// Figure out what unit is in goto mode. If the tile we're hovering over is
 			// different than the tile the unit is on, calculate the path to move there.
 			MapUnit unit = tile == null ? null : gameData.GetUnit(CurrentlySelectedUnit.id);
-			if (unit != null && unit.location != tile) {
+
+			// Units like the Bomber don't have a go-to action
+			if (unit != null && !unit.GetAvailableActions().Contains(UnitAction.Goto)) {
+				result = null;
+			} else if (unit != null && unit.location != tile) {
 				result.path = PathingAlgorithmChooser.GetAlgorithm(unit).PathFrom(unit.location, tile, unit);
 				result.moveCost =
 					result.path.PathCost(unit.owner, unit.location, unit.unitType.movement, unit.movementPoints.remaining);

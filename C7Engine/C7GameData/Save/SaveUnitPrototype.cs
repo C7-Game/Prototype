@@ -22,6 +22,7 @@ namespace C7GameData.Save {
 		public int rateOfFire { get; set; }
 		public int movement { get; set; }
 		public int capacity { get; set; }
+		public int hpBonus { get; set; }
 
 		public HashSet<string> producibleBy = [];
 
@@ -46,10 +47,10 @@ namespace C7GameData.Save {
 
 		public SaveUnitPrototype(UnitPrototype proto) {
 			(name, art, shieldCost, populationCost, unproducible,
-			attack, defense, bombard, bombardRange, rateOfFire, movement, capacity) =
+			attack, defense, bombard, bombardRange, rateOfFire, movement, capacity, hpBonus) =
 			(proto.name, proto.art, proto.shieldCost, proto.populationCost, proto.unproducible,
 			 proto.attack, proto.defense, proto.bombard, proto.bombardRange, proto.rateOfFire, proto.movement,
-			 proto.capacity);
+			 proto.capacity, proto.hpBonus);
 
 			if (proto.requiredTech != null)
 				requiredTech = proto.requiredTech.id;

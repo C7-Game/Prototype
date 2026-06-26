@@ -81,9 +81,11 @@ public partial class UnitSelector : Node {
 			unit.path = TilePath.NONE;
 		}
 
-		// Allow cancellation of active worker jobs by clicking on the unit.
+		// Ask for confirmation to cancel an active worker's job by clicking on the unit.
 		if (unit.WorkerJob != null) {
-			unit.resetWorkerJob();
+			var turnsToFinish = unit.TurnsToCompleteTerraform(unit.WorkerJob);
+			new MsgDisplayStopWorkerActionPopup(unit, unit.WorkerJob, turnsToFinish).send();
+			return unit.WorkerJob == null && unit.movementPoints.remaining >= 1.0f;
 		}
 
 		// Allow cancellation automation via clicking on the unit.

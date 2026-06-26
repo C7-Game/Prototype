@@ -1,3 +1,5 @@
+using static C7GameData.PlayerRelationship;
+
 namespace C7GameData {
 	using Serilog;
 	using System.Collections.Generic;
@@ -37,7 +39,7 @@ namespace C7GameData {
 		public int hitPointsRemaining { get; set; }
 		public int maxHitPoints {
 			get {
-				return experienceLevel.baseHitPoints; // TODO: Include bonus HP from unit type
+				return this.experienceLevel.baseHitPoints + this.unitType.hpBonus;
 			}
 		}
 		public bool isFortified { get; set; }
@@ -47,7 +49,7 @@ namespace C7GameData {
 		//sentry, etc. will come later.  For now, let's just have a couple things so we can cycle through units that aren't fortified.
 		public int defensiveBombardsRemaining;
 
-		public TileDirection facingDirection;
+		public TileDirection facingDirection = TileDirection.SOUTHEAST;
 
 		public float WorkerProgressTowardsJob { get; set; }
 		public Terraform WorkerJob { get; set; }
@@ -71,6 +73,9 @@ namespace C7GameData {
 		}
 		public bool IsWaterUnit() {
 			return this.unitType.categories.Contains("Sea");
+		}
+		public bool IsAirUnit() {
+			return this.unitType.categories.Contains("Air");
 		}
 
 		public bool CanDefendOnLand() {
@@ -209,11 +214,14 @@ namespace C7GameData {
 			// worker that would take 2 turns. In order for the job to take the
 			// expected 4 turns we need to multiply by the movement cost of the
 			// terrain. This also makes roading hills/mountains more expensive.
-			return workerJob.TurnsToComplete * tile.overlayTerrainType.movementCost;
+			return tile.overlayTerrainType.movementCost * workerJob.TurnsToComplete;
 		}
 
-		public async Task animateAsync(MapUnit.AnimatedAction action, AnimationEnding ending = AnimationEnding.Stop) {
-			if (EngineStorage.animationsEnabled && !EngineStorage.gameData.observerMode) {
+		public async Task animateAsync(AnimatedAction action, AnimationEnding ending = AnimationEnding.Stop) {
+			var animationsEnabled = EngineStorage.animationsEnabled && !EngineStorage.gameData.observerMode;
+			var skipAnimations = SkipAnimations(action);
+
+			if (animationsEnabled && !skipAnimations) {
 				var msg = new MsgStartUnitAnimation(this, action, ending);
 				msg.send();
 
@@ -225,6 +233,23 @@ namespace C7GameData {
 
 		public void animate(MapUnit.AnimatedAction action, AnimationEnding ending = AnimationEnding.Stop) {
 			_ = animateAsync(action, ending);
+		}
+
+		private bool SkipAnimations(AnimatedAction action) {
+			if (action != AnimatedAction.RUN) return false;
+
+			// as soon as we move, the tile we were just on becomes the previous tile
+			var isOnRailroad = Tile.IsTileValid(this.previousLocation) && this.previousLocation.overlays.HasRailroad();
+			if (!isOnRailroad) return false;
+
+			// and the tile we are moving towards, becomes the current tile
+			var movingOnRailroad = Tile.IsTileValid(this.location) && this.location.overlays.HasRailroad();
+			if (!movingOnRailroad) return false;
+
+			var canMoveFreely = Player.CanMoveFreely(this.owner, this.previousLocation, this.location);
+			if (!canMoveFreely) return false;
+
+			return true;
 		}
 
 		public void fortify() {
@@ -752,6 +777,11 @@ namespace C7GameData {
 
 		// Generalized check to see whether a given tile is accessible to the unit in a given context.
 		public bool CanEnterTile(Tile tile, TileProbe probe) {
+			// TODO: Perhaps this is not sufficient, but it is for now,
+			// since otherwise we can move air units on land and sea
+			if (this.IsAirUnit())
+				return false;
+
 			if (this.owner.isHuman && !this.owner.HasExploredTile(tile))
 				return true;
 
@@ -789,6 +819,14 @@ namespace C7GameData {
 					if (probe.RaiseNotice) {
 						new MsgShowTemporaryPopup($"Non-combat units may not attack.", location).send();
 					}
+					return false;
+				}
+			}
+
+			var tileOwner = tile.OwningPlayer();
+
+			if (tile.HasCity && tileOwner != this.owner) {
+				if (EngineStorage.gameData.AreInLockedPeace(tileOwner, this.owner)) {
 					return false;
 				}
 			}
@@ -905,14 +943,14 @@ namespace C7GameData {
 
 		private static bool HasHostileUnits(Tile tile, Player player) {
 			foreach (MapUnit other in tile.unitsOnTile) {
-				if (player != other.owner && !player.IsAtPeaceWith(other.owner))
+				if (player != other.owner && AtWar(player, other.owner))
 					return true;
 			}
 			return false;
 		}
 
 		private static bool HasHostileCity(Tile tile, Player player) {
-			return tile.HasCity && !player.IsAtPeaceWith(tile.cityAtTile.owner);
+			return tile.HasCity && AtWar(player, tile.cityAtTile.owner);
 		}
 
 		/// <summary>
@@ -1073,12 +1111,12 @@ namespace C7GameData {
 
 		public int TurnsToCompleteTerraform(Terraform t) {
 			// Figure out how much work remains to do on this particular job.
-			int remainingTerraformCost = GetWorkerJobCost(location, t) - (int)SumWorkerProgress(location, t);
+			int remainingTerraformCost = GetWorkerJobCost(location, t) - (int)this.SumWorkerProgress(location, t);
 
 			// Figure out how fast all of the wokers doing this particular
 			// terraform will work.
-			float combinedWorkerSpeed = workerSpeed();
-			foreach (MapUnit unit in location.unitsOnTile) {
+			float combinedWorkerSpeed = this.workerSpeed();
+			foreach (MapUnit unit in location.unitsOnTile.Where(u => u.id != this.id)) {
 				if (unit.WorkerJob == t) {
 					combinedWorkerSpeed += unit.workerSpeed();
 				}
@@ -1098,9 +1136,18 @@ namespace C7GameData {
 				return;
 			}
 
-			// Check to see if we have a worker job, and if so, contribute our
-			// work towards it. We do this before any automation logic, so that
-			// automated units properly contribute their efforts.
+			if (isAutomated) {
+				// workers contribute their work at the end of the turn, not when assigned
+				if (this.unitType.isWorker && WorkerJob != null) {
+					return;
+				}
+				playAutomatedTurn();
+				return;
+			}
+		}
+
+		public async Task PerformEndOfTurnAction() {
+			// Busy Worker
 			if (WorkerJob != null) {
 				WorkerProgressTowardsJob += workerSpeed();
 				movementPoints.onConsumeAll();
@@ -1109,11 +1156,6 @@ namespace C7GameData {
 				if ((int)SumWorkerProgress(location, WorkerJob) >= GetWorkerJobCost(location, WorkerJob)) {
 					location.FinishWorkerJob(WorkerJob);
 				}
-			}
-
-			if (isAutomated) {
-				playAutomatedTurn();
-				return;
 			}
 		}
 
@@ -1175,6 +1217,7 @@ namespace C7GameData {
 			return unitType.terraformActions.Contains(terraform) && terraform.MeetsRequirements(owner, tile);
 		}
 
+		// entry point for "manual" job assignment
 		public void PerformTerraformAction(Terraform terraform) {
 			if (!canPerformTerraformAction(terraform)) {
 				log.Warning($"can't perform {terraform.Name} by {this}");
@@ -1184,6 +1227,17 @@ namespace C7GameData {
 
 			if (terraform.Animation is AnimatedAction animation)
 				animate(animation, AnimationEnding.Repeat);
+
+			movementPoints.onConsumeAll();
+
+			// See if this worker finished the job.
+			var terraformProgress = this.SumWorkerProgress(this.location, this.WorkerJob);
+			var turnProgress = this.location.GetCurrentUnaccountedJobProgress(terraform);
+			var totalCost = (float)GetWorkerJobCost(this.location, this.WorkerJob);
+
+			if (terraformProgress + turnProgress == totalCost) {
+				location.FinishWorkerJob(WorkerJob);
+			}
 
 			wake();
 			_ = PerformBusyAction();

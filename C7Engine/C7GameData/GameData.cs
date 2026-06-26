@@ -34,6 +34,8 @@ namespace C7GameData {
 
 		internal List<Civilization> civilizations = new List<Civilization>();
 		internal HashSet<CultureGroup> cultureGroups = new HashSet<CultureGroup>();
+		internal HashSet<Alliance> alliances;
+		internal Dictionary<Alliance, Alliance> allianceWars = new Dictionary<Alliance, Alliance>();
 
 		public List<ExperienceLevel> experienceLevels = new List<ExperienceLevel>();
 		public List<Tech> techs = new();
@@ -125,6 +127,25 @@ namespace C7GameData {
 				return experienceLevels[n + 1];
 			else
 				return null;
+		}
+
+		// Players are in an active locked war (can't make peace)
+		private bool AreInLockedWar(Alliance one, Alliance other) {
+			return allianceWars.Any(
+				kvp => (one != null && other != null) &&
+					((kvp.Key.name == one.name && kvp.Value.name == other.name)
+					|| (kvp.Key.name == other.name && kvp.Value.name == one.name)));
+		}
+		public bool AreInLockedWar(Player one, Player other) {
+			return AreInLockedWar(one.alliance, other.alliance);
+		}
+
+		// Both players are part of the same alliance (can't declare war)
+		private bool AreInLockedPeace(Alliance one, Alliance other) {
+			return one != null && other != null && one == other;
+		}
+		public bool AreInLockedPeace(Player one, Player other) {
+			return AreInLockedPeace(one.alliance, other.alliance);
 		}
 
 		public void UpdateTileOwners() {
@@ -274,14 +295,17 @@ namespace C7GameData {
 		internal void SpawnUnit(Player player, UnitPrototype proto, Tile tile) {
 			// TODO: consolidate unit spawning routines (here) 
 
+			var defaultExpLevel = this.defaultExperienceLevel;
+			var barbExpLevel = this.experienceLevels.First(e => e.baseHitPoints == this.barbarianInfo.maxHitpoints);
+
 			MapUnit newUnit = proto.GetInstance(this.GenerateID(proto.name), proto, player, location: tile);
-			// TODO: make this a conscript.
-			newUnit.experienceLevelKey = defaultExperienceLevelKey;
-			newUnit.experienceLevel = defaultExperienceLevel;
-			newUnit.hitPointsRemaining = 3;
+
+			newUnit.experienceLevel = player.isBarbarians ? barbExpLevel : defaultExpLevel;
+			newUnit.experienceLevelKey = player.isBarbarians ? barbExpLevel.key : defaultExpLevel.key;
+			newUnit.hitPointsRemaining = player.isBarbarians ? barbExpLevel.baseHitPoints : defaultExpLevel.baseHitPoints;
 
 			tile.unitsOnTile.Add(newUnit);
-			mapUnits.Add(newUnit);
+			this.mapUnits.Add(newUnit);
 			player.units.Add(newUnit);
 
 			log.Debug("New unit of type {type} added at {tile} for player {player}",

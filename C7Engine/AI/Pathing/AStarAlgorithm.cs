@@ -38,6 +38,10 @@ namespace C7Engine.Pathing {
 			this.isPassable = isPassable;
 		}
 
+		private Tile lastStartTile = null;
+		private Tile lastDestTile = null;
+		private Tile lastNeighTile = null;
+
 		public override TilePath PathFrom(Tile start, Tile destination, MapUnit unit) {
 			// Exit early if AI is starting and ending on land, and it's on
 			// different continents. Don't waste time checking every tile on the
@@ -86,9 +90,15 @@ namespace C7Engine.Pathing {
 						&& (unit.owner.HasExploredTile(destination) || !unit.owner.isHuman)
 						&& GameMap.IsLandStrip(current, neighbor)) continue;
 
-					if (!isPassable(neighbor, destination)) {
-						continue;
+					if (lastStartTile != start || lastDestTile != destination || lastNeighTile != neighbor) {
+						if (!isPassable(neighbor, destination)) {
+							continue;
+						}
 					}
+
+					lastNeighTile = neighbor;
+					lastStartTile = start;
+					lastDestTile = destination;
 
 					double newCost = neighborEdge.distanceToCurrent + knownCosts[current];
 

@@ -14,6 +14,15 @@ namespace C7Engine {
 			log.Information("\n*** Beginning turn " + gameData.turn + " ***");
 		}
 
+		public static void OnEndTurn(Player player) {
+			GameData gameData = EngineStorage.gameData;
+
+			var busyWorkers = gameData.mapUnits.Where(u => u.owner.id == player.id && u.WorkerJob != null);
+			foreach (MapUnit busyWorker in busyWorkers)
+				if (busyWorker.WorkerJob != null)
+					_ = busyWorker.PerformEndOfTurnAction();
+		}
+
 		public static void InitTurnData(Player player = null, bool skipTurn = false) {
 			GameData gameData = EngineStorage.gameData;
 			if (player == null) {
@@ -100,13 +109,15 @@ namespace C7Engine {
 
 				if (player.isBarbarians) {
 					await BarbarianAI.PlayTurn(player, gameData);
-					player.hasPlayedThisTurn = true;
 				} else if (!player.isHuman) {
 					await PlayerAI.PlayTurn(player, gameData);
-					player.hasPlayedThisTurn = true;
-				} else if (player.id != EngineStorage.uiControllerID) {
+				}
+
+				if (player.id != EngineStorage.uiControllerID) {
+					OnEndTurn(player);
 					player.hasPlayedThisTurn = true;
 				}
+
 				//Human player check. Let the human see what's going on even if they are in observer mode.
 				if (player.id == EngineStorage.uiControllerID) {
 					new MsgStartTurn().send();

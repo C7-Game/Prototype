@@ -795,6 +795,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -875,6 +876,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -956,6 +958,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Russia",
         "America",
@@ -1006,6 +1009,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1076,6 +1080,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1150,6 +1155,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1224,6 +1230,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "A Barbarian Chiefdom",
         "Rome",
@@ -1301,6 +1308,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1374,6 +1382,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1445,6 +1454,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Egypt",
         "Greece",
@@ -1519,6 +1529,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Greece",
@@ -1595,6 +1606,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "A Barbarian Chiefdom",
         "Rome",
@@ -1678,6 +1690,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1753,6 +1766,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1826,6 +1840,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1903,6 +1918,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -1978,6 +1994,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2052,6 +2069,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2125,6 +2143,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2202,6 +2221,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2279,6 +2299,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2354,6 +2375,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2429,6 +2451,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2504,6 +2527,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2584,6 +2608,7 @@
       "rateOfFire": 2,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2659,6 +2684,7 @@
       "rateOfFire": 3,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2737,6 +2763,7 @@
       "rateOfFire": 3,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2811,6 +2838,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2887,6 +2915,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -2961,6 +2990,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 2,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3038,6 +3068,7 @@
       "rateOfFire": 0,
       "movement": 4,
       "capacity": 3,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3114,6 +3145,7 @@
       "rateOfFire": 2,
       "movement": 5,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3191,6 +3223,7 @@
       "rateOfFire": 0,
       "movement": 4,
       "capacity": 4,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3268,6 +3301,7 @@
       "rateOfFire": 2,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3346,6 +3380,7 @@
       "rateOfFire": 0,
       "movement": 6,
       "capacity": 6,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3420,6 +3455,7 @@
       "rateOfFire": 0,
       "movement": 7,
       "capacity": 4,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3497,6 +3533,7 @@
       "rateOfFire": 0,
       "movement": 4,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3570,6 +3607,7 @@
       "rateOfFire": 2,
       "movement": 8,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3644,6 +3682,7 @@
       "rateOfFire": 2,
       "movement": 5,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3721,6 +3760,7 @@
       "rateOfFire": 2,
       "movement": 7,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3796,6 +3836,7 @@
       "rateOfFire": 0,
       "movement": 5,
       "capacity": 1,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3873,6 +3914,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -3949,6 +3991,7 @@
       "rateOfFire": 3,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4021,6 +4064,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 3,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4097,6 +4141,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4169,6 +4214,7 @@
       "rateOfFire": 2,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4242,6 +4288,7 @@
       "rateOfFire": 3,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4327,6 +4374,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4408,6 +4456,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 3,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -4479,6 +4528,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Aztecs"
       ],
@@ -4523,6 +4573,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Babylon"
       ],
@@ -4567,6 +4618,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Greece"
       ],
@@ -4611,6 +4663,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Zululand"
       ],
@@ -4655,6 +4708,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome"
       ],
@@ -4702,6 +4756,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Persia"
       ],
@@ -4749,6 +4804,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Egypt"
       ],
@@ -4796,6 +4852,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "China"
       ],
@@ -4844,6 +4901,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Iroquois"
       ],
@@ -4891,6 +4949,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "France"
       ],
@@ -4938,6 +4997,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Japan"
       ],
@@ -4985,6 +5045,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 1,
       "producibleBy": [
         "India"
       ],
@@ -5029,6 +5090,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Russia"
       ],
@@ -5074,6 +5136,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Germany"
       ],
@@ -5122,6 +5185,7 @@
       "rateOfFire": 2,
       "movement": 5,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "England"
       ],
@@ -5170,6 +5234,7 @@
       "rateOfFire": 2,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "America"
       ],
@@ -5213,6 +5278,7 @@
       "rateOfFire": 0,
       "movement": 5,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -5290,6 +5356,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Mongols"
       ],
@@ -5337,6 +5404,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Spain"
       ],
@@ -5381,6 +5449,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Scandinavia"
       ],
@@ -5425,6 +5494,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Ottomans"
       ],
@@ -5470,6 +5540,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Celts"
       ],
@@ -5517,6 +5588,7 @@
       "rateOfFire": 0,
       "movement": 3,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Arabia"
       ],
@@ -5565,6 +5637,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Carthage"
       ],
@@ -5609,6 +5682,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Korea"
       ],
@@ -5657,6 +5731,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -5733,6 +5808,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -5806,6 +5882,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5839,6 +5916,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5875,6 +5953,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5911,6 +5990,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5947,6 +6027,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -5983,6 +6064,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6019,6 +6101,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6055,6 +6138,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6091,6 +6175,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6127,6 +6212,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6163,6 +6249,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6199,6 +6286,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6235,6 +6323,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6271,6 +6360,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6307,6 +6397,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6343,6 +6434,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6379,6 +6471,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6415,6 +6508,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6451,6 +6545,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6487,6 +6582,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6523,6 +6619,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6559,6 +6656,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6595,6 +6693,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6631,6 +6730,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6667,6 +6767,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6703,6 +6804,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Sumeria"
       ],
@@ -6747,6 +6849,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Hittites"
       ],
@@ -6793,6 +6896,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6829,6 +6933,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6865,6 +6970,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -6902,6 +7008,7 @@
       "rateOfFire": 0,
       "movement": 4,
       "capacity": 3,
+      "hpBonus": 0,
       "producibleBy": [
         "Portugal"
       ],
@@ -6949,6 +7056,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Netherlands"
       ],
@@ -6995,6 +7103,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7032,6 +7141,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7106,6 +7216,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7142,6 +7253,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7178,6 +7290,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7214,6 +7327,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Inca"
       ],
@@ -7258,6 +7372,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Maya"
       ],
@@ -7302,6 +7417,7 @@
       "rateOfFire": 2,
       "movement": 3,
       "capacity": 2,
+      "hpBonus": 0,
       "producibleBy": [
         "Byzantines"
       ],
@@ -7347,6 +7463,7 @@
       "rateOfFire": 2,
       "movement": 6,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7423,6 +7540,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7463,6 +7581,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 1,
       "unproducible": true,
       "categories": [
         "Land"
@@ -7501,6 +7620,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7578,6 +7698,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7656,6 +7777,7 @@
       "rateOfFire": 1,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7727,6 +7849,7 @@
       "rateOfFire": 0,
       "movement": 1,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",
@@ -7801,6 +7924,7 @@
       "rateOfFire": 0,
       "movement": 2,
       "capacity": 0,
+      "hpBonus": 0,
       "producibleBy": [
         "Rome",
         "Egypt",

@@ -40,6 +40,17 @@ namespace C7GameData {
 			return corrupted + taxes + beakers + happiness + wealthProduction;
 		}
 	}
+
+	public class Alliance {
+		public int index;
+		public string name;
+
+		public Alliance(int index, string name) {
+			this.index = index;
+			this.name = name;
+		}
+	}
+
 	public class Player {
 		private static ILogger log = Log.ForContext<Player>();
 
@@ -157,6 +168,8 @@ namespace C7GameData {
 		// be awarded after researching a tech (like Philosophy) or after
 		// completing a wonder (like Theory of Evolution).
 		public int freeTechsRemaining = 0;
+
+		public Alliance alliance;
 
 		public int EraIndex() {
 			return GetEraIndex(eraCivilopediaName);
@@ -310,6 +323,8 @@ namespace C7GameData {
 
 		public bool WillAcceptCommunicationFrom(Player other, int currentTurn) {
 			EnsureRelationshipExists(other);
+
+			if (EngineStorage.gameData.AreInLockedWar(this, other)) return false;
 
 			PlayerRelationship pr = playerRelationships[other.id];
 			if (AtPeace(this, other)) {

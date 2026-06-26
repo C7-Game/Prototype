@@ -101,6 +101,18 @@ namespace C7Engine {
 		}
 	}
 
+	public class MsgDisplayStopWorkerActionPopup : MessageToUI {
+		public MapUnit worker;
+		public Terraform workerJob;
+		public float turnsLeft;
+
+		public MsgDisplayStopWorkerActionPopup(MapUnit worker, Terraform workerJob, float turnsLeft) {
+			this.worker = worker;
+			this.workerJob = workerJob;
+			this.turnsLeft = turnsLeft;
+		}
+	}
+
 	public class MsgShowCityScreen : MessageToUI {
 		public City city;
 

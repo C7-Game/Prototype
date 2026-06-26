@@ -18,10 +18,10 @@ public partial class UnitLayer : LooseLayer {
 		unitMovementIndicators = TextureLoader.Load("ui.unit_control.movement_indicators");
 	}
 
-	public Color getHPColor(float fractionRemaining) {
-		if (fractionRemaining >= 0.67f) {
+	public static Color GetHpColor(float remaining, float total) {
+		if (remaining >= 0.67f) {
 			return Color.Color8(0, 255, 0);
-		} else if (fractionRemaining >= 0.34f) {
+		} else if (remaining >= 0.34f && total > 2) {
 			return Color.Color8(255, 255, 0);
 		} else {
 			return Color.Color8(255, 0, 0);
@@ -304,9 +304,9 @@ public partial class UnitLayer : LooseLayer {
 		Rect2 hpIndBackgroundRect = new Rect2(hpStartingLocation - new Vector2(0, offsetXFromCenter), Vector2.One);
 		if (unit.unitType.attack > 0 || unit.unitType.defense > 0) {
 			hpIndBackgroundRect = new Rect2((hpStartingLocation - new Vector2(0, hpBarTotal) - new Vector2(0, offsetYFromCenter)), new Vector2(hpIndWidth, hpBarTotal));
-			float hpFraction = (float)unit.hitPointsRemaining / unit.maxHitPoints;
+			float hpFraction = (float)unit.hitPointsRemaining / maxHp;
 			looseView.DrawRect(hpIndBackgroundRect, Color.Color8(0, 0, 0));
-			Color hpColor = getHPColor(hpFraction);
+			Color hpColor = GetHpColor(hpFraction, maxHp);
 			for (int i = 0; i < unit.hitPointsRemaining; i++) {
 				Rect2 hpContentsRect = new Rect2(hpIndBackgroundRect.Position + new Vector2(0, hpBarTotal) - new Vector2(0, hpIndHeight + (hpIndHeight+lineWidth)*i), new Vector2(hpIndWidth, hpIndHeight));
 				looseView.DrawRect(hpContentsRect, hpColor);

@@ -15,7 +15,7 @@ namespace C7GameData.Save {
 		public int hitPointsRemaining;
 		public float movePointsRemaining;
 		public string action; // "fortified"
-		public TileDirection facingDirection;
+		public TileDirection facingDirection = TileDirection.SOUTHEAST;
 		public string experience;
 		public float WorkerProgressTowardsJob;
 		public ID WorkerJob;
@@ -27,7 +27,7 @@ namespace C7GameData.Save {
 
 		public SaveUnit() { }
 
-		public SaveUnit(MapUnit unit, GameMap map) {
+		public SaveUnit(MapUnit unit) {
 			id = unit.id;
 			name = unit.name;
 			nationality = unit.nationality.name;

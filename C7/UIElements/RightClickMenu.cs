@@ -58,10 +58,10 @@ public partial class RightClickMenu : VBoxContainer {
 	private static StyleBoxFlat GetItemStyleBox(Color color) {
 		return new StyleBoxFlat() {
 			BgColor = color,
-			ContentMarginLeft = 4f,
-			ContentMarginTop = 2f,
-			ContentMarginRight = 4f,
-			ContentMarginBottom = 2f
+			ContentMarginLeft = 10f,
+			ContentMarginTop = 0f,
+			ContentMarginRight = 10f,
+			ContentMarginBottom = 0f
 		};
 	}
 
@@ -77,6 +77,34 @@ public partial class RightClickMenu : VBoxContainer {
 		}
 		this.AddChild(button);
 		return button;
+	}
+
+	protected void AddTreeSeparator() {
+		var background = new ColorRect();
+		background.Color = Color.Color8(255, 247, 222, 255);
+		background.CustomMinimumSize = new Vector2(0, 12);
+		background.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		background.MouseFilter = Control.MouseFilterEnum.Stop;
+
+		var margin = new MarginContainer();
+		margin.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+		margin.MouseFilter = MouseFilterEnum.Stop;
+
+		margin.AddThemeConstantOverride("margin_left", 10);
+		margin.AddThemeConstantOverride("margin_right", 10);
+		margin.AddThemeConstantOverride("margin_top", 5);
+		margin.AddThemeConstantOverride("margin_bottom", 5);
+
+		var line = new ColorRect();
+		line.Color = Color.Color8(165, 165, 165, 255);
+		line.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		line.CustomMinimumSize = new Vector2(0, 2);
+		line.MouseFilter = Control.MouseFilterEnum.Stop;
+
+		margin.AddChild(line);
+		background.AddChild(margin);
+
+		this.AddChild(background);
 	}
 
 	public void RemoveAll() {
@@ -101,10 +129,6 @@ public partial class RightClickMenu : VBoxContainer {
 		} else if (!((@event is InputEventMouse) && mouseOverMenu)) {
 			this.AcceptEvent();
 		}
-	}
-
-	public void ShowCannotMovePopup() {
-		TemporaryPopup.Show(GetParent(), "This unit has already moved.", position);
 	}
 }
 
@@ -146,10 +170,12 @@ public partial class RightClickTileMenu : RightClickMenu {
 	public void ResetItems(Tile tile, Dictionary<ID, bool> uiUpdatedUnitStates = null) {
 		RemoveAll();
 
-		AddItem($"Show Tile Information", () => {
+		AddItem($"Terrain Info", () => {
 			game.ShowTileInfo(tile);
 			CloseAndDelete();
 		});
+
+		AddTreeSeparator();
 
 		bool observerMode = false;
 		EngineStorage.ReadGameData((GameData gameData) => {
@@ -184,7 +210,16 @@ public partial class RightClickTileMenu : RightClickMenu {
 			AddItem($"Fortify All ({unfortifiedCount} units)", () => ForAll(tile.XCoordinate, tile.YCoordinate, true));
 		}
 		if (tile.cityAtTile?.owner == game.controller) {
-			AddItem("Change Production (Shift+right click)", () => {
+			AddTreeSeparator();
+			AddItem($"Zoom to {tile.cityAtTile.name}", () => {
+				this.CloseAndDelete();
+				EngineStorage.ReadGameData((GameData gameData) => {
+					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
+				});
+			});
+			// TODO: Rename city
+			AddTreeSeparator();
+			AddItem("Change Production", () => {
 				// Close the first menu before opening the second menu.
 				this.CloseAndDelete();
 				new RightClickChooseProductionMenu(game, tile.cityAtTile).Open(this.position);
@@ -196,12 +231,15 @@ public partial class RightClickTileMenu : RightClickMenu {
 					new MsgDisplayHurryProductionPopup(tile.cityAtTile, details).send();
 				});
 			});
-			AddItem("Zoom to city", () => {
-				this.CloseAndDelete();
-				EngineStorage.ReadGameData((GameData gameData) => {
-					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
-				});
-			});
+			// TODO: Contact Governor
+			// TODO: Set Rally Point
+			// TODO: Set Continental Rally Point
+			// TODO: Clear Continental Rally Point
+			// TODO: Abandon City
+
+			// AddTreeSeparator();
+			// TODO: Wikipedia links
+
 		}
 
 		// If we're looking at an enemy tile, then the behavior depends on whether the units
@@ -244,11 +282,9 @@ public partial class RightClickTileMenu : RightClickMenu {
 	public void SelectUnit(ID id) {
 		EngineStorage.ReadGameData((GameData gameData) => {
 			MapUnit toSelect = gameData.mapUnits.Find(u => u.id == id);
+
 			if (toSelect != null && toSelect.owner == game.controller) {
-				bool canMove = game.unitSelector.SetSelectedUnit(toSelect);
-				if (!canMove) {
-					ShowCannotMovePopup();
-				}
+				game.SelectUnit(toSelect);
 
 				new MsgSetFortification(toSelect.id, false).send();
 				ResetItems(toSelect.location, new Dictionary<ID, bool>() { { toSelect.id, false } });
@@ -272,7 +308,7 @@ public partial class RightClickTileMenu : RightClickMenu {
 					if (!hasSelectedUnit && !isFortify) {
 						bool canMove = game.unitSelector.SetSelectedUnit(unit);
 						if (!canMove) {
-							ShowCannotMovePopup();
+							new MsgShowTemporaryPopup("This unit has already moved.", tile).send();
 						}
 					}
 				}
@@ -295,8 +331,24 @@ public partial class RightClickCityMenu : RightClickMenu {
 	public void ResetItems(Tile tile) {
 		RemoveAll();
 
+		// TODO: maybe look into unifying this with the other right click menu (when there are units present)
+		// I don't like this much duplication
+		AddItem($"Terrain Info", () => {
+			game.ShowTileInfo(tile);
+			CloseAndDelete();
+		});
+
+		AddTreeSeparator();
+
 		if (tile.cityAtTile?.owner == game.controller) {
-			AddItem("Change Production (Shift+right click)", () => {
+			AddItem($"Zoom to {tile.cityAtTile.name}", () => {
+				this.CloseAndDelete();
+				EngineStorage.ReadGameData((GameData gameData) => {
+					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
+				});
+			});
+			AddTreeSeparator();
+			AddItem("Change Production", () => {
 				// Close the first menu before opening the second menu.
 				this.CloseAndDelete();
 				new RightClickChooseProductionMenu(game, tile.cityAtTile).Open(this.position);
@@ -306,12 +358,6 @@ public partial class RightClickCityMenu : RightClickMenu {
 				EngineStorage.ReadGameData((GameData gameData) => {
 					City.HurryProductionDetails details = tile.cityAtTile.GetHurryProductionDetails();
 					new MsgDisplayHurryProductionPopup(tile.cityAtTile, details).send();
-				});
-			});
-			AddItem("Zoom to city", () => {
-				this.CloseAndDelete();
-				EngineStorage.ReadGameData((GameData gameData) => {
-					game.ShowCityScreenForCity(gameData, tile.cityAtTile);
 				});
 			});
 		}

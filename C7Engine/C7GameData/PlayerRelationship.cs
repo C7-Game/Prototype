@@ -211,6 +211,8 @@ public class PlayerRelationship {
 					.Where(mtd => mtd != null
 							  && mtd.dealSubType != DealSubType.Peace
 							  && mtd.TurnsRemaining(currentTurn) <= 0)
+					.Where(mtd => mtd.dealSubType != DealSubType.MutualProtectionPact
+								   && !EngineStorage.gameData.AreInLockedPeace(player, other))
 					.ToList();
 
 				foreach (MultiTurnDeal deadDeal in deadDeals) {
@@ -267,6 +269,9 @@ public class MultiTurnDeal {
 	// A multi turn peace deal that is from the start of the game without end.
 	// Used for when a civ meets another civ to establish the initial peace.
 	public static MultiTurnDeal DEFAULT_PEACE => new MultiTurnDeal(DealType.DiplomaticAgreement, DealSubType.Peace,
+			DealDetails.Exchange, 0, null, 0, 0, null);
+
+	public static MultiTurnDeal DEFAULT_MUTUAL_PROTECTION_PACT => new MultiTurnDeal(DealType.DiplomaticAgreement, DealSubType.MutualProtectionPact,
 			DealDetails.Exchange, 0, null, 0, 0, null);
 
 	/// <summary>

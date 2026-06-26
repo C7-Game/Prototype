@@ -41,25 +41,41 @@ public partial class TalkScreen : TextureRect {
 			leaderName = opponentPlayer.civilization.leader;
 		});
 
+		int offset = 500;
+		int gap = 20;
+
 		Button proposeDeal = new();
 		proposeDeal.Text = "We would like to propose a deal...";
-		proposeDeal.SetPosition(new Vector2(512 - 205, 500));
+		proposeDeal.SetPosition(new Vector2(512 - 205, offset));
 		proposeDeal.Theme = fontTheme;
 		proposeDeal.Pressed += () => {
 			GetParent<Diplomacy>().ShowDealScreenForPlayer(humanPlayerId, opponentPlayerId);
 		};
 		AddChild(proposeDeal);
+		offset += gap;
 
-		Button declareWar = new();
-		declareWar.Text = "That's it! Prepare for WAR!";
-		declareWar.SetPosition(new Vector2(512 - 205, 520));
-		declareWar.Theme = fontTheme;
-		declareWar.Pressed += DeclareWar;
-		AddChild(declareWar);
+		EngineStorage.ReadGameData((GameData gD) => {
+			if (!gD.AreInLockedPeace(gD.GetPlayer(humanPlayerId), gD.GetPlayer(opponentPlayerId))) {
+				Button declareWar = new();
+				declareWar.Text = "That's it! Prepare for WAR!";
+				declareWar.SetPosition(new Vector2(512 - 205, offset));
+				declareWar.Theme = fontTheme;
+				declareWar.Pressed += DeclareWar;
+				AddChild(declareWar);
+			} else {
+				Button tradeWorldMaps = new();
+				tradeWorldMaps.Text = "Care to trade World Maps?";
+				tradeWorldMaps.SetPosition(new Vector2(512 - 205, offset));
+				tradeWorldMaps.Theme = fontTheme;
+				tradeWorldMaps.Pressed += TradeWorldMaps;
+				AddChild(tradeWorldMaps);
+			}
+			offset += gap;
+		});
 
 		Button goodbye = new();
 		goodbye.Text = $"That's it. Goodbye, {leaderName}";
-		goodbye.SetPosition(new Vector2(512 - 205, 540));
+		goodbye.SetPosition(new Vector2(512 - 205, offset));
 		goodbye.Theme = fontTheme;
 		goodbye.Pressed += () => { GetParent<Diplomacy>().Hide(); };
 		AddChild(goodbye);
@@ -75,5 +91,12 @@ public partial class TalkScreen : TextureRect {
 					GetParent<Diplomacy>().Hide();
 				}), PopupOverlay.PopupCategory.Advisor);
 		});
+	}
+
+	private void TradeWorldMaps() {
+		var weGive = new TradeOffer();
+		var theyGive = new TradeOffer();
+		// TODO: make maps tradeable, and (pre)add them to this deal/ call the method that adds them
+		GetParent<Diplomacy>().ShowDealScreenForPlayer(humanPlayerId, opponentPlayerId, weGive, theyGive);
 	}
 }

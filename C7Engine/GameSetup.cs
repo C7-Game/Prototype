@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using C7GameData;
 using C7GameData.Save;
 using Serilog;
@@ -106,6 +107,13 @@ public class GameSetup {
 	}
 
 	private void AddUnit(SaveGame save, SavePlayer player, string unitType, TileLocation location) {
+		var defaultExpLevelKey = save.DefaultExperienceLevel;
+
+		var defaultExpLevel = save.ExperienceLevels.First(e => e.key == defaultExpLevelKey);
+		var barbExpLevel = save.ExperienceLevels.First(e => e.baseHitPoints == save.BarbarianInfo.maxHitpoints);
+
+		var proto = save.UnitPrototypes.First(p => p.name == unitType);
+
 		SaveUnit unit = new() {
 			id = ids.CreateID(unitType),
 			name = unitType,
@@ -115,12 +123,11 @@ public class GameSetup {
 			previousLocation = new TileLocation(-1, -1),
 			currentLocation = location,
 
-			// TODO: stop hardcoding these
-			hitPointsRemaining = 3,
-			movePointsRemaining = 1,
-			experience = "Regular",
+			hitPointsRemaining = (player.isBarbarian ? barbExpLevel.baseHitPoints : defaultExpLevel.baseHitPoints) + proto.hpBonus,
+			movePointsRemaining = proto.movement,
+			experience = player.isBarbarian ? barbExpLevel.key : defaultExpLevel.key,
 
-			facingDirection = TileDirection.NORTH,
+			facingDirection = TileDirection.SOUTHEAST,
 		};
 		save.Units.Add(unit);
 	}

@@ -54,7 +54,7 @@ public partial class GotoLayer : LooseLayer {
 		staticCursorRect.Position = position - new Vector2(staticCursor.GetWidth(), staticCursor.GetHeight()) / 2;
 
 		gotoLabel.Theme = attackingMove ? redFontTheme : whiteFontTheme;
-		gotoLabel.Text = moves > 0 ? moves.ToString() : " ";
+		gotoLabel.Text = moves > 0 || !attackingMove ? moves.ToString() : " ";
 		Vector2 labelSize = gotoLabelFont.GetStringSize(gotoLabel.Text);
 		gotoLabel.Position = position - labelSize / 2;
 
@@ -71,6 +71,9 @@ public partial class GotoLayer : LooseLayer {
 		looseView.mapView.game.animationController.updateAnimations();
 	}
 
+	private GotoInfo lastGotoInfo = null;
+	private bool lastCanEnter = false;
+
 	public override void drawObject(LooseView looseView, GameData gameData, Tile tile, Vector2 tileCenter) {
 		MapUnit unit = looseView.mapView.game.CurrentlySelectedUnit;
 		// When no unit is selected, at the end of a turn for example, we don't need to draw anything
@@ -85,38 +88,48 @@ public partial class GotoLayer : LooseLayer {
 			DrawStaticGoToCursor(looseView, tileCenter, 0, true);
 		}
 
-		if (gotoInfo.path != null && unit.CanEnterTile(gotoInfo.destinationTile, TileProbe.DeclareWarProbe())) {
-			List<Tile> tiles = new List<Tile>();
-			tiles.Add(unitOriginTile);
-			tiles.AddRange(gotoInfo.path.path);
+		bool canEnter;
 
-			for (int i = 0; i < tiles.Count - 1; i++) {
-				Tile currentTile = tiles[i];
-				Tile nextTile = tiles[i + 1];
+		if (gotoInfo == lastGotoInfo)
+			canEnter = lastCanEnter;
+		else {
+			lastCanEnter = canEnter = unit.CanEnterTile(gotoInfo.destinationTile, TileProbe.DeclareWarProbe());
+			lastGotoInfo = gotoInfo;
+		}
 
-				// Variable width of the line to account for various camera zoom levels.
-				// The end result should look pretty much the same to the player on any zoom level.
-				float lineWidth = Math.Max(1f / looseView.mapView.cameraZoom, 1f);
+		if (gotoInfo.path == null || !canEnter)
+			return;
 
-				// We draw only the lines between tiles that are in our visible area
-				// with one or two tile buffer on both axis. How many is determined in the MapView
-				// by the getVisibleRegion().
-				// This is not only saving draw calls which is great, but there is a bigger reason.
-				// Imagine just loading the game, not moving the camera at all
-				// and press G to instruct a unit to move somewhere.
-				// The path is precomputed by another module, so we know the route to our destination.
-				// But if the path goes outside the visible area + the buffer, there is an issue.
-				// The visible region is only what you see at the screen plus the tiny buffer.
-				// These are the only tiles the player has seen and calculated the centers of, so far.
-				// If we try to draw lines between tiles that are outside this visible region, we will
-				// get an error because we don't know yet what these centers are. We either have to move the camera
-				// and calculate them, or precompute a huge buffer of tiles which is not practical at all.
-				if (looseView.tileCenters.TryGetValue(currentTile, out Vector2 currentTileCenter)
-					&& looseView.tileCenters.TryGetValue(nextTile, out Vector2 nextTileCenter)) {
-					staticCursorRect?.Hide();
-					looseView.DrawLine(currentTileCenter, nextTileCenter, Colors.Red, width: lineWidth);
-					DrawStaticGoToCursor(looseView, nextTileCenter, gotoInfo.moveCost, gotoInfo.attackingMove);
-				}
+		List<Tile> tiles = new List<Tile>();
+		tiles.Add(unitOriginTile);
+		tiles.AddRange(gotoInfo.path.path);
+
+		for (int i = 0; i < tiles.Count - 1; i++) {
+			Tile currentTile = tiles[i];
+			Tile nextTile = tiles[i + 1];
+
+			// Variable width of the line to account for various camera zoom levels.
+			// The end result should look pretty much the same to the player on any zoom level.
+			float lineWidth = Math.Max(1f / looseView.mapView.cameraZoom, 1f);
+
+			// We draw only the lines between tiles that are in our visible area
+			// with one or two tile buffer on both axis. How many is determined in the MapView
+			// by the getVisibleRegion().
+			// This is not only saving draw calls which is great, but there is a bigger reason.
+			// Imagine just loading the game, not moving the camera at all
+			// and press G to instruct a unit to move somewhere.
+			// The path is precomputed by another module, so we know the route to our destination.
+			// But if the path goes outside the visible area + the buffer, there is an issue.
+			// The visible region is only what you see at the screen plus the tiny buffer.
+			// These are the only tiles the player has seen and calculated the centers of, so far.
+			// If we try to draw lines between tiles that are outside this visible region, we will
+			// get an error because we don't know yet what these centers are. We either have to move the camera
+			// and calculate them, or precompute a huge buffer of tiles which is not practical at all.
+			if (looseView.tileCenters.TryGetValue(currentTile, out Vector2 currentTileCenter)
+				&& looseView.tileCenters.TryGetValue(nextTile, out Vector2 nextTileCenter)) {
+				staticCursorRect?.Hide();
+				looseView.DrawLine(currentTileCenter, nextTileCenter, Colors.Red, width: lineWidth);
+				DrawStaticGoToCursor(looseView, nextTileCenter, gotoInfo.moveCost, gotoInfo.attackingMove);
 			}
 		}
 	}

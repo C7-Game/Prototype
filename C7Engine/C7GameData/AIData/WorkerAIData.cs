@@ -5,7 +5,7 @@ namespace C7GameData.AIData {
 		public TilePath pathToDestination;
 
 		public override string ToString() {
-			return workerMove + " at " + destination;
+			return workerMove.UIAction + " at " + destination;
 		}
 	}
 }

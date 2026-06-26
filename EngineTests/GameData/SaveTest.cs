@@ -93,6 +93,8 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 						continue;
 					case MsgShowTemporaryPopup mSTP:
 						continue;
+					case MsgCityDestroyed mCD:
+						continue;
 					default:
 						throw new Exception($"{msg}");
 				}
@@ -412,7 +414,7 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 	}
 
 	[SkippableFact]
-	public void LoadAllConquestScenarios() {
+	public async Task LoadAllConquestScenarios() {
 		Skip.If(Civ3TestData.ShouldSkipCiv3DependentTests(), "No Civ3 install found.");
 
 		string[] singleplayerScenarios = {
@@ -441,8 +443,8 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 		};
 		// Only bother running one turn of the newer scenarios, just to keep the
 		// tests faster.
-		CheckScenariosInCiv3Subfolder("Conquests/Conquests", singleplayerScenarios, runOneTurn: true, "singleplayer");
-		CheckScenariosInCiv3Subfolder("Conquests/Scenarios", multiplayerScenarios, runOneTurn: false, "multiplayer");
+		await CheckScenariosInCiv3Subfolder("Conquests/Conquests", singleplayerScenarios, runOneTurn: true, "singleplayer");
+		await CheckScenariosInCiv3Subfolder("Conquests/Scenarios", multiplayerScenarios, runOneTurn: false, "multiplayer");
 	}
 
 	private async Task CheckScenariosInCiv3Subfolder(string subfolder, string[] scenarioNamesToTest, bool runOneTurn, string basename) {
@@ -466,6 +468,8 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 				return Path.GetFullPath(Path.Combine(Civ3Location.GetCiv3Path(), subfolder, relativeModPath, "Text", "PediaIcons.txt"));
 			};
 
+			EngineStorage.animationsEnabled = false;
+
 			Exception ex = Record.Exception(() => {
 				game = ImportCiv3.ImportBiq(saveFileInfo.FullName, PathUtils.defaultBicPath, getPediaIconsPath);
 			});
@@ -478,6 +482,7 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 			Assert.NotNull(gd);
 
 			CheckPlayableCivs(name, game);
+			CheckAlliances(name, gd);
 
 			// Check that the human player has at least one settler or city in
 			// each scenario, when looking at the SaveGame.
@@ -652,6 +657,69 @@ public class SaveTests : IClassFixture<SaveGameFixture> {
 			Assert.Contains(game.Civilizations, c => c.name == "Portugal");
 			Assert.Contains(game.Civilizations, c => c.name == "Netherlands");
 			Assert.Contains(game.Civilizations, c => c.name == "Kingdom of Naples");
+		}
+	}
+
+	private void CheckAlliances(string name, C7GameData.GameData gd) {
+		var players = gd.players;
+
+		if (name.Equals("8 Napoleonic Europe.biq")) {
+			var france = players.First(p => p.civilization.name == "France");
+			var denmark = players.First(p => p.civilization.name == "Denmark");
+			var britain = players.First(p => p.civilization.name == "Britain");
+			var netherlands = players.First(p => p.civilization.name == "Netherlands");
+			var portugal = players.First(p => p.civilization.name == "Portugal");
+			var naples = players.First(p => p.civilization.name == "Kingdom of Naples");
+			var austria = players.First(p => p.civilization.name == "Austria");
+			var spain = players.First(p => p.civilization.name == "Spain");
+
+			Assert.True(france.alliance.name == "French Coalition");
+			Assert.True(denmark.alliance.name == "French Coalition");
+
+			Assert.True(austria.alliance == null);
+			Assert.True(spain.alliance == null);
+
+			Assert.False(gd.AreInLockedPeace(austria, spain));
+			Assert.False(gd.AreInLockedWar(austria, spain));
+
+			Assert.True(britain.alliance.name == "English Coalition");
+			Assert.True(netherlands.alliance.name == "English Coalition");
+			Assert.True(portugal.alliance.name == "English Coalition");
+			Assert.True(naples.alliance.name == "English Coalition");
+
+			Assert.True(gd.AreInLockedPeace(france, denmark));
+			Assert.True(gd.AreInLockedPeace(britain, portugal));
+			Assert.True(gd.AreInLockedWar(france, britain));
+			Assert.True(gd.AreInLockedWar(denmark, naples));
+
+			Assert.True(france.playerRelationships[britain.id].AtWar());
+			Assert.True(denmark.playerRelationships[naples.id].AtWar());
+		}
+
+		if (name.Equals("9 WWII in the Pacific.biq")) {
+			var usa = players.First(p => p.civilization.name == "United States");
+			var china = players.First(p => p.civilization.name == "China");
+			var commonwealth = players.First(p => p.civilization.name == "Commonwealth");
+			var netherlands = players.First(p => p.civilization.name == "Netherlands");
+			var japan = players.First(p => p.civilization.name == "Japan");
+
+			Assert.True(usa.alliance.name == "Allies");
+			Assert.True(china.alliance.name == "Allies");
+			Assert.True(commonwealth.alliance.name == "Allies");
+			Assert.True(netherlands.alliance.name == "Allies");
+
+			Assert.True(japan.alliance.name == "Japanese Empire");
+
+			Assert.True(gd.AreInLockedPeace(usa, china));
+			Assert.True(gd.AreInLockedPeace(netherlands, china));
+			Assert.True(gd.AreInLockedPeace(usa, commonwealth));
+
+			Assert.True(gd.AreInLockedWar(netherlands, japan));
+			Assert.True(gd.AreInLockedWar(china, japan));
+			Assert.True(gd.AreInLockedWar(usa, japan));
+
+			Assert.True(usa.playerRelationships[japan.id].AtWar());
+			Assert.True(china.playerRelationships[japan.id].AtWar());
 		}
 	}
 }
