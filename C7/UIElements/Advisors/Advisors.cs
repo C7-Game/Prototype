@@ -42,6 +42,7 @@ public partial class Advisors : CenterContainer {
 			tr.Hide();
 		}
 		domesticAdvisor.Hide();
+		tradeAdvisor.Hide();
 
 		if (advisorType.Equals("F1")) {
 			domesticAdvisor.ShowAdvisor();
