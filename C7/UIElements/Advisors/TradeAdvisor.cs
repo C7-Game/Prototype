@@ -2,20 +2,25 @@ using C7Engine;
 using C7GameData;
 using Godot;
 
+public interface IAdvisor {
+	void ShowAdvisor();
+}
+
 [GlobalClass]
 [Tool]
-public partial class TradeAdvisor : Control {
-	[Export] TextureRect background;
-	[Export] TextureButton close;
+public partial class TradeAdvisor : Control, IAdvisor  {
 
-	TextureRect advisorHead = new();
-	Label DialogBoxAdvise = new();
+	[Export] public TextureRect background;
+	[Export] public TextureButton close;
+
+	private TextureRect advisorHead = new();
+	private Label DialogBoxAdvise = new();
 
 	public override void _Ready() {
 		this.CreateUI();
 	}
 
-	private void CreateUI() {
+	protected void CreateUI() {
 		background.Texture = TextureLoader.Load("advisors.trade.background");
 
 		advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Domestic, AdvisorHead.Mood.Happy, eraIndex: 0);
