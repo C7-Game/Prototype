@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cldl5nk4n61m2"]
+[gd_scene load_steps=21 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" uid="uid://yxhiwx46tety" path="res://Game.cs" id="1"]
 [ext_resource type="Script" uid="uid://cfenrvu7tnp40" path="res://DoubleClickHandler.cs" id="2_t735q"]
@@ -19,6 +19,7 @@
 [ext_resource type="Script" uid="uid://bmfpx37ovqnsx" path="res://UIElements/Diplomacy/Diplomacy.cs" id="14"]
 [ext_resource type="PackedScene" uid="uid://dkcu255o1qrt1" path="res://UIElements/PalaceScreen/palace_screen.tscn" id="14_ud8vi"]
 [ext_resource type="PackedScene" uid="uid://da7hbbufyfllg" path="res://UIElements/Advisors/domestic_advisor.tscn" id="15"]
+[ext_resource type="PackedScene" uid="uid://cucamooiqvddl" path="res://UIElements/Advisors/trade_advisor.tscn" id="15_4pqcd"]
 
 [node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "popupOverlay", "cityScreen", "advisor", "diplomacy", "palaceScene", "doubleClickHandler", "animationController", "unitSelector")]
 script = ExtResource("1")
@@ -200,6 +201,10 @@ script = ExtResource("3")
 domesticAdvisor = NodePath("DomesticAdvisor")
 
 [node name="DomesticAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("15")]
+visible = false
+layout_mode = 2
+
+[node name="TradeAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("15_4pqcd")]
 visible = false
 layout_mode = 2
 

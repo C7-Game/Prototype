@@ -2,6 +2,7 @@ using Godot;
 using System;
 using Serilog;
 using System.Collections.Generic;
+using C7Engine;
 
 /**
  * Handles managing the advisor screens.
@@ -12,6 +13,7 @@ public partial class Advisors : CenterContainer {
 	private ILogger log = LogManager.ForContext<Advisors>();
 
 	[Export] public DomesticAdvisor domesticAdvisor;
+	[Export] public TradeAdvisor tradeAdvisor;
 	private MilitaryAdvisor militaryAdvisor;
 	private ScienceAdvisor scienceAdvisor;
 
@@ -43,6 +45,10 @@ public partial class Advisors : CenterContainer {
 
 		if (advisorType.Equals("F1")) {
 			domesticAdvisor.ShowAdvisor();
+			this.Show();
+		}
+		if (advisorType.Equals(C7Action.ShowTradeAdvisor)) {
+			tradeAdvisor.ShowAdvisor();
 			this.Show();
 		}
 		if (advisorType.Equals("F3")) {

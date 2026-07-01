@@ -8,6 +8,7 @@ namespace C7Engine;
 public static class C7Action {
 	public const string EndTurn = "end_turn";
 	public const string Escape = "escape";
+
 	public const string MoveUnitSouthwest = "move_unit_southwest";
 	public const string MoveUnitSouth = "move_unit_south";
 	public const string MoveUnitSoutheast = "move_unit_southeast";
@@ -16,11 +17,20 @@ public static class C7Action {
 	public const string MoveUnitNorthwest = "move_unit_northwest";
 	public const string MoveUnitNorth = "move_unit_north";
 	public const string MoveUnitNortheast = "move_unit_northeast";
+
 	public const string ToggleAnimations = "toggle_animations";
 	public const string EnableTempAnimations = "enable_temp_animations";
 	public const string ToggleGrid = "toggle_grid";
 	public const string ToggleCoordinates = "toggle_coordinates";
 	public const string ToggleZoom = "toggle_zoom";
+
+	public const string ShowDomesticAdvisor = "show_domestic_advisor";
+	public const string ShowTradeAdvisor = "show_trade_advisor";
+	public const string ShowMilitaryAdvisor = "show_military_advisor";
+	public const string ShowForeignAdvisor = "show_foreign_advisor";
+	public const string ShowCulturalAdvisor = "show_cultural_advisor";
+	public const string ShowScienceAdvisor = "show_science_advisor";
+
 	public const string UnitBombard = "unit_bombard";
 	public const string UnitBuildCity = "unit_build_city";
 	public const string UnitBuildRoad = "unit_build_road";

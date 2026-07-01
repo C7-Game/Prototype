@@ -79,6 +79,34 @@ textures.advisors = {
       },
     },
   },
+  trade = {
+    background = ADVISORS .. "trade.pcx",
+  },
+  foreign = {
+    background = ADVISORS .. "foreign.pcx",
+    navigation = {
+      trade = {
+        path = ADVISORS .. "foreignTAB.pcx",
+        crop_region = { 0, 0, 224, 237 },
+      },
+      treaty = {
+        path = ADVISORS .. "foreignTAB.pcx",
+        crop_region = { 225, 0, 448, 237 },
+      }
+    }
+  },
+  culture = {
+    background = ADVISORS .. "culture.pcx",
+  }
+}
+
+textures.screens = {
+  demographics = {
+    background = ADVISORS .. "demographics.pcx",
+  },
+  wonders = {
+    background = ADVISORS .. "wonders.pcx",
+  }
 }
 
 textures.ui = {
@@ -275,6 +303,10 @@ textures.icons = {
   minus = {
     path = ADVISORS .. "domestic_icons_aux.pcx",
     crop_region = { 51, 1, 22, 22 },
+  },
+  maintenance = {
+    path = ADVISORS .. "domestic_icons_aux.pcx",
+    crop_region = { 1, 1, 19, 34 },
   },
   capital_star = {
     path = CITY_ICONS,

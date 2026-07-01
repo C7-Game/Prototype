@@ -743,6 +743,9 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.F1) {
 			EmitSignal(SignalName.ShowSpecificAdvisor, "F1");
 		}
+		if (eventKeyDown.Keycode == Godot.Key.F2) {
+			EmitSignal(SignalName.ShowSpecificAdvisor, C7Action.ShowTradeAdvisor);
+		}
 		if (eventKeyDown.Keycode == Godot.Key.F3) {
 			EmitSignal(SignalName.ShowSpecificAdvisor, "F3");
 		}
