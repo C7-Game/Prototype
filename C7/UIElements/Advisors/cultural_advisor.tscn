@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cla8cx1cxecu2"]
+
+[ext_resource type="Script" uid="uid://3ypsgev3rsg7" path="res://UIElements/Advisors/CulturalAdvisor.cs" id="1_c1awi"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="1_mght3"]
+
+[node name="CulturalAdvisor" type="CenterContainer" node_paths=PackedStringArray("background")]
+script = ExtResource("1_c1awi")
+background = NodePath("CulturalAdvisorBG")
+
+[node name="CulturalAdvisorBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("1_mght3")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"

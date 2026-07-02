@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5qvjbhp6c3bv"]
+
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="1_hrpi3"]
+[ext_resource type="Script" uid="uid://goye21dxmgpf" path="res://UIElements/Advisors/ScienceAdvisor.cs" id="1_iqyvj"]
+
+[node name="ScienceAdvisor" type="CenterContainer" node_paths=PackedStringArray("background")]
+script = ExtResource("1_iqyvj")
+background = NodePath("ScienceAdvisorBG")
+
+[node name="ScienceAdvisorBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("1_hrpi3")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"

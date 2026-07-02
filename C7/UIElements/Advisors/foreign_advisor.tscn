@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://balpdexsjgl0b"]
+
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="1_1v6yt"]
+[ext_resource type="Script" uid="uid://bf2a0oynkd2b2" path="res://UIElements/Advisors/ForeignAdvisor.cs" id="1_wq635"]
+
+[node name="ForeignAdvisor" type="CenterContainer" node_paths=PackedStringArray("background")]
+script = ExtResource("1_wq635")
+background = NodePath("ForeingAdvisorBG")
+
+[node name="ForeingAdvisorBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("1_1v6yt")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"

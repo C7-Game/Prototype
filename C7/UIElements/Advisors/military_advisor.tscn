@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://d0qk1h4jvf3i1"]
+
+[ext_resource type="Script" uid="uid://b4s6vurld6x3b" path="res://UIElements/Advisors/MilitaryAdvisor.cs" id="1_plxsm"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_plxsm"]
+
+[node name="MilitaryAdvisor" type="CenterContainer" node_paths=PackedStringArray("background")]
+script = ExtResource("1_plxsm")
+background = NodePath("MilitaryAdvisorBG")
+
+[node name="MilitaryAdvisorBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("2_plxsm")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"
