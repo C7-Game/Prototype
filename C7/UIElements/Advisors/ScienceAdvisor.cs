@@ -6,7 +6,12 @@ using System.Linq;
 using static C7Engine.MsgChooseResearch;
 using static C7GameData.EraUtils;
 
-public partial class ScienceAdvisor : TextureRect {
+[GlobalClass]
+[Tool]
+public partial class ScienceAdvisor : Control {
+
+	[Export] public TextureRect background;
+
 	private ImageTexture AncientBackground;
 	private ImageTexture MiddleBackground;
 	private ImageTexture IndustrialBackground;
@@ -22,35 +27,14 @@ public partial class ScienceAdvisor : TextureRect {
 	// store the last opened era window so next time we open the advisor, it opens at the same era window
 	private static string lastOpenedEra = string.Empty;
 
-	private string advisorTitleString = "SCIENCE ADVISOR";
-
-	private FontFile regularFont = new();
-	private Theme regularBigFontTheme = new();
-
-	private int bigFontSize = 26;
-	// private int middleFontSize = 20;
-
-	private int bigFontGlyphSpacing = 14;
-	private int bigFontGlyphSpaceSpacing = 22;
-
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		this.CreateUI();
 
-		EngineStorage.ReadGameData((GameData gameData) => {
-			List<Tech> allTechs = gameData.techs;
-			Player player = gameData.GetFirstHumanPlayer();
-			eraName = string.IsNullOrEmpty(lastOpenedEra) ? player.eraCivilopediaName : lastOpenedEra;
-			this.DrawTechTree(eraName, player, allTechs, player.GetAvailableTechsToResearch(allTechs));
-		});
+
 	}
 
 	private void CreateUI() {
-
-		regularFont = ResourceLoader.Load<FontFile>("res://Fonts/NotoSans-Regular.ttf");
-		regularBigFontTheme.DefaultFont = regularFont;
-		regularBigFontTheme.SetFontSize("font_size", "Label", bigFontSize);
-
 		// science_industrial_new is used as the industrial tech tree is
 		// different from vanilla civ3.
 		AncientBackground = TextureLoader.Load("advisors.science.background.ancient");
@@ -60,58 +44,33 @@ public partial class ScienceAdvisor : TextureRect {
 
 		advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Science, AdvisorHead.Mood.Happy, eraIndex: 0);
 		advisorHead.SetPosition(new Vector2(851, 0));
-		AddChild(advisorHead);
+		background.AddChild(advisorHead);
 
-		FontVariation fontVariation = new FontVariation
-		{
-			BaseFont = regularFont,
-			SpacingGlyph = bigFontGlyphSpacing,
-			SpacingSpace = bigFontGlyphSpaceSpacing,
-		};
-
-		Theme regularThemeWithCustomSpacing = new Theme();
-		regularThemeWithCustomSpacing.SetFont("font", "Label", fontVariation);
-		regularThemeWithCustomSpacing.SetFontSize("font_size", "Label", bigFontSize);
-
-		float containerWidth = AncientBackground.GetWidth();
-
-		float advisorTitleStringWidth = GetStringSizeWithCustomSpacing(regularFont, advisorTitleString, bigFontSize,
-			bigFontGlyphSpacing, bigFontGlyphSpaceSpacing).X;
-
-		float advisorTitleOffsetLeft = (containerWidth / 2.0f) - (advisorTitleStringWidth) / 2.0f;
-
-		Label advisorTitle = new() {
-			Text = advisorTitleString,
-			OffsetLeft = advisorTitleOffsetLeft,
-			OffsetTop = 15,
-			Theme = regularThemeWithCustomSpacing,
-		};
-		AddChild(advisorTitle);
-
+		AdvisorUtils.CreateAdvisorTitle(background, AncientBackground.GetWidth(), "SCIENCE ADVISOR");
 
 		ImageTexture DialogBoxTexture = TextureLoader.Load("advisors.dialog_box");
 		TextureButton DialogBox = new TextureButton();
 		DialogBox.TextureNormal = DialogBoxTexture;
 		DialogBox.SetPosition(new Vector2(806, 110));
-		AddChild(DialogBox);
+		background.AddChild(DialogBox);
 
 		//TODO: Multi-line capabilities
 		Label DialogBoxAdvise = new Label();
 		DialogBoxAdvise.Text = "You are running OpenCiv3!";
 		DialogBoxAdvise.SetPosition(new Vector2(815, 119));
-		AddChild(DialogBoxAdvise);
+		background.AddChild(DialogBoxAdvise);
 
 		ImageTexture GoBackTexture = TextureLoader.Load("ui.exit.normal");
 		TextureButton GoBackButton = new TextureButton();
 		GoBackButton.TextureNormal = GoBackTexture;
 		GoBackButton.SetPosition(new Vector2(952, 720));
-		AddChild(GoBackButton);
+		background.AddChild(GoBackButton);
 		GoBackButton.Pressed += ReturnToMenu;
 
 		previousEra = new();
 		TextureLoader.SetButtonTextures(previousEra, "advisors.science.navigation.button");
 		previousEra.SetPosition(new Vector2(512 - 128 - 100, 720));
-		AddChild(previousEra);
+		background.AddChild(previousEra);
 		previousEra.Pressed += () => { ChangeEraAndDrawTree(-1); };
 
 		TextureRect leftArrow = new() {
@@ -128,7 +87,7 @@ public partial class ScienceAdvisor : TextureRect {
 		nextEra = new();
 		TextureLoader.SetButtonTextures(nextEra, "advisors.science.navigation.button");
 		nextEra.SetPosition(new Vector2(512 + 100, 720));
-		AddChild(nextEra);
+		background.AddChild(nextEra);
 		nextEra.Pressed += () => { ChangeEraAndDrawTree(1); };
 
 		TextureRect rightArrow = new() {
@@ -143,6 +102,17 @@ public partial class ScienceAdvisor : TextureRect {
 		nextEraLabel.Position += new Vector2(0, 7);
 	}
 
+
+	private void LoadTechTree()
+	{
+		EngineStorage.ReadGameData((GameData gameData) => {
+			List<Tech> allTechs = gameData.techs;
+			Player player = gameData.GetFirstHumanPlayer();
+			eraName = string.IsNullOrEmpty(lastOpenedEra) ? player.eraCivilopediaName : lastOpenedEra;
+			this.DrawTechTree(eraName, player, allTechs, player.GetAvailableTechsToResearch(allTechs));
+		});
+	}
+
 	void DrawTechTree(string eraName, Player player, List<Tech> allTechs, HashSet<Tech> availableTechsToResearch) {
 		HashSet<ID> knownTechs = player.knownTechs;
 		previousEra.Show();
@@ -155,13 +125,13 @@ public partial class ScienceAdvisor : TextureRect {
 		// Set the tech background based on the player's era.
 		if (eraName == ANCIENT_TIMES_CVLPD) {
 			previousEra.Hide();
-			this.Texture = AncientBackground;
+			background.Texture = AncientBackground;
 		} else if (eraName == MIDDLE_AGES_CVLPD) {
-			this.Texture = MiddleBackground;
+			background.Texture = MiddleBackground;
 		} else if (eraName == INDUSTRIAL_AGE_CVLPD) {
-			this.Texture = IndustrialBackground;
+			background.Texture = IndustrialBackground;
 		} else if (eraName == MODERN_ERA_CVLPD) {
-			this.Texture = ModernBackground;
+			background.Texture = ModernBackground;
 			nextEra.Hide();
 		}
 		advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Science, AdvisorHead.Mood.Happy, player.EraIndex());
@@ -192,7 +162,7 @@ public partial class ScienceAdvisor : TextureRect {
 				SelectionMode selection = Input.IsKeyPressed(Key.Shift) ? SelectionMode.Multi : SelectionMode.Single;
 				new MsgChooseResearch(tech, AdvisorState.Show, selection).send();
 			};
-			AddChild(techButton);
+			background.AddChild(techButton);
 			techBoxes.Add(techButton);
 		}
 	}
@@ -218,20 +188,18 @@ public partial class ScienceAdvisor : TextureRect {
 		GetParent<Advisors>().Hide();
 	}
 
-	private Vector2 GetStringSizeWithCustomSpacing(Font font, string input, int fontSize = 16, int glyphSpacing = 0, int glyphSpaceSpacing = 0) {
 
-		float extraSpacing = 0.0f;
-		for (int i = 0; i < input.Length; i++) {
-			if (i < input.Length - 1) {
-				if (char.IsWhiteSpace(input[i]) && glyphSpaceSpacing > 0) {
-					extraSpacing += glyphSpaceSpacing;
-				} else {
-					extraSpacing += glyphSpacing;
-				}
-			}
-		}
 
-		Vector2 originalSize = font.GetStringSize(input, fontSize: fontSize);
-		return new Vector2(originalSize.X + extraSpacing, originalSize.Y);
+	public void ShowAdvisor() {
+		LoadTechTree();
+
+		Show();
+
+		EngineStorage.ReadGameData((GameData gameData) => {
+			Player player = gameData.GetFirstHumanPlayer();
+
+			// TODO: Choose advisor head
+			// _advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Science, AdvisorHead.Mood.Happy, player.EraIndex());
+		});
 	}
 }

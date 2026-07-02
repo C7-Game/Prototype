@@ -5,7 +5,7 @@ using Godot;
 
 [GlobalClass]
 [Tool]
-public partial class TradeAdvisor : Control  {
+public partial class CulturalAdvisor : Control  {
 
 	[Export] public TextureRect background;
 
@@ -19,14 +19,12 @@ public partial class TradeAdvisor : Control  {
 	}
 
 	private void CreateUI() {
-		background.Texture = TextureLoader.Load("advisors.trade.background");
+		background.Texture = TextureLoader.Load("advisors.culture.background");
 
-		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Trade);
+		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Culture);
 		_close = AdvisorUtils.CreateExitButton(background);
 		_close.Pressed += () => {  this.GetParent<Advisors>().Hide(); };
 		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
-
-		AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(), "TRADE ADVISOR");
 	}
 
 	public void ShowAdvisor() {
@@ -36,7 +34,7 @@ public partial class TradeAdvisor : Control  {
 			Player player = gameData.GetFirstHumanPlayer();
 
 			// TODO: Choose advisor head
-			_advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Trade, AdvisorHead.Mood.Happy, player.EraIndex());
+			_advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Culture, AdvisorHead.Mood.Happy, player.EraIndex());
 		});
 	}
 }

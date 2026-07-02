@@ -1,27 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://cucamooiqvddl"]
+[gd_scene load_steps=3 format=3 uid="uid://cucamooiqvddl"]
 
 [ext_resource type="Script" uid="uid://bqrqi50q5303p" path="res://UIElements/Advisors/TradeAdvisor.cs" id="1_cr3pi"]
 [ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_nbt20"]
-[ext_resource type="Script" uid="uid://dcrdcjop64t6t" path="res://UIElements/Civ3TextureButton.cs" id="3_mxdqt"]
 
-[node name="TradeAdvisor" type="CenterContainer" node_paths=PackedStringArray("background", "close")]
+[node name="TradeAdvisor" type="CenterContainer" node_paths=PackedStringArray("background")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_cr3pi")
-background = NodePath("TradeAdvisorBackground")
-close = NodePath("TradeAdvisorBackground/Close")
+background = NodePath("TradeAdvisorBG")
 
-[node name="TradeAdvisorBackground" type="TextureRect" parent="."]
+[node name="TradeAdvisorBG" type="TextureRect" parent="."]
 layout_mode = 2
 script = ExtResource("2_nbt20")
-
-[node name="Close" type="TextureButton" parent="TradeAdvisorBackground"]
-layout_mode = 0
-offset_left = 952.0
-offset_top = 720.0
-offset_right = 1024.0
-offset_bottom = 768.0
-script = ExtResource("3_mxdqt")

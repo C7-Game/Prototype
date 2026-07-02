@@ -1,7 +1,5 @@
 using Godot;
-using System;
 using Serilog;
-using System.Collections.Generic;
 using C7Engine;
 
 /**
@@ -12,69 +10,63 @@ using C7Engine;
 public partial class Advisors : CenterContainer {
 	private ILogger log = LogManager.ForContext<Advisors>();
 
+	private string latest = C7Action.ShowDomesticAdvisor;
+
 	[Export] public DomesticAdvisor domesticAdvisor;
 	[Export] public TradeAdvisor tradeAdvisor;
-	private MilitaryAdvisor militaryAdvisor;
-	private ScienceAdvisor scienceAdvisor;
+	[Export] public MilitaryAdvisor militaryAdvisor;
+	[Export] public ForeignAdvisor foreignAdvisor;
+	[Export] public CulturalAdvisor culturalAdvisor;
+	[Export] public ScienceAdvisor scienceAdvisor;
 
-	// A list of all the non-null advisors, so we can hide them whenever we
-	// draw a different advisor.
-	private List<TextureRect> advisors = new();
-
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
-		//Center the advisor container.  Following directions at https://docs.godotengine.org/en/stable/tutorials/gui/size_and_anchors.html?highlight=anchor
-		//Also taking advantage of it being 1024x768, as the directions didn't really work.  This is not 100% ideal (would be great for a general-purpose solution to work),
-		//but does work with the current graphics independent of resolution.
-		this.Hide();
+		Hide();
 	}
 
 	private void ShowLatestAdvisor() {
-		log.Debug("Received request to show latest advisor");
-
-		OnShowSpecificAdvisor("F1");
-		this.Show();
+		OnShowSpecificAdvisor(latest);
 	}
 
 	private void OnShowSpecificAdvisor(string advisorType) {
-		// Hide any existing advisors so we can draw the requested one.
-		foreach (TextureRect tr in advisors) {
-			tr.Hide();
+		latest = advisorType;
+
+		HideAdvisors();
+
+		switch (advisorType)
+		{
+			case C7Action.ShowDomesticAdvisor:
+				domesticAdvisor.ShowAdvisor();
+				break;
+			case C7Action.ShowTradeAdvisor:
+				tradeAdvisor.ShowAdvisor();
+				break;
+			case C7Action.ShowForeignAdvisor:
+				foreignAdvisor.ShowAdvisor();
+				break;
+			case C7Action.ShowMilitaryAdvisor:
+				militaryAdvisor.ShowAdvisor();
+				break;
+			case C7Action.ShowCulturalAdvisor:
+				culturalAdvisor.ShowAdvisor();
+				break;
+			case C7Action.ShowScienceAdvisor:
+				scienceAdvisor.ShowAdvisor();
+				break;
+			default:
+				log.Warning("Unknown advisor type: " + advisorType);
+				break;
 		}
+
+		Show();
+	}
+
+	private void HideAdvisors()
+	{
 		domesticAdvisor.Hide();
 		tradeAdvisor.Hide();
-
-		if (advisorType.Equals("F1")) {
-			domesticAdvisor.ShowAdvisor();
-			this.Show();
-		}
-		if (advisorType.Equals(C7Action.ShowTradeAdvisor)) {
-			tradeAdvisor.ShowAdvisor();
-			this.Show();
-		}
-		if (advisorType.Equals("F3")) {
-			if (militaryAdvisor != null) {
-				RemoveChild(militaryAdvisor);
-				militaryAdvisor = null;
-			}
-
-			militaryAdvisor = new MilitaryAdvisor();
-			advisors.Add(militaryAdvisor);
-			AddChild(militaryAdvisor);
-			this.Show();
-		}
-		if (advisorType.Equals("F6")) {
-			// TODO: What's the best way to refresh the tech tree UI without
-			// adding too many children?
-			if (scienceAdvisor != null) {
-				RemoveChild(scienceAdvisor);
-				scienceAdvisor = null;
-			}
-
-			scienceAdvisor = new ScienceAdvisor();
-			advisors.Add(scienceAdvisor);
-			AddChild(scienceAdvisor);
-			this.Show();
-		}
+		militaryAdvisor.Hide();
+		foreignAdvisor.Hide();
+		culturalAdvisor.Hide();
+		scienceAdvisor.Hide();
 	}
 }

@@ -3,66 +3,58 @@ using C7GameData;
 using Godot;
 using System;
 
-public partial class MilitaryAdvisor : TextureRect {
-	Label totalUnitsLabel = new();
-	Label allowedUnitsLabel = new();
-	Label unitSupportCostLabel = new();
+[GlobalClass]
+[Tool]
+public partial class MilitaryAdvisor : Control {
+
+	[Export] public TextureRect background;
+
+	private TextureButton _close;
+	private TextureRect _advisorHead;
+	private TextureButton _dialogBox;
+	private Label _dialogBoxLabel;
+
+	private Label _totalUnitsLabel = new();
+	private Label _allowedUnitsLabel = new();
+	private Label _unitSupportCostLabel = new();
 
 	public override void _Ready() {
 		this.CreateUI();
 	}
 
 	private void CreateUI() {
-		this.Texture = TextureLoader.Load("advisors.military.background");
+		background.Texture = TextureLoader.Load("advisors.military.background");
 
-		ImageTexture DialogBoxTexture = TextureLoader.Load("advisors.dialog_box");
-		TextureButton DialogBox = new TextureButton();
-		DialogBox.TextureNormal = DialogBoxTexture;
-		DialogBox.SetPosition(new Vector2(806, 110));
-		AddChild(DialogBox);
+		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Military);
+		_close = AdvisorUtils.CreateExitButton(background);
+		_close.Pressed += () => {  this.GetParent<Advisors>().Hide(); };
+		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
 
-		//TODO: Multi-line capabilities
-		Label DialogBoxAdvise = new Label();
-		DialogBoxAdvise.Text = "You are running OpenCiv3!";
-		DialogBoxAdvise.SetPosition(new Vector2(815, 119));
-		AddChild(DialogBoxAdvise);
+		background.AddChild(_totalUnitsLabel);
 
-		ImageTexture GoBackTexture = TextureLoader.Load("ui.exit.normal");
-		TextureButton GoBackButton = new TextureButton();
-		GoBackButton.TextureNormal = GoBackTexture;
-		GoBackButton.SetPosition(new Vector2(952, 720));
-		AddChild(GoBackButton);
-		GoBackButton.Pressed += ReturnToMenu;
+		background.AddChild(_allowedUnitsLabel);
+		_allowedUnitsLabel.SetPosition(new Vector2(-50, 139));
+
+		background.AddChild(_unitSupportCostLabel);
+		_unitSupportCostLabel.SetPosition(new Vector2(-50, 188));
+	}
+
+	public void ShowAdvisor() {
+		Show();
 
 		EngineStorage.ReadGameData((GameData gameData) => {
 			Player player = gameData.GetFirstHumanPlayer();
 			var (totalUnits, allowedUnits, unitSupportCost) = player.TotalUnitsAllowedUnitsAndSupportCost();
 
-			AddChild(totalUnitsLabel);
-			totalUnitsLabel.SetPosition(new Vector2(0, 90));
-			totalUnitsLabel.SetTextAndCenterLabel($"Total Units\n{totalUnits}");
-			totalUnitsLabel.Position += new Vector2(-50, 0);
+			var headlineFiguresOffset = -75;
+			_totalUnitsLabel.SetTextAndCenterLabel($"Total Units\n{totalUnits}");
+			_totalUnitsLabel.SetPosition(new Vector2(headlineFiguresOffset, 90));
 
-			AddChild(allowedUnitsLabel);
-			allowedUnitsLabel.SetPosition(new Vector2(0, 139));
-			allowedUnitsLabel.SetTextAndCenterLabel($"Allowed Units\n{allowedUnits}");
-			allowedUnitsLabel.Position += new Vector2(-50, 0);
+			_allowedUnitsLabel.SetTextAndCenterLabel($"Allowed Units\n{allowedUnits}");
+			_unitSupportCostLabel.SetTextAndCenterLabel($"Unit Support Cost\n{unitSupportCost} gold/turn");
 
-			AddChild(unitSupportCostLabel);
-			unitSupportCostLabel.SetPosition(new Vector2(0, 188));
-			unitSupportCostLabel.SetTextAndCenterLabel($"Unit Support Cost\n{unitSupportCost} gold/turn");
-			unitSupportCostLabel.Position += new Vector2(-50, 0);
-
-			TextureRect advisorHead = new();
-			//TODO: Randomize or set logically
-			advisorHead.Texture =
+			_advisorHead.Texture =
 				AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Military, AdvisorHead.Mood.Happy, player.EraIndex());
-			advisorHead.SetPosition(new Vector2(851, 0));
-			AddChild(advisorHead);
 		});
-	}
-
-	private void ReturnToMenu() {
-		GetParent<Advisors>().Hide();
 	}
 }

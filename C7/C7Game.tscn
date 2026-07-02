@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cldl5nk4n61m2"]
+[gd_scene load_steps=25 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" uid="uid://yxhiwx46tety" path="res://Game.cs" id="1"]
 [ext_resource type="Script" uid="uid://cfenrvu7tnp40" path="res://DoubleClickHandler.cs" id="2_t735q"]
@@ -20,6 +20,10 @@
 [ext_resource type="PackedScene" uid="uid://dkcu255o1qrt1" path="res://UIElements/PalaceScreen/palace_screen.tscn" id="14_ud8vi"]
 [ext_resource type="PackedScene" uid="uid://da7hbbufyfllg" path="res://UIElements/Advisors/domestic_advisor.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://cucamooiqvddl" path="res://UIElements/Advisors/trade_advisor.tscn" id="15_4pqcd"]
+[ext_resource type="PackedScene" uid="uid://d0qk1h4jvf3i1" path="res://UIElements/Advisors/military_advisor.tscn" id="16_js1p2"]
+[ext_resource type="PackedScene" uid="uid://balpdexsjgl0b" path="res://UIElements/Advisors/foreign_advisor.tscn" id="18_alc04"]
+[ext_resource type="PackedScene" uid="uid://cla8cx1cxecu2" path="res://UIElements/Advisors/cultural_advisor.tscn" id="19_wqtcm"]
+[ext_resource type="PackedScene" uid="uid://c5qvjbhp6c3bv" path="res://UIElements/Advisors/science_advisor.tscn" id="20_v3pw1"]
 
 [node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "popupOverlay", "cityScreen", "advisor", "diplomacy", "palaceScene", "doubleClickHandler", "animationController", "unitSelector")]
 script = ExtResource("1")
@@ -190,7 +194,7 @@ script = ExtResource("8_7a2mf")
 text = "S"
 tooltipText = "Spaceship"
 
-[node name="Advisor" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("domesticAdvisor", "tradeAdvisor")]
+[node name="Advisor" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("domesticAdvisor", "tradeAdvisor", "militaryAdvisor", "foreignAdvisor", "culturalAdvisor", "scienceAdvisor")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -200,12 +204,32 @@ theme = ExtResource("10")
 script = ExtResource("3")
 domesticAdvisor = NodePath("DomesticAdvisor")
 tradeAdvisor = NodePath("TradeAdvisor")
+militaryAdvisor = NodePath("MilitaryAdvisor")
+foreignAdvisor = NodePath("ForeignAdvisor")
+culturalAdvisor = NodePath("CulturalAdvisor")
+scienceAdvisor = NodePath("ScienceAdvisor")
 
 [node name="DomesticAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("15")]
 visible = false
 layout_mode = 2
 
 [node name="TradeAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("15_4pqcd")]
+visible = false
+layout_mode = 2
+
+[node name="MilitaryAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("16_js1p2")]
+visible = false
+layout_mode = 2
+
+[node name="ForeignAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("18_alc04")]
+visible = false
+layout_mode = 2
+
+[node name="CulturalAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("19_wqtcm")]
+visible = false
+layout_mode = 2
+
+[node name="ScienceAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("20_v3pw1")]
 visible = false
 layout_mode = 2
 
