@@ -5,7 +5,7 @@ using Godot;
 
 [GlobalClass]
 [Tool]
-public partial class ForeignAdvisor : Control  {
+public partial class ForeignAdvisor : Control {
 
 	[Export] public TextureRect background;
 
@@ -23,8 +23,10 @@ public partial class ForeignAdvisor : Control  {
 
 		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Foreign);
 		_close = AdvisorUtils.CreateExitButton(background);
-		_close.Pressed += () => {  this.GetParent<Advisors>().Hide(); };
+		_close.Pressed += () => { this.GetParent<Advisors>().Hide(); };
 		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
+
+		AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(), "FOREIGN ADVISOR");
 	}
 
 	public void ShowAdvisor() {

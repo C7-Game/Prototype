@@ -16,10 +16,15 @@ public partial class ScienceAdvisor : Control {
 	private ImageTexture MiddleBackground;
 	private ImageTexture IndustrialBackground;
 	private ImageTexture ModernBackground;
+
+	private TextureButton _close;
+	private TextureRect _advisorHead;
+	private TextureButton _dialogBox;
+	private Label _dialogBoxLabel;
+
 	private TextureButton nextEra;
 	private TextureButton previousEra;
 	private List<TechBox> techBoxes = new();
-	private TextureRect advisorHead = new();
 
 	// Stored separately so we can modify this without mutating the player.
 	private string eraName;
@@ -42,30 +47,13 @@ public partial class ScienceAdvisor : Control {
 		IndustrialBackground = TextureLoader.Load("advisors.science.background.industrial");
 		ModernBackground = TextureLoader.Load("advisors.science.background.modern");
 
-		advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Science, AdvisorHead.Mood.Happy, eraIndex: 0);
-		advisorHead.SetPosition(new Vector2(851, 0));
-		background.AddChild(advisorHead);
+		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Science);
+		_close = AdvisorUtils.CreateExitButton(background);
+		_close.Pressed += () => { this.GetParent<Advisors>().Hide(); };
+		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
 
 		AdvisorUtils.CreateAdvisorTitle(background, AncientBackground.GetWidth(), "SCIENCE ADVISOR");
 
-		ImageTexture DialogBoxTexture = TextureLoader.Load("advisors.dialog_box");
-		TextureButton DialogBox = new TextureButton();
-		DialogBox.TextureNormal = DialogBoxTexture;
-		DialogBox.SetPosition(new Vector2(806, 110));
-		background.AddChild(DialogBox);
-
-		//TODO: Multi-line capabilities
-		Label DialogBoxAdvise = new Label();
-		DialogBoxAdvise.Text = "You are running OpenCiv3!";
-		DialogBoxAdvise.SetPosition(new Vector2(815, 119));
-		background.AddChild(DialogBoxAdvise);
-
-		ImageTexture GoBackTexture = TextureLoader.Load("ui.exit.normal");
-		TextureButton GoBackButton = new TextureButton();
-		GoBackButton.TextureNormal = GoBackTexture;
-		GoBackButton.SetPosition(new Vector2(952, 720));
-		background.AddChild(GoBackButton);
-		GoBackButton.Pressed += ReturnToMenu;
 
 		previousEra = new();
 		TextureLoader.SetButtonTextures(previousEra, "advisors.science.navigation.button");
@@ -103,8 +91,7 @@ public partial class ScienceAdvisor : Control {
 	}
 
 
-	private void LoadTechTree()
-	{
+	private void LoadTechTree() {
 		EngineStorage.ReadGameData((GameData gameData) => {
 			List<Tech> allTechs = gameData.techs;
 			Player player = gameData.GetFirstHumanPlayer();
@@ -134,7 +121,7 @@ public partial class ScienceAdvisor : Control {
 			background.Texture = ModernBackground;
 			nextEra.Hide();
 		}
-		advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Science, AdvisorHead.Mood.Happy, player.EraIndex());
+		_advisorHead.Texture = AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Science, AdvisorHead.Mood.Happy, player.EraIndex());
 
 		foreach (Tech tech in allTechs) {
 			if (tech.EraCivilopediaName != eraName) {

@@ -32,8 +32,7 @@ public partial class Advisors : CenterContainer {
 
 		HideAdvisors();
 
-		switch (advisorType)
-		{
+		switch (advisorType) {
 			case C7Action.ShowDomesticAdvisor:
 				domesticAdvisor.ShowAdvisor();
 				break;
@@ -60,8 +59,7 @@ public partial class Advisors : CenterContainer {
 		Show();
 	}
 
-	private void HideAdvisors()
-	{
+	private void HideAdvisors() {
 		domesticAdvisor.Hide();
 		tradeAdvisor.Hide();
 		militaryAdvisor.Hide();

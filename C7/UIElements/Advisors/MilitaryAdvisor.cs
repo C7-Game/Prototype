@@ -27,16 +27,17 @@ public partial class MilitaryAdvisor : Control {
 
 		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Military);
 		_close = AdvisorUtils.CreateExitButton(background);
-		_close.Pressed += () => {  this.GetParent<Advisors>().Hide(); };
+		_close.Pressed += () => { this.GetParent<Advisors>().Hide(); };
 		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
 
+		AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(), "MILITARY ADVISOR");
+
 		background.AddChild(_totalUnitsLabel);
-
+		_totalUnitsLabel.SetPosition(new Vector2(0, 90));
 		background.AddChild(_allowedUnitsLabel);
-		_allowedUnitsLabel.SetPosition(new Vector2(-50, 139));
-
+		_allowedUnitsLabel.SetPosition(new Vector2(0, 139));
 		background.AddChild(_unitSupportCostLabel);
-		_unitSupportCostLabel.SetPosition(new Vector2(-50, 188));
+		_unitSupportCostLabel.SetPosition(new Vector2(0, 188));
 	}
 
 	public void ShowAdvisor() {
@@ -46,12 +47,12 @@ public partial class MilitaryAdvisor : Control {
 			Player player = gameData.GetFirstHumanPlayer();
 			var (totalUnits, allowedUnits, unitSupportCost) = player.TotalUnitsAllowedUnitsAndSupportCost();
 
-			var headlineFiguresOffset = -75;
 			_totalUnitsLabel.SetTextAndCenterLabel($"Total Units\n{totalUnits}");
-			_totalUnitsLabel.SetPosition(new Vector2(headlineFiguresOffset, 90));
-
+			_totalUnitsLabel.Position += new Vector2(-50, 0);
 			_allowedUnitsLabel.SetTextAndCenterLabel($"Allowed Units\n{allowedUnits}");
+			_allowedUnitsLabel.Position += new Vector2(-50, 0);
 			_unitSupportCostLabel.SetTextAndCenterLabel($"Unit Support Cost\n{unitSupportCost} gold/turn");
+			_unitSupportCostLabel.Position += new Vector2(-50, 0);
 
 			_advisorHead.Texture =
 				AdvisorHead.GetPopupImage(AdvisorHead.Advisor.Military, AdvisorHead.Mood.Happy, player.EraIndex());

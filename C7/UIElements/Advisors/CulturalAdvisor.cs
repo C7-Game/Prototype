@@ -5,7 +5,7 @@ using Godot;
 
 [GlobalClass]
 [Tool]
-public partial class CulturalAdvisor : Control  {
+public partial class CulturalAdvisor : Control {
 
 	[Export] public TextureRect background;
 
@@ -23,8 +23,10 @@ public partial class CulturalAdvisor : Control  {
 
 		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Culture);
 		_close = AdvisorUtils.CreateExitButton(background);
-		_close.Pressed += () => {  this.GetParent<Advisors>().Hide(); };
+		_close.Pressed += () => { this.GetParent<Advisors>().Hide(); };
 		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
+
+		AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(), "CULTURAL ADVISOR");
 	}
 
 	public void ShowAdvisor() {

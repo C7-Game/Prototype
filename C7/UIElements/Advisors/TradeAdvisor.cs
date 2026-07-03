@@ -5,7 +5,7 @@ using Godot;
 
 [GlobalClass]
 [Tool]
-public partial class TradeAdvisor : Control  {
+public partial class TradeAdvisor : Control {
 
 	[Export] public TextureRect background;
 
@@ -23,7 +23,7 @@ public partial class TradeAdvisor : Control  {
 
 		_advisorHead = AdvisorUtils.CreateAdvisorHead(background, AdvisorHead.Advisor.Trade);
 		_close = AdvisorUtils.CreateExitButton(background);
-		_close.Pressed += () => {  this.GetParent<Advisors>().Hide(); };
+		_close.Pressed += () => { this.GetParent<Advisors>().Hide(); };
 		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
 
 		AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(), "TRADE ADVISOR");
