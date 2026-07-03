@@ -14,6 +14,10 @@ public partial class TradeAdvisor : Control {
 	private TextureButton _dialogBox;
 	private Label _dialogBoxLabel;
 
+	public TradeAdvisor() {
+		MouseFilter = MouseFilterEnum.Stop;
+	}
+
 	public override void _Ready() {
 		this.CreateUI();
 	}

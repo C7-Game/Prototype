@@ -18,6 +18,10 @@ public partial class MilitaryAdvisor : Control {
 	private Label _allowedUnitsLabel = new();
 	private Label _unitSupportCostLabel = new();
 
+	public MilitaryAdvisor() {
+		MouseFilter = MouseFilterEnum.Stop;
+	}
+
 	public override void _Ready() {
 		this.CreateUI();
 	}

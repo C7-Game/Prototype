@@ -14,6 +14,10 @@ public partial class ForeignAdvisor : Control {
 	private TextureButton _dialogBox;
 	private Label _dialogBoxLabel;
 
+	public ForeignAdvisor() {
+		MouseFilter = MouseFilterEnum.Stop;
+	}
+
 	public override void _Ready() {
 		this.CreateUI();
 	}

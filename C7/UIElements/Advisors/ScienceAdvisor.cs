@@ -32,11 +32,13 @@ public partial class ScienceAdvisor : Control {
 	// store the last opened era window so next time we open the advisor, it opens at the same era window
 	private static string lastOpenedEra = string.Empty;
 
+	public ScienceAdvisor() {
+		MouseFilter = MouseFilterEnum.Stop;
+	}
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		this.CreateUI();
-
-
 	}
 
 	private void CreateUI() {

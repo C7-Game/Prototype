@@ -14,6 +14,10 @@ public partial class CulturalAdvisor : Control {
 	private TextureButton _dialogBox;
 	private Label _dialogBoxLabel;
 
+	public CulturalAdvisor() {
+		MouseFilter = MouseFilterEnum.Stop;
+	}
+
 	public override void _Ready() {
 		this.CreateUI();
 	}

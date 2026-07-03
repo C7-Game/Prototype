@@ -44,6 +44,10 @@ public partial class DomesticAdvisor : Control {
 	private int scienceSliderY = 84;
 	private int luxurySliderY = 130;
 
+	public DomesticAdvisor() {
+		MouseFilter = MouseFilterEnum.Stop;
+	}
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		this.CreateUI();
