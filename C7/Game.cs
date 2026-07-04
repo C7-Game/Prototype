@@ -308,26 +308,20 @@ public partial class Game : Node {
 				break;
 			case MsgShowMilitaryAdvisorPopup mSMAP:
 				if (!popupOverlay.Visible) {
-					popupOverlay.ShowPopup(
-						new InformationalPopup(mSMAP.message, AdvisorHead.Advisor.Military, mSMAP.happy ? AdvisorHead.Mood.Happy : AdvisorHead.Mood.Angry),
-						PopupOverlay.PopupCategory.Advisor);
+					var mood = mSMAP.happy ? AdvisorHead.Mood.Happy : AdvisorHead.Mood.Angry;
+					var pop = new InformationalPopup(mSMAP.message, AdvisorHead.Advisor.Military, mood);
+					popupOverlay.ShowPopup(pop, PopupOverlay.PopupCategory.Advisor);
 				}
 				break;
 			case MsgShowScienceAdvisor mSSA:
-				// F6 is the science advisor.
-				// TODO: Move the F* key strings to a set of constants/enum.
-				EmitSignal(SignalName.ShowSpecificAdvisor, "F6");
+				EmitSignal(SignalName.ShowSpecificAdvisor, C7Action.ShowScienceAdvisor);
 				break;
 			case MsgUpdateUiAfterDomesticChange mUUASC:
-				// F1 is the domestic advisor.
-				// TODO: Move the F* key strings to a set of constants/enum.
-
-				// Ensure the citizen moods are correct before displaying
-				// them.
+				// Ensure the citizen moods are correct before displaying them.
 				foreach (City c in controller.cities) {
 					c.RecalculateCitizenMoods(gameData);
 				}
-				EmitSignal(SignalName.ShowSpecificAdvisor, "F1");
+				EmitSignal(SignalName.ShowSpecificAdvisor, C7Action.ShowDomesticAdvisor);
 				break;
 			case MsgShowTradeOffer mSTO:
 				diplomacy.ShowDealScreenForPlayer(

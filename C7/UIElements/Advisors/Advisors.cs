@@ -28,9 +28,10 @@ public partial class Advisors : CenterContainer {
 	}
 
 	private void OnShowSpecificAdvisor(string advisorType) {
-		latest = advisorType;
-
-		HideAdvisors();
+		if (advisorType != latest) {
+			latest = advisorType;
+			HideAdvisors();
+		}
 
 		switch (advisorType) {
 			case C7Action.ShowDomesticAdvisor:
