@@ -1,4 +1,5 @@
 -- Base paths
+local ROOT = "Art/"
 local ADVISORS = "Art/Advisors/"
 
 local BUTTONS = "Art/buttonsFINAL.pcx"
@@ -17,6 +18,7 @@ local CITY_ICONS = "Art/Cities/city icons.pcx"
 
 local CREDITS = "Art/Credits/"
 local PALACE = "Art/PalaceView/"
+local SPACE_RACE = "Art/SpaceShip/"
 
 local POPUP_BORDERS = "Art/popupborders.pcx"
 
@@ -101,12 +103,27 @@ textures.advisors = {
 }
 
 textures.screens = {
+  wonders = {
+    background = ADVISORS .. "wonders.pcx",
+  },
+  standing = {
+    victory_status = {
+      background = ROOT .. "histograph-win5_final.pcx",
+    },
+    histogram = {
+      background = ROOT .. "histograph-top5_final.pcx",
+    }
+  },
+  space_race = {
+    background = SPACE_RACE .. "SHIPbackground.pcx",
+  },
+  palace = {
+    background = PALACE .. "bkgr.pcx",
+  },
   demographics = {
     background = ADVISORS .. "demographics.pcx",
   },
-  wonders = {
-    background = ADVISORS .. "wonders.pcx",
-  }
+
 }
 
 textures.ui = {
@@ -375,10 +392,6 @@ textures.city_screen = {
     },
   },
   production_queue = CITY_SCREEN .. "ProductionQueueBox.pcx",
-}
-
-textures.palace = {
-  background = PALACE .. "bkgr.pcx",
 }
 
 textures.world_setup = require "textures.world_setup"

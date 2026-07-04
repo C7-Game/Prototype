@@ -10,7 +10,7 @@
 layout_mode = 2
 script = ExtResource("2_kp65c")
 switchButtonContainer = NodePath("SwitchButtonContainer")
-textureConfigKey = "palace.background"
+textureConfigKey = "screens.palace.background"
 
 [node name="Close" type="TextureButton" parent="HBoxContainer/PalaceScreen" index="0"]
 layout_mode = 0
