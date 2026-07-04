@@ -104,7 +104,7 @@ textures.advisors = {
 
 textures.screens = {
   wonders = {
-    background = ADVISORS .. "wonders.pcx",
+    background = ADVISORS .. "wonders_background.pcx",
   },
   standing = {
     victory_status = {

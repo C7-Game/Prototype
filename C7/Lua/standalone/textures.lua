@@ -101,7 +101,15 @@ local c7_texture_list = {
   "Art/city screen/buildings-small.png",
   "Art/city screen/buildings-large.png",
   "Art/Cursor.png",
-  "Art/interface/box trans color.png"
+  "Art/interface/box trans color.png",
+  "Art/SpaceShip/SHIPbackground.png",
+  "Art/Advisors/trade.png",
+  "Art/Advisors/foreign.png",
+  "Art/Advisors/foreignTAB.png",
+  "Art/Advisors/culture.png",
+  "Art/Advisors/wonders_background.png",
+  "Art/histograph-win5_final.png",
+  "Art/histograph-top5_final.png",
 }
 
 --- For ease of editing, we define the civ colors as hex codes, not 1x1 px images
