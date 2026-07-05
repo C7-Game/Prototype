@@ -87,13 +87,17 @@ textures.advisors = {
   foreign = {
     background = ADVISORS .. "foreign.pcx",
     navigation = {
-      trade = {
+      treaties = {
         path = ADVISORS .. "foreignTAB.pcx",
-        crop_region = { 0, 0, 224, 237 },
+        crop_region = { 1, 1, 223, 236 },
       },
-      treaty = {
+      trades = {
         path = ADVISORS .. "foreignTAB.pcx",
-        crop_region = { 225, 0, 448, 237 },
+        crop_region = { 225, 1, 223, 236 },
+      },
+      details = {
+        path = ADVISORS .. "foreignTAB.pcx",
+        crop_region = { 449, 1, 223, 236 },
       }
     }
   },

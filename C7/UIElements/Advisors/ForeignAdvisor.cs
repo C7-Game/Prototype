@@ -2,12 +2,20 @@ using System.Numerics;
 using C7Engine;
 using C7GameData;
 using Godot;
+using Vector2 = Godot.Vector2;
 
 [GlobalClass]
 [Tool]
 public partial class ForeignAdvisor : Control {
 
 	[Export] public TextureRect background;
+
+	[Export] public TextureRect treaties = new();
+	[Export] public TextureButton treatiesButton = new();
+	[Export] public TextureRect trades = new();
+	[Export] public TextureButton tradesButton = new();
+	[Export] public TextureRect details = new();
+	[Export] public TextureButton detailsButton = new();
 
 	private TextureButton _close;
 	private TextureRect _advisorHead;
@@ -30,7 +38,50 @@ public partial class ForeignAdvisor : Control {
 		_close.Pressed += () => { this.GetParent<Advisors>().Hide(); };
 		(_dialogBox, _dialogBoxLabel) = AdvisorUtils.CreateAdvisorDialogBox(background);
 
+		// Tabs
+		Vector2 tabsPosition = new(740, 300);
+		CreateTabs(tabsPosition);
+		CreateTabHeaders(tabsPosition);
+
 		AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(), "FOREIGN ADVISOR");
+	}
+
+	private void CreateTabs(Vector2 tabsPosition) {
+		treaties.Texture = TextureLoader.Load("advisors.foreign.navigation.treaties");
+		treaties.SetPosition(tabsPosition);
+		background.AddChild(treaties);
+
+		trades.Texture = TextureLoader.Load("advisors.foreign.navigation.trades");
+		trades.SetPosition(tabsPosition);
+		background.AddChild(trades);
+
+		details.Texture = TextureLoader.Load("advisors.foreign.navigation.details");
+		details.SetPosition(tabsPosition);
+		background.AddChild(details);
+
+		treaties.Show();
+		trades.Hide();
+		details.Hide();
+	}
+
+	private void CreateTabHeaders(Vector2 tabsPosition) {
+		Vector2 buttonSize = new(74, 18);
+		Vector2 xShift = new(buttonSize.X + 3, 0);
+
+		treatiesButton.SetSize(buttonSize);
+		treatiesButton.Pressed += () => { treaties.Show(); trades.Hide(); details.Hide(); };
+		treatiesButton.SetPosition(tabsPosition);
+		background.AddChild(treatiesButton);
+
+		tradesButton.SetSize(buttonSize);
+		tradesButton.Pressed += () => { treaties.Hide(); trades.Show(); details.Hide(); };
+		tradesButton.SetPosition(tabsPosition + xShift);
+		background.AddChild(tradesButton);
+
+		detailsButton.SetSize(buttonSize);
+		detailsButton.Pressed += () => { treaties.Hide(); trades.Hide(); details.Show(); };
+		detailsButton.SetPosition(tabsPosition + xShift + xShift);
+		background.AddChild(detailsButton);
 	}
 
 	public void ShowAdvisor() {
