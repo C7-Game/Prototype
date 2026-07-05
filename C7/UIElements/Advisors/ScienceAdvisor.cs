@@ -36,7 +36,6 @@ public partial class ScienceAdvisor : Control {
 		MouseFilter = MouseFilterEnum.Stop;
 	}
 
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		this.CreateUI();
 	}
@@ -56,7 +55,11 @@ public partial class ScienceAdvisor : Control {
 
 		AdvisorUtils.CreateAdvisorTitle(background, AncientBackground.GetWidth(), "SCIENCE ADVISOR");
 
+		CreatePreviousEraButton();
+		CreateNextEraButton();
+	}
 
+	private void CreatePreviousEraButton() {
 		previousEra = new();
 		TextureLoader.SetButtonTextures(previousEra, "advisors.science.navigation.button");
 		previousEra.SetPosition(new Vector2(512 - 128 - 100, 720));
@@ -73,7 +76,9 @@ public partial class ScienceAdvisor : Control {
 		previousEra.AddChild(previousEraLabel);
 		previousEraLabel.SetTextAndCenterLabel("Previous Era");
 		previousEraLabel.Position += new Vector2(0, 7);
+	}
 
+	private void CreateNextEraButton() {
 		nextEra = new();
 		TextureLoader.SetButtonTextures(nextEra, "advisors.science.navigation.button");
 		nextEra.SetPosition(new Vector2(512 + 100, 720));
@@ -91,7 +96,6 @@ public partial class ScienceAdvisor : Control {
 		nextEraLabel.SetTextAndCenterLabel("Next Era");
 		nextEraLabel.Position += new Vector2(0, 7);
 	}
-
 
 	private void LoadTechTree() {
 		EngineStorage.ReadGameData((GameData gameData) => {
@@ -158,7 +162,7 @@ public partial class ScienceAdvisor : Control {
 
 	private void ChangeEraAndDrawTree(int delta) {
 		foreach (TechBox tb in techBoxes) {
-			RemoveChild(tb);
+			background.RemoveChild(tb);
 			tb.QueueFree();
 		}
 		techBoxes.Clear();
@@ -172,11 +176,6 @@ public partial class ScienceAdvisor : Control {
 			DrawTechTree(eraName, player, allTechs, player.GetAvailableTechsToResearch(allTechs));
 		});
 	}
-
-	private void ReturnToMenu() {
-		GetParent<Advisors>().Hide();
-	}
-
 
 
 	public void ShowAdvisor() {
