@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dkcu255o1qrt1"]
 
 [ext_resource type="PackedScene" uid="uid://bnvwn0hhrsn82" path="res://UIElements/black_sidebars.tscn" id="1_a64pg"]
-[ext_resource type="Script" uid="uid://by7gjap06whbu" path="res://UIElements/PalaceScreen/PalaceScreen.cs" id="2_kp65c"]
+[ext_resource type="Script" uid="uid://by7gjap06whbu" path="res://UIElements/GameViews/PalaceScreen.cs" id="2_kp65c"]
 [ext_resource type="Script" uid="uid://dcrdcjop64t6t" path="res://UIElements/Civ3TextureButton.cs" id="4_yi45k"]
 
 [node name="PalaceScene" instance=ExtResource("1_a64pg")]

@@ -17,7 +17,7 @@
 [ext_resource type="Script" uid="uid://cqbrjccf0k1xx" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
 [ext_resource type="PackedScene" uid="uid://bvncm1bgcii5e" path="res://UIElements/civ3_file_dialog.tscn" id="12_yjlfl"]
 [ext_resource type="Script" uid="uid://bmfpx37ovqnsx" path="res://UIElements/Diplomacy/Diplomacy.cs" id="14"]
-[ext_resource type="PackedScene" uid="uid://dkcu255o1qrt1" path="res://UIElements/PalaceScreen/palace_screen.tscn" id="14_ud8vi"]
+[ext_resource type="PackedScene" uid="uid://dkcu255o1qrt1" path="res://UIElements/GameViews/palace_screen.tscn" id="14_ud8vi"]
 [ext_resource type="PackedScene" uid="uid://da7hbbufyfllg" path="res://UIElements/Advisors/domestic_advisor.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://cucamooiqvddl" path="res://UIElements/Advisors/trade_advisor.tscn" id="15_4pqcd"]
 [ext_resource type="PackedScene" uid="uid://d0qk1h4jvf3i1" path="res://UIElements/Advisors/military_advisor.tscn" id="16_js1p2"]
