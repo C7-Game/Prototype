@@ -24,12 +24,18 @@ public static class C7Action {
 	public const string ToggleCoordinates = "toggle_coordinates";
 	public const string ToggleZoom = "toggle_zoom";
 
-	public const string ShowDomesticAdvisor = "show_domestic_advisor";
+	public const string ShowDomesticAdvisor = "show_domestic_advisor"; // F1
 	public const string ShowTradeAdvisor = "show_trade_advisor";
 	public const string ShowMilitaryAdvisor = "show_military_advisor";
 	public const string ShowForeignAdvisor = "show_foreign_advisor";
 	public const string ShowCulturalAdvisor = "show_cultural_advisor";
-	public const string ShowScienceAdvisor = "show_science_advisor";
+	public const string ShowScienceAdvisor = "show_science_advisor"; // F6
+
+	public const string ShowWondersView = "show_wonders_view"; // F7
+	public const string ShowVictoryStatusView = "show_victory_status_view";
+	public const string ShowPalaceView = "show_palace_view";
+	public const string ShowSpaceRaceView = "show_space_race_view";
+	public const string ShowDemographicsView = "show_demographics_view"; // F11
 
 	public const string UnitBombard = "unit_bombard";
 	public const string UnitBuildCity = "unit_build_city";
