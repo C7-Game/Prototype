@@ -749,6 +749,7 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.O && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 			ToggleObserverMode();
 		}
+		
 		if (eventKeyDown.Keycode == Godot.Key.F1) {
 			EmitSignal(SignalName.ShowSpecificAdvisor, C7Action.ShowDomesticAdvisor);
 		}
@@ -767,6 +768,7 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.F6) {
 			EmitSignal(SignalName.ShowSpecificAdvisor, C7Action.ShowScienceAdvisor);
 		}
+
 		if (eventKeyDown.Keycode == Godot.Key.F7) {
 			EmitSignal(SignalName.ShowGameView, C7Action.ShowWondersView);
 		}
@@ -782,6 +784,7 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.F11) {
 			EmitSignal(SignalName.ShowGameView, C7Action.ShowDemographicsView);
 		}
+
 		if (eventKeyDown.Keycode == Godot.Key.C && HasCurrentlySelectedUnit()) {
 			mapView.centerCameraOnTile(CurrentlySelectedUnit.location);
 		}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://cldl5nk4n61m2"]
+[gd_scene load_steps=26 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" uid="uid://yxhiwx46tety" path="res://Game.cs" id="1"]
 [ext_resource type="Script" uid="uid://cfenrvu7tnp40" path="res://DoubleClickHandler.cs" id="2_t735q"]
@@ -24,6 +24,7 @@
 [ext_resource type="PackedScene" uid="uid://balpdexsjgl0b" path="res://UIElements/Advisors/foreign_advisor.tscn" id="18_alc04"]
 [ext_resource type="PackedScene" uid="uid://cla8cx1cxecu2" path="res://UIElements/Advisors/cultural_advisor.tscn" id="19_wqtcm"]
 [ext_resource type="PackedScene" uid="uid://c5qvjbhp6c3bv" path="res://UIElements/Advisors/science_advisor.tscn" id="20_v3pw1"]
+[ext_resource type="Script" uid="uid://bw62py00o3x5a" path="res://UIElements/GameViews/GameViews.cs" id="24_hwb67"]
 
 [node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "popupOverlay", "cityScreen", "advisor", "diplomacy", "palaceScene", "doubleClickHandler", "animationController", "unitSelector")]
 script = ExtResource("1")
@@ -212,26 +213,37 @@ scienceAdvisor = NodePath("ScienceAdvisor")
 [node name="DomesticAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("15")]
 visible = false
 layout_mode = 2
+mouse_filter = 0
 
 [node name="TradeAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("15_4pqcd")]
 visible = false
 layout_mode = 2
+mouse_filter = 0
 
 [node name="MilitaryAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("16_js1p2")]
 visible = false
 layout_mode = 2
+mouse_filter = 0
 
 [node name="ForeignAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("18_alc04")]
 visible = false
 layout_mode = 2
+mouse_filter = 0
 
 [node name="CulturalAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("19_wqtcm")]
 visible = false
 layout_mode = 2
+mouse_filter = 0
 
 [node name="ScienceAdvisor" parent="CanvasLayer/Advisor" instance=ExtResource("20_v3pw1")]
 visible = false
 layout_mode = 2
+mouse_filter = 0
+
+[node name="GameViews" type="CenterContainer" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("24_hwb67")
 
 [node name="CityScreen" parent="CanvasLayer" instance=ExtResource("11_12lt4")]
 visible = false
@@ -269,8 +281,8 @@ visible = false
 [connection signal="GameInitialized" from="." to="CanvasLayer/Control/UnitButtons" method="SetUpControlButtons"]
 [connection signal="ShowCityScreen" from="." to="CanvasLayer/CityScreen" method="OnShowCityScreen"]
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
-[connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="StopToggling"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="PleaseWait"]
+[connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="StopToggling"]
 [connection signal="UnitMoved" from="." to="CanvasLayer/Control/UnitButtons" method="OnUnitMoved"]
 [connection signal="UnitMoved" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="OnUnitMoved"]
 [connection signal="NewAutoselectedUnit" from="UnitSelector" to="CanvasLayer/Control/UnitButtons" method="OnNewUnitSelected"]
