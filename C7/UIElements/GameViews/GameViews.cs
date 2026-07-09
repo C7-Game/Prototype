@@ -49,9 +49,9 @@ public partial class GameViews : CenterContainer {
 
 	private void HideGameViews() {
 		wondersView.Hide();
-		victoryStatusView.Hide();
-		palaceView.Hide();
-		spaceRaceView.Hide();
-		demographicsView.Hide();
+		// victoryStatusView.Hide(); // TODO: Do the rest
+		// palaceView.Hide();
+		// spaceRaceView.Hide();
+		// demographicsView.Hide();
 	}
 }
