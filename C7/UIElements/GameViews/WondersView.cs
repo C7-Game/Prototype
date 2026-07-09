@@ -20,6 +20,9 @@ public partial class WondersView : Control {
 
 	private void CreateUI() {
 		background.Texture = TextureLoader.Load("screens.wonders.background");
+
+		_close = AdvisorUtils.CreateExitButton(background);
+		_close.Pressed += () => { this.GetParent<GameViews>().Hide(); };
 	}
 
 	public void ShowView() {

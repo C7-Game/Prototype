@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://cldl5nk4n61m2"]
+[gd_scene load_steps=30 format=3 uid="uid://cldl5nk4n61m2"]
 
 [ext_resource type="Script" uid="uid://yxhiwx46tety" path="res://Game.cs" id="1"]
 [ext_resource type="Script" uid="uid://cfenrvu7tnp40" path="res://DoubleClickHandler.cs" id="2_t735q"]
@@ -25,7 +25,10 @@
 [ext_resource type="PackedScene" uid="uid://cla8cx1cxecu2" path="res://UIElements/Advisors/cultural_advisor.tscn" id="19_wqtcm"]
 [ext_resource type="PackedScene" uid="uid://c5qvjbhp6c3bv" path="res://UIElements/Advisors/science_advisor.tscn" id="20_v3pw1"]
 [ext_resource type="PackedScene" uid="uid://c1xgkp0gw7t6s" path="res://UIElements/GameViews/wonders_view.tscn" id="21_js1p2"]
+[ext_resource type="PackedScene" uid="uid://cqon8tavnjvay" path="res://UIElements/GameViews/victory_status_view.tscn" id="22_rpa6e"]
 [ext_resource type="Script" uid="uid://bw62py00o3x5a" path="res://UIElements/GameViews/GameViews.cs" id="24_hwb67"]
+[ext_resource type="PackedScene" uid="uid://bwe87nwkg01n1" path="res://UIElements/GameViews/space_race_view.tscn" id="25_y31gw"]
+[ext_resource type="PackedScene" uid="uid://dvrx5adwjd0w4" path="res://UIElements/GameViews/demographics_view.tscn" id="27_gbxbf"]
 
 [node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "popupOverlay", "cityScreen", "advisor", "diplomacy", "palaceScene", "doubleClickHandler", "animationController", "unitSelector")]
 script = ExtResource("1")
@@ -34,7 +37,7 @@ popupOverlay = NodePath("CanvasLayer/PopupOverlay")
 cityScreen = NodePath("CanvasLayer/CityScreen")
 advisor = NodePath("CanvasLayer/Advisor")
 diplomacy = NodePath("CanvasLayer/Diplomacy")
-palaceScene = NodePath("CanvasLayer/PalaceScene")
+palaceScene = NodePath("CanvasLayer/GameViews/PalaceScene")
 doubleClickHandler = NodePath("DoubleClickHandler")
 animationController = NodePath("AnimationController")
 unitSelector = NodePath("UnitSelector")
@@ -159,7 +162,7 @@ script = ExtResource("7_yn4xe")
 openDiplomacy = NodePath("Diplomacy")
 openPalaceScreen = NodePath("Palace")
 popupOverlay = NodePath("../../../PopupOverlay")
-palaceScene = NodePath("../../../PalaceScene")
+palaceScene = NodePath("../../../GameViews/PalaceScene")
 
 [node name="Diplomacy" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
@@ -241,7 +244,7 @@ visible = false
 layout_mode = 2
 mouse_filter = 0
 
-[node name="GameViews" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("wondersView")]
+[node name="GameViews" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("wondersView", "victoryStatusView", "spaceRaceView", "demographicsView")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -249,15 +252,31 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("24_hwb67")
 wondersView = NodePath("WondersView")
+victoryStatusView = NodePath("VictoryStatusView")
+spaceRaceView = NodePath("SpaceRaceView")
+demographicsView = NodePath("DemographicsView")
 
 [node name="WondersView" parent="CanvasLayer/GameViews" instance=ExtResource("21_js1p2")]
 visible = false
 layout_mode = 2
 
-[node name="CityScreen" parent="CanvasLayer" instance=ExtResource("11_12lt4")]
+[node name="VictoryStatusView" parent="CanvasLayer/GameViews" instance=ExtResource("22_rpa6e")]
 visible = false
+layout_mode = 2
 
-[node name="PalaceScene" parent="CanvasLayer" instance=ExtResource("14_ud8vi")]
+[node name="PalaceScene" parent="CanvasLayer/GameViews" instance=ExtResource("14_ud8vi")]
+visible = false
+layout_mode = 2
+
+[node name="SpaceRaceView" parent="CanvasLayer/GameViews" instance=ExtResource("25_y31gw")]
+visible = false
+layout_mode = 2
+
+[node name="DemographicsView" parent="CanvasLayer/GameViews" instance=ExtResource("27_gbxbf")]
+visible = false
+layout_mode = 2
+
+[node name="CityScreen" parent="CanvasLayer" instance=ExtResource("11_12lt4")]
 visible = false
 
 [node name="Diplomacy" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("popupOverlay")]
@@ -293,8 +312,8 @@ visible = false
 [connection signal="ShowGameView" from="." to="CanvasLayer/GameViews" method="OnShowGameView"]
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/Advisor" method="OnShowSpecificAdvisor"]
 [connection signal="ShowSpecificAdvisor" from="." to="CanvasLayer/GameViews" method="OnShowSpecificAdvisor"]
-[connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="PleaseWait"]
 [connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="StopToggling"]
+[connection signal="TurnEnded" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="PleaseWait"]
 [connection signal="UnitMoved" from="." to="CanvasLayer/Control/UnitButtons" method="OnUnitMoved"]
 [connection signal="UnitMoved" from="." to="CanvasLayer/Control/GameStatus/LowerRightInfoBox" method="OnUnitMoved"]
 [connection signal="NewAutoselectedUnit" from="UnitSelector" to="CanvasLayer/Control/UnitButtons" method="OnNewUnitSelected"]

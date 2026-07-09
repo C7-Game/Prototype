@@ -21,6 +21,9 @@ public partial class VictoryStatusView : Control {
 	private void CreateUI() {
 		background.Texture = TextureLoader.Load("screens.standing.victory_status.background");
 		var histogramTexture = TextureLoader.Load("screens.standing.histogram.background");
+
+		_close = AdvisorUtils.CreateExitButton(background);
+		_close.Pressed += () => { this.GetParent<GameViews>().Hide(); };
 	}
 
 	public void ShowView() {

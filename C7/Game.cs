@@ -749,7 +749,7 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.O && eventKeyDown.ShiftPressed && eventKeyDown.IsCommandOrControlPressed() && eventKeyDown.AltPressed) {
 			ToggleObserverMode();
 		}
-		
+
 		if (eventKeyDown.Keycode == Godot.Key.F1) {
 			EmitSignal(SignalName.ShowSpecificAdvisor, C7Action.ShowDomesticAdvisor);
 		}

@@ -1,3 +1,14 @@
-[gd_scene format=3 uid="uid://dvrx5adwjd0w4"]
+[gd_scene load_steps=3 format=3 uid="uid://dvrx5adwjd0w4"]
 
-[node name="DemographicsView" type="CenterContainer"]
+[ext_resource type="Script" uid="uid://c5vqpwl0oa5cj" path="res://UIElements/GameViews/DemographicsView.cs" id="1_wrwm4"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_cyllx"]
+
+[node name="DemographicsView" type="CenterContainer" node_paths=PackedStringArray("background")]
+mouse_filter = 0
+script = ExtResource("1_wrwm4")
+background = NodePath("DemographicsBG")
+
+[node name="DemographicsBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("2_cyllx")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"

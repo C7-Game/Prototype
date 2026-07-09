@@ -1,3 +1,14 @@
-[gd_scene format=3 uid="uid://cqon8tavnjvay"]
+[gd_scene load_steps=3 format=3 uid="uid://cqon8tavnjvay"]
 
-[node name="VictoryStatusView" type="CenterContainer"]
+[ext_resource type="Script" uid="uid://dehyy4c30r04x" path="res://UIElements/GameViews/VictoryStatusView.cs" id="1_m5w0r"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_xkj2y"]
+
+[node name="VictoryStatusView" type="CenterContainer" node_paths=PackedStringArray("background")]
+mouse_filter = 0
+script = ExtResource("1_m5w0r")
+background = NodePath("VictoryStatusBG")
+
+[node name="VictoryStatusBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("2_xkj2y")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"

@@ -20,6 +20,9 @@ public partial class SpaceRaceView : Control {
 
 	private void CreateUI() {
 		background.Texture = TextureLoader.Load("screens.space_race.background");
+
+		_close = AdvisorUtils.CreateExitButton(background);
+		_close.Pressed += () => { this.GetParent<GameViews>().Hide(); };
 	}
 
 	public void ShowView() {
