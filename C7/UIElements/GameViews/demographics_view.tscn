@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://dvrx5adwjd0w4"]
+
+[node name="DemographicsView" type="CenterContainer"]
