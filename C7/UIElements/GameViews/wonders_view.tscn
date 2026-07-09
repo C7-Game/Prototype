@@ -1,3 +1,14 @@
-[gd_scene format=3 uid="uid://c1xgkp0gw7t6s"]
+[gd_scene load_steps=3 format=3 uid="uid://c1xgkp0gw7t6s"]
 
-[node name="WondersView" type="CenterContainer"]
+[ext_resource type="Script" uid="uid://6vn6hii2ome4" path="res://UIElements/GameViews/WondersView.cs" id="1_407tl"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="1_skmuw"]
+
+[node name="WondersView" type="CenterContainer" node_paths=PackedStringArray("background")]
+mouse_filter = 0
+script = ExtResource("1_407tl")
+background = NodePath("WondersBG")
+
+[node name="WondersBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("1_skmuw")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"
