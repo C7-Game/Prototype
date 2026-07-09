@@ -90,6 +90,7 @@ public partial class Game : Node {
 
 	[Signal] public delegate void TurnEndedEventHandler();
 	[Signal] public delegate void ShowSpecificAdvisorEventHandler();
+	[Signal] public delegate void ShowGameViewEventHandler();
 	[Signal] public delegate void ShowCityScreenEventHandler();
 
 	[Signal] public delegate void PlayerTurnStartEventHandler();
@@ -766,8 +767,20 @@ public partial class Game : Node {
 		if (eventKeyDown.Keycode == Godot.Key.F6) {
 			EmitSignal(SignalName.ShowSpecificAdvisor, C7Action.ShowScienceAdvisor);
 		}
+		if (eventKeyDown.Keycode == Godot.Key.F7) {
+			EmitSignal(SignalName.ShowGameView, C7Action.ShowWondersView);
+		}
+		if (eventKeyDown.Keycode == Godot.Key.F8) {
+			EmitSignal(SignalName.ShowGameView, C7Action.ShowVictoryStatusView);
+		}
 		if (eventKeyDown.Keycode == Godot.Key.F9) {
-			palaceScene.Show();
+			EmitSignal(SignalName.ShowGameView, C7Action.ShowPalaceView);
+		}
+		if (eventKeyDown.Keycode == Godot.Key.F10) {
+			EmitSignal(SignalName.ShowGameView, C7Action.ShowSpaceRaceView);
+		}
+		if (eventKeyDown.Keycode == Godot.Key.F11) {
+			EmitSignal(SignalName.ShowGameView, C7Action.ShowDemographicsView);
 		}
 		if (eventKeyDown.Keycode == Godot.Key.C && HasCurrentlySelectedUnit()) {
 			mapView.centerCameraOnTile(CurrentlySelectedUnit.location);

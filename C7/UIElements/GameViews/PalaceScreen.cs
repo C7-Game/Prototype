@@ -100,4 +100,8 @@ public partial class PalaceScreen : Civ3TextureRect {
 
 		switchButtonContainer.AddChild(button);
 	}
+
+	public void ShowView() {
+		Show();
+	}
 }
