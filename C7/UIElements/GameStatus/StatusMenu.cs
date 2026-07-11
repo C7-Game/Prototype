@@ -8,11 +8,11 @@ public partial class StatusMenu : Control {
 	[Export] ConsoleButton openPalaceScreen;
 
 	[Export] PopupOverlay popupOverlay;
-	[Export] Control palaceScene;
+	[Export] PalaceView palaceView; // TODO fix
 
 	public override void _Ready() {
 		openDiplomacy.Pressed += OpenDiplomacyPopup;
-		openPalaceScreen.Pressed += palaceScene.Show;
+		openPalaceScreen.Pressed += palaceView.Show;
 	}
 
 	public override void _Process(double delta) {

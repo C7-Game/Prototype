@@ -12,7 +12,7 @@ public partial class GameViews : CenterContainer {
 
 	[Export] public WondersView wondersView;
 	[Export] public VictoryStatusView victoryStatusView;
-	[Export] public PalaceScreen palaceView;
+	[Export] public PalaceView palaceView;
 	[Export] public SpaceRaceView spaceRaceView;
 	[Export] public DemographicsView demographicsView;
 
@@ -53,9 +53,9 @@ public partial class GameViews : CenterContainer {
 
 	private void HideGameViews() {
 		wondersView.Hide();
-		// victoryStatusView.Hide(); // TODO: Do the rest
-		// palaceView.Hide();
-		// spaceRaceView.Hide();
-		// demographicsView.Hide();
+		victoryStatusView.Hide();
+		palaceView.Hide();
+		spaceRaceView.Hide();
+		demographicsView.Hide();
 	}
 }

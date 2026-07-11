@@ -5,7 +5,9 @@ using Godot;
 using C7Engine.PalaceMinigame;
 
 [Tool]
-public partial class PalaceScreen : Civ3TextureRect {
+public partial class PalaceView : Control {
+	[Export] public TextureRect background;
+
 	[Export] HBoxContainer switchButtonContainer;
 	ButtonGroup switchButtonGroup = new();
 
@@ -41,12 +43,12 @@ public partial class PalaceScreen : Civ3TextureRect {
 	public override void _Draw() {
 		foreach (Building b in assignedBuildings.OrderBy(b => b.Index)) {
 			ImageTexture texture = TextureLoader.LoadByPath(b.TexturePath);
-			DrawTexture(texture, new Vector2(b.X, b.Y));
+			background.DrawTexture(texture, new Vector2(b.X, b.Y));
 		}
 
 		if (pendingBuilding != null) {
 			ImageTexture texture = TextureLoader.LoadByPath(pendingBuilding.TexturePath);
-			DrawTexture(texture, new Vector2(pendingBuilding.X, pendingBuilding.Y), new Color(1, 1, 1, 0.45f));
+			background.DrawTexture(texture, new Vector2(pendingBuilding.X, pendingBuilding.Y), new Color(1, 1, 1, 0.45f));
 		}
 	}
 

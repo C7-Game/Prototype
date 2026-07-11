@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://q7j4ujtspirs"]
+
+[ext_resource type="Script" uid="uid://by7gjap06whbu" path="res://UIElements/GameViews/PalaceView.cs" id="1_ae0o0"]
+[ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_ie0uk"]
+
+[node name="PalaceView" type="CenterContainer" node_paths=PackedStringArray("background")]
+script = ExtResource("1_ae0o0")
+background = NodePath("PalaceBG")
+
+[node name="PalaceBG" type="TextureRect" parent="."]
+layout_mode = 2
+script = ExtResource("2_ie0uk")
+metadata/_custom_type_script = "uid://doqipc4rnaotx"

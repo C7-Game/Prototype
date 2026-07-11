@@ -17,7 +17,6 @@
 [ext_resource type="Script" uid="uid://cqbrjccf0k1xx" path="res://UIElements/UnitButtons/UnitButtons.cs" id="12"]
 [ext_resource type="PackedScene" uid="uid://bvncm1bgcii5e" path="res://UIElements/civ3_file_dialog.tscn" id="12_yjlfl"]
 [ext_resource type="Script" uid="uid://bmfpx37ovqnsx" path="res://UIElements/Diplomacy/Diplomacy.cs" id="14"]
-[ext_resource type="PackedScene" uid="uid://dkcu255o1qrt1" path="res://UIElements/GameViews/palace_screen.tscn" id="14_ud8vi"]
 [ext_resource type="PackedScene" uid="uid://da7hbbufyfllg" path="res://UIElements/Advisors/domestic_advisor.tscn" id="15"]
 [ext_resource type="PackedScene" uid="uid://cucamooiqvddl" path="res://UIElements/Advisors/trade_advisor.tscn" id="15_4pqcd"]
 [ext_resource type="PackedScene" uid="uid://d0qk1h4jvf3i1" path="res://UIElements/Advisors/military_advisor.tscn" id="16_js1p2"]
@@ -26,18 +25,18 @@
 [ext_resource type="PackedScene" uid="uid://c5qvjbhp6c3bv" path="res://UIElements/Advisors/science_advisor.tscn" id="20_v3pw1"]
 [ext_resource type="PackedScene" uid="uid://c1xgkp0gw7t6s" path="res://UIElements/GameViews/wonders_view.tscn" id="21_js1p2"]
 [ext_resource type="PackedScene" uid="uid://cqon8tavnjvay" path="res://UIElements/GameViews/victory_status_view.tscn" id="22_rpa6e"]
+[ext_resource type="PackedScene" uid="uid://q7j4ujtspirs" path="res://UIElements/GameViews/palace_view.tscn" id="23_wqtcm"]
 [ext_resource type="Script" uid="uid://bw62py00o3x5a" path="res://UIElements/GameViews/GameViews.cs" id="24_hwb67"]
 [ext_resource type="PackedScene" uid="uid://bwe87nwkg01n1" path="res://UIElements/GameViews/space_race_view.tscn" id="25_y31gw"]
 [ext_resource type="PackedScene" uid="uid://dvrx5adwjd0w4" path="res://UIElements/GameViews/demographics_view.tscn" id="27_gbxbf"]
 
-[node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "popupOverlay", "cityScreen", "advisor", "diplomacy", "palaceScene", "doubleClickHandler", "animationController", "unitSelector")]
+[node name="C7Game" type="Node" node_paths=PackedStringArray("Toolbar", "popupOverlay", "cityScreen", "advisor", "diplomacy", "doubleClickHandler", "animationController", "unitSelector")]
 script = ExtResource("1")
 Toolbar = NodePath("CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer")
 popupOverlay = NodePath("CanvasLayer/PopupOverlay")
 cityScreen = NodePath("CanvasLayer/CityScreen")
 advisor = NodePath("CanvasLayer/Advisor")
 diplomacy = NodePath("CanvasLayer/Diplomacy")
-palaceScene = NodePath("CanvasLayer/GameViews/PalaceScene")
 doubleClickHandler = NodePath("DoubleClickHandler")
 animationController = NodePath("AnimationController")
 unitSelector = NodePath("UnitSelector")
@@ -150,7 +149,7 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 script = ExtResource("6_24l34")
 
-[node name="StatusMenu" type="VBoxContainer" parent="CanvasLayer/Control/GameStatus" node_paths=PackedStringArray("openDiplomacy", "openPalaceScreen", "popupOverlay", "palaceScene")]
+[node name="StatusMenu" type="VBoxContainer" parent="CanvasLayer/Control/GameStatus" node_paths=PackedStringArray("openDiplomacy", "openPalaceScreen", "popupOverlay", "palaceView")]
 layout_mode = 2
 offset_left = 272.0
 offset_top = 31.0
@@ -162,7 +161,7 @@ script = ExtResource("7_yn4xe")
 openDiplomacy = NodePath("Diplomacy")
 openPalaceScreen = NodePath("Palace")
 popupOverlay = NodePath("../../../PopupOverlay")
-palaceScene = NodePath("../../../GameViews/PalaceScene")
+palaceView = NodePath("../../../GameViews/PalaceView")
 
 [node name="Diplomacy" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
@@ -264,7 +263,7 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 
-[node name="PalaceScene" parent="CanvasLayer/GameViews" instance=ExtResource("14_ud8vi")]
+[node name="PalaceView" parent="CanvasLayer/GameViews" instance=ExtResource("23_wqtcm")]
 visible = false
 layout_mode = 2
 
