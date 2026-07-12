@@ -111,6 +111,8 @@ public partial class Game : Node {
 	[Export]
 	private Advisors advisor;
 	[Export]
+	private GameViews gameViews;
+	[Export]
 	private Diplomacy diplomacy;
 
 	[Export]
@@ -900,6 +902,11 @@ public partial class Game : Node {
 
 		if (currentAction == C7Action.Escape && advisor.Visible) {
 			advisor.Hide();
+			return;
+		}
+
+		if (currentAction == C7Action.Escape && gameViews.Visible) {
+			gameViews.Hide();
 			return;
 		}
 
