@@ -23,6 +23,10 @@ public partial class DemographicsView : Control {
 
 		_close = AdvisorUtils.CreateExitButton(background);
 		_close.Pressed += () => { this.GetParent<GameViews>().Hide(); };
+
+		var title = AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(),
+			" TOP 5 CITIES    DEMOGRAPHICS");
+		title.Position += new Vector2(0, 10);
 	}
 
 	public void ShowView() {

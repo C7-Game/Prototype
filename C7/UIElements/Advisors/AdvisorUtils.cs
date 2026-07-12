@@ -41,7 +41,7 @@ public static class AdvisorUtils {
 		return (dialogBox, dialogBoxLabel);
 	}
 
-	public static void CreateAdvisorTitle(Control parent, float containerWidth, string advisorTitleString) {
+	public static Label CreateAdvisorTitle(Control parent, float containerWidth, string advisorTitleString) {
 		int bigFontSize = 26;
 		// int middleFontSize = 20;
 		int bigFontGlyphSpacing = 14;
@@ -75,6 +75,8 @@ public static class AdvisorUtils {
 			Theme = regularThemeWithCustomSpacing,
 		};
 		parent.AddChild(advisorTitle);
+
+		return advisorTitle;
 	}
 
 	private static Vector2 GetStringSizeWithCustomSpacing(Font font, string input, int fontSize = 16, int glyphSpacing = 0, int glyphSpaceSpacing = 0) {

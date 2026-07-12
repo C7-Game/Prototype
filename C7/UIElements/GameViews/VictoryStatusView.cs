@@ -24,6 +24,8 @@ public partial class VictoryStatusView : Control {
 
 		_close = AdvisorUtils.CreateExitButton(background);
 		_close.Pressed += () => { this.GetParent<GameViews>().Hide(); };
+
+		AdvisorUtils.CreateAdvisorTitle(background, background.Texture.GetWidth(), "VICTORY STATUS");
 	}
 
 	public void ShowView() {
