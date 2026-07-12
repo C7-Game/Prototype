@@ -1,26 +1,34 @@
-[gd_scene load_steps=3 format=3 uid="uid://q7j4ujtspirs"]
+[gd_scene load_steps=4 format=3 uid="uid://q7j4ujtspirs"]
 
 [ext_resource type="Script" uid="uid://by7gjap06whbu" path="res://UIElements/GameViews/PalaceView.cs" id="1_ae0o0"]
 [ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_ie0uk"]
+[ext_resource type="Script" uid="uid://dt8uyv5s5dxg2" path="res://UIElements/GameViews/PalaceBuildingsLayer.cs" id="3_ie0uk"]
 
-[node name="PalaceView" type="CenterContainer" node_paths=PackedStringArray("background", "switchButtonContainer")]
+[node name="PalaceView" type="CenterContainer" node_paths=PackedStringArray("background")]
+mouse_filter = 0
 script = ExtResource("1_ae0o0")
 background = NodePath("PalaceBG")
-switchButtonContainer = NodePath("PalaceBG/SwitchButtonContainer")
 
 [node name="PalaceBG" type="TextureRect" parent="."]
 layout_mode = 2
 script = ExtResource("2_ie0uk")
 metadata/_custom_type_script = "uid://doqipc4rnaotx"
 
-[node name="SwitchButtonContainer" type="HBoxContainer" parent="PalaceBG"]
+[node name="PalaceBuildings" type="TextureRect" parent="PalaceBG" node_paths=PackedStringArray("switchButtonContainer")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("3_ie0uk")
+switchButtonContainer = NodePath("SwitchButtonContainer")
+
+[node name="SwitchButtonContainer" type="HBoxContainer" parent="PalaceBG/PalaceBuildings"]
 layout_mode = 0
 offset_left = 490.0
 offset_top = 645.0
 offset_right = 968.0
 offset_bottom = 699.0
 theme_override_constants/separation = 35
-
-[node name="PalaceBuildings" type="Control" parent="."]
-layout_mode = 2
-anchors_preset = 0
