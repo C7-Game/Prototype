@@ -10,12 +10,12 @@ public partial class ForeignAdvisor : Control {
 
 	[Export] public TextureRect background;
 
-	[Export] public TextureRect treaties = new();
-	[Export] public TextureButton treatiesButton = new();
-	[Export] public TextureRect trades = new();
-	[Export] public TextureButton tradesButton = new();
-	[Export] public TextureRect details = new();
-	[Export] public TextureButton detailsButton = new();
+	private TextureRect treaties = new();
+	private TextureButton treatiesButton = new();
+	private TextureRect trades = new();
+	private TextureButton tradesButton = new();
+	private TextureRect details = new();
+	private TextureButton detailsButton = new();
 
 	private TextureButton _close;
 	private TextureRect _advisorHead;
