@@ -3,11 +3,24 @@
 [ext_resource type="Script" uid="uid://by7gjap06whbu" path="res://UIElements/GameViews/PalaceView.cs" id="1_ae0o0"]
 [ext_resource type="Script" uid="uid://doqipc4rnaotx" path="res://UIElements/Civ3TextureRect.cs" id="2_ie0uk"]
 
-[node name="PalaceView" type="CenterContainer" node_paths=PackedStringArray("background")]
+[node name="PalaceView" type="CenterContainer" node_paths=PackedStringArray("background", "switchButtonContainer")]
 script = ExtResource("1_ae0o0")
 background = NodePath("PalaceBG")
+switchButtonContainer = NodePath("PalaceBG/SwitchButtonContainer")
 
 [node name="PalaceBG" type="TextureRect" parent="."]
 layout_mode = 2
 script = ExtResource("2_ie0uk")
 metadata/_custom_type_script = "uid://doqipc4rnaotx"
+
+[node name="SwitchButtonContainer" type="HBoxContainer" parent="PalaceBG"]
+layout_mode = 0
+offset_left = 490.0
+offset_top = 645.0
+offset_right = 968.0
+offset_bottom = 699.0
+theme_override_constants/separation = 35
+
+[node name="PalaceBuildings" type="Control" parent="."]
+layout_mode = 2
+anchors_preset = 0

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using C7Engine;
 using Godot;
 using C7Engine.PalaceMinigame;
@@ -7,15 +6,12 @@ using C7Engine.PalaceMinigame;
 [Tool]
 public partial class PalaceView : Control {
 	[Export] public TextureRect background;
+	[Export] public PalaceBuildingsLayer buildingsLayer;
 
 	[Export] HBoxContainer switchButtonContainer;
 	ButtonGroup switchButtonGroup = new();
 
-	string activeCulture;
-	List<Building> assignedBuildings = [];
-	Building pendingBuilding;
-
-	Dictionary<string, Culture> cultures = [];
+	private TextureButton _close;
 
 	public override void _Ready() {
 		base._Ready();
@@ -24,66 +20,28 @@ public partial class PalaceView : Control {
 			return;
 		}
 
-		string configPath = Util.Civ3MediaPath("Text/PalaceView.txt");
-		ConfigParser parser = new();
+		background.Texture = TextureLoader.Load("screens.palace.background");
 
-		cultures = parser.Parse(configPath);
-		activeCulture = cultures.Keys.First();
+		Dictionary<string, Culture> cultures = ParsePalaceView();
+		buildingsLayer.SetCultures(cultures);
+
+		MouseFilter = MouseFilterEnum.Stop;
+
+		_close = AdvisorUtils.CreateExitButton(background);
+		_close.Pressed += () => { this.GetParent<GameViews>().Hide(); };
 
 		foreach (Culture culture in cultures.Values) {
 			AddSwitchButton(culture);
 		}
+
+		switchButtonContainer.GetChild<TextureButton>(0).ButtonPressed = true;
 	}
 
-	public override void _Process(double delta) {
-		if (Engine.IsEditorHint()) return;
-		QueueRedraw();
-	}
+	private Dictionary<string, Culture> ParsePalaceView() {
+		string configPath = Util.Civ3MediaPath("Text/PalaceView.txt");
+		ConfigParser parser = new();
 
-	public override void _Draw() {
-		foreach (Building b in assignedBuildings.OrderBy(b => b.Index)) {
-			ImageTexture texture = TextureLoader.LoadByPath(b.TexturePath);
-			background.DrawTexture(texture, new Vector2(b.X, b.Y));
-		}
-
-		if (pendingBuilding != null) {
-			ImageTexture texture = TextureLoader.LoadByPath(pendingBuilding.TexturePath);
-			background.DrawTexture(texture, new Vector2(pendingBuilding.X, pendingBuilding.Y), new Color(1, 1, 1, 0.45f));
-		}
-	}
-
-	public override void _GuiInput(InputEvent @event) {
-		if (@event is InputEventMouseButton eventMouseButton) {
-			if (pendingBuilding == null) return;
-
-			if (eventMouseButton.ButtonIndex == MouseButton.Left && eventMouseButton.Pressed) {
-				assignedBuildings.Add(pendingBuilding);
-				pendingBuilding = null;
-			}
-		} else if (@event is InputEventMouseMotion eventMouseMotion) {
-			foreach (Building building in AvailableBuildings()) {
-				ImageTexture texture = TextureLoader.LoadByPath(building.TexturePath);
-				Rect2 textureRect = new() {
-					Position = new(building.X, building.Y),
-					Size = texture.GetSize()
-				};
-
-				if (textureRect.HasPoint(eventMouseMotion.Position)) {
-					pendingBuilding = building;
-					return;
-				}
-			}
-
-			pendingBuilding = null;
-		}
-	}
-
-	private IEnumerable<Building> AvailableBuildings() {
-		var assignedIndexes = assignedBuildings.Select(b=> b.Index);
-
-		return cultures[activeCulture].Buildings
-				.Where(b => !assignedIndexes.Contains(b.Index))
-				.Where(b => b.Prerequisites.All(index => assignedIndexes.Contains(index)));
+		return parser.Parse(configPath);
 	}
 
 	private void AddSwitchButton(Culture culture) {
@@ -96,11 +54,16 @@ public partial class PalaceView : Control {
 			ButtonGroup = switchButtonGroup,
 			ToggleMode = true,
 		};
-		button.Pressed += () => { activeCulture = culture.Name; };
-
-		if (culture.Name == activeCulture) button.ButtonPressed = true;
+		button.Pressed += () => {
+			buildingsLayer.ActivateCulture(culture);
+		};
 
 		switchButtonContainer.AddChild(button);
+	}
+
+	public override void _Process(double delta) {
+		if (Engine.IsEditorHint()) return;
+		QueueRedraw();
 	}
 
 	public void ShowView() {

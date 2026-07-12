@@ -4,15 +4,18 @@ using C7Engine;
 
 [GlobalClass]
 public partial class StatusMenu : Control {
+	[Signal] public delegate void ShowGameViewEventHandler();
+
 	[Export] ConsoleButton openDiplomacy;
 	[Export] ConsoleButton openPalaceScreen;
 
 	[Export] PopupOverlay popupOverlay;
-	[Export] PalaceView palaceView; // TODO fix
 
 	public override void _Ready() {
 		openDiplomacy.Pressed += OpenDiplomacyPopup;
-		openPalaceScreen.Pressed += palaceView.Show;
+		openPalaceScreen.Pressed += () => {
+			EmitSignal(SignalName.ShowGameView, C7Action.ShowPalaceView);
+		};
 	}
 
 	public override void _Process(double delta) {

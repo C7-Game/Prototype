@@ -149,7 +149,7 @@ metadata/_edit_use_anchors_ = true
 layout_mode = 2
 script = ExtResource("6_24l34")
 
-[node name="StatusMenu" type="VBoxContainer" parent="CanvasLayer/Control/GameStatus" node_paths=PackedStringArray("openDiplomacy", "openPalaceScreen", "popupOverlay", "palaceView")]
+[node name="StatusMenu" type="VBoxContainer" parent="CanvasLayer/Control/GameStatus" node_paths=PackedStringArray("openDiplomacy", "openPalaceScreen", "popupOverlay")]
 layout_mode = 2
 offset_left = 272.0
 offset_top = 31.0
@@ -161,7 +161,6 @@ script = ExtResource("7_yn4xe")
 openDiplomacy = NodePath("Diplomacy")
 openPalaceScreen = NodePath("Palace")
 popupOverlay = NodePath("../../../PopupOverlay")
-palaceView = NodePath("../../../GameViews/PalaceView")
 
 [node name="Diplomacy" type="Control" parent="CanvasLayer/Control/GameStatus/StatusMenu"]
 custom_minimum_size = Vector2(16, 16)
@@ -243,7 +242,7 @@ visible = false
 layout_mode = 2
 mouse_filter = 0
 
-[node name="GameViews" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("wondersView", "victoryStatusView", "spaceRaceView", "demographicsView")]
+[node name="GameViews" type="CenterContainer" parent="CanvasLayer" node_paths=PackedStringArray("wondersView", "victoryStatusView", "palaceView", "spaceRaceView", "demographicsView")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -252,6 +251,7 @@ grow_vertical = 2
 script = ExtResource("24_hwb67")
 wondersView = NodePath("WondersView")
 victoryStatusView = NodePath("VictoryStatusView")
+palaceView = NodePath("PalaceView")
 spaceRaceView = NodePath("SpaceRaceView")
 demographicsView = NodePath("DemographicsView")
 
@@ -325,6 +325,8 @@ visible = false
 [connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/AdvisorButton" to="CanvasLayer/Advisor" method="ShowLatestAdvisor"]
 [connection signal="pressed" from="CanvasLayer/Control/ToolBar/MarginContainer/HBoxContainer/UiBarEndTurnButton" to="." method="_onEndTurnButtonPressed"]
 [connection signal="BlinkyEndTurnButtonPressed" from="CanvasLayer/Control/GameStatus/LowerRightInfoBox" to="." method="OnPlayerEndTurn"]
+[connection signal="ShowGameView" from="CanvasLayer/Control/GameStatus/StatusMenu" to="CanvasLayer/Advisor" method="OnShowGameView"]
+[connection signal="ShowGameView" from="CanvasLayer/Control/GameStatus/StatusMenu" to="CanvasLayer/GameViews" method="OnShowGameView"]
 [connection signal="BuildCity" from="CanvasLayer/PopupOverlay" to="." method="OnBuildCity"]
 [connection signal="DiplomacySelection" from="CanvasLayer/PopupOverlay" to="." method="OnDiplomacySelected"]
 [connection signal="HidePopup" from="CanvasLayer/PopupOverlay" to="CanvasLayer/PopupOverlay" method="OnHidePopup"]

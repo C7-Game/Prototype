@@ -112,8 +112,6 @@ public partial class Game : Node {
 	private Advisors advisor;
 	[Export]
 	private Diplomacy diplomacy;
-	[Export]
-	private Control palaceScene;
 
 	[Export]
 	private DoubleClickHandler doubleClickHandler;
@@ -530,7 +528,7 @@ public partial class Game : Node {
 
 	public override void _UnhandledInput(InputEvent @event) {
 		// Don't handle mouse actions if UI elements are visible, or it's the AI's turn
-		if (popupOverlay.Visible || cityScreen.Visible || diplomacy.Visible || palaceScene.Visible || CurrentState == GameState.ComputerTurn) {
+		if (popupOverlay.Visible || cityScreen.Visible || diplomacy.Visible || CurrentState == GameState.ComputerTurn) {
 			IsMovingCamera = false;
 			return;
 		}
@@ -900,11 +898,6 @@ public partial class Game : Node {
 			return;
 		}
 
-		if (currentAction == C7Action.Escape && palaceScene.Visible) {
-			palaceScene.Hide();
-			return;
-		}
-
 		if (currentAction == C7Action.Escape && advisor.Visible) {
 			advisor.Hide();
 			return;
@@ -921,7 +914,7 @@ public partial class Game : Node {
 		}
 
 		// never poll for actions if UI elements are visible
-		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible || palaceScene.Visible) {
+		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible) {
 			return;
 		}
 
