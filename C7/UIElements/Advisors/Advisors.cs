@@ -25,6 +25,7 @@ public partial class Advisors : CenterContainer {
 
 	private void OnShowGameView(string gameView) {
 		HideAdvisors();
+		Hide();
 	}
 
 	private void ShowLatestAdvisor() {

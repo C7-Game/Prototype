@@ -529,8 +529,8 @@ public partial class Game : Node {
 	}
 
 	public override void _UnhandledInput(InputEvent @event) {
-		// Don't handle mouse actions if UI elements are visible, or it's the AI's turn
-		if (popupOverlay.Visible || cityScreen.Visible || diplomacy.Visible || CurrentState == GameState.ComputerTurn) {
+		// Don't handle if there's an open modal, or if it's the AI's turn
+		if ((HasVisibleModal() && !IsModalSwitchEvent(@event)) || CurrentState == GameState.ComputerTurn) {
 			IsMovingCamera = false;
 			return;
 		}
@@ -884,6 +884,24 @@ public partial class Game : Node {
 		}
 	}
 
+	private bool HasVisibleModal() {
+		if (popupOverlay.Visible || cityScreen.Visible || diplomacy.Visible)
+			return true;
+
+		if (advisor.Visible || gameViews.Visible)
+			return true;
+
+		return false;
+	}
+
+	private bool IsModalSwitchEvent(InputEvent @event) {
+		if (@event is InputEventKey eventKeyDown && eventKeyDown.Pressed) {
+			return eventKeyDown.Keycode is >= Key.F1 and <= Key.F11;
+		}
+
+		return false;
+	}
+
 	private void ProcessAction(string currentAction) {
 		if (currentAction == C7Action.Escape && tileInfo != null) {
 			HideTileInfo();
@@ -921,7 +939,7 @@ public partial class Game : Node {
 		}
 
 		// never poll for actions if UI elements are visible
-		if (popupOverlay.Visible || cityScreen.Visible || advisor.Visible || diplomacy.Visible) {
+		if (HasVisibleModal()) {
 			return;
 		}
 
