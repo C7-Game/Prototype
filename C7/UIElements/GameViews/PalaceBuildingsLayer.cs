@@ -67,6 +67,19 @@ public partial class PalaceBuildingsLayer : TextureRect {
 			ImageTexture texture = TextureLoader.LoadByPath(pendingBuilding.TexturePath);
 			DrawTexture(texture, new Vector2(pendingBuilding.X, pendingBuilding.Y), new Color(1, 1, 1, 0.45f));
 		}
+
+		DrawFrame();
+	}
+
+	private void DrawFrame() {
+		var size = Size;
+
+		// Outer black border
+		DrawRect(new Rect2(Vector2.Zero, size), Colors.Black, false, 1f);
+
+		// Inner white border, inset by 1px
+		var inset = new Rect2(Vector2.One, size - new Vector2(2, 2));
+		DrawRect(inset, Colors.White, false, 1f);
 	}
 
 	public override void _GuiInput(InputEvent @event) {
