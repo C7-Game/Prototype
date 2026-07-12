@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using C7Engine;
 using C7Engine.PalaceMinigame;
 using Godot;
 
@@ -16,6 +17,10 @@ public partial class PalaceBuildingsLayer : TextureRect {
 
 	public override void _Ready() {
 		base._Ready();
+
+		if (C7Settings.UseStandaloneMode()) {
+			return;
+		}
 
 		MouseFilter = MouseFilterEnum.Stop;
 		SetAnchorsPreset(LayoutPreset.FullRect);

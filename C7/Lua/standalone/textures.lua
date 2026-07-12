@@ -107,6 +107,7 @@ local c7_texture_list = {
   "Art/Advisors/foreign.png",
   "Art/Advisors/foreignTAB.png",
   "Art/Advisors/culture.png",
+  "Art/Advisors/demographics.png",
   "Art/Advisors/wonders_background.png",
   "Art/histograph-win5_final.png",
   "Art/histograph-top5_final.png",
