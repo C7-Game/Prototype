@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.4", "C#")
 boot_splash/fullsize=false
 boot_splash/image="uid://ovwv08a53d7k"
 config/icon="res://icon.png"
+config/windows_native_icon="res://icon.ico"
 
 [autoload]
 
