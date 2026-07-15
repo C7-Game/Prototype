@@ -70,3 +70,6 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+# Agent workspace (local only, not upstream)
+.agents/

@@ -1,8 +1,6 @@
 using Godot;
 using ConvertCiv3Media;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Serilog;
 
 public partial class Margins {
@@ -33,12 +31,77 @@ public partial class Popup : TextureRect {
 	public BoxContainer.AlignmentMode alignment;
 	public Margins margins;
 
-	const int HTILE_SIZE = 61;
-	const int VTILE_SIZE = 44;
+	private const int HTILE_SIZE = 61;
+	private const int VTILE_SIZE = 44;
 
-	private static Dictionary<(int, int), ImageTexture> backgroundCache = new Dictionary<(int, int), ImageTexture>();
+	private static ImageTexture? _ninePatchTexture = null;
 
-	protected void AddButton(string label, int verticalPosition, Action action) {
+	public const int DARK_PATCH_SIZE = 8;
+	private static ImageTexture? _darkEdgeTexture = null;
+
+	internal static ImageTexture? EnsureDarkEdgeTexture() {
+		if (_darkEdgeTexture != null) return _darkEdgeTexture;
+		int total = DARK_PATCH_SIZE * 3; // 24x24
+
+		Image img = Image.Create(total, total, false, Image.Format.Rgba8);
+
+		Color edgeColor = new(0, 0, 0, 0.7f);
+		Color cornerColor = new(0, 0, 0, 0.9f); // darker corners
+
+		for (int x = 0; x < total; x++) {
+			for (int y = 0; y < total; y++) {
+				bool edge = x < DARK_PATCH_SIZE || x >= total - DARK_PATCH_SIZE
+						 || y < DARK_PATCH_SIZE || y >= total - DARK_PATCH_SIZE;
+				bool corner = (x < DARK_PATCH_SIZE || x >= total - DARK_PATCH_SIZE)
+						   && (y < DARK_PATCH_SIZE || y >= total - DARK_PATCH_SIZE);
+				if (corner) img.SetPixel(x, y, cornerColor);
+				else if (edge) img.SetPixel(x, y, edgeColor);
+			}
+		}
+
+		_darkEdgeTexture = ImageTexture.CreateFromImage(img);
+		return _darkEdgeTexture;
+	}
+
+	private static ImageTexture EnsureNinePatchTexture() {
+		if (_ninePatchTexture != null) return _ninePatchTexture;
+
+		Image topLeftPopup = TextureLoader.Load("popup_background.top_left").GetImage();
+		Image topCenterPopup = TextureLoader.Load("popup_background.top_center").GetImage();
+		Image topRightPopup = TextureLoader.Load("popup_background.top_right").GetImage();
+		Image middleLeftPopup = TextureLoader.Load("popup_background.middle_left").GetImage();
+		Image middleCenterPopup = TextureLoader.Load("popup_background.middle_center").GetImage();
+		Image middleRightPopup = TextureLoader.Load("popup_background.middle_right").GetImage();
+		Image bottomLeftPopup = TextureLoader.Load("popup_background.bottom_left").GetImage();
+		Image bottomCenterPopup = TextureLoader.Load("popup_background.bottom_center").GetImage();
+		Image bottomRightPopup = TextureLoader.Load("popup_background.bottom_right").GetImage();
+
+		int compW = topLeftPopup.GetWidth() + topCenterPopup.GetWidth() + topRightPopup.GetWidth();
+		int compH = topLeftPopup.GetHeight() + middleCenterPopup.GetHeight() + bottomLeftPopup.GetHeight();
+
+		Image composite = Image.Create(compW, compH, false, Image.Format.Rgba8);
+		composite.Fill(Color.Color8(0, 0, 0, 0));
+
+		// Row 0
+		composite.BlitRect(topLeftPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(topLeftPopup.GetWidth(), topLeftPopup.GetHeight())), new Vector2I(0, 0));
+		composite.BlitRect(topCenterPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(topCenterPopup.GetWidth(), topCenterPopup.GetHeight())), new Vector2I(HTILE_SIZE, 0));
+		composite.BlitRect(topRightPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(topRightPopup.GetWidth(), topRightPopup.GetHeight())), new Vector2I(HTILE_SIZE * 2, 0));
+
+		// Row 1
+		composite.BlitRect(middleLeftPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(middleLeftPopup.GetWidth(), middleLeftPopup.GetHeight())), new Vector2I(0, VTILE_SIZE));
+		composite.BlitRect(middleCenterPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(middleCenterPopup.GetWidth(), middleCenterPopup.GetHeight())), new Vector2I(HTILE_SIZE, VTILE_SIZE));
+		composite.BlitRect(middleRightPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(middleRightPopup.GetWidth(), middleRightPopup.GetHeight())), new Vector2I(HTILE_SIZE * 2, VTILE_SIZE));
+
+		// Row 2
+		composite.BlitRect(bottomLeftPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(bottomLeftPopup.GetWidth(), bottomLeftPopup.GetHeight())), new Vector2I(0, VTILE_SIZE * 2));
+		composite.BlitRect(bottomCenterPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(bottomCenterPopup.GetWidth(), bottomCenterPopup.GetHeight())), new Vector2I(HTILE_SIZE, VTILE_SIZE * 2));
+		composite.BlitRect(bottomRightPopup, new Rect2I(new Vector2I(0, 0), new Vector2I(bottomRightPopup.GetWidth(), bottomRightPopup.GetHeight())), new Vector2I(HTILE_SIZE * 2, VTILE_SIZE * 2));
+
+		_ninePatchTexture = ImageTexture.CreateFromImage(composite);
+		return _ninePatchTexture;
+	}
+
+	protected void AddButton(string label, int verticalPosition, System.Action action) {
 		const int HORIZONTAL_POSITION = 30;
 
 		Civ3MenuButton button = new() {
@@ -76,19 +139,6 @@ public partial class Popup : TextureRect {
 		AddChild(header);
 	}
 
-	private void DrawRow(Image image, int vOffset, int width, Image left, Image center, Image right) {
-
-		image.BlitRect(left, new Rect2I(new Vector2I(0, 0), new Vector2I(left.GetWidth(), left.GetHeight())), new Vector2I(0, vOffset));
-
-		int leftOffset = HTILE_SIZE;
-		for (; leftOffset < width - HTILE_SIZE; leftOffset += HTILE_SIZE) {
-			image.BlitRect(center, new Rect2I(new Vector2I(0, 0), new Vector2I(center.GetWidth(), center.GetHeight())), new Vector2I(leftOffset, vOffset));
-		}
-
-		leftOffset = width - HTILE_SIZE;
-		image.BlitRect(right, new Rect2I(new Vector2I(0, 0), new Vector2I(right.GetWidth(), right.GetHeight())), new Vector2I(leftOffset, vOffset));
-	}
-
 	protected void AddTexture(int width, int height) {
 		Image image = Image.Create(width, height, false, Image.Format.Rgba8);
 		image.Fill(Color.Color8(0, 0, 0, 0));
@@ -96,61 +146,23 @@ public partial class Popup : TextureRect {
 	}
 
 	protected void AddBackground(int width, int height, int vOffset = 0) {
-		TextureRect background = CreateBackground(width, height);
+		Control background = CreateBackground(width, height);
 		background.SetPosition(new Vector2(0, vOffset));
 		AddChild(background);
 	}
 
-	private TextureRect CreateBackground(int width, int height) {
-		TextureRect rect = new TextureRect();
-
-		if (backgroundCache.ContainsKey((width, height))) {
-			rect.Texture = backgroundCache[(width, height)];
-			return rect;
-		}
-
-		Image image = Image.Create(width, height, false, Image.Format.Rgba8);
-
-		//The pop-up part is the tricky part
-		Stopwatch imageTimer = new Stopwatch();
-		imageTimer.Start();
-		Image topLeftPopup = TextureLoader.Load("popup_background.top_left").GetImage();
-		Image topCenterPopup = TextureLoader.Load("popup_background.top_center").GetImage();
-		Image topRightPopup = TextureLoader.Load("popup_background.top_right").GetImage();
-		Image middleLeftPopup = TextureLoader.Load("popup_background.middle_left").GetImage();
-		Image middleCenterPopup = TextureLoader.Load("popup_background.middle_center").GetImage();
-		Image middleRightPopup = TextureLoader.Load("popup_background.middle_right").GetImage();
-		Image bottomLeftPopup = TextureLoader.Load("popup_background.bottom_left").GetImage();
-		Image bottomCenterPopup = TextureLoader.Load("popup_background.bottom_center").GetImage();
-		Image bottomRightPopup = TextureLoader.Load("popup_background.bottom_right").GetImage();
-		imageTimer.Stop();
-		TimeSpan stopwatchElapsed = imageTimer.Elapsed;
-		log.Debug("Image creation time: " + Convert.ToInt32(stopwatchElapsed.TotalMilliseconds) + " ms");
-
-		//Dimensions are 530x320.  The leaderhead takes up 110.  So the popup is 530x210.
-		//We have multiples of... 62? For the horizontal dimension, 45 for vertical.
-		//45 does not fit into 210.  90, 135, 180, 215.  Well, 215 is sorta closeish.
-		//62, we got 62, 124, 248, 496, 558.  Doesn't match up at all.
-		//Which means that partial textures can be used.  Lovely.
-
-		//Let's try adding some helper functions so this can be refactored later into a more general-purpose popup popper
-		int vOffset = 0;
-		DrawRow(image, vOffset, width, topLeftPopup, topCenterPopup, topRightPopup);
-		vOffset += VTILE_SIZE;
-		for (; vOffset < height - VTILE_SIZE; vOffset += VTILE_SIZE) {
-			DrawRow(image, vOffset, width, middleLeftPopup, middleCenterPopup, middleRightPopup);
-		}
-		vOffset = height - VTILE_SIZE;
-		DrawRow(image, vOffset, width, bottomLeftPopup, bottomCenterPopup, bottomRightPopup);
-
-		ImageTexture texture = ImageTexture.CreateFromImage(image);
-		backgroundCache.Add((width, height), texture);
-
-		rect.Texture = texture;
-		return rect;
+	private Control CreateBackground(int width, int height) {
+		NinePatchRect patch = new();
+		patch.Texture = EnsureNinePatchTexture()!;
+		patch.PatchMarginLeft = HTILE_SIZE;
+		patch.PatchMarginRight = HTILE_SIZE;
+		patch.PatchMarginTop = VTILE_SIZE;
+		patch.PatchMarginBottom = VTILE_SIZE;
+		patch.SetSize(new Vector2(width, height));
+		return patch;
 	}
 
-	protected void AddConfirmButton(Vector2 position, Action action) {
+	protected void AddConfirmButton(Vector2 position, System.Action action) {
 		ImageTexture circleTexture= TextureLoader.Load("ui.confirm.normal");
 		ImageTexture circleHover = TextureLoader.Load("ui.confirm.hover");
 		ImageTexture circlePressed = TextureLoader.Load("ui.confirm.pressed");

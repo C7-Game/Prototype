@@ -84,6 +84,14 @@ public partial class CityScreen : Control {
 	public override void _Ready() {
 		background.Texture = TextureLoader.Load("city_screen.background");
 
+		// Set the dark edge overlay texture.
+		var darkEdge = GetNode<NinePatchRect>("DarkEdge");
+		darkEdge.Texture = Popup.EnsureDarkEdgeTexture()!;
+		darkEdge.PatchMarginLeft = Popup.DARK_PATCH_SIZE;
+		darkEdge.PatchMarginRight = Popup.DARK_PATCH_SIZE;
+		darkEdge.PatchMarginTop = Popup.DARK_PATCH_SIZE;
+		darkEdge.PatchMarginBottom = Popup.DARK_PATCH_SIZE;
+
 		// The close button.
 		TextureLoader.SetButtonTextures(close, "city_screen.buttons.close");
 		close.Pressed += Hide;
