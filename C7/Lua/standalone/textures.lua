@@ -196,9 +196,51 @@ return function(civ3_textures)
   }
 
   function c7_textures.tech_icons.small:map_object_to_sprite(tech)
-    return {
-      path = "Art/Tech Chooser/Icons/placeholder.png",
-    }
+    if tech.name == "Alphabet" then
+      return {
+        path = "Art/Tech Chooser/Icons/Alphabet.png",
+      }
+    elseif tech.name == "Literature" then
+      return {
+        path = "Art/Tech Chooser/Icons/Literature.png",
+      }
+    elseif tech.name == "Code of Laws" then
+      return {
+        path = "Art/Tech Chooser/Icons/Code of Laws.png",
+      }
+    elseif tech.name == "Map Making" then
+      return {
+        path = "Art/Tech Chooser/Icons/MapMaking.png",
+      }
+    elseif tech.name == "Ceremonial Burial" then
+      return {
+        path = "Art/Tech Chooser/Icons/CeremonialBurial.png",
+      }
+    elseif tech.name == "Mysticism" then
+      return {
+        path = "Art/Tech Chooser/Icons/Mystisism.png",
+      }
+    elseif tech.name == "The Wheel" then
+      return {
+        path = "Art/Tech Chooser/Icons/TheWheel.png",
+      }
+    elseif tech.name == "Horseback Riding" then
+      return {
+        path = "Art/Tech Chooser/Icons/HorsebackRiding.png",
+      }
+    elseif tech.name == "Warrior Code" then
+      return {
+        path = "Art/Tech Chooser/Icons/WarriorCode.png",
+      }
+    elseif tech.name == "Masonry" then
+      return {
+        path = "Art/Tech Chooser/Icons/Masonry.png",
+      }
+    else
+      return {
+        path = "Art/Tech Chooser/Icons/placeholder.png",
+      }
+    end
   end
 
   function c7_textures.leader_heads:map_object_to_sprite(player_or_civ)
