@@ -152,6 +152,20 @@ local civ_colors = {
   "696969"  -- Dim Gray
 }
 
+local tech_icon_replacement_map = {
+  ["tech-2"] = "Masonry.png",
+  ["tech-3"] = "Alphabet.png",
+  ["tech-5"] = "TheWheel.png",
+  ["tech-6"] = "WarriorCode.png",
+  ["tech-7"] = "CeremonialBurial.png",
+  ["tech-10"] = "Mysticism.png",
+  ["tech-13"] = "Code of Laws.png",
+  ["tech-14"] = "Literature.png",
+  ["tech-15"] = "MapMaking.png",
+  ["tech-16"] = "HorsebackRiding.png",
+}
+
+
 -- Build lookup table from c7_texture_list without extensions
 local lookup = {}
 for _, path in ipairs(c7_texture_list) do
@@ -196,53 +210,11 @@ return function(civ3_textures)
   }
 
   function c7_textures.tech_icons.small:map_object_to_sprite(tech)
-    if tech.name == "Alphabet" then
-      return {
-        path = "Art/Tech Chooser/Icons/Alphabet.png",
-      }
-    elseif tech.name == "Literature" then
-      return {
-        path = "Art/Tech Chooser/Icons/Literature.png",
-      }
-    elseif tech.name == "Code of Laws" then
-      return {
-        path = "Art/Tech Chooser/Icons/Code of Laws.png",
-      }
-    elseif tech.name == "Map Making" then
-      return {
-        path = "Art/Tech Chooser/Icons/MapMaking.png",
-      }
-    elseif tech.name == "Ceremonial Burial" then
-      return {
-        path = "Art/Tech Chooser/Icons/CeremonialBurial.png",
-      }
-    elseif tech.name == "Mysticism" then
-      return {
-        path = "Art/Tech Chooser/Icons/Mystisism.png",
-      }
-    elseif tech.name == "The Wheel" then
-      return {
-        path = "Art/Tech Chooser/Icons/TheWheel.png",
-      }
-    elseif tech.name == "Horseback Riding" then
-      return {
-        path = "Art/Tech Chooser/Icons/HorsebackRiding.png",
-      }
-    elseif tech.name == "Warrior Code" then
-      return {
-        path = "Art/Tech Chooser/Icons/WarriorCode.png",
-      }
-    elseif tech.name == "Masonry" then
-      return {
-        path = "Art/Tech Chooser/Icons/Masonry.png",
-      }
-    else
-      return {
-        path = "Art/Tech Chooser/Icons/placeholder.png",
-      }
-    end
+    --local key = 
+    local icon = tech_icon_replacement_map[tostring(tech.id)] or "placeholder.png"
+    return { path = "Art/Tech Chooser/Icons/" .. icon }
   end
-
+  
   function c7_textures.leader_heads:map_object_to_sprite(player_or_civ)
     return {
       path = "Art/Advisors/placeholder_leaderhead.png",
