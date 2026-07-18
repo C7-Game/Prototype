@@ -210,7 +210,6 @@ return function(civ3_textures)
   }
 
   function c7_textures.tech_icons.small:map_object_to_sprite(tech)
-    --local key = 
     local icon = tech_icon_replacement_map[tostring(tech.id)] or "placeholder.png"
     return { path = "Art/Tech Chooser/Icons/" .. icon }
   end
