@@ -47,6 +47,9 @@ public partial class GlobalSingleton : Node {
 		var (script, textureConfig) = GameMode.textures;
 		TextureLoader.SetConfig(script, textureConfig);
 
+		var (audioLua, audioConfig) = GameMode.audio;
+		AudioLoader.SetConfig(audioLua, audioConfig);
+
 		if (config.addonPaths.Contains("standalone")) {
 			C7Settings.SetValue("locations", "useStandaloneMode", "true");
 		} else {

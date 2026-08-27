@@ -292,7 +292,7 @@ public partial class Util {
 		}
 	}
 
-	static public AudioStreamWav LoadWAVFromDisk(string path) {
+	public static AudioStreamWav LoadWAVFromDisk(string path) {
 		FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
 
 		byte[] riffBytes = file.GetBuffer(4);
@@ -309,7 +309,7 @@ public partial class Util {
 		bool formatFound = false;
 		bool dataFound = false;
 
-		AudioStreamWav wav = new AudioStreamWav();
+		AudioStreamWav wav = new();
 
 		while (!file.EofReached()) {
 			byte[] chunkBytes = file.GetBuffer(4);
@@ -372,6 +372,24 @@ public partial class Util {
 
 		return wav;
 	}
+
+	public static AudioStreamMP3? LoadCiv3Mp3FromDisk(string path) {
+		try {
+			return LoadMp3FromDisk(Civ3MediaPath(path));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static AudioStreamMP3 LoadMp3FromDisk(string path) {
+		FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+		AudioStreamMP3 mp3 = new();
+		long fileSize = (long)file.GetLength();  //might blow up if it's > 2 GB, oh well
+		mp3.Data = file.GetBuffer(fileSize);
+		mp3.Loop = true; // TODO: beyond simple path loading: add looping as a property
+		return mp3;
+	}
+
 
 	// This method is intended for use within overrides of Godot object _ValidateProperty method.
 	// Its purpose is to prevent values of properties listed in validProperties from being saved as
