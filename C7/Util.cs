@@ -382,12 +382,23 @@ public partial class Util {
 	}
 
 	public static AudioStreamMP3 LoadMp3FromDisk(string path) {
-		FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
-		AudioStreamMP3 mp3 = new();
-		long fileSize = (long)file.GetLength();  //might blow up if it's > 2 GB, oh well
-		mp3.Data = file.GetBuffer(fileSize);
+		AudioStreamMP3 mp3 = AudioStreamMP3.LoadFromFile(path);
 		mp3.Loop = true; // TODO: beyond simple path loading: add looping as a property
 		return mp3;
+	}
+
+	public static AudioStreamOggVorbis? LoadCiv3OggFromDisk(string path) {
+		try {
+			return LoadOggFromDisk(Civ3MediaPath(path));
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public static AudioStreamOggVorbis LoadOggFromDisk(string path) {
+		AudioStreamOggVorbis ogg = AudioStreamOggVorbis.LoadFromFile(path);
+		ogg.Loop = true;
+		return ogg;
 	}
 
 
