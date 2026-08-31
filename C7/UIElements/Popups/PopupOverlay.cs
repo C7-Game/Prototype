@@ -8,12 +8,20 @@ public partial class PopupOverlay : HBoxContainer {
 
 	private ILogger log = LogManager.ForContext<PopupOverlay>();
 
-	[Signal] public delegate void QuitEventHandler();
-	[Signal] public delegate void RetireEventHandler();
-	[Signal] public delegate void BuildCityEventHandler(string name);
-	[Signal] public delegate void DiplomacySelectionEventHandler(ParameterWrapper<ID> opponentPlayer);
+	// Meta
 	[Signal] public delegate void HidePopupEventHandler();
 	[Signal] public delegate void ClickEventHandler();
+
+	// Game events
+	[Signal] public delegate void BuildCityEventHandler(string name);
+	[Signal] public delegate void DiplomacySelectionEventHandler(ParameterWrapper<ID> opponentPlayer);
+
+	// Menu events
+	[Signal] public delegate void SaveGameEventHandler();
+	[Signal] public delegate void LoadGameEventHandler();
+	[Signal] public delegate void RetireEventHandler();
+	[Signal] public delegate void QuitEventHandler();
+
 
 	Control currentChild = null;
 
@@ -76,6 +84,13 @@ public partial class PopupOverlay : HBoxContainer {
 		if (wav != null) {
 			PlaySound(wav);
 		}
+	}
+
+	public void ShowDialog(Control child) {
+		AddChild(child);
+		currentChild = child;
+		Isolate();
+		Show();
 	}
 
 	/// <summary>
@@ -142,7 +157,7 @@ public partial class PopupOverlay : HBoxContainer {
 		}
 
 		if (@event is InputEventMouseButton ev) {
-			// Catch right clicks over UI elements to stop awkward TileInfo renders 
+			// Catch right clicks over UI elements to stop awkward TileInfo renders
 			if (ev.ButtonIndex == MouseButton.Right) {
 				if (IsOverUI()) {
 					AcceptEvent();
