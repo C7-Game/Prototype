@@ -14,10 +14,6 @@ public static class AudioLoader {
 	private static Dictionary<string, AudioStream> configKeyCache = [];
 
 	static AudioLoader() {
-		// We need to register the "Type" type to be able to inspect
-		// the types of C# objects in the Lua code
-		UserData.RegisterType<Type>();
-
 		// Initialize when running in the editor
 		// In game it is done by GlobalSingleton, but it's not accessible in the editor
 		if (Engine.IsEditorHint()) {
