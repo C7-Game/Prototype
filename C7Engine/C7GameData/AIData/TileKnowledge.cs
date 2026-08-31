@@ -211,5 +211,17 @@ namespace C7GameData {
 				}
 			}
 		}
+
+		public List<Tile> OwnedTiles() {
+			return knownTiles.Where(t => t.OwningPlayer() == _player).ToList();
+		}
+
+		public List<Tile> DominationTiles() {
+			return OwnedTiles().Where(t => t.IsCountedForDomination()).ToList();
+		}
+
+		public List<Tile> ScoreTiles() {
+			return OwnedTiles().Where(t => t.IsCountedForScore()).ToList();
+		}
 	}
 }

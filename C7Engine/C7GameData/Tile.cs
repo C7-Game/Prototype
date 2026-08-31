@@ -248,6 +248,18 @@ namespace C7GameData {
 			return baseTerrainType.isCoast();
 		}
 
+		public bool IsSea() {
+			return baseTerrainType.isSea();
+		}
+
+		public bool IsCountedForDomination() {
+			return IsLand() || IsCoast();
+		}
+
+		public bool IsCountedForScore() {
+			return IsLand() || IsCoast() || IsSea();
+		}
+
 		public bool IsAllowCities() {
 			return overlayTerrainType.allowCities && !hasBarbarianCamp;
 		}

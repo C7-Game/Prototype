@@ -49,6 +49,9 @@ namespace C7GameData {
 		public ExperienceLevel defaultExperienceLevel;
 		public Rules rules;
 		public TimeOptions timeOptions;
+		public VictoryConditions victoryConditions;
+		public List<IVictory> victories = new();
+		public Dictionary<string, List<HistTurnRecord>> history;
 
 		public BarbarianInfo barbarianInfo = new BarbarianInfo();
 
@@ -110,6 +113,15 @@ namespace C7GameData {
 			}
 
 			return null;
+		}
+
+		public List<Player> GetRivals(Player player) {
+			return players.Where(p => !p.isBarbarians && p != player && !p.defeated).ToList();
+		}
+
+		public List<Player> GetKnownRivals(Player player) {
+			var rivals = GetRivals(player);
+			return rivals.Where(x => player.playerRelationships.ContainsKey(x.id)).ToList();
 		}
 
 		public MapUnit GetUnit(ID id) {
@@ -324,7 +336,7 @@ namespace C7GameData {
 		}
 
 		internal void SpawnUnit(Player player, UnitPrototype proto, Tile tile) {
-			// TODO: consolidate unit spawning routines (here) 
+			// TODO: consolidate unit spawning routines (here)
 
 			var defaultExpLevel = this.defaultExperienceLevel;
 			var barbExpLevel = this.experienceLevels.First(e => e.baseHitPoints == this.barbarianInfo.maxHitpoints);

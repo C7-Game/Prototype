@@ -8,13 +8,13 @@ using QueryCiv3.Biq;
 using C7GameData.Save;
 using System.Reflection;
 using static C7GameData.Tile.TileOverlays;
+using GAME = QueryCiv3.Sav.GAME;
 
 /*
   This will read a Civ3 sav into C7 native format for immediate use or saving to native JSON save
 */
 
 namespace C7GameData {
-
 	public class Civ3ExtraInfo {
 		public int BaseTerrainFileID;
 		public int BaseTerrainImageID;
@@ -99,11 +99,15 @@ namespace C7GameData {
 			save.TurnNumber = savData.Game.TurnNumber;
 			save.Seed = savData.Wrld.WorldSeed;
 
+			ImportSavVictoryConditions();
+
 			ImportSharedBiqData();
 			ImportSavLeaders();
 			ImportSavUnits();
 			ImportSavCities();
 			save.GameDifficulty = save.Difficulties[savData.Game.DifficultyID];
+
+			ImportSavHistory();
 
 			SetMapDimensions(savData, save);
 			SetWorldWrap(savData, save);
@@ -204,6 +208,44 @@ namespace C7GameData {
 			save.Players.Where(p => p.isBarbarian).ToList().ForEach(p => p.canBePicked = false);
 
 			return save;
+		}
+
+		private void ImportSavHistory() {
+			Dictionary<int, ID> civPlayerMap = BuildCivIdPlayerMap();
+
+			foreach (ID player in civPlayerMap.Values) {
+				save.History[player.ToString()] = new List<HistTurnRecord>();
+			}
+
+			foreach (var turn in savData.HistTurn) {
+				var civs = savData.TurnCiv[turn.TurnNumber];
+				var powers = savData.TurnPower[turn.TurnNumber];
+				var scores = savData.TurnScore[turn.TurnNumber];
+				var cultures = savData.TurnCulture[turn.TurnNumber];
+				var vps = savData.TurnVP[turn.TurnNumber];
+				foreach ((int civ, int idx) in civs.Select((civ, idx) => (civ, idx))) {
+					var player = civPlayerMap[civ];
+					save.History[player.ToString()].Add(new HistTurnRecord {
+						Date = turn.Date,
+						Power = powers[idx],
+						Score = scores[idx],
+						Culture = cultures[idx],
+						VP = vps == null ? 0 : vps[idx]
+					});
+				}
+			}
+		}
+
+		private Dictionary<int, ID> BuildCivIdPlayerMap() {
+			var civ3CivIdToPlayerId = new Dictionary<int, ID>();
+			var civs = savData.TurnCiv[0];
+			foreach (int civ in civs) {
+				var raceId = savData.Lead[civ].RaceID;
+				var race = savData.Bic.Race[raceId];
+				var player = save.Players.First(p => p.civilization == race.Name);
+				civ3CivIdToPlayerId[civ] = player.id;
+			}
+			return civ3CivIdToPlayerId;
 		}
 
 		/**
@@ -397,6 +439,27 @@ namespace C7GameData {
 			save.TimeOptions.timeScale[0, 7] = 50000;
 			save.TimeOptions.timeScale[1, 7] = 1;
 
+		}
+
+		private void ImportSavVictoryConditions() {
+			var game = savData.Game;
+
+			save.VictoryConditions = new VictoryConditions {
+				AllowDominationVictory = game.DominationVictory,
+				AllowSpaceRaceVictory = game.SpaceRaceVictory,
+				AllowDiplomaticVictory = game.DiplomaticVictory,
+				AllowConquestVictory = game.ConquestVictory,
+				AllowCulturalVictory = game.CulturalVictory,
+
+				AllowWonderVictory = game.WonderVictory,
+
+				CityElimination = game.CityElimination,
+				Regicide = game.Regicide,
+				MassRegicide = game.MassRegicide,
+				VictoryLocations = game.VictoryLocations,
+				CaptureTheFlag = game.CaptureTheFlag, // 'Capture the Unit', 'Capture the Princess'
+				ReverseCaptureTheFlag = game.ReverseCaptureTheFlag,
+			};
 		}
 
 		private void ImportCiv3Resources() {
@@ -616,6 +679,8 @@ namespace C7GameData {
 				player.governmentId = save.Governments[leader.Government].id;
 				player.inAnarchyUntilTurn = save.TurnNumber + leader.AnarchyTurnsLeft;
 				player.primaryColorIndex = leader.Color;
+
+				player.defeated = IsDefeated(player, leader);
 
 				save.Players.Add(player);
 				i++;
@@ -892,6 +957,14 @@ namespace C7GameData {
 					}
 				}
 			}
+		}
+
+		// TODO: Confirm IsDefeated logic
+		private static bool IsDefeated(SavePlayer player, QueryCiv3.Sav.LEAD leader) {
+			if (player.isBarbarian)
+				return false;
+
+			return leader.CapitalCity < 0 && leader.NumberOfUnits < 1;
 		}
 
 		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isHuman, string era, bool isIncludedInGame = true) {
