@@ -3,6 +3,7 @@ local ROOT = "Art/"
 local ADVISORS = "Art/Advisors/"
 
 local BUTTONS = "Art/buttonsFINAL.pcx"
+local CHECKBOXES = "Art/3checkboxes-USE.pcx"
 local EXIT_BOX = "Art/exitBox-backgroundStates.pcx"
 local INTERFACE = "Art/interface/"
 local X_O = "Art/X-o_ALLstates-sprite.pcx"
@@ -182,6 +183,23 @@ textures.ui = {
     pressed = {
       path = BUTTONS,
       crop_region = { 43, 1, 20, 20 },
+      shadows = false,
+    },
+  },
+  checkbox = {
+    inactive = {
+      path = CHECKBOXES,
+      crop_region = { 1, 1, 15, 15 },
+      shadows = false,
+    },
+    hover = {
+      path = CHECKBOXES,
+      crop_region = { 17, 1, 15, 15 },
+      shadows = false,
+    },
+    pressed = {
+      path = CHECKBOXES,
+      crop_region = { 33, 1, 15, 15 },
       shadows = false,
     },
   },

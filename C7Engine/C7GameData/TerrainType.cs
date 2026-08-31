@@ -53,6 +53,10 @@ namespace C7GameData {
 			return Key.Equals("coast");
 		}
 
+		public bool isSea() {
+			return Key.Equals("sea");
+		}
+
 		public override string ToString() {
 			return DisplayName + "(" + baseFoodProduction + ", " + baseShieldProduction + ", " + baseCommerceProduction + ")";
 		}

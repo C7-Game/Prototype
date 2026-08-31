@@ -675,12 +675,27 @@ namespace C7GameData {
 			return perPlayerCulture[owner];
 		}
 
+		public int GetCultureFor(Player player) {
+			return perPlayerCulture.GetValueOrDefault(player, 0);
+		}
+
 		public int GetCulturePerTurnRaw() {
 			int result = 0;
 			foreach (CityBuilding cb in GetBuildings()) {
-				result += cb.building.culturePerTurn;
+				var multiplier = AgeMultiplier(cb);
+				result += cb.building.culturePerTurn * multiplier;
 			}
 			return result;
+		}
+
+		private int AgeMultiplier(CityBuilding cb) {
+			int gameYear = EngineStorage.gameData.timeOptions.GetRawNumber(EngineStorage.gameData.turn);
+			int ageInMillennia = (int) Math.Floor((gameYear - cb.year) / 1000f);
+
+			if (ageInMillennia < 0) // Workaround hack , TODO: record build year correctly
+				ageInMillennia = 0;
+
+			return 1 << ageInMillennia;
 		}
 
 		[MoonSharpHidden]

@@ -113,8 +113,10 @@ local c7_texture_list = {
   "Art/Advisors/culture.png",
   "Art/Advisors/demographics.png",
   "Art/Advisors/wonders_background.png",
+  "Art/Advisors/domestic_plusminus.png",
   "Art/histograph-win5_final.png",
   "Art/histograph-top5_final.png",
+  "Art/3checkboxes-USE.png"
 }
 
 --- For ease of editing, we define the civ colors as hex codes, not 1x1 px images

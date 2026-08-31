@@ -617,6 +617,8 @@ namespace C7GameData {
 				player.inAnarchyUntilTurn = save.TurnNumber + leader.AnarchyTurnsLeft;
 				player.primaryColorIndex = leader.Color;
 
+				player.defeated = IsDefeated(player, leader);
+
 				save.Players.Add(player);
 				i++;
 			}
@@ -892,6 +894,14 @@ namespace C7GameData {
 					}
 				}
 			}
+		}
+
+		// TODO: Confirm IsDefeated logic
+		private static bool IsDefeated(SavePlayer player, QueryCiv3.Sav.LEAD leader) {
+			if (player.isBarbarian)
+				return false;
+
+			return leader.CapitalCity < 0 && leader.NumberOfUnits < 1;
 		}
 
 		private SavePlayer MakeSavePlayerFromCiv(Civilization civ, bool isHuman, string era, bool isIncludedInGame = true) {

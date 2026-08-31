@@ -33,11 +33,12 @@ namespace QueryCiv3.Biq {
             Dynamic length gap
             In BIQ files, if the NumberOfPlayableCivs is > 0,
             for each playable civ, there is a 1 int long ID for that civ.
-            If the NumberOfPlayableCivs is 0 this section has been observed to have 0 length. 
+            If the NumberOfPlayableCivs is 0 this section has been observed to have 0 length.
             Data is instead stored in 2d array GameCiv
         */
 
 		private fixed byte Flags[4];
+
 		public bool DominationVictory { get => Util.GetFlag(Flags[0], 0); }
 		public bool SpaceRaceVictory { get => Util.GetFlag(Flags[0], 1); }
 		public bool DiplomaticVictory { get => Util.GetFlag(Flags[0], 2); }
@@ -65,6 +66,7 @@ namespace QueryCiv3.Biq {
 		public int AutoPlaceVictoryLocations;
 		public int DebugMode;
 		public int UseTimeLimit;
+
 		public int BaseTimeUnit; // 0: Years, 1: Months, 2: Weeks
 		public int StartMonth;
 		public int StartWeek;
@@ -81,7 +83,7 @@ namespace QueryCiv3.Biq {
             Dynamic length gap
             In BIQ files, if the NumberOfPlayableCivs is > 0,
             for each playable civ, there is a single int for alliance status.
-            If the NumberOfPlayableCivs is 0 this section has been observed to have 0 length. 
+            If the NumberOfPlayableCivs is 0 this section has been observed to have 0 length.
             Data is instead stored in 2d array GameAlliance
         */
 
