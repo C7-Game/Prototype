@@ -535,7 +535,7 @@ public partial class Game : Node {
 		popupOverlay.OnHidePopup(); // hide game menu
 
 		// FileDialog is a Window, not a Control, so we have the popup overlay present a blank control
-		popupOverlay.ShowDialog(new Control());
+		popupOverlay.ShowBlank();
 
 		// TODO: this should go to our own saves directory.
 		FileDialog.SetDirectoryForSaving(@"Conquests/Saves");
@@ -548,8 +548,9 @@ public partial class Game : Node {
 		popupOverlay.OnHidePopup(); // hide game menu
 
 		// FileDialog is a Window, not a Control, so we have the popup overlay present a blank control
-		popupOverlay.ShowDialog(new Control());
+		popupOverlay.ShowBlank();
 
+		// TODO: this should go to our own saves directory.
 		FileDialog.SetDirectoryForLoading(@"Conquests/Saves");
 
 		// TODO: sound -- see MainMenu.PlayButtonPressedSound();

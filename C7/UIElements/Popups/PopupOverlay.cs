@@ -65,9 +65,6 @@ public partial class PopupOverlay : HBoxContainer {
 		OffsetLeft = child.margins.left;
 		OffsetRight = child.margins.right;
 
-		AddChild(child);
-		currentChild = child;
-
 		var soundFile = category switch {
 			PopupCategory.Advisor => "Sounds/PopupAdvisor.wav",
 			PopupCategory.Console => "Sounds/PopupConsole.wav",
@@ -77,16 +74,18 @@ public partial class PopupOverlay : HBoxContainer {
 
 		var wav = soundFile == null ? null : Util.LoadCiv3WAVFromDisk(soundFile);
 
-		Isolate();
-
-		Show();
+		ShowChild(child);
 
 		if (wav != null) {
 			PlaySound(wav);
 		}
 	}
 
-	public void ShowDialog(Control child) {
+	public void ShowBlank() {
+		ShowChild(new Control());
+	}
+
+	private void ShowChild(Control child) {
 		AddChild(child);
 		currentChild = child;
 		Isolate();
