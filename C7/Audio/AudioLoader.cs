@@ -84,6 +84,7 @@ public static class AudioLoader {
 			".wav" => Util.LoadCiv3WAVFromDisk(path),
 			".mp3" => Util.LoadCiv3Mp3FromDisk(path),
 			".ogg" => Util.LoadCiv3OggFromDisk(path),
+			".oga" => Util.LoadCiv3OggFromDisk(path),
 			_ => throw new FormatException($"Unknown audio format: {path}"),
 		};
 	}
