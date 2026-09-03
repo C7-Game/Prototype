@@ -46,9 +46,9 @@ public partial class PopupOverlay : HBoxContainer {
 
 	public bool ShowingPopup => currentChild is not null;
 
-	public void PlaySound(AudioStreamWav wav) {
+	public void PlaySound(AudioStream stream) {
 		AudioStreamPlayer player = GetNode<AudioStreamPlayer>("PopupSound");
-		player.Stream = wav;
+		player.Stream = stream;
 		player.Play();
 	}
 
@@ -66,13 +66,13 @@ public partial class PopupOverlay : HBoxContainer {
 		OffsetRight = child.margins.right;
 
 		var soundFile = category switch {
-			PopupCategory.Advisor => "Sounds/PopupAdvisor.wav",
-			PopupCategory.Console => "Sounds/PopupConsole.wav",
-			PopupCategory.Info => "Sounds/PopupInfo.wav",
+			PopupCategory.Advisor => "popups.advisor",
+			PopupCategory.Console => "popups.console",
+			PopupCategory.Info => "popups.info",
 			_ => null
 		};
 
-		var wav = soundFile == null ? null : Util.LoadCiv3WAVFromDisk(soundFile);
+		var wav = soundFile == null ? null : AudioLoader.Load(soundFile);
 
 		ShowChild(child);
 
