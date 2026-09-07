@@ -1130,6 +1130,41 @@ namespace C7GameData {
 
 			return producible.ShieldCost(civilization.traits, costFactor);
 		}
+
+		public void UpdateHistory(GameData gameData) {
+			if (!gameData.history.ContainsKey(id.ToString()))
+				return;
+
+			int n = gameData.history[id.ToString()].Count;
+			HistTurnRecord lastTurn = gameData.history[id.ToString()].LastOrDefault();
+
+			// TODO: Make formulas moddable
+
+			// "Power is an amalgam of cities, gold, culture, advances, resources, military strength,
+			// nuclear weapons, and wonder."
+			// Exact formula is unknown, so we repeat the previous value.
+			// TODO: Figure out power formula
+			int power = (lastTurn?.Power ?? 100);
+
+			// Score is the _average_ of "turn scores".
+			// Here we calculate the cumulative moving average: S[n+1] = S[n] + (x[n+1] - S[N])/(n+1)
+			int lastScore = (lastTurn?.Score ?? 0);
+			// TODO: Victory scoring
+			// float turnScore = ScoreVictory.ComputeTurnScore(this, gameData);
+			// int score = (int) Math.Floor(lastScore + (turnScore - lastScore) / (1f * (n+1)));
+			int score = lastScore;
+
+			// Culture is "the sum of the cultural value of all your cities"
+			int totalCulture = cities.Sum(c => c.GetCulture());
+
+			gameData.history[id.ToString()].Add(new HistTurnRecord {
+				Date = gameData.timeOptions.GetRawNumber(gameData.turn),
+				Power = power,
+				Score = score,
+				Culture = totalCulture,
+				VP = 0 // TODO: victory points
+			});
+		}
 	}
 
 }

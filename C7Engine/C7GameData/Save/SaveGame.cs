@@ -80,6 +80,7 @@ namespace C7GameData.Save {
 				GameDifficulty = data.gameDifficulty,
 				Rules = data.rules,
 				TimeOptions = data.timeOptions,
+				History = data.history,
 				TerrainImprovements = data.terrainImprovements.ConvertAll(ti => ti.ToSaveTerrainImprovement()),
 				GameModeConfig = data.gameModeConfig,
 			};
@@ -138,6 +139,8 @@ namespace C7GameData.Save {
 			ConvertAlliances(data);
 			ConvertAllianceWars(data);
 
+			BeginHistory(data);
+
 			data.defaultExperienceLevelKey = DefaultExperienceLevel;
 			data.defaultExperienceLevel = data.experienceLevels.Find(el => el.key == DefaultExperienceLevel);
 
@@ -147,6 +150,15 @@ namespace C7GameData.Save {
 			data.onGameCreation += OnGameCreation;
 
 			return data;
+		}
+
+		private void BeginHistory(GameData data) {
+			foreach (var player in data.players) {
+				if (!player.isBarbarians) {
+					if (!data.history.ContainsKey(player.id.ToString()))
+						data.history[player.id.ToString()] = new List<HistTurnRecord>();
+				}
+			}
 		}
 
 		private void OnGameCreation() {
@@ -193,6 +205,7 @@ namespace C7GameData.Save {
 				experienceLevels = ExperienceLevels,
 				rules = Rules,
 				timeOptions = TimeOptions,
+				history = History,
 				GreatWondersBuilt = GreatWondersBuilt,
 			};
 
@@ -449,6 +462,7 @@ namespace C7GameData.Save {
 		public List<SaveTerraform> TerraForms = new();
 		public List<Government> Governments = new();
 		public List<WorldSize> WorldSizes = new();
+		public Dictionary<string, List<HistTurnRecord>> History = new();
 
 		// The relative directory that can be used to find scenario-specific
 		// assets.
