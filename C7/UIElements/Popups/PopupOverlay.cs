@@ -104,7 +104,7 @@ public partial class PopupOverlay : HBoxContainer {
 		control.ProcessMode = ProcessModeEnum.Disabled;
 
 		// 3. Ignore all mouse input on UI elements
-		SetMouseFilter(control, MouseFilterEnum.Ignore);
+		control.SetMouseFilterRecursive(MouseFilterEnum.Ignore);
 	}
 
 	/// <summary>
@@ -112,24 +112,11 @@ public partial class PopupOverlay : HBoxContainer {
 	/// Inverse of `Isolate(..)`.
 	/// </summary>
 	private void Reconnect() {
-		// 1. Let events propagate past the overlay
-		control.MouseFilter = MouseFilterEnum.Pass;
+		// 1. Let UI elements catch mouse inputs again, propagating events past the overlay
+		control.SetMouseFilterRecursive(MouseFilterEnum.Pass);
 
-		// 2. Let UI elements catch mouse inputs again
-		SetMouseFilter(control, MouseFilterEnum.Pass);
-
-		// 3. Restart the world: let UI elements run normal
+		// 2. Restart the world: let UI elements run normal
 		control.ProcessMode = ProcessModeEnum.Inherit;
-	}
-
-	/// Recursively set MouseFilter on node children and their children, etc.
-	private static void SetMouseFilter(Node n, MouseFilterEnum filter) {
-		foreach (var child in n?.GetChildren() ?? []) {
-			SetMouseFilter(child, filter);
-		}
-		if (n is Control control) {
-			control.MouseFilter = filter;
-		}
 	}
 
 	public override void _GuiInput(InputEvent @event) {
